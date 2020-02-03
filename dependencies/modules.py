@@ -2,7 +2,7 @@
 import logging
 from os import path
 
-from erdpy import config, downloader, environment, utils
+from erdpy import config, downloader, environment, errors, utils
 
 logger = logging.getLogger("modules")
 
@@ -30,22 +30,52 @@ class StandaloneModule(DependencyModule):
         self.urls_by_platform = urls_by_platform
 
     def install(self, overwrite):
-        logger.debug(f"StandaloneModule.install: name={self.name}, tag={self.tag}")
+        logger.debug(f"install: name={self.name}, tag={self.tag}")
 
-        tools_folder = environment.get_tools_folder()
-        destination_folder = path.join(tools_folder, self.name, self.tag)
-
-        if path.isdir(destination_folder) and not overwrite:
+        if self._should_skip(overwrite):
             logger.debug("Already exists. Skip install.")
             return
 
+        self._download()
+        self._extract()
+
+    def _should_skip(self, overwrite):
+        if overwrite:
+            return False
+
+        destination_folder = self._get_destination_folder()
+        exists = path.isdir(destination_folder)
+        return exists
+
+    def _download(self):
+        url = self._get_download_url()
+        archive_path = self._get_archive_path()
+        downloader.download(url, archive_path)
+
+    def _extract(self):
+        archive_path = self._get_archive_path()
+        destination_folder = self._get_destination_folder()
+        utils.untar(archive_path, destination_folder)
+
+    def _get_destination_folder(self):
+        tools_folder = environment.get_tools_folder()
+        destination_folder = path.join(tools_folder, self.name, self.tag)
+        return destination_folder
+
+    def _get_download_url(self):
         platform = environment.get_platform()
         url = self.urls_by_platform.get(platform)
-        url = f"{config.DOWNLOAD_MIRROR}/{url}"
-        archive = path.join(tools_folder, f"{self.name}.{self.tag}.tar.gz")
-        downloader.download(url, archive)
 
-        utils.untar(archive, destination_folder)
+        if url is None:
+            raise errors.PlatformNotSupported(self.name, platform)
+
+        url = f"{config.DOWNLOAD_MIRROR}/{url}"
+        return url
+
+    def _get_archive_path(self):
+        tools_folder = environment.get_tools_folder()
+        archive = path.join(tools_folder, f"{self.name}.{self.tag}.tar.gz")
+        return archive
 
 
 class Rust(DependencyModule):
