@@ -15,3 +15,8 @@ class DownloadError(KnownError):
 class BadUrlError(DownloadError):
     def __init__(self):
         pass
+
+
+class BadDirectory(KnownError):
+    def __init__(self, directory):
+        super().__init__(f"Bad directory: {directory}")
