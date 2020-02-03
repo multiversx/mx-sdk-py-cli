@@ -8,12 +8,12 @@ from erdpy.dependencies.config import get_all_modules
 logger = logging.getLogger("install")
 
 
-def install_group(group_name):
+def install_group(group_name, overwrite=False):
     logger.info(f"install_group.group_name: {group_name}")
 
     modules = get_modules_by_group(group_name)
     for module in modules:
-        module.install()
+        module.install(overwrite)
 
 
 def get_modules_by_group(group):

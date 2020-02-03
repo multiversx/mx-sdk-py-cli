@@ -14,11 +14,11 @@ class DependencyModule:
         self.tag = tag
         self.groups = groups
 
-    def install(self):
-        logger.info("install: %s / %s", self.name, self.tag)
+    def install(self, overwrite):
+        pass
 
     def uninstall(self):
-        logger.info("uninstall: %s / %s", self.name, self.tag)
+        pass
 
     def is_installed(self):
         pass
@@ -29,17 +29,23 @@ class StandaloneModule(DependencyModule):
         super().__init__(key, name, tag, groups)
         self.urls_by_platform = urls_by_platform
 
-    def install(self):
-        super().install()
+    def install(self, overwrite):
+        logger.debug(f"StandaloneModule.install: name={self.name}, tag={self.tag}")
+
+        tools_folder = environment.get_tools_folder()
+        destination_folder = path.join(tools_folder, self.name, self.tag)
+
+        if path.isdir(destination_folder) and not overwrite:
+            logger.debug("Already exists. Skip install.")
+            return
 
         platform = environment.get_platform()
         url = self.urls_by_platform.get(platform)
         url = f"{config.DOWNLOAD_MIRROR}/{url}"
-        tools_folder = environment.get_tools_folder()
         archive = path.join(tools_folder, f"{self.name}.{self.tag}.tar.gz")
         downloader.download(url, archive)
-        llvm_folder = path.join(tools_folder, self.name, self.tag)
-        utils.untar(archive, llvm_folder)
+
+        utils.untar(archive, destination_folder)
 
 
 class Rust(DependencyModule):

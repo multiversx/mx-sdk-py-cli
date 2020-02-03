@@ -46,7 +46,7 @@ def install(args):
     group = args.group
 
     try:
-        dependencies.install_group(group)
+        dependencies.install_group(group, overwrite=True)
     except errors.KnownError as err:
         logger.fatal(err)
 
