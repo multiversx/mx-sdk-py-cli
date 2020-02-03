@@ -3,7 +3,7 @@ import logging
 import os
 from os import path
 
-from erdpy import config, environment, errors, utils
+from erdpy import config, dependencies, environment, errors, utils
 
 logger = logging.getLogger("builder")
 
@@ -55,17 +55,24 @@ class ProjectSource:
         pass
 
     def build(self):
-        dependencies = self.get_dependencies()
+        self._ensure_dependencies_installed()
 
-        # for depe
-        # pass
+    def _ensure_dependencies_installed(self):
+        module_keys = self.get_dependencies()
+        for module_key in module_keys:
+            dependencies.install_module(module_key)
 
-    def get_dependencies():
+    def get_dependencies(self):
         return []
 
 
 class CProjectSource(ProjectSource):
-    pass
+    def build(self):
+        super().build()
+        print("Build using LLVM.")
+
+    def get_dependencies(self):
+        return ["llvm-for-c"]
 
 
 class SolProjectSource(ProjectSource):

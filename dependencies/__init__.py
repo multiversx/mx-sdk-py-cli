@@ -1,1 +1,1 @@
-from erdpy.dependencies.install import install_group
+from erdpy.dependencies.install import install_group, install_module
