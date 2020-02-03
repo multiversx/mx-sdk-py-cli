@@ -2,7 +2,7 @@ import logging
 import pprint
 from argparse import ArgumentParser
 
-from erdpy import dependencies, projects, errors
+from erdpy import builder, dependencies, projects, errors
 
 logger = logging.getLogger("cli")
 
@@ -24,8 +24,8 @@ def setup_parser():
     subparsers = parser.add_subparsers()
 
     install_parser = subparsers.add_parser("install")
-    choices = ["C", "soll", "rust", "nodedebug"]
-    install_parser.add_argument("module", choices=choices)
+    choices = ["C_BUILDCHAIN", "SOL_BUILDCHAIN", "RUST_BUILDCHAIN", "NODE_DEBUG"]
+    install_parser.add_argument("group", choices=choices)
     install_parser.set_defaults(func=install)
 
     create_parser = subparsers.add_parser("new")
@@ -43,10 +43,10 @@ def setup_parser():
 
 
 def install(args):
-    module = args.module
+    group = args.group
 
     try:
-        dependencies.install(module)
+        dependencies.install_group(group)
     except errors.KnownError as err:
         logger.fatal(err)
 
@@ -63,8 +63,10 @@ def create(args):
 
 
 def build(args):
-    logger.info("build")
-    pprint.pprint(args)
+    project = args.project
+    debug = args.debug
+
+    builder.build_project(project, debug)
 
 
 if __name__ == "__main__":
