@@ -153,12 +153,11 @@ class CCodebase(Codebase):
 
     def _get_undefined_file(self):
         file_parent = Path(__file__).parent
-        print(Path(__file__).parent.joinpath("builder_api_debug.txt"))
 
         if self.debug:
-            return file_parent.joinpath("builder_api_debug.txt")
+            return file_parent.joinpath("api_debug.txt")
         else:
-            return file_parent.joinpath("builder_api.txt")
+            return file_parent.joinpath("api.txt")
 
     def _get_exports(self):
         file_export = self._get_single_unit(".export")

@@ -2,7 +2,7 @@ import logging
 import pprint
 from argparse import ArgumentParser
 
-from erdpy import builder, dependencies, projects, errors
+from erdpy import building, dependencies, projects, errors
 
 logger = logging.getLogger("cli")
 
@@ -68,7 +68,7 @@ def build(args):
     debug = args.debug
 
     try:
-        builder.build_project(project, debug)
+        building.build_project(project, debug)
     except errors.KnownError as err:
         logger.fatal(err)
 
