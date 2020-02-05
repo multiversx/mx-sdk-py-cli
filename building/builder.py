@@ -179,4 +179,11 @@ class SolCodebase(Codebase):
         return ["soll", "llvm-for-soll"]
 
 class RustCodebase(Codebase):
-    pass
+    def perform_build(self):
+        try:
+            pass
+        except subprocess.CalledProcessError as err:
+            raise errors.BuildError(err.output)
+
+    def get_dependencies(self):
+        return ["rust"]
