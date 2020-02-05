@@ -1,5 +1,7 @@
 
 import logging
+import os
+import subprocess
 from os import path
 
 from erdpy import config, downloader, environment, errors, utils
@@ -15,13 +17,13 @@ class DependencyModule:
         self.groups = groups
 
     def install(self, overwrite):
-        pass
+        raise NotImplementedError()
 
     def uninstall(self):
-        pass
+        raise NotImplementedError()
 
     def is_installed(self):
-        pass
+        raise NotImplementedError()
 
 
 class StandaloneModule(DependencyModule):
@@ -59,8 +61,8 @@ class StandaloneModule(DependencyModule):
 
     def get_directory(self):
         tools_folder = environment.get_tools_folder()
-        destination_folder = path.join(tools_folder, self.name, self.tag)
-        return destination_folder
+        folder = path.join(tools_folder, self.name, self.tag)
+        return folder
 
     def _get_download_url(self):
         platform = environment.get_platform()
@@ -81,3 +83,43 @@ class StandaloneModule(DependencyModule):
 class Rust(DependencyModule):
     def __init__(self, key, name, tag, groups):
         super().__init__(key, name, tag, groups)
+
+    def install(self, overwrite):
+        logger.debug(f"install: name={self.name}, tag={self.tag}")
+
+        if self._should_skip(overwrite):
+            logger.debug("Already exists. Skip install.")
+            return
+
+        rustup_path = self._get_rustup_path()
+        downloader.download("https://sh.rustup.rs", rustup_path)
+        utils.mark_executable(rustup_path)
+
+        args = [rustup_path, "--verbose", "--default-toolchain", "nightly", "--profile",
+                "minimal", "--target", "wasm32-unknown-unknown", "--no-modify-path", "-y"]
+        utils.run_process(args, env=self._get_env())
+
+    def _should_skip(self, overwrite):
+        if overwrite:
+            return False
+
+        try:
+            utils.run_process(["rustc", "--version"], env=self._get_env())
+            return True
+        except FileNotFoundError:
+            return False
+
+    def _get_rustup_path(self):
+        tools_folder = environment.get_tools_folder()
+        return path.join(tools_folder, "rustup.sh")
+
+    def get_directory(self):
+        tools_folder = environment.get_tools_folder()
+        return path.join(tools_folder, "vendor-rust")
+
+    def _get_env(self):
+        return {
+            "PATH": f"{path.join(self.get_directory(), 'bin')}:{os.environ['PATH']}",
+            "RUSTUP_HOME": self.get_directory(),
+            "CARGO_HOME": self.get_directory()
+        }

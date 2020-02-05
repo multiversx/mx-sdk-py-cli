@@ -34,14 +34,15 @@ def ensure_folder(folder):
     pathlib.Path(folder).mkdir(parents=True, exist_ok=True)
 
 
-def run_process(args):
+def run_process(args, env=None):
     logger.info(f"run_process: {args}")
 
-    output = subprocess.check_output(args, shell=False, universal_newlines=True, stderr=subprocess.STDOUT)
+    output = subprocess.check_output(
+        args, shell=False, universal_newlines=True, stderr=subprocess.STDOUT, env=env)
     logger.info("Successful run. Output:")
     print(output or "[No output]")
     return output
-    
+
 
 def read_lines(file):
     with open(file) as f:
@@ -53,3 +54,8 @@ def read_lines(file):
 
 def get_subfolders(folder):
     return [item.name for item in os.scandir(folder) if item.is_dir() and not item.name.startswith(".")]
+
+
+def mark_executable(file):
+    st = os.stat(file)
+    os.chmod(file, st.st_mode | stat.S_IEXEC)
