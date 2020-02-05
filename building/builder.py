@@ -180,6 +180,8 @@ class SolCodebase(Codebase):
 
 class RustCodebase(Codebase):
     def perform_build(self):
+        # TODO: if debug mode, one task. if not debug, the other.
+
         try:
             pass
         except subprocess.CalledProcessError as err:

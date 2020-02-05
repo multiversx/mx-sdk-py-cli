@@ -24,6 +24,9 @@ def create_project(name, template, directory):
     _download_repositories()
     _copy_template(template, destination_path)
 
+    # TODO: if RUST, add tasks.json, launch.json
+    # TODO: replace all placeholders
+
     logger.info("Project created.")
 
 
