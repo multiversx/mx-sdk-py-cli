@@ -1,5 +1,7 @@
 import logging
+import os
 import pathlib
+import stat
 import subprocess
 import tarfile
 import zipfile
@@ -49,4 +51,5 @@ def read_lines(file):
     return lines
 
 
-    
+def get_subfolders(folder):
+    return [item.name for item in os.scandir(folder) if item.is_dir() and not item.name.startswith(".")]

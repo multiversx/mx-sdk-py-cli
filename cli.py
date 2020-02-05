@@ -2,7 +2,7 @@ import logging
 import pprint
 from argparse import ArgumentParser
 
-from erdpy import building, dependencies, projects, errors
+from erdpy import building, dependencies, errors, templates
 
 logger = logging.getLogger("cli")
 
@@ -35,6 +35,9 @@ def setup_parser():
     create_parser.add_argument("--directory", type=str)
     create_parser.set_defaults(func=create)
 
+    templates_parser = subparsers.add_parser("templates")
+    templates_parser.set_defaults(func=list_templates)
+
     build_parser = subparsers.add_parser("build")
     build_parser.add_argument("project")
     build_parser.add_argument("--debug", action="store_true")
@@ -52,13 +55,20 @@ def install(args):
         logger.fatal(err)
 
 
+def list_templates(args):
+    try:
+        templates.list_templates()
+    except errors.KnownError as err:
+        logger.fatal(err)
+
+
 def create(args):
     name = args.name
     template = args.template
     directory = args.directory
 
     try:
-        projects.create_project(name, template, directory)
+        templates.create_project(name, template, directory)
     except errors.KnownError as err:
         logger.fatal(err)
 
