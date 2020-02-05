@@ -21,10 +21,20 @@ def create_project(name, template, directory):
 
     destination_path = path.join(directory, name)
 
-    for repo in get_all_repositories():
-        repo.download()
-        if repo.has_template(template):
-            repo.copy_template(template, destination_path)
+    _download_repositories()
+    _copy_template(template, destination_path)
 
     logger.info("Project created.")
 
+
+def _download_repositories():
+    for repo in get_all_repositories():
+        repo.download()
+
+def _copy_template(template, destination_path):
+    for repo in get_all_repositories():
+        if repo.has_template(template):
+            repo.copy_template(template, destination_path)
+            return
+
+    raise errors.TemplateMissingError(template)
