@@ -43,7 +43,7 @@ class StandaloneModule(DependencyModule):
         if overwrite:
             return False
 
-        destination_folder = self._get_destination_folder()
+        destination_folder = self.get_directory()
         exists = path.isdir(destination_folder)
         return exists
 
@@ -54,10 +54,10 @@ class StandaloneModule(DependencyModule):
 
     def _extract(self):
         archive_path = self._get_archive_path()
-        destination_folder = self._get_destination_folder()
+        destination_folder = self.get_directory()
         utils.untar(archive_path, destination_folder)
 
-    def _get_destination_folder(self):
+    def get_directory(self):
         tools_folder = environment.get_tools_folder()
         destination_folder = path.join(tools_folder, self.name, self.tag)
         return destination_folder

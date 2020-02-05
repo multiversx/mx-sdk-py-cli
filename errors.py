@@ -24,4 +24,10 @@ class BadDirectory(KnownError):
 
 class PlatformNotSupported(KnownError):
     def __init__(self, action_or_item, platform):
-        super().__init__(f"[{action_or_item}] is not supported on platform [{platform}].")
+        super().__init__(
+            f"[{action_or_item}] is not supported on platform [{platform}].")
+
+
+class BuildError(KnownError):
+    def __init__(self, message):
+        super().__init__(f"Build error:\n {message}.")

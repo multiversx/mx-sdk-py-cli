@@ -21,6 +21,12 @@ def install_module(key, overwrite=False):
     module.install(overwrite)
 
 
+def get_install_directory(key):
+    module = _get_module_by_key(key)
+    directory = module.get_directory()
+    return directory
+
+
 def _get_modules_by_group(group):
     return [module for module in get_all_modules() if group in module.groups]
 

@@ -24,7 +24,8 @@ def setup_parser():
     subparsers = parser.add_subparsers()
 
     install_parser = subparsers.add_parser("install")
-    choices = ["C_BUILDCHAIN", "SOL_BUILDCHAIN", "RUST_BUILDCHAIN", "NODE_DEBUG"]
+    choices = ["C_BUILDCHAIN", "SOL_BUILDCHAIN",
+               "RUST_BUILDCHAIN", "NODE_DEBUG"]
     install_parser.add_argument("group", choices=choices)
     install_parser.set_defaults(func=install)
 
@@ -66,7 +67,10 @@ def build(args):
     project = args.project
     debug = args.debug
 
-    builder.build_project(project, debug)
+    try:
+        builder.build_project(project, debug)
+    except errors.KnownError as err:
+        logger.fatal(err)
 
 
 if __name__ == "__main__":
