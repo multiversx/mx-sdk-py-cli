@@ -1,4 +1,5 @@
 
+import binascii
 import logging
 import os
 import subprocess
@@ -59,6 +60,12 @@ class Codebase:
     def build(self, debug):
         self.debug = debug
         self._ensure_dependencies_installed()
+        self.unit = self.get_main_unit()
+        self.file_wasm = self.unit.with_suffix(".wasm")
+        self.file_wasm_hex = self.unit.with_suffix(".hex")
+        self.file_wasm_hex_arwen = self.unit.with_suffix(".hex.arwen")
+        self.perform_build()
+        self._create_arwen_files()
 
     def _ensure_dependencies_installed(self):
         module_keys = self.get_dependencies()
@@ -66,7 +73,13 @@ class Codebase:
             dependencies.install_module(module_key)
 
     def get_dependencies(self):
-        return []
+        raise NotImplementedError()
+
+    def get_main_unit(self):
+        raise NotImplementedError()
+
+    def perform_build(self):
+        raise NotImplementedError()
 
     def _get_single_unit(self, suffix):
         all_files = os.listdir(self.directory)
@@ -81,15 +94,22 @@ class Codebase:
         file = path.join(self.directory, files[0])
         return Path(file).resolve()
 
+    def _create_arwen_files(self):
+        ARWEN_TAG = b"0500"
+
+        with open(self.file_wasm, "rb") as file:
+            bytecode_hex = binascii.hexlify(file.read())
+        with open(self.file_wasm_hex, "wb+") as file:
+            file.write(bytecode_hex)
+        with open(self.file_wasm_hex_arwen, "wb+") as file:
+            file.write(bytecode_hex)
+            file.write(ARWEN_TAG)
+
 
 class CCodebase(Codebase):
-    def build(self, debug):
-        super().build(debug)
-
-        self.unit = self._get_main_unit()
+    def perform_build(self):
         self.file_ll = self.unit.with_suffix(".ll")
         self.file_o = self.unit.with_suffix(".o")
-        self.file_wasm = self.unit.with_suffix(".wasm")
         self.file_export = self.unit.with_suffix(".export")
 
         try:
@@ -99,7 +119,7 @@ class CCodebase(Codebase):
         except subprocess.CalledProcessError as err:
             raise errors.BuildError(err.output)
 
-    def _get_main_unit(self):
+    def get_main_unit(self):
         return self._get_single_unit(".c")
 
     def _do_clang(self):
