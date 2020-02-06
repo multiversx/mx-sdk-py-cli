@@ -19,7 +19,7 @@ def run_process_piped_output(args, env=None):
     logger.info(f"run_process_realtime_output: {args}")
 
     process = subprocess.Popen(args, shell=False, universal_newlines=True, stdout=subprocess.PIPE,
-                               stderr=subprocess.PIPE)
+                               stderr=subprocess.PIPE, env=env)
 
     while True:
         line = process.stdout.readline()

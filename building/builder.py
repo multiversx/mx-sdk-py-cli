@@ -178,21 +178,21 @@ class SolCodebase(Codebase):
     def get_dependencies(self):
         return ["soll", "llvm-for-soll"]
 
+
 class RustCodebase(Codebase):
     def perform_build(self):
         try:
-            pass
+            self.run_cargo()
         except subprocess.CalledProcessError as err:
             raise errors.BuildError(err.output)
 
     def run_cargo(self):
         if self.debug:
-            pass
+            args = ["cargo", "build"]
         else:
-            args = []
-        myprocess.run_process(args)
-
-        # cargo build --bin wasm --target=wasm32-unknown-unknown --release
+            args = ["cargo", "build", "--manifest-path", self.get_cargo_file(),
+                    "--target=wasm32-unknown-unknown", "--release"]
+        myprocess.run_process_async(args, env=self._get_env())
 
     def get_main_unit(self):
         name = self.get_package_name()
@@ -203,6 +203,14 @@ class RustCodebase(Codebase):
         name = cargo["package"]["name"]
         return name
 
+    def get_bin_name(self):
+        cargo = self.read_cargo()
+        name = cargo["bin"]["name"]
+        return name
+
+    def get_wasm_path(self):
+        pass
+
     def read_cargo(self):
         return utils.read_toml_file(self.get_cargo_file())
 
@@ -211,3 +219,6 @@ class RustCodebase(Codebase):
 
     def get_dependencies(self):
         return ["rust"]
+
+    def _get_env(self):
+        return dependencies.get_module_by_key("rust").get_env()

@@ -97,14 +97,14 @@ class Rust(DependencyModule):
 
         args = [rustup_path, "--verbose", "--default-toolchain", "nightly", "--profile",
                 "minimal", "--target", "wasm32-unknown-unknown", "--no-modify-path", "-y"]
-        myprocess.run_process_async(args, env=self._get_env())
+        myprocess.run_process_async(args, env=self.get_env())
 
     def _should_skip(self, overwrite):
         if overwrite:
             return False
 
         try:
-            myprocess.run_process(["rustc", "--version"], env=self._get_env())
+            myprocess.run_process(["rustc", "--version"], env=self.get_env())
             return True
         except FileNotFoundError:
             return False
@@ -117,7 +117,7 @@ class Rust(DependencyModule):
         tools_folder = environment.get_tools_folder()
         return path.join(tools_folder, "vendor-rust")
 
-    def _get_env(self):
+    def get_env(self):
         return {
             "PATH": f"{path.join(self.get_directory(), 'bin')}:{os.environ['PATH']}",
             "RUSTUP_HOME": self.get_directory(),

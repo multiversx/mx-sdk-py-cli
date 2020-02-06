@@ -17,12 +17,12 @@ def install_group(group_name, overwrite=False):
 
 
 def install_module(key, overwrite=False):
-    module = _get_module_by_key(key)
+    module = get_module_by_key(key)
     module.install(overwrite)
 
 
 def get_install_directory(key):
-    module = _get_module_by_key(key)
+    module = get_module_by_key(key)
     directory = module.get_directory()
     return directory
 
@@ -31,5 +31,5 @@ def _get_modules_by_group(group):
     return [module for module in get_all_modules() if group in module.groups]
 
 
-def _get_module_by_key(key):
+def get_module_by_key(key):
     return [module for module in get_all_modules() if module.key == key][0]
