@@ -3,6 +3,7 @@ import os
 import pathlib
 import stat
 import tarfile
+import toml
 import zipfile
 
 logger = logging.getLogger("utils")
@@ -39,6 +40,15 @@ def read_lines(file):
     lines = [line.strip() for line in lines]
     lines = [line for line in lines if line]
     return lines
+
+
+def read_file(filename):
+    with open(filename) as f:
+        return f.read()
+
+
+def read_toml_file(filename):
+    return toml.load(filename)
 
 
 def get_subfolders(folder):

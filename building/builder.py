@@ -180,12 +180,34 @@ class SolCodebase(Codebase):
 
 class RustCodebase(Codebase):
     def perform_build(self):
-        # TODO: if debug mode, one task. if not debug, the other.
-
         try:
             pass
         except subprocess.CalledProcessError as err:
             raise errors.BuildError(err.output)
+
+    def run_cargo(self):
+        if self.debug:
+            pass
+        else:
+            args = []
+        myprocess.run_process(args)
+
+        # cargo build --bin wasm --target=wasm32-unknown-unknown --release
+
+    def get_main_unit(self):
+        name = self.get_package_name()
+        return Path(self.directory, f"{name}.rust").resolve()
+
+    def get_package_name(self):
+        cargo = self.read_cargo()
+        name = cargo["package"]["name"]
+        return name
+
+    def read_cargo(self):
+        return utils.read_toml_file(self.get_cargo_file())
+
+    def get_cargo_file(self):
+        return path.join(self.directory, "Cargo.toml")
 
     def get_dependencies(self):
         return ["rust"]
