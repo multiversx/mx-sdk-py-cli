@@ -6,7 +6,7 @@ import subprocess
 from os import path
 from pathlib import Path
 
-from erdpy import config, dependencies, environment, errors, utils
+from erdpy import config, dependencies, environment, errors, myprocess, utils
 
 logger = logging.getLogger("builder")
 
@@ -127,13 +127,13 @@ class CCodebase(Codebase):
         tool = path.join(self._get_llvm_path(), "clang-9")
         args = [tool, "-cc1", "-Ofast", "-emit-llvm",
                 "-triple=wasm32-unknown-unknown-wasm", str(self.unit)]
-        utils.run_process(args)
+        myprocess.run_process(args)
 
     def _do_llc(self):
         logger.info("CCodebase._do_llc")
         tool = path.join(self._get_llvm_path(), "llc")
         args = [tool, "-O3", "-filetype=obj", self.file_ll, "-o", self.file_o]
-        utils.run_process(args)
+        myprocess.run_process(args)
 
     def _do_wasm(self):
         logger.info("CCodebase._do_wasm")
@@ -146,7 +146,7 @@ class CCodebase(Codebase):
         for export in exports:
             args.append(f"-export={export}")
 
-        utils.run_process(args)
+        myprocess.run_process(args)
 
     def _get_llvm_path(self):
         return dependencies.get_install_directory("llvm-for-c")

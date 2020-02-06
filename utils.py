@@ -2,7 +2,6 @@ import logging
 import os
 import pathlib
 import stat
-import subprocess
 import tarfile
 import zipfile
 
@@ -32,16 +31,6 @@ def unzip(archive_path, destination_folder):
 
 def ensure_folder(folder):
     pathlib.Path(folder).mkdir(parents=True, exist_ok=True)
-
-
-def run_process(args, env=None):
-    logger.info(f"run_process: {args}")
-
-    output = subprocess.check_output(
-        args, shell=False, universal_newlines=True, stderr=subprocess.STDOUT, env=env)
-    logger.info("Successful run. Output:")
-    print(output or "[No output]")
-    return output
 
 
 def read_lines(file):

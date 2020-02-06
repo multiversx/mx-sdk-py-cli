@@ -4,7 +4,7 @@ import os
 import subprocess
 from os import path
 
-from erdpy import config, downloader, environment, errors, utils
+from erdpy import config, downloader, environment, errors, myprocess, utils
 
 logger = logging.getLogger("modules")
 
@@ -97,14 +97,14 @@ class Rust(DependencyModule):
 
         args = [rustup_path, "--verbose", "--default-toolchain", "nightly", "--profile",
                 "minimal", "--target", "wasm32-unknown-unknown", "--no-modify-path", "-y"]
-        utils.run_process(args, env=self._get_env())
+        myprocess.run_process_async(args, env=self._get_env())
 
     def _should_skip(self, overwrite):
         if overwrite:
             return False
 
         try:
-            utils.run_process(["rustc", "--version"], env=self._get_env())
+            myprocess.run_process(["rustc", "--version"], env=self._get_env())
             return True
         except FileNotFoundError:
             return False
