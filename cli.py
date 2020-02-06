@@ -3,7 +3,7 @@ import pprint
 import argparse
 from argparse import ArgumentParser
 
-from erdpy import building, dependencies, errors, templates
+from erdpy import building, dependencies, errors, templates, nodedebug
 
 logger = logging.getLogger("cli")
 

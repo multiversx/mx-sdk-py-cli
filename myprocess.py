@@ -52,3 +52,10 @@ async def _read_stream(stream):
             print(str(line, "utf-8").strip())
         else:
             break
+
+
+def run_process_nowait(args, env=None):
+    logger.info(f"run_process_nowait: {args}")
+
+    subprocess.Popen(args, shell=False, universal_newlines=True, stdout=subprocess.PIPE,
+                     stderr=subprocess.PIPE, env=env)
