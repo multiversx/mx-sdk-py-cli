@@ -1,5 +1,6 @@
 import logging
 import pprint
+import argparse
 from argparse import ArgumentParser
 
 from erdpy import building, dependencies, errors, templates
@@ -12,6 +13,9 @@ def main():
 
     parser = setup_parser()
     args = parser.parse_args()
+
+    # TODO: raise parser error if deploy --testnet no --pem etc.
+    # https://stackoverflow.com/a/19414853/1475331
 
     if not hasattr(args, "func"):
         parser.print_help()
@@ -42,6 +46,16 @@ def setup_parser():
     build_parser.add_argument("project")
     build_parser.add_argument("--debug", action="store_true")
     build_parser.set_defaults(func=build)
+
+    deploy_parser = subparsers.add_parser("deploy")
+    deploy_parser.add_argument("project")
+    group = deploy_parser.add_mutually_exclusive_group()
+    group.add_argument('--debug', action='store_true')
+    group.add_argument('--testnet', action='store_true')
+    deploy_parser.add_argument("--proxy")
+    deploy_parser.add_argument("--pem", type=argparse.FileType('r'))
+    deploy_parser.add_argument("--params", type=argparse.FileType('r'))
+    deploy_parser.set_defaults(func=deploy)
 
     return parser
 
@@ -79,6 +93,13 @@ def build(args):
 
     try:
         building.build_project(project, debug)
+    except errors.KnownError as err:
+        logger.fatal(err)
+
+
+def deploy(args):
+    try:
+        pass
     except errors.KnownError as err:
         logger.fatal(err)
 
