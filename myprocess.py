@@ -30,12 +30,12 @@ def run_process_piped_output(args, env=None):
 
 def run_process_async(args, env=None):
     loop = asyncio.get_event_loop()
-    result = loop.run_until_complete(_stream_subprocess(args, env))
+    result = loop.run_until_complete(async_subprocess(args, env))
     loop.close()
     return result
 
 
-async def _stream_subprocess(args, env=None):
+async def async_subprocess(args, env=None):
     process = await asyncio.create_subprocess_exec(*args, env=env, stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.PIPE)
 
     await asyncio.wait([

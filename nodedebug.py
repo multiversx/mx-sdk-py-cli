@@ -20,14 +20,23 @@ def start(force=False):
     if force:
         stop()
 
+    logger.info("Starting nodedebug...")
+    myprocess.run_process_async(_get_args())
+
+
+def _get_args():
     directory = dependencies.get_module_by_key("nodedebug").get_directory()
     executable = path.join(directory, "nodedebug")
     config_path = path.join(directory, "config", "config.toml")
     genesis_path = path.join(directory, "config", "genesis.json")
-    args = [executable, "--rest-api-port", "8080", "--config", config_path, "--genesis-file", genesis_path]
 
-    logger.info("Starting nodedebug...")
-    myprocess.run_process_async(args)
+    args = [executable, "--rest-api-port", "8080", "--config",
+            config_path, "--genesis-file", genesis_path]
+    return args
+
+
+async def start_async():
+    await myprocess.async_subprocess(_get_args())
 
 
 def _is_running():
