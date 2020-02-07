@@ -12,17 +12,22 @@ logger = logging.getLogger("nodedebug")
 
 
 def start(force=False):
-    # TODO: if already started and no force, noop.
     _install_if_missing()
-    directory = dependencies.get_module_by_key("nodedebug").get_directory()
-    args = [path.join(directory, "nodedebug")]
 
-    # let port: any = MySettings.getRestDebuggerPort();
-    # let configPath: any = path.join(toolPathFolder, "config", "config.toml");
-    # let genesisPath: any = path.join(toolPathFolder, "config", "genesis.json");
-    # args: ["--rest-api-port", port, "--config", configPath, "--genesis-file", genesisPath]
+    if _is_running() and not force:
+        return
+
+    if force:
+        stop()
+
+    directory = dependencies.get_module_by_key("nodedebug").get_directory()
+    executable = path.join(directory, "nodedebug")
+    config_path = path.join(directory, "config", "config.toml")
+    genesis_path = path.join(directory, "config", "genesis.json")
+    args = [executable, "--rest-api-port", "8080", "--config", config_path, "--genesis-file", genesis_path]
+
     logger.info("Starting nodedebug...")
-    myprocess.run_process_nowait(args)
+    myprocess.run_process_async(args)
 
 
 def _is_running():
@@ -51,6 +56,9 @@ def stop():
 
 
 def deploy():
+    start()
+
+
     # let response = await RequestsFacade.post({
     #     url: url,
     #     data: {

@@ -55,8 +55,8 @@ def setup_parser():
     deploy_parser.add_argument("--proxy")
     deploy_parser.add_argument("--pem", type=argparse.FileType('r'))
     deploy_parser.add_argument("--params", type=argparse.FileType('r'))
-    # TODO gasLimit, good default
-    # TODO gasPrice, good default
+    deploy_parser.add_argument("--gas-price", default=200000000000000)
+    deploy_parser.add_argument("--gas-limit", default=500000000)
     deploy_parser.set_defaults(func=deploy)
 
     node_parser = subparsers.add_parser("nodedebug")
@@ -129,11 +129,3 @@ def do_nodedebug(args):
 
 if __name__ == "__main__":
     main()
-
-    # TODO
-    # contract = SmartContract()
-    # gateway = NodeDebug() / Testnet("..."). Gateway interface.
-    # 
-    # tx_hash, contract_address = gateway.deploy(contract)
-    # contract.set_address(contract_address)
-    # contract.execute("increment", 1)

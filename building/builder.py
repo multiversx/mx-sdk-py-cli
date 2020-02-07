@@ -105,6 +105,10 @@ class Codebase:
             file.write(bytecode_hex)
             file.write(ARWEN_TAG)
 
+    def get_bytecode(self):
+        bytecode = utils.read_file(self.file_wasm_hex_arwen)
+        return bytecode
+
 
 class CCodebase(Codebase):
     def perform_build(self):
