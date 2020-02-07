@@ -20,7 +20,7 @@ class Gateway:
         raise NotImplementedError()
 
 
-class DebugGateway(Gateway):
+class DebugHost(Gateway):
     def __init__(self):
         super().__init__()
 
@@ -55,5 +55,5 @@ class DebugGateway(Gateway):
     def query_contract(self, contract, function):
         return nodedebug.query(contract.address, function, None)
 
-class TestnetGateway(Gateway):
+class TestnetHost(Gateway):
     pass
