@@ -59,6 +59,12 @@ def setup_parser():
     # TODO gasPrice, good default
     deploy_parser.set_defaults(func=deploy)
 
+    node_parser = subparsers.add_parser("nodedebug")
+    group = node_parser.add_mutually_exclusive_group()
+    group.add_argument('--stop', action='store_true')
+    group.add_argument('--restart', action='store_true')
+    node_parser.set_defaults(func=do_nodedebug)
+
     return parser
 
 
@@ -105,6 +111,21 @@ def deploy(args):
     except errors.KnownError as err:
         logger.fatal(err)
 
+
+def do_nodedebug(args):
+    stop = args.stop
+    restart = args.restart
+
+    try:
+        if restart:
+            nodedebug.stop()
+            nodedebug.start()
+        elif stop:
+            nodedebug.stop()
+        else:
+            nodedebug.start()
+    except errors.KnownError as err:
+        logger.fatal(err)
 
 if __name__ == "__main__":
     main()

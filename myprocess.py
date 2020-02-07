@@ -58,4 +58,4 @@ def run_process_nowait(args, env=None):
     logger.info(f"run_process_nowait: {args}")
 
     subprocess.Popen(args, shell=False, universal_newlines=True, stdout=subprocess.PIPE,
-                     stderr=subprocess.PIPE, env=env)
+                     stderr=subprocess.PIPE, env=env, start_new_session=True)
