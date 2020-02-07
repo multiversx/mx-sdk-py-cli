@@ -28,11 +28,11 @@ def _guard_is_directory(directory):
 
 def _create_codebase(directory):
     if _is_source_C(directory):
-        return CCodebase(directory)
+        return CodebaseC(directory)
     if _is_source_sol(directory):
-        return SolCodebase(directory)
+        return CodebaseSol(directory)
     if _is_source_rust(directory):
-        return RustCodebase(directory)
+        return CodebaseRust(directory)
 
 
 def _is_source_C(directory):
@@ -110,7 +110,7 @@ class Codebase:
         return bytecode
 
 
-class CCodebase(Codebase):
+class CodebaseC(Codebase):
     def perform_build(self):
         self.file_ll = self.unit.with_suffix(".ll")
         self.file_o = self.unit.with_suffix(".o")
@@ -127,20 +127,20 @@ class CCodebase(Codebase):
         return self._get_single_unit(".c")
 
     def _do_clang(self):
-        logger.info("CCodebase._do_clang")
+        logger.info("CodebaseC._do_clang")
         tool = path.join(self._get_llvm_path(), "clang-9")
         args = [tool, "-cc1", "-Ofast", "-emit-llvm",
                 "-triple=wasm32-unknown-unknown-wasm", str(self.unit)]
         myprocess.run_process(args)
 
     def _do_llc(self):
-        logger.info("CCodebase._do_llc")
+        logger.info("CodebaseC._do_llc")
         tool = path.join(self._get_llvm_path(), "llc")
         args = [tool, "-O3", "-filetype=obj", self.file_ll, "-o", self.file_o]
         myprocess.run_process(args)
 
     def _do_wasm(self):
-        logger.info("CCodebase._do_wasm")
+        logger.info("CodebaseC._do_wasm")
         tool = path.join(self._get_llvm_path(), "wasm-ld")
         undefined_file = self._get_undefined_file()
         args = [tool, "--verbose", "--no-entry", str(self.file_o), "-o", str(self.file_wasm),
@@ -172,7 +172,7 @@ class CCodebase(Codebase):
         return ["llvm-for-c"]
 
 
-class SolCodebase(Codebase):
+class CodebaseSol(Codebase):
     def perform_build(self):
         try:
             pass
@@ -183,7 +183,7 @@ class SolCodebase(Codebase):
         return ["soll", "llvm-for-soll"]
 
 
-class RustCodebase(Codebase):
+class CodebaseRust(Codebase):
     def perform_build(self):
         try:
             self.run_cargo()
