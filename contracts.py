@@ -1,3 +1,4 @@
 class SmartContract:
     def __init__(self, bytecode=None, address=None):
-        pass
+        self.bytecode = bytecode
+        self.address = address

@@ -95,7 +95,7 @@ class Codebase:
         return Path(file).resolve()
 
     def _create_arwen_files(self):
-        ARWEN_TAG = b"0500"
+        ARWEN_TAG = b"@0500"
 
         with open(self.file_wasm, "rb") as file:
             bytecode_hex = binascii.hexlify(file.read())

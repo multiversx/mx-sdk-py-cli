@@ -1,10 +1,13 @@
+import json
 import logging
 import os
 import pathlib
 import stat
 import tarfile
-import toml
+import urllib.request
 import zipfile
+
+import toml
 
 logger = logging.getLogger("utils")
 
@@ -58,3 +61,20 @@ def get_subfolders(folder):
 def mark_executable(file):
     st = os.stat(file)
     os.chmod(file, st.st_mode | stat.S_IEXEC)
+
+
+def post_json(url, data):
+    data_json = json.dumps(data).encode("utf8")
+    logger.info("data_json: %s", data_json)
+
+    request = urllib.request.Request(url, data=data_json, headers={
+                                     "content-type": "application/json"})
+
+    try:
+        response = urllib.request.urlopen(request)
+        response_json = response.read().decode("utf8")
+        response_data = json.loads(response_json)
+        return response_data
+    except urllib.request.HTTPError as err:
+        message = err.read()
+        print(message)

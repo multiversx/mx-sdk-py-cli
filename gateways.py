@@ -16,6 +16,9 @@ class Gateway:
     def deploy_contract(self, contract):
         raise NotImplementedError()
 
+    def execute_contract(self, contract):
+        raise NotImplementedError()
+
 
 class DebugGateway(Gateway):
     def __init__(self):
@@ -41,12 +44,16 @@ class DebugGateway(Gateway):
         await asyncio.sleep(1)
         nodedebug.stop()
 
-    def deploy_contract(self, contract):
-        tx_hash = None
-        contract_address = None
-
+    def deploy_contract(self, contract, sender):
+        tx_hash, contract_address = nodedebug.deploy(contract.bytecode, sender)
+        contract.address = contract_address
         return tx_hash, contract_address
 
+    def execute_contract(self, contract, sender, function):
+        nodedebug.execute(contract.address, sender, function)
+
+    def query_contract(self, contract, function):
+        return nodedebug.query(contract.address, function, None)
 
 class TestnetGateway(Gateway):
     pass

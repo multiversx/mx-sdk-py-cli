@@ -6,7 +6,7 @@ from os import path
 
 from psutil import process_iter
 
-from erdpy import dependencies, myprocess
+from erdpy import dependencies, myprocess, utils
 
 logger = logging.getLogger("nodedebug")
 
@@ -64,21 +64,46 @@ def stop():
         logger.info("Nodedebug wasn't started.")
 
 
-def deploy():
-    start()
+def deploy(bytecode, sender):
+    url = "http://localhost:8080/vm-values/deploy"
+    data = {
+        "OnTestnet": False,
+        # "PrivateKey": "",
+        # "TestnetNodeEndpoint": "",
+        "SndAddress": sender,
+        "Value": "0",
+        "GasLimit": 500000000,
+        "GasPrice": 200000000000000,
+        "TxData": bytecode
+    }
+
+    response = utils.post_json(url, data)
+    print(response)
+    tx_hash = None
+    contract_address = response["data"]["Address"]
+
+    return tx_hash, contract_address
 
 
-    # let response = await RequestsFacade.post({
-    #     url: url,
-    #     data: {
-    #         "OnTestnet": options.onTestnet,
-    #         "PrivateKey": options.privateKey,
-    #         "TestnetNodeEndpoint": MySettings.getTestnetUrl(),
-    #         "SndAddress": options.senderAddress,
-    #         "Value": options.value.toString(),
-    #         "GasLimit": options.gasLimit,
-    #         "GasPrice": options.gasPrice,
-    #         "TxData": options.transactionData
-    #     },
-    # });
-    pass
+def execute(address, sender, function):
+    url = "http://localhost:8080/vm-values/run"
+    data = {
+
+    }
+
+    response = utils.post_json(url, data)
+    print(response)
+
+
+def query(address, function, arguments):
+    url = "http://localhost:8080/vm-values/query"
+    data = {
+        "ScAddress": address,
+        "FuncName": function,
+        "Args": []
+    }
+
+    response = utils.post_json(url, data)
+    print(response)
+    return_data = response["data"]["ReturnData"]
+    return return_data
