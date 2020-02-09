@@ -39,10 +39,10 @@ class Project:
         files = [file for file in all_files if file.endswith(suffix)]
 
         if len(files) == 0:
-            raise errors.KnownError(f"No unit: [{suffix}].")
+            raise errors.KnownError(f"No file with suffix: [{suffix}].")
         if len(files) > 1:
             raise errors.KnownError(
-                f"More [{suffix}] units aren't supported yet.")
+                f"More files found with suffix: [{suffix}]")
 
         file = path.join(self.directory, files[0])
         return Path(file).resolve()
