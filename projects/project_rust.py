@@ -40,9 +40,8 @@ class ProjectRust(Project):
 
         myprocess.run_process_async(args, env=self._get_env())
 
-    def get_main_unit(self):
-        name = self.cargo_file.package_name
-        return Path(self.directory, f"{name}.rust").resolve()
+    def get_file_wasm(self):
+        return Path(self.directory, "target", "wasm32-unknown-unknown", "release", "wasm.wasm")
 
     def get_wasm_path(self):
         pass

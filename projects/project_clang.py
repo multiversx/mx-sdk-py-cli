@@ -16,6 +16,7 @@ class ProjectClang(Project):
 
     def perform_build(self):
         self.build_configuration = BuildConfiguration(self, self.debug)
+        self.unit = self.find_file(".c")
         self.file_ll = self.unit.with_suffix(".ll")
         self.file_o = self.unit.with_suffix(".o")
         self.file_export = self.unit.with_suffix(".export")
@@ -26,9 +27,6 @@ class ProjectClang(Project):
             self._do_wasm()
         except subprocess.CalledProcessError as err:
             raise errors.BuildError(err.output)
-
-    def get_main_unit(self):
-        return self.find_file(".c")
 
     def _do_clang(self):
         logger.info("_do_clang")
@@ -55,7 +53,7 @@ class ProjectClang(Project):
             "--verbose",
             "--no-entry",
             str(self.file_o),
-            "-o", str(self.file_wasm),
+            "-o", self.get_file_wasm(),
             "--strip-all",
             f"-allow-undefined-file={str(self.build_configuration.undefined_file)}"
         ]
@@ -64,6 +62,9 @@ class ProjectClang(Project):
             args.append(f"-export={export}")
 
         myprocess.run_process(args)
+
+    def get_file_wasm(self):
+        return self.unit.with_suffix(".wasm")
 
     def _get_llvm_path(self):
         return dependencies.get_install_directory("llvm-for-c")

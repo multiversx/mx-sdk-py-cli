@@ -13,10 +13,6 @@ class Project:
     def build(self, debug):
         self.debug = debug
         self._ensure_dependencies_installed()
-        self.unit = self.get_main_unit()
-        self.file_wasm = self.unit.with_suffix(".wasm")
-        self.file_wasm_hex = self.unit.with_suffix(".hex")
-        self.file_wasm_hex_arwen = self.unit.with_suffix(".hex.arwen")
         self.perform_build()
         self._create_arwen_files()
 
@@ -28,10 +24,10 @@ class Project:
     def get_dependencies(self):
         raise NotImplementedError()
 
-    def get_main_unit(self):
+    def perform_build(self):
         raise NotImplementedError()
 
-    def perform_build(self):
+    def get_file_wasm(self):
         raise NotImplementedError()
 
     def find_file(self, suffix):
@@ -50,14 +46,19 @@ class Project:
     def _create_arwen_files(self):
         ARWEN_TAG = b"@0500"
 
-        with open(self.file_wasm, "rb") as file:
+        file_wasm = self.get_file_wasm()
+        file_wasm_hex = file_wasm.with_suffix(".hex")
+        file_wasm_hex_arwen = file_wasm.with_suffix(".hex.arwen")
+
+        with open(file_wasm, "rb") as file:
             bytecode_hex = binascii.hexlify(file.read())
-        with open(self.file_wasm_hex, "wb+") as file:
+        with open(file_wasm_hex, "wb+") as file:
             file.write(bytecode_hex)
-        with open(self.file_wasm_hex_arwen, "wb+") as file:
+        with open(file_wasm_hex_arwen, "wb+") as file:
             file.write(bytecode_hex)
             file.write(ARWEN_TAG)
 
     def get_bytecode(self):
-        bytecode = utils.read_file(self.file_wasm_hex_arwen)
+        bytecode = utils.read_file(
+            self.get_file_wasm().with_suffix(".hex.arwen"))
         return bytecode
