@@ -3,12 +3,12 @@ import os
 import shutil
 from os import path
 
+from erdpy import errors
 from erdpy.projects.project_base import Project
 from erdpy.projects.project_clang import ProjectClang
 from erdpy.projects.project_rust import ProjectRust
 from erdpy.projects.project_sol import ProjectSol
 from erdpy.projects.templates_config import get_templates_repositories
-from erdpy import errors
 
 logger = logging.getLogger("projects.core")
 
@@ -83,3 +83,18 @@ def _directory_contains_file(directory, name_suffix):
     for file in os.listdir(directory):
         if file.lower().endswith(name_suffix.lower()):
             return True
+
+
+def build_project(directory, debug=False):
+    logger.info("build_project.directory: %s", directory)
+    logger.info("build_project.debug: %s", debug)
+
+    _guard_is_directory(directory)
+    project = load_project(directory)
+    project.build(debug)
+
+
+def _guard_is_directory(directory):
+    ok = path.isdir(directory)
+    if not ok:
+        raise errors.BadDirectory(directory)

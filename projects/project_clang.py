@@ -56,12 +56,12 @@ class ProjectClang(Project):
         return dependencies.get_install_directory("llvm-for-c")
 
     def _get_undefined_file(self):
-        building_path = Path(__file__).parent.parent.joinpath("building")
+        package_path = Path(__file__).parent
 
         if self.debug:
-            return building_path.joinpath("api_debug.txt")
+            return package_path.joinpath("list_api_debug.txt")
         else:
-            return building_path.joinpath("api.txt")
+            return package_path.joinpath("list_api.txt")
 
     def _get_exports(self):
         file_export = self._get_single_unit(".export")

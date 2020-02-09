@@ -3,7 +3,7 @@ import pprint
 import argparse
 from argparse import ArgumentParser
 
-from erdpy import projects, building, dependencies, errors, nodedebug
+from erdpy import projects, dependencies, errors, nodedebug
 
 logger = logging.getLogger("cli")
 
@@ -100,7 +100,7 @@ def build(args):
     debug = args.debug
 
     try:
-        building.build_project(project, debug)
+        projects.build_project(project, debug)
     except errors.KnownError as err:
         logger.fatal(err)
 
