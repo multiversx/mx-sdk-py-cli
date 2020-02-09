@@ -38,8 +38,8 @@ def create_from_template(name, template, directory):
     _download_templates_repositories()
     _copy_template(template, destination_path)
 
-    # TODO: if RUST, add tasks.json, launch.json
-    # TODO: replace all placeholders
+    # TODO: expand_template() if RUST, add tasks.json, launch.json
+    # TODO: replace_placeholders() replace all placeholders
 
     logger.info("Project created.")
 
