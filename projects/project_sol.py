@@ -1,7 +1,7 @@
 import subprocess
 
 from erdpy import dependencies, errors, myprocess, utils
-from erdpy.projects import Project
+from erdpy.projects.project_base import Project
 
 
 class ProjectSol(Project):

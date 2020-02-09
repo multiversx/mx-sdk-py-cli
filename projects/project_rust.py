@@ -5,7 +5,7 @@ from os import path
 from pathlib import Path
 
 from erdpy import dependencies, errors, myprocess, utils
-from erdpy.projects import Project
+from erdpy.projects.project_base import Project
 
 logger = logging.getLogger("ProjectRust")
 

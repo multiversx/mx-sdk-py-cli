@@ -3,7 +3,7 @@ import pprint
 import argparse
 from argparse import ArgumentParser
 
-from erdpy import building, dependencies, errors, templates, nodedebug
+from erdpy import projects, building, dependencies, errors, nodedebug
 
 logger = logging.getLogger("cli")
 
@@ -79,7 +79,7 @@ def install(args):
 
 def list_templates(args):
     try:
-        templates.list_templates()
+        projects.list_project_templates()
     except errors.KnownError as err:
         logger.fatal(err)
 
@@ -90,7 +90,7 @@ def create(args):
     directory = args.directory
 
     try:
-        templates.create_project(name, template, directory)
+        projects.create_from_template(name, template, directory)
     except errors.KnownError as err:
         logger.fatal(err)
 
