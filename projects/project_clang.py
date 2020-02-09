@@ -11,7 +11,11 @@ logger = logging.getLogger("ProjectClang")
 
 
 class ProjectClang(Project):
+    def __init__(self, directory):
+        super().__init__(directory)
+
     def perform_build(self):
+        self.build_configuration = BuildConfiguration(self, self.debug)
         self.file_ll = self.unit.with_suffix(".ll")
         self.file_o = self.unit.with_suffix(".o")
         self.file_export = self.unit.with_suffix(".export")
@@ -24,13 +28,17 @@ class ProjectClang(Project):
             raise errors.BuildError(err.output)
 
     def get_main_unit(self):
-        return self._get_single_unit(".c")
+        return self.find_file(".c")
 
     def _do_clang(self):
         logger.info("_do_clang")
         tool = path.join(self._get_llvm_path(), "clang-9")
-        args = [tool, "-cc1", "-Ofast", "-emit-llvm",
-                "-triple=wasm32-unknown-unknown-wasm", str(self.unit)]
+        args = [
+            tool,
+            "-cc1", "-Ofast", "-emit-llvm",
+            "-triple=wasm32-unknown-unknown-wasm",
+            str(self.unit)
+        ]
         myprocess.run_process(args)
 
     def _do_llc(self):
@@ -42,18 +50,39 @@ class ProjectClang(Project):
     def _do_wasm(self):
         logger.info("_do_wasm")
         tool = path.join(self._get_llvm_path(), "wasm-ld")
-        undefined_file = self._get_undefined_file()
-        args = [tool, "--verbose", "--no-entry", str(self.file_o), "-o", str(self.file_wasm),
-                "--strip-all", f"-allow-undefined-file={str(undefined_file)}"]
-        exports = self._get_exports()
+        args = [
+            tool,
+            "--verbose",
+            "--no-entry",
+            str(self.file_o),
+            "-o", str(self.file_wasm),
+            "--strip-all",
+            f"-allow-undefined-file={str(self.build_configuration.undefined_file)}"
+        ]
 
-        for export in exports:
+        for export in self.build_configuration.exports:
             args.append(f"-export={export}")
 
         myprocess.run_process(args)
 
     def _get_llvm_path(self):
         return dependencies.get_install_directory("llvm-for-c")
+
+    def get_dependencies(self):
+        return ["llvm-for-c"]
+
+
+class BuildConfiguration:
+    def __init__(self, project, debug):
+        self.project = project
+        self.debug = debug
+        self.exports = self._get_exports()
+        self.undefined_file = self._get_undefined_file()
+
+    def _get_exports(self):
+        file_export = self.project.find_file(".export")
+        lines = utils.read_lines(file_export)
+        return lines
 
     def _get_undefined_file(self):
         package_path = Path(__file__).parent
@@ -62,11 +91,3 @@ class ProjectClang(Project):
             return package_path.joinpath("list_api_debug.txt")
         else:
             return package_path.joinpath("list_api.txt")
-
-    def _get_exports(self):
-        file_export = self._get_single_unit(".export")
-        lines = utils.read_lines(file_export)
-        return lines
-
-    def get_dependencies(self):
-        return ["llvm-for-c"]

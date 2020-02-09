@@ -34,7 +34,7 @@ class Project:
     def perform_build(self):
         raise NotImplementedError()
 
-    def _get_single_unit(self, suffix):
+    def find_file(self, suffix):
         all_files = os.listdir(self.directory)
         files = [file for file in all_files if file.endswith(suffix)]
 

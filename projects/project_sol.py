@@ -5,6 +5,9 @@ from erdpy.projects.project_base import Project
 
 
 class ProjectSol(Project):
+    def __init__(self, directory):
+        super().__init__(directory)
+
     def perform_build(self):
         try:
             pass
