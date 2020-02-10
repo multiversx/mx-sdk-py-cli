@@ -54,6 +54,17 @@ def setup_parser():
     deploy_parser.add_argument("--gas-limit", default=500000000)
     deploy_parser.set_defaults(func=deploy)
 
+    call_parser = subparsers.add_parser("call")
+    call_parser.add_argument("contract")
+    call_parser.add_argument("--proxy", required=True)
+    call_parser.add_argument("--caller", required=True)
+    call_parser.add_argument("--pem", required=True)
+    call_parser.add_argument("--function", required=True)
+    call_parser.add_argument("--arguments", type=argparse.FileType('r'))
+    call_parser.add_argument("--gas-price", default=200000000000000)
+    call_parser.add_argument("--gas-limit", default=500000000)
+    call_parser.set_defaults(func=call)
+
     query_parser = subparsers.add_parser("query")
     query_parser.add_argument("contract")
     query_parser.add_argument("--proxy", required=True)
@@ -116,6 +127,20 @@ def deploy(args):
 
     try:
         flows.deploy_smart_contract(project, owner, pem, proxy, arguments)
+    except errors.KnownError as err:
+        logger.fatal(err)
+
+
+def call(args):
+    contract = args.contract
+    caller = args.caller
+    pem = args.pem
+    proxy = args.proxy
+    function = args.function
+    arguments = None
+
+    try:
+        flows.call_smart_contract(contract, caller, pem, proxy, function, arguments)
     except errors.KnownError as err:
         logger.fatal(err)
 

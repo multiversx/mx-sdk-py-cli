@@ -81,8 +81,9 @@ def post_json(url, data):
         response_data = json.loads(response_json)
         return response_data
     except urllib.request.HTTPError as err:
-        message = err.read()
-        print(message)
+        message_json = err.read()
+        message_data = json.loads(message_json)
+        return message_data
 
 
 def find_in_dictionary(dictionary, compound_path):

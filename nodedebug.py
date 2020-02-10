@@ -82,8 +82,8 @@ def deploy(bytecode, owner, arguments=None, testnet_url=None):
     }
 
     raw_response = utils.post_json(url, data)
+    logger.debug("Response: %s", raw_response)
     response = _Response(raw_response)
-    print(response)
 
     return response.tx_hash, response.contract_address
 
@@ -93,6 +93,7 @@ def execute(contract_address, caller, function, arguments=None, testnet_url=None
 
     url = _get_url("run")
     on_testnet = testnet_url is not None
+    arguments = arguments or []
 
     tx_data = function
     for arg in arguments:
@@ -110,8 +111,10 @@ def execute(contract_address, caller, function, arguments=None, testnet_url=None
         "TxData": tx_data
     }
 
-    response = utils.post_json(url, data)
-    print(response)
+    raw_response = utils.post_json(url, data)
+    logger.debug("Response: %s", raw_response)
+    response = _VMOutputResponse(raw_response)
+    return response
 
 
 def query(contract_address, function, arguments=None, testnet_url=None):
@@ -128,10 +131,10 @@ def query(contract_address, function, arguments=None, testnet_url=None):
         "TestnetNodeEndpoint": testnet_url
     }
 
-    response = utils.post_json(url, data)
-    print(response)
-    return_data = response["data"]["ReturnData"]
-    return return_data
+    raw_response = utils.post_json(url, data)
+    logger.debug("Response: %s", raw_response)
+    response = _VMOutputResponse(raw_response)
+    return response.return_data
 
 
 def _get_url(action):
@@ -142,5 +145,15 @@ class _Response:
     def __init__(self, raw_dict):
         def find(key): return utils.find_in_dictionary(raw_dict, key)
 
+        self.error = find("error")
         self.contract_address = find("data.Address")
         self.tx_hash = find("data.Other.txHash")
+
+
+class _VMOutputResponse:
+    def __init__(self, raw_dict):
+        def find(key): return utils.find_in_dictionary(raw_dict, key)
+
+        self.error = find("error")
+        self.return_data = find("data.ReturnData")
+        self.return_code = find("data.ReturnCode")
