@@ -1,6 +1,8 @@
 import asyncio
-import subprocess
 import logging
+import subprocess
+
+from erdpy import feedback
 
 logger = logging.getLogger("myprocess")
 
@@ -35,21 +37,26 @@ def run_process_async(args, env=None):
     return result
 
 
-async def async_subprocess(args, env=None):
+async def async_subprocess(args, env=None, sinks=None):
     process = await asyncio.create_subprocess_exec(*args, env=env, stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.PIPE)
 
     await asyncio.wait([
-        _read_stream(process.stdout),
-        _read_stream(process.stderr)
+        _read_stream(process.stdout, sinks),
+        _read_stream(process.stderr, sinks)
     ])
     return await process.wait()
 
 
-async def _read_stream(stream):
+async def _read_stream(stream, sinks=None):
     while True:
         line = await stream.readline()
         if line:
-            print(str(line, "utf-8").strip())
+            line = str(line, "utf-8").strip()
+            if sinks is None:
+                print(line)
+            else:
+                for sink in sinks:
+                    feedback.get_sink(sink).write(line)
         else:
             break
 

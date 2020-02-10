@@ -36,7 +36,7 @@ def _get_args():
 
 
 async def start_async():
-    await myprocess.async_subprocess(_get_args())
+    await myprocess.async_subprocess(_get_args(), sinks=["nodedebug"])
 
 
 def _is_running():

@@ -3,6 +3,10 @@ class KnownError(Exception):
     pass
 
 
+class ProgrammingError(KnownError):
+    pass
+
+
 class TemplateMissingError(KnownError):
     def __init__(self, template):
         super().__init__(f"Template missing: {template}")
@@ -31,3 +35,8 @@ class PlatformNotSupported(KnownError):
 class BuildError(KnownError):
     def __init__(self, message):
         super().__init__(f"Build error:\n {message}.")
+
+
+class BadSink(ProgrammingError):
+    def __init__(self, name):
+        super().__init__(f"Bad sink:\n {name}.")
