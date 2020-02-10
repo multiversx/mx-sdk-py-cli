@@ -64,7 +64,7 @@ class ProjectClang(Project):
         myprocess.run_process(args)
 
     def get_file_wasm(self):
-        return self.unit.with_suffix(".wasm")
+        return self.find_file(".c").with_suffix(".wasm")
 
     def _get_llvm_path(self):
         return dependencies.get_install_directory("llvm-for-c")

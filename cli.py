@@ -1,9 +1,9 @@
+import argparse
 import logging
 import pprint
-import argparse
 from argparse import ArgumentParser
 
-from erdpy import projects, dependencies, errors, nodedebug
+from erdpy import dependencies, errors, flows, nodedebug, projects
 
 logger = logging.getLogger("cli")
 
@@ -13,9 +13,6 @@ def main():
 
     parser = setup_parser()
     args = parser.parse_args()
-
-    # TODO: raise parser error if deploy --testnet no --pem etc.
-    # https://stackoverflow.com/a/19414853/1475331
 
     if not hasattr(args, "func"):
         parser.print_help()
@@ -50,10 +47,9 @@ def setup_parser():
     deploy_parser = subparsers.add_parser("deploy")
     deploy_parser.add_argument("project")
     group = deploy_parser.add_mutually_exclusive_group()
-    group.add_argument('--debug', action='store_true')
-    group.add_argument('--testnet', action='store_true')
-    deploy_parser.add_argument("--proxy")
-    deploy_parser.add_argument("--pem", type=argparse.FileType('r'))
+    deploy_parser.add_argument("--proxy", required=True)
+    deploy_parser.add_argument("--address", required=True)
+    deploy_parser.add_argument("--pem", required=True)
     deploy_parser.add_argument("--params", type=argparse.FileType('r'))
     deploy_parser.add_argument("--gas-price", default=200000000000000)
     deploy_parser.add_argument("--gas-limit", default=500000000)
@@ -106,8 +102,14 @@ def build(args):
 
 
 def deploy(args):
+    project = args.project
+    address = args.address
+    pem = args.pem
+    proxy = args.proxy
+    #params = args.params
+
     try:
-        pass
+        flows.deploy_smart_contract(project, address, pem, proxy)
     except errors.KnownError as err:
         logger.fatal(err)
 
@@ -126,6 +128,7 @@ def do_nodedebug(args):
             nodedebug.start()
     except errors.KnownError as err:
         logger.fatal(err)
+
 
 if __name__ == "__main__":
     main()

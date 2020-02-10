@@ -81,7 +81,7 @@ def deploy(bytecode, sender, testnet_url=None):
 
     response = utils.post_json(url, data)
     print(response)
-    tx_hash = None
+    tx_hash = response["data"]["Other"].get("txHash")
     contract_address = response["data"]["Address"]
 
     return tx_hash, contract_address
