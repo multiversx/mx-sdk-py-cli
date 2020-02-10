@@ -2,6 +2,7 @@ import logging
 import os
 import shutil
 from os import path
+from pathlib import Path
 
 from erdpy import errors
 from erdpy.projects.project_base import Project
@@ -33,13 +34,12 @@ def create_from_template(name, template, directory):
         logger.info("Using current directory")
         directory = os.getcwd()
 
-    destination_path = path.join(directory, name)
+    project_directory = path.join(directory, name)
 
     _download_templates_repositories()
-    _copy_template(template, destination_path)
-
-    # TODO: expand_template() if RUST, add tasks.json, launch.json
-    # TODO: replace_placeholders() replace all placeholders
+    _copy_template(template, project_directory)
+    _expand_template(project_directory)
+    _supplant_template_placeholders(project_directory)
 
     logger.info("Project created.")
 
@@ -58,8 +58,44 @@ def _copy_template(template, destination_path):
     raise errors.TemplateMissingError(template)
 
 
+def _expand_template(directory):
+    if _is_source_clang(directory):
+        _expand_template_clang(directory)
+    if _is_source_sol(directory):
+        _expand_template_sol(directory)
+    if _is_source_rust(directory):
+        _expand_template_rust(directory)
+
+
+def _expand_template_clang(directory):
+    pass
+
+
+def _expand_template_sol(directory):
+    pass
+
+
+def _expand_template_rust(directory):
+    logger.info("_expand_template_rust")
+
+    package_path = Path(__file__).parent
+    launch_file = package_path.joinpath("vscode_launch_rust.json")
+    tasks_file = package_path.joinpath("vscode_tasks_rust.json")
+    vscode_directory = path.join(directory, ".vscode")
+
+    logger.info("Creating directory [.vscode]...")
+    os.mkdir(vscode_directory)
+    logger.info("Adding files: [launch.json], [tasks.json]")
+    shutil.copy(launch_file, path.join(vscode_directory, "launch.json"))
+    shutil.copy(tasks_file, path.join(vscode_directory, "tasks.json"))
+
+
+def _supplant_template_placeholders(directory):
+    pass
+
+
 def load_project(directory):
-    if _is_source_C(directory):
+    if _is_source_clang(directory):
         return ProjectClang(directory)
     if _is_source_sol(directory):
         return ProjectSol(directory)
@@ -67,7 +103,7 @@ def load_project(directory):
         return ProjectRust(directory)
 
 
-def _is_source_C(directory):
+def _is_source_clang(directory):
     return _directory_contains_file(directory, ".c")
 
 
