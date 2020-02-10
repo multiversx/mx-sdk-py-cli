@@ -13,12 +13,14 @@ class Host:
     def run_flow(self):
         raise NotImplementedError()
 
-    def deploy_contract(self, contract):
+    def deploy_contract(self, contract, owner, arguments=None):
         raise NotImplementedError()
 
-    def execute_contract(self, contract):
+    def execute_contract(self, contract, caller, function, arguments=None):
         raise NotImplementedError()
 
+    def query_contract(self, contract, function, arguments=None):
+        raise NotImplementedError()
 
 class DebugHost(Host):
     def __init__(self):
@@ -36,27 +38,27 @@ class DebugHost(Host):
         ])
 
     async def _wrap_flow(self, flow):
-        logger.info("Wait before starting flow...")
+        logger.debug("Wait before starting flow...")
         await asyncio.sleep(1)
-        logger.info("Starting flow...")
+        logger.debug("Starting flow...")
         flow()
-        logger.info("Flow ran.")
+        logger.debug("Flow ran.")
         await asyncio.sleep(1)
         nodedebug.stop()
 
-    def deploy_contract(self, contract, sender):
-        logger.info("deploy_contract")
-        tx_hash, contract_address = nodedebug.deploy(contract.bytecode, sender)
+    def deploy_contract(self, contract, owner, arguments=None):
+        logger.debug("deploy_contract")
+        tx_hash, contract_address = nodedebug.deploy(contract.bytecode, owner, arguments)
         contract.address = contract_address
         return tx_hash, contract_address
 
-    def execute_contract(self, contract, sender, function, arguments):
-        logger.info("execute_contract")
-        nodedebug.execute(contract.address, sender, function, arguments)
+    def execute_contract(self, contract, caller, function, arguments=None):
+        logger.debug("execute_contract")
+        nodedebug.execute(contract.address, caller, function, arguments)
 
-    def query_contract(self, contract, function):
-        logger.info("query_contract")
-        return nodedebug.query(contract.address, function, None)
+    def query_contract(self, contract, function, arguments=None):
+        logger.debug("query_contract")
+        return nodedebug.query(contract.address, function, arguments)
 
 class TestnetHost(Host):
     def __init__(self, url):
@@ -75,24 +77,24 @@ class TestnetHost(Host):
         ])
 
     async def _wrap_flow(self, flow):
-        logger.info("Wait before starting flow...")
+        logger.debug("Wait before starting flow...")
         await asyncio.sleep(1)
-        logger.info("Starting flow...")
+        logger.debug("Starting flow...")
         flow()
-        logger.info("Flow ran.")
+        logger.debug("Flow ran.")
         await asyncio.sleep(1)
         nodedebug.stop()
 
-    def deploy_contract(self, contract, sender):
-        logger.info("deploy_contract")
-        tx_hash, contract_address = nodedebug.deploy(contract.bytecode, sender, testnet_url=self.url)
+    def deploy_contract(self, contract, owner, arguments=None):
+        logger.debug("deploy_contract")
+        tx_hash, contract_address = nodedebug.deploy(contract.bytecode, owner, arguments, testnet_url=self.url)
         contract.address = contract_address
         return tx_hash, contract_address
 
-    def execute_contract(self, contract, sender, function, arguments):
-        logger.info("execute_contract")
+    def execute_contract(self, contract, sender, function, arguments=None):
+        logger.debug("execute_contract")
         nodedebug.execute(contract.address, sender, function, arguments, testnet_url=self.url)
 
-    def query_contract(self, contract, function):
-        logger.info("query_contract")
-        return nodedebug.query(contract.address, function, None, testnet_url=self.url)
+    def query_contract(self, contract, function, arguments=None):
+        logger.debug("query_contract")
+        return nodedebug.query(contract.address, function, arguments, testnet_url=self.url)

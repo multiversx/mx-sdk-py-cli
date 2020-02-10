@@ -64,15 +64,15 @@ def stop():
         logger.info("Nodedebug wasn't started.")
 
 
-def deploy(bytecode, sender, testnet_url=None):
+def deploy(bytecode, owner, arguments=None, testnet_url=None):
     url = _get_url("deploy")
     on_testnet = testnet_url is not None
 
     data = {
         "OnTestnet": on_testnet,
-        "PrivateKey": sender.pem,
+        "PrivateKey": owner.pem,
         "TestnetNodeEndpoint": testnet_url,
-        "SndAddress": sender.address,
+        "SndAddress": owner.address,
         "Value": "0",
         "GasLimit": 500000000,
         "GasPrice": 200000000000000,
@@ -87,7 +87,7 @@ def deploy(bytecode, sender, testnet_url=None):
     return tx_hash, contract_address
 
 
-def execute(address, sender, function, arguments=None, testnet_url=None):
+def execute(contract_address, caller, function, arguments=None, testnet_url=None):
     url = _get_url("run")
     on_testnet = testnet_url is not None
 
@@ -97,10 +97,10 @@ def execute(address, sender, function, arguments=None, testnet_url=None):
 
     data = {
         "OnTestnet": on_testnet,
-        "PrivateKey": sender.pem,
+        "PrivateKey": caller.pem,
         "TestnetNodeEndpoint": testnet_url,
-        "SndAddress": sender.address,
-        "ScAddress": address,
+        "SndAddress": caller.address,
+        "ScAddress": contract_address,
         "Value": "0",
         "GasLimit": 500000000,
         "GasPrice": 200000000000000,
@@ -111,12 +111,12 @@ def execute(address, sender, function, arguments=None, testnet_url=None):
     print(response)
 
 
-def query(address, function, arguments, testnet_url=None):
+def query(contract_address, function, arguments=None, testnet_url=None):
     url = _get_url("query")
     on_testnet = testnet_url is not None
 
     data = {
-        "ScAddress": address,
+        "ScAddress": contract_address,
         "FuncName": function,
         "Args": [],
         "OnTestnet": on_testnet,

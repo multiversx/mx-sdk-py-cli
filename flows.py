@@ -6,31 +6,44 @@ from erdpy.contracts import SmartContract
 
 logger = logging.getLogger("examples")
 
-def deploy_smart_contract(project_directory, address, pem_file, proxy_url):
-    logger.info("deploy_smart_contract")
+
+def deploy_smart_contract(project_directory, owner_address, pem_file, proxy_url, arguments):
+    logger.debug("deploy_smart_contract")
 
     project = load_project(project_directory)
     bytecode = project.get_bytecode()
     contract = SmartContract(bytecode=bytecode)
     host = TestnetHost(proxy_url)
-    owner = Account(address, pem_file)
+    owner = Account(owner_address, pem_file)
 
     def flow():
-        tx, address = host.deploy_contract(contract, sender=owner)
+        tx, address = host.deploy_contract(contract, owner, arguments)
         logger.info("Tx hash: %s", tx)
         logger.info("Contract address: %s", address)
 
     host.run_flow(flow)
 
 
-def call_smart_contract(contract_address, function, arguments, address, pem_file, proxy_url):
-    logger.info("call_smart_contract")
+def call_smart_contract(contract_address, caller_address, pem_file, proxy_url, function, arguments):
+    logger.debug("call_smart_contract")
 
     contract = SmartContract(contract_address)
     host = TestnetHost(proxy_url)
-    caller = Account(address, pem_file)
+    caller = Account(caller_address, pem_file)
 
     def flow():
         host.execute_contract(contract, caller, function, arguments)
+
+    host.run_flow(flow)
+
+
+def query_smart_contract(contract_address, proxy_url, function, arguments):
+    logger.debug("query_smart_contract")
+
+    contract = SmartContract(contract_address)
+    host = TestnetHost(proxy_url)
+
+    def flow():
+        host.query_contract(contract, function, arguments)
 
     host.run_flow(flow)

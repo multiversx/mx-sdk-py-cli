@@ -46,14 +46,20 @@ def setup_parser():
 
     deploy_parser = subparsers.add_parser("deploy")
     deploy_parser.add_argument("project")
-    group = deploy_parser.add_mutually_exclusive_group()
     deploy_parser.add_argument("--proxy", required=True)
-    deploy_parser.add_argument("--address", required=True)
+    deploy_parser.add_argument("--owner", required=True)
     deploy_parser.add_argument("--pem", required=True)
-    deploy_parser.add_argument("--params", type=argparse.FileType('r'))
+    deploy_parser.add_argument("--arguments", type=argparse.FileType('r'))
     deploy_parser.add_argument("--gas-price", default=200000000000000)
     deploy_parser.add_argument("--gas-limit", default=500000000)
     deploy_parser.set_defaults(func=deploy)
+
+    query_parser = subparsers.add_parser("query")
+    query_parser.add_argument("contract")
+    query_parser.add_argument("--proxy", required=True)
+    query_parser.add_argument("--function", required=True)
+    query_parser.add_argument("--arguments", type=argparse.FileType('r'))
+    query_parser.set_defaults(func=query)
 
     node_parser = subparsers.add_parser("nodedebug")
     group = node_parser.add_mutually_exclusive_group()
@@ -103,13 +109,25 @@ def build(args):
 
 def deploy(args):
     project = args.project
-    address = args.address
+    owner = args.owner
     pem = args.pem
     proxy = args.proxy
-    #params = args.params
+    arguments = None
 
     try:
-        flows.deploy_smart_contract(project, address, pem, proxy)
+        flows.deploy_smart_contract(project, owner, pem, proxy, arguments)
+    except errors.KnownError as err:
+        logger.fatal(err)
+
+
+def query(args):
+    contract = args.contract
+    proxy = args.proxy
+    function = args.function
+    arguments = None
+
+    try:
+        flows.query_smart_contract(contract, proxy, function, arguments)
     except errors.KnownError as err:
         logger.fatal(err)
 
