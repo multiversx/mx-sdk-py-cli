@@ -50,6 +50,11 @@ def read_file(filename):
         return f.read()
 
 
+def write_file(filename, text):
+    with open(filename, "w") as f:
+        return f.write(text)
+
+
 def read_toml_file(filename):
     return toml.load(filename)
 
