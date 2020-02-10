@@ -3,10 +3,10 @@ import logging
 
 from erdpy import nodedebug
 
-logger = logging.getLogger("gateway")
+logger = logging.getLogger("hosts")
 
 
-class Gateway:
+class Host:
     def __init__(self):
         pass
 
@@ -20,7 +20,7 @@ class Gateway:
         raise NotImplementedError()
 
 
-class DebugHost(Gateway):
+class DebugHost(Host):
     def __init__(self):
         super().__init__()
 
@@ -55,5 +55,5 @@ class DebugHost(Gateway):
     def query_contract(self, contract, function):
         return nodedebug.query(contract.address, function, None)
 
-class TestnetHost(Gateway):
+class TestnetHost(Host):
     pass
