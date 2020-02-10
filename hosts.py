@@ -50,9 +50,9 @@ class DebugHost(Host):
         contract.address = contract_address
         return tx_hash, contract_address
 
-    def execute_contract(self, contract, sender, function):
+    def execute_contract(self, contract, sender, function, arguments):
         logger.info("execute_contract")
-        nodedebug.execute(contract.address, sender, function)
+        nodedebug.execute(contract.address, sender, function, arguments)
 
     def query_contract(self, contract, function):
         logger.info("query_contract")
@@ -89,9 +89,9 @@ class TestnetHost(Host):
         contract.address = contract_address
         return tx_hash, contract_address
 
-    def execute_contract(self, contract, sender, function):
+    def execute_contract(self, contract, sender, function, arguments):
         logger.info("execute_contract")
-        nodedebug.execute(contract.address, sender, function)
+        nodedebug.execute(contract.address, sender, function, arguments, testnet_url=self.url)
 
     def query_contract(self, contract, function):
         logger.info("query_contract")

@@ -87,10 +87,24 @@ def deploy(bytecode, sender, testnet_url=None):
     return tx_hash, contract_address
 
 
-def execute(address, sender, function):
+def execute(address, sender, function, arguments=None, testnet_url=None):
     url = _get_url("run")
-    data = {
+    on_testnet = testnet_url is not None
 
+    tx_data = function
+    for arg in arguments:
+        tx_data += f"@{arg}"
+
+    data = {
+        "OnTestnet": on_testnet,
+        "PrivateKey": sender.pem,
+        "TestnetNodeEndpoint": testnet_url,
+        "SndAddress": sender.address,
+        "ScAddress": address,
+        "Value": "0",
+        "GasLimit": 500000000,
+        "GasPrice": 200000000000000,
+        "TxData": tx_data
     }
 
     response = utils.post_json(url, data)
@@ -113,6 +127,7 @@ def query(address, function, arguments, testnet_url=None):
     print(response)
     return_data = response["data"]["ReturnData"]
     return return_data
+
 
 def _get_url(action):
     return f"http://localhost:8080/vm-values/{action}"

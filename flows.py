@@ -21,3 +21,16 @@ def deploy_smart_contract(project_directory, address, pem_file, proxy_url):
         logger.info("Contract address: %s", address)
 
     host.run_flow(flow)
+
+
+def call_smart_contract(contract_address, function, arguments, address, pem_file, proxy_url):
+    logger.info("call_smart_contract")
+
+    contract = SmartContract(contract_address)
+    host = TestnetHost(proxy_url)
+    caller = Account(address, pem_file)
+
+    def flow():
+        host.execute_contract(contract, caller, function, arguments)
+
+    host.run_flow(flow)
