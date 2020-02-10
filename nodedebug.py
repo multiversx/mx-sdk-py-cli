@@ -64,13 +64,15 @@ def stop():
         logger.info("Nodedebug wasn't started.")
 
 
-def deploy(bytecode, sender):
-    url = "http://localhost:8080/vm-values/deploy"
+def deploy(bytecode, sender, testnet_url=None):
+    url = _get_url("deploy")
+    on_testnet = testnet_url is not None
+
     data = {
-        "OnTestnet": False,
-        # "PrivateKey": "",
-        # "TestnetNodeEndpoint": "",
-        "SndAddress": sender,
+        "OnTestnet": on_testnet,
+        "PrivateKey": sender.pem,
+        "TestnetNodeEndpoint": testnet_url,
+        "SndAddress": sender.address,
         "Value": "0",
         "GasLimit": 500000000,
         "GasPrice": 200000000000000,
@@ -86,7 +88,7 @@ def deploy(bytecode, sender):
 
 
 def execute(address, sender, function):
-    url = "http://localhost:8080/vm-values/run"
+    url = _get_url("run")
     data = {
 
     }
@@ -95,15 +97,22 @@ def execute(address, sender, function):
     print(response)
 
 
-def query(address, function, arguments):
-    url = "http://localhost:8080/vm-values/query"
+def query(address, function, arguments, testnet_url=None):
+    url = _get_url("query")
+    on_testnet = testnet_url is not None
+
     data = {
         "ScAddress": address,
         "FuncName": function,
-        "Args": []
+        "Args": [],
+        "OnTestnet": on_testnet,
+        "TestnetNodeEndpoint": testnet_url
     }
 
     response = utils.post_json(url, data)
     print(response)
     return_data = response["data"]["ReturnData"]
     return return_data
+
+def _get_url(action):
+    return f"http://localhost:8080/vm-values/{action}"
