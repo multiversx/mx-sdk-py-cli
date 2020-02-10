@@ -65,6 +65,8 @@ def stop():
 
 
 def deploy(bytecode, owner, arguments=None, testnet_url=None):
+    logger.debug("deploy")
+
     url = _get_url("deploy")
     on_testnet = testnet_url is not None
 
@@ -79,15 +81,16 @@ def deploy(bytecode, owner, arguments=None, testnet_url=None):
         "TxData": bytecode
     }
 
-    response = utils.post_json(url, data)
+    raw_response = utils.post_json(url, data)
+    response = _Response(raw_response)
     print(response)
-    tx_hash = response["data"]["Other"].get("txHash")
-    contract_address = response["data"]["Address"]
 
-    return tx_hash, contract_address
+    return response.tx_hash, response.contract_address
 
 
 def execute(contract_address, caller, function, arguments=None, testnet_url=None):
+    logger.debug("execute")
+
     url = _get_url("run")
     on_testnet = testnet_url is not None
 
@@ -112,6 +115,8 @@ def execute(contract_address, caller, function, arguments=None, testnet_url=None
 
 
 def query(contract_address, function, arguments=None, testnet_url=None):
+    logger.debug("query")
+
     url = _get_url("query")
     on_testnet = testnet_url is not None
 
@@ -131,3 +136,11 @@ def query(contract_address, function, arguments=None, testnet_url=None):
 
 def _get_url(action):
     return f"http://localhost:8080/vm-values/{action}"
+
+
+class _Response:
+    def __init__(self, raw_dict):
+        def find(key): return utils.find_in_dictionary(raw_dict, key)
+
+        self.contract_address = find("data.Address")
+        self.tx_hash = find("data.Other.txHash")

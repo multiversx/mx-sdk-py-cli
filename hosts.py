@@ -1,5 +1,6 @@
 import asyncio
 import logging
+import traceback
 
 from erdpy import nodedebug
 
@@ -38,13 +39,17 @@ class DebugHost(Host):
         ])
 
     async def _wrap_flow(self, flow):
-        logger.debug("Wait before starting flow...")
-        await asyncio.sleep(1)
-        logger.debug("Starting flow...")
-        flow()
-        logger.debug("Flow ran.")
-        await asyncio.sleep(1)
-        nodedebug.stop()
+        try:
+            logger.debug("Wait before starting flow...")
+            await asyncio.sleep(1)
+            logger.debug("Starting flow...")
+            flow()
+            logger.debug("Flow ran.")
+            await asyncio.sleep(1)
+        except:
+            print(traceback.format_exc())
+        finally:
+            nodedebug.stop()
 
     def deploy_contract(self, contract, owner, arguments=None):
         logger.debug("deploy_contract")
@@ -77,13 +82,17 @@ class TestnetHost(Host):
         ])
 
     async def _wrap_flow(self, flow):
-        logger.debug("Wait before starting flow...")
-        await asyncio.sleep(1)
-        logger.debug("Starting flow...")
-        flow()
-        logger.debug("Flow ran.")
-        await asyncio.sleep(1)
-        nodedebug.stop()
+        try:
+            logger.debug("Wait before starting flow...")
+            await asyncio.sleep(1)
+            logger.debug("Starting flow...")
+            flow()
+            logger.debug("Flow ran.")
+            await asyncio.sleep(1)
+        except:
+            print(traceback.format_exc())
+        finally:
+            nodedebug.stop()
 
     def deploy_contract(self, contract, owner, arguments=None):
         logger.debug("deploy_contract")

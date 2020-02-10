@@ -83,3 +83,14 @@ def post_json(url, data):
     except urllib.request.HTTPError as err:
         message = err.read()
         print(message)
+
+
+def find_in_dictionary(dictionary, compound_path):
+    keys = compound_path.split(".")
+    node = dictionary
+    for key in keys:
+        node = node.get(key)
+        if node is None:
+            break
+
+    return node
