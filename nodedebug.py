@@ -70,6 +70,10 @@ def deploy(bytecode, owner, arguments=None, testnet_url=None):
     url = _get_url("deploy")
     on_testnet = testnet_url is not None
 
+    tx_data = bytecode
+    for arg in arguments:
+        tx_data += f"@{_prepare_argument(arg)}"
+
     data = {
         "OnTestnet": on_testnet,
         "PrivateKey": owner.pem,
@@ -78,7 +82,7 @@ def deploy(bytecode, owner, arguments=None, testnet_url=None):
         "Value": "0",
         "GasLimit": 500000000,
         "GasPrice": 200000000000000,
-        "TxData": bytecode
+        "TxData": tx_data
     }
 
     raw_response = utils.post_json(url, data)
@@ -97,7 +101,7 @@ def execute(contract_address, caller, function, arguments=None, testnet_url=None
 
     tx_data = function
     for arg in arguments:
-        tx_data += f"@{arg}"
+        tx_data += f"@{_prepare_argument(arg)}"
 
     data = {
         "OnTestnet": on_testnet,
@@ -123,11 +127,12 @@ def query(contract_address, function, arguments=None, testnet_url=None):
 
     url = _get_url("query")
     on_testnet = testnet_url is not None
+    arguments = [_prepare_argument(arg) for arg in arguments or []]
 
     data = {
         "ScAddress": contract_address,
         "FuncName": function,
-        "Args": [],
+        "Args": arguments,
         "OnTestnet": on_testnet,
         "TestnetNodeEndpoint": testnet_url
     }
@@ -167,3 +172,21 @@ class _VMOutputResponse:
     def verify(self):
         if self.error:
             raise errors.KnownError(self.error)        
+
+
+def _prepare_argument(argument):
+    hex_prefix = "0X"
+    as_string = str(argument).upper()
+
+    if as_string.startswith(hex_prefix):
+        return as_string[len(hex_prefix):]
+
+    if not as_string.isnumeric():
+        raise errors.UnknownArgumentFormat(as_string)
+
+    as_number = int(as_string)
+    as_hexstring = hex(as_number)[len(hex_prefix):]
+    if len(as_hexstring) % 2 == 1:
+        as_hexstring = "0" + as_hexstring
+
+    return as_hexstring
