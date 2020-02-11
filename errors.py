@@ -40,3 +40,9 @@ class BuildError(KnownError):
 class BadSink(ProgrammingError):
     def __init__(self, name):
         super().__init__(f"Bad sink:\n {name}.")
+
+
+class UnknownArgumentFormat(KnownError):
+    def __init__(self, argument):
+        super().__init__(
+            f"Cannot handle non-hex, non-number arguments yet: {argument}.")
