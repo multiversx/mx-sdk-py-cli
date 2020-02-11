@@ -6,7 +6,7 @@ from os import path
 
 from psutil import process_iter
 
-from erdpy import dependencies, myprocess, utils
+from erdpy import dependencies, errors, myprocess, utils
 
 logger = logging.getLogger("nodedebug")
 
@@ -84,7 +84,7 @@ def deploy(bytecode, owner, arguments=None, testnet_url=None):
     raw_response = utils.post_json(url, data)
     logger.debug("Response: %s", raw_response)
     response = _Response(raw_response)
-
+    response.verify()
     return response.tx_hash, response.contract_address
 
 
@@ -114,6 +114,7 @@ def execute(contract_address, caller, function, arguments=None, testnet_url=None
     raw_response = utils.post_json(url, data)
     logger.debug("Response: %s", raw_response)
     response = _VMOutputResponse(raw_response)
+    response.verify()
     return response
 
 
@@ -134,6 +135,7 @@ def query(contract_address, function, arguments=None, testnet_url=None):
     raw_response = utils.post_json(url, data)
     logger.debug("Response: %s", raw_response)
     response = _VMOutputResponse(raw_response)
+    response.verify()
     return response.return_data
 
 
@@ -149,6 +151,10 @@ class _Response:
         self.contract_address = find("data.Address")
         self.tx_hash = find("data.Other.txHash")
 
+    def verify(self):
+        if self.error:
+            raise errors.KnownError(self.error)
+
 
 class _VMOutputResponse:
     def __init__(self, raw_dict):
@@ -157,3 +163,7 @@ class _VMOutputResponse:
         self.error = find("error")
         self.return_data = find("data.ReturnData")
         self.return_code = find("data.ReturnCode")
+
+    def verify(self):
+        if self.error:
+            raise errors.KnownError(self.error)        

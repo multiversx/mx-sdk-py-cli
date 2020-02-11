@@ -70,8 +70,6 @@ def mark_executable(file):
 
 def post_json(url, data):
     data_json = json.dumps(data).encode("utf8")
-    logger.info("data_json: %s", data_json)
-
     request = urllib.request.Request(url, data=data_json, headers={
                                      "content-type": "application/json"})
 

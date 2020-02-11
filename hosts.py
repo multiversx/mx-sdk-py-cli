@@ -2,7 +2,7 @@ import asyncio
 import logging
 import traceback
 
-from erdpy import nodedebug
+from erdpy import errors, nodedebug
 
 logger = logging.getLogger("hosts")
 
@@ -46,6 +46,8 @@ class DebugHost(Host):
             flow()
             logger.debug("Flow ran.")
             await asyncio.sleep(1)
+        except errors.KnownError as err:
+            logger.critical(err)
         except:
             print(traceback.format_exc())
         finally:
@@ -74,6 +76,7 @@ class TestnetHost(Host):
         loop = asyncio.get_event_loop()
         loop.run_until_complete(self._run_node_debug_and_flow(flow))
         loop.close()
+        asyncio.set_event_loop(asyncio.new_event_loop())
 
     async def _run_node_debug_and_flow(self, flow):
         await asyncio.wait([
@@ -89,6 +92,8 @@ class TestnetHost(Host):
             flow()
             logger.debug("Flow ran.")
             await asyncio.sleep(1)
+        except errors.KnownError as err:
+            logger.critical(err)
         except:
             print(traceback.format_exc())
         finally:
