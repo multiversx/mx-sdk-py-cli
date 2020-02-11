@@ -34,6 +34,7 @@ def run_process_async(args, env=None):
     loop = asyncio.get_event_loop()
     result = loop.run_until_complete(async_subprocess(args, env))
     loop.close()
+    asyncio.set_event_loop(asyncio.new_event_loop())
     return result
 
 

@@ -31,6 +31,7 @@ class DebugHost(Host):
         loop = asyncio.get_event_loop()
         loop.run_until_complete(self._run_node_debug_and_flow(flow))
         loop.close()
+        asyncio.set_event_loop(asyncio.new_event_loop())
 
     async def _run_node_debug_and_flow(self, flow):
         await asyncio.wait([
