@@ -38,3 +38,5 @@ bigIntGetUnsignedArgument
 bigIntGetSignedArgument
 bigIntGetCallValue
 bigIntGetExternalBalance
+
+keccak256

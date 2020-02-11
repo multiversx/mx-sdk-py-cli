@@ -39,6 +39,8 @@ bigIntGetSignedArgument
 bigIntGetCallValue
 bigIntGetExternalBalance
 
+keccak256
+
 debugPrintBigInt
 debugPrintInt64
 debugPrintInt32
