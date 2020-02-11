@@ -26,11 +26,11 @@ def get_all_modules():
                              "osx": "vendor-soll/darwin-amd64.tar.gz"
                          }),
 
-        StandaloneModule(key="nodedebug", name="nodedebug", tag="v0.0.4",
+        StandaloneModule(key="nodedebug", name="nodedebug", tag="v0.0.5",
                          groups=["NODE_DEBUG"],
                          urls_by_platform={
-                             "linux": "nodedebug/v003/linux-amd64.tar.gz",
-                             "osx": "nodedebug/v003/darwin-amd64.tar.gz"
+                             "linux": "nodedebug/v005/linux-amd64.tar.gz",
+                             "osx": "nodedebug/v005/darwin-amd64.tar.gz"
                          }),
 
         Rust(key="rust", name="rust", tag="initial",
