@@ -49,7 +49,7 @@ def setup_parser():
     deploy_parser.add_argument("--proxy", required=True)
     deploy_parser.add_argument("--owner", required=True)
     deploy_parser.add_argument("--pem", required=True)
-    deploy_parser.add_argument("--arguments", type=argparse.FileType('r'))
+    deploy_parser.add_argument("--arguments", nargs='+')
     deploy_parser.add_argument("--gas-price", default=200000000000000)
     deploy_parser.add_argument("--gas-limit", default=500000000)
     deploy_parser.set_defaults(func=deploy)
@@ -60,7 +60,7 @@ def setup_parser():
     call_parser.add_argument("--caller", required=True)
     call_parser.add_argument("--pem", required=True)
     call_parser.add_argument("--function", required=True)
-    call_parser.add_argument("--arguments", type=argparse.FileType('r'))
+    call_parser.add_argument("--arguments", nargs='+')
     call_parser.add_argument("--gas-price", default=200000000000000)
     call_parser.add_argument("--gas-limit", default=500000000)
     call_parser.set_defaults(func=call)
@@ -69,7 +69,7 @@ def setup_parser():
     query_parser.add_argument("contract")
     query_parser.add_argument("--proxy", required=True)
     query_parser.add_argument("--function", required=True)
-    query_parser.add_argument("--arguments", type=argparse.FileType('r'))
+    query_parser.add_argument("--arguments", nargs='+')
     query_parser.set_defaults(func=query)
 
     node_parser = subparsers.add_parser("nodedebug")
@@ -123,7 +123,7 @@ def deploy(args):
     owner = args.owner
     pem = args.pem
     proxy = args.proxy
-    arguments = None
+    arguments = args.arguments
 
     try:
         flows.deploy_smart_contract(project, owner, pem, proxy, arguments)
