@@ -12,7 +12,7 @@ logger = logging.getLogger("nodedebug")
 
 
 def start(force=False):
-    _install_if_missing()
+    install_if_missing()
 
     if _is_running() and not force:
         return
@@ -50,7 +50,7 @@ def _get_proc():
             return proc
 
 
-def _install_if_missing():
+def install_if_missing():
     dependencies.install_module("nodedebug", overwrite=False)
 
 

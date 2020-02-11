@@ -26,7 +26,7 @@ def get_all_modules():
                              "osx": "vendor-soll/darwin-amd64.tar.gz"
                          }),
 
-        StandaloneModule(key="nodedebug", name="nodedebug", tag="v0.0.3",
+        StandaloneModule(key="nodedebug", name="nodedebug", tag="v0.0.4",
                          groups=["NODE_DEBUG"],
                          urls_by_platform={
                              "linux": "nodedebug/v003/linux-amd64.tar.gz",

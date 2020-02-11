@@ -28,6 +28,8 @@ class DebugHost(Host):
         super().__init__()
 
     def run_flow(self, flow):
+        nodedebug.install_if_missing()
+        
         loop = asyncio.get_event_loop()
         loop.run_until_complete(self._run_node_debug_and_flow(flow))
         loop.close()
@@ -74,6 +76,8 @@ class TestnetHost(Host):
         self.url = url
 
     def run_flow(self, flow):
+        nodedebug.install_if_missing()
+
         loop = asyncio.get_event_loop()
         loop.run_until_complete(self._run_node_debug_and_flow(flow))
         loop.close()
