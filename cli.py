@@ -37,6 +37,7 @@ def setup_parser():
     create_parser.set_defaults(func=create)
 
     templates_parser = subparsers.add_parser("templates")
+    templates_parser.add_argument("--json", action="store_true")
     templates_parser.set_defaults(func=list_templates)
 
     build_parser = subparsers.add_parser("build")
@@ -96,8 +97,10 @@ def install(args):
 
 
 def list_templates(args):
+    json = args.json
+
     try:
-        projects.list_project_templates()
+        projects.list_project_templates(json)
     except errors.KnownError as err:
         logger.fatal(err)
 

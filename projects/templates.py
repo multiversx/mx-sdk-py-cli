@@ -1,8 +1,11 @@
+import json
 import logging
 import os
 import shutil
 from os import path
 from pathlib import Path
+
+from texttable import Texttable
 
 from erdpy import dependencies, environment, errors, utils
 from erdpy.projects import shared
@@ -11,15 +14,32 @@ from erdpy.projects.templates_config import get_templates_repositories
 logger = logging.getLogger("projects.templates")
 
 
-def list_project_templates():
+def list_project_templates(as_json=False):
     templates = []
 
-    for repo in get_templates_repositories():
-        repo.download()
-        templates.extend(repo.get_templates())
+    for repository in get_templates_repositories():
+        repository.download()
+        for template in repository.get_templates():
+            templates.append(TemplateSummary(template, repository))
 
-    templates = sorted(templates)
-    print(templates)
+    templates = sorted(templates, key=lambda item: item.name)
+
+    if as_json:
+        pretty_json = json.dumps([item.__dict__ for item in templates], indent=4)
+        print(pretty_json)
+    else:
+        table = Texttable()
+        table_data = [["Name", "Github", "Language"]]
+        table_data.extend([[item.name, item.github, item.language] for item in templates])
+        table.add_rows(table_data)
+        print(table.draw())
+
+
+class TemplateSummary():
+    def __init__(self, name, repository):
+        self.name = name
+        self.github = repository.github
+        self.language = repository.get_language(name)
 
 
 def create_from_template(name, template_name, directory):

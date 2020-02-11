@@ -1,5 +1,6 @@
 
 import logging
+import sys
 import urllib
 from os import path
 from urllib.request import urlretrieve
@@ -28,4 +29,4 @@ def download(url, filename):
 def _report_download_progress(block_number, read_size, total_size):
     num_blocks = total_size / read_size + 1
     progress = int(block_number / num_blocks * 100)
-    print(f"{progress} %", end="\r")
+    print(f"{progress} %", end="\r", file=sys.stderr)

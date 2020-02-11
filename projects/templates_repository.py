@@ -3,12 +3,14 @@ import shutil
 from os import path
 
 from erdpy import config, downloader, environment, errors, utils
+from erdpy.projects import shared
 
 
 class TemplatesRepository:
-    def __init__(self, key, url, relative_path):
+    def __init__(self, key, url, github, relative_path):
         self.key = key
         self.url = url
+        self.github = github
         self.relative_path = relative_path
 
     def download(self):
@@ -28,11 +30,11 @@ class TemplatesRepository:
         return folder
 
     def has_template(self, template):
-        folder = self._get_template_folder(template)
+        folder = self.get_template_folder(template)
         has = path.isdir(folder)
         return has
 
-    def _get_template_folder(self, template):
+    def get_template_folder(self, template):
         return path.join(self.get_folder(), self.relative_path,  template)
 
     def get_templates(self):
@@ -44,5 +46,16 @@ class TemplatesRepository:
         if not self.has_template(template):
             raise errors.TemplateMissingError(template)
 
-        source_path = self._get_template_folder(template)
+        source_path = self.get_template_folder(template)
         shutil.copytree(source_path, destination_path)
+
+    def get_language(self, template):
+        directory = self.get_template_folder(template)
+        
+        if shared.is_source_clang(directory):
+            return "C / C++"
+        if shared.is_source_sol(directory):
+            return "Solidity"
+        if shared.is_source_rust(directory):
+            return "Rust"
+        return "unknown"
