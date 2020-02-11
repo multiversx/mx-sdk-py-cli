@@ -32,6 +32,13 @@ def get_all_modules():
                              "linux": "nodedebug/v005/linux-amd64.tar.gz",
                              "osx": "nodedebug/v005/darwin-amd64.tar.gz"
                          }),
+                        
+        StandaloneModule(key="testrunner", name="testrunner", tag="v0.0.1",
+                         groups=["testing"],
+                         urls_by_platform={
+                             "linux": "testrunner/v001/linux-amd64.tar.gz",
+                             "osx": "testrunner/v001/darwin-amd64.tar.gz"
+                         }),
 
         Rust(key="rust", name="rust", tag="initial",
              groups=["RUST_BUILDCHAIN"])

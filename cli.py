@@ -78,6 +78,11 @@ def setup_parser():
     group.add_argument('--restart', action='store_true')
     node_parser.set_defaults(func=do_nodedebug)
 
+    test_parser = subparsers.add_parser("test")
+    test_parser.add_argument("project")
+    test_parser.add_argument("--name")
+    test_parser.set_defaults(func=run_tests)
+
     return parser
 
 
@@ -169,6 +174,16 @@ def do_nodedebug(args):
             nodedebug.stop()
         else:
             nodedebug.start()
+    except errors.KnownError as err:
+        logger.fatal(err)
+
+
+def run_tests(args):
+    project = args.project
+    name = args.name
+
+    try:
+        projects.run_tests(project, name)
     except errors.KnownError as err:
         logger.fatal(err)
 

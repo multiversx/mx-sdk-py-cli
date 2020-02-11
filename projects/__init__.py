@@ -1,4 +1,4 @@
-from erdpy.projects.core import build_project, load_project
+from erdpy.projects.core import build_project, load_project, run_tests
 from erdpy.projects.project_base import Project
 from erdpy.projects.project_clang import ProjectClang
 from erdpy.projects.project_rust import ProjectRust

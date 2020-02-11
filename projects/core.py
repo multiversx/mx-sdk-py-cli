@@ -4,7 +4,7 @@ import shutil
 from os import path
 from pathlib import Path
 
-from erdpy import errors
+from erdpy import dependencies, errors
 from erdpy.projects import shared
 from erdpy.projects.project_base import Project
 from erdpy.projects.project_clang import ProjectClang
@@ -36,3 +36,14 @@ def _guard_is_directory(directory):
     ok = path.isdir(directory)
     if not ok:
         raise errors.BadDirectory(directory)
+
+
+def run_tests(project_directory, test_name):
+    logger.info("run_tests.project_directory: %s", project_directory)
+    logger.info("run_tests.test_name: %s", test_name)
+
+    dependencies.install_module("testrunner")
+
+    _guard_is_directory(project_directory)
+    project = load_project(project_directory)
+    project.run_tests(test_name)

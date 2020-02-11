@@ -62,3 +62,6 @@ class Project:
         bytecode = utils.read_file(
             self.get_file_wasm().with_suffix(".hex.arwen"))
         return bytecode
+
+    def run_tests(self):
+        raise NotImplementedError()
