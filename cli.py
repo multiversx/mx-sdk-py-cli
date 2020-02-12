@@ -1,3 +1,4 @@
+import os
 import argparse
 import logging
 import pprint
@@ -44,7 +45,7 @@ def setup_parser():
     templates_parser.set_defaults(func=list_templates)
 
     build_parser = subparsers.add_parser("build")
-    build_parser.add_argument("project", default=".")
+    build_parser.add_argument("project", nargs='?', default=os.getcwd())
     build_parser.add_argument("--debug", action="store_true")
     build_parser.set_defaults(func=build)
 
