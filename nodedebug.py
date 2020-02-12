@@ -69,6 +69,7 @@ def deploy(bytecode, owner, arguments=None, testnet_url=None):
 
     url = _get_url("deploy")
     on_testnet = testnet_url is not None
+    arguments = arguments or []
 
     tx_data = bytecode
     for arg in arguments:
