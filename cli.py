@@ -3,7 +3,7 @@ import logging
 import pprint
 from argparse import ArgumentParser
 
-from erdpy import dependencies, errors, flows, nodedebug, projects
+from erdpy import config, dependencies, errors, flows, nodedebug, projects
 from erdpy._version import __version__
 
 logger = logging.getLogger("cli")
@@ -55,8 +55,8 @@ def setup_parser():
     deploy_parser.add_argument("--owner", required=True)
     deploy_parser.add_argument("--pem", required=True)
     deploy_parser.add_argument("--arguments", nargs='+')
-    deploy_parser.add_argument("--gas-price", default=200000000000000)
-    deploy_parser.add_argument("--gas-limit", default=500000000)
+    deploy_parser.add_argument("--gas-price", default=config.DEFAULT_GASPRICE)
+    deploy_parser.add_argument("--gas-limit", default=config.DEFAULT_GASLIMIT)
     deploy_parser.set_defaults(func=deploy)
 
     call_parser = subparsers.add_parser("call")
@@ -66,8 +66,8 @@ def setup_parser():
     call_parser.add_argument("--pem", required=True)
     call_parser.add_argument("--function", required=True)
     call_parser.add_argument("--arguments", nargs='+')
-    call_parser.add_argument("--gas-price", default=200000000000000)
-    call_parser.add_argument("--gas-limit", default=500000000)
+    call_parser.add_argument("--gas-price", default=config.DEFAULT_GASPRICE)
+    call_parser.add_argument("--gas-limit", default=config.DEFAULT_GASLIMIT)
     call_parser.set_defaults(func=call)
 
     query_parser = subparsers.add_parser("query")
@@ -136,9 +136,11 @@ def deploy(args):
     pem = args.pem
     proxy = args.proxy
     arguments = args.arguments
+    gas_price = args.gas_price
+    gas_limit = args.gas_limit
 
     try:
-        flows.deploy_smart_contract(project, owner, pem, proxy, arguments)
+        flows.deploy_smart_contract(project, owner, pem, proxy, arguments, gas_price, gas_limit)
     except errors.KnownError as err:
         logger.fatal(err)
 
@@ -150,9 +152,11 @@ def call(args):
     proxy = args.proxy
     function = args.function
     arguments = None
+    gas_price = args.gas_price
+    gas_limit = args.gas_limit
 
     try:
-        flows.call_smart_contract(contract, caller, pem, proxy, function, arguments)
+        flows.call_smart_contract(contract, caller, pem, proxy, function, arguments, gas_price, gas_limit)
     except errors.KnownError as err:
         logger.fatal(err)
 

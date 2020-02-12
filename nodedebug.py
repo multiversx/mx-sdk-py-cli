@@ -6,7 +6,7 @@ from os import path
 
 from psutil import process_iter
 
-from erdpy import dependencies, errors, myprocess, utils
+from erdpy import config, dependencies, errors, myprocess, utils
 
 logger = logging.getLogger("nodedebug")
 
@@ -64,12 +64,15 @@ def stop():
         logger.info("Nodedebug wasn't started.")
 
 
-def deploy(bytecode, owner, arguments=None, testnet_url=None):
+def deploy(bytecode, owner, arguments=None, gas_price=None, gas_limit=None, testnet_url=None):
     logger.debug("deploy")
+
+    arguments = arguments or []
+    gas_limit = gas_limit or config.DEFAULT_GASLIMIT
+    gas_price = gas_price or config.DEFAULT_GASPRICE
 
     url = _get_url("deploy")
     on_testnet = testnet_url is not None
-    arguments = arguments or []
 
     tx_data = bytecode
     for arg in arguments:
@@ -81,8 +84,8 @@ def deploy(bytecode, owner, arguments=None, testnet_url=None):
         "TestnetNodeEndpoint": testnet_url,
         "SndAddress": owner.address,
         "Value": "0",
-        "GasLimit": 500000000,
-        "GasPrice": 200000000000000,
+        "GasLimit": gas_limit,
+        "GasPrice": gas_price,
         "TxData": tx_data
     }
 
@@ -93,12 +96,15 @@ def deploy(bytecode, owner, arguments=None, testnet_url=None):
     return response.tx_hash, response.contract_address
 
 
-def execute(contract_address, caller, function, arguments=None, testnet_url=None):
+def execute(contract_address, caller, function, arguments=None, gas_price=None, gas_limit=None, testnet_url=None):
     logger.debug("execute")
+
+    arguments = arguments or []
+    gas_limit = gas_limit or config.DEFAULT_GASLIMIT
+    gas_price = gas_price or config.DEFAULT_GASPRICE
 
     url = _get_url("run")
     on_testnet = testnet_url is not None
-    arguments = arguments or []
 
     tx_data = function
     for arg in arguments:
@@ -111,8 +117,8 @@ def execute(contract_address, caller, function, arguments=None, testnet_url=None
         "SndAddress": caller.address,
         "ScAddress": contract_address,
         "Value": "0",
-        "GasLimit": 500000000,
-        "GasPrice": 200000000000000,
+        "GasLimit": gas_limit,
+        "GasPrice": gas_price,
         "TxData": tx_data
     }
 
@@ -126,9 +132,10 @@ def execute(contract_address, caller, function, arguments=None, testnet_url=None
 def query(contract_address, function, arguments=None, testnet_url=None):
     logger.debug("query")
 
+    arguments = [_prepare_argument(arg) for arg in arguments or []]
+
     url = _get_url("query")
     on_testnet = testnet_url is not None
-    arguments = [_prepare_argument(arg) for arg in arguments or []]
 
     data = {
         "ScAddress": contract_address,
