@@ -72,13 +72,6 @@ class ProjectClang(Project):
     def get_dependencies(self):
         return ["llvm-for-c"]
 
-    def run_tests(self, test_name):
-        tool_directory = dependencies.get_install_directory("testrunner")
-        tool = path.join(tool_directory, "test")
-        test_path = path.join(self.directory, "tests", f"{test_name}.json")
-        args = [tool, test_path]
-        myprocess.run_process(args)
-
 
 class BuildConfiguration:
     def __init__(self, project, debug):

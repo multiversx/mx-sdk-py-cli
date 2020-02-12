@@ -38,12 +38,12 @@ def _guard_is_directory(directory):
         raise errors.BadDirectory(directory)
 
 
-def run_tests(project_directory, test_name):
+def run_tests(project_directory, wildcard):
     logger.info("run_tests.project_directory: %s", project_directory)
-    logger.info("run_tests.test_name: %s", test_name)
+    logger.info("run_tests.wildcard: %s", wildcard)
 
     dependencies.install_module("testrunner")
 
     _guard_is_directory(project_directory)
     project = load_project(project_directory)
-    project.run_tests(test_name)
+    project.run_tests(wildcard)

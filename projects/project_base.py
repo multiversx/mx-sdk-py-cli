@@ -1,14 +1,15 @@
 import binascii
+import glob
 import os
 from os import path
 from pathlib import Path
 
-from erdpy import dependencies, errors, utils
+from erdpy import dependencies, errors, utils, myprocess
 
 
 class Project:
     def __init__(self, directory):
-        self.directory = directory
+        self.directory = str(Path(directory).resolve())
 
     def build(self, debug):
         self.debug = debug
@@ -63,5 +64,14 @@ class Project:
             self.get_file_wasm().with_suffix(".hex.arwen"))
         return bytecode
 
-    def run_tests(self):
-        raise NotImplementedError()
+    def run_tests(self, wildcard):
+        tool_directory = dependencies.get_install_directory("testrunner")
+        tool = path.join(tool_directory, "test")
+        test_folder = path.join(self.directory, "test")
+        pattern = path.join(test_folder, wildcard)
+        test_files = glob.glob(pattern)
+
+        for test_file in test_files:
+            print("Run test for:", test_file)
+            args = [tool, test_file]
+            myprocess.run_process(args)    

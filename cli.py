@@ -86,7 +86,7 @@ def setup_parser():
 
     test_parser = subparsers.add_parser("test")
     test_parser.add_argument("project")
-    test_parser.add_argument("--name")
+    test_parser.add_argument("--wildcard", default="*")
     test_parser.set_defaults(func=run_tests)
 
     return parser
@@ -192,10 +192,10 @@ def do_nodedebug(args):
 
 def run_tests(args):
     project = args.project
-    name = args.name
+    wildcard = args.wildcard
 
     try:
-        projects.run_tests(project, name)
+        projects.run_tests(project, wildcard)
     except errors.KnownError as err:
         logger.fatal(err)
 
