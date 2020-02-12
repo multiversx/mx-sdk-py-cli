@@ -4,6 +4,7 @@ import pprint
 from argparse import ArgumentParser
 
 from erdpy import dependencies, errors, flows, nodedebug, projects
+from erdpy._version import __version__
 
 logger = logging.getLogger("cli")
 
@@ -23,6 +24,8 @@ def main():
 def setup_parser():
     parser = ArgumentParser()
     subparsers = parser.add_subparsers()
+
+    parser.add_argument('-v', '--version', action='version', version=f"erdpy {__version__}")
 
     install_parser = subparsers.add_parser("install")
     choices = ["C_BUILDCHAIN", "SOL_BUILDCHAIN",
