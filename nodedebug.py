@@ -97,7 +97,7 @@ def deploy(bytecode, owner, arguments=None, gas_price=None, gas_limit=None, test
 
 
 def execute(contract_address, caller, function, arguments=None, gas_price=None, gas_limit=None, testnet_url=None):
-    logger.debug("execute")
+    logger.debug(f"execute, address={contract_address}")
 
     arguments = arguments or []
     gas_limit = gas_limit or config.DEFAULT_GASLIMIT
@@ -130,7 +130,7 @@ def execute(contract_address, caller, function, arguments=None, gas_price=None, 
 
 
 def query(contract_address, function, arguments=None, testnet_url=None):
-    logger.debug("query")
+    logger.debug(f"query, address={contract_address}")
 
     arguments = [_prepare_argument(arg) for arg in arguments or []]
 
