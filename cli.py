@@ -49,6 +49,7 @@ def setup_parser():
     build_parser.set_defaults(func=build)
 
     deploy_parser = subparsers.add_parser("deploy")
+    # TODO: path to project or path to bytecode (hex.arwen).
     deploy_parser.add_argument("project")
     deploy_parser.add_argument("--proxy", required=True)
     deploy_parser.add_argument("--owner", required=True)
