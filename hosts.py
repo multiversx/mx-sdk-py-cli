@@ -106,13 +106,13 @@ class TestnetHost(Host):
 
     def deploy_contract(self, contract, owner, arguments=None, gas_price=None, gas_limit=None):
         logger.debug("deploy_contract")
-        tx_hash, contract_address = nodedebug.deploy(contract.bytecode, owner, arguments, gas_price, gas_price, testnet_url=self.url)
+        tx_hash, contract_address = nodedebug.deploy(contract.bytecode, owner, arguments, gas_price, gas_limit, testnet_url=self.url)
         contract.address = contract_address
         return tx_hash, contract_address
 
     def execute_contract(self, contract, sender, function, arguments=None, gas_price=None, gas_limit=None):
         logger.debug("execute_contract")
-        nodedebug.execute(contract.address, sender, function, arguments, gas_price, gas_price, testnet_url=self.url)
+        nodedebug.execute(contract.address, sender, function, arguments, gas_price, gas_limit, testnet_url=self.url)
 
     def query_contract(self, contract, function, arguments=None):
         logger.debug("query_contract")
