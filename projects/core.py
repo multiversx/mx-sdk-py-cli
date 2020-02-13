@@ -15,6 +15,8 @@ logger = logging.getLogger("projects.core")
 
 
 def load_project(directory):
+    _guard_is_directory(directory)
+    
     if shared.is_source_clang(directory):
         return ProjectClang(directory)
     if shared.is_source_sol(directory):
