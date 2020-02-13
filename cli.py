@@ -85,7 +85,7 @@ def setup_parser():
     node_parser.set_defaults(func=do_nodedebug)
 
     test_parser = subparsers.add_parser("test")
-    test_parser.add_argument("project")
+    test_parser.add_argument("project", nargs='?', default=os.getcwd())
     test_parser.add_argument("--wildcard", default="*")
     test_parser.set_defaults(func=run_tests)
 
