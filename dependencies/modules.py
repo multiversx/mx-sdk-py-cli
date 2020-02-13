@@ -106,7 +106,7 @@ class Rust(DependencyModule):
         try:
             myprocess.run_process(["rustc", "--version"], env=self.get_env())
             return True
-        except FileNotFoundError:
+        except:
             return False
 
     def _get_rustup_path(self):
