@@ -65,7 +65,10 @@ class Project:
         return bytecode
 
     def run_tests(self, wildcard):
-        tool_directory = dependencies.get_install_directory("testrunner")
+        testrunner_module = dependencies.get_module_by_key("testrunner")
+        tool_directory = testrunner_module.get_directory()
+        tool_env = testrunner_module.get_env()
+
         tool = path.join(tool_directory, "test")
         test_folder = path.join(self.directory, "test")
         pattern = path.join(test_folder, wildcard)
@@ -74,4 +77,4 @@ class Project:
         for test_file in test_files:
             print("Run test for:", test_file)
             args = [tool, test_file]
-            myprocess.run_process(args)    
+            myprocess.run_process(args, env=tool_env())    

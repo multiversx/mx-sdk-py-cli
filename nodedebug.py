@@ -21,7 +21,7 @@ def start(force=False):
         stop()
 
     logger.info("Starting nodedebug...")
-    myprocess.run_process_async(_get_args())
+    myprocess.run_process_async(_get_args(), env=_get_env())
 
 
 def _get_args():
@@ -36,7 +36,7 @@ def _get_args():
 
 
 async def start_async():
-    await myprocess.async_subprocess(_get_args(), sinks=["nodedebug"])
+    await myprocess.async_subprocess(_get_args(), env=_get_env(), sinks=["nodedebug"])
 
 
 def _is_running():
@@ -198,3 +198,7 @@ def _prepare_argument(argument):
         as_hexstring = "0" + as_hexstring
 
     return as_hexstring
+
+
+def _get_env():
+    return dependencies.get_module_by_key("nodedebug").get_env()

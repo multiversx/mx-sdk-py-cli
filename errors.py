@@ -26,6 +26,11 @@ class BadDirectory(KnownError):
         super().__init__(f"Bad directory: {directory}")
 
 
+class NotSupportedProject(KnownError):
+    def __init__(self, directory):
+        super().__init__(f"Directory is not a supported project: {directory}")
+
+
 class PlatformNotSupported(KnownError):
     def __init__(self, action_or_item, platform):
         super().__init__(

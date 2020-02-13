@@ -25,6 +25,9 @@ class DependencyModule:
     def is_installed(self):
         raise NotImplementedError()
 
+    def get_env(self):
+        raise NotImplementedError()
+
 
 class StandaloneModule(DependencyModule):
     def __init__(self, key, name, tag, groups, urls_by_platform):
@@ -79,6 +82,11 @@ class StandaloneModule(DependencyModule):
         archive = path.join(tools_folder, f"{self.name}.{self.tag}.tar.gz")
         return archive
 
+    def get_env(self):
+        return {
+            "LD_LIBRARY_PATH": f"{path.join(self.get_directory())}:{os.environ.get('LD_LIBRARY_PATH')}"
+        }
+
 
 class Rust(DependencyModule):
     def __init__(self, key, name, tag, groups):
@@ -119,7 +127,7 @@ class Rust(DependencyModule):
 
     def get_env(self):
         return {
-            "PATH": f"{path.join(self.get_directory(), 'bin')}:{os.environ['PATH']}",
+            "PATH": f"{path.join(self.get_directory(), 'bin')}",
             "RUSTUP_HOME": self.get_directory(),
             "CARGO_HOME": self.get_directory()
         }

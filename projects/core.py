@@ -21,6 +21,8 @@ def load_project(directory):
         return ProjectSol(directory)
     if shared.is_source_rust(directory):
         return ProjectRust(directory)
+    else:
+        raise errors.NotSupportedProject(directory)
 
 
 def build_project(directory, debug=False):
