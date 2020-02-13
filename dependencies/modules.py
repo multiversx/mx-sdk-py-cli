@@ -127,7 +127,7 @@ class Rust(DependencyModule):
 
     def get_env(self):
         return {
-            "PATH": f"{path.join(self.get_directory(), 'bin')}",
+            "PATH": f"{path.join(self.get_directory(), 'bin')}:{os.environ['PATH']}",
             "RUSTUP_HOME": self.get_directory(),
             "CARGO_HOME": self.get_directory()
         }
