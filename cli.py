@@ -81,7 +81,7 @@ def setup_parser():
     node_parser = subparsers.add_parser("nodedebug")
     group = node_parser.add_mutually_exclusive_group()
     group.add_argument('--stop', action='store_true')
-    group.add_argument('--restart', action='store_true')
+    group.add_argument('--restart', action='store_true', default=True)
     node_parser.set_defaults(func=do_nodedebug)
 
     test_parser = subparsers.add_parser("test")

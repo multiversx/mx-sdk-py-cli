@@ -1,6 +1,7 @@
 import asyncio
 import logging
 import subprocess
+import traceback
 
 from erdpy import feedback
 
@@ -15,19 +16,6 @@ def run_process(args, env=None):
     logger.info("Successful run. Output:")
     print(output or "[No output]")
     return output
-
-
-def run_process_piped_output(args, env=None):
-    logger.info(f"run_process_realtime_output: {args}")
-
-    process = subprocess.Popen(args, shell=False, universal_newlines=True, stdout=subprocess.PIPE,
-                               stderr=subprocess.PIPE, env=env)
-
-    while True:
-        line = process.stdout.readline()
-        if not line:
-            break
-        print(line.strip())
 
 
 def run_process_async(args, env=None):
@@ -50,20 +38,16 @@ async def async_subprocess(args, env=None, sinks=None):
 
 async def _read_stream(stream, sinks=None):
     while True:
-        line = await stream.readline()
-        if line:
-            line = str(line, "utf-8").strip()
-            if sinks is None:
-                print(line)
+        try:
+            line = await stream.readline()
+            if line:
+                line = line.decode("utf-8", "replace").strip()
+                if sinks is None:
+                    print(line)
+                else:
+                    for sink in sinks:
+                        feedback.get_sink(sink).write(line)
             else:
-                for sink in sinks:
-                    feedback.get_sink(sink).write(line)
-        else:
-            break
-
-
-def run_process_nowait(args, env=None):
-    logger.info(f"run_process_nowait: {args}")
-
-    subprocess.Popen(args, shell=False, universal_newlines=True, stdout=subprocess.PIPE,
-                     stderr=subprocess.PIPE, env=env, start_new_session=True)
+                break
+        except Exception as err:
+            print(traceback.format_exc())
