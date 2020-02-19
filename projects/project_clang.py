@@ -67,10 +67,10 @@ class ProjectClang(Project):
         return self.find_file(".c").with_suffix(".wasm")
 
     def _get_llvm_path(self):
-        return dependencies.get_install_directory("llvm-for-c")
+        return dependencies.get_install_directory("llvm")
 
     def get_dependencies(self):
-        return ["llvm-for-c"]
+        return ["llvm"]
 
 
 class BuildConfiguration:

@@ -3,27 +3,19 @@ from erdpy.dependencies.modules import StandaloneModule, Rust
 
 def get_all_modules():
     return [
-        StandaloneModule(key="llvm-for-c", name="llvm", tag="v9",
-                         groups=["C_BUILDCHAIN"],
+        StandaloneModule(key="llvm", name="llvm", tag="v9",
+                         groups=["C_BUILDCHAIN", "SOL_BUILDCHAIN"],
                          urls_by_platform={
-                             "linux": "vendor-llvm/v9/linux-amd64.tar.gz",
-                             "osx": "vendor-llvm/v9/darwin-amd64.tar.gz",
-                             "windows": "vendor-llvm/v9/windows-amd64.tar.gz",
+                             "linux": "vendor-llvm/v9-19feb/linux-amd64.tar.gz?t=19feb",
+                             "osx": "vendor-llvm/v9-19feb/darwin-amd64.tar.gz",
+                             "windows": "vendor-llvm/v9-19feb/windows-amd64.tar.gz",
                          }),
 
-        StandaloneModule(key="llvm-for-soll", name="llvm", tag="v8",
+        StandaloneModule(key="soll", name="soll", tag="v0.0.5",
                          groups=["SOL_BUILDCHAIN"],
                          urls_by_platform={
-                             "linux": "vendor-llvm/v8/linux-amd64.tar.gz",
-                             "osx": "vendor-llvm/v8/darwin-amd64.tar.gz",
-                             "windows": "vendor-llvm/v8/windows-amd64.tar.gz",
-                         }),
-
-        StandaloneModule(key="soll", name="soll", tag="v0.0.3",
-                         groups=["SOL_BUILDCHAIN"],
-                         urls_by_platform={
-                             "linux": "vendor-soll/linux-amd64.tar.gz",
-                             "osx": "vendor-soll/darwin-amd64.tar.gz"
+                             "linux": "vendor-soll/v005/linux-amd64.tar.gz",
+                             "osx": "vendor-soll/v005/darwin-amd64.tar.gz"
                          }),
 
         StandaloneModule(key="nodedebug", name="nodedebug", tag="v0.0.7",
