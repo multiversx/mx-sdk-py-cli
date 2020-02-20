@@ -10,3 +10,6 @@ class Account:
         if pem_file:
             pem_file = path.expanduser(pem_file)
             self.pem = utils.read_file(pem_file)
+
+    def address_formatted(self):
+        return f"0x{self.address}"

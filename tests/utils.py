@@ -15,6 +15,12 @@ class ProjectTestCase(unittest.TestCase):
         self.host = DebugHost()
         self.alice = Account(
             "aaaaaaaa112233441122334411223344112233441122334411223344aaaaaaaa")
+        self.bob = Account(
+            "bbbbbbbb112233441122334411223344112233441122334411223344bbbbbbbb")
+        self.carol = Account(
+            "cccccccc112233441122334411223344112233441122334411223344cccccccc")
+        self.david = Account(
+            "dddddddd112233441122334411223344112233441122334411223344dddddddd")
 
     def build(self, name):
         project = self.load_project(name)
@@ -30,6 +36,9 @@ class ProjectTestCase(unittest.TestCase):
         owner = owner or self.alice
         tx, address = self.host.deploy_contract(contract, owner=owner)
         return tx, address
+
+    def execute(self, contract, caller, function, arguments=None):
+        self.host.execute_contract(contract, caller, function, arguments)
 
     def query_number(self, contract, function, arguments=None):
         result = self.query_first(contract, function, arguments)
