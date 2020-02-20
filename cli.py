@@ -51,7 +51,7 @@ def setup_parser():
 
     deploy_parser = subparsers.add_parser("deploy")
     # TODO: path to project or path to bytecode (hex.arwen).
-    deploy_parser.add_argument("project")
+    deploy_parser.add_argument("project", nargs='?', default=os.getcwd())
     deploy_parser.add_argument("--proxy", required=True)
     deploy_parser.add_argument("--owner", required=True)
     deploy_parser.add_argument("--pem", required=True)
