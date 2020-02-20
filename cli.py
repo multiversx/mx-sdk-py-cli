@@ -152,7 +152,7 @@ def call(args):
     pem = args.pem
     proxy = args.proxy
     function = args.function
-    arguments = None
+    arguments = args.arguments
     gas_price = args.gas_price
     gas_limit = args.gas_limit
 
