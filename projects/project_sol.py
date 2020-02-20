@@ -13,6 +13,10 @@ class ProjectSol(Project):
         super().__init__(directory)
 
     def perform_build(self):
+        """
+        See https://github.com/second-state/SOLL/blob/master/utils/ll2ewasm_sol
+        """
+
         self.unit = self.find_file(".sol")
         self.unit_name = self.unit.stem
         self.file_ll = self.unit.with_suffix(".ll")
@@ -21,13 +25,10 @@ class ProjectSol(Project):
         self.file_bc = self.unit.with_suffix(".bc")
         self.file_o = self.unit.with_suffix(".o")
 
-        # TODO: fix wrt:
-        # https://github.com/second-state/SOLL/blob/master/utils/ll2ewasm_sol
-
         try:
-            #self._create_main_ll()
-            #self._emit_LLVM()
-            #self._emit_funcions()
+            self._create_main_ll()
+            self._emit_LLVM()
+            self._emit_funcions()
             self._do_llvm_link()
             self._do_llvm_opt()
             self._do_llc()
@@ -84,16 +85,14 @@ class ProjectSol(Project):
     def _do_wasm_ld(self):
         logger.info("_do_wasm_ld")
 
-        #--entry main --gc-sections --allow-undefined
         tool = path.join(self._get_llvm_path(), "wasm-ld")
         args = [
             tool, 
             "--entry",
             "main",
-            #"--gc-sections",
             "--demangle",
             "--no-gc-sections",
-            #"--export-all",
+            "--export-all",
             "--allow-undefined",
             "--verbose",
             self.file_o,

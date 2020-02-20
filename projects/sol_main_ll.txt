@@ -1,6 +1,9 @@
 source_filename = "{{NAME}}"
 target datalayout = "e-m:e-p:32:32-i64:64-n32:64-S128"
 target triple = "wasm32-unknown-unknown-wasm"
+; STUB "deploy.data" as "wasm"
+@deploy.data = local_unnamed_addr constant [4 x i8] c"\77\61\73\6D", align 1
+@deploy.size = local_unnamed_addr constant i32 4, align 8
 declare void @solidity.main()
 define void @main() {
     tail call void @solidity.main()
