@@ -6,7 +6,7 @@ from pathlib import Path
 from erdpy import projects
 from erdpy.accounts import Account
 from erdpy.contracts import SmartContract
-from erdpy.hosts import DebugHost
+from erdpy.environments import DebugEnvironment
 from erdpy.tests import utils
 
 logging.basicConfig(level=logging.ERROR)
@@ -24,7 +24,7 @@ class ProjectSolidityTestCase(utils.ProjectTestCase):
             answer = self.query_number(contract, "getValue()")
             self.assertEqual(42, answer)
 
-        self.host.run_flow(myflow)
+        self.environment.run_flow(myflow)
 
     def test_solidity_soll_001(self):
         _, contract = self.build("solidity_soll_001")
@@ -38,7 +38,7 @@ class ProjectSolidityTestCase(utils.ProjectTestCase):
             args = [a, b]
             return self.query_number(contract, "add(uint256,uint256)", args)
 
-        self.host.run_flow(myflow)
+        self.environment.run_flow(myflow)
 
     def test_solidity_soll_003(self):
         _, contract = self.build("solidity_soll_003")
@@ -63,4 +63,4 @@ class ProjectSolidityTestCase(utils.ProjectTestCase):
             args = [account.address_formatted()]
             return self.query_number(contract, "balanceOf(address)", args)
 
-        self.host.run_flow(myflow)
+        self.environment.run_flow(myflow)

@@ -2,7 +2,7 @@ import os
 import shutil
 from os import path
 
-from erdpy import config, downloader, environment, errors, utils
+from erdpy import config, downloader, workstation, errors, utils
 from erdpy.projects import shared
 
 
@@ -20,12 +20,12 @@ class TemplatesRepository:
         utils.unzip(archive, templates_folder)
 
     def _get_archive_path(self):
-        tools_folder = environment.get_tools_folder()
+        tools_folder = workstation.get_tools_folder()
         archive = path.join(tools_folder, f"{self.key}.zip")
         return archive
 
     def get_folder(self):
-        tools_folder = environment.get_tools_folder()
+        tools_folder = workstation.get_tools_folder()
         folder = path.join(tools_folder, "templates", self.key)
         return folder
 

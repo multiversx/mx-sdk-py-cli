@@ -4,7 +4,7 @@ import os
 import subprocess
 from os import path
 
-from erdpy import config, downloader, environment, errors, myprocess, utils
+from erdpy import config, downloader, workstation, errors, myprocess, utils
 
 logger = logging.getLogger("modules")
 
@@ -63,12 +63,12 @@ class StandaloneModule(DependencyModule):
         utils.untar(archive_path, destination_folder)
 
     def get_directory(self):
-        tools_folder = environment.get_tools_folder()
+        tools_folder = workstation.get_tools_folder()
         folder = path.join(tools_folder, self.name, self.tag)
         return folder
 
     def _get_download_url(self):
-        platform = environment.get_platform()
+        platform = workstation.get_platform()
         url = self.urls_by_platform.get(platform)
 
         if url is None:
@@ -78,7 +78,7 @@ class StandaloneModule(DependencyModule):
         return url
 
     def _get_archive_path(self):
-        tools_folder = environment.get_tools_folder()
+        tools_folder = workstation.get_tools_folder()
         archive = path.join(tools_folder, f"{self.name}.{self.tag}.tar.gz")
         return archive
 
@@ -118,11 +118,11 @@ class Rust(DependencyModule):
             return False
 
     def _get_rustup_path(self):
-        tools_folder = environment.get_tools_folder()
+        tools_folder = workstation.get_tools_folder()
         return path.join(tools_folder, "rustup.sh")
 
     def get_directory(self):
-        tools_folder = environment.get_tools_folder()
+        tools_folder = workstation.get_tools_folder()
         return path.join(tools_folder, "vendor-rust")
 
     def get_env(self):

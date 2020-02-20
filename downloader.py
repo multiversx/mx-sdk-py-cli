@@ -5,7 +5,7 @@ import urllib
 from os import path
 from urllib.request import urlretrieve
 
-from erdpy import config, environment, errors, utils
+from erdpy import config, workstation, errors, utils
 
 logger = logging.getLogger("downloader")
 

@@ -7,7 +7,7 @@ from pathlib import Path
 
 from texttable import Texttable
 
-from erdpy import dependencies, environment, errors, utils
+from erdpy import dependencies, workstation, errors, utils
 from erdpy.projects import shared
 from erdpy.projects.templates_config import get_templates_repositories
 

@@ -1,6 +1,6 @@
 from os import path
 
-from erdpy import environment, errors, utils
+from erdpy import workstation, errors, utils
 
 
 class Sink:
@@ -28,7 +28,7 @@ class ConsoleChannel(OutputChannel):
 
 class FileChannel(OutputChannel):
     def __init__(self, name):
-        directory = path.join(environment.get_tools_folder(), "OutputChannels")
+        directory = path.join(workstation.get_tools_folder(), "OutputChannels")
         utils.ensure_folder(directory)
         filepath = path.join(directory, f"{name}.txt")
         self.file = open(filepath, "a")

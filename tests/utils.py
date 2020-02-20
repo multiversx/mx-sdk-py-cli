@@ -6,13 +6,13 @@ from pathlib import Path
 from erdpy import projects
 from erdpy.accounts import Account
 from erdpy.contracts import SmartContract
-from erdpy.hosts import DebugHost
+from erdpy.environments import DebugEnvironment
 
 
 class ProjectTestCase(unittest.TestCase):
     def setUp(self):
         self.testdata = Path(__file__).parent.joinpath("testdata")
-        self.host = DebugHost()
+        self.environment = DebugEnvironment()
         self.alice = Account(
             "aaaaaaaa112233441122334411223344112233441122334411223344aaaaaaaa")
         self.bob = Account(
@@ -34,11 +34,11 @@ class ProjectTestCase(unittest.TestCase):
 
     def deploy(self, contract, owner=None):
         owner = owner or self.alice
-        tx, address = self.host.deploy_contract(contract, owner=owner)
+        tx, address = self.environment.deploy_contract(contract, owner=owner)
         return tx, address
 
     def execute(self, contract, caller, function, arguments=None):
-        self.host.execute_contract(contract, caller, function, arguments)
+        self.environment.execute_contract(contract, caller, function, arguments)
 
     def query_number(self, contract, function, arguments=None):
         result = self.query_first(contract, function, arguments)
@@ -46,7 +46,7 @@ class ProjectTestCase(unittest.TestCase):
         return result
 
     def query_first(self, contract, function, arguments=None):
-        results = self.host.query_contract(contract, function, arguments)
+        results = self.environment.query_contract(contract, function, arguments)
         result = results[0]
         return result
 
