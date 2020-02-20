@@ -31,9 +31,12 @@ class ProjectSolidityTestCase(utils.ProjectTestCase):
 
         def myflow():
             self.deploy(contract)
-            answer = self.query_number(
-                contract, "add(uint256,uint256)", [30, 12])
+            answer = add(30, 12)
             self.assertEqual(42, answer)
+
+        def add(a, b):
+            args = [a, b]
+            return self.query_number(contract, "add(uint256,uint256)", args)
 
         self.host.run_flow(myflow)
 
@@ -53,10 +56,11 @@ class ProjectSolidityTestCase(utils.ProjectTestCase):
             self.assertEqual(800, balance_of(self.carol))
 
         def transfer(sender, recipient, amount):
-            self.execute(contract, sender, "transfer(address,uint256)", [
-                         recipient.address_formatted(), amount])
+            args = [recipient.address_formatted(), amount]
+            self.execute(contract, sender, "transfer(address,uint256)", args)
 
         def balance_of(account):
-            return self.query_number(contract, "balanceOf(address)", [account.address_formatted()])
+            args = [account.address_formatted()]
+            return self.query_number(contract, "balanceOf(address)", args)
 
         self.host.run_flow(myflow)
