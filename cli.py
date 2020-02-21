@@ -46,7 +46,8 @@ def setup_parser():
 
     build_parser = subparsers.add_parser("build")
     build_parser.add_argument("project", nargs='?', default=os.getcwd())
-    build_parser.add_argument("--debug", action="store_true")
+    build_parser.add_argument("--debug", action="store_true", default=False)
+    build_pasers.add_argument("--no-optimization", action="store_true")
     build_parser.set_defaults(func=build)
 
     deploy_parser = subparsers.add_parser("deploy")
@@ -123,10 +124,13 @@ def create(args):
 
 def build(args):
     project = args.project
-    debug = args.debug
+    options = {
+        "debug" : args.debug,
+        "optimized": not args.no_optimization
+    }
 
     try:
-        projects.build_project(project, debug)
+        projects.build_project(project, options)
     except errors.KnownError as err:
         logger.fatal(err)
 

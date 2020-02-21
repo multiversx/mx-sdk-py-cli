@@ -33,16 +33,25 @@ class ProjectClang(Project):
         tool = path.join(self._get_llvm_path(), "clang-9")
         args = [
             tool,
-            "-cc1", "-Ofast", "-emit-llvm",
+            "-cc1", "-emit-llvm",
             "-triple=wasm32-unknown-unknown-wasm",
-            str(self.unit)
         ]
+        if self.options["optimized"]:
+            args.append("-Ofast")
+        else:
+            args.append("-O0")
+        args.append(str(self.unit))
         myprocess.run_process(args)
 
     def _do_llc(self):
         logger.info("_do_llc")
         tool = path.join(self._get_llvm_path(), "llc")
-        args = [tool, "-O3", "-filetype=obj", self.file_ll, "-o", self.file_o]
+        args = [tool]
+        if self.options["optimized"]:
+            args.append("-O3")
+        else:
+            args.append("-O0")
+        args.extend(["-filetype=obj", self.file_ll, "-o", self.file_o])
         myprocess.run_process(args)
 
     def _do_wasm(self):
