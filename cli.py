@@ -166,7 +166,7 @@ def query(args):
     contract = args.contract
     proxy = args.proxy
     function = args.function
-    arguments = None
+    arguments = args.arguments
 
     try:
         flows.query_smart_contract(contract, proxy, function, arguments)
