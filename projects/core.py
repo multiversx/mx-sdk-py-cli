@@ -16,7 +16,7 @@ logger = logging.getLogger("projects.core")
 
 def load_project(directory):
     _guard_is_directory(directory)
-    
+
     if shared.is_source_clang(directory):
         return ProjectClang(directory)
     if shared.is_source_sol(directory):
@@ -27,13 +27,13 @@ def load_project(directory):
         raise errors.NotSupportedProject(directory)
 
 
-def build_project(directory, debug=False):
+def build_project(directory, options):
     logger.info("build_project.directory: %s", directory)
-    logger.info("build_project.debug: %s", debug)
+    logger.info("build_project.debug: %s", options['debug'])
 
     _guard_is_directory(directory)
     project = load_project(directory)
-    project.build(debug)
+    project.build(options)
 
 
 def _guard_is_directory(directory):
