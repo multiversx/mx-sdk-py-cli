@@ -1,10 +1,10 @@
-import os
 import argparse
 import logging
+import os
 import pprint
 from argparse import ArgumentParser
 
-from erdpy import config, dependencies, errors, flows, nodedebug, projects
+from erdpy import config, dependencies, errors, flows, ide, nodedebug, projects
 from erdpy._version import __version__
 
 logger = logging.getLogger("cli")
@@ -88,6 +88,10 @@ def setup_parser():
     test_parser.add_argument("project", nargs='?', default=os.getcwd())
     test_parser.add_argument("--wildcard", default="*")
     test_parser.set_defaults(func=run_tests)
+
+    ide_parser = subparsers.add_parser("ide")
+    ide_parser.add_argument("project", nargs='?', default=os.getcwd())
+    ide_parser.set_defaults(func=run_ide)
 
     return parser
 
@@ -196,6 +200,15 @@ def run_tests(args):
 
     try:
         projects.run_tests(project, wildcard)
+    except errors.KnownError as err:
+        logger.fatal(err)
+
+
+def run_ide(args):
+    project = args.project
+    
+    try:
+        ide.run_ide(project)
     except errors.KnownError as err:
         logger.fatal(err)
 
