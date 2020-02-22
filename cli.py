@@ -91,7 +91,7 @@ def setup_parser():
     test_parser.set_defaults(func=run_tests)
 
     ide_parser = subparsers.add_parser("ide")
-    ide_parser.add_argument("project", nargs='?', default=os.getcwd())
+    ide_parser.add_argument("workspace", nargs='?', default=os.getcwd())
     ide_parser.set_defaults(func=run_ide)
 
     return parser
@@ -209,10 +209,10 @@ def run_tests(args):
 
 
 def run_ide(args):
-    project = args.project
+    workspace = args.workspace
     
     try:
-        ide.run_ide(project)
+        ide.run_ide(workspace)
     except errors.KnownError as err:
         logger.fatal(err)
 
