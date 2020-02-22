@@ -36,7 +36,7 @@ class ProjectClang(Project):
             "-cc1", "-emit-llvm",
             "-triple=wasm32-unknown-unknown-wasm",
         ]
-        if self.options["optimized"]:
+        if self.options.get("optimized", False):
             args.append("-Ofast")
         else:
             args.append("-O0")
@@ -47,7 +47,7 @@ class ProjectClang(Project):
         logger.info("_do_llc")
         tool = path.join(self._get_llvm_path(), "llc")
         args = [tool]
-        if self.options["optimized"]:
+        if self.options.get("optimized", False):
             args.append("-O3")
         else:
             args.append("-O0")
