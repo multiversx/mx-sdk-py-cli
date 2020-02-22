@@ -1,0 +1,82 @@
+<div class="modal-dialog modal-lg">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h4 class="modal-title">Deploy Smart Contract</h4>
+            <button type="button" class="close" data-dismiss="modal">&times;</button>
+        </div>
+
+        <div class="modal-body">
+            <form>
+                [[ if (onTestnet) { ]]
+                <div class="form-group">
+                    <label class="">Private key:</label>
+                    <input class="form-control" type="file" name="PrivateKeyFile" accept=".pem" />
+                </div>
+                [[ } else { ]]
+                <div class="form-group">
+                    <label class="">Sender address:</label>
+                    <input class="form-control" name="SenderAddress" type="text" value="" />
+                </div>
+                [[ } ]]
+                <div class="form-group">
+                    <label>Deploy (init) arguments</label>
+                    <textarea name="InitArgs" class="form-control" rows="3"></textarea>
+                </div>
+                <strong>
+                    Arguments that start with <kbd>0x</kbd> will be sent as they are, with the prefix removed.
+                    Other arguments will be interpreted as numbers and converted to hex before sending.
+                </strong>
+
+                <div class="row">
+                    <div class="col-sm-4">
+                        <div class="form-group">
+                            <label>Value</label>
+                            <input name="Value" type="text" class="form-control" required placeholder="0" value="0">
+                        </div>
+                    </div>
+                    <div class="col-sm-4">
+                        <div class="form-group">
+                            <label>Gas limit</label>
+                            <input name="GasLimit" type="number" class="form-control" required value="500000000">
+                        </div>
+                    </div>
+                    <div class="col-sm-4">
+                        <div class="form-group">
+                            <label>Gas price</label>
+                            <input name="GasPrice" type="number" class="form-control" required value="100000000000000">
+                        </div>
+                    </div>
+                </div>
+            </form>
+
+            [[ if (onTestnet) { ]]
+            [[ if (contract.PropertiesOnTestnet.Address) { ]]
+            <div class="form-group">
+                <label class="">Deployed at address:</label>
+                <input class="form-control" name="" type="text" value="[[= contract.PropertiesOnTestnet.Address ]]" readonly />
+            </div>
+            [[ } ]]
+            [[ } else { ]]
+            [[ if (contract.PropertiesOnNodeDebug.Address) { ]]
+            <div class="form-group">
+                <label class="">Deployed at address:</label>
+                <input class="form-control" name="" type="text" value="[[= contract.Address ]]" readonly />
+            </div>
+            [[ } ]]
+            [[ } ]]
+
+            <div class="alert alert-danger validation-errors-container d-none"></div>
+        </div>
+
+        <div class="modal-footer">
+            <button type="button" class="btn btn-light" data-dismiss="modal">Close</button>
+            <button type="button" class="btn btn-primary btn-submit">
+                [[ if (onTestnet) { ]]
+                [[= contract.PropertiesOnTestnet.Address ? "Deploy again" : "Deploy" ]]
+                [[ } else { ]]
+                [[= contract.PropertiesOnNodeDebug.Address ? "Deploy again" : "Deploy" ]]
+                [[ } ]]
+            </button>
+        </div>
+    </div>
+</div>

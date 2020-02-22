@@ -1,0 +1,19 @@
+<div>
+    <div class="card mb-2">
+        <div class="card-header">URL: <strong>[[= item.request.url ]]</strong></div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-sm-6">
+                    <h5>Request</h5>
+                    <pre>[[= JSON.stringify(item.request.data, null, 4) ]]</pre>
+                </div>
+                <div class="col-sm-6">
+                    <h5>Response</h5>
+                    [[ if (item.response) { ]]
+                    <pre>[[= JSON.stringify(item.response.data, null, 4) ]]</pre>
+                    [[ } ]]
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
