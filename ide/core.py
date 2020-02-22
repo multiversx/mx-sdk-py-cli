@@ -1,13 +1,27 @@
 import bottle
 from bottle import route, post, run, template, static_file, request
 from pathlib import Path
+from erdpy.projects import get_projects_in_workspace
+from erdpy.ide.view_models import SmartContractViewModel
 
 app = bottle.Bottle()
+global_workspace = "./examples/contracts"
 
 
 @app.route("/")
 def index():
     return template("dashboard.html")
+
+
+@app.route("/workspace/contracts")
+def workspace_contracts():
+    projects = get_projects_in_workspace(global_workspace)
+    models = [SmartContractViewModel(project).__dict__ for project in projects]
+    return dict(data=models)
+
+
+def load_workspace_contracts():
+    pass
 
 
 @app.post("/contracts/deploy")
@@ -25,6 +39,8 @@ def server_static(filepath):
 
 
 def run_ide(workspace):
+    global global_workspace
+    global_workspace = workspace
     run(app, host="localhost", port=8081, debug=True)
 
 

@@ -4,7 +4,7 @@ import shutil
 from os import path
 from pathlib import Path
 
-from erdpy import dependencies, errors
+from erdpy import dependencies, errors, utils
 from erdpy.projects import shared
 from erdpy.projects.project_base import Project
 from erdpy.projects.project_clang import ProjectClang
@@ -51,3 +51,20 @@ def run_tests(project_directory, wildcard):
     _guard_is_directory(project_directory)
     project = load_project(project_directory)
     project.run_tests(wildcard)
+
+
+def get_projects_in_workspace(workspace):
+    _guard_is_directory(workspace)
+    subfolders = utils.get_subfolders(workspace)
+    projects = []
+
+    for folder in subfolders:
+        project_directory = path.join(workspace, folder)
+
+        try:
+            project = load_project(project_directory)
+            projects.append(project)
+        except:
+            pass
+
+    return projects

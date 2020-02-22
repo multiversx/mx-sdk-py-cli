@@ -7,19 +7,19 @@ var SmartContract = Backbone.Model.extend({
     deploy: function (options) {
         var payload = options.toJSON();
         payload.id = this.id;
-        app.talkToVscode("deploySmartContract", payload);
+        app.talkToHead("deploySmartContract", payload);
     },
 
     run: function (options) {
         var payload = options.toJSON();
         payload.id = this.id;
-        app.talkToVscode("runSmartContract", payload);
+        app.talkToHead("runSmartContract", payload);
     },
 
     queryWatchedVariables: function (payload) {
         payload = payload || {};
         payload.id = this.id;
-        app.talkToVscode("queryWatchedVariables", payload);
+        app.talkToHead("queryWatchedVariables", payload);
     },
 
     addWatchedVariable: function(options) {
@@ -61,7 +61,7 @@ var SmartContract = Backbone.Model.extend({
         payload.variables = this.getWatchedVariables(options.onTestnet);
 
         this.trigger("change", this);
-        app.talkToVscode("setWatchedVariables", payload);
+        app.talkToHead("setWatchedVariables", payload);
     }
 });
 

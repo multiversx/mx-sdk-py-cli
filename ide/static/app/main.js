@@ -1,18 +1,3 @@
-// $(function () {
-//     var data = JSON.stringify({});
-
-//     $.ajax({
-//         type: "POST",
-//         url: "/contracts/deploy",
-//         data: data,
-//         contentType: 'application/json; charset=UTF-8',
-//         success: function() {
-
-//         },
-//         dataType: "json"
-//     });
-// })
-
 _.templateSettings = {
     interpolate: /\[\[=(.+?)\]\]/g,
     evaluate: /\[\[(.+?)\]\]/g,
@@ -26,7 +11,7 @@ $(function () {
 });
 
 function main() {
-    //app.vscode = acquireVsCodeApi();
+    app.head = getHead();
     app.smartContracts = new SmartContractsCollection();
     app.restDialogue = new RestDialogueCollection();
     app.variables = new VariablesModel();
@@ -114,10 +99,10 @@ function onMessageRefreshSmartContracts(contracts) {
     app.smartContracts.set(contracts);
 }
 
-app.talkToVscode = function (what, payload) {
+app.talkToHead = function (what, payload) {
     app.log("OUTGOING MESSAGE: " + what);
     app.log(payload);
-    //app.vscode.postMessage({ what: what, payload: payload });
+    app.head.postMessage(what, payload);
 };
 
 app.log = function (message) {

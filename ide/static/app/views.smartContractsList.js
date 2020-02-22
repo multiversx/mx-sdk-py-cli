@@ -6,7 +6,7 @@ var SmartContractsListView = Backbone.View.extend({
         this.listenTo(this.collection, "update", this.render);
         this.render();
 
-        app.talkToVscode("refreshSmartContracts");
+        app.talkToHead("refreshSmartContracts");
     },
 
     render: function () {
