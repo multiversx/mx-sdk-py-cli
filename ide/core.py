@@ -3,8 +3,10 @@ from bottle import route, post, run, template, static_file, request
 from pathlib import Path
 from erdpy.projects import get_projects_in_workspace
 from erdpy.ide.view_models import SmartContractViewModel
+from erdpy.ide.bottle_plugins import EnableCors
 
 app = bottle.Bottle()
+app.install(EnableCors())
 global_workspace = "./examples/contracts"
 
 
