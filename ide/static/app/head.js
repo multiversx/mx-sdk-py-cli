@@ -1,5 +1,5 @@
 function getHead() {
-    if (window.acquireVsCodeApi) {
+    if (document.location.href.indexOf("vscode") > -1) {
         return new VsCodeHead();
     } else {
         return new BrowserHead();
@@ -7,14 +7,27 @@ function getHead() {
 }
 
 function VsCodeHead() {
-    var vscode = window.acquireVsCodeApi();
-
     function postMessage(what, payload) {
-        vscode.postMessage({ what: what, payload: payload });
+        window.parent.postMessage({ what: what, payload: payload }, "*");
     }
 
+    function log(payload) {
+        postMessage("log", payload);
+    }
+
+    window.addEventListener("message", function(event) {
+        // Message from vscode webview.
+        var data = event.data;
+        var what = data.what;
+        var payload = data.payload || {};
+        
+        log(`Received message from vscode: ${what}`);
+        app.events.trigger(`extension-message:${what}`, payload);
+    });
+
     return {
-        postMessage: postMessage
+        postMessage: postMessage,
+        log: log
     }
 }
 

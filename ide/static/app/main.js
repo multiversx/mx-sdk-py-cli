@@ -19,13 +19,6 @@ function main() {
     initializeNavigation();
     initializeUnderscoreTemplates();
     listenToExtensionMessages();
-
-    // Listen to vscode extension messages.
-    window.addEventListener("message", event => {
-        app.log("INCOMING MESSAGE: " + event.data.what);
-        app.log(event.data.payload);
-        app.events.trigger(`extension-message:${event.data.what}`, event.data.payload || {});
-    });
     
     app.debugView = new DebugView({
         el: ".debug-view",
@@ -100,11 +93,5 @@ function onMessageRefreshSmartContracts(contracts) {
 }
 
 app.talkToHead = function (what, payload) {
-    app.log("OUTGOING MESSAGE: " + what);
-    app.log(payload);
     app.head.postMessage(what, payload);
-};
-
-app.log = function (message) {
-    console.log(message);
 };
