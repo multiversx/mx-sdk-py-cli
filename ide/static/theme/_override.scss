@@ -1,0 +1,61 @@
+$dark-blue: #212529;
+$nav-item-gray: #b8b8b8;
+
+body {
+  padding: 0;
+}
+
+.navbar.override {
+  .navbar-brand {
+    cursor: pointer;
+
+    img {
+      display: inline-block;
+      height: 2.286rem;
+    }
+
+    .product {
+      vertical-align: middle;
+      display: inline-block;
+      font-size: 1.4rem;
+      white-space: nowrap;
+      color: $dark-blue;
+      padding-left: 0.3rem;
+
+      &:hover {
+        color: $black;
+      }
+    }
+  }
+
+  .nav-link.override {
+    cursor: pointer;
+    color: $nav-item-gray !important;
+    transition: none;
+    border-top: 0.2rem solid transparent;
+    line-height: 3.4rem;
+    padding-top: 0.4rem;
+
+    &:hover {
+      color: $dark-blue !important;
+    }
+
+    &.active {
+      border-color: $blue !important;
+      color: $dark-blue !important;
+    }
+  }
+}
+
+// Larger fontawesome icons
+.btn {
+  i.fas {
+    font-size: large;
+  }
+}
+
+.watched-variables-view {
+  .variable-value {
+    display: inline-block;
+  }
+}
