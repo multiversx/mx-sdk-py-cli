@@ -11,7 +11,7 @@ class ProxyApiCaller:
         self.url = url
 
     def get_account_nonce(self, address):
-        req = self.url + '/address/' + address + '/nonce'
+        req = f"{self.url}/address/{address}/nonce"
         try:
             response = requests.get(req)
             if response.status_code != 200:
@@ -24,7 +24,7 @@ class ProxyApiCaller:
             return print("cannot get nonce")
 
     def get_account_balance(self, address):
-        req = self.url + '/address/' + address + '/balance'
+        req = f"{self.url}/address/{address}/balance"
         try:
             response = requests.get(req)
             if response.status_code != 200:
@@ -37,7 +37,7 @@ class ProxyApiCaller:
             return print("cannot get balance")
 
     def get_account(self, address):
-        req = self.url + '/address/' + address
+        req = f"{self.url}/address/{address}"
         try:
             response = requests.get(req)
             if response.status_code != 200:
