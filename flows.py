@@ -1,8 +1,10 @@
 import logging
+
 from erdpy.projects import load_project
 from erdpy.environments import TestnetEnvironment
 from erdpy.accounts import Account
 from erdpy.contracts import SmartContract
+from erdpy.proxy.caller import ProxyApiCaller
 
 logger = logging.getLogger("examples")
 
@@ -47,3 +49,24 @@ def query_smart_contract(contract_address, proxy_url, function, arguments):
         environment.query_contract(contract, function, arguments)
 
     environment.run_flow(flow)
+
+
+def get_account_nonce(proxy_url, address):
+    logger.debug("call_get_account_nonce")
+
+    api_caller = ProxyApiCaller(proxy_url)
+    api_caller.get_account_nonce(address)
+
+
+def get_account_balance(proxy_url, address):
+    logger.debug("call_get_account_balance")
+
+    api_caller = ProxyApiCaller(proxy_url)
+    api_caller.get_account_balance(address)
+
+
+def get_account(proxy_url, address):
+    logger.debug("call_get_account")
+
+    api_caller = ProxyApiCaller(proxy_url)
+    api_caller.get_account(address)

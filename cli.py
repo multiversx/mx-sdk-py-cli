@@ -78,6 +78,21 @@ def setup_parser():
     query_parser.add_argument("--arguments", nargs='+')
     query_parser.set_defaults(func=query)
 
+    get_nonce_parser = subparsers.add_parser("get_nonce")
+    get_nonce_parser.add_argument("--proxy", required=True)
+    get_nonce_parser.add_argument("--address", required=True)
+    get_nonce_parser.set_defaults(func=get_nonce)
+
+    get_balance_parser = subparsers.add_parser("get_balance")
+    get_balance_parser.add_argument("--proxy", required=True)
+    get_balance_parser.add_argument("--address", required=True)
+    get_balance_parser.set_defaults(func=get_balance)
+
+    get_account_parser = subparsers.add_parser("get_account")
+    get_account_parser.add_argument("--proxy", required=True)
+    get_account_parser.add_argument("--address", required=True)
+    get_account_parser.set_defaults(func=get_account)
+
     node_parser = subparsers.add_parser("nodedebug")
     group = node_parser.add_mutually_exclusive_group()
     group.add_argument('--stop', action='store_true')
@@ -170,6 +185,36 @@ def query(args):
 
     try:
         flows.query_smart_contract(contract, proxy, function, arguments)
+    except errors.KnownError as err:
+        logger.fatal(err)
+
+
+def get_nonce(args):
+    proxy = args.proxy
+    address = args.address
+
+    try:
+        flows.get_account_nonce(proxy, address)
+    except errors.KnownError as err:
+        logger.fatal(err)
+
+
+def get_balance(args):
+    proxy = args.proxy
+    address = args.address
+
+    try:
+        flows.get_account_balance(proxy, address)
+    except errors.KnownError as err:
+        logger.fatal(err)
+
+
+def get_account(args):
+    proxy = args.proxy
+    address = args.address
+
+    try:
+        flows.get_account(proxy, address)
     except errors.KnownError as err:
         logger.fatal(err)
 

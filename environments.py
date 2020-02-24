@@ -1,6 +1,8 @@
 import asyncio
 import logging
 import traceback
+import requests
+import json
 
 from erdpy import errors, nodedebug
 
@@ -23,13 +25,14 @@ class Environment:
     def query_contract(self, contract, function, arguments=None):
         raise NotImplementedError()
 
+
 class DebugEnvironment(Environment):
     def __init__(self):
         super().__init__()
 
     def run_flow(self, flow):
         nodedebug.install_if_missing()
-        
+
         loop = asyncio.get_event_loop()
         loop.run_until_complete(self._run_node_debug_and_flow(flow))
         loop.close()
@@ -70,6 +73,7 @@ class DebugEnvironment(Environment):
         logger.debug("query_contract")
         return nodedebug.query(contract.address, function, arguments)
 
+
 class TestnetEnvironment(Environment):
     def __init__(self, url):
         super().__init__()
@@ -106,7 +110,8 @@ class TestnetEnvironment(Environment):
 
     def deploy_contract(self, contract, owner, arguments=None, gas_price=None, gas_limit=None):
         logger.debug("deploy_contract")
-        tx_hash, contract_address = nodedebug.deploy(contract.bytecode, owner, arguments, gas_price, gas_limit, testnet_url=self.url)
+        tx_hash, contract_address = nodedebug.deploy(contract.bytecode, owner, arguments, gas_price, gas_limit,
+                                                     testnet_url=self.url)
         contract.address = contract_address
         return tx_hash, contract_address
 
