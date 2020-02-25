@@ -85,6 +85,15 @@ def setup_parser():
     get_account_parser.add_argument("--nonce", required=False, nargs='?', const=True, default=False)
     get_account_parser.set_defaults(func=get_account)
 
+    get_num_shard_parser = subparsers.add_parser("get_num_shards")
+    get_num_shard_parser.add_argument("--proxy", required=True)
+    get_num_shard_parser.set_defaults(func=get_num_shards)
+
+    get_last_block_nonce_parser = subparsers.add_parser("get_last_block_nonce")
+    get_last_block_nonce_parser.add_argument("--proxy", required=True)
+    get_last_block_nonce_parser.add_argument("--shard-id", required=True)
+    get_last_block_nonce_parser.set_defaults(func=get_last_block_nonce)
+
     node_parser = subparsers.add_parser("nodedebug")
     group = node_parser.add_mutually_exclusive_group()
     group.add_argument('--stop', action='store_true')
@@ -191,6 +200,25 @@ def get_account(args):
             flows.get_account_nonce()
         else:
             flows.get_account(proxy, address)
+    except errors.KnownError as err:
+        logger.fatal(err)
+
+
+def get_num_shards(args):
+    proxy = args.proxy
+
+    try:
+        flows.get_num_shards(proxy)
+    except errors.KnownError as err:
+        logger.fatal(err)
+
+
+def get_last_block_nonce(args):
+    proxy = args.proxy
+    shard_id = args.shard_id
+
+    try:
+        flows.get_last_block_nonce(proxy, shard_id)
     except errors.KnownError as err:
         logger.fatal(err)
 

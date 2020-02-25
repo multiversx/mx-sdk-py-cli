@@ -14,4 +14,20 @@ class TestProxyCalls(unittest.TestCase):
             print(response.json())
             self.assertTrue(self, response is not None)
         except:
+            print("test not run")
+            pass
+
+    def test_do_request_node_status(self):
+        # use a valid proxy address
+        url = "http://localhost:8001"
+        # use a valid shard id
+        shard_id = "0"
+
+        try:
+            response = requests.get(f"{url}/node/status/{shard_id}")
+            print("response status code " + str(response.status_code))
+            print(response.json())
+            self.assertTrue(self, response is not None)
+        except:
+            print("test not run")
             pass

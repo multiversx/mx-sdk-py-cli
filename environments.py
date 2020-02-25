@@ -122,3 +122,4 @@ class TestnetEnvironment(Environment):
     def query_contract(self, contract, function, arguments=None):
         logger.debug("query_contract")
         return nodedebug.query(contract.address, function, arguments, testnet_url=self.url)
+

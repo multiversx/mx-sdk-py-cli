@@ -26,7 +26,8 @@ def deploy_smart_contract(project_directory, owner_address, pem_file, proxy_url,
     environment.run_flow(flow)
 
 
-def call_smart_contract(contract_address, caller_address, pem_file, proxy_url, function, arguments, gas_price, gas_limit):
+def call_smart_contract(contract_address, caller_address, pem_file, proxy_url, function, arguments, gas_price,
+                        gas_limit):
     logger.debug("call_smart_contract")
 
     contract = SmartContract(contract_address)
@@ -70,3 +71,17 @@ def get_account(proxy_url, address):
 
     api_caller = ProxyApiCaller(proxy_url)
     api_caller.get_account(address)
+
+
+def get_num_shards(proxy_url):
+    logger.debug("call_get_number_of_shards")
+
+    api_caller = ProxyApiCaller(proxy_url)
+    api_caller.get_num_shards()
+
+
+def get_last_block_nonce(proxy_url, shard_id):
+    logger.debug("call_get_last_block_nonce")
+
+    api_caller = ProxyApiCaller(proxy_url)
+    api_caller.get_last_block_nonce(shard_id)
