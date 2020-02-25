@@ -16,6 +16,7 @@ getArgument
 getFunction
 getNumArguments
 getArgumentLength
+storageGetValueLength
 storageStore
 storageLoad
 getCaller
