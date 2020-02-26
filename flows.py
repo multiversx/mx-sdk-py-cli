@@ -85,3 +85,17 @@ def get_last_block_nonce(proxy_url, shard_id):
 
     api_caller = ProxyApiCaller(proxy_url)
     api_caller.get_last_block_nonce(shard_id)
+
+
+def get_gas_price(proxy_url):
+    logger.debug("call_get_gas_price")
+
+    api_caller = ProxyApiCaller(proxy_url)
+    api_caller.get_gas_price()
+
+
+def get_chain_id(proxy_url):
+    logger.debug("call_get_chain_id")
+
+    api_caller = ProxyApiCaller(proxy_url)
+    api_caller.get_chain_id()

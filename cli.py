@@ -94,6 +94,14 @@ def setup_parser():
     get_last_block_nonce_parser.add_argument("--shard-id", required=True)
     get_last_block_nonce_parser.set_defaults(func=get_last_block_nonce)
 
+    get_gas_price_parser = subparsers.add_parser("get_gas_price")
+    get_gas_price_parser.add_argument("--proxy", required=True)
+    get_gas_price_parser.set_defaults(func=get_gas_price)
+
+    get_chain_id_parser = subparsers.add_parser("get_chain_id")
+    get_chain_id_parser.add_argument("--proxy", required=True)
+    get_chain_id_parser.set_defaults(func=get_chain_id)
+
     node_parser = subparsers.add_parser("nodedebug")
     group = node_parser.add_mutually_exclusive_group()
     group.add_argument('--stop', action='store_true')
@@ -219,6 +227,24 @@ def get_last_block_nonce(args):
 
     try:
         flows.get_last_block_nonce(proxy, shard_id)
+    except errors.KnownError as err:
+        logger.fatal(err)
+
+
+def get_gas_price(args):
+    proxy = args.proxy
+
+    try:
+        flows.get_gas_price(proxy)
+    except errors.KnownError as err:
+        logger.fatal(err)
+
+
+def get_chain_id(args):
+    proxy = args.proxy
+
+    try:
+        flows.get_chain_id(proxy)
     except errors.KnownError as err:
         logger.fatal(err)
 
