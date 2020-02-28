@@ -24,7 +24,7 @@ class ProjectTestCase(unittest.TestCase):
 
     def build(self, name):
         project = self.load_project(name)
-        project.build(debug=False)
+        project.build()
         bytecode = project.get_bytecode()
         contract = SmartContract(bytecode=bytecode)
         return project, contract

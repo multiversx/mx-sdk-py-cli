@@ -1,8 +1,11 @@
+import argparse
 import os
 import logging
+import os
+import pprint
 
 from argparse import ArgumentParser
-from erdpy.proxy.tx_types import TxTypes
+
 from erdpy import config, dependencies, errors, flows, nodedebug, projects
 from erdpy._version import __version__
 
@@ -45,7 +48,8 @@ def setup_parser():
 
     build_parser = subparsers.add_parser("build")
     build_parser.add_argument("project", nargs='?', default=os.getcwd())
-    build_parser.add_argument("--debug", action="store_true")
+    build_parser.add_argument("--debug", action="store_true", default=False)
+    build_parser.add_argument("--no-optimization", action="store_true", default=False)
     build_parser.set_defaults(func=build)
 
     deploy_parser = subparsers.add_parser("deploy")
@@ -123,6 +127,10 @@ def setup_parser():
     test_parser.add_argument("--wildcard", default="*")
     test_parser.set_defaults(func=run_tests)
 
+    ide_parser = subparsers.add_parser("ide")
+    ide_parser.add_argument("workspace", nargs='?', default=os.getcwd())
+    ide_parser.set_defaults(func=run_ide)
+
     return parser
 
 
@@ -157,10 +165,13 @@ def create(args):
 
 def build(args):
     project = args.project
-    debug = args.debug
+    options = {
+        "debug" : args.debug,
+        "optimized": not args.no_optimization
+    }
 
     try:
-        projects.build_project(project, debug)
+        projects.build_project(project, options)
     except errors.KnownError as err:
         logger.fatal(err)
 
@@ -288,6 +299,15 @@ def run_tests(args):
 
     try:
         projects.run_tests(project, wildcard)
+    except errors.KnownError as err:
+        logger.fatal(err)
+
+
+def run_ide(args):
+    workspace = args.workspace
+
+    try:
+        ide.run_ide(workspace)
     except errors.KnownError as err:
         logger.fatal(err)
 

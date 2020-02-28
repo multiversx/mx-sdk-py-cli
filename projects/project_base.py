@@ -11,8 +11,9 @@ class Project:
     def __init__(self, directory):
         self.directory = str(Path(directory).resolve())
 
-    def build(self, debug):
-        self.debug = debug
+    def build(self, options=None):
+        self.options = options or dict()
+        self.debug = self.options.get("debug", False)
         self._ensure_dependencies_installed()
         self.perform_build()
         self._create_arwen_files()

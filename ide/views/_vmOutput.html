@@ -1,0 +1,66 @@
+[[ if (!data.ReturnData) { ]]
+    <strong>no data yet</strong>
+    [[ } else { ]]
+    
+    <table class="table table-hover">
+        <thead>
+        </thead>
+        <tbody>
+            <tr>
+                <th scope="row">Return data (base64)</th>
+                <td><strong>[[= data.ReturnData ]]</strong></td>
+            </tr>
+            <tr>
+                <th scope="row">Return data (hex)</th>
+                <td><strong>[[= data.ReturnDataHex ]]</strong></td>
+            </tr>
+            <tr>
+                <th scope="row">Return data (decimal)</th>
+                <td><strong>[[= data.ReturnDataDecimal ]]</strong></td>
+            </tr>
+            <tr>
+                <th scope="row">Return data (string)</th>
+                <td><strong>[[= data.ReturnDataString ]]</strong></td>
+            </tr>
+            <tr>
+                <th scope="row">Return code</th>
+                <td><strong>[[= data.ReturnCode ]]</strong></td>
+            </tr>
+            <!-- <tr>
+                <th scope="row">Gas remaining</th>
+                <td><strong>[[= data.GasRemaining ]]</strong></td>
+            </tr>
+            <tr>
+                <th scope="row">Gas refund</th>
+                <td><strong>[[= data.GasRefund ]]</strong></td>
+            </tr> -->
+        </tbody>
+    </table>
+    
+    <div>
+        [[ _.each(data.OutputAccounts, function(account) { ]]
+        <div class="row">
+            <div class="col-sm-12">
+                <h5>Storage updates</h5>
+    
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th scope="col">Key</th>
+                            <th scope="col">Data (decimal)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        [[ _.each(account.StorageUpdates, function(update) { ]]
+                        <tr>
+                            <th scope="row">[[= update.Offset ]] / [[= update.Key ]]</th>
+                            <td>[[= update.DataDecimal ]]</td>
+                        </tr>
+                        [[ }) ]]
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        [[ }) ]]
+    </div>
+    [[ } ]]
