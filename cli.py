@@ -1,9 +1,8 @@
 import os
-import argparse
 import logging
-import pprint
-from argparse import ArgumentParser
 
+from argparse import ArgumentParser
+from erdpy.proxy.tx_types import TxTypes
 from erdpy import config, dependencies, errors, flows, nodedebug, projects
 from erdpy._version import __version__
 
@@ -101,6 +100,17 @@ def setup_parser():
     get_chain_id_parser = subparsers.add_parser("get_chain_id")
     get_chain_id_parser.add_argument("--proxy", required=True)
     get_chain_id_parser.set_defaults(func=get_chain_id)
+
+    get_transaction_cost_parser = subparsers.add_parser("get_transaction_cost")
+    tx_types = [TxTypes.SC_CALL, TxTypes.MOVE_BALANCE, TxTypes.SC_DEPLOY]
+    get_transaction_cost_parser.add_argument("tx_type", choices=tx_types)
+    get_transaction_cost_parser.add_argument("--proxy", required=True)
+    get_transaction_cost_parser.add_argument("--data", required=False)
+    get_transaction_cost_parser.add_argument("--sc-address", required=False)
+    get_transaction_cost_parser.add_argument("--path", required=False)
+    get_transaction_cost_parser.add_argument("--function", required=False)
+    get_transaction_cost_parser.add_argument("--arguments", nargs='+', required=False)
+    get_transaction_cost_parser.set_defaults(func=get_transaction_cost)
 
     node_parser = subparsers.add_parser("nodedebug")
     group = node_parser.add_mutually_exclusive_group()
@@ -205,9 +215,16 @@ def get_account(args):
         if args.balance:
             flows.get_account_balance(proxy, address)
         elif args.nonce:
-            flows.get_account_nonce()
+            flows.get_account_nonce(proxy, address)
         else:
             flows.get_account(proxy, address)
+    except errors.KnownError as err:
+        logger.fatal(err)
+
+
+def get_transaction_cost(args):
+    try:
+        flows.get_transaction_cost(args)
     except errors.KnownError as err:
         logger.fatal(err)
 

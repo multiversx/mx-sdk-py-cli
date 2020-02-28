@@ -5,6 +5,7 @@ from erdpy.environments import TestnetEnvironment
 from erdpy.accounts import Account
 from erdpy.contracts import SmartContract
 from erdpy.proxy.caller import ProxyApiCaller
+from erdpy.proxy.cost import TransactionCostEstimator
 
 logger = logging.getLogger("examples")
 
@@ -99,3 +100,10 @@ def get_chain_id(proxy_url):
 
     api_caller = ProxyApiCaller(proxy_url)
     api_caller.get_chain_id()
+
+
+def get_transaction_cost(arguments):
+    logger.debug("call_get_transaction_cost")
+
+    cost_estimator = TransactionCostEstimator(arguments.proxy)
+    cost_estimator.estimate_tx_cost(arguments)
