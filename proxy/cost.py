@@ -41,9 +41,9 @@ class TransactionCostEstimator:
         sender = "e3784da068cca901c0c629b304d024eb777fdf604dd8f6b5c0dc0c7f75877473"
         receiver = "e3784da068cca901c0c629b304d024eb777fdf604dd8f6b5c0dc0c7f75877471"
         data = data or ""
-        data_bytes = list(bytes(data, "ascii"))
+        data_bytes = base64.b64encode(data.encode())
 
-        self.__sent_tx(sender, receiver, data_bytes)
+        self.__sent_tx(sender, receiver, data_bytes.decode())
 
     def __estimate_sc_deploy(self, contract_path):
         project = load_project(contract_path)
