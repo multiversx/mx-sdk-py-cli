@@ -88,6 +88,6 @@ class ElrondProxy:
             if response.status_code != HTTPStatus.OK:
                 return None, False
             parsed = json.loads(response.content)
-            return parsed['message'], True
+            return parsed['message']['details'], True
         except:
             return None, False

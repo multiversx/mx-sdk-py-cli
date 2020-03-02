@@ -95,4 +95,9 @@ class TransactionCostEstimator:
         url = f"{self.proxy}/transaction/cost"
 
         raw_response = utils.post_json(url, tx_object)
-        print(raw_response['txGasUnits'])
+        gas_units_key = 'txGasUnits'
+        if gas_units_key in raw_response.keys():
+            print(raw_response[gas_units_key])
+            return
+
+        print(raw_response)
