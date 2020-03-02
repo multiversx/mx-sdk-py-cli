@@ -1,8 +1,11 @@
 import base64
+import logging
 
 from erdpy.proxy.tx_types import TxTypes
 from erdpy import utils, errors
 from erdpy.projects import load_project
+
+logger = logging.getLogger("proxy")
 
 
 def prepare_argument(argument):
@@ -24,6 +27,9 @@ def prepare_argument(argument):
 
 
 class TransactionCostEstimator:
+    _SENDER_ADDRESS = "e3784da068cca901c0c629b304d024eb777fdf604dd8f6b5c0dc0c7f75877473"
+    _RECEIVER_ADDRESS = "e3784da068cca901c0c629b304d024eb777fdf604dd8f6b5c0dc0c7f75877471"
+
     def __init__(self, proxy_url):
         self.proxy = proxy_url
 
@@ -31,32 +37,44 @@ class TransactionCostEstimator:
         tx_type = arguments.tx_type
 
         if tx_type == TxTypes.MOVE_BALANCE:
-            self.__estimate_move_balance(arguments.data)
+            self._estimate_move_balance(arguments.data)
         elif tx_type == TxTypes.SC_DEPLOY:
-            self.__estimate_sc_deploy(arguments.path)
+            self._estimate_sc_deploy(arguments.path)
         else:
-            self.__estimate_sc_call(arguments.sc_address, arguments.function, arguments.arguments)
+            self._estimate_sc_call(arguments.sc_address, arguments.function, arguments.arguments)
 
-    def __estimate_move_balance(self, data):
-        sender = "e3784da068cca901c0c629b304d024eb777fdf604dd8f6b5c0dc0c7f75877473"
-        receiver = "e3784da068cca901c0c629b304d024eb777fdf604dd8f6b5c0dc0c7f75877471"
+    def _estimate_move_balance(self, data):
+        sender = self._SENDER_ADDRESS
+        receiver = self._RECEIVER_ADDRESS
         data = data or ""
         data_bytes = base64.b64encode(data.encode())
 
-        self.__sent_tx(sender, receiver, data_bytes.decode())
+        self._sent_tx(sender, receiver, data_bytes.decode())
 
-    def __estimate_sc_deploy(self, contract_path):
+    def _estimate_sc_deploy(self, contract_path):
+        if contract_path is None:
+            logger.fatal("contract-path argument missing")
+            return
+
         project = load_project(contract_path)
         bytecode = project.get_bytecode()
 
         base64_bytecode = base64.b64encode(bytecode.encode())
 
-        sender = "e3784da068cca901c0c629b304d024eb777fdf604dd8f6b5c0dc0c7f75877473"
-        receiver = "0000000000000000000000000000000000000000000000000000000000000000"
-        self.__sent_tx(sender, receiver, base64_bytecode.decode())
+        sender = self._SENDER_ADDRESS
+        receiver = self._RECEIVER_ADDRESS
+        self._sent_tx(sender, receiver, base64_bytecode.decode())
 
-    def __estimate_sc_call(self, sc_address, function, arguments):
-        sender = "aaaaaaaa112233441122334411223344112233441122334411223344aaaaaaaa"
+    def _estimate_sc_call(self, sc_address, function, arguments):
+        if function is None:
+            logger.fatal("function argument missing")
+            return
+
+        if sc_address is None:
+            logger.fatal("sc-address argument missing")
+            return
+
+        sender = self._SENDER_ADDRESS
         receiver = sc_address
         arguments = arguments or []
         tx_data = function
@@ -64,9 +82,9 @@ class TransactionCostEstimator:
             tx_data += f"@{prepare_argument(arg)}"
 
         base64_bytes = base64.b64encode(tx_data.encode())
-        self.__sent_tx(sender, receiver, base64_bytes.decode())
+        self._sent_tx(sender, receiver, base64_bytes.decode())
 
-    def __sent_tx(self, sender, receiver, data):
+    def _sent_tx(self, sender, receiver, data):
         tx_object = {
             "nonce": 1,
             "value": "0",
@@ -77,4 +95,4 @@ class TransactionCostEstimator:
         url = f"{self.proxy}/transaction/cost"
 
         raw_response = utils.post_json(url, tx_object)
-        print(raw_response)
+        print(raw_response['txGasUnits'])

@@ -9,7 +9,7 @@ METACHAIN_ID = 4294967295
 logger = logging.getLogger("proxy")
 
 
-class ProxyApiCaller:
+class ElrondProxy:
     def __init__(self, url):
         self.url = url
 
@@ -49,7 +49,7 @@ class ProxyApiCaller:
             return print("cannot get account")
 
     def get_num_shards(self):
-        metrics, ok = self.__get_status_metrics(METACHAIN_ID)
+        metrics, ok = self._get_status_metrics(METACHAIN_ID)
         if not ok:
             return print("cannot get number of shards")
 
@@ -59,29 +59,29 @@ class ProxyApiCaller:
 
     def get_last_block_nonce(self, shard_id):
         if shard_id == "metachain":
-            metrics, ok = self.__get_status_metrics(METACHAIN_ID)
+            metrics, ok = self._get_status_metrics(METACHAIN_ID)
         else:
-            metrics, ok = self.__get_status_metrics(shard_id)
+            metrics, ok = self._get_status_metrics(shard_id)
 
         if not ok:
             return print("cannot get last block nonce")
         return print(metrics['erd_probable_highest_nonce'])
 
     def get_gas_price(self):
-        metrics, ok = self.__get_status_metrics(0)
+        metrics, ok = self._get_status_metrics(0)
         if not ok:
             return print("cannot get gas price")
 
         return print(metrics['erd_min_gas_price'])
 
     def get_chain_id(self):
-        metrics, ok = self.__get_status_metrics(0)
+        metrics, ok = self._get_status_metrics(0)
         if not ok:
             return print("cannot get chain id")
 
         return print(metrics['erd_chain_id'])
 
-    def __get_status_metrics(self, shard_id):
+    def _get_status_metrics(self, shard_id):
         req = f"{self.url}/node/status/{shard_id}"
         try:
             response = requests.get(req)

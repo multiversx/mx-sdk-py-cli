@@ -1,8 +1,6 @@
 import asyncio
 import logging
 import traceback
-import requests
-import json
 
 from erdpy import errors, nodedebug
 
