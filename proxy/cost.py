@@ -41,7 +41,7 @@ class TransactionCostEstimator:
         if tx_type == TxTypes.MOVE_BALANCE:
             self._estimate_move_balance(arguments.data)
         elif tx_type == TxTypes.SC_DEPLOY:
-            self._estimate_sc_deploy(arguments.path)
+            self._estimate_sc_deploy(arguments.sc_path)
         else:
             self._estimate_sc_call(arguments.sc_address, arguments.function, arguments.arguments)
 
