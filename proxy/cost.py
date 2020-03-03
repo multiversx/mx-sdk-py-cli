@@ -27,6 +27,8 @@ def prepare_argument(argument):
 
 
 class TransactionCostEstimator:
+    # needs these constant because when the observer node receive a post request from proxy with a transaction needs
+    # to can figure out what type of transaction was send to can calculate an estimation
     _SENDER_ADDRESS = "e3784da068cca901c0c629b304d024eb777fdf604dd8f6b5c0dc0c7f75877473"
     _RECEIVER_ADDRESS = "e3784da068cca901c0c629b304d024eb777fdf604dd8f6b5c0dc0c7f75877471"
 
