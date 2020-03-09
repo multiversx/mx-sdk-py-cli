@@ -88,6 +88,24 @@ class StandaloneModule(DependencyModule):
         }
 
 
+class SOLLModule(StandaloneModule):
+    def __init__(self, key, name, tag, groups, urls_by_platform):
+        super().__init__(key, name, tag, groups, urls_by_platform)
+
+    def install(self, overwrite):
+        super().install(overwrite)
+        utils.mark_executable(path.join(self.get_directory(), "soll"))
+
+
+class NodeDebugModule(StandaloneModule):
+    def __init__(self, key, name, tag, groups, urls_by_platform):
+        super().__init__(key, name, tag, groups, urls_by_platform)
+
+    def install(self, overwrite):
+        super().install(overwrite)
+        utils.mark_executable(path.join(self.get_directory(), "nodedebug"))
+
+
 class Rust(DependencyModule):
     def __init__(self, key, name, tag, groups):
         super().__init__(key, name, tag, groups)

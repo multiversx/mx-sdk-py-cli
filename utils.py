@@ -64,6 +64,7 @@ def get_subfolders(folder):
 
 
 def mark_executable(file):
+    logger.debug(f"Mark [{file}] as executable")
     st = os.stat(file)
     os.chmod(file, st.st_mode | stat.S_IEXEC)
 
