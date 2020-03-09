@@ -56,50 +56,50 @@ def query_smart_contract(contract_address, proxy_url, function, arguments):
 def get_account_nonce(proxy_url, address):
     logger.debug("call_get_account_nonce")
 
-    api_caller = ElrondProxy(proxy_url)
-    api_caller.get_account_nonce(address)
+    proxy = ElrondProxy(proxy_url)
+    proxy.get_account_nonce(address)
 
 
 def get_account_balance(proxy_url, address):
     logger.debug("call_get_account_balance")
 
-    api_caller = ElrondProxy(proxy_url)
-    api_caller.get_account_balance(address)
+    proxy = ElrondProxy(proxy_url)
+    proxy.get_account_balance(address)
 
 
 def get_account(proxy_url, address):
     logger.debug("call_get_account")
 
-    api_caller = ElrondProxy(proxy_url)
-    api_caller.get_account(address)
+    proxy = ElrondProxy(proxy_url)
+    proxy.get_account(address)
 
 
 def get_num_shards(proxy_url):
     logger.debug("call_get_number_of_shards")
 
-    api_caller = ElrondProxy(proxy_url)
-    api_caller.get_num_shards()
+    proxy = ElrondProxy(proxy_url)
+    proxy.get_num_shards()
 
 
 def get_last_block_nonce(proxy_url, shard_id):
     logger.debug("call_get_last_block_nonce")
 
-    api_caller = ElrondProxy(proxy_url)
-    api_caller.get_last_block_nonce(shard_id)
+    proxy = ElrondProxy(proxy_url)
+    proxy.get_last_block_nonce(shard_id)
 
 
 def get_gas_price(proxy_url):
     logger.debug("call_get_gas_price")
 
-    api_caller = ElrondProxy(proxy_url)
-    api_caller.get_gas_price()
+    proxy = ElrondProxy(proxy_url)
+    proxy.get_gas_price()
 
 
 def get_chain_id(proxy_url):
     logger.debug("call_get_chain_id")
 
-    api_caller = ElrondProxy(proxy_url)
-    api_caller.get_chain_id()
+    proxy = ElrondProxy(proxy_url)
+    proxy.get_chain_id()
 
 
 def get_transaction_cost(arguments):
