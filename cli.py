@@ -1,7 +1,5 @@
-import argparse
 import logging
 import os
-import pprint
 from argparse import ArgumentParser
 
 from erdpy import config, dependencies, errors, flows, ide, nodedebug, projects
@@ -129,7 +127,7 @@ def create(args):
 def build(args):
     project = args.project
     options = {
-        "debug" : args.debug,
+        "debug": args.debug,
         "optimized": not args.no_optimization
     }
 
@@ -210,7 +208,7 @@ def run_tests(args):
 
 def run_ide(args):
     workspace = args.workspace
-    
+
     try:
         ide.run_ide(workspace)
     except errors.KnownError as err:

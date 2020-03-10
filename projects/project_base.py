@@ -78,4 +78,4 @@ class Project:
         for test_file in test_files:
             print("Run test for:", test_file)
             args = [tool, test_file]
-            myprocess.run_process(args, env=tool_env)    
+            myprocess.run_process(args, env=tool_env)
