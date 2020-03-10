@@ -1,4 +1,4 @@
-from erdpy.dependencies.modules import StandaloneModule, Rust
+from erdpy.dependencies.modules import StandaloneModule, SOLLModule, NodeDebugModule, Rust
 
 
 def get_all_modules():
@@ -11,18 +11,18 @@ def get_all_modules():
                              "windows": "vendor-llvm/v9-19feb/windows-amd64.tar.gz",
                          }),
 
-        StandaloneModule(key="soll", name="soll", tag="v0.0.5",
+        SOLLModule(key="soll", name="soll", tag="v0.0.5",
                          groups=["SOL_BUILDCHAIN"],
                          urls_by_platform={
                              "linux": "vendor-soll/v005/linux-amd64.tar.gz",
                              "osx": "vendor-soll/v005/darwin-amd64.tar.gz"
                          }),
 
-        StandaloneModule(key="nodedebug", name="nodedebug", tag="v0.0.7",
+        NodeDebugModule(key="nodedebug", name="nodedebug", tag="v0.1.0",
                          groups=["NODE_DEBUG"],
                          urls_by_platform={
-                             "linux": "nodedebug/v007/linux-amd64.tar.gz",
-                             "osx": "nodedebug/v007/darwin-amd64.tar.gz"
+                             "linux": "nodedebug/v010/linux-amd64.tar.gz",
+                             "osx": "nodedebug/v010/darwin-amd64.tar.gz"
                          }),
                         
         StandaloneModule(key="testrunner", name="testrunner", tag="v0.0.1",
