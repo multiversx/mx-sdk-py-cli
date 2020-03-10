@@ -9,10 +9,13 @@ logger = logging.getLogger("cli")
 
 
 def main():
-    logging.basicConfig(level=logging.DEBUG)
-
     parser = setup_parser()
     args = parser.parse_args()
+
+    if args.verbose:
+        logging.basicConfig(level=logging.DEBUG)
+    else:
+        logging.basicConfig(level=logging.WARNING)
 
     if not hasattr(args, "func"):
         parser.print_help()
@@ -46,6 +49,7 @@ def setup_parser():
     build_parser.add_argument("project", nargs='?', default=os.getcwd())
     build_parser.add_argument("--debug", action="store_true", default=False)
     build_parser.add_argument("--no-optimization", action="store_true", default=False)
+    build_parser.add_argument("-v", "--verbose", action="store_true", default=False)
     build_parser.set_defaults(func=build)
 
     deploy_parser = subparsers.add_parser("deploy")
@@ -128,7 +132,8 @@ def build(args):
     project = args.project
     options = {
         "debug": args.debug,
-        "optimized": not args.no_optimization
+        "optimized": not args.no_optimization,
+        "verbose": args.verbose
     }
 
     try:

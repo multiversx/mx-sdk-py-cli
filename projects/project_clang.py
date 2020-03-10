@@ -59,13 +59,15 @@ class ProjectClang(Project):
         undefined_file = str(self.build_configuration.undefined_file)
         args = [
             tool,
-            "--verbose",
             "--no-entry",
             str(self.file_o),
             "-o", self.get_file_wasm(),
             "--strip-all",
             f"-allow-undefined-file={undefined_file}"
         ]
+
+        if self.options.get("verbose", False):
+            args.append("--verbose")
 
         for export in self.build_configuration.exports:
             args.append(f"-export={export}")
