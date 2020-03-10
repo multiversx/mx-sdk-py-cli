@@ -28,6 +28,7 @@ def setup_parser():
     subparsers = parser.add_subparsers()
 
     parser.add_argument('-v', '--version', action='version', version=f"erdpy {__version__}")
+    parser.add_argument("--verbose", action="store_true", default=False)
 
     install_parser = subparsers.add_parser("install")
     choices = ["C_BUILDCHAIN", "SOL_BUILDCHAIN",
@@ -49,7 +50,6 @@ def setup_parser():
     build_parser.add_argument("project", nargs='?', default=os.getcwd())
     build_parser.add_argument("--debug", action="store_true", default=False)
     build_parser.add_argument("--no-optimization", action="store_true", default=False)
-    build_parser.add_argument("-v", "--verbose", action="store_true", default=False)
     build_parser.set_defaults(func=build)
 
     deploy_parser = subparsers.add_parser("deploy")
