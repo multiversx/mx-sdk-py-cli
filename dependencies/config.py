@@ -22,7 +22,7 @@ def get_all_modules():
                          groups=["NODE_DEBUG"],
                          urls_by_platform={
                              "linux": "nodedebug/v010/linux-amd64.tar.gz",
-                             "osx": "nodedebug/v010/darwin-amd64.tar.gz"
+                             "osx": "nodedebug/v010-libfix/darwin-amd64.tar.gz"
                          }),
                         
         StandaloneModule(key="testrunner", name="testrunner", tag="v0.0.1",
