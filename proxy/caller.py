@@ -14,9 +14,9 @@ class ElrondProxy:
         self.url = url
 
     def get_account_nonce(self, address):
-        req = f"{self.url}/address/{address}/nonce"
+        url = f"{self.url}/address/{address}/nonce"
         try:
-            response = requests.get(req)
+            response = requests.get(url)
             if response.status_code != HTTPStatus.OK:
                 return "response status code " + str(response.status_code)
 
@@ -26,9 +26,9 @@ class ElrondProxy:
             return print("cannot get nonce")
 
     def get_account_balance(self, address):
-        req = f"{self.url}/address/{address}/balance"
+        url = f"{self.url}/address/{address}/balance"
         try:
-            response = requests.get(req)
+            response = requests.get(url)
             if response.status_code != HTTPStatus.OK:
                 return "response status code " + str(response.status_code)
 
@@ -38,9 +38,9 @@ class ElrondProxy:
             return print("cannot get balance")
 
     def get_account(self, address):
-        req = f"{self.url}/address/{address}"
+        url = f"{self.url}/address/{address}"
         try:
-            response = requests.get(req)
+            response = requests.get(url)
             if response.status_code != HTTPStatus.OK:
                 return "response status code " + str(response.status_code)
             parsed = json.loads(response.text)
@@ -82,9 +82,9 @@ class ElrondProxy:
         return print(metrics['erd_chain_id'])
 
     def _get_status_metrics(self, shard_id):
-        req = f"{self.url}/node/status/{shard_id}"
+        url = f"{self.url}/node/status/{shard_id}"
         try:
-            response = requests.get(req)
+            response = requests.get(url)
             if response.status_code != HTTPStatus.OK:
                 return None, False
             parsed = json.loads(response.content)
