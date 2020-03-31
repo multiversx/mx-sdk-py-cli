@@ -1,12 +1,8 @@
 import logging
-import os
-import shutil
 from os import path
-from pathlib import Path
 
 from erdpy import dependencies, errors, utils
 from erdpy.projects import shared
-from erdpy.projects.project_base import Project
 from erdpy.projects.project_clang import ProjectClang
 from erdpy.projects.project_rust import ProjectRust
 from erdpy.projects.project_sol import ProjectSol
@@ -28,6 +24,8 @@ def load_project(directory):
 
 
 def build_project(directory, options):
+    directory = path.expanduser(directory)
+
     logger.info("build_project.directory: %s", directory)
     logger.info("build_project.debug: %s", options['debug'])
 
@@ -64,7 +62,7 @@ def get_projects_in_workspace(workspace):
         try:
             project = load_project(project_directory)
             projects.append(project)
-        except:
+        except Exception:
             pass
 
     return projects

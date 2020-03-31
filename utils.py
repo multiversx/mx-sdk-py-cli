@@ -58,6 +58,11 @@ def read_toml_file(filename):
     return toml.load(filename)
 
 
+def write_toml_file(filename, data):
+    with open(filename, "w") as f:
+        toml.dump(data, f)
+
+
 def get_subfolders(folder):
     return [item.name for item in os.scandir(folder) if item.is_dir() and not item.name.startswith(".")]
 

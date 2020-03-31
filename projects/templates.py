@@ -7,9 +7,10 @@ from pathlib import Path
 
 from texttable import Texttable
 
-from erdpy import dependencies, workstation, errors, utils
+from erdpy import dependencies, errors, utils
 from erdpy.projects import shared
 from erdpy.projects.templates_config import get_templates_repositories
+from erdpy.projects.project_rust import CargoFile
 
 logger = logging.getLogger("projects.templates")
 
@@ -43,6 +44,8 @@ class TemplateSummary():
 
 
 def create_from_template(name, template_name, directory):
+    directory = path.expanduser(directory)
+
     logger.info("create_from_template.name: %s", name)
     logger.info("create_from_template.template_name: %s", template_name)
     logger.info("create_from_template.directory: %s", directory)
@@ -55,8 +58,9 @@ def create_from_template(name, template_name, directory):
 
     _download_templates_repositories()
     _copy_template(template_name, project_directory)
+
     template = _load_as_template(project_directory)
-    template.apply(name)
+    template.apply(template_name, name)
 
     logger.info("Project created, template applied.")
 
@@ -88,7 +92,8 @@ class Template:
     def __init__(self, directory):
         self.directory = directory
 
-    def apply(self, project_name):
+    def apply(self, template_name, project_name):
+        self.template_name = template_name
         self.project_name = project_name
         self._extend()
         self._replace_placeholders()
@@ -125,18 +130,45 @@ class TemplateRust(Template):
         self.rust_bin_directory = path.join(self.rust_directory, "bin")
 
         cargo_path = path.join(self.directory, "Cargo.toml")
+        cargo_debug_path = path.join(self.directory, "debug", "Cargo.toml")
         launch_path = path.join(self.directory, ".vscode", "launch.json")
         tasks_path = path.join(self.directory, ".vscode", "tasks.json")
-        self._replace_placeholders_in_file(cargo_path)
-        self._replace_placeholders_in_file(launch_path)
-        self._replace_placeholders_in_file(tasks_path)
+        debug_main_path = path.join(self.directory, "debug", "src", "main.rs")
 
-    def _replace_placeholders_in_file(self, filepath):
+        self._replace_simple_placeholders_in_file(launch_path)
+        self._replace_simple_placeholders_in_file(tasks_path)
+
+        cargo_file = CargoFile(cargo_path)
+        cargo_file.package_name = self.project_name
+
+        cargo_file_debug = CargoFile(cargo_debug_path)
+        cargo_file_debug.package_name = f"{self.project_name}-debug"
+
+        cargo_file.save()
+        cargo_file_debug.save()
+
+        to_replace = f"use {self.template_name.replace('-', '_')}::*"
+        replacement = f"use {self.project_name.replace('-', '_')}::*"
+        self._one_replace_in_file(debug_main_path, to_replace, replacement)
+
+        to_replace = f"[dependencies.{self.template_name}]"
+        replacement = f"[dependencies.{self.project_name}]"
+        self._one_replace_in_file(cargo_debug_path, to_replace, replacement)
+
+        # TODO: refactor
+        # TODO: set author, year, version
+
+    def _replace_simple_placeholders_in_file(self, filepath):
         content = utils.read_file(filepath)
         content = content.replace("{{PROJECT_NAME}}", self.project_name)
         content = content.replace("{{PATH_RUST_BIN}}", self.rust_bin_directory)
         content = content.replace("{{RUSTUP_HOME}}", self.rust_directory)
         content = content.replace("{{CARGO_HOME}}", self.rust_directory)
+        utils.write_file(filepath, content)
+
+    def _one_replace_in_file(self, filepath, to_replace, replacement):
+        content = utils.read_file(filepath)
+        content = content.replace(to_replace, replacement)
         utils.write_file(filepath, content)
 
 

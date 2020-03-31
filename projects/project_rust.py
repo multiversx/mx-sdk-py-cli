@@ -1,4 +1,3 @@
-import binascii
 import logging
 import subprocess
 from os import path
@@ -59,10 +58,28 @@ class CargoFile:
 
         try:
             self._parse_file()
-        except:
+        except Exception:
             raise errors.BuildError("Can't read cargo file.")
 
     def _parse_file(self):
-        data = utils.read_toml_file(self.path)
-        self.package_name = data["package"]["name"]
-        self.bin_name = data["bin"][0]["name"]
+        self.data = utils.read_toml_file(self.path)
+
+    @property
+    def package_name(self):
+        return self.data["package"]["name"]
+
+    @package_name.setter
+    def package_name(self, value):
+        self.data["package"]["name"] = value
+
+
+    @property
+    def bin_name(self):
+        return self.data["bin"][0]["name"]
+
+    @bin_name.setter
+    def bin_name(self, value):
+        self.data["bin"][0]["name"] = value
+
+    def save(self):
+        utils.write_toml_file(self.path, self.data)
