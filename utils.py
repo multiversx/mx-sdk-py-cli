@@ -69,10 +69,12 @@ def mark_executable(file):
     os.chmod(file, st.st_mode | stat.S_IEXEC)
 
 
-def post_json(url, data):
-    data_json = json.dumps(data).encode("utf8")
-    request = urllib.request.Request(url, data=data_json, headers={
-                                     "content-type": "application/json"})
+def post_json(url, data=None, data_json=None):
+    if not data_json:
+        data_json = json.dumps(data).encode("utf8")
+
+    headers = {"content-type": "application/json"}
+    request = urllib.request.Request(url, data=data_json, headers=headers)
 
     try:
         response = urllib.request.urlopen(request)

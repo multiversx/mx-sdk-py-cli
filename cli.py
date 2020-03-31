@@ -2,7 +2,8 @@ import logging
 import os
 from argparse import ArgumentParser
 
-from erdpy import config, dependencies, errors, flows, nodedebug, projects, ide, proxy
+from erdpy import (config, dependencies, errors, flows, ide, nodedebug,
+                   projects, proxy, transactions)
 from erdpy._version import __version__
 
 logger = logging.getLogger("cli")
@@ -15,7 +16,7 @@ def main():
     if args.verbose:
         logging.basicConfig(level=logging.DEBUG)
     else:
-        logging.basicConfig(level=logging.WARNING)
+        logging.basicConfig(level=logging.INFO)
 
     if not hasattr(args, "func"):
         parser.print_help()
@@ -130,6 +131,23 @@ def setup_parser():
     ide_parser = subparsers.add_parser("ide")
     ide_parser.add_argument("workspace", nargs='?', default=os.getcwd())
     ide_parser.set_defaults(func=run_ide)
+
+    tx_prepare_parser = subparsers.add_parser("tx-prepare")
+    tx_prepare_parser.add_argument("--pem", required=True)
+    tx_prepare_parser.add_argument("--nonce", required=True)
+    tx_prepare_parser.add_argument("--value", default="0")
+    tx_prepare_parser.add_argument("--receiver", required=True)
+    tx_prepare_parser.add_argument("--gas-price", default=config.DEFAULT_GASPRICE)
+    tx_prepare_parser.add_argument("--gas-limit", default=config.DEFAULT_GASLIMIT)
+    tx_prepare_parser.add_argument("--data", default="")
+    tx_prepare_parser.add_argument("--tag", default="untitled")
+    tx_prepare_parser.add_argument("workspace", nargs='?', default=os.getcwd())
+    tx_prepare_parser.set_defaults(func=tx_prepare)
+
+    tx_send_parser = subparsers.add_parser("tx-send")
+    tx_send_parser.add_argument("tx")
+    tx_send_parser.add_argument("--proxy", required=True)
+    tx_send_parser.set_defaults(func=tx_send)
 
     return parser
 
@@ -309,6 +327,20 @@ def run_ide(args):
 
     try:
         ide.run_ide(workspace)
+    except errors.KnownError as err:
+        logger.fatal(err)
+
+
+def tx_prepare(args):
+    try:
+        transactions.prepare(args)
+    except errors.KnownError as err:
+        logger.fatal(err)
+
+
+def tx_send(args):
+    try:
+        transactions.send_prepared(args)
     except errors.KnownError as err:
         logger.fatal(err)
 

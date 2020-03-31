@@ -1,5 +1,5 @@
 import bottle
-from bottle import route, post, run, template, static_file, request
+from bottle import run, template, static_file, request
 from pathlib import Path
 from erdpy.projects import get_projects_in_workspace
 from erdpy.ide.view_models import SmartContractViewModel
@@ -31,7 +31,7 @@ def contracts_deploy():
     try:
         data = request.json
         print(data)
-    except:
+    except Exception:
         raise ValueError
 
 
