@@ -55,7 +55,6 @@ class TransactionPayloadToSign:
             ordered_fields["data"] = self.data
 
         data_json = json.dumps(ordered_fields, separators=(',', ':')).encode("utf8")
-        print(data_json)
         return data_json
 
 

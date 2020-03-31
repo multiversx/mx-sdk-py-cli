@@ -56,11 +56,11 @@ class ProjectSolidityTestCase(utils.ProjectTestCase):
             self.assertEqual(800, balance_of(self.carol))
 
         def transfer(sender, recipient, amount):
-            args = [recipient.address_hex(), amount]
+            args = [recipient.address_formatted(), amount]
             self.execute(contract, sender, "transfer(address,uint256)", args)
 
         def balance_of(account):
-            args = [account.address_hex()]
+            args = [account.address_formatted()]
             return self.query_number(contract, "balanceOf(address)", args)
 
         self.environment.run_flow(myflow)

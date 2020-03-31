@@ -1,12 +1,9 @@
 import logging
-import os
 import signal
-import time
 from os import path
 
-from psutil import process_iter
-
 from erdpy import config, dependencies, errors, myprocess, utils
+from psutil import process_iter
 
 logger = logging.getLogger("nodedebug")
 
@@ -64,7 +61,7 @@ def stop():
         logger.info("Nodedebug wasn't started.")
 
 
-def deploy(bytecode, owner, arguments=None, gas_price=None, gas_limit=None, testnet_url=None):
+def deploy(bytecode, owner, arguments=None, gas_price=None, gas_limit=None):
     logger.debug("deploy")
 
     arguments = arguments or []
@@ -72,16 +69,12 @@ def deploy(bytecode, owner, arguments=None, gas_price=None, gas_limit=None, test
     gas_price = gas_price or config.DEFAULT_GASPRICE
 
     url = _get_url("deploy")
-    on_testnet = testnet_url is not None
 
     tx_data = bytecode
     for arg in arguments:
         tx_data += f"@{_prepare_argument(arg)}"
 
     data = {
-        "OnTestnet": on_testnet,
-        "PrivateKey": owner.pem,
-        "TestnetNodeEndpoint": testnet_url,
         "SndAddress": owner.address,
         "Value": "0",
         "GasLimit": gas_limit,
@@ -96,7 +89,7 @@ def deploy(bytecode, owner, arguments=None, gas_price=None, gas_limit=None, test
     return response.tx_hash, response.contract_address
 
 
-def execute(contract_address, caller, function, arguments=None, gas_price=None, gas_limit=None, testnet_url=None):
+def execute(contract_address, caller, function, arguments=None, gas_price=None, gas_limit=None):
     logger.debug(f"execute, address={contract_address}")
 
     arguments = arguments or []
@@ -104,16 +97,12 @@ def execute(contract_address, caller, function, arguments=None, gas_price=None, 
     gas_price = gas_price or config.DEFAULT_GASPRICE
 
     url = _get_url("run")
-    on_testnet = testnet_url is not None
 
     tx_data = function
     for arg in arguments:
         tx_data += f"@{_prepare_argument(arg)}"
 
     data = {
-        "OnTestnet": on_testnet,
-        "PrivateKey": caller.pem,
-        "TestnetNodeEndpoint": testnet_url,
         "SndAddress": caller.address,
         "ScAddress": contract_address,
         "Value": "0",
@@ -129,20 +118,17 @@ def execute(contract_address, caller, function, arguments=None, gas_price=None, 
     return response
 
 
-def query(contract_address, function, arguments=None, testnet_url=None):
+def query(contract_address, function, arguments=None):
     logger.debug(f"query, address={contract_address}")
 
     arguments = [_prepare_argument(arg) for arg in arguments or []]
 
     url = _get_url("query")
-    on_testnet = testnet_url is not None
 
     data = {
         "ScAddress": contract_address,
         "FuncName": function,
-        "Args": arguments,
-        "OnTestnet": on_testnet,
-        "TestnetNodeEndpoint": testnet_url
+        "Args": arguments
     }
 
     raw_response = utils.post_json(url, data)
@@ -158,7 +144,8 @@ def _get_url(action):
 
 class _Response:
     def __init__(self, raw_dict):
-        def find(key): return utils.find_in_dictionary(raw_dict, key)
+        def find(key):
+            return utils.find_in_dictionary(raw_dict, key)
 
         self.error = find("error")
         self.contract_address = find("data.Address")
@@ -171,7 +158,8 @@ class _Response:
 
 class _VMOutputResponse:
     def __init__(self, raw_dict):
-        def find(key): return utils.find_in_dictionary(raw_dict, key)
+        def find(key):
+            return utils.find_in_dictionary(raw_dict, key)
 
         self.error = find("error")
         self.return_data = find("data.ReturnData")
@@ -180,24 +168,6 @@ class _VMOutputResponse:
     def verify(self):
         if self.error:
             raise errors.KnownError(self.error)        
-
-
-def _prepare_argument(argument):
-    hex_prefix = "0X"
-    as_string = str(argument).upper()
-
-    if as_string.startswith(hex_prefix):
-        return as_string[len(hex_prefix):]
-
-    if not as_string.isnumeric():
-        raise errors.UnknownArgumentFormat(as_string)
-
-    as_number = int(as_string)
-    as_hexstring = hex(as_number)[len(hex_prefix):]
-    if len(as_hexstring) % 2 == 1:
-        as_hexstring = "0" + as_hexstring
-
-    return as_hexstring
 
 
 def _get_env():
