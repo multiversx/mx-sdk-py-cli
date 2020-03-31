@@ -103,8 +103,9 @@ class PreparedTransaction(PlainTransaction):
 
     def send(self, proxy):
         logger.info(f"PreparedTransaction.send:\n{self.to_json()}")
-        response = proxy.send_transaction(self.to_dictionary())
-        logger.info(f"Hash: {response['txHash']}")
+        tx_hash = proxy.send_transaction(self.to_dictionary())
+        logger.info(f"Hash: {tx_hash}")
+        return tx_hash
 
 
 def prepare(args):

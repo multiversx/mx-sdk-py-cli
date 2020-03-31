@@ -8,24 +8,6 @@ from erdpy.projects import load_project
 logger = logging.getLogger("proxy")
 
 
-def prepare_argument(argument):
-    hex_prefix = "0X"
-    as_string = str(argument).upper()
-
-    if as_string.startswith(hex_prefix):
-        return as_string[len(hex_prefix):]
-
-    if not as_string.isnumeric():
-        raise errors.UnknownArgumentFormat(as_string)
-
-    as_number = int(as_string)
-    as_hexstring = hex(as_number)[len(hex_prefix):]
-    if len(as_hexstring) % 2 == 1:
-        as_hexstring = "0" + as_hexstring
-
-    return as_hexstring
-
-
 class TransactionCostEstimator:
     # needs these constant because when the observer node receive a post request from proxy with a transaction needs
     # to can figure out what type of transaction was send to can calculate an estimation
