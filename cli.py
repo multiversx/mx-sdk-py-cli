@@ -57,7 +57,6 @@ def setup_parser():
     # TODO: path to project or path to bytecode (hex.arwen).
     deploy_parser.add_argument("project", nargs='?', default=os.getcwd())
     deploy_parser.add_argument("--proxy", required=True)
-    deploy_parser.add_argument("--owner", required=True)
     deploy_parser.add_argument("--pem", required=True)
     deploy_parser.add_argument("--arguments", nargs='+')
     deploy_parser.add_argument("--gas-price", default=config.DEFAULT_GASPRICE)
@@ -67,7 +66,6 @@ def setup_parser():
     call_parser = subparsers.add_parser("call")
     call_parser.add_argument("contract")
     call_parser.add_argument("--proxy", required=True)
-    call_parser.add_argument("--caller", required=True)
     call_parser.add_argument("--pem", required=True)
     call_parser.add_argument("--function", required=True)
     call_parser.add_argument("--arguments", nargs='+')
@@ -197,7 +195,6 @@ def build(args):
 
 def deploy(args):
     project = args.project
-    owner = args.owner
     pem = args.pem
     proxy_url = args.proxy
     arguments = args.arguments
@@ -205,14 +202,13 @@ def deploy(args):
     gas_limit = args.gas_limit
 
     try:
-        flows.deploy_smart_contract(project, owner, pem, proxy_url, arguments, gas_price, gas_limit)
+        flows.deploy_smart_contract(project, pem, proxy_url, arguments, gas_price, gas_limit)
     except errors.KnownError as err:
         logger.fatal(err)
 
 
 def call(args):
     contract = args.contract
-    caller = args.caller
     pem = args.pem
     proxy_url = args.proxy
     function = args.function
@@ -221,7 +217,7 @@ def call(args):
     gas_limit = args.gas_limit
 
     try:
-        flows.call_smart_contract(contract, caller, pem, proxy_url, function, arguments, gas_price, gas_limit)
+        flows.call_smart_contract(contract, pem, proxy_url, function, arguments, gas_price, gas_limit)
     except errors.KnownError as err:
         logger.fatal(err)
 
