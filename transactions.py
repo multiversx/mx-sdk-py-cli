@@ -60,7 +60,16 @@ class TransactionPayloadToSign:
 
 
 class PreparedTransaction(PlainTransaction):
-    def __init__(self, transaction, signature):
+    def __init__(self, transaction=None, signature=None, dictionary=None):
+        if dictionary:
+            self._init_with_dictionary(dictionary)
+        else:
+            self._init_default(transaction, signature)
+
+    def _init_with_dictionary(self, dictionary):
+        self.__dict__.update(dictionary)
+
+    def _init_default(self, transaction, signature):
         self.__dict__.update(transaction.payload())
         self.signature = signature
 
@@ -68,9 +77,34 @@ class PreparedTransaction(PlainTransaction):
             data_bytes = transaction.data.encode("utf-8")
             self.data = base64.b64encode(data_bytes).decode()
 
+    @classmethod
+    def from_file(cls, filename):
+        data_json = utils.read_file(filename).encode()
+        return cls.from_json(data_json)
+
+    def save_to_file(self, filename):
+        utils.write_file(filename, self.to_json())
+
+    @classmethod
+    def from_json(cls, json_data):
+        dictionary = json.loads(json_data)
+        return cls.from_dictionary(dictionary)
+
     def to_json(self):
-        data_json = json.dumps(self.payload(), separators=(',', ':')).encode("utf8")
+        data_json = json.dumps(self.to_dictionary(), indent=4)
         return data_json
+
+    @classmethod
+    def from_dictionary(cls, dictionary):
+        return cls(dictionary=dictionary)
+
+    def to_dictionary(self):
+        return self.__dict__.copy()
+
+    def send(self, proxy):
+        logger.info(f"PreparedTransaction.send:\n{self.to_json()}")
+        response = proxy.send_transaction(self.to_dictionary())
+        logger.info(f"Hash: {response['txHash']}")
 
 
 def prepare(args):
@@ -81,31 +115,19 @@ def prepare(args):
     sender_bytes = signing.get_address_from_pem(args.pem)
     sender_hex = sender_bytes.hex()
 
-    transaction = PlainTransaction()
-    transaction.nonce = int(args.nonce)
-    transaction.value = args.value
-    transaction.sender = sender_hex
-    transaction.receiver = args.receiver
-    transaction.gasPrice = int(args.gas_price)
-    transaction.gasLimit = int(args.gas_limit)
-    transaction.data = args.data
+    plain = PlainTransaction()
+    plain.nonce = int(args.nonce)
+    plain.value = args.value
+    plain.sender = sender_hex
+    plain.receiver = args.receiver
+    plain.gasPrice = int(args.gas_price)
+    plain.gasLimit = int(args.gas_limit)
+    plain.data = args.data
 
-    transaction_payload = TransactionPayloadToSign(transaction)
-    signature = signing.sign_transaction(transaction_payload, args.pem)
-    signed_transaction = PreparedTransaction(transaction, signature)
-    signed_transaction_json = signed_transaction.to_json().decode()
+    payload = TransactionPayloadToSign(plain)
+    signature = signing.sign_transaction(payload, args.pem)
+    prepared = PreparedTransaction(plain, signature)
 
-    prepared_transaction_filename = path.join(workspace, f"tx-{args.tag}.json")
-    utils.write_file(prepared_transaction_filename, signed_transaction_json)
-    logger.info(f"Saved prepared transaction to {prepared_transaction_filename}")
-
-
-def send_prepared(args):
-    tx_json = utils.read_file(args.tx).encode()
-
-    logger.info(f"send_prepared:\n{tx_json}")
-
-    url = f"{args.proxy}/transaction/send"
-    raw_response = utils.post_json(url, data_json=tx_json)
-    print(raw_response)
-    pass
+    prepared_filename = path.join(workspace, f"tx-{args.tag}.json")
+    prepared.save_to_file(prepared_filename)
+    logger.info(f"Saved prepared transaction to {prepared_filename}")

@@ -2,6 +2,7 @@ import logging
 import nacl.encoding
 import nacl.signing
 import base64
+from os import path
 
 from erdpy import utils
 
@@ -26,6 +27,8 @@ def sign_transaction(transaction, pem_file):
 
 
 def parse_pem(pem_file):
+    pem_file = path.expanduser(pem_file)
+
     lines = utils.read_lines(pem_file)
     lines = [line for line in lines if "-----" not in line]
     key_base64 = "".join(lines)

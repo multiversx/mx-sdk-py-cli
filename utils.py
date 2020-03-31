@@ -4,7 +4,6 @@ import os
 import pathlib
 import stat
 import tarfile
-import urllib.request
 import zipfile
 
 import toml
@@ -67,24 +66,6 @@ def mark_executable(file):
     logger.debug(f"Mark [{file}] as executable")
     st = os.stat(file)
     os.chmod(file, st.st_mode | stat.S_IEXEC)
-
-
-def post_json(url, data=None, data_json=None):
-    if not data_json:
-        data_json = json.dumps(data).encode("utf8")
-
-    headers = {"content-type": "application/json"}
-    request = urllib.request.Request(url, data=data_json, headers=headers)
-
-    try:
-        response = urllib.request.urlopen(request)
-        response_json = response.read().decode("utf8")
-        response_data = json.loads(response_json)
-        return response_data
-    except urllib.request.HTTPError as err:
-        message_json = err.read()
-        message_data = json.loads(message_json)
-        return message_data
 
 
 def find_in_dictionary(dictionary, compound_path):

@@ -1,23 +1,23 @@
 import logging
 
-from erdpy.projects import load_project
-from erdpy.environments import TestnetEnvironment
 from erdpy.accounts import Account
 from erdpy.contracts import SmartContract
-from erdpy.proxy.caller import ElrondProxy
-from erdpy.proxy.cost import TransactionCostEstimator
+from erdpy.environments import TestnetEnvironment
+from erdpy.projects import load_project
+from erdpy.proxy import ElrondProxy, TransactionCostEstimator
+from erdpy.transactions import PreparedTransaction
 
 logger = logging.getLogger("examples")
 
 
-def deploy_smart_contract(project_directory, owner_address, pem_file, proxy_url, arguments, gas_price, gas_limit):
+def deploy_smart_contract(project_directory, pem_file, proxy_url, arguments, gas_price, gas_limit):
     logger.debug("deploy_smart_contract")
 
     project = load_project(project_directory)
     bytecode = project.get_bytecode()
     contract = SmartContract(bytecode=bytecode)
     environment = TestnetEnvironment(proxy_url)
-    owner = Account(owner_address, pem_file)
+    owner = Account(pem_file=pem_file)
 
     def flow():
         tx, address = environment.deploy_contract(contract, owner, arguments, gas_price, gas_limit)
@@ -27,13 +27,12 @@ def deploy_smart_contract(project_directory, owner_address, pem_file, proxy_url,
     environment.run_flow(flow)
 
 
-def call_smart_contract(contract_address, caller_address, pem_file, proxy_url, function, arguments, gas_price,
-                        gas_limit):
+def call_smart_contract(contract_address, pem_file, proxy_url, function, arguments, gas_price, gas_limit):
     logger.debug("call_smart_contract")
 
     contract = SmartContract(contract_address)
     environment = TestnetEnvironment(proxy_url)
-    caller = Account(caller_address, pem_file)
+    caller = Account(pem_file=pem_file)
 
     def flow():
         environment.execute_contract(contract, caller, function, arguments, gas_price, gas_limit)
@@ -107,3 +106,9 @@ def get_transaction_cost(arguments):
 
     cost_estimator = TransactionCostEstimator(arguments.proxy)
     cost_estimator.estimate_tx_cost(arguments)
+
+
+def send_prepared_transaction(args):
+    proxy = ElrondProxy(args.proxy)
+    prepared = PreparedTransaction.from_file(args.tx)
+    prepared.send(proxy)

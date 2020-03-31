@@ -336,7 +336,7 @@ def tx_prepare(args):
 
 def tx_send(args):
     try:
-        transactions.send_prepared(args)
+        flows.send_prepared_transaction(args)
     except errors.KnownError as err:
         logger.fatal(err)
 
