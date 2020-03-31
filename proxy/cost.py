@@ -33,7 +33,7 @@ class TransactionCostEstimator:
     _RECEIVER_ADDRESS = "e3784da068cca901c0c629b304d024eb777fdf604dd8f6b5c0dc0c7f75877471"
 
     def __init__(self, proxy_url):
-        self.proxy = proxy_url
+        self.proxy_url = proxy_url
 
     def estimate_tx_cost(self, arguments):
         tx_type = arguments.tx_type
@@ -51,7 +51,7 @@ class TransactionCostEstimator:
         data = data or ""
         data_bytes = base64.b64encode(data.encode())
 
-        self._sent_tx(sender, receiver, data_bytes.decode())
+        self._send_transaction(sender, receiver, data_bytes.decode())
 
     def _estimate_sc_deploy(self, contract_path):
         if contract_path is None:
@@ -65,7 +65,7 @@ class TransactionCostEstimator:
 
         sender = self._SENDER_ADDRESS
         receiver = self._RECEIVER_ADDRESS
-        self._sent_tx(sender, receiver, base64_bytecode.decode())
+        self._send_transaction(sender, receiver, base64_bytecode.decode())
 
     def _estimate_sc_call(self, sc_address, function, arguments):
         if function is None:
@@ -84,9 +84,9 @@ class TransactionCostEstimator:
             tx_data += f"@{prepare_argument(arg)}"
 
         base64_bytes = base64.b64encode(tx_data.encode())
-        self._sent_tx(sender, receiver, base64_bytes.decode())
+        self._send_transaction(sender, receiver, base64_bytes.decode())
 
-    def _sent_tx(self, sender, receiver, data):
+    def _send_transaction(self, sender, receiver, data):
         tx_object = {
             "nonce": 1,
             "value": "0",
@@ -94,7 +94,7 @@ class TransactionCostEstimator:
             "sender": sender,
             "data": data
         }
-        url = f"{self.proxy}/transaction/cost"
+        url = f"{self.proxy_url}/transaction/cost"
 
         raw_response = utils.post_json(url, tx_object)
         gas_units_key = 'txGasUnits'
