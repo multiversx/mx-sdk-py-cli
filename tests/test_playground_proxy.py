@@ -2,7 +2,7 @@ import unittest
 import requests
 
 
-class TestProxyCalls(unittest.TestCase):
+class TestPlaygroundElrondProxy(unittest.TestCase):
     def test_do_request(self):
         # use a valid proxy address
         url = "http://localhost:8001"
