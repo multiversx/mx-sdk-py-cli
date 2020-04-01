@@ -1,7 +1,7 @@
-import hashlib
 from erdpy import errors, config
 from erdpy.transactions import PlainTransaction, TransactionPayloadToSign, PreparedTransaction
 from erdpy.wallet import signing
+from Crypto.Hash import keccak
 
 
 class SmartContract:
@@ -51,7 +51,7 @@ class SmartContract:
         owner_bytes = self.owner.address_bytes()
         nonce_bytes = self.owner.nonce.to_bytes(8, byteorder="little")
         bytes_to_hash = owner_bytes + nonce_bytes
-        address = hashlib.sha3_256(bytes_to_hash).digest()
+        address = keccak.new(digest_bits=256).update(bytes_to_hash).digest()
         address = bytes([0] * 8) + bytes([5, 0]) + address[10:30] + owner_bytes[30:]
         self.address = address.hex()
 
@@ -90,6 +90,7 @@ class SmartContract:
         return tx_data
 
     def query(self, proxy, function, arguments):
+        arguments = arguments or []
         prepared_arguments = [_prepare_argument(argument) for argument in arguments]
 
         # TODO: move to proxy
@@ -100,7 +101,7 @@ class SmartContract:
         }
 
         response = proxy.query_contract(payload)
-        return response["data"]
+        return response["data"]["ReturnData"]
 
 
 def _prepare_argument(argument):

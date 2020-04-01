@@ -79,7 +79,8 @@ def query_smart_contract(args):
     environment = TestnetEnvironment(proxy_url)
 
     def flow():
-        environment.query_contract(contract, function, arguments)
+        result = environment.query_contract(contract, function, arguments)
+        print(result)
 
     environment.run_flow(flow)
 
