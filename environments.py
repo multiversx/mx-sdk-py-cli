@@ -100,11 +100,8 @@ class TestnetEnvironment(Environment):
     def deploy_contract(self, contract, owner, arguments=None, gas_price=None, gas_limit=None):
         logger.debug("deploy_contract")
         proxy = self._get_proxy()
-
-        owner.sync_nonce(proxy)
-        transaction = contract.prepare_deploy_transaction(owner, arguments, gas_price, gas_limit)
-        tx_hash = transaction.send(proxy)
-        contract.address = "TBD"
+        tx_hash, address = contract.deploy(proxy, owner, arguments, gas_price, gas_limit)
+        print("hehe", address)
 
         return tx_hash, contract.address
 

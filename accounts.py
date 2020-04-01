@@ -24,7 +24,7 @@ class Account:
         return self.address
 
     def address_bytes(self):
-        pass
+        return bytearray.fromhex(self.address)
 
     def address_base64(self):
         pass

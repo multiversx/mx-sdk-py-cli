@@ -1,3 +1,4 @@
+import hashlib
 from erdpy import errors, config
 from erdpy.transactions import PlainTransaction, TransactionPayloadToSign, PreparedTransaction
 from erdpy.wallet import signing
@@ -7,6 +8,14 @@ class SmartContract:
     def __init__(self, address=None, bytecode=None):
         self.address = address
         self.bytecode = bytecode
+
+    def deploy(self, proxy, owner, arguments, gas_price, gas_limit):
+        self.owner = owner
+        self.owner.sync_nonce(proxy)
+        self.compute_address()
+        transaction = self.prepare_deploy_transaction(owner, arguments, gas_price, gas_limit)
+        tx_hash = transaction.send(proxy)
+        return tx_hash, self.address
 
     def prepare_deploy_transaction(self, owner, arguments, gas_price, gas_limit):
         arguments = arguments or []
@@ -35,6 +44,17 @@ class SmartContract:
 
         return tx_data
 
+    def compute_address(self):
+        """
+        8 bytes of zero + 2 bytes for VM type + 20 bytes of hash(owner) + 2 bytes of shard(owner)
+        """
+        owner_bytes = self.owner.address_bytes()
+        nonce_bytes = self.owner.nonce.to_bytes(8, byteorder="little")
+        bytes_to_hash = owner_bytes + nonce_bytes
+        address = hashlib.sha3_256(bytes_to_hash).digest()
+        address = bytes([0] * 8) + bytes([0, 5]) + address[10:30] + owner_bytes[30:]
+        self.address = address.hex()
+
 
 def _prepare_argument(argument):
     hex_prefix = "0X"
@@ -52,49 +72,3 @@ def _prepare_argument(argument):
         as_hexstring = "0" + as_hexstring
 
     return as_hexstring
-
-
-def compute_contract_address(owner, nonce):
-    """
-    Implement as follows (Go):
-
-    func (bh *BlockChainHookImpl) NewAddress(creatorAddress []byte, creatorNonce uint64, vmType []byte) ([]byte, error) {
-        addressLength := bh.addrConv.AddressLen()
-        if len(creatorAddress) != addressLength {
-            return nil, ErrAddressLengthNotCorrect
-        }
-
-        if len(vmType) != core.VMTypeLen {
-            return nil, ErrVMTypeLengthIsNotCorrect
-        }
-
-        base := hashFromAddressAndNonce(creatorAddress, creatorNonce)
-        prefixMask := createPrefixMask(vmType)
-        suffixMask := createSuffixMask(creatorAddress)
-
-        copy(base[:core.NumInitCharactersForScAddress], prefixMask)
-        copy(base[len(base)-core.ShardIdentiferLen:], suffixMask)
-
-        return base, nil
-    }
-
-    func hashFromAddressAndNonce(creatorAddress []byte, creatorNonce uint64) []byte {
-        buffNonce := make([]byte, 8)
-        binary.LittleEndian.PutUint64(buffNonce, creatorNonce)
-        adrAndNonce := append(creatorAddress, buffNonce...)
-        scAddress := keccak.Keccak{}.Compute(string(adrAndNonce))
-
-        return scAddress
-    }
-
-    func createPrefixMask(vmType []byte) []byte {
-        prefixMask := make([]byte, core.NumInitCharactersForScAddress-core.VMTypeLen)
-        prefixMask = append(prefixMask, vmType...)
-
-        return prefixMask
-    }
-
-    func createSuffixMask(creatorAddress []byte) []byte {
-        return creatorAddress[len(creatorAddress)-2:]
-    }
-    """
