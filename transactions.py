@@ -14,7 +14,7 @@ logger = logging.getLogger("transactions")
 class PlainTransaction:
     def __init__(self):
         self.nonce = 0
-        self.value = ""
+        self.value = "0"
         self.sender = ""
         self.receiver = ""
         self.gasPrice = 0

@@ -21,6 +21,7 @@ class SmartContract:
         arguments = arguments or []
         gas_price = int(gas_price or config.DEFAULT_GASPRICE)
         gas_limit = int(gas_limit or config.DEFAULT_GASLIMIT)
+        value = str(value or "0")
 
         plain = PlainTransaction()
         plain.nonce = owner.nonce
@@ -66,6 +67,7 @@ class SmartContract:
         arguments = arguments or []
         gas_price = int(gas_price or config.DEFAULT_GASPRICE)
         gas_limit = int(gas_limit or config.DEFAULT_GASLIMIT)
+        value = str(value or "0")
 
         plain = PlainTransaction()
         plain.nonce = caller.nonce
