@@ -18,8 +18,8 @@ class ContractsTestCase(unittest.TestCase):
 
         contract.owner.nonce = 0
         contract.compute_address()
-        self.assertEqual("000000000000000000052c53ff3ac9360413569c3e12a68e577736241ac4bd5e", contract.address)
+        self.assertEqual("000000000000000005002c53ff3ac9360413569c3e12a68e577736241ac4bd5e", contract.address)
 
         contract.owner.nonce = 1
         contract.compute_address()
-        self.assertEqual("00000000000000000005981e67c1cc99f4c7473ec53f2421c830ff95273dbd5e", contract.address)
+        self.assertEqual("00000000000000000500981e67c1cc99f4c7473ec53f2421c830ff95273dbd5e", contract.address)

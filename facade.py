@@ -64,8 +64,16 @@ def call_smart_contract(args):
     environment.run_flow(flow)
 
 
-def query_smart_contract(contract_address, proxy_url, function, arguments):
+def query_smart_contract(args):
     logger.debug("query_smart_contract")
+
+    contract_address = args.contract
+    proxy_url = args.proxy
+    function = args.function
+    arguments = args.arguments
+
+    # TODO: apply more guards
+    guards.is_hex_address(contract_address)
 
     contract = SmartContract(contract_address)
     environment = TestnetEnvironment(proxy_url)

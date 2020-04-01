@@ -210,13 +210,8 @@ def call(args):
 
 
 def query(args):
-    contract = args.contract
-    proxy_url = args.proxy
-    function = args.function
-    arguments = args.arguments
-
     try:
-        facade.query_smart_contract(contract, proxy_url, function, arguments)
+        facade.query_smart_contract(args)
     except errors.KnownError as err:
         logger.fatal(err)
 
@@ -224,6 +219,7 @@ def query(args):
 def get_account(args):
     proxy_url = args.proxy
     address = args.address
+
     try:
         if args.balance:
             facade.get_account_balance(proxy_url, address)

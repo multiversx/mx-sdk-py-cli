@@ -111,6 +111,9 @@ class TestnetEnvironment(Environment):
 
     def query_contract(self, contract, function, arguments=None):
         logger.debug("query_contract")
+        proxy = self._get_proxy()
+        return_data = contract.query(proxy, function, arguments)
+        return return_data
 
     def _get_proxy(self):
         return ElrondProxy(self.url)

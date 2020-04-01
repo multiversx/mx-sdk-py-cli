@@ -69,6 +69,11 @@ class ElrondProxy:
         tx_hash = response["txHash"]
         return tx_hash
 
+    def query_contract(self, payload):
+        url = f"{self.url}/vm-values/query"
+        response = self._do_post(url, payload)
+        return response
+
     def _do_get(self, url):
         try:
             response = requests.get(url)

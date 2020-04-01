@@ -52,7 +52,7 @@ class SmartContract:
         nonce_bytes = self.owner.nonce.to_bytes(8, byteorder="little")
         bytes_to_hash = owner_bytes + nonce_bytes
         address = hashlib.sha3_256(bytes_to_hash).digest()
-        address = bytes([0] * 8) + bytes([0, 5]) + address[10:30] + owner_bytes[30:]
+        address = bytes([0] * 8) + bytes([5, 0]) + address[10:30] + owner_bytes[30:]
         self.address = address.hex()
 
     def execute(self, proxy, caller, function, arguments, gas_price, gas_limit, value):
@@ -88,6 +88,19 @@ class SmartContract:
             tx_data += f"@{_prepare_argument(arg)}"
 
         return tx_data
+
+    def query(self, proxy, function, arguments):
+        prepared_arguments = [_prepare_argument(argument) for argument in arguments]
+
+        # TODO: move to proxy
+        payload = {
+            "ScAddress": self.address,
+            "FuncName": function,
+            "Args": prepared_arguments
+        }
+
+        response = proxy.query_contract(payload)
+        return response["data"]
 
 
 def _prepare_argument(argument):
