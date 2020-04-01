@@ -17,7 +17,7 @@ class ProjectSol(Project):
         See https://github.com/second-state/SOLL/blob/master/utils/ll2ewasm_sol
         """
 
-        self.unit = self.find_file(".sol")
+        self.unit = self.find_file("*.sol")
         self.unit_name = self.unit.stem
         self.file_ll = self.unit.with_suffix(".ll")
         self.file_functions = self.unit.with_suffix(".functions")
@@ -101,7 +101,7 @@ class ProjectSol(Project):
         myprocess.run_process(args)
 
     def get_file_wasm(self):
-        return self.find_file(".sol").with_suffix(".wasm")
+        return self.find_file("*.sol").with_suffix(".wasm")
 
     def _get_soll_path(self):
         directory = dependencies.get_install_directory("soll")

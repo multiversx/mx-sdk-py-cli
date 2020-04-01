@@ -15,7 +15,7 @@ class ProjectClang(Project):
 
     def perform_build(self):
         self.build_configuration = BuildConfiguration(self, self.debug)
-        self.unit = self.find_file(".c")
+        self.unit = self.find_file("*.c")
         self.file_ll = self.unit.with_suffix(".ll")
         self.file_o = self.unit.with_suffix(".o")
         self.file_export = self.unit.with_suffix(".export")
@@ -75,7 +75,7 @@ class ProjectClang(Project):
         myprocess.run_process(args)
 
     def get_file_wasm(self):
-        return self.find_file(".c").with_suffix(".wasm")
+        return self.find_file("*.c").with_suffix(".wasm")
 
     def _get_llvm_path(self):
         return dependencies.get_install_directory("llvm")
@@ -92,7 +92,7 @@ class BuildConfiguration:
         self.undefined_file = self._get_undefined_file()
 
     def _get_exports(self):
-        file_export = self.project.find_file(".export")
+        file_export = self.project.find_file("*.export")
         lines = utils.read_lines(file_export)
         return lines
 
