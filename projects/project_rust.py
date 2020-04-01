@@ -72,6 +72,29 @@ class CargoFile:
     def package_name(self, value):
         self.data["package"]["name"] = value
 
+    @property
+    def version(self):
+        return self.data["package"]["version"]
+
+    @version.setter
+    def version(self, value):
+        self.data["package"]["version"] = value
+
+    @property
+    def authors(self):
+        return self.data["package"]["authors"]
+
+    @authors.setter
+    def authors(self, value):
+        self.data["package"]["authors"] = value
+
+    @property
+    def edition(self):
+        return self.data["package"]["edition"]
+
+    @edition.setter
+    def edition(self, value):
+        self.data["package"]["edition"] = value
 
     @property
     def bin_name(self):

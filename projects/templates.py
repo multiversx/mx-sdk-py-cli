@@ -2,15 +2,15 @@ import json
 import logging
 import os
 import shutil
+from datetime import date
 from os import path
 from pathlib import Path
 
-from texttable import Texttable
-
 from erdpy import dependencies, errors, utils
 from erdpy.projects import shared
-from erdpy.projects.templates_config import get_templates_repositories
 from erdpy.projects.project_rust import CargoFile
+from erdpy.projects.templates_config import get_templates_repositories
+from texttable import Texttable
 
 logger = logging.getLogger("projects.templates")
 
@@ -135,41 +135,56 @@ class TemplateRust(Template):
         tasks_path = path.join(self.directory, ".vscode", "tasks.json")
         debug_main_path = path.join(self.directory, "debug", "src", "main.rs")
 
-        self._replace_simple_placeholders_in_file(launch_path)
-        self._replace_simple_placeholders_in_file(tasks_path)
+        logger.info("Updating cargo files...")
 
         cargo_file = CargoFile(cargo_path)
         cargo_file.package_name = self.project_name
+        cargo_file.version = "0.0.1"
+        cargo_file.authors = ["you"]
+        cargo_file.edition = "2018"
+        cargo_file.save()
 
         cargo_file_debug = CargoFile(cargo_debug_path)
         cargo_file_debug.package_name = f"{self.project_name}-debug"
-
-        cargo_file.save()
+        cargo_file_debug.version = "0.0.1"
+        cargo_file_debug.authors = ["you"]
+        cargo_file_debug.edition = "2018"
         cargo_file_debug.save()
 
-        to_replace = f"use {self.template_name.replace('-', '_')}::*"
-        replacement = f"use {self.project_name.replace('-', '_')}::*"
-        self._one_replace_in_file(debug_main_path, to_replace, replacement)
+        logger.info("Applying replacements...")
 
-        to_replace = f"[dependencies.{self.template_name}]"
-        replacement = f"[dependencies.{self.project_name}]"
-        self._one_replace_in_file(cargo_debug_path, to_replace, replacement)
+        self._replace_in_files(
+            [launch_path, tasks_path],
+            [
+                ("{{PROJECT_NAME}}", self.project_name),
+                ("{{PATH_RUST_BIN}}", self.rust_bin_directory),
+                ("{{RUSTUP_HOME}}", self.rust_directory),
+                ("{{CARGO_HOME}}", self.rust_directory)
+            ])
 
-        # TODO: refactor
-        # TODO: set author, year, version
+        self._replace_in_files(
+            [debug_main_path],
+            [
+                # Example "use simple_coin::*" to "use my_project::*"
+                (f"use {self.template_name.replace('-', '_')}::*", f"use {self.project_name.replace('-', '_')}::*")
+            ]
+        )
 
-    def _replace_simple_placeholders_in_file(self, filepath):
-        content = utils.read_file(filepath)
-        content = content.replace("{{PROJECT_NAME}}", self.project_name)
-        content = content.replace("{{PATH_RUST_BIN}}", self.rust_bin_directory)
-        content = content.replace("{{RUSTUP_HOME}}", self.rust_directory)
-        content = content.replace("{{CARGO_HOME}}", self.rust_directory)
-        utils.write_file(filepath, content)
+        self._replace_in_files(
+            [cargo_debug_path],
+            [
+                (f"[dependencies.{self.template_name}]", f"[dependencies.{self.project_name}]")
+            ]
+        )
 
-    def _one_replace_in_file(self, filepath, to_replace, replacement):
-        content = utils.read_file(filepath)
-        content = content.replace(to_replace, replacement)
-        utils.write_file(filepath, content)
+    def _replace_in_files(self, files, replacements):
+        for file in files:
+            content = utils.read_file(file)
+
+            for to_replace, replacement in replacements:
+                content = content.replace(to_replace, replacement)
+
+            utils.write_file(file, content)
 
 
 class TemplateSol(Template):
