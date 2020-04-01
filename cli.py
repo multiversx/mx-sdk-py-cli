@@ -2,7 +2,7 @@ import logging
 import os
 from argparse import ArgumentParser
 
-from erdpy import (config, dependencies, errors, flows, ide, nodedebug,
+from erdpy import (config, dependencies, errors, facade, ide, nodedebug,
                    projects, proxy, transactions)
 from erdpy._version import __version__
 
@@ -202,7 +202,7 @@ def deploy(args):
     gas_limit = args.gas_limit
 
     try:
-        flows.deploy_smart_contract(project, pem, proxy_url, arguments, gas_price, gas_limit)
+        facade.deploy_smart_contract(project, pem, proxy_url, arguments, gas_price, gas_limit)
     except errors.KnownError as err:
         logger.fatal(err)
 
@@ -217,7 +217,7 @@ def call(args):
     gas_limit = args.gas_limit
 
     try:
-        flows.call_smart_contract(contract, pem, proxy_url, function, arguments, gas_price, gas_limit)
+        facade.call_smart_contract(contract, pem, proxy_url, function, arguments, gas_price, gas_limit)
     except errors.KnownError as err:
         logger.fatal(err)
 
@@ -229,7 +229,7 @@ def query(args):
     arguments = args.arguments
 
     try:
-        flows.query_smart_contract(contract, proxy_url, function, arguments)
+        facade.query_smart_contract(contract, proxy_url, function, arguments)
     except errors.KnownError as err:
         logger.fatal(err)
 
@@ -239,18 +239,18 @@ def get_account(args):
     address = args.address
     try:
         if args.balance:
-            flows.get_account_balance(proxy_url, address)
+            facade.get_account_balance(proxy_url, address)
         elif args.nonce:
-            flows.get_account_nonce(proxy_url, address)
+            facade.get_account_nonce(proxy_url, address)
         else:
-            flows.get_account(proxy_url, address)
+            facade.get_account(proxy_url, address)
     except errors.KnownError as err:
         logger.fatal(err)
 
 
 def get_transaction_cost(args):
     try:
-        flows.get_transaction_cost(args)
+        facade.get_transaction_cost(args)
     except errors.KnownError as err:
         logger.fatal(err)
 
@@ -259,7 +259,7 @@ def get_num_shards(args):
     proxy_url = args.proxy
 
     try:
-        flows.get_num_shards(proxy_url)
+        facade.get_num_shards(proxy_url)
     except errors.KnownError as err:
         logger.fatal(err)
 
@@ -269,7 +269,7 @@ def get_last_block_nonce(args):
     shard_id = args.shard_id
 
     try:
-        flows.get_last_block_nonce(proxy_url, shard_id)
+        facade.get_last_block_nonce(proxy_url, shard_id)
     except errors.KnownError as err:
         logger.fatal(err)
 
@@ -278,7 +278,7 @@ def get_gas_price(args):
     proxy_url = args.proxy
 
     try:
-        flows.get_gas_price(proxy_url)
+        facade.get_gas_price(proxy_url)
     except errors.KnownError as err:
         logger.fatal(err)
 
@@ -287,7 +287,7 @@ def get_chain_id(args):
     proxy_url = args.proxy
 
     try:
-        flows.get_chain_id(proxy_url)
+        facade.get_chain_id(proxy_url)
     except errors.KnownError as err:
         logger.fatal(err)
 
@@ -336,7 +336,7 @@ def tx_prepare(args):
 
 def tx_send(args):
     try:
-        flows.send_prepared_transaction(args)
+        facade.send_prepared_transaction(args)
     except errors.KnownError as err:
         logger.fatal(err)
 
