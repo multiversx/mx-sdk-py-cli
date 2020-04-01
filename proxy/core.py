@@ -83,6 +83,8 @@ class ElrondProxy:
         except requests.HTTPError as err:
             error_data = err.response.json()
             raise errors.ProxyRequestError(url, error_data)
+        except requests.ConnectionError as err:
+            raise errors.ProxyRequestError(url, err)
 
     def _do_post(self, url, payload):
         try:
