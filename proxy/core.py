@@ -33,9 +33,9 @@ class ElrondProxy:
 
     def get_num_shards(self):
         metrics = self._get_status_metrics(METACHAIN_ID)
-        num_shards = metrics["erd_metric_cross_check_block_height"]
+        metric = metrics["erd_metric_cross_check_block_height"]
         # + 1 for metachain
-        num_shards += 1
+        num_shards = metric.count(":") + 1
         return num_shards
 
     def get_last_block_nonce(self, shard_id):
