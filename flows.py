@@ -1,5 +1,6 @@
 import logging
 
+from erdpy import guards
 from erdpy.accounts import Account
 from erdpy.contracts import SmartContract
 from erdpy.environments import TestnetEnvironment
@@ -20,8 +21,8 @@ def deploy_smart_contract(project_directory, pem_file, proxy_url, arguments, gas
     owner = Account(pem_file=pem_file)
 
     def flow():
-        tx, address = environment.deploy_contract(contract, owner, arguments, gas_price, gas_limit)
-        logger.info("Tx hash: %s", tx)
+        tx_hash, address = environment.deploy_contract(contract, owner, arguments, gas_price, gas_limit)
+        logger.info("Tx hash: %s", tx_hash)
         logger.info("Contract address: %s", address)
 
     environment.run_flow(flow)
@@ -30,12 +31,15 @@ def deploy_smart_contract(project_directory, pem_file, proxy_url, arguments, gas
 def call_smart_contract(contract_address, pem_file, proxy_url, function, arguments, gas_price, gas_limit):
     logger.debug("call_smart_contract")
 
+    guards.is_hex_address(contract_address)
+
     contract = SmartContract(contract_address)
     environment = TestnetEnvironment(proxy_url)
     caller = Account(pem_file=pem_file)
 
     def flow():
-        environment.execute_contract(contract, caller, function, arguments, gas_price, gas_limit)
+        tx_hash = environment.execute_contract(contract, caller, function, arguments, gas_price, gas_limit)
+        logger.info("Tx hash: %s", tx_hash)
 
     environment.run_flow(flow)
 

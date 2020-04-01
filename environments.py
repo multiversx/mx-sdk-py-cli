@@ -103,8 +103,11 @@ class TestnetEnvironment(Environment):
         tx_hash, address = contract.deploy(proxy, owner, arguments, gas_price, gas_limit)
         return tx_hash, contract.address
 
-    def execute_contract(self, contract, sender, function, arguments=None, gas_price=None, gas_limit=None):
+    def execute_contract(self, contract, caller, function, arguments=None, gas_price=None, gas_limit=None):
         logger.debug("execute_contract")
+        proxy = self._get_proxy()
+        tx_hash = contract.execute(proxy, caller, function, arguments, gas_price, gas_limit)
+        return tx_hash
 
     def query_contract(self, contract, function, arguments=None):
         logger.debug("query_contract")

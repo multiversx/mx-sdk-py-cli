@@ -57,3 +57,9 @@ class ProxyRequestError(KnownError):
     def __init__(self, url, data):
         super().__init__(
             f"Proxy request error for url [{url}]: {data}")
+
+
+class BadInputError(KnownError):
+    def __init__(self, input, message):
+        super().__init__(
+            f"Bad input [{input}]: {message}")

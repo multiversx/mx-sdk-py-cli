@@ -24,7 +24,7 @@ class SmartContract:
 
         plain = PlainTransaction()
         plain.nonce = owner.nonce
-        plain.value = "0"
+        plain.value = "0"   # TODO
         plain.sender = owner.address
         plain.receiver = "0" * 64
         plain.gasPrice = gas_price
@@ -54,6 +54,40 @@ class SmartContract:
         address = hashlib.sha3_256(bytes_to_hash).digest()
         address = bytes([0] * 8) + bytes([0, 5]) + address[10:30] + owner_bytes[30:]
         self.address = address.hex()
+
+    def execute(self, proxy, caller, function, arguments, gas_price, gas_limit):
+        self.caller = caller
+        self.caller.sync_nonce(proxy)
+        transaction = self.prepare_execute_transaction(caller, function, arguments, gas_price, gas_limit)
+        tx_hash = transaction.send(proxy)
+        return tx_hash
+
+    def prepare_execute_transaction(self, caller, function, arguments, gas_price, gas_limit):
+        arguments = arguments or []
+        gas_price = int(gas_price or config.DEFAULT_GASPRICE)
+        gas_limit = int(gas_limit or config.DEFAULT_GASLIMIT)
+
+        plain = PlainTransaction()
+        plain.nonce = caller.nonce
+        plain.value = "0"   # TODO
+        plain.sender = caller.address
+        plain.receiver = self.address
+        plain.gasPrice = gas_price
+        plain.gasLimit = gas_limit
+        plain.data = self.prepare_execute_transaction_data(function, arguments)
+
+        payload = TransactionPayloadToSign(plain)
+        signature = signing.sign_transaction(payload, caller.pem_file)
+        prepared = PreparedTransaction(plain, signature)
+        return prepared
+
+    def prepare_execute_transaction_data(self, function, arguments):
+        tx_data = function
+
+        for arg in arguments:
+            tx_data += f"@{_prepare_argument(arg)}"
+
+        return tx_data
 
 
 def _prepare_argument(argument):
