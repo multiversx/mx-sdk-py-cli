@@ -1,10 +1,12 @@
 import binascii
 import glob
-import os
+import logging
 from os import path
 from pathlib import Path
 
-from erdpy import dependencies, errors, utils, myprocess
+from erdpy import dependencies, errors, myprocess, utils
+
+logger = logging.getLogger("Project")
 
 
 class Project:
@@ -32,15 +34,13 @@ class Project:
     def get_file_wasm(self):
         raise NotImplementedError()
 
-    def find_file(self, suffix):
-        all_files = os.listdir(self.directory)
-        files = [file for file in all_files if file.endswith(suffix)]
+    def find_file(self, pattern):
+        files = list(Path(self.directory).rglob(pattern))
 
         if len(files) == 0:
-            raise errors.KnownError(f"No file with suffix: [{suffix}].")
+            raise errors.KnownError(f"No file matches pattern [{pattern}].")
         if len(files) > 1:
-            raise errors.KnownError(
-                f"More files found with suffix: [{suffix}]")
+            logging.warning(f"More files match pattern [{pattern}]. Will pick first:\n{files}")
 
         file = path.join(self.directory, files[0])
         return Path(file).resolve()
