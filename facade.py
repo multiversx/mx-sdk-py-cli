@@ -11,8 +11,18 @@ from erdpy.transactions import PreparedTransaction
 logger = logging.getLogger("examples")
 
 
-def deploy_smart_contract(project_directory, pem_file, proxy_url, arguments, gas_price, gas_limit):
+def deploy_smart_contract(args):
     logger.debug("deploy_smart_contract")
+
+    project_directory = args.project
+    pem_file = args.pem
+    proxy_url = args.proxy
+    arguments = args.arguments
+    gas_price = args.gas_price
+    gas_limit = args.gas_limit
+    value = args.value
+
+    # TODO: apply guards
 
     project = load_project(project_directory)
     bytecode = project.get_bytecode()
@@ -21,16 +31,26 @@ def deploy_smart_contract(project_directory, pem_file, proxy_url, arguments, gas
     owner = Account(pem_file=pem_file)
 
     def flow():
-        tx_hash, address = environment.deploy_contract(contract, owner, arguments, gas_price, gas_limit)
+        tx_hash, address = environment.deploy_contract(contract, owner, arguments, gas_price, gas_limit, value)
         logger.info("Tx hash: %s", tx_hash)
         logger.info("Contract address: %s", address)
 
     environment.run_flow(flow)
 
 
-def call_smart_contract(contract_address, pem_file, proxy_url, function, arguments, gas_price, gas_limit):
+def call_smart_contract(args):
     logger.debug("call_smart_contract")
 
+    contract_address = args.contract
+    pem_file = args.pem
+    proxy_url = args.proxy
+    function = args.function
+    arguments = args.arguments
+    gas_price = args.gas_price
+    gas_limit = args.gas_limit
+    value = args.value
+
+    # TODO: apply more guards
     guards.is_hex_address(contract_address)
 
     contract = SmartContract(contract_address)
@@ -38,7 +58,7 @@ def call_smart_contract(contract_address, pem_file, proxy_url, function, argumen
     caller = Account(pem_file=pem_file)
 
     def flow():
-        tx_hash = environment.execute_contract(contract, caller, function, arguments, gas_price, gas_limit)
+        tx_hash = environment.execute_contract(contract, caller, function, arguments, gas_price, gas_limit, value)
         logger.info("Tx hash: %s", tx_hash)
 
     environment.run_flow(flow)

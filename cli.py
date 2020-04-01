@@ -61,6 +61,7 @@ def setup_parser():
     deploy_parser.add_argument("--arguments", nargs='+')
     deploy_parser.add_argument("--gas-price", default=config.DEFAULT_GASPRICE)
     deploy_parser.add_argument("--gas-limit", default=config.DEFAULT_GASLIMIT)
+    deploy_parser.add_argument("--value", default="0")
     deploy_parser.set_defaults(func=deploy)
 
     call_parser = subparsers.add_parser("call")
@@ -71,6 +72,7 @@ def setup_parser():
     call_parser.add_argument("--arguments", nargs='+')
     call_parser.add_argument("--gas-price", default=config.DEFAULT_GASPRICE)
     call_parser.add_argument("--gas-limit", default=config.DEFAULT_GASLIMIT)
+    call_parser.add_argument("--value", default="0")
     call_parser.set_defaults(func=call)
 
     query_parser = subparsers.add_parser("query")
@@ -194,30 +196,15 @@ def build(args):
 
 
 def deploy(args):
-    project = args.project
-    pem = args.pem
-    proxy_url = args.proxy
-    arguments = args.arguments
-    gas_price = args.gas_price
-    gas_limit = args.gas_limit
-
     try:
-        facade.deploy_smart_contract(project, pem, proxy_url, arguments, gas_price, gas_limit)
+        facade.deploy_smart_contract(args)
     except errors.KnownError as err:
         logger.fatal(err)
 
 
 def call(args):
-    contract = args.contract
-    pem = args.pem
-    proxy_url = args.proxy
-    function = args.function
-    arguments = args.arguments
-    gas_price = args.gas_price
-    gas_limit = args.gas_limit
-
     try:
-        facade.call_smart_contract(contract, pem, proxy_url, function, arguments, gas_price, gas_limit)
+        facade.call_smart_contract(args)
     except errors.KnownError as err:
         logger.fatal(err)
 

@@ -9,22 +9,22 @@ class SmartContract:
         self.address = address
         self.bytecode = bytecode
 
-    def deploy(self, proxy, owner, arguments, gas_price, gas_limit):
+    def deploy(self, proxy, owner, arguments, gas_price, gas_limit, value):
         self.owner = owner
         self.owner.sync_nonce(proxy)
         self.compute_address()
-        transaction = self.prepare_deploy_transaction(owner, arguments, gas_price, gas_limit)
+        transaction = self.prepare_deploy_transaction(owner, arguments, gas_price, gas_limit, value)
         tx_hash = transaction.send(proxy)
         return tx_hash, self.address
 
-    def prepare_deploy_transaction(self, owner, arguments, gas_price, gas_limit):
+    def prepare_deploy_transaction(self, owner, arguments, gas_price, gas_limit, value):
         arguments = arguments or []
         gas_price = int(gas_price or config.DEFAULT_GASPRICE)
         gas_limit = int(gas_limit or config.DEFAULT_GASLIMIT)
 
         plain = PlainTransaction()
         plain.nonce = owner.nonce
-        plain.value = "0"   # TODO
+        plain.value = value
         plain.sender = owner.address
         plain.receiver = "0" * 64
         plain.gasPrice = gas_price
@@ -55,21 +55,21 @@ class SmartContract:
         address = bytes([0] * 8) + bytes([0, 5]) + address[10:30] + owner_bytes[30:]
         self.address = address.hex()
 
-    def execute(self, proxy, caller, function, arguments, gas_price, gas_limit):
+    def execute(self, proxy, caller, function, arguments, gas_price, gas_limit, value):
         self.caller = caller
         self.caller.sync_nonce(proxy)
-        transaction = self.prepare_execute_transaction(caller, function, arguments, gas_price, gas_limit)
+        transaction = self.prepare_execute_transaction(caller, function, arguments, gas_price, gas_limit, value)
         tx_hash = transaction.send(proxy)
         return tx_hash
 
-    def prepare_execute_transaction(self, caller, function, arguments, gas_price, gas_limit):
+    def prepare_execute_transaction(self, caller, function, arguments, gas_price, gas_limit, value):
         arguments = arguments or []
         gas_price = int(gas_price or config.DEFAULT_GASPRICE)
         gas_limit = int(gas_limit or config.DEFAULT_GASLIMIT)
 
         plain = PlainTransaction()
         plain.nonce = caller.nonce
-        plain.value = "0"   # TODO
+        plain.value = value
         plain.sender = caller.address
         plain.receiver = self.address
         plain.gasPrice = gas_price
