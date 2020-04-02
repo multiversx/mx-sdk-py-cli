@@ -81,9 +81,11 @@ class ElrondProxy:
             parsed = response.json()
             return parsed
         except requests.HTTPError as err:
-            error_data = err.response.json()
+            error_data = self._extract_error_from_response(err.response)
             raise errors.ProxyRequestError(url, error_data)
         except requests.ConnectionError as err:
+            raise errors.ProxyRequestError(url, err)
+        except Exception as err:
             raise errors.ProxyRequestError(url, err)
 
     def _do_post(self, url, payload):
@@ -93,5 +95,15 @@ class ElrondProxy:
             parsed = response.json()
             return parsed
         except requests.HTTPError as err:
-            error_data = err.response.json()
+            error_data = self._extract_error_from_response(err.response)
             raise errors.ProxyRequestError(url, error_data)
+        except requests.ConnectionError as err:
+            raise errors.ProxyRequestError(url, err)
+        except Exception as err:
+            raise errors.ProxyRequestError(url, err)
+
+    def _extract_error_from_response(self, response):
+        try:
+            return response.json()
+        except Exception:
+            return response.text
