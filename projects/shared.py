@@ -5,6 +5,10 @@ def is_source_clang(directory):
     return _directory_contains_file(directory, ".c")
 
 
+def is_source_cpp(directory):
+    return _directory_contains_file(directory, ".cpp")
+
+
 def is_source_sol(directory):
     return _directory_contains_file(directory, ".sol")
 

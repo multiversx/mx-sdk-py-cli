@@ -4,6 +4,7 @@ from os import path
 from erdpy import dependencies, errors, utils
 from erdpy.projects import shared
 from erdpy.projects.project_clang import ProjectClang
+from erdpy.projects.project_cpp import ProjectCpp
 from erdpy.projects.project_rust import ProjectRust
 from erdpy.projects.project_sol import ProjectSol
 
@@ -15,6 +16,8 @@ def load_project(directory):
 
     if shared.is_source_clang(directory):
         return ProjectClang(directory)
+    if shared.is_source_cpp(directory):
+        return ProjectCpp(directory)
     if shared.is_source_sol(directory):
         return ProjectSol(directory)
     if shared.is_source_rust(directory):
