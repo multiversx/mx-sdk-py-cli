@@ -1,7 +1,7 @@
 from erdpy import errors, config
 from erdpy.transactions import PlainTransaction, TransactionPayloadToSign, PreparedTransaction
 from erdpy.wallet import signing
-from Crypto.Hash import keccak
+from Cryptodome.Hash import keccak
 
 
 class SmartContract:
