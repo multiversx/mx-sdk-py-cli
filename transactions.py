@@ -111,6 +111,13 @@ def prepare(args):
     workspace = args.workspace
     utils.ensure_folder(workspace)
 
+    prepared = do_prepare_transaction(args)
+    prepared_filename = path.join(workspace, f"tx-{args.tag}.json")
+    prepared.save_to_file(prepared_filename)
+    logger.info(f"Saved prepared transaction to {prepared_filename}")
+
+
+def do_prepare_transaction(args):
     # "sender" taken from the PEM file
     sender_bytes = signing.get_address_from_pem(args.pem)
     sender_hex = sender_bytes.hex()
@@ -127,7 +134,4 @@ def prepare(args):
     payload = TransactionPayloadToSign(plain)
     signature = signing.sign_transaction(payload, args.pem)
     prepared = PreparedTransaction(plain, signature)
-
-    prepared_filename = path.join(workspace, f"tx-{args.tag}.json")
-    prepared.save_to_file(prepared_filename)
-    logger.info(f"Saved prepared transaction to {prepared_filename}")
+    return prepared

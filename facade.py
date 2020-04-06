@@ -6,7 +6,7 @@ from erdpy.contracts import SmartContract
 from erdpy.environments import TestnetEnvironment
 from erdpy.projects import load_project
 from erdpy.proxy import ElrondProxy, TransactionCostEstimator
-from erdpy.transactions import PreparedTransaction
+from erdpy.transactions import PreparedTransaction, do_prepare_transaction
 
 logger = logging.getLogger("examples")
 
@@ -159,3 +159,17 @@ def send_prepared_transaction(args):
     proxy = ElrondProxy(args.proxy)
     prepared = PreparedTransaction.from_file(args.tx)
     prepared.send(proxy)
+
+
+def prepare_and_send_transaction(args):
+    proxy = ElrondProxy(args.proxy)
+
+    # Need to sync nonce
+    owner = Account(pem_file=args.pem)
+    owner.sync_nonce(proxy)
+    args.nonce = owner.nonce
+
+    prepared = do_prepare_transaction(args)
+    tx_hash = prepared.send(proxy)
+    print(tx_hash)
+    return tx_hash

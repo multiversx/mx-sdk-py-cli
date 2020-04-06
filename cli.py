@@ -16,7 +16,7 @@ def main():
     if args.verbose:
         logging.basicConfig(level=logging.DEBUG)
     else:
-        logging.basicConfig(level=logging.INFO)
+        logging.basicConfig(level=logging.WARN)
 
     if not hasattr(args, "func"):
         parser.print_help()
@@ -148,6 +148,16 @@ def setup_parser():
     tx_send_parser.add_argument("tx")
     tx_send_parser.add_argument("--proxy", required=True)
     tx_send_parser.set_defaults(func=tx_send)
+
+    tx_prepare_and_send_parser = subparsers.add_parser("tx-prepare-and-send")
+    tx_prepare_and_send_parser.add_argument("--pem", required=True)
+    tx_prepare_and_send_parser.add_argument("--value", default="0")
+    tx_prepare_and_send_parser.add_argument("--receiver", required=True)
+    tx_prepare_and_send_parser.add_argument("--gas-price", default=config.DEFAULT_GASPRICE)
+    tx_prepare_and_send_parser.add_argument("--gas-limit", default=config.DEFAULT_GASLIMIT)
+    tx_prepare_and_send_parser.add_argument("--data", default="")
+    tx_prepare_and_send_parser.add_argument("--proxy", required=True)
+    tx_prepare_and_send_parser.set_defaults(func=tx_prepare_and_send)
 
     return parser
 
@@ -320,6 +330,13 @@ def tx_prepare(args):
 def tx_send(args):
     try:
         facade.send_prepared_transaction(args)
+    except errors.KnownError as err:
+        logger.fatal(err)
+
+
+def tx_prepare_and_send(args):
+    try:
+        facade.prepare_and_send_transaction(args)
     except errors.KnownError as err:
         logger.fatal(err)
 
