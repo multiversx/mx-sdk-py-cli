@@ -3,7 +3,6 @@ import signal
 from os import path
 
 from erdpy import config, dependencies, errors, myprocess, utils
-from psutil import process_iter
 
 logger = logging.getLogger("nodedebug")
 
@@ -42,6 +41,10 @@ def _is_running():
 
 
 def _get_proc():
+    # TODO: Find another way to get the process, so that psutil is not needed
+    # psutil requires "sudo apt-get install python3-dev" / "build-essentials"
+    from psutil import process_iter
+
     for proc in process_iter():
         if proc.name() == "nodedebug":
             return proc
