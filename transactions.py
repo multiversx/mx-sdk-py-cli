@@ -37,6 +37,7 @@ class TransactionPayloadToSign:
         sender_base64 = base64.b64encode(sender_bytes).decode()
         self.sender = sender_base64
 
+        # When signing the transaction, we base64 encode the "Data" field
         if transaction.data:
             data_bytes = transaction.data.encode("utf-8")
             data_base64 = base64.b64encode(data_bytes).decode()
@@ -73,8 +74,7 @@ class PreparedTransaction(PlainTransaction):
         self.signature = signature
 
         if transaction.data:
-            data_bytes = transaction.data.encode("utf-8")
-            self.data = base64.b64encode(data_bytes).decode()
+            self.data = transaction.data
 
     @classmethod
     def from_file(cls, filename):
