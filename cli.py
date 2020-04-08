@@ -62,6 +62,7 @@ def setup_parser():
     deploy_parser.add_argument("--gas-price", default=config.DEFAULT_GASPRICE)
     deploy_parser.add_argument("--gas-limit", default=config.DEFAULT_GASLIMIT)
     deploy_parser.add_argument("--value", default="0")
+    deploy_parser.add_argument("--metadata-upgradeable", action="store_true", default=False)
     deploy_parser.set_defaults(func=deploy)
 
     call_parser = subparsers.add_parser("call")

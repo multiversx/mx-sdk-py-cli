@@ -2,7 +2,7 @@ import logging
 
 from erdpy import guards
 from erdpy.accounts import Account
-from erdpy.contracts import SmartContract
+from erdpy.contracts import SmartContract, CodeMetadata
 from erdpy.environments import TestnetEnvironment
 from erdpy.projects import load_project
 from erdpy.proxy import ElrondProxy, TransactionCostEstimator
@@ -21,12 +21,14 @@ def deploy_smart_contract(args):
     gas_price = args.gas_price
     gas_limit = args.gas_limit
     value = args.value
+    metadata_upgradeable = args.metadata_upgradeable
 
     # TODO: apply guards
 
     project = load_project(project_directory)
     bytecode = project.get_bytecode()
-    contract = SmartContract(bytecode=bytecode)
+    metadata = CodeMetadata(metadata_upgradeable)
+    contract = SmartContract(bytecode=bytecode, metadata=metadata)
     environment = TestnetEnvironment(proxy_url)
     owner = Account(pem_file=pem_file)
 

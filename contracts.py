@@ -5,9 +5,10 @@ from Cryptodome.Hash import keccak
 
 
 class SmartContract:
-    def __init__(self, address=None, bytecode=None):
+    def __init__(self, address=None, bytecode=None, metadata=None):
         self.address = address
         self.bytecode = bytecode
+        self.metadata = metadata or CodeMetadata()
 
     def deploy(self, proxy, owner, arguments, gas_price, gas_limit, value):
         self.owner = owner
@@ -38,7 +39,8 @@ class SmartContract:
         return prepared
 
     def prepare_deploy_transaction_data(self, arguments):
-        tx_data = self.bytecode
+        # The bytecode already includes vm-type
+        tx_data = f"{self.bytecode}@{self.metadata.to_hex()}"
 
         for arg in arguments:
             tx_data += f"@{_prepare_argument(arg)}"
@@ -122,3 +124,13 @@ def _prepare_argument(argument):
         as_hexstring = "0" + as_hexstring
 
     return as_hexstring
+
+
+class CodeMetadata:
+    def __init__(self, upgradeable=False):
+        self.upgradeable = upgradeable
+
+    def to_hex(self):
+        if self.upgradeable:
+            return "0100"
+        return "0000"
