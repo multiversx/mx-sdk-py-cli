@@ -3,7 +3,7 @@ from erdpy.transactions import PlainTransaction, TransactionPayloadToSign, Prepa
 from erdpy.wallet import signing
 from Cryptodome.Hash import keccak
 
-VM_TYPE_ARWEN = b"@0500"
+VM_TYPE_ARWEN = "0500"
 
 
 class SmartContract:
@@ -121,7 +121,7 @@ class SmartContract:
         prepared = PreparedTransaction(plain, signature)
         return prepared
 
-    def prepare_update_transaction_data(self, arguments):
+    def prepare_upgrade_transaction_data(self, arguments):
         tx_data = f"upgradeContract@{self.bytecode}@{self.metadata.to_hex()}"
 
         for arg in arguments:
