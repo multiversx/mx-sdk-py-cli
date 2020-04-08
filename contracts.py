@@ -3,6 +3,8 @@ from erdpy.transactions import PlainTransaction, TransactionPayloadToSign, Prepa
 from erdpy.wallet import signing
 from Cryptodome.Hash import keccak
 
+VM_TYPE_ARWEN = b"@0500"
+
 
 class SmartContract:
     def __init__(self, address=None, bytecode=None, metadata=None):
@@ -39,8 +41,7 @@ class SmartContract:
         return prepared
 
     def prepare_deploy_transaction_data(self, arguments):
-        # The bytecode already includes vm-type
-        tx_data = f"{self.bytecode}@{self.metadata.to_hex()}"
+        tx_data = f"{self.bytecode}@{VM_TYPE_ARWEN}@{self.metadata.to_hex()}"
 
         for arg in arguments:
             tx_data += f"@{_prepare_argument(arg)}"

@@ -18,7 +18,7 @@ class Project:
         self.debug = self.options.get("debug", False)
         self._ensure_dependencies_installed()
         self.perform_build()
-        self._create_arwen_files()
+        self._create_deploy_files()
 
     def _ensure_dependencies_installed(self):
         module_keys = self.get_dependencies()
@@ -45,24 +45,18 @@ class Project:
         file = path.join(self.directory, files[0])
         return Path(file).resolve()
 
-    def _create_arwen_files(self):
-        ARWEN_TAG = b"@0500"
-
+    def _create_deploy_files(self):
         file_wasm = self.get_file_wasm()
         file_wasm_hex = file_wasm.with_suffix(".hex")
-        file_wasm_hex_arwen = file_wasm.with_suffix(".hex.arwen")
 
         with open(file_wasm, "rb") as file:
             bytecode_hex = binascii.hexlify(file.read())
         with open(file_wasm_hex, "wb+") as file:
             file.write(bytecode_hex)
-        with open(file_wasm_hex_arwen, "wb+") as file:
-            file.write(bytecode_hex)
-            file.write(ARWEN_TAG)
 
     def get_bytecode(self):
         bytecode = utils.read_file(
-            self.get_file_wasm().with_suffix(".hex.arwen"))
+            self.get_file_wasm().with_suffix(".hex"))
         return bytecode
 
     def run_tests(self, wildcard):
