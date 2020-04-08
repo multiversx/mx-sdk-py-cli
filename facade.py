@@ -66,6 +66,36 @@ def call_smart_contract(args):
     environment.run_flow(flow)
 
 
+def upgrade_smart_contract(args):
+    logger.debug("upgrade_smart_contract")
+
+    contract_address = args.contract
+    project_directory = args.project
+    pem_file = args.pem
+    proxy_url = args.proxy
+    arguments = args.arguments
+    gas_price = args.gas_price
+    gas_limit = args.gas_limit
+    value = args.value
+    metadata_upgradeable = args.metadata_upgradeable
+
+    # TODO: apply more guards
+    guards.is_hex_address(contract_address)
+
+    project = load_project(project_directory)
+    bytecode = project.get_bytecode()
+    metadata = CodeMetadata(metadata_upgradeable)
+    contract = SmartContract(contract_address, bytecode=bytecode, metadata=metadata)
+    environment = TestnetEnvironment(proxy_url)
+    caller = Account(pem_file=pem_file)
+
+    def flow():
+        tx_hash = environment.upgrade_contract(contract, caller, arguments, gas_price, gas_limit, value)
+        logger.info("Tx hash: %s", tx_hash)
+
+    environment.run_flow(flow)
+
+
 def query_smart_contract(args):
     logger.debug("query_smart_contract")
 

@@ -76,6 +76,18 @@ def setup_parser():
     call_parser.add_argument("--value", default="0")
     call_parser.set_defaults(func=call)
 
+    upgrade_parser = subparsers.add_parser("upgrade")
+    upgrade_parser.add_argument("contract")
+    upgrade_parser.add_argument("project")
+    upgrade_parser.add_argument("--proxy", required=True)
+    upgrade_parser.add_argument("--pem", required=True)
+    upgrade_parser.add_argument("--arguments", nargs='+')
+    upgrade_parser.add_argument("--gas-price", default=config.DEFAULT_GASPRICE)
+    upgrade_parser.add_argument("--gas-limit", default=config.DEFAULT_GASLIMIT)
+    upgrade_parser.add_argument("--value", default="0")
+    upgrade_parser.add_argument("--metadata-upgradeable", action="store_true", default=False)
+    upgrade_parser.set_defaults(func=upgrade)
+
     query_parser = subparsers.add_parser("query")
     query_parser.add_argument("contract")
     query_parser.add_argument("--proxy", required=True)
@@ -216,6 +228,13 @@ def deploy(args):
 def call(args):
     try:
         facade.call_smart_contract(args)
+    except errors.KnownError as err:
+        logger.fatal(err)
+
+
+def upgrade(args):
+    try:
+        facade.upgrade_smart_contract(args)
     except errors.KnownError as err:
         logger.fatal(err)
 
