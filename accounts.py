@@ -68,6 +68,10 @@ class Address:
         if self._value_hex is None:
             raise errors.EmptyAddressError()
 
+    @classmethod
+    def zero(cls):
+        return Address("0" * 64)
+
 
 def _as_string(value):
     if isinstance(value, str):

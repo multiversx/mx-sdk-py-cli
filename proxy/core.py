@@ -15,19 +15,19 @@ class ElrondProxy:
         self.url = url
 
     def get_account_nonce(self, address):
-        url = f"{self.url}/address/{address}/nonce"
+        url = f"{self.url}/address/{address.bech32()}"
         response = self._do_get(url)
-        nonce = response["nonce"]
+        nonce = response["account"]["nonce"]
         return nonce
 
     def get_account_balance(self, address):
-        url = f"{self.url}/address/{address}/balance"
+        url = f"{self.url}/address/{address.bech32()}/balance"
         response = self._do_get(url)
         balance = response["balance"]
         return balance
 
     def get_account(self, address):
-        url = f"{self.url}/address/{address}"
+        url = f"{self.url}/address/{address.bech32()}"
         response = self._do_get(url)
         return response
 

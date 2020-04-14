@@ -11,7 +11,7 @@ VM_TYPE_ARWEN = "0500"
 
 class SmartContract:
     def __init__(self, address=None, bytecode=None, metadata=None):
-        self.address = address
+        self.address = Address(address)
         self.bytecode = bytecode
         self.metadata = metadata or CodeMetadata()
 
@@ -32,8 +32,8 @@ class SmartContract:
         plain = PlainTransaction()
         plain.nonce = owner.nonce
         plain.value = value
-        plain.sender = owner.address
-        plain.receiver = "0" * 64
+        plain.sender = owner.address.bech32()
+        plain.receiver = Address.zero().bech32()
         plain.gasPrice = gas_price
         plain.gasLimit = gas_limit
         plain.data = self.prepare_deploy_transaction_data(arguments)
@@ -78,8 +78,8 @@ class SmartContract:
         plain = PlainTransaction()
         plain.nonce = caller.nonce
         plain.value = value
-        plain.sender = caller.address
-        plain.receiver = self.address
+        plain.sender = caller.address.bech32()
+        plain.receiver = self.address.bech32()
         plain.gasPrice = gas_price
         plain.gasLimit = gas_limit
         plain.data = self.prepare_execute_transaction_data(function, arguments)
@@ -113,8 +113,8 @@ class SmartContract:
         plain = PlainTransaction()
         plain.nonce = owner.nonce
         plain.value = value
-        plain.sender = owner.address
-        plain.receiver = self.address
+        plain.sender = owner.address.bech32()
+        plain.receiver = self.address.bech32()
         plain.gasPrice = gas_price
         plain.gasLimit = gas_limit
         plain.data = self.prepare_upgrade_transaction_data(arguments)
@@ -136,9 +136,9 @@ class SmartContract:
         arguments = arguments or []
         prepared_arguments = [_prepare_argument(argument) for argument in arguments]
 
-        # TODO: move to proxy
+        # TODO: move to proxy/core.py?
         payload = {
-            "ScAddress": self.address,
+            "ScAddress": self.address.bech32(),
             "FuncName": function,
             "Args": prepared_arguments
         }

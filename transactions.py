@@ -6,6 +6,7 @@ from os import path
 from erdpy import utils
 from erdpy.wallet import signing
 from collections import OrderedDict
+from erdpy.accounts import Address
 
 
 logger = logging.getLogger("transactions")
@@ -111,13 +112,13 @@ def prepare(args):
 
 def do_prepare_transaction(args):
     # "sender" taken from the PEM file
-    sender_bytes = signing.get_address_from_pem(args.pem)
-    sender_hex = sender_bytes.hex()
+    sender_bytes = signing.get_pubkey_from_pem(args.pem)
+    sender_bech32 = Address(sender_bytes).bech32()
 
     plain = PlainTransaction()
     plain.nonce = int(args.nonce)
     plain.value = args.value
-    plain.sender = sender_hex
+    plain.sender = sender_bech32
     plain.receiver = args.receiver
     plain.gasPrice = int(args.gas_price)
     plain.gasLimit = int(args.gas_limit)
