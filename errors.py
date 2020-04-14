@@ -49,17 +49,24 @@ class BadSink(ProgrammingError):
 
 class UnknownArgumentFormat(KnownError):
     def __init__(self, argument):
-        super().__init__(
-            f"Cannot handle non-hex, non-number arguments yet: {argument}.")
+        super().__init__(f"Cannot handle non-hex, non-number arguments yet: {argument}.")
 
 
 class ProxyRequestError(KnownError):
     def __init__(self, url, data):
-        super().__init__(
-            f"Proxy request error for url [{url}]: {data}")
+        super().__init__(f"Proxy request error for url [{url}]: {data}")
 
 
 class BadInputError(KnownError):
     def __init__(self, input, message):
-        super().__init__(
-            f"Bad input [{input}]: {message}")
+        super().__init__(f"Bad input [{input}]: {message}")
+
+
+class BadAddressFormatError(KnownError):
+    def __init__(self, value):
+        super().__init__(f"Bad address [{value}].")
+
+
+class EmptyAddressError(KnownError):
+    def __init__(self):
+        super().__init__(f"Address is empty.")

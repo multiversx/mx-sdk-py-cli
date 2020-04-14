@@ -172,6 +172,13 @@ def setup_parser():
     tx_prepare_and_send_parser.add_argument("--proxy", required=True)
     tx_prepare_and_send_parser.set_defaults(func=tx_prepare_and_send)
 
+    bech32_parser = subparsers.add_parser("bech32")
+    bech32_parser.add_argument("value")
+    group = bech32_parser.add_mutually_exclusive_group(required=True)
+    group.add_argument("--encode", action="store_true")
+    group.add_argument("--decode", action="store_true")
+    bech32_parser.set_defaults(func=do_bech32)
+
     return parser
 
 
@@ -357,6 +364,13 @@ def tx_send(args):
 def tx_prepare_and_send(args):
     try:
         facade.prepare_and_send_transaction(args)
+    except errors.KnownError as err:
+        logger.fatal(err)
+
+
+def do_bech32(args):
+    try:
+        facade.do_bech32(args)
     except errors.KnownError as err:
         logger.fatal(err)
 

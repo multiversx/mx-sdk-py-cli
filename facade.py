@@ -1,7 +1,7 @@
 import logging
 
 from erdpy import guards
-from erdpy.accounts import Account
+from erdpy.accounts import Account, Address
 from erdpy.contracts import SmartContract, CodeMetadata
 from erdpy.environments import TestnetEnvironment
 from erdpy.projects import load_project
@@ -205,3 +205,13 @@ def prepare_and_send_transaction(args):
     tx_hash = prepared.send(proxy)
     print(tx_hash)
     return tx_hash
+
+
+def do_bech32(args):
+    encode = args.encode
+    value = args.value
+    address = Address(value)
+
+    result = address.bech32() if encode else address.hex()
+    print(result)
+    return result

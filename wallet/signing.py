@@ -5,18 +5,17 @@ import base64
 from os import path
 
 from erdpy import utils, guards
-from erdpy.wallet import bech32
 
 logger = logging.getLogger("wallet")
 
 
-def get_address_from_pem(pem_file):
-    _, address = parse_pem(pem_file)
-    return address
+def get_pubkey_from_pem(pem_file):
+    _, pubkey = parse_pem(pem_file)
+    return pubkey
 
 
 def sign_transaction(transaction, pem_file):
-    seed, address = parse_pem(pem_file)
+    seed, _ = parse_pem(pem_file)
     signing_key = nacl.signing.SigningKey(seed)
 
     data_json = transaction.to_json()
@@ -38,11 +37,8 @@ def parse_pem(pem_file):
     key_bytes = bytes.fromhex(key_hex)
 
     seed = key_bytes[:32]
-    address = key_bytes[32:]
-    address = bech32.bech32_encode("erd", bech32.convertbits(address, 8, 5))
-    logger.info(f"Loaded PEM file for address [{address}]")
-
-    return seed, address
+    pubkey = key_bytes[32:]
+    return seed, pubkey
 
 
 def generate_account():
