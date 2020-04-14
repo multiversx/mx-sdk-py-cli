@@ -56,8 +56,13 @@ class Address:
 
     def bech32(self):
         self._assert_validity()
-        pubkey = bytes.fromhex(self._value_hex)
+        pubkey = self.pubkey()
         return bech32.bech32_encode(self.HRP, bech32.convertbits(pubkey, 8, 5))
+
+    def pubkey(self):
+        self._assert_validity()
+        pubkey = bytes.fromhex(self._value_hex)
+        return pubkey
 
     def _assert_validity(self):
         if self._value_hex is None:

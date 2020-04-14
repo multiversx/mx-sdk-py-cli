@@ -1,7 +1,10 @@
-from erdpy import errors, config
-from erdpy.transactions import PlainTransaction, TransactionPayloadToSign, PreparedTransaction
-from erdpy.wallet import signing
 from Cryptodome.Hash import keccak
+
+from erdpy import config, errors
+from erdpy.accounts import Address
+from erdpy.transactions import (PlainTransaction, PreparedTransaction,
+                                TransactionPayloadToSign)
+from erdpy.wallet import signing
 
 VM_TYPE_ARWEN = "0500"
 
@@ -52,12 +55,12 @@ class SmartContract:
         """
         8 bytes of zero + 2 bytes for VM type + 20 bytes of hash(owner) + 2 bytes of shard(owner)
         """
-        owner_bytes = self.owner.address_bytes()
+        owner_bytes = self.owner.address.pubkey()
         nonce_bytes = self.owner.nonce.to_bytes(8, byteorder="little")
         bytes_to_hash = owner_bytes + nonce_bytes
         address = keccak.new(digest_bits=256).update(bytes_to_hash).digest()
         address = bytes([0] * 8) + bytes([5, 0]) + address[10:30] + owner_bytes[30:]
-        self.address = address.hex()
+        self.address = Address(address)
 
     def execute(self, proxy, caller, function, arguments, gas_price, gas_limit, value):
         self.caller = caller

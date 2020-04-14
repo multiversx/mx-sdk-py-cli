@@ -27,17 +27,18 @@ class WalletTestCase(unittest.TestCase):
         self.assertEqual("a4918458d874ca58893a1f92dac33e7b10e3bf46048ad5de5bc260487ca84e8e07603297120fdc018242f63bd8e87b13efd108f8ffa095f536b6eda03805590c", signed_bytes_hex)
         self.assertEqual(64, len(signature))
 
-    def test_get_address_from_pem(self):
+    def test_get_pubkey_from_pem(self):
         pem = self.testdata.joinpath("keys", "alice.pem")
-        address = signing.get_address_from_pem(pem)
-        self.assertEqual("erd1l453hd0gt5gzdp7czpuall8ggt2dcv5zwmfdf3sd3lguxseux2fsmsgldz", address)
+        address = signing.get_pubkey_from_pem(pem)
+
+        self.assertEqual("fd691bb5e85d102687d81079dffce842d4dc328276d2d4c60d8fd1c3433c3293", address.hex())
 
     def test_parse_pem(self):
         pem = self.testdata.joinpath("keys", "alice.pem")
         seed, address = signing.parse_pem(pem)
 
         self.assertEqual("1a927e2af5306a9bb2ea777f73e06ecc0ac9aaa72fb4ea3fecf659451394cccf", seed.hex())
-        self.assertEqual("erd1l453hd0gt5gzdp7czpuall8ggt2dcv5zwmfdf3sd3lguxseux2fsmsgldz", address)
+        self.assertEqual("fd691bb5e85d102687d81079dffce842d4dc328276d2d4c60d8fd1c3433c3293", address.hex())
 
     def test_serialize_transaction_payload(self):
         # With data field
