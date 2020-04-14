@@ -29,14 +29,6 @@ class TransactionPayloadToSign:
     def __init__(self, transaction):
         self.__dict__.update(transaction.payload())
 
-        receiver_bytes = bytes.fromhex(transaction.receiver)
-        receiver_base64 = base64.b64encode(receiver_bytes).decode()
-        self.receiver = receiver_base64
-
-        sender_bytes = bytes.fromhex(transaction.sender)
-        sender_base64 = base64.b64encode(sender_bytes).decode()
-        self.sender = sender_base64
-
         # When signing the transaction, we base64 encode the "Data" field
         if transaction.data:
             data_bytes = transaction.data.encode("utf-8")

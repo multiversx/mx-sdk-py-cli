@@ -5,6 +5,7 @@ import base64
 from os import path
 
 from erdpy import utils, guards
+from erdpy.wallet import bech32
 
 logger = logging.getLogger("wallet")
 
@@ -38,8 +39,8 @@ def parse_pem(pem_file):
 
     seed = key_bytes[:32]
     address = key_bytes[32:]
-
-    logger.info(f"Loaded PEM file for address [{address.hex()}]")
+    address = bech32.bech32_encode("erd", bech32.convertbits(address, 8, 5))
+    logger.info(f"Loaded PEM file for address [{address}]")
 
     return seed, address
 
