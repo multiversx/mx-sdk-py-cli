@@ -1,8 +1,6 @@
-import requests
-import json
 import logging
 
-from erdpy import errors
+from erdpy.proxy.http_facade import do_get, do_post
 
 METACHAIN_ID = 4294967295
 ANY_SHARD_ID = 0
@@ -16,19 +14,19 @@ class ElrondProxy:
 
     def get_account_nonce(self, address):
         url = f"{self.url}/address/{address.bech32()}"
-        response = self._do_get(url)
+        response = do_get(url)
         nonce = response["account"]["nonce"]
         return nonce
 
     def get_account_balance(self, address):
         url = f"{self.url}/address/{address.bech32()}/balance"
-        response = self._do_get(url)
+        response = do_get(url)
         balance = response["balance"]
         return balance
 
     def get_account(self, address):
         url = f"{self.url}/address/{address.bech32()}"
-        response = self._do_get(url)
+        response = do_get(url)
         return response
 
     def get_num_shards(self):
@@ -59,51 +57,17 @@ class ElrondProxy:
 
     def _get_status_metrics(self, shard_id):
         url = f"{self.url}/node/status/{shard_id}"
-        response = self._do_get(url)
+        response = do_get(url)
         details = response["message"]["details"]
         return details
 
     def send_transaction(self, payload):
         url = f"{self.url}/transaction/send"
-        response = self._do_post(url, payload)
+        response = do_post(url, payload)
         tx_hash = response["txHash"]
         return tx_hash
 
     def query_contract(self, payload):
         url = f"{self.url}/vm-values/query"
-        response = self._do_post(url, payload)
+        response = do_post(url, payload)
         return response
-
-    def _do_get(self, url):
-        try:
-            response = requests.get(url)
-            response.raise_for_status()
-            parsed = response.json()
-            return parsed
-        except requests.HTTPError as err:
-            error_data = self._extract_error_from_response(err.response)
-            raise errors.ProxyRequestError(url, error_data)
-        except requests.ConnectionError as err:
-            raise errors.ProxyRequestError(url, err)
-        except Exception as err:
-            raise errors.ProxyRequestError(url, err)
-
-    def _do_post(self, url, payload):
-        try:
-            response = requests.post(url, json=payload)
-            response.raise_for_status()
-            parsed = response.json()
-            return parsed
-        except requests.HTTPError as err:
-            error_data = self._extract_error_from_response(err.response)
-            raise errors.ProxyRequestError(url, error_data)
-        except requests.ConnectionError as err:
-            raise errors.ProxyRequestError(url, err)
-        except Exception as err:
-            raise errors.ProxyRequestError(url, err)
-
-    def _extract_error_from_response(self, response):
-        try:
-            return response.json()
-        except Exception:
-            return response.text

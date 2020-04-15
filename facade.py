@@ -52,9 +52,6 @@ def call_smart_contract(args):
     gas_limit = args.gas_limit
     value = args.value
 
-    # TODO: apply more guards
-    guards.is_hex_address(contract_address)
-
     contract = SmartContract(contract_address)
     environment = TestnetEnvironment(proxy_url)
     caller = Account(pem_file=pem_file)
@@ -79,9 +76,6 @@ def upgrade_smart_contract(args):
     value = args.value
     metadata_upgradeable = args.metadata_upgradeable
 
-    # TODO: apply more guards
-    guards.is_hex_address(contract_address)
-
     project = load_project(project_directory)
     bytecode = project.get_bytecode()
     metadata = CodeMetadata(metadata_upgradeable)
@@ -104,9 +98,6 @@ def query_smart_contract(args):
     function = args.function
     arguments = args.arguments
 
-    # TODO: apply more guards
-    guards.is_hex_address(contract_address)
-
     contract = SmartContract(contract_address)
     environment = TestnetEnvironment(proxy_url)
 
@@ -121,7 +112,7 @@ def get_account_nonce(proxy_url, address):
     logger.debug("call_get_account_nonce")
 
     proxy = ElrondProxy(proxy_url)
-    nonce = proxy.get_account_nonce(address)
+    nonce = proxy.get_account_nonce(Address(address))
     print(nonce)
     return nonce
 
@@ -130,7 +121,7 @@ def get_account_balance(proxy_url, address):
     logger.debug("call_get_account_balance")
 
     proxy = ElrondProxy(proxy_url)
-    balance = proxy.get_account_balance(address)
+    balance = proxy.get_account_balance(Address(address))
     print(balance)
     return balance
 
@@ -139,7 +130,7 @@ def get_account(proxy_url, address):
     logger.debug("call_get_account")
 
     proxy = ElrondProxy(proxy_url)
-    account = proxy.get_account(address)
+    account = proxy.get_account(Address(address))
     print(account)
     return account
 
@@ -180,11 +171,13 @@ def get_chain_id(proxy_url):
     return chain_id
 
 
-def get_transaction_cost(arguments):
+def get_transaction_cost(args):
     logger.debug("call_get_transaction_cost")
 
-    cost_estimator = TransactionCostEstimator(arguments.proxy)
-    cost_estimator.estimate_tx_cost(arguments)
+    cost_estimator = TransactionCostEstimator(args.proxy)
+    result = cost_estimator.estimate_tx_cost(args)
+    print(result)
+    return result
 
 
 def send_prepared_transaction(args):
