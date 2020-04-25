@@ -2,7 +2,7 @@ import logging
 import unittest
 from pathlib import Path
 
-from Crypto.Hash import keccak
+from Cryptodome.Hash import keccak
 from erdpy.accounts import Account
 from erdpy.contracts import SmartContract
 
