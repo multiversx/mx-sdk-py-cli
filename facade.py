@@ -8,7 +8,7 @@ from erdpy.projects import load_project
 from erdpy.proxy import ElrondProxy, TransactionCostEstimator
 from erdpy.transactions import PreparedTransaction, do_prepare_transaction
 
-logger = logging.getLogger("examples")
+logger = logging.getLogger("facade")
 
 
 def deploy_smart_contract(args):
