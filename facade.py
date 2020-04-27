@@ -183,7 +183,9 @@ def get_transaction_cost(args):
 def send_prepared_transaction(args):
     proxy = ElrondProxy(args.proxy)
     prepared = PreparedTransaction.from_file(args.tx)
-    prepared.send(proxy)
+    tx_hash = prepared.send(proxy)
+    print(tx_hash)
+    return tx_hash
 
 
 def prepare_and_send_transaction(args):
