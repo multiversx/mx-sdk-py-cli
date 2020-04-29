@@ -5,6 +5,7 @@ from argparse import ArgumentParser
 from erdpy import (config, dependencies, errors, facade, ide, nodedebug,
                    projects, proxy, transactions)
 from erdpy._version import __version__
+import sys
 
 logger = logging.getLogger("cli")
 
@@ -183,20 +184,12 @@ def setup_parser():
 
 def install(args):
     group = args.group
-
-    try:
-        dependencies.install_group(group, overwrite=True)
-    except errors.KnownError as err:
-        logger.fatal(err)
+    dependencies.install_group(group, overwrite=True)
 
 
 def list_templates(args):
     json = args.json
-
-    try:
-        projects.list_project_templates(json)
-    except errors.KnownError as err:
-        logger.fatal(err)
+    projects.list_project_templates(json)
 
 
 def create(args):
@@ -204,10 +197,7 @@ def create(args):
     template = args.template
     directory = args.directory
 
-    try:
-        projects.create_from_template(name, template, directory)
-    except errors.KnownError as err:
-        logger.fatal(err)
+    projects.create_from_template(name, template, directory)
 
 
 def build(args):
@@ -218,161 +208,105 @@ def build(args):
         "verbose": args.verbose
     }
 
-    try:
-        projects.build_project(project, options)
-    except errors.KnownError as err:
-        logger.fatal(err)
+    projects.build_project(project, options)
 
 
 def deploy(args):
-    try:
-        facade.deploy_smart_contract(args)
-    except errors.KnownError as err:
-        logger.fatal(err)
+    facade.deploy_smart_contract(args)
 
 
 def call(args):
-    try:
-        facade.call_smart_contract(args)
-    except errors.KnownError as err:
-        logger.fatal(err)
+    facade.call_smart_contract(args)
 
 
 def upgrade(args):
-    try:
-        facade.upgrade_smart_contract(args)
-    except errors.KnownError as err:
-        logger.fatal(err)
+    facade.upgrade_smart_contract(args)
 
 
 def query(args):
-    try:
-        facade.query_smart_contract(args)
-    except errors.KnownError as err:
-        logger.fatal(err)
+    facade.query_smart_contract(args)
 
 
 def get_account(args):
     proxy_url = args.proxy
     address = args.address
 
-    try:
-        if args.balance:
-            facade.get_account_balance(proxy_url, address)
-        elif args.nonce:
-            facade.get_account_nonce(proxy_url, address)
-        else:
-            facade.get_account(proxy_url, address)
-    except errors.KnownError as err:
-        logger.fatal(err)
+    if args.balance:
+        facade.get_account_balance(proxy_url, address)
+    elif args.nonce:
+        facade.get_account_nonce(proxy_url, address)
+    else:
+        facade.get_account(proxy_url, address)
 
 
 def get_transaction_cost(args):
-    try:
-        facade.get_transaction_cost(args)
-    except errors.KnownError as err:
-        logger.fatal(err)
+    facade.get_transaction_cost(args)
 
 
 def get_num_shards(args):
     proxy_url = args.proxy
-
-    try:
-        facade.get_num_shards(proxy_url)
-    except errors.KnownError as err:
-        logger.fatal(err)
+    facade.get_num_shards(proxy_url)
 
 
 def get_last_block_nonce(args):
     proxy_url = args.proxy
     shard_id = args.shard_id
-
-    try:
-        facade.get_last_block_nonce(proxy_url, shard_id)
-    except errors.KnownError as err:
-        logger.fatal(err)
+    facade.get_last_block_nonce(proxy_url, shard_id)
 
 
 def get_gas_price(args):
     proxy_url = args.proxy
-
-    try:
-        facade.get_gas_price(proxy_url)
-    except errors.KnownError as err:
-        logger.fatal(err)
+    facade.get_gas_price(proxy_url)
 
 
 def get_chain_id(args):
     proxy_url = args.proxy
-
-    try:
-        facade.get_chain_id(proxy_url)
-    except errors.KnownError as err:
-        logger.fatal(err)
+    facade.get_chain_id(proxy_url)
 
 
 def do_nodedebug(args):
     stop = args.stop
     restart = args.restart
 
-    try:
-        if restart:
-            nodedebug.stop()
-            nodedebug.start()
-        elif stop:
-            nodedebug.stop()
-        else:
-            nodedebug.start()
-    except errors.KnownError as err:
-        logger.fatal(err)
+    if restart:
+        nodedebug.stop()
+        nodedebug.start()
+    elif stop:
+        nodedebug.stop()
+    else:
+        nodedebug.start()
 
 
 def run_tests(args):
     project = args.project
     wildcard = args.wildcard
-
-    try:
-        projects.run_tests(project, wildcard)
-    except errors.KnownError as err:
-        logger.fatal(err)
+    projects.run_tests(project, wildcard)
 
 
 def run_ide(args):
     workspace = args.workspace
-
-    try:
-        ide.run_ide(workspace)
-    except errors.KnownError as err:
-        logger.fatal(err)
+    ide.run_ide(workspace)
 
 
 def tx_prepare(args):
-    try:
-        transactions.prepare(args)
-    except errors.KnownError as err:
-        logger.fatal(err)
+    transactions.prepare(args)
 
 
 def tx_send(args):
-    try:
-        facade.send_prepared_transaction(args)
-    except errors.KnownError as err:
-        logger.fatal(err)
+    facade.send_prepared_transaction(args)
 
 
 def tx_prepare_and_send(args):
-    try:
-        facade.prepare_and_send_transaction(args)
-    except errors.KnownError as err:
-        logger.fatal(err)
+    facade.prepare_and_send_transaction(args)
 
 
 def do_bech32(args):
-    try:
-        facade.do_bech32(args)
-    except errors.KnownError as err:
-        logger.fatal(err)
+    facade.do_bech32(args)
 
 
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    except errors.KnownError as err:
+        logger.fatal(err)
+        sys.exit(1)

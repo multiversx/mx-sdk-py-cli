@@ -17,10 +17,10 @@ def get_all_modules():
             "osx": "vendor-soll/v005/darwin-amd64.tar.gz"
         }),
 
-        ArwenToolsModule(key="arwentools", name="arwentools", tag="geb3c3f7", groups=["ARWENTOOLS"],
+        ArwenToolsModule(key="arwentools", name="arwentools", tag="g03d0b3f", groups=["ARWENTOOLS"],
                          urls_by_platform={
-                             "linux": "travis-builds/ARWEN_v0.3.15-120-geb3c3f7_linux_amd64.tar.gz",
-                             "osx": "travis-builds/ARWEN_v0.3.15-120-geb3c3f7_darwin_amd64.tar.gz"
+                             "linux": "travis-builds/ARWEN_v0.3.15-120-g03d0b3f_linux_amd64.tar.gz",
+                             "osx": "travis-builds/ARWEN_v0.3.15-120-g03d0b3f_darwin_amd64.tar.gz"
         }),
 
         Rust(key="rust", name="rust", tag="initial", groups=["RUST_BUILDCHAIN"])
