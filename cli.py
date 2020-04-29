@@ -138,7 +138,8 @@ def setup_parser():
 
     test_parser = subparsers.add_parser("test")
     test_parser.add_argument("project", nargs='?', default=os.getcwd())
-    test_parser.add_argument("--wildcard", default="*")
+    test_parser.add_argument("--directory", default="test")
+    test_parser.add_argument("--wildcard", required=False)
     test_parser.set_defaults(func=run_tests)
 
     ide_parser = subparsers.add_parser("ide")
@@ -278,9 +279,7 @@ def do_nodedebug(args):
 
 
 def run_tests(args):
-    project = args.project
-    wildcard = args.wildcard
-    projects.run_tests(project, wildcard)
+    projects.run_tests(args)
 
 
 def run_ide(args):

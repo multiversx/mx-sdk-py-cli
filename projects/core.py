@@ -43,15 +43,18 @@ def _guard_is_directory(directory):
         raise errors.BadDirectory(directory)
 
 
-def run_tests(project_directory, wildcard):
-    logger.info("run_tests.project_directory: %s", project_directory)
-    logger.info("run_tests.wildcard: %s", wildcard)
+def run_tests(args):
+    project = args.project
+    directory = args.directory
+    wildcard = args.wildcard
+
+    logger.info("run_tests.project: %s", project)
 
     dependencies.install_module("arwentools")
 
-    _guard_is_directory(project_directory)
-    project = load_project(project_directory)
-    project.run_tests(wildcard)
+    _guard_is_directory(project)
+    project = load_project(project)
+    project.run_tests(directory, wildcard)
 
 
 def get_projects_in_workspace(workspace):
