@@ -177,6 +177,14 @@ class TemplateRust(Template):
             ]
         )
 
+        json_test_files = list(Path(self.directory, "test").rglob("*.json"))
+        self._replace_in_files(
+            json_test_files,
+            [
+                (f"file:{self.template_name}.wasm", f"file:../target/wasm32-unknown-unknown/release/{self.project_name}.wasm")
+            ]
+        )
+
     def _replace_in_files(self, files, replacements):
         for file in files:
             content = utils.read_file(file)
