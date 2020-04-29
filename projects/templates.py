@@ -138,6 +138,7 @@ class TemplateRust(Template):
 
         cargo_file = CargoFile(cargo_path)
         cargo_file.package_name = self.project_name
+        cargo_file.bin_name = self.project_name
         cargo_file.version = "0.0.1"
         cargo_file.authors = ["you"]
         cargo_file.edition = "2018"

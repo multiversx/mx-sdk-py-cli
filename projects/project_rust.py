@@ -25,6 +25,8 @@ class ProjectRust(Project):
             raise errors.BuildError(err.output)
 
     def run_cargo(self):
+        env = self._get_env()
+
         if self.debug:
             args = ["cargo", "build"]
         else:
@@ -37,10 +39,13 @@ class ProjectRust(Project):
                 "--release"
             ]
 
-        myprocess.run_process_async(args, env=self._get_env())
+            env["RUSTFLAGS"] = "-C link-arg=-s"
+
+        myprocess.run_process_async(args, env=env)
 
     def get_file_wasm(self):
-        return self.find_file("wasm.wasm")
+        name = f"{self.cargo_file.bin_name}.wasm"
+        return Path(self.directory, "target", "wasm32-unknown-unknown", "release", name).resolve()
 
     def get_wasm_path(self):
         pass
