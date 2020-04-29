@@ -93,7 +93,7 @@ class ClangBuildConfiguration:
         self.undefined_file = self._get_undefined_file()
 
     def _get_exports(self):
-        file_export = self.project.find_file("*.export")
+        file_export = self.project.find_file_globally("*.export")
         lines = utils.read_lines(file_export)
         return lines
 
