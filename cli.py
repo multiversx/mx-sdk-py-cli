@@ -32,8 +32,7 @@ def setup_parser():
     parser.add_argument("--verbose", action="store_true", default=False)
 
     install_parser = subparsers.add_parser("install")
-    choices = ["C_BUILDCHAIN", "SOL_BUILDCHAIN",
-               "RUST_BUILDCHAIN", "NODE_DEBUG"]
+    choices = ["C_BUILDCHAIN", "SOL_BUILDCHAIN", "RUST_BUILDCHAIN", "ARWENTOOLS"]
     install_parser.add_argument("group", choices=choices)
     install_parser.set_defaults(func=install)
 

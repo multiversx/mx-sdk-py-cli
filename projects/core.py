@@ -47,7 +47,7 @@ def run_tests(project_directory, wildcard):
     logger.info("run_tests.project_directory: %s", project_directory)
     logger.info("run_tests.wildcard: %s", wildcard)
 
-    dependencies.install_module("testrunner")
+    dependencies.install_module("arwentools")
 
     _guard_is_directory(project_directory)
     project = load_project(project_directory)

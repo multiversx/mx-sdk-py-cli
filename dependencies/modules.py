@@ -1,7 +1,6 @@
 
 import logging
 import os
-import subprocess
 from os import path
 
 from erdpy import config, downloader, workstation, errors, myprocess, utils
@@ -97,13 +96,15 @@ class SOLLModule(StandaloneModule):
         utils.mark_executable(path.join(self.get_directory(), "soll"))
 
 
-class NodeDebugModule(StandaloneModule):
+class ArwenToolsModule(StandaloneModule):
     def __init__(self, key, name, tag, groups, urls_by_platform):
         super().__init__(key, name, tag, groups, urls_by_platform)
 
     def install(self, overwrite):
         super().install(overwrite)
-        utils.mark_executable(path.join(self.get_directory(), "nodedebug"))
+        utils.mark_executable(path.join(self.get_directory(), "arwen"))
+        utils.mark_executable(path.join(self.get_directory(), "arwendebug"))
+        utils.mark_executable(path.join(self.get_directory(), "test"))
 
 
 class Rust(DependencyModule):

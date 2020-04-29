@@ -60,7 +60,7 @@ class Project:
         return bytecode
 
     def run_tests(self, wildcard):
-        testrunner_module = dependencies.get_module_by_key("testrunner")
+        testrunner_module = dependencies.get_module_by_key("arwentools")
         tool_directory = testrunner_module.get_directory()
         tool_env = testrunner_module.get_env()
 
