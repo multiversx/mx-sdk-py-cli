@@ -43,9 +43,14 @@ class ProjectRust(Project):
 
         myprocess.run_process_async(args, env=env)
 
+    def _copy_build_artifacts_to_output(self):
+        name = f"{self.cargo_file.bin_name}.wasm"
+        wasm_file = Path(self.directory, "target", "wasm32-unknown-unknown", "release", name).resolve()
+        self._copy_to_output(wasm_file)
+
     def get_file_wasm(self):
         name = f"{self.cargo_file.bin_name}.wasm"
-        return Path(self.directory, "target", "wasm32-unknown-unknown", "release", name).resolve()
+        return Path(self.directory, "output", name).resolve()
 
     def get_wasm_path(self):
         pass

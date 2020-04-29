@@ -18,6 +18,7 @@ class Project:
         self.debug = self.options.get("debug", False)
         self._ensure_dependencies_installed()
         self.perform_build()
+        self._copy_build_artifacts_to_output()
         self._create_deploy_files()
 
     def _ensure_dependencies_installed(self):
@@ -32,18 +33,33 @@ class Project:
         raise NotImplementedError()
 
     def get_file_wasm(self):
-        raise NotImplementedError()
+        return self.find_file_in_output("*.wasm")
 
-    def find_file(self, pattern):
-        files = list(Path(self.directory).rglob(pattern))
+    def find_file_globally(self, pattern):
+        folder = self.directory
+        return self.find_file_in_folder(folder, pattern)
+
+    def find_file_in_output(self, pattern):
+        folder = path.join(self.directory, "output")
+        return self.find_file_in_folder(folder, pattern)
+
+    def find_file_in_folder(self, folder, pattern):
+        files = list(Path(folder).rglob(pattern))
 
         if len(files) == 0:
             raise errors.KnownError(f"No file matches pattern [{pattern}].")
         if len(files) > 1:
             logging.warning(f"More files match pattern [{pattern}]. Will pick first:\n{files}")
 
-        file = path.join(self.directory, files[0])
+        file = path.join(folder, files[0])
         return Path(file).resolve()
+
+    def _copy_build_artifacts_to_output(self):
+        raise NotImplementedError()
+
+    def _copy_to_output(self, file):
+        output_dir = path.join(self.directory, "output")
+        utils.ensure_folder(output_dir)
 
     def _create_deploy_files(self):
         file_wasm = self.get_file_wasm()
@@ -55,21 +71,25 @@ class Project:
             file.write(bytecode_hex)
 
     def get_bytecode(self):
-        bytecode = utils.read_file(
-            self.get_file_wasm().with_suffix(".hex"))
+        bytecode = utils.read_file(self.get_file_wasm().with_suffix(".hex"))
         return bytecode
 
-    def run_tests(self, wildcard):
+    def run_tests(self, tests_directory, wildcard=None):
         testrunner_module = dependencies.get_module_by_key("arwentools")
         tool_directory = testrunner_module.get_directory()
         tool_env = testrunner_module.get_env()
 
         tool = path.join(tool_directory, "test")
-        test_folder = path.join(self.directory, "test")
-        pattern = path.join(test_folder, wildcard)
-        test_files = glob.glob(pattern)
+        test_folder = path.join(self.directory, tests_directory)
 
-        for test_file in test_files:
-            print("Run test for:", test_file)
-            args = [tool, test_file]
+        if not wildcard:
+            args = [tool, test_folder]
             myprocess.run_process(args, env=tool_env)
+        else:
+            pattern = path.join(test_folder, wildcard)
+            test_files = glob.glob(pattern)
+
+            for test_file in test_files:
+                print("Run test for:", test_file)
+                args = [tool, test_file]
+                myprocess.run_process(args, env=tool_env)
