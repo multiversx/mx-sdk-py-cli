@@ -68,6 +68,9 @@ class Address:
         if self._value_hex is None:
             raise errors.EmptyAddressError()
 
+    def __repr__(self):
+        return self.bech32()
+
     @classmethod
     def zero(cls):
         return Address("0" * 64)
