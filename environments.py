@@ -85,13 +85,14 @@ class TestnetEnvironment(Environment):
         self.url = url
 
     def run_flow(self, flow):
-        self._wrap_flow(flow)
+        return self._wrap_flow(flow)
 
     def _wrap_flow(self, flow):
         try:
             logger.debug("Starting flow...")
-            flow()
+            result = flow()
             logger.debug("Flow ran.")
+            return result
         except errors.KnownError as err:
             logger.critical(err)
         except Exception:
@@ -104,19 +105,19 @@ class TestnetEnvironment(Environment):
         return tx_hash, contract.address
 
     def execute_contract(self, contract, caller, function, arguments=None, gas_price=None, gas_limit=None, value=None):
-        logger.debug("execute_contract")
+        logger.debug("execute_contract: %s", contract.address.bech32())
         proxy = self._get_proxy()
         tx_hash = contract.execute(proxy, caller, function, arguments, gas_price, gas_limit, value)
         return tx_hash
 
     def upgrade_contract(self, contract, caller, arguments=None, gas_price=None, gas_limit=None, value=None):
-        logger.debug("upgrade_contract")
+        logger.debug("upgrade_contract: %s", contract.address.bech32())
         proxy = self._get_proxy()
         tx_hash = contract.upgrade(proxy, caller, arguments, gas_price, gas_limit, value)
         return tx_hash
 
     def query_contract(self, contract, function, arguments=None):
-        logger.debug("query_contract")
+        logger.debug("query_contract: %s", contract.address.bech32())
         proxy = self._get_proxy()
         return_data = contract.query(proxy, function, arguments)
         return return_data
