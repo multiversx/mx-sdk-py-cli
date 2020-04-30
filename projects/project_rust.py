@@ -48,13 +48,6 @@ class ProjectRust(Project):
         wasm_file = Path(self.directory, "target", "wasm32-unknown-unknown", "release", name).resolve()
         self._copy_to_output(wasm_file)
 
-    def get_file_wasm(self):
-        name = f"{self.cargo_file.bin_name}.wasm"
-        return Path(self.directory, "output", name).resolve()
-
-    def get_wasm_path(self):
-        pass
-
     def get_dependencies(self):
         return ["rust"]
 

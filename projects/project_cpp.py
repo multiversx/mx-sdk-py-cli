@@ -64,7 +64,7 @@ class ProjectCpp(Project):
             tool,
             "--no-entry",
             str(self.file_o),
-            "-o", self.get_file_wasm(),
+            "-o", self.find_file_globally("*.cpp").with_suffix(".wasm"),
             "--strip-all",
             f"--allow-undefined",
             "--demangle"

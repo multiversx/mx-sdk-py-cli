@@ -5,6 +5,7 @@ from os import path
 from pathlib import Path
 
 from erdpy import dependencies, errors, myprocess, utils
+import shutil
 
 logger = logging.getLogger("Project")
 
@@ -60,6 +61,7 @@ class Project:
     def _copy_to_output(self, file):
         output_dir = path.join(self.directory, "output")
         utils.ensure_folder(output_dir)
+        shutil.copy(file, output_dir)
 
     def _create_deploy_files(self):
         file_wasm = self.get_file_wasm()

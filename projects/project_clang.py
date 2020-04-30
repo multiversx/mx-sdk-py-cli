@@ -61,7 +61,7 @@ class ProjectClang(Project):
             tool,
             "--no-entry",
             str(self.file_o),
-            "-o", self.get_file_wasm(),
+            "-o", self.find_file_globally("*.c").with_suffix(".wasm"),
             "--strip-all",
             f"-allow-undefined-file={undefined_file}"
         ]
