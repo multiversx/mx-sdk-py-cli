@@ -67,6 +67,12 @@ class ElrondProxy:
         tx_hash = response["txHash"]
         return tx_hash
 
+    def send_transactions(self, payload):
+        url = f"{self.url}/transaction/send-multiple"
+        response = do_post(url, payload)
+        num_sent = response["numOfSentTxs"]
+        return num_sent
+
     def query_contract(self, payload):
         url = f"{self.url}/vm-values/query"
         response = do_post(url, payload)
