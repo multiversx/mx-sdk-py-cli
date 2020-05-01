@@ -1,7 +1,7 @@
 import logging
 
 from erdpy import errors
-from erdpy.wallet import bech32, parse_pem
+from erdpy.wallet import bech32, pem
 
 logger = logging.getLogger("accounts")
 
@@ -14,7 +14,7 @@ class Account:
         self.nonce = 0
 
         if pem_file:
-            seed, pubkey = parse_pem(pem_file)
+            seed, pubkey = pem.parse(pem_file)
             self.private_key_seed = seed.hex()
             self.address = Address(pubkey)
 
