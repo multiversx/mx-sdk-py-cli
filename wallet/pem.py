@@ -22,3 +22,9 @@ def parse(pem_file):
     seed = key_bytes[:32]
     pubkey = key_bytes[32:]
     return seed, pubkey
+
+
+def write(pem_file, seed, pubkey):
+    combined = seed + pubkey
+    key_base64 = base64.b64encode(combined).encode()
+    utils.write_file(pem_file, key_base64)
