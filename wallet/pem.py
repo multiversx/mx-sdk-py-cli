@@ -1,4 +1,5 @@
 import base64
+import textwrap
 from os import path
 
 from erdpy import utils, guards
@@ -24,7 +25,22 @@ def parse(pem_file):
     return seed, pubkey
 
 
-def write(pem_file, seed, pubkey):
-    combined = seed + pubkey
-    key_base64 = base64.b64encode(combined).encode()
-    utils.write_file(pem_file, key_base64)
+def write(pem_file, seed, pubkey, name=None):
+    pem_file = path.expanduser(pem_file)
+
+    if not name:
+        name = pubkey.hex()
+
+    header = f"-----BEGIN PRIVATE KEY for {name}-----"
+    footer = f"-----END PRIVATE KEY for {name}-----"
+
+    seed_hex = seed.hex()
+    pubkey_hex = pubkey.hex()
+    combined = seed_hex + pubkey_hex
+    combined = combined.encode()
+    key_base64 = base64.b64encode(combined).decode()
+    
+    payload_lines = textwrap.wrap(key_base64, 64)
+    payload = "\n".join(payload_lines)
+    content = "\n".join([header, payload, footer])
+    utils.write_file(pem_file, content)

@@ -5,7 +5,7 @@ from pathlib import Path
 import nacl.encoding
 import nacl.signing
 
-from erdpy.wallet import signing, pem
+from erdpy.wallet import signing, pem, generate_pair
 from erdpy.transactions import PlainTransaction, TransactionPayloadToSign
 
 logging.basicConfig(level=logging.INFO)
@@ -14,6 +14,7 @@ logging.basicConfig(level=logging.INFO)
 class WalletTestCase(unittest.TestCase):
     def setUp(self):
         self.testdata = Path(__file__).parent.joinpath("testdata")
+        self.testdata_out = Path(__file__).parent.joinpath("testdata-out")
 
     def test_nacl_playground_signing(self):
         private_key_hex = "b8211b08edc8aca591bedf1b9aba47e4077e54ac7d4ceb2f1bc9e10c064d3e6c7a5679a427f6df7adf2310ddf5e570fd51e47e6b1511124d6b250b989b017588"
@@ -100,3 +101,12 @@ class WalletTestCase(unittest.TestCase):
         signature = signing.sign_transaction(payload, pem)
 
         self.assertEqual("4e160bcafb6cb8ab8fc3260d3faf24bf7ce1205b5685adb457803db6d67c648a614308d8354e40b40fbb90c227046d6997493f798b92acb1b4bc49173939e703", signature)
+
+    def test_generate_pair_pem(self):
+        seed, pubkey = generate_pair()
+        pem_file = Path(self.testdata_out, "foo.pem")
+        pem.write(pem_file, seed, pubkey)
+        parsed_seed, parsed_pubkey = pem.parse(pem_file)
+
+        self.assertEqual(seed, parsed_seed)
+        self.assertEqual(pubkey, parsed_pubkey)

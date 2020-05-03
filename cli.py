@@ -182,6 +182,10 @@ def setup_parser_wallet(subparsers):
     wallet_parser = subparsers.add_parser("wallet")
     wallet_subparsers = wallet_parser.add_subparsers()
 
+    generate_parser = wallet_subparsers.add_parser("generate")
+    generate_parser.add_argument("pem")
+    generate_parser.set_defaults(func=generate_pem)
+
     bech32_parser = wallet_subparsers.add_parser("bech32")
     bech32_parser.add_argument("value")
     group = bech32_parser.add_mutually_exclusive_group(required=True)
@@ -304,6 +308,10 @@ def tx_send(args):
 
 def tx_prepare_and_send(args):
     facade.prepare_and_send_transaction(args)
+
+
+def generate_pem(args):
+    facade.generate_pem(args)
 
 
 def do_bech32(args):
