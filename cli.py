@@ -173,14 +173,21 @@ def setup_parser():
     tx_prepare_and_send_parser.add_argument("--proxy", required=True)
     tx_prepare_and_send_parser.set_defaults(func=tx_prepare_and_send)
 
-    bech32_parser = subparsers.add_parser("bech32")
+    setup_parser_wallet(subparsers)
+
+    return parser
+
+
+def setup_parser_wallet(subparsers):
+    wallet_parser = subparsers.add_parser("wallet")
+    wallet_subparsers = wallet_parser.add_subparsers()
+
+    bech32_parser = wallet_subparsers.add_parser("bech32")
     bech32_parser.add_argument("value")
     group = bech32_parser.add_mutually_exclusive_group(required=True)
     group.add_argument("--encode", action="store_true")
     group.add_argument("--decode", action="store_true")
     bech32_parser.set_defaults(func=do_bech32)
-
-    return parser
 
 
 def install(args):
