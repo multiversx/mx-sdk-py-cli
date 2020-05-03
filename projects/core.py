@@ -1,7 +1,7 @@
 import logging
 from os import path
 
-from erdpy import dependencies, errors, utils
+from erdpy import dependencies, errors, utils, guards
 from erdpy.projects import shared
 from erdpy.projects.project_clang import ProjectClang
 from erdpy.projects.project_cpp import ProjectCpp
@@ -12,7 +12,7 @@ logger = logging.getLogger("projects.core")
 
 
 def load_project(directory):
-    _guard_is_directory(directory)
+    guards.is_directory(directory)
 
     if shared.is_source_clang(directory):
         return ProjectClang(directory)
@@ -32,15 +32,9 @@ def build_project(directory, options):
     logger.info("build_project.directory: %s", directory)
     logger.info("build_project.debug: %s", options['debug'])
 
-    _guard_is_directory(directory)
+    guards.is_directory(directory)
     project = load_project(directory)
     project.build(options)
-
-
-def _guard_is_directory(directory):
-    ok = path.isdir(directory)
-    if not ok:
-        raise errors.BadDirectory(directory)
 
 
 def run_tests(args):
@@ -52,13 +46,13 @@ def run_tests(args):
 
     dependencies.install_module("arwentools")
 
-    _guard_is_directory(project)
+    guards.is_directory(project)
     project = load_project(project)
     project.run_tests(directory, wildcard)
 
 
 def get_projects_in_workspace(workspace):
-    _guard_is_directory(workspace)
+    guards.is_directory(workspace)
     subfolders = utils.get_subfolders(workspace)
     projects = []
 

@@ -1,19 +1,43 @@
 import logging
+import os
 from os import path
 
 from erdpy import errors
-from erdpy.wallet import bech32, pem
+from erdpy.wallet import bech32, pem, generate_pair
+from erdpy import utils
 
 logger = logging.getLogger("accounts")
 
 
 class AccountsRepository:
     def __init__(self, folder):
+        utils.ensure_folder(folder)
         self.folder = folder
 
     def get_account(self, name):
         pem_file = path.join(self.folder, f"{name}.pem")
         return Account(pem_file=pem_file)
+
+    def generate_accounts(self, count):
+        for i in range(count):
+            self.generate_account(i)
+
+    def generate_account(self, name):
+        seed, pubkey = generate_pair()
+        address = Address(pubkey).bech32()
+
+        pem_file = f"{name}_{address}.pem"
+        pem_file = path.join(self.folder, pem_file)
+        pem.write(pem_file, seed, pubkey, name=f"{name}:{address}")
+
+    def get_all(self):
+        accounts = []
+        for pem_file in os.listdir(self.folder):
+            pem_file = path.join(self.folder, pem_file)
+            account = Account(pem_file=pem_file)
+            accounts.append(account)
+
+        return accounts
 
 
 class Account:

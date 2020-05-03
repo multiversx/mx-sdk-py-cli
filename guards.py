@@ -7,6 +7,11 @@ def is_file(input):
         raise errors.BadInputError(input, "is not a valid file")
 
 
+def is_directory(directory):
+    if not os.path.isdir(directory):
+        raise errors.BadDirectory(directory)
+
+
 def is_hex_address(input):
     is_hex_string(input)
 

@@ -7,7 +7,7 @@ from erdpy.accounts import AccountsRepository
 from erdpy.proxy import ElrondProxy
 from erdpy.transactions import BunchOfTransactions
 
-logger = logging.getLogger("dipatcher.scenario")
+logger = logging.getLogger("dipatcher.scenarios")
 
 
 def main():
