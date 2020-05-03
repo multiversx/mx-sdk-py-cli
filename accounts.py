@@ -1,9 +1,19 @@
 import logging
+from os import path
 
 from erdpy import errors
 from erdpy.wallet import bech32, pem
 
 logger = logging.getLogger("accounts")
+
+
+class AccountsRepository:
+    def __init__(self, folder):
+        self.folder = folder
+
+    def get_account(self, name):
+        pem_file = path.join(self.folder, f"{name}.pem")
+        return Account(pem_file=pem_file)
 
 
 class Account:

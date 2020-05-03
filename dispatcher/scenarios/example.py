@@ -1,10 +1,9 @@
 import logging
 import sys
 from argparse import ArgumentParser
-from os import path
 
-from erdpy.accounts import Account
 from erdpy import errors
+from erdpy.accounts import AccountsRepository
 from erdpy.proxy import ElrondProxy
 from erdpy.transactions import BunchOfTransactions
 
@@ -28,15 +27,6 @@ def main():
     bunch.add(bob, "erd1l453hd0gt5gzdp7czpuall8ggt2dcv5zwmfdf3sd3lguxseux2fsmsgldz", bob.nonce, 10, "", 100000000000000, 50000)
     bunch.add(bob, "erd1l453hd0gt5gzdp7czpuall8ggt2dcv5zwmfdf3sd3lguxseux2fsmsgldz", bob.nonce + 1, 10, "", 100000000000000, 50000)
     bunch.send(proxy)
-
-
-class AccountsRepository:
-    def __init__(self, folder):
-        self.folder = folder
-
-    def get_account(self, name):
-        pem_file = path.join(self.folder, f"{name}.pem")
-        return Account(pem_file=pem_file)
 
 
 if __name__ == "__main__":
