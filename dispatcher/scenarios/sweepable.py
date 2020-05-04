@@ -28,13 +28,14 @@ def main():
     senders_repository = AccountsRepository(args.senders_folder)
 
     for sender in senders_repository.get_all():
-        sender.sync_nonce()
+        sender.sync_nonce(proxy)
 
         # Send bad transactions to self
         nonce = sender.nonce + 42
-        value = 42
-        bunch.add(sender, sender.address.bech32(), nonce, value, "", GAS_PRICE, GAS_LIMIT)
-        nonce += 1
+
+        for i in range(100):
+            bunch.add(sender, sender.address.bech32(), nonce, 0, "", GAS_PRICE, GAS_LIMIT)
+            nonce += 1
 
     bunch.send(proxy)
 
