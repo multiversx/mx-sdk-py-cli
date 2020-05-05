@@ -4,6 +4,7 @@ import logging
 from os import path
 
 from erdpy import utils
+from erdpy.validators.validators import parse_args_for_stake
 from erdpy.wallet import signing
 from collections import OrderedDict
 from erdpy.accounts import Address
@@ -98,6 +99,11 @@ class PreparedTransaction(PlainTransaction):
         tx_hash = proxy.send_transaction(self.to_dictionary())
         logger.info(f"Hash: {tx_hash}")
         return tx_hash
+
+
+def stake_prepare(args):
+    args = parse_args_for_stake(args)
+    prepare(args)
 
 
 def prepare(args):
