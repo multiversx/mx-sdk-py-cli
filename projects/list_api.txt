@@ -19,6 +19,7 @@ getArgumentLength
 storageGetValueLength
 storageStore
 storageLoad
+storageLoadLength
 getCaller
 getCallValue
 writeLog
