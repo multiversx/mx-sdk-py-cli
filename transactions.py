@@ -6,6 +6,7 @@ from os import path
 
 from erdpy import utils
 from erdpy.accounts import Address
+from erdpy.validators.validators import parse_args_for_stake
 from erdpy.wallet import pem, signing
 
 logger = logging.getLogger("transactions")
@@ -131,6 +132,11 @@ class BunchOfTransactions:
         num_sent = proxy.send_transactions(payload)
         logger.info(f"Sent: {num_sent}")
         return num_sent
+
+
+def stake_prepare(args):
+    args = parse_args_for_stake(args)
+    prepare(args)
 
 
 def prepare(args):

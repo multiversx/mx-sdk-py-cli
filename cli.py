@@ -173,9 +173,77 @@ def setup_parser():
     tx_prepare_and_send_parser.add_argument("--proxy", required=True)
     tx_prepare_and_send_parser.set_defaults(func=tx_prepare_and_send)
 
+    setup_parser_validators(subparsers)
     setup_parser_wallet(subparsers)
 
     return parser
+
+
+def setup_parser_validators(subparsers):
+    stake_prepare_parser = subparsers.add_parser("stake-prepare")
+    stake_prepare_parser.add_argument("--pem", required=True)
+    stake_prepare_parser.add_argument("--nonce", required=True)
+    stake_prepare_parser.add_argument("--value", default="0")
+    stake_prepare_parser.add_argument("--gas-price", default=config.DEFAULT_GASPRICE)
+    stake_prepare_parser.add_argument("--gas-limit", default=config.DEFAULT_GASLIMIT)
+    stake_prepare_parser.add_argument("--number-of-nodes", required=True)
+    stake_prepare_parser.add_argument("--nodes-public-keys", required=True)
+    stake_prepare_parser.add_argument("--reward-address", default="")
+    stake_prepare_parser.add_argument("--tag", default="untitled")
+    stake_prepare_parser.add_argument("workspace", nargs='?', default=os.getcwd())
+    stake_prepare_parser.set_defaults(func=stake_prepare)
+
+    stake_send_parser = subparsers.add_parser("stake-send")
+    stake_send_parser.add_argument("tx")
+    stake_send_parser.add_argument("--proxy", required=True)
+    stake_send_parser.set_defaults(func=stake_send)
+
+    stake_prepare_parser_and_send = subparsers.add_parser("stake-prepare-and-send")
+    stake_prepare_parser_and_send.add_argument("--pem", required=True)
+    stake_prepare_parser_and_send.add_argument("--value", default="0")
+    stake_prepare_parser_and_send.add_argument("--gas-price", default=config.DEFAULT_GASPRICE)
+    stake_prepare_parser_and_send.add_argument("--gas-limit", default=config.DEFAULT_GASLIMIT)
+    stake_prepare_parser_and_send.add_argument("--number-of-nodes", required=True)
+    stake_prepare_parser_and_send.add_argument("--nodes-public-keys", required=True)
+    stake_prepare_parser_and_send.add_argument("--reward-address", default="")
+    stake_prepare_parser_and_send.add_argument("--proxy", required=True)
+    stake_prepare_parser_and_send.set_defaults(func=stake_prepare_and_send)
+
+    un_stake_parser = subparsers.add_parser("unstake")
+    un_stake_parser.add_argument("--pem", required=True)
+    un_stake_parser.add_argument("--value", default="0")
+    un_stake_parser.add_argument("--gas-price", default=config.DEFAULT_GASPRICE)
+    un_stake_parser.add_argument("--gas-limit", default=config.DEFAULT_GASLIMIT)
+    un_stake_parser.add_argument("--nodes-public-keys", required=True)
+    un_stake_parser.add_argument("--proxy", required=True)
+    un_stake_parser.set_defaults(func=do_un_stake)
+
+    un_jail_parser = subparsers.add_parser("unjail")
+    un_jail_parser.add_argument("--pem", required=True)
+    un_jail_parser.add_argument("--value", default="0")
+    un_jail_parser.add_argument("--gas-price", default=config.DEFAULT_GASPRICE)
+    un_jail_parser.add_argument("--gas-limit", default=config.DEFAULT_GASLIMIT)
+    un_jail_parser.add_argument("--nodes-public-keys", required=True)
+    un_jail_parser.add_argument("--proxy", required=True)
+    un_jail_parser.set_defaults(func=do_un_jail)
+
+    un_bond_parser = subparsers.add_parser("unbond")
+    un_bond_parser.add_argument("--pem", required=True)
+    un_bond_parser.add_argument("--value", default="0")
+    un_bond_parser.add_argument("--gas-price", default=config.DEFAULT_GASPRICE)
+    un_bond_parser.add_argument("--gas-limit", default=config.DEFAULT_GASLIMIT)
+    un_bond_parser.add_argument("--nodes-public-keys", required=True)
+    un_bond_parser.add_argument("--proxy", required=True)
+    un_bond_parser.set_defaults(func=do_un_bond)
+
+    change_reward_address_parser = subparsers.add_parser("change-reward-address")
+    change_reward_address_parser.add_argument("--value", default="0")
+    change_reward_address_parser.add_argument("--pem", required=True)
+    change_reward_address_parser.add_argument("--gas-price", default=config.DEFAULT_GASPRICE)
+    change_reward_address_parser.add_argument("--gas-limit", default=config.DEFAULT_GASLIMIT)
+    change_reward_address_parser.add_argument("--reward-address", required=True)
+    change_reward_address_parser.add_argument("--proxy", required=True)
+    change_reward_address_parser.set_defaults(func=change_reward_address)
 
 
 def setup_parser_wallet(subparsers):
@@ -316,6 +384,34 @@ def generate_pem(args):
 
 def do_bech32(args):
     facade.do_bech32(args)
+
+
+def stake_prepare(args):
+    transactions.stake_prepare(args)
+
+
+def stake_send(args):
+    facade.send_prepared_transaction(args)
+
+
+def stake_prepare_and_send(args):
+    facade.prepare_and_send_stake_transaction(args)
+
+
+def do_un_stake(args):
+    facade.prepare_and_send_un_stake_transaction(args)
+
+
+def do_un_bond(args):
+    facade.prepare_and_send_un_bond_transaction(args)
+
+
+def do_un_jail(args):
+    facade.prepare_and_send_un_jail_transaction(args)
+
+
+def change_reward_address(args):
+    facade.prepare_and_send_change_reward_address_transaction(args)
 
 
 if __name__ == "__main__":
