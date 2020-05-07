@@ -4,9 +4,9 @@ from pathlib import Path
 
 import nacl.encoding
 import nacl.signing
-
-from erdpy.wallet import signing, pem, generate_pair
+from erdpy import utils
 from erdpy.transactions import PlainTransaction, TransactionPayloadToSign
+from erdpy.wallet import generate_pair, pem, signing
 
 logging.basicConfig(level=logging.INFO)
 
@@ -15,6 +15,7 @@ class WalletTestCase(unittest.TestCase):
     def setUp(self):
         self.testdata = Path(__file__).parent.joinpath("testdata")
         self.testdata_out = Path(__file__).parent.joinpath("testdata-out")
+        utils.ensure_folder(self.testdata_out)
 
     def test_nacl_playground_signing(self):
         private_key_hex = "b8211b08edc8aca591bedf1b9aba47e4077e54ac7d4ceb2f1bc9e10c064d3e6c7a5679a427f6df7adf2310ddf5e570fd51e47e6b1511124d6b250b989b017588"
@@ -52,7 +53,7 @@ class WalletTestCase(unittest.TestCase):
         transaction.gasLimit = 44
         transaction.data = "foobar"
         serialized = TransactionPayloadToSign(transaction).to_json().decode()
-        self.assertEqual("""{"nonce":0,"value":"42","receiver":"bob","sender":"alice","gasPrice":43,"gasLimit":44,"data":"Zm9vYmFy"}""", serialized)
+        self.assertEqual("""{"nonce":0,"value":"42","receiver":"bob","sender":"alice","gasPrice":43,"gasLimit":44,"data":"foobar"}""", serialized)
 
         # Without data field
         transaction.data = ""
@@ -69,7 +70,7 @@ class WalletTestCase(unittest.TestCase):
         transaction.gasLimit = 500000000
         transaction.data = "foo"
         serialized = TransactionPayloadToSign(transaction).to_json().decode()
-        self.assertEqual("""{"nonce":0,"value":"0","receiver":"erd188nydpkagtpwvfklkl2tn0w6g40zdxkwfgwpjqc2a2m2n7ne9g8q2t22sr","sender":"erd1l453hd0gt5gzdp7czpuall8ggt2dcv5zwmfdf3sd3lguxseux2fsmsgldz","gasPrice":200000000000000,"gasLimit":500000000,"data":"Zm9v"}""", serialized)
+        self.assertEqual("""{"nonce":0,"value":"0","receiver":"erd188nydpkagtpwvfklkl2tn0w6g40zdxkwfgwpjqc2a2m2n7ne9g8q2t22sr","sender":"erd1l453hd0gt5gzdp7czpuall8ggt2dcv5zwmfdf3sd3lguxseux2fsmsgldz","gasPrice":200000000000000,"gasLimit":500000000,"data":"foo"}""", serialized)
 
     def test_sign_transaction(self):
         pem = self.testdata.joinpath("keys", "alice.pem")
@@ -86,7 +87,7 @@ class WalletTestCase(unittest.TestCase):
         payload = TransactionPayloadToSign(transaction)
         signature = signing.sign_transaction(payload, pem)
 
-        self.assertEqual("8912cd7310df084cffe67557ef93c8fd30048d00bb71ea5fe9f5ebb6d90194500122eab982d49c5c5c164e7012cb8d29279820f3e7e885a5fe31c5b2cce0e90a", signature)
+        self.assertEqual("8e68002bdd45d04508b7325d1cab9195680acf03a4cd5cba23629a85074bf92a88275f1f2bc3c2bd19d8f5cd62bde83186d86932b04e0f5b88a374a824547009", signature)
 
         # Without data
         transaction = PlainTransaction()

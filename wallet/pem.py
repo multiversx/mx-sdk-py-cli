@@ -39,7 +39,7 @@ def write(pem_file, seed, pubkey, name=None):
     combined = seed_hex + pubkey_hex
     combined = combined.encode()
     key_base64 = base64.b64encode(combined).decode()
-    
+
     payload_lines = textwrap.wrap(key_base64, 64)
     payload = "\n".join(payload_lines)
     content = "\n".join([header, payload, footer])

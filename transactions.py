@@ -32,9 +32,7 @@ class TransactionPayloadToSign:
 
         # When signing the transaction, we base64 encode the "Data" field
         if transaction.data:
-            data_bytes = transaction.data.encode("utf-8")
-            data_base64 = base64.b64encode(data_bytes).decode()
-            self.data = data_base64
+            self.data = transaction.data
 
     def to_json(self):
         ordered_fields = OrderedDict()
