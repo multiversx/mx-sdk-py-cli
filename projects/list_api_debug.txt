@@ -87,3 +87,8 @@ debugPrintInt32
 debugPrintBytes
 debugPrintString
 debugPrintLineNumber
+
+setStorageLock
+getStorageLock
+isStorageLocked
+clearStorageLock

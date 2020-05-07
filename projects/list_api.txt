@@ -80,3 +80,8 @@ bigIntGetExternalBalance
 
 sha256
 keccak256
+
+setStorageLock
+getStorageLock
+isStorageLocked
+clearStorageLock
