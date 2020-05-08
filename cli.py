@@ -102,19 +102,6 @@ def setup_parser():
     get_account_parser.add_argument("--nonce", required=False, nargs='?', const=True, default=False)
     get_account_parser.set_defaults(func=get_account)
 
-    get_num_shard_parser = subparsers.add_parser("get-num-shards")
-    get_num_shard_parser.add_argument("--proxy", required=True)
-    get_num_shard_parser.set_defaults(func=get_num_shards)
-
-    get_last_block_nonce_parser = subparsers.add_parser("get-last-block-nonce")
-    get_last_block_nonce_parser.add_argument("--proxy", required=True)
-    get_last_block_nonce_parser.add_argument("--shard-id", required=True)
-    get_last_block_nonce_parser.set_defaults(func=get_last_block_nonce)
-
-    get_chain_id_parser = subparsers.add_parser("get-chain-id")
-    get_chain_id_parser.add_argument("--proxy", required=True)
-    get_chain_id_parser.set_defaults(func=get_chain_id)
-
     node_parser = subparsers.add_parser("nodedebug")
     group = node_parser.add_mutually_exclusive_group()
     group.add_argument('--stop', action='store_true')
@@ -161,6 +148,7 @@ def setup_parser():
     setup_parser_validators(subparsers)
     setup_parser_wallet(subparsers)
     setup_parser_cost(subparsers)
+    setup_parser_network(subparsers)
 
     return parser
 
@@ -266,6 +254,24 @@ def setup_parser_cost(subparsers):
     get_transaction_cost_parser.add_argument("--function", required=False)
     get_transaction_cost_parser.add_argument("--arguments", nargs='+', required=False)
     get_transaction_cost_parser.set_defaults(func=get_transaction_cost)
+
+
+def setup_parser_network(subparsers):
+    network_parser = subparsers.add_parser("network")
+    network_subparsers = network_parser.add_subparsers()
+
+    get_num_shard_parser = network_subparsers.add_parser("num-shards")
+    get_num_shard_parser.add_argument("--proxy", required=True)
+    get_num_shard_parser.set_defaults(func=get_num_shards)
+
+    get_last_block_nonce_parser = network_subparsers.add_parser("last-block-nonce")
+    get_last_block_nonce_parser.add_argument("--proxy", required=True)
+    get_last_block_nonce_parser.add_argument("--shard-id", required=True)
+    get_last_block_nonce_parser.set_defaults(func=get_last_block_nonce)
+
+    get_chain_id_parser = network_subparsers.add_parser("chain-id")
+    get_chain_id_parser.add_argument("--proxy", required=True)
+    get_chain_id_parser.set_defaults(func=get_chain_id)
 
 
 def install(args):
