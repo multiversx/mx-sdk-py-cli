@@ -110,8 +110,9 @@ def query_smart_contract(args):
     environment.run_flow(flow)
 
 
-def get_account_nonce(proxy_url, address):
-    logger.debug("call_get_account_nonce")
+def get_account_nonce(args):
+    proxy_url = args.proxy
+    address = args.address
 
     proxy = ElrondProxy(proxy_url)
     nonce = proxy.get_account_nonce(Address(address))
@@ -119,8 +120,9 @@ def get_account_nonce(proxy_url, address):
     return nonce
 
 
-def get_account_balance(proxy_url, address):
-    logger.debug("call_get_account_balance")
+def get_account_balance(args):
+    proxy_url = args.proxy
+    address = args.address
 
     proxy = ElrondProxy(proxy_url)
     balance = proxy.get_account_balance(Address(address))
@@ -128,11 +130,22 @@ def get_account_balance(proxy_url, address):
     return balance
 
 
-def get_account(proxy_url, address):
-    logger.debug("call_get_account")
+def get_account(args):
+    proxy_url = args.proxy
+    address = args.address
 
     proxy = ElrondProxy(proxy_url)
     account = proxy.get_account(Address(address))
+    print(account)
+    return account
+
+
+def get_account_transactions(args):
+    proxy_url = args.proxy
+    address = args.address
+
+    proxy = ElrondProxy(proxy_url)
+    account = proxy.get_account_transactions(Address(address))
     print(account)
     return account
 

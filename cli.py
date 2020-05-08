@@ -150,12 +150,17 @@ def setup_parser_accounts(subparsers):
     accounts_parser = subparsers.add_parser("account")
     accounts_subparsers = accounts_parser.add_subparsers()
 
-    get_account_parser = accounts_subparsers.add_parser("get")
-    get_account_parser.add_argument("--proxy", required=True)
-    get_account_parser.add_argument("--address", required=True)
-    get_account_parser.add_argument("--balance", required=False, nargs='?', const=True, default=False)
-    get_account_parser.add_argument("--nonce", required=False, nargs='?', const=True, default=False)
-    get_account_parser.set_defaults(func=get_account)
+    get = accounts_subparsers.add_parser("get")
+    get.add_argument("--proxy", required=True)
+    get.add_argument("--address", required=True)
+    get.add_argument("--balance", required=False, nargs='?', const=True, default=False)
+    get.add_argument("--nonce", required=False, nargs='?', const=True, default=False)
+    get.set_defaults(func=get_account)
+
+    get_transactions = accounts_subparsers.add_parser("get-transactions")
+    get_transactions.add_argument("--proxy", required=True)
+    get_transactions.add_argument("--address", required=True)
+    get_transactions.set_defaults(func=get_account_transactions)
 
 
 def setup_parser_validators(subparsers):
@@ -325,15 +330,16 @@ def query(args):
 
 
 def get_account(args):
-    proxy_url = args.proxy
-    address = args.address
-
     if args.balance:
-        facade.get_account_balance(proxy_url, address)
+        facade.get_account_balance(args)
     elif args.nonce:
-        facade.get_account_nonce(proxy_url, address)
+        facade.get_account_nonce(args)
     else:
-        facade.get_account(proxy_url, address)
+        facade.get_account(args)
+
+
+def get_account_transactions(args):
+    facade.get_account_transactions(args)
 
 
 def get_transaction_cost(args):
