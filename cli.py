@@ -54,7 +54,6 @@ def setup_parser():
     build_parser.set_defaults(func=build)
 
     deploy_parser = subparsers.add_parser("deploy")
-    # TODO: path to project or path to bytecode (hex.arwen).
     deploy_parser.add_argument("project", nargs='?', default=os.getcwd())
     deploy_parser.add_argument("--proxy", required=True)
     deploy_parser.add_argument("--pem", required=True)
@@ -94,13 +93,6 @@ def setup_parser():
     query_parser.add_argument("--function", required=True)
     query_parser.add_argument("--arguments", nargs='+')
     query_parser.set_defaults(func=query)
-
-    get_account_parser = subparsers.add_parser("get-account")
-    get_account_parser.add_argument("--proxy", required=True)
-    get_account_parser.add_argument("--address", required=True)
-    get_account_parser.add_argument("--balance", required=False, nargs='?', const=True, default=False)
-    get_account_parser.add_argument("--nonce", required=False, nargs='?', const=True, default=False)
-    get_account_parser.set_defaults(func=get_account)
 
     node_parser = subparsers.add_parser("nodedebug")
     group = node_parser.add_mutually_exclusive_group()
@@ -145,12 +137,25 @@ def setup_parser():
     tx_prepare_and_send_parser.add_argument("--proxy", required=True)
     tx_prepare_and_send_parser.set_defaults(func=tx_prepare_and_send)
 
+    setup_parser_accounts(subparsers)
     setup_parser_validators(subparsers)
     setup_parser_wallet(subparsers)
     setup_parser_cost(subparsers)
     setup_parser_network(subparsers)
 
     return parser
+
+
+def setup_parser_accounts(subparsers):
+    accounts_parser = subparsers.add_parser("account")
+    accounts_subparsers = accounts_parser.add_subparsers()
+
+    get_account_parser = accounts_subparsers.add_parser("get")
+    get_account_parser.add_argument("--proxy", required=True)
+    get_account_parser.add_argument("--address", required=True)
+    get_account_parser.add_argument("--balance", required=False, nargs='?', const=True, default=False)
+    get_account_parser.add_argument("--nonce", required=False, nargs='?', const=True, default=False)
+    get_account_parser.set_defaults(func=get_account)
 
 
 def setup_parser_validators(subparsers):
