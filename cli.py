@@ -111,24 +111,9 @@ def setup_parser():
     get_last_block_nonce_parser.add_argument("--shard-id", required=True)
     get_last_block_nonce_parser.set_defaults(func=get_last_block_nonce)
 
-    get_gas_price_parser = subparsers.add_parser("get-gas-price")
-    get_gas_price_parser.add_argument("--proxy", required=True)
-    get_gas_price_parser.set_defaults(func=get_gas_price)
-
     get_chain_id_parser = subparsers.add_parser("get-chain-id")
     get_chain_id_parser.add_argument("--proxy", required=True)
     get_chain_id_parser.set_defaults(func=get_chain_id)
-
-    get_transaction_cost_parser = subparsers.add_parser("get-transaction-cost")
-    tx_types = [proxy.TxTypes.SC_CALL, proxy.TxTypes.MOVE_BALANCE, proxy.TxTypes.SC_DEPLOY]
-    get_transaction_cost_parser.add_argument("tx_type", choices=tx_types)
-    get_transaction_cost_parser.add_argument("--proxy", required=True)
-    get_transaction_cost_parser.add_argument("--data", required=False)
-    get_transaction_cost_parser.add_argument("--sc-address", required=False)
-    get_transaction_cost_parser.add_argument("--sc-path", required=False)
-    get_transaction_cost_parser.add_argument("--function", required=False)
-    get_transaction_cost_parser.add_argument("--arguments", nargs='+', required=False)
-    get_transaction_cost_parser.set_defaults(func=get_transaction_cost)
 
     node_parser = subparsers.add_parser("nodedebug")
     group = node_parser.add_mutually_exclusive_group()
@@ -175,6 +160,7 @@ def setup_parser():
 
     setup_parser_validators(subparsers)
     setup_parser_wallet(subparsers)
+    setup_parser_cost(subparsers)
 
     return parser
 
@@ -260,6 +246,26 @@ def setup_parser_wallet(subparsers):
     group.add_argument("--encode", action="store_true")
     group.add_argument("--decode", action="store_true")
     bech32_parser.set_defaults(func=do_bech32)
+
+
+def setup_parser_cost(subparsers):
+    cost_parser = subparsers.add_parser("cost")
+    cost_subparsers = cost_parser.add_subparsers()
+
+    get_gas_price_parser = cost_subparsers.add_parser("gas-price")
+    get_gas_price_parser.add_argument("--proxy", required=True)
+    get_gas_price_parser.set_defaults(func=get_gas_price)
+
+    get_transaction_cost_parser = cost_subparsers.add_parser("transaction")
+    tx_types = [proxy.TxTypes.SC_CALL, proxy.TxTypes.MOVE_BALANCE, proxy.TxTypes.SC_DEPLOY]
+    get_transaction_cost_parser.add_argument("tx_type", choices=tx_types)
+    get_transaction_cost_parser.add_argument("--proxy", required=True)
+    get_transaction_cost_parser.add_argument("--data", required=False)
+    get_transaction_cost_parser.add_argument("--sc-address", required=False)
+    get_transaction_cost_parser.add_argument("--sc-path", required=False)
+    get_transaction_cost_parser.add_argument("--function", required=False)
+    get_transaction_cost_parser.add_argument("--arguments", nargs='+', required=False)
+    get_transaction_cost_parser.set_defaults(func=get_transaction_cost)
 
 
 def install(args):

@@ -29,6 +29,11 @@ class ElrondProxy:
         response = do_get(url)
         return response
 
+    def get_account_transactions(self, address):
+        url = f"{self.url}/address/{address.bech32()}/transactions"
+        response = do_get(url)
+        return response
+
     def get_num_shards(self):
         metrics = self._get_status_metrics(METACHAIN_ID)
         metric = metrics["erd_metric_cross_check_block_height"]
