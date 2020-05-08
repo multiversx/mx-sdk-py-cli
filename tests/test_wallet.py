@@ -103,6 +103,37 @@ class WalletTestCase(unittest.TestCase):
 
         self.assertEqual("4e160bcafb6cb8ab8fc3260d3faf24bf7ce1205b5685adb457803db6d67c648a614308d8354e40b40fbb90c227046d6997493f798b92acb1b4bc49173939e703", signature)
 
+    def test_sign_transaction_trust_wallet_scenario(self):
+        pem = self.testdata.joinpath("keys", "alice.pem")
+
+        # With data
+        transaction = PlainTransaction()
+        transaction.nonce = 0
+        transaction.value = "0"
+        transaction.sender = "erd1l453hd0gt5gzdp7czpuall8ggt2dcv5zwmfdf3sd3lguxseux2fsmsgldz"
+        transaction.receiver = "erd1cux02zersde0l7hhklzhywcxk4u9n4py5tdxyx7vrvhnza2r4gmq4vw35r"
+        transaction.gasPrice = 200000000000000
+        transaction.gasLimit = 500000000
+        transaction.data = "foo"
+        payload = TransactionPayloadToSign(transaction)
+        signature = signing.sign_transaction(payload, pem)
+
+        self.assertEqual("3c807eddeb5c9d7864ca3a97da8d2bffcef84826228567d4c7478812fdd09858f438a5cade3341bb2b02a2a8717d271b9163735d65f61795f5dd946f519fc500", signature)
+
+        # Without data
+        transaction = PlainTransaction()
+        transaction.nonce = 0
+        transaction.value = "0"
+        transaction.sender = "erd1l453hd0gt5gzdp7czpuall8ggt2dcv5zwmfdf3sd3lguxseux2fsmsgldz"
+        transaction.receiver = "erd1cux02zersde0l7hhklzhywcxk4u9n4py5tdxyx7vrvhnza2r4gmq4vw35r"
+        transaction.gasPrice = 200000000000000
+        transaction.gasLimit = 500000000
+        transaction.data = ""
+        payload = TransactionPayloadToSign(transaction)
+        signature = signing.sign_transaction(payload, pem)
+
+        self.assertEqual("39ab0e18bfce04bf53c9610faa3b9e7cecfca919510a7631e529e9086279b70a4832df32a5d1b8fdceb4e9082f2995da97f9195532c8d611ee749bc312cbf90c", signature)
+
     def test_generate_pair_pem(self):
         seed, pubkey = generate_pair()
         pem_file = Path(self.testdata_out, "foo.pem")
