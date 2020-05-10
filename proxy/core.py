@@ -50,6 +50,18 @@ class ElrondProxy:
         nonce = metrics["erd_probable_highest_nonce"]
         return nonce
 
+    def get_meta_nonce(self):
+        url = f"{self.url}/meta/nonce"
+        response = do_get(url)
+        nonce = response["nonce"]
+        return nonce
+
+    def get_meta_block(self):
+        url = f"{self.url}/meta/block"
+        response = do_get(url)
+        nonce = response["block"]
+        return nonce
+
     def get_gas_price(self):
         metrics = self._get_status_metrics(ANY_SHARD_ID)
         price = metrics["erd_min_gas_price"]
