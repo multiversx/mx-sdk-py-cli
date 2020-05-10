@@ -270,18 +270,26 @@ def setup_parser_network(subparsers):
     network_parser = subparsers.add_parser("network")
     network_subparsers = network_parser.add_subparsers()
 
-    get_num_shard_parser = network_subparsers.add_parser("num-shards")
-    get_num_shard_parser.add_argument("--proxy", required=True)
-    get_num_shard_parser.set_defaults(func=get_num_shards)
+    num_shards = network_subparsers.add_parser("num-shards")
+    num_shards.add_argument("--proxy", required=True)
+    num_shards.set_defaults(func=get_num_shards)
 
-    get_last_block_nonce_parser = network_subparsers.add_parser("last-block-nonce")
-    get_last_block_nonce_parser.add_argument("--proxy", required=True)
-    get_last_block_nonce_parser.add_argument("--shard-id", required=True)
-    get_last_block_nonce_parser.set_defaults(func=get_last_block_nonce)
+    last_block_nonce = network_subparsers.add_parser("last-block-nonce")
+    last_block_nonce.add_argument("--proxy", required=True)
+    last_block_nonce.add_argument("--shard-id", required=True)
+    last_block_nonce.set_defaults(func=get_last_block_nonce)
 
-    get_chain_id_parser = network_subparsers.add_parser("chain-id")
-    get_chain_id_parser.add_argument("--proxy", required=True)
-    get_chain_id_parser.set_defaults(func=get_chain_id)
+    chain_id = network_subparsers.add_parser("chain-id")
+    chain_id.add_argument("--proxy", required=True)
+    chain_id.set_defaults(func=get_chain_id)
+
+    meta_nonce = network_subparsers.add_parser("meta-nonce")
+    meta_nonce.add_argument("--proxy", required=True)
+    meta_nonce.set_defaults(func=get_meta_nonce)
+
+    meta_block = network_subparsers.add_parser("meta-block")
+    meta_block.add_argument("--proxy", required=True)
+    meta_block.set_defaults(func=get_meta_block)
 
 
 def install(args):
@@ -347,24 +355,27 @@ def get_transaction_cost(args):
 
 
 def get_num_shards(args):
-    proxy_url = args.proxy
-    facade.get_num_shards(proxy_url)
+    facade.get_num_shards(args)
 
 
 def get_last_block_nonce(args):
-    proxy_url = args.proxy
-    shard_id = args.shard_id
-    facade.get_last_block_nonce(proxy_url, shard_id)
+    facade.get_last_block_nonce(args)
 
 
 def get_gas_price(args):
-    proxy_url = args.proxy
-    facade.get_gas_price(proxy_url)
+    facade.get_gas_price(args)
 
 
 def get_chain_id(args):
-    proxy_url = args.proxy
-    facade.get_chain_id(proxy_url)
+    facade.get_chain_id(args)
+
+
+def get_meta_nonce(args):
+    facade.get_meta_nonce(args)
+
+
+def get_meta_block(args):
+    facade.get_meta_block(args)
 
 
 def do_nodedebug(args):

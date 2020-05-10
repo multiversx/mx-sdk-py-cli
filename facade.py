@@ -150,40 +150,51 @@ def get_account_transactions(args):
     return account
 
 
-def get_num_shards(proxy_url):
-    logger.debug("call_get_number_of_shards")
-
+def get_num_shards(args):
+    proxy_url = args.proxy
     proxy = ElrondProxy(proxy_url)
     num_shards = proxy.get_num_shards()
     print(num_shards)
     return num_shards
 
 
-def get_last_block_nonce(proxy_url, shard_id):
-    logger.debug("call_get_last_block_nonce")
-
+def get_last_block_nonce(args):
+    proxy_url = args.proxy
+    shard_id = args.shard_id
     proxy = ElrondProxy(proxy_url)
     nonce = proxy.get_last_block_nonce(shard_id)
     print(nonce)
     return nonce
 
 
-def get_gas_price(proxy_url):
-    logger.debug("call_get_gas_price")
-
+def get_gas_price(args):
+    proxy_url = args.proxy
     proxy = ElrondProxy(proxy_url)
     price = proxy.get_gas_price()
     print(price)
     return price
 
 
-def get_chain_id(proxy_url):
-    logger.debug("call_get_chain_id")
-
+def get_chain_id(args):
+    proxy_url = args.proxy
     proxy = ElrondProxy(proxy_url)
     chain_id = proxy.get_chain_id()
     print(chain_id)
     return chain_id
+
+
+def get_meta_nonce(args):
+    proxy = ElrondProxy(args.proxy)
+    nonce = proxy.get_meta_nonce()
+    print(nonce)
+    return nonce
+
+
+def get_meta_block(args):
+    proxy = ElrondProxy(args.proxy)
+    block = proxy.get_meta_block()
+    print(block)
+    return block
 
 
 def get_transaction_cost(args):
