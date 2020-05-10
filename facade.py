@@ -2,6 +2,7 @@ import logging
 
 from erdpy import wallet
 from erdpy.accounts import Account, Address
+from erdpy.blockatlas import BlockAtlas
 from erdpy.contracts import CodeMetadata, SmartContract
 from erdpy.environments import TestnetEnvironment
 from erdpy.projects import load_project
@@ -270,3 +271,24 @@ def do_bech32(args):
     result = address.bech32() if encode else address.hex()
     print(result)
     return result
+
+
+def blockatlas_get_current_block_number(args):
+    client = BlockAtlas(args.url, args.coin)
+    number = client.get_current_block_number()
+    print(number)
+    return number
+
+
+def blockatlas_get_block_by_number(args):
+    client = BlockAtlas(args.url, args.coin)
+    block = client.get_block_by_number(args.number)
+    print(block)
+    return block
+
+
+def blockatlas_get_txs_by_address(args):
+    client = BlockAtlas(args.url, args.coin)
+    transactions = client.get_txs_by_address(args.address)
+    print(transactions)
+    return transactions

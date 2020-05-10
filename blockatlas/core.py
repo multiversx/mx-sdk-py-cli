@@ -6,14 +6,17 @@ logger = logging.getLogger("block-atlas")
 
 
 class BlockAtlas:
-    def __init__(self, url):
+    def __init__(self, url, coin):
         self.url = url
+        self.coin = coin
 
-    def get_txs_by_address(self):
-        pass
-
-    def current_block_number(self):
+    def get_current_block_number(self):
         pass
 
     def get_block_by_number(self, num: int):
         pass
+
+    def get_txs_by_address(self, address: str):
+        url = f"{self.url}/v2/{self.coin}/transactions/{address}"
+        response = do_get(url)
+        return response

@@ -142,6 +142,7 @@ def setup_parser():
     setup_parser_wallet(subparsers)
     setup_parser_cost(subparsers)
     setup_parser_network(subparsers)
+    setup_parser_blockatlas(subparsers)
 
     return parser
 
@@ -290,6 +291,25 @@ def setup_parser_network(subparsers):
     meta_block = network_subparsers.add_parser("meta-block")
     meta_block.add_argument("--proxy", required=True)
     meta_block.set_defaults(func=get_meta_block)
+
+
+def setup_parser_blockatlas(subparsers):
+    parser = subparsers.add_parser("blockatlas")
+    subparsers = parser.add_subparsers()
+
+    parser.add_argument("--url", required=True)
+    parser.add_argument("--coin", required=True)
+
+    sub = subparsers.add_parser("current-block-number")
+    sub.set_defaults(func=facade.blockatlas_get_current_block_number)
+
+    sub = subparsers.add_parser("block-by-number")
+    sub.add_argument("--number", required=True)
+    sub.set_defaults(func=facade.blockatlas_get_block_by_number)
+
+    sub = subparsers.add_parser("transactions")
+    sub.add_argument("--address", required=True)
+    sub.set_defaults(func=facade.blockatlas_get_txs_by_address)
 
 
 def install(args):
