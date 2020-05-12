@@ -279,26 +279,27 @@ def setup_parser_network(subparsers):
     network_parser = subparsers.add_parser("network")
     network_subparsers = network_parser.add_subparsers()
 
-    num_shards = network_subparsers.add_parser("num-shards")
-    num_shards.add_argument("--proxy", required=True)
-    num_shards.set_defaults(func=get_num_shards)
+    subparser = network_subparsers.add_parser("num-shards")
+    subparser.add_argument("--proxy", required=True)
+    subparser.set_defaults(func=get_num_shards)
 
-    last_block_nonce = network_subparsers.add_parser("last-block-nonce")
-    last_block_nonce.add_argument("--proxy", required=True)
-    last_block_nonce.add_argument("--shard-id", required=True)
-    last_block_nonce.set_defaults(func=get_last_block_nonce)
+    subparser = network_subparsers.add_parser("last-block-nonce")
+    subparser.add_argument("--proxy", required=True)
+    subparser.add_argument("--shard-id", required=True)
+    subparser.set_defaults(func=get_last_block_nonce)
 
-    chain_id = network_subparsers.add_parser("chain-id")
-    chain_id.add_argument("--proxy", required=True)
-    chain_id.set_defaults(func=get_chain_id)
+    subparser = network_subparsers.add_parser("chain-id")
+    subparser.add_argument("--proxy", required=True)
+    subparser.set_defaults(func=get_chain_id)
 
-    meta_nonce = network_subparsers.add_parser("meta-nonce")
-    meta_nonce.add_argument("--proxy", required=True)
-    meta_nonce.set_defaults(func=get_meta_nonce)
+    subparser = network_subparsers.add_parser("meta-nonce")
+    subparser.add_argument("--proxy", required=True)
+    subparser.set_defaults(func=get_meta_nonce)
 
-    meta_block = network_subparsers.add_parser("meta-block")
-    meta_block.add_argument("--proxy", required=True)
-    meta_block.set_defaults(func=get_meta_block)
+    subparser = network_subparsers.add_parser("meta-block")
+    subparser.add_argument("--proxy", required=True)
+    subparser.add_argument("--nonce", required=True, type=int)
+    subparser.set_defaults(func=get_meta_block)
 
 
 def setup_parser_blockatlas(subparsers):

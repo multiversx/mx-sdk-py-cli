@@ -193,7 +193,7 @@ def get_meta_nonce(args):
 
 def get_meta_block(args):
     proxy = ElrondProxy(args.proxy)
-    block = proxy.get_meta_block()
+    block = proxy.get_meta_block(args.nonce)
     print(block)
     return block
 

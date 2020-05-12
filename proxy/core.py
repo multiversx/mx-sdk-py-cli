@@ -51,13 +51,13 @@ class ElrondProxy:
         return nonce
 
     def get_meta_nonce(self):
-        url = f"{self.url}/meta/nonce"
+        url = f"{self.url}/block/meta-nonce"
         response = do_get(url)
         nonce = response["nonce"]
         return nonce
 
-    def get_meta_block(self):
-        url = f"{self.url}/meta/block"
+    def get_meta_block(self, nonce):
+        url = f"{self.url}/block/meta/{nonce}"
         response = do_get(url)
         nonce = response["block"]
         return nonce
