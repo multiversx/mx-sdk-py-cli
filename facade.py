@@ -254,6 +254,11 @@ def prepare_and_send_change_reward_address_transaction(args):
     return prepare_and_send_transaction(args)
 
 
+def prepare_and_send_claim_transaction(args):
+    args = validators.parse_args_for_claim(args)
+    return prepare_and_send_transaction(args)
+
+
 def generate_pem(args):
     pem_file = args.pem
 

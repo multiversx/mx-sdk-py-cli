@@ -230,6 +230,15 @@ def setup_parser_validators(subparsers):
     change_reward_address_parser.add_argument("--proxy", required=True)
     change_reward_address_parser.set_defaults(func=change_reward_address)
 
+    claim_parser = subparsers.add_parser("claim")
+    claim_parser.add_argument("--value", default="0")
+    claim_parser.add_argument("--pem", required=True)
+    claim_parser.add_argument("--gas-price", default=config.DEFAULT_GASPRICE)
+    claim_parser.add_argument("--gas-limit", default=config.DEFAULT_GASLIMIT)
+    claim_parser.add_argument("--claim-address", required=True)
+    claim_parser.add_argument("--proxy", required=True)
+    claim_parser.set_defaults(func=do_claim)
+
 
 def setup_parser_wallet(subparsers):
     wallet_parser = subparsers.add_parser("wallet")
@@ -466,6 +475,10 @@ def do_un_jail(args):
 
 def change_reward_address(args):
     facade.prepare_and_send_change_reward_address_transaction(args)
+
+
+def do_claim(args):
+    facade.prepare_and_send_claim_transaction(args)
 
 
 if __name__ == "__main__":
