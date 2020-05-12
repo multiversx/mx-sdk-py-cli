@@ -53,7 +53,7 @@ def parse_args_for_changing_reward_address(args):
 
 
 def parse_args_for_claim(args):
-    args.data = 'claim@' + convert_to_hex(args.claim_address)
+    args.data = 'claim'
     args.receiver = _STAKE_SMART_CONTRACT_ADDRESS
     return args
 

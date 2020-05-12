@@ -235,7 +235,6 @@ def setup_parser_validators(subparsers):
     claim_parser.add_argument("--pem", required=True)
     claim_parser.add_argument("--gas-price", default=config.DEFAULT_GASPRICE)
     claim_parser.add_argument("--gas-limit", default=config.DEFAULT_GASLIMIT)
-    claim_parser.add_argument("--claim-address", required=True)
     claim_parser.add_argument("--proxy", required=True)
     claim_parser.set_defaults(func=do_claim)
 
