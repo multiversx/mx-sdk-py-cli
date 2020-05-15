@@ -183,7 +183,7 @@ def setup_parser_validators(subparsers):
     stake_send_parser.add_argument("--proxy", required=True)
     stake_send_parser.set_defaults(func=stake_send)
 
-    stake_prepare_parser_and_send = subparsers.add_parser("stake-prepare-and-send")
+    stake_prepare_parser_and_send = subparsers.add_parser("stake")
     stake_prepare_parser_and_send.add_argument("--pem", required=True)
     stake_prepare_parser_and_send.add_argument("--value", default="0")
     stake_prepare_parser_and_send.add_argument("--gas-price", default=config.DEFAULT_GASPRICE)

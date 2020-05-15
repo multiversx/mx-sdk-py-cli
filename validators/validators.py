@@ -1,6 +1,8 @@
 import binascii
 import logging
 
+from erdpy.accounts import Address
+
 logger = logging.getLogger("validators")
 
 _STAKE_SMART_CONTRACT_ADDRESS = "erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqplllst77y4l"
@@ -20,7 +22,8 @@ def parse_args_for_stake(args):
         stake_data += '@' + key + '@' + convert_to_hex('genesis')
 
     if reward_address:
-        stake_data += '@' + convert_to_hex(reward_address)
+        reward_address = Address(args.reward_address)
+        stake_data += '@' + reward_address.hex()
 
     args.receiver = _STAKE_SMART_CONTRACT_ADDRESS
     args.data = stake_data
@@ -47,7 +50,8 @@ def parse_args_for_un_jail(args):
 
 
 def parse_args_for_changing_reward_address(args):
-    args.data = 'changeRewardAddress@' + convert_to_hex(args.reward_address)
+    reward_address = Address(args.reward_address)
+    args.data = 'changeRewardAddress@' + reward_address.hex()
     args.receiver = _STAKE_SMART_CONTRACT_ADDRESS
     return args
 
