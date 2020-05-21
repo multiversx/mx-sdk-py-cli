@@ -1,0 +1,141 @@
+import os
+import json
+import time
+from os import path
+
+from erdpy.transactions import BunchOfTransactions
+from erdpy.workstation import get_tools_folder
+from erdpy.accounts import Account
+from erdpy.proxy.core import ElrondProxy
+from erdpy import utils
+from collections import OrderedDict
+
+
+def _prepare_tx(args):
+    ordered_fields = OrderedDict()
+    ordered_fields["nonce"] = 0
+    ordered_fields["value"] = int(args.value)
+    ordered_fields["receiver"] = args.receiver
+    ordered_fields["gasPrice"] = args.gas_price
+    ordered_fields["gasLimit"] = args.gas_limit
+    ordered_fields["data"] = args.data
+
+    return ordered_fields
+
+
+def _wait_to_execute_txs(proxy, owner, expected_nonce):
+    new_nonce = 0
+    old_time = time.time()
+    timeout = False
+    while new_nonce < expected_nonce and not timeout:
+        owner.sync_nonce(proxy)
+        new_nonce = owner.nonce
+        # timeout if passed a minute
+        timeout = time.time() - old_time > 59
+    if timeout:
+        print("not all transactions was executed")
+    else:
+        print(f"transactions was executed")
+
+
+class TransactionQueue:
+    _TXS_FILE_NAME = "txs.json"
+    _TXS_FIELD_NAME = "transactions"
+    _TXS_INFO_FILE_NAME = "txs_info.txt"
+
+    def __init__(self):
+        tools_folder = get_tools_folder()
+
+        txs_file_dir = path.join(tools_folder, "transactions")
+        # create transactions directory if not exits
+        if not os.path.exists(txs_file_dir):
+            os.mkdir(txs_file_dir)
+
+        self.txs_file_path = path.join(txs_file_dir, self._TXS_FILE_NAME)
+        if not os.path.exists(self.txs_file_path):
+            # create transactions file if not exits
+            utils.write_file(self.txs_file_path, '{"' + self._TXS_FIELD_NAME + '":[]}')
+
+        self.txs_info_file_path = path.join(txs_file_dir, self._TXS_INFO_FILE_NAME)
+        if not os.path.exists(self.txs_info_file_path):
+            utils.write_file(self.txs_info_file_path, f"index:{0}")
+
+    def enqueue_transaction(self, args):
+        prepared = _prepare_tx(args)
+        data = self._read_json_file()
+        temp_data = data[self._TXS_FIELD_NAME]
+        temp_data.append(prepared)
+        self._write_json_file(data)
+
+    def _read_json_file(self):
+        with open(self.txs_file_path, "r") as json_file:
+            try:
+                data = json.load(json_file)
+            except:
+                print("cannot read from transactions file")
+                return {self._TXS_FIELD_NAME: []}
+            return data
+
+    def _write_json_file(self, data):
+        with open(self.txs_file_path, "w") as json_file:
+            json.dump(data, json_file, indent=1)
+
+    def _remove_all_transactions(self):
+        os.remove(self.txs_file_path)
+
+    def _read_index(self):
+        info = utils.read_file(self.txs_info_file_path)
+        info_slit = info.split(":")
+        return int(info_slit[1])
+
+    def clean_transactions_queue(self):
+        os.remove(self.txs_info_file_path)
+        os.remove(self.txs_file_path)
+
+    def dispatch_transactions_continuously(self, args):
+        while True:
+            self.dispatch_transactions(args)
+            time.sleep(int(args.interval))
+
+    def dispatch_transactions(self, args):
+        data = self._read_json_file()
+        txs = data[self._TXS_FIELD_NAME]
+        txs_index = self._read_index()
+
+        total_txs = len(txs)-txs_index
+        if total_txs == 0 or len(txs) == 0:
+            return
+
+        proxy = ElrondProxy(args.proxy)
+        # Need to sync nonce
+        owner = Account(pem_file=args.pem)
+        owner.sync_nonce(proxy)
+        nonce = owner.nonce
+        old_nonce = nonce
+
+        print(nonce)
+        bunch = BunchOfTransactions()
+        idx = txs_index
+        while idx < len(txs):
+            tx = txs[idx]
+            bunch.add(owner, tx["receiver"], nonce, tx["value"], tx["data"], tx["gasPrice"], tx["gasLimit"])
+            # increment nonce
+            nonce += 1
+            idx += 1
+
+        print(f"want to send {total_txs} transactions")
+        try:
+            num_sent, hashes = bunch.send(proxy)
+        except:
+            print("no valid transactions to send")
+            num_sent = 0
+            hashes = []
+
+        print(f"{num_sent} transactions was accepted by observers")
+        for key in hashes:
+            print(f"tx {txs_index+int(key)}: hash => {hashes[key]}")
+
+        utils.write_file(self.txs_info_file_path, f"index:{len(txs)}")
+        # wait until transactions are executed
+        _wait_to_execute_txs(proxy, owner, old_nonce + num_sent)
+

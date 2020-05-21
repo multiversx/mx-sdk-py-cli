@@ -4,6 +4,7 @@ from erdpy import wallet
 from erdpy.accounts import Account, Address
 from erdpy.blockatlas import BlockAtlas
 from erdpy.contracts import CodeMetadata, SmartContract
+from erdpy.dispatcher.transactions.queue import TransactionQueue
 from erdpy.environments import TestnetEnvironment
 from erdpy.projects import load_project
 from erdpy.proxy import ElrondProxy, TransactionCostEstimator
@@ -257,6 +258,26 @@ def prepare_and_send_change_reward_address_transaction(args):
 def prepare_and_send_claim_transaction(args):
     args = validators.parse_args_for_claim(args)
     return prepare_and_send_transaction(args)
+
+
+def enqueue_transaction(args):
+    queue = TransactionQueue()
+    queue.enqueue_transaction(args)
+
+
+def dispatch_transactions(args):
+    queue = TransactionQueue()
+    queue.dispatch_transactions(args)
+
+
+def dispatch_transactions_continuously(args):
+    queue = TransactionQueue()
+    queue.dispatch_transactions_continuously(args)
+
+
+def clean_transactions_queue():
+    queue = TransactionQueue()
+    queue.clean_transactions_queue()
 
 
 def generate_pem(args):
