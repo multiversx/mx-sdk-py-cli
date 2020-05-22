@@ -87,7 +87,8 @@ class ElrondProxy:
         url = f"{self.url}/transaction/send-multiple"
         response = do_post(url, payload)
         num_sent = response["numOfSentTxs"]
-        return num_sent
+        hashes = response["txsHashes"]
+        return num_sent, hashes
 
     def query_contract(self, payload):
         url = f"{self.url}/vm-values/query"

@@ -144,6 +144,8 @@ def setup_parser():
     setup_parser_network(subparsers)
     setup_parser_blockatlas(subparsers)
 
+    setup_parser_queue(subparsers)
+
     return parser
 
 
@@ -321,6 +323,33 @@ def setup_parser_blockatlas(subparsers):
     sub.set_defaults(func=facade.blockatlas_get_txs_by_address)
 
 
+def setup_parser_queue(subparsers):
+    network_parser = subparsers.add_parser("dispatcher")
+    queue_subparsers = network_parser.add_subparsers()
+
+    subparsers = queue_subparsers.add_parser("enqueue-transaction")
+    subparsers.add_argument("--value", default="0")
+    subparsers.add_argument("--receiver", required=True)
+    subparsers.add_argument("--gas-price", default=config.DEFAULT_GASPRICE)
+    subparsers.add_argument("--gas-limit", default=config.DEFAULT_GASLIMIT)
+    subparsers.add_argument("--data", default="")
+    subparsers.set_defaults(func=enqueue_transaction)
+
+    subparsers = queue_subparsers.add_parser("dispatch-transactions")
+    subparsers.add_argument("--proxy", required=True)
+    subparsers.add_argument("--pem", required=True)
+    subparsers.set_defaults(func=dispatch_transactions)
+
+    subparsers = queue_subparsers.add_parser("dispatch-transactions-continuously")
+    subparsers.add_argument("--proxy", required=True)
+    subparsers.add_argument("--pem", required=True)
+    subparsers.add_argument("--interval", required=True)
+    subparsers.set_defaults(func=dispatch_transactions_continuously)
+
+    subparsers = queue_subparsers.add_parser("clean")
+    subparsers.set_defaults(func=clean_transactions_queue)
+
+
 def install(args):
     group = args.group
     dependencies.install_group(group, overwrite=True)
@@ -479,6 +508,22 @@ def change_reward_address(args):
 
 def do_claim(args):
     facade.prepare_and_send_claim_transaction(args)
+
+
+def enqueue_transaction(args):
+    facade.enqueue_transaction(args)
+
+
+def dispatch_transactions(args):
+    facade.dispatch_transactions(args)
+
+
+def dispatch_transactions_continuously(args):
+    facade.dispatch_transactions_continuously(args)
+
+
+def clean_transactions_queue(args):
+    facade.clean_transactions_queue()
 
 
 if __name__ == "__main__":

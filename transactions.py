@@ -1,4 +1,3 @@
-import base64
 import json
 import logging
 from collections import OrderedDict
@@ -127,9 +126,10 @@ class BunchOfTransactions:
     def send(self, proxy):
         logger.info(f"BunchOfTransactions.send: {len(self.transactions)} transactions")
         payload = [transaction.to_dictionary() for transaction in self.transactions]
-        num_sent = proxy.send_transactions(payload)
+        num_sent, hashes = proxy.send_transactions(payload)
         logger.info(f"Sent: {num_sent}")
-        return num_sent
+        logger.info(f"TxsHashes: {hashes}")
+        return num_sent, hashes
 
 
 def stake_prepare(args):
