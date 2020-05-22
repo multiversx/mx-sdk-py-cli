@@ -324,30 +324,30 @@ def setup_parser_blockatlas(subparsers):
 
 
 def setup_parser_queue(subparsers):
-    network_parser = subparsers.add_parser("dispatcher")
-    queue_subparsers = network_parser.add_subparsers()
+    parser = subparsers.add_parser("dispatcher")
+    subparsers = parser.add_subparsers()
 
-    subparsers = queue_subparsers.add_parser("enqueue-transaction")
-    subparsers.add_argument("--value", default="0")
-    subparsers.add_argument("--receiver", required=True)
-    subparsers.add_argument("--gas-price", default=config.DEFAULT_GASPRICE)
-    subparsers.add_argument("--gas-limit", default=config.DEFAULT_GASLIMIT)
-    subparsers.add_argument("--data", default="")
-    subparsers.set_defaults(func=enqueue_transaction)
+    sub = subparsers.add_parser("enqueue")
+    sub.add_argument("--value", default="0")
+    sub.add_argument("--receiver", required=True)
+    sub.add_argument("--gas-price", default=config.DEFAULT_GASPRICE)
+    sub.add_argument("--gas-limit", default=config.DEFAULT_GASLIMIT)
+    sub.add_argument("--data", default="")
+    sub.set_defaults(func=enqueue_transaction)
 
-    subparsers = queue_subparsers.add_parser("dispatch-transactions")
-    subparsers.add_argument("--proxy", required=True)
-    subparsers.add_argument("--pem", required=True)
-    subparsers.set_defaults(func=dispatch_transactions)
+    sub = subparsers.add_parser("dispatch")
+    sub.add_argument("--proxy", required=True)
+    sub.add_argument("--pem", required=True)
+    sub.set_defaults(func=dispatch_transactions)
 
-    subparsers = queue_subparsers.add_parser("dispatch-transactions-continuously")
-    subparsers.add_argument("--proxy", required=True)
-    subparsers.add_argument("--pem", required=True)
-    subparsers.add_argument("--interval", required=True)
-    subparsers.set_defaults(func=dispatch_transactions_continuously)
+    sub = subparsers.add_parser("dispatch-continuously")
+    sub.add_argument("--proxy", required=True)
+    sub.add_argument("--pem", required=True)
+    sub.add_argument("--interval", required=True)
+    sub.set_defaults(func=dispatch_transactions_continuously)
 
-    subparsers = queue_subparsers.add_parser("clean")
-    subparsers.set_defaults(func=clean_transactions_queue)
+    sub = subparsers.add_parser("clean")
+    sub.set_defaults(func=clean_transactions_queue)
 
 
 def install(args):

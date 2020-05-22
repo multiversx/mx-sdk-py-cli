@@ -1,14 +1,17 @@
-import os
 import json
+import logging
+import os
 import time
+from collections import OrderedDict
 from os import path
 
-from erdpy.transactions import BunchOfTransactions
-from erdpy.workstation import get_tools_folder
+from erdpy import utils
 from erdpy.accounts import Account
 from erdpy.proxy.core import ElrondProxy
-from erdpy import utils
-from collections import OrderedDict
+from erdpy.transactions import BunchOfTransactions
+from erdpy.workstation import get_tools_folder
+
+logger = logging.getLogger("queue")
 
 
 def _prepare_tx(args):
@@ -33,9 +36,9 @@ def _wait_to_execute_txs(proxy, owner, expected_nonce):
         # timeout if passed a minute
         timeout = time.time() - old_time > 59
     if timeout:
-        print("not all transactions was executed")
+        logger.error("Not all transactions were executed")
     else:
-        print(f"transactions was executed")
+        logger.info(f"Transactions were executed")
 
 
 class TransactionQueue:
@@ -71,8 +74,8 @@ class TransactionQueue:
         with open(self.txs_file_path, "r") as json_file:
             try:
                 data = json.load(json_file)
-            except:
-                print("cannot read from transactions file")
+            except Exception:
+                logger.error("Cannot read transactions file")
                 return {self._TXS_FIELD_NAME: []}
             return data
 
@@ -94,6 +97,7 @@ class TransactionQueue:
 
     def dispatch_transactions_continuously(self, args):
         while True:
+            logger.info("dispatch_transactions_continuously()")
             self.dispatch_transactions(args)
             time.sleep(int(args.interval))
 
@@ -102,8 +106,9 @@ class TransactionQueue:
         txs = data[self._TXS_FIELD_NAME]
         txs_index = self._read_index()
 
-        total_txs = len(txs)-txs_index
+        total_txs = len(txs) - txs_index
         if total_txs == 0 or len(txs) == 0:
+            logger.info("No transactions to dispatch")
             return
 
         proxy = ElrondProxy(args.proxy)
@@ -123,19 +128,18 @@ class TransactionQueue:
             nonce += 1
             idx += 1
 
-        print(f"want to send {total_txs} transactions")
+        logger.info(f"Sending {total_txs} transactions")
         try:
             num_sent, hashes = bunch.send(proxy)
-        except:
-            print("no valid transactions to send")
+        except Exception:
+            logger.error("No valid transactions to send")
             num_sent = 0
             hashes = []
 
-        print(f"{num_sent} transactions was accepted by observers")
+        logger.info(f"{num_sent} transactions were accepted by observers")
         for key in hashes:
             print(f"tx {txs_index+int(key)}: hash => {hashes[key]}")
 
         utils.write_file(self.txs_info_file_path, f"index:{len(txs)}")
         # wait until transactions are executed
         _wait_to_execute_txs(proxy, owner, old_nonce + num_sent)
-

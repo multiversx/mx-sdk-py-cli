@@ -1,25 +1,36 @@
-#Transaction dispatcher
+# Transaction dispatcher
 
-##Commands
+## Features
+
+### Register (enqueue) a transaction to be sent
 
 ```
-# erdpy dispatcher enqueue-transaction will put a transaction in a queue without send sender address and sign it
-erdpy dispatcher enqueue-transaction --value="100" --receiver="bech32Addr" --data="blablabla" --gas-price=int(optional) --gas-limit=int(optional)
+erdpy dispatcher enqueue --value="100" --receiver="erd1cux02zersde0l7hhklzhywcxk4u9n4py5tdxyx7vrvhnza2r4gmq4vw35r" --data="foo" --gas-price=200000000000 --gas-limit=50000000
 ```
+
+### Dispatch registered (enqueued) transactions
+
+This operation manages the nonce sequence, signs the transactions and sends them to the blockchain.
+
 ```
-# erdpy dispatcher dispatch-transactions will prepare (sign, sync nonce and set sender address) and send all transactions that are in queue
-erdpy dispatcher dispatch-transactions --proxy="https://api.elrond.com" -pem="./examples/keys/alice.pem"
+erdpy dispatcher dispatch --proxy="https://api.elrond.com" --pem="alice.pem"
 ```
+
+### Continuously dispatch transactions
+
+Same as above, but in a continuous, neverending process. The dispatch takes place at the specified time interval (in seconds).
+
 ```
-# erdpy dispatcher dispatch-transactions-continuously will prepare (sign, sync nonce and set sender address) and send all transactions that are in queue at a specified time interval
-erdpy dispatcher dispatch-transactions-continuously --proxy="https://api.elrond.com" -pem="./examples/keys/alice.pem" --interval=int(dispatch interval in seconds)
+erdpy dispatcher dispatch-continuously --proxy="https://api.elrond.com" -pem="./examples/keys/alice.pem" --interval=30
 ```
+
+### Unregister (clear) all enqueued transactions
+
 ```
-erdpy dispatcher clean  will remove all transactions that are stored in queue
 erdpy dispatcher clean 
 ```
 
-TODO
-- implement a micro-DB (right now transactions are saved in a json file and the writing operation in this are not atomic)
-- implement a mechanism to check which transactions was executed successfully (we need to use api route `transaction/:hash` and `transaction/:hash/status` )
-- implement a mechanism to close _dispatch-transactions-continuously_ command
+## Roadmap
+
+- Use a database as the queue backend
+- Implement a mechanism to check which transactions was executed successfully (we need to use api route `transaction/:hash` and `transaction/:hash/status` )
