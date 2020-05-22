@@ -2,15 +2,13 @@ import time
 import unittest
 import _thread
 
-from argparse import ArgumentParser
 from erdpy.config import DEFAULT_GASPRICE, DEFAULT_GASLIMIT
 
 from erdpy.dispatcher.transactions.queue import TransactionQueue
 
 
 def _create_mock_args():
-    parser = ArgumentParser()
-    args = parser.parse_args()
+    args = TestArgs()
     args.data = "data1"
     args.receiver = "erd12cl2dgtjws8vt9yf4v9869vryt0juv3eq8hzzq6mlm9ck935vs3q9lfnqe"
     args.gas_price = DEFAULT_GASPRICE
@@ -35,13 +33,10 @@ def write_in_queue():
 class DispatcherTestCase(unittest.TestCase):
     # this a manual test needs proxy and pem file with funds
     def test_multi_thread(self):
-        pass
         _thread.start_new_thread(write_in_queue, ())
 
-        proxy = "http://localhost:7950"
-        parser = ArgumentParser()
-        args = parser.parse_args()
-        args.proxy = proxy
+        args = TestArgs()
+        args.proxy = "http://localhost:7950"
         args.pem = "./../../../file.pem"
         args.interval = 2
         queue = TransactionQueue()
@@ -50,16 +45,12 @@ class DispatcherTestCase(unittest.TestCase):
         self.assertFalse(False)
 
     def test_enqueue_tx(self):
-        pass
         write_in_queue()
         self.assertFalse(False)
 
     def test_dispatcher_txs(self):
-        pass
-        proxy = "http://localhost:7950"
-        parser = ArgumentParser()
-        args = parser.parse_args()
-        args.proxy = proxy
+        args = TestArgs()
+        args.proxy = "http://localhost:7950"
         args.pem = "./../../../file.pem"
         queue = TransactionQueue()
         queue.dispatch_transactions(args)
@@ -69,3 +60,7 @@ class DispatcherTestCase(unittest.TestCase):
         queue = TransactionQueue()
         queue.clean_transactions_queue()
         self.assertFalse(False)
+
+
+class TestArgs(object):
+    pass
