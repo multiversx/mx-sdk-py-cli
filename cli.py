@@ -188,8 +188,11 @@ def setup_parser_validators(subparsers):
     stake_prepare_parser_and_send = subparsers.add_parser("stake")
     stake_prepare_parser_and_send.add_argument("--pem", required=True)
     stake_prepare_parser_and_send.add_argument("--value", default="0")
+    stake_prepare_parser_and_send.add_argument("--estimate-gas", action="store_true", default=False)
     stake_prepare_parser_and_send.add_argument("--gas-price", default=config.DEFAULT_GASPRICE)
-    stake_prepare_parser_and_send.add_argument("--gas-limit", default=config.DEFAULT_GASLIMIT)
+    stake_prepare_parser_and_send.add_argument("--gas-limit",
+                                               required=not("--estimate-gas" in sys.argv),
+                                               default=config.DEFAULT_GASLIMIT)
     stake_prepare_parser_and_send.add_argument("--number-of-nodes", required=True)
     stake_prepare_parser_and_send.add_argument("--nodes-public-keys", required=True)
     stake_prepare_parser_and_send.add_argument("--reward-address", default="")
@@ -199,8 +202,11 @@ def setup_parser_validators(subparsers):
     un_stake_parser = subparsers.add_parser("unstake")
     un_stake_parser.add_argument("--pem", required=True)
     un_stake_parser.add_argument("--value", default="0")
+    un_stake_parser.add_argument("--estimate-gas", action="store_true", default=False)
     un_stake_parser.add_argument("--gas-price", default=config.DEFAULT_GASPRICE)
-    un_stake_parser.add_argument("--gas-limit", default=config.DEFAULT_GASLIMIT)
+    un_stake_parser.add_argument("--gas-limit",
+                                 required=not ("--estimate-gas" in sys.argv),
+                                 default=config.DEFAULT_GASLIMIT)
     un_stake_parser.add_argument("--nodes-public-keys", required=True)
     un_stake_parser.add_argument("--proxy", required=True)
     un_stake_parser.set_defaults(func=do_un_stake)
@@ -208,8 +214,11 @@ def setup_parser_validators(subparsers):
     un_jail_parser = subparsers.add_parser("unjail")
     un_jail_parser.add_argument("--pem", required=True)
     un_jail_parser.add_argument("--value", default="0")
+    un_jail_parser.add_argument("--estimate-gas", action="store_true", default=False)
     un_jail_parser.add_argument("--gas-price", default=config.DEFAULT_GASPRICE)
-    un_jail_parser.add_argument("--gas-limit", default=config.DEFAULT_GASLIMIT)
+    un_jail_parser.add_argument("--gas-limit",
+                                required=not ("--estimate-gas" in sys.argv),
+                                default=config.DEFAULT_GASLIMIT)
     un_jail_parser.add_argument("--nodes-public-keys", required=True)
     un_jail_parser.add_argument("--proxy", required=True)
     un_jail_parser.set_defaults(func=do_un_jail)
@@ -217,8 +226,11 @@ def setup_parser_validators(subparsers):
     un_bond_parser = subparsers.add_parser("unbond")
     un_bond_parser.add_argument("--pem", required=True)
     un_bond_parser.add_argument("--value", default="0")
+    un_bond_parser.add_argument("--estimate-gas", action="store_true", default=False)
     un_bond_parser.add_argument("--gas-price", default=config.DEFAULT_GASPRICE)
-    un_bond_parser.add_argument("--gas-limit", default=config.DEFAULT_GASLIMIT)
+    un_bond_parser.add_argument("--gas-limit",
+                                required=not ("--estimate-gas" in sys.argv),
+                                default=config.DEFAULT_GASLIMIT)
     un_bond_parser.add_argument("--nodes-public-keys", required=True)
     un_bond_parser.add_argument("--proxy", required=True)
     un_bond_parser.set_defaults(func=do_un_bond)
@@ -226,8 +238,11 @@ def setup_parser_validators(subparsers):
     change_reward_address_parser = subparsers.add_parser("change-reward-address")
     change_reward_address_parser.add_argument("--value", default="0")
     change_reward_address_parser.add_argument("--pem", required=True)
+    change_reward_address_parser.add_argument("--estimate-gas", action="store_true", default=False)
     change_reward_address_parser.add_argument("--gas-price", default=config.DEFAULT_GASPRICE)
-    change_reward_address_parser.add_argument("--gas-limit", default=config.DEFAULT_GASLIMIT)
+    change_reward_address_parser.add_argument("--gas-limit",
+                                              required=not ("--estimate-gas" in sys.argv),
+                                              default=config.DEFAULT_GASLIMIT)
     change_reward_address_parser.add_argument("--reward-address", required=True)
     change_reward_address_parser.add_argument("--proxy", required=True)
     change_reward_address_parser.set_defaults(func=change_reward_address)
@@ -235,8 +250,11 @@ def setup_parser_validators(subparsers):
     claim_parser = subparsers.add_parser("claim")
     claim_parser.add_argument("--value", default="0")
     claim_parser.add_argument("--pem", required=True)
+    claim_parser.add_argument("--estimate-gas", action="store_true", default=False)
     claim_parser.add_argument("--gas-price", default=config.DEFAULT_GASPRICE)
-    claim_parser.add_argument("--gas-limit", default=config.DEFAULT_GASLIMIT)
+    claim_parser.add_argument("--gas-limit",
+                              required=not ("--estimate-gas" in sys.argv),
+                              default=config.DEFAULT_GASLIMIT)
     claim_parser.add_argument("--proxy", required=True)
     claim_parser.set_defaults(func=do_claim)
 
