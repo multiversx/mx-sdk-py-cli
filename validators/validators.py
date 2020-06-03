@@ -2,7 +2,7 @@ import binascii
 import logging
 
 from erdpy.accounts import Address
-from erdpy.gas.gas_cfg import *
+from erdpy.config import MIN_GAS_LIMIT, GAS_PER_DATA_BYTE, MetaChainSystemSCsCost
 
 logger = logging.getLogger("validators")
 

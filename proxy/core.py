@@ -42,11 +42,11 @@ class ElrondProxy:
 
     def get_last_block_nonce(self, shard_id):
         if shard_id == "metachain":
-            metrics = self._get_status_metrics(METACHAIN_ID)
+            metrics = self._get_network_status(METACHAIN_ID)
         else:
-            metrics = self._get_status_metrics(shard_id)
+            metrics = self._get_network_status(shard_id)
 
-        nonce = metrics["erd_probable_highest_nonce"]
+        nonce = metrics["erd_nonce"]
         return nonce
 
     def get_meta_nonce(self):
@@ -62,19 +62,25 @@ class ElrondProxy:
         return nonce
 
     def get_gas_price(self):
-        metrics = self._get_status_metrics(ANY_SHARD_ID)
+        metrics = self._get_network_config()
         price = metrics["erd_min_gas_price"]
         return price
 
     def get_chain_id(self):
-        metrics = self._get_status_metrics(ANY_SHARD_ID)
+        metrics = self._get_network_config()
         chain_id = metrics["erd_chain_id"]
         return chain_id
 
-    def _get_status_metrics(self, shard_id):
-        url = f"{self.url}/node/status/{shard_id}"
+    def _get_network_status(self, shard_id):
+        url = f"{self.url}/network/status/{shard_id}"
         response = do_get(url)
-        details = response["message"]["details"]
+        details = response["message"]["status"]
+        return details
+
+    def _get_network_config(self):
+        url = f"{self.url}/network/config"
+        response = do_get(url)
+        details = response["message"]["config"]
         return details
 
     def send_transaction(self, payload):

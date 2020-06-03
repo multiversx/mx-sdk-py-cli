@@ -2,6 +2,8 @@ import logging
 import signal
 from os import path
 
+from erdpy.contracts import _prepare_argument
+
 from erdpy import config, dependencies, errors, myprocess, utils
 
 logger = logging.getLogger("nodedebug")
@@ -68,8 +70,8 @@ def deploy(bytecode, owner, arguments=None, gas_price=None, gas_limit=None):
     logger.debug("deploy")
 
     arguments = arguments or []
-    gas_limit = gas_limit or config.DEFAULT_GASLIMIT
-    gas_price = gas_price or config.DEFAULT_GASPRICE
+    gas_limit = gas_limit or config.DEFAULT_GAS_LIMIT
+    gas_price = gas_price or config.DEFAULT_GAS_PRICE
 
     url = _get_url("deploy")
 
@@ -96,8 +98,8 @@ def execute(contract_address, caller, function, arguments=None, gas_price=None, 
     logger.debug(f"execute, address={contract_address}")
 
     arguments = arguments or []
-    gas_limit = gas_limit or config.DEFAULT_GASLIMIT
-    gas_price = gas_price or config.DEFAULT_GASPRICE
+    gas_limit = gas_limit or config.DEFAULT_GAS_LIMIT
+    gas_price = gas_price or config.DEFAULT_GAS_PRICE
 
     url = _get_url("run")
 
