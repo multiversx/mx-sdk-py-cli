@@ -1,18 +1,18 @@
 import binascii
 import logging
 
-from erdpy import config
 from erdpy.accounts import Address
+from erdpy.gas.gas_cfg import *
 
 logger = logging.getLogger("validators")
 
 _STAKE_SMART_CONTRACT_ADDRESS = "erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqplllst77y4l"
 
 
-def estimate_gas_limit(args, num_keys):
+def estimate_system_sc_call(args, base_cost, factor=1):
     num_bytes = len(args.data)
-    gas_limit = config.MIN_GAS_LIMIT + num_bytes * config.GAS_PER_DATA_BYTE
-    gas_limit += num_keys * config.SYSTEM_SC_COST
+    gas_limit = MIN_GAS_LIMIT + num_bytes * GAS_PER_DATA_BYTE
+    gas_limit += factor * base_cost
     return gas_limit
 
 
@@ -37,7 +37,7 @@ def parse_args_for_stake(args):
     args.data = stake_data
 
     if args.estimate_gas:
-        args.gas_limit = estimate_gas_limit(args, len(keys))
+        args.gas_limit = estimate_system_sc_call(args, MetaChainSystemSCsCost.STAKE, len(keys))
 
     return args
 
@@ -48,7 +48,7 @@ def parse_args_for_un_stake(args):
     args.receiver = _STAKE_SMART_CONTRACT_ADDRESS
 
     if args.estimate_gas:
-        args.gas_limit = estimate_gas_limit(args, num_keys)
+        args.gas_limit = estimate_system_sc_call(args, MetaChainSystemSCsCost.UNSTAKE, num_keys)
 
     return args
 
@@ -59,7 +59,7 @@ def parse_args_for_un_bond(args):
     args.receiver = _STAKE_SMART_CONTRACT_ADDRESS
 
     if args.estimate_gas:
-        args.gas_limit = estimate_gas_limit(args, num_keys)
+        args.gas_limit = estimate_system_sc_call(args, MetaChainSystemSCsCost.UNBOND, num_keys)
 
     return args
 
@@ -70,7 +70,7 @@ def parse_args_for_un_jail(args):
     args.receiver = _STAKE_SMART_CONTRACT_ADDRESS
 
     if args.estimate_gas:
-        args.gas_limit = estimate_gas_limit(args, num_keys)
+        args.gas_limit = estimate_system_sc_call(args, MetaChainSystemSCsCost.UNJAIL, num_keys)
 
     return args
 
@@ -81,7 +81,7 @@ def parse_args_for_changing_reward_address(args):
     args.receiver = _STAKE_SMART_CONTRACT_ADDRESS
 
     if args.estimate_gas:
-        args.gas_limit = estimate_gas_limit(args, 1)
+        args.gas_limit = estimate_system_sc_call(args, MetaChainSystemSCsCost.CHANGE_REWARD_ADDRESS)
 
     return args
 
@@ -91,7 +91,7 @@ def parse_args_for_claim(args):
     args.receiver = _STAKE_SMART_CONTRACT_ADDRESS
 
     if args.estimate_gas:
-        args.gas_limit = estimate_gas_limit(args, 1)
+        args.gas_limit = estimate_system_sc_call(args, MetaChainSystemSCsCost.CLAIM)
 
     return args
 
