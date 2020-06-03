@@ -19,7 +19,7 @@ class TestPlaygroundElrondProxy(unittest.TestCase):
         # use a valid shard id
         shard_id = "0"
 
-        response = requests.get(f"{url}/node/status/{shard_id}")
+        response = requests.get(f"{url}/network/status/{shard_id}")
         print("response status code " + str(response.status_code))
         print(response.json())
         self.assertTrue(self, response is not None)

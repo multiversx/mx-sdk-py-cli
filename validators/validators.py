@@ -2,10 +2,18 @@ import binascii
 import logging
 
 from erdpy.accounts import Address
+from erdpy.config import MIN_GAS_LIMIT, GAS_PER_DATA_BYTE, MetaChainSystemSCsCost
 
 logger = logging.getLogger("validators")
 
 _STAKE_SMART_CONTRACT_ADDRESS = "erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqplllst77y4l"
+
+
+def estimate_system_sc_call(args, base_cost, factor=1):
+    num_bytes = len(args.data)
+    gas_limit = MIN_GAS_LIMIT + num_bytes * GAS_PER_DATA_BYTE
+    gas_limit += factor * base_cost
+    return gas_limit
 
 
 def parse_args_for_stake(args):
@@ -28,24 +36,42 @@ def parse_args_for_stake(args):
     args.receiver = _STAKE_SMART_CONTRACT_ADDRESS
     args.data = stake_data
 
+    if args.estimate_gas:
+        args.gas_limit = estimate_system_sc_call(args, MetaChainSystemSCsCost.STAKE, len(keys))
+
     return args
 
 
 def parse_args_for_un_stake(args):
-    args.data = 'unStake' + parse_keys(args.nodes_public_keys)
+    parsed_keys, num_keys = parse_keys(args.nodes_public_keys)
+    args.data = 'unStake' + parsed_keys
     args.receiver = _STAKE_SMART_CONTRACT_ADDRESS
+
+    if args.estimate_gas:
+        args.gas_limit = estimate_system_sc_call(args, MetaChainSystemSCsCost.UNSTAKE, num_keys)
+
     return args
 
 
 def parse_args_for_un_bond(args):
-    args.data = 'unBond' + parse_keys(args.nodes_public_keys)
+    parsed_keys, num_keys = parse_keys(args.nodes_public_keys)
+    args.data = 'unBond' + parsed_keys
     args.receiver = _STAKE_SMART_CONTRACT_ADDRESS
+
+    if args.estimate_gas:
+        args.gas_limit = estimate_system_sc_call(args, MetaChainSystemSCsCost.UNBOND, num_keys)
+
     return args
 
 
 def parse_args_for_un_jail(args):
-    args.data = 'unJail' + parse_keys(args.nodes_public_keys)
+    parsed_keys, num_keys = parse_keys(args.nodes_public_keys)
+    args.data = 'unJail' + parsed_keys
     args.receiver = _STAKE_SMART_CONTRACT_ADDRESS
+
+    if args.estimate_gas:
+        args.gas_limit = estimate_system_sc_call(args, MetaChainSystemSCsCost.UNJAIL, num_keys)
+
     return args
 
 
@@ -53,12 +79,20 @@ def parse_args_for_changing_reward_address(args):
     reward_address = Address(args.reward_address)
     args.data = 'changeRewardAddress@' + reward_address.hex()
     args.receiver = _STAKE_SMART_CONTRACT_ADDRESS
+
+    if args.estimate_gas:
+        args.gas_limit = estimate_system_sc_call(args, MetaChainSystemSCsCost.CHANGE_REWARD_ADDRESS)
+
     return args
 
 
 def parse_args_for_claim(args):
     args.data = 'claim'
     args.receiver = _STAKE_SMART_CONTRACT_ADDRESS
+
+    if args.estimate_gas:
+        args.gas_limit = estimate_system_sc_call(args, MetaChainSystemSCsCost.CLAIM)
+
     return args
 
 
@@ -67,7 +101,7 @@ def parse_keys(bls_public_keys):
     parsed_keys = ''
     for key in keys:
         parsed_keys += '@' + key
-    return parsed_keys
+    return parsed_keys, len(keys)
 
 
 def convert_to_hex(key):
