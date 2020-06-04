@@ -282,11 +282,15 @@ def clean_transactions_queue():
 
 def generate_pem(args):
     pem_file = args.pem
+    mnemonic = args.mnemonic
 
     seed, pubkey = wallet.generate_pair()
+    if mnemonic:
+        seed, pubkey = wallet.derive_keys(mnemonic)
+
     address = Address(pubkey)
     pem.write(pem_file, seed, pubkey, name=address.bech32())
-    logger.info(f"Created PEM file [{pem_file}].")
+    logger.info(f"Created PEM file [{pem_file}] for [{address.bech32()}]")
 
 
 def do_bech32(args):

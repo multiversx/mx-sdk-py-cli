@@ -1,6 +1,7 @@
 import hashlib
 import hmac
 import struct
+import nacl.signing
 
 BIP39_SALT_MODIFIER = "mnemonic"
 BIP39_PBKDF2_ROUNDS = 2048
@@ -9,8 +10,11 @@ ELROND_DERIVATION_PATH = [44, 508, 0, 0]
 HARDENED_OFFSET = 0x80000000
 
 
-def derive_private_key(mnemonic):
-    pass
+def derive_keys(mnemonic):
+    seed = mnemonic_to_bip39seed(mnemonic)
+    private_key = bip39seed_to_private_key(seed)
+    public_key = bytes(nacl.signing.SigningKey(private_key).verify_key)
+    return private_key, public_key
 
 
 # References:

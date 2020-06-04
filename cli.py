@@ -251,16 +251,17 @@ def setup_parser_wallet(subparsers):
     wallet_parser = subparsers.add_parser("wallet")
     wallet_subparsers = wallet_parser.add_subparsers()
 
-    generate_parser = wallet_subparsers.add_parser("generate")
-    generate_parser.add_argument("pem")
-    generate_parser.set_defaults(func=generate_pem)
+    subparser = wallet_subparsers.add_parser("generate")
+    subparser.add_argument("pem")
+    subparser.add_argument("--mnemonic", required=False, default="")
+    subparser.set_defaults(func=generate_pem)
 
-    bech32_parser = wallet_subparsers.add_parser("bech32")
-    bech32_parser.add_argument("value")
-    group = bech32_parser.add_mutually_exclusive_group(required=True)
+    subparser = wallet_subparsers.add_parser("bech32")
+    subparser.add_argument("value")
+    group = subparser.add_mutually_exclusive_group(required=True)
     group.add_argument("--encode", action="store_true")
     group.add_argument("--decode", action="store_true")
-    bech32_parser.set_defaults(func=do_bech32)
+    subparser.set_defaults(func=do_bech32)
 
 
 def setup_parser_cost(subparsers):
