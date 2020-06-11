@@ -1,6 +1,6 @@
 import logging
 import os
-from argparse import ArgumentParser
+from argparse import ArgumentParser, FileType
 
 from erdpy import (config, dependencies, errors, facade, ide, nodedebug,
                    projects, proxy, transactions)
@@ -70,6 +70,7 @@ def setup_parser():
     deploy_parser.add_argument("--gas-limit", default=config.DEFAULT_GAS_LIMIT)
     deploy_parser.add_argument("--value", default="0")
     deploy_parser.add_argument("--metadata-upgradeable", action="store_true", default=False)
+    deploy_parser.add_argument("--outfile", type=FileType("w"), default=sys.stdout)
     deploy_parser.set_defaults(func=deploy)
 
     call_parser = subparsers.add_parser("call")

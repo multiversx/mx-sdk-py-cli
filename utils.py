@@ -63,6 +63,10 @@ def write_toml_file(filename, data):
         toml.dump(data, f)
 
 
+def dump_out_json(data, outfile):
+    json.dump(data, outfile, indent=4)
+
+
 def get_subfolders(folder):
     return [item.name for item in os.scandir(folder) if item.is_dir() and not item.name.startswith(".")]
 

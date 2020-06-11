@@ -1,6 +1,6 @@
 import logging
 
-from erdpy import wallet
+from erdpy import utils, wallet
 from erdpy.accounts import Account, Address
 from erdpy.blockatlas import BlockAtlas
 from erdpy.contracts import CodeMetadata, SmartContract
@@ -40,6 +40,7 @@ def deploy_smart_contract(args):
         tx_hash, address = environment.deploy_contract(contract, owner, arguments, gas_price, gas_limit, value)
         logger.info("Tx hash: %s", tx_hash)
         logger.info("Contract address: %s", address)
+        utils.dump_out_json({"tx": tx_hash, "contract": address.bech32()}, args.outfile)
 
     environment.run_flow(flow)
 
