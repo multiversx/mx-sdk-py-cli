@@ -11,6 +11,14 @@ logger = logging.getLogger("cli")
 
 
 def main():
+    try:
+        _do_main()
+    except errors.KnownError as err:
+        logger.fatal(err)
+        sys.exit(1)
+
+
+def _do_main():
     parser = setup_parser()
     args = parser.parse_args()
 
@@ -40,7 +48,7 @@ def setup_parser():
     create_parser = subparsers.add_parser("new")
     create_parser.add_argument("name")
     create_parser.add_argument("--template", required=True)
-    create_parser.add_argument("--directory", type=str)
+    create_parser.add_argument("--directory", type=str, default=os.getcwd())
     create_parser.set_defaults(func=create)
 
     templates_parser = subparsers.add_parser("templates")
@@ -534,8 +542,4 @@ def clean_transactions_queue(args):
 
 
 if __name__ == "__main__":
-    try:
-        main()
-    except errors.KnownError as err:
-        logger.fatal(err)
-        sys.exit(1)
+    main()

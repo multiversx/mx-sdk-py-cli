@@ -54,6 +54,8 @@ def create_from_template(name, template_name, directory):
         directory = os.getcwd()
 
     project_directory = path.join(directory, name)
+    if path.exists(project_directory):
+        raise errors.BadDirectory(project_directory)
 
     _download_templates_repositories()
     _copy_template(template_name, project_directory)
