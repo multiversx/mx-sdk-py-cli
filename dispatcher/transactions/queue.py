@@ -19,8 +19,8 @@ def _prepare_tx(args):
     ordered_fields["nonce"] = 0
     ordered_fields["value"] = int(args.value)
     ordered_fields["receiver"] = args.receiver
-    ordered_fields["gasPrice"] = args.gas_price
-    ordered_fields["gasLimit"] = args.gas_limit
+    ordered_fields["gasPrice"] = int(args.gas_price)
+    ordered_fields["gasLimit"] = int(args.gas_limit)
     ordered_fields["data"] = args.data
 
     return ordered_fields
