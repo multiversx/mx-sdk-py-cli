@@ -26,7 +26,7 @@ class SmartContract:
     def prepare_deploy_transaction(self, owner, arguments, gas_price, gas_limit, value):
         arguments = arguments or []
         gas_price = int(gas_price or config.DEFAULT_GAS_PRICE)
-        gas_limit = int(gas_limit or config.DEFAULT_GAS_LIMIT)
+        gas_limit = int(gas_limit)
         value = str(value or "0")
 
         plain = PlainTransaction()
@@ -72,7 +72,7 @@ class SmartContract:
     def prepare_execute_transaction(self, caller, function, arguments, gas_price, gas_limit, value):
         arguments = arguments or []
         gas_price = int(gas_price or config.DEFAULT_GAS_PRICE)
-        gas_limit = int(gas_limit or config.DEFAULT_GAS_LIMIT)
+        gas_limit = int(gas_limit)
         value = str(value or "0")
 
         plain = PlainTransaction()
@@ -107,7 +107,7 @@ class SmartContract:
     def prepare_upgrade_transaction(self, owner, arguments, gas_price, gas_limit, value):
         arguments = arguments or []
         gas_price = int(gas_price or config.DEFAULT_GAS_PRICE)
-        gas_limit = int(gas_limit or config.DEFAULT_GAS_LIMIT)
+        gas_limit = int(gas_limit)
         value = str(value or "0")
 
         plain = PlainTransaction()

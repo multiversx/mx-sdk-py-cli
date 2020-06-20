@@ -2,7 +2,7 @@ import time
 import unittest
 import _thread
 
-from erdpy.config import DEFAULT_GAS_PRICE, DEFAULT_GAS_LIMIT
+from erdpy.config import DEFAULT_GAS_PRICE
 
 from erdpy.dispatcher.transactions.queue import TransactionQueue
 
@@ -12,7 +12,7 @@ def _create_mock_args():
     args.data = "data1"
     args.receiver = "erd12cl2dgtjws8vt9yf4v9869vryt0juv3eq8hzzq6mlm9ck935vs3q9lfnqe"
     args.gas_price = DEFAULT_GAS_PRICE
-    args.gas_limit = DEFAULT_GAS_LIMIT
+    args.gas_limit = 50000
     args.value = "100"
     args.nonce = 0
     return args

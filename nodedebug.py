@@ -70,7 +70,7 @@ def deploy(bytecode, owner, arguments=None, gas_price=None, gas_limit=None):
     logger.debug("deploy")
 
     arguments = arguments or []
-    gas_limit = gas_limit or config.DEFAULT_GAS_LIMIT
+    gas_limit = gas_limit
     gas_price = gas_price or config.DEFAULT_GAS_PRICE
 
     url = _get_url("deploy")
@@ -98,7 +98,7 @@ def execute(contract_address, caller, function, arguments=None, gas_price=None, 
     logger.debug(f"execute, address={contract_address}")
 
     arguments = arguments or []
-    gas_limit = gas_limit or config.DEFAULT_GAS_LIMIT
+    gas_limit = gas_limit
     gas_price = gas_price or config.DEFAULT_GAS_PRICE
 
     url = _get_url("run")
