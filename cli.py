@@ -1,11 +1,11 @@
 import logging
 import os
-from argparse import ArgumentParser, FileType
+import sys
+from argparse import ArgumentParser
 
-from erdpy import (config, dependencies, errors, facade, ide, nodedebug,
+from erdpy import (cli_contracts, config, dependencies, errors, facade, ide,
                    projects, proxy, transactions)
 from erdpy._version import __version__
-import sys
 
 logger = logging.getLogger("cli")
 
@@ -40,84 +40,12 @@ def setup_parser():
     parser.add_argument('-v', '--version', action='version', version=f"erdpy {__version__}")
     parser.add_argument("--verbose", action="store_true", default=False)
 
-    install_parser = subparsers.add_parser("install")
-    choices = ["C_BUILDCHAIN", "SOL_BUILDCHAIN", "RUST_BUILDCHAIN", "ARWENTOOLS"]
-    install_parser.add_argument("group", choices=choices)
+    install_parser = subparsers.add_parser("install", description="Install dependencies or elrond-sdk packages.")
+    choices = ["clang", "rust", "arwentools"]
+    install_parser.add_argument("group", choices=choices, help="the package to install")
     install_parser.set_defaults(func=install)
 
-    create_parser = subparsers.add_parser("new")
-    create_parser.add_argument("name")
-    create_parser.add_argument("--template", required=True)
-    create_parser.add_argument("--directory", type=str, default=os.getcwd())
-    create_parser.set_defaults(func=create)
-
-    templates_parser = subparsers.add_parser("templates")
-    templates_parser.add_argument("--json", action="store_true")
-    templates_parser.set_defaults(func=list_templates)
-
-    build_parser = subparsers.add_parser("build")
-    build_parser.add_argument("project", nargs='?', default=os.getcwd())
-    build_parser.add_argument("--debug", action="store_true", default=False)
-    build_parser.add_argument("--no-optimization", action="store_true", default=False)
-    build_parser.set_defaults(func=build)
-
-    deploy_parser = subparsers.add_parser("deploy")
-    deploy_parser.add_argument("project", nargs='?', default=os.getcwd())
-    deploy_parser.add_argument("--proxy", required=True)
-    deploy_parser.add_argument("--pem", required=True)
-    deploy_parser.add_argument("--arguments", nargs='+')
-    deploy_parser.add_argument("--gas-price", default=config.DEFAULT_GAS_PRICE)
-    deploy_parser.add_argument("--gas-limit", required=True)
-    deploy_parser.add_argument("--value", default="0")
-    deploy_parser.add_argument("--metadata-upgradeable", action="store_true", default=False)
-    deploy_parser.add_argument("--outfile", type=FileType("w"), default=sys.stdout)
-    deploy_parser.set_defaults(func=deploy)
-
-    call_parser = subparsers.add_parser("call")
-    call_parser.add_argument("contract")
-    call_parser.add_argument("--proxy", required=True)
-    call_parser.add_argument("--pem", required=True)
-    call_parser.add_argument("--function", required=True)
-    call_parser.add_argument("--arguments", nargs='+')
-    call_parser.add_argument("--gas-price", default=config.DEFAULT_GAS_PRICE)
-    call_parser.add_argument("--gas-limit", required=True)
-    call_parser.add_argument("--value", default="0")
-    call_parser.set_defaults(func=call)
-
-    upgrade_parser = subparsers.add_parser("upgrade")
-    upgrade_parser.add_argument("contract")
-    upgrade_parser.add_argument("project")
-    upgrade_parser.add_argument("--proxy", required=True)
-    upgrade_parser.add_argument("--pem", required=True)
-    upgrade_parser.add_argument("--arguments", nargs='+')
-    upgrade_parser.add_argument("--gas-price", default=config.DEFAULT_GAS_PRICE)
-    upgrade_parser.add_argument("--gas-limit", required=True)
-    upgrade_parser.add_argument("--value", default="0")
-    upgrade_parser.add_argument("--metadata-upgradeable", action="store_true", default=False)
-    upgrade_parser.set_defaults(func=upgrade)
-
-    query_parser = subparsers.add_parser("query")
-    query_parser.add_argument("contract")
-    query_parser.add_argument("--proxy", required=True)
-    query_parser.add_argument("--function", required=True)
-    query_parser.add_argument("--arguments", nargs='+')
-    query_parser.set_defaults(func=query)
-
-    node_parser = subparsers.add_parser("nodedebug")
-    group = node_parser.add_mutually_exclusive_group()
-    group.add_argument('--stop', action='store_true')
-    group.add_argument('--restart', action='store_true', default=True)
-    node_parser.set_defaults(func=do_nodedebug)
-
-    test_parser = subparsers.add_parser("test")
-    test_parser.add_argument("project", nargs='?', default=os.getcwd())
-    test_parser.add_argument("--directory", default="test")
-    test_parser.add_argument("--wildcard", required=False)
-    test_parser.set_defaults(func=run_tests)
-
-    ide_parser = subparsers.add_parser("ide")
-    ide_parser.add_argument("workspace", nargs='?', default=os.getcwd())
-    ide_parser.set_defaults(func=run_ide)
+    cli_contracts.setup_parser_contract(subparsers)
 
     tx_prepare_parser = subparsers.add_parser("tx-prepare")
     tx_prepare_parser.add_argument("--pem", required=True)
@@ -152,27 +80,26 @@ def setup_parser():
     setup_parser_cost(subparsers)
     setup_parser_network(subparsers)
     setup_parser_blockatlas(subparsers)
-
     setup_parser_queue(subparsers)
 
     return parser
 
 
 def setup_parser_accounts(subparsers):
-    accounts_parser = subparsers.add_parser("account")
-    accounts_subparsers = accounts_parser.add_subparsers()
+    parser = subparsers.add_parser("account")
+    subparsers = parser.add_subparsers()
 
-    get = accounts_subparsers.add_parser("get")
-    get.add_argument("--proxy", required=True)
-    get.add_argument("--address", required=True)
-    get.add_argument("--balance", required=False, nargs='?', const=True, default=False)
-    get.add_argument("--nonce", required=False, nargs='?', const=True, default=False)
-    get.set_defaults(func=get_account)
+    sub = subparsers.add_parser("get")
+    sub.add_argument("--proxy", required=True)
+    sub.add_argument("--address", required=True)
+    sub.add_argument("--balance", required=False, nargs='?', const=True, default=False)
+    sub.add_argument("--nonce", required=False, nargs='?', const=True, default=False)
+    sub.set_defaults(func=get_account)
 
-    get_transactions = accounts_subparsers.add_parser("get-transactions")
-    get_transactions.add_argument("--proxy", required=True)
-    get_transactions.add_argument("--address", required=True)
-    get_transactions.set_defaults(func=get_account_transactions)
+    sub = subparsers.add_parser("get-transactions")
+    sub.add_argument("--proxy", required=True)
+    sub.add_argument("--address", required=True)
+    sub.set_defaults(func=get_account_transactions)
 
 
 def setup_parser_validators(subparsers):
@@ -371,46 +298,6 @@ def install(args):
     dependencies.install_group(group, overwrite=True)
 
 
-def list_templates(args):
-    json = args.json
-    projects.list_project_templates(json)
-
-
-def create(args):
-    name = args.name
-    template = args.template
-    directory = args.directory
-
-    projects.create_from_template(name, template, directory)
-
-
-def build(args):
-    project = args.project
-    options = {
-        "debug": args.debug,
-        "optimized": not args.no_optimization,
-        "verbose": args.verbose
-    }
-
-    projects.build_project(project, options)
-
-
-def deploy(args):
-    facade.deploy_smart_contract(args)
-
-
-def call(args):
-    facade.call_smart_contract(args)
-
-
-def upgrade(args):
-    facade.upgrade_smart_contract(args)
-
-
-def query(args):
-    facade.query_smart_contract(args)
-
-
 def get_account(args):
     if args.balance:
         facade.get_account_balance(args)
@@ -450,28 +337,6 @@ def get_meta_nonce(args):
 
 def get_meta_block(args):
     facade.get_meta_block(args)
-
-
-def do_nodedebug(args):
-    stop = args.stop
-    restart = args.restart
-
-    if restart:
-        nodedebug.stop()
-        nodedebug.start()
-    elif stop:
-        nodedebug.stop()
-    else:
-        nodedebug.start()
-
-
-def run_tests(args):
-    projects.run_tests(args)
-
-
-def run_ide(args):
-    workspace = args.workspace
-    ide.run_ide(workspace)
 
 
 def tx_prepare(args):
