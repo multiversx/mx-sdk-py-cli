@@ -135,6 +135,7 @@ class TemplateRust(Template):
         launch_path = path.join(self.directory, ".vscode", "launch.json")
         tasks_path = path.join(self.directory, ".vscode", "tasks.json")
         debug_main_path = path.join(self.directory, "debug", "src", "main.rs")
+        test_paths = utils.list_files(path.join(self.directory, "test"))
 
         logger.info("Updating cargo files...")
 
@@ -176,6 +177,13 @@ class TemplateRust(Template):
             [cargo_debug_path],
             [
                 (f"[dependencies.{self.template_name}]", f"[dependencies.{self.project_name}]")
+            ]
+        )
+
+        self._replace_in_files(
+            test_paths,
+            [
+                (f"adder.wasm", f"myadder.wasm")
             ]
         )
 

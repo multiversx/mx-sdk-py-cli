@@ -75,3 +75,10 @@ class BadAddressFormatError(KnownError):
 class EmptyAddressError(KnownError):
     def __init__(self):
         super().__init__(f"Address is empty.")
+
+
+class ExternalProcessError(KnownError):
+    def __init__(self, command_line, message):
+        super().__init__(f"""External process error:
+Command line: {command_line}
+Output: {message}""")

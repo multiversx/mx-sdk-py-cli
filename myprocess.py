@@ -3,7 +3,7 @@ import logging
 import subprocess
 import traceback
 
-from erdpy import feedback
+from erdpy import feedback, errors
 
 logger = logging.getLogger("myprocess")
 
@@ -11,11 +11,13 @@ logger = logging.getLogger("myprocess")
 def run_process(args, env=None):
     logger.info(f"run_process: {args}")
 
-    output = subprocess.check_output(
-        args, shell=False, universal_newlines=True, stderr=subprocess.STDOUT, env=env)
-    logger.info("Successful run. Output:")
-    print(output or "[No output]")
-    return output
+    try:
+        output = subprocess.check_output(args, shell=False, universal_newlines=True, stderr=subprocess.STDOUT, env=env)
+        logger.info("Successful run. Output:")
+        print(output or "[No output]")
+        return output
+    except subprocess.CalledProcessError as error:
+        raise errors.ExternalProcessError(error.cmd, error.output)
 
 
 def run_process_async(args, env=None):

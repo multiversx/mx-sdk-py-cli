@@ -19,8 +19,8 @@ def get_all_modules():
 
         ArwenToolsModule(key="arwentools", name="arwentools", tag="g03d0b3f", groups=["ARWENTOOLS"],
                          urls_by_platform={
-                             "linux": "travis-builds/ARWEN_v0.3.15-120-g03d0b3f_linux_amd64.tar.gz",
-                             "osx": "travis-builds/ARWEN_v0.3.15-120-g03d0b3f_darwin_amd64.tar.gz"
+                             "linux": "travis-builds/ARWEN_v0.3.20-24-ge8c5c68_linux_amd64.tar.gz",
+                             "osx": "travis-builds/ARWEN_v0.3.20-24-ge8c5c68_darwin_amd64.tar.gz"
         }),
 
         Rust(key="rust", name="rust", tag="initial", groups=["RUST_BUILDCHAIN"])

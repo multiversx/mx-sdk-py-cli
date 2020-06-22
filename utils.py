@@ -1,10 +1,12 @@
 import json
 import logging
 import os
+import os.path
 import pathlib
 import stat
 import tarfile
 import zipfile
+from typing import List
 
 import toml
 
@@ -86,3 +88,9 @@ def find_in_dictionary(dictionary, compound_path):
             break
 
     return node
+
+
+def list_files(folder: str) -> List[str]:
+    files = os.listdir(folder)
+    files = [os.path.join(folder, f) for f in files]
+    return files
