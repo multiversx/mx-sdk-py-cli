@@ -41,7 +41,9 @@ class ProjectRust(Project):
 
             env["RUSTFLAGS"] = "-C link-arg=-s"
 
-        myprocess.run_process_async(args, env=env)
+        result = myprocess.run_process_async(args, env=env)
+        if result != 0:
+            raise errors.BuildError(f"error code = {result}, see output")
 
     def _copy_build_artifacts_to_output(self):
         name = f"{self.cargo_file.bin_name}.wasm"

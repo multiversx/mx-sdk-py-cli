@@ -1,46 +1,6 @@
-export PYTHONPATH=../
-export SANDBOX=../SANDBOX
-ERDPY = python3 -m erdpy.cli
-
-clean-sandbox:
-	rm -rf ${SANDBOX}
-
-cli-contract-trivial:
-	${ERDPY} contract --help
-	${ERDPY} contract templates
-
-cli-contract-new: clean-sandbox
-	${ERDPY} contract new --template ultimate-answer --directory ${SANDBOX} myanswer
-	${ERDPY} contract new --template adder --directory ${SANDBOX} myadder
-	
-	# # BUSD (rust)
-	# git clone --depth=1 --branch=master https://github.com/ElrondNetwork/sc-busd-rs.git ${SANDBOX}/sc-busd-rs
-	# rm -rf ${SANDBOX}/sc-busd-rs/.git
-	# ${ERDPY} contract build ${SANDBOX}/sc-busd-rs
-	# ${ERDPY} contract test --directory="tests" ${SANDBOX}/sc-busd-rs
-
-cli-contract-build:
-	${ERDPY} contract build ${SANDBOX}/myanswer
-	${ERDPY} contract build ${SANDBOX}/myadder
-
-cli-contract-test:
-	${ERDPY} --verbose contract test --directory="test" ${SANDBOX}/myadder
-
-cli-contract: cli-contract-trivial cli-contract-new cli-contract-build cli-contract-test
-
-
-test-short:
-	python3 -m unittest -v erdpy.tests.test_wallet
-	python3 -m unittest -v erdpy.tests.test_accounts
-	python3 -m unittest -v erdpy.tests.test_contracts
 
 test-cli: test-cli-accounts, test-cli-network
-	python3 -m erdpy.cli templates --json
-
-	python3 -m erdpy.cli wallet generate ./myaccount.pem
-	python3 -m erdpy.cli wallet bech32 --encode 000000000000000005006e4f90488e27342f9a46e1809452c85ee7186566bd5e
-	python3 -m erdpy.cli wallet bech32 --decode erd1qqqqqqqqqqqqqpgqde8eqjywyu6zlxjxuxqfg5kgtmn3setxh40qen8egy
-
+	
 	python3 -m erdpy.cli cost gas-price --proxy=https://api.elrond.com
 	python3 -m erdpy.cli cost transaction move-balance --data="foobar" --proxy="https://api.elrond.com"
 
