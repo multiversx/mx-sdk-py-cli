@@ -3,8 +3,8 @@ import os
 import sys
 from argparse import ArgumentParser
 
-from erdpy import (cli_contracts, config, dependencies, errors, facade, ide,
-                   projects, proxy, transactions)
+from erdpy import (cli_contracts, cli_install, config, errors,
+                   facade, proxy, transactions)
 from erdpy._version import __version__
 
 logger = logging.getLogger("cli")
@@ -40,11 +40,7 @@ def setup_parser():
     parser.add_argument('-v', '--version', action='version', version=f"erdpy {__version__}")
     parser.add_argument("--verbose", action="store_true", default=False)
 
-    install_parser = subparsers.add_parser("install", description="Install dependencies or elrond-sdk packages.")
-    choices = ["clang", "rust", "arwentools"]
-    install_parser.add_argument("group", choices=choices, help="the package to install")
-    install_parser.set_defaults(func=install)
-
+    cli_install.setup_parser_install(subparsers)
     cli_contracts.setup_parser_contract(subparsers)
 
     tx_prepare_parser = subparsers.add_parser("tx-prepare")
@@ -291,11 +287,6 @@ def setup_parser_queue(subparsers):
 
     sub = subparsers.add_parser("clean")
     sub.set_defaults(func=clean_transactions_queue)
-
-
-def install(args):
-    group = args.group
-    dependencies.install_group(group, overwrite=True)
 
 
 def get_account(args):

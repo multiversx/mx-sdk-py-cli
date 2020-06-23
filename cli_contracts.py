@@ -1,11 +1,8 @@
-
-import logging
 import os
 import sys
-from argparse import ArgumentParser, FileType
+from argparse import FileType
 
-from erdpy import (cli_contracts, config, dependencies, errors, facade, ide,
-                   nodedebug, projects, proxy, transactions)
+from erdpy import config, facade, ide, projects
 
 
 def setup_parser_contract(subparsers):
