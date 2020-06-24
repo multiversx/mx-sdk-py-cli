@@ -1,5 +1,6 @@
 # Configuration that should not be edited by the end user:
 DOWNLOAD_MIRROR = "https://ide.elrond.com"
+MODULES_CONFIG_URL = "https://raw.githubusercontent.com/ElrondNetwork/elrond-sdk/master/deps.json"
 
 # Configuration that may be edited by the end user:
 ROOT_FOLDER_NAME = "ElrondSCTools"
