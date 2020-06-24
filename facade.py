@@ -219,12 +219,6 @@ def send_prepared_transaction(args):
 
 def prepare_and_send_transaction(args):
     proxy = ElrondProxy(args.proxy)
-
-    # Need to sync nonce
-    owner = Account(pem_file=args.pem)
-    owner.sync_nonce(proxy)
-    args.nonce = owner.nonce
-
     prepared = do_prepare_transaction(args)
     tx_hash = prepared.send(proxy)
     print(tx_hash)

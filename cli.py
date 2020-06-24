@@ -45,7 +45,7 @@ def setup_parser():
 
     tx_prepare_parser = subparsers.add_parser("tx-prepare")
     tx_prepare_parser.add_argument("--pem", required=True)
-    tx_prepare_parser.add_argument("--nonce", required=True)
+    tx_prepare_parser.add_argument("--nonce", type=int, required=True)
     tx_prepare_parser.add_argument("--value", default="0")
     tx_prepare_parser.add_argument("--receiver", required=True)
     tx_prepare_parser.add_argument("--gas-price", default=config.DEFAULT_GAS_PRICE)
@@ -62,6 +62,7 @@ def setup_parser():
 
     tx_prepare_and_send_parser = subparsers.add_parser("tx-prepare-and-send")
     tx_prepare_and_send_parser.add_argument("--pem", required=True)
+    tx_prepare_and_send_parser.add_argument("--nonce", type=int, required=True)
     tx_prepare_and_send_parser.add_argument("--value", default="0")
     tx_prepare_and_send_parser.add_argument("--receiver", required=True)
     tx_prepare_and_send_parser.add_argument("--gas-price", default=config.DEFAULT_GAS_PRICE)
