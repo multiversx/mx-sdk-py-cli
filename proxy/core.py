@@ -92,8 +92,9 @@ class ElrondProxy:
     def send_transactions(self, payload):
         url = f"{self.url}/transaction/send-multiple"
         response = do_post(url, payload)
-        num_sent = response["numOfSentTxs"]
-        hashes = response["txsHashes"]
+        # Proxy and Observers have different response format:
+        num_sent = response.get("numOfSentTxs", 0) or response.get("txsSent", 0)
+        hashes = response.get("txsHashes", None)
         return num_sent, hashes
 
     def query_contract(self, payload):
