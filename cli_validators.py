@@ -3,40 +3,40 @@ import sys
 from erdpy import config, facade
 
 
-def setup_parser_validators(subparsers):
+def setup_parser(subparsers):
     sub = subparsers.add_parser("stake")
-    _add_common_validator_arguments(sub)
+    _add_common_arguments(sub)
     sub.add_argument("--number-of-nodes", required=True)
     sub.add_argument("--nodes-public-keys", required=True)
     sub.add_argument("--reward-address", default="")
     sub.set_defaults(func=do_stake)
 
     sub = subparsers.add_parser("unstake")
-    _add_common_validator_arguments(sub)
+    _add_common_arguments(sub)
     sub.add_argument("--nodes-public-keys", required=True)
     sub.set_defaults(func=do_unstake)
 
     sub = subparsers.add_parser("unjail")
-    _add_common_validator_arguments(sub)
+    _add_common_arguments(sub)
     sub.add_argument("--nodes-public-keys", required=True)
     sub.set_defaults(func=do_unjail)
 
     sub = subparsers.add_parser("unbond")
-    _add_common_validator_arguments(sub)
+    _add_common_arguments(sub)
     sub.add_argument("--nodes-public-keys", required=True)
     sub.set_defaults(func=do_unbond)
 
     sub = subparsers.add_parser("change-reward-address")
-    _add_common_validator_arguments(sub)
+    _add_common_arguments(sub)
     sub.add_argument("--reward-address", required=True)
     sub.set_defaults(func=change_reward_address)
 
     sub = subparsers.add_parser("claim")
-    _add_common_validator_arguments(sub)
+    _add_common_arguments(sub)
     sub.set_defaults(func=do_claim)
 
 
-def _add_common_validator_arguments(subparser):
+def _add_common_arguments(subparser):
     subparser.add_argument("--pem", required=True)
     subparser.add_argument("--nonce", type=int, required=not("--recall-nonce" in sys.argv))
     subparser.add_argument("--recall-nonce", action="store_true", default=False)

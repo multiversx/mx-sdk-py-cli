@@ -5,7 +5,7 @@ from argparse import FileType
 from erdpy import config, facade, ide, projects
 
 
-def setup_parser_contract(subparsers):
+def setup_parser(subparsers):
     parser = subparsers.add_parser("contract")
     subparsers = parser.add_subparsers()
 

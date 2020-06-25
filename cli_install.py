@@ -1,7 +1,7 @@
 from erdpy import dependencies
 
 
-def setup_parser_install(subparsers):
+def setup_parser(subparsers):
     sub = subparsers.add_parser("install", description="Install dependencies or elrond-sdk packages.")
     choices = ["clang", "rust", "arwentools"]
     sub.add_argument("group", choices=choices, help="the package to install")
