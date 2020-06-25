@@ -1,4 +1,3 @@
-getOwner
 getExternalBalance
 getBlockHash
 getBlockNonce
@@ -85,3 +84,8 @@ setStorageLock
 getStorageLock
 isStorageLocked
 clearStorageLock
+
+getSCAddress
+getOwnerAddress
+getShardOfAddress
+isSmartContract

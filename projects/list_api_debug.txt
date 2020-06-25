@@ -1,4 +1,3 @@
-getOwner
 getExternalBalance
 getBlockHash
 getBlockNonce
@@ -81,14 +80,12 @@ bigIntGetExternalBalance
 sha256
 keccak256
 
-debugPrintBigInt
-debugPrintInt64
-debugPrintInt32
-debugPrintBytes
-debugPrintString
-debugPrintLineNumber
-
 setStorageLock
 getStorageLock
 isStorageLocked
 clearStorageLock
+
+getSCAddress
+getOwnerAddress
+getShardOfAddress
+isSmartContract
