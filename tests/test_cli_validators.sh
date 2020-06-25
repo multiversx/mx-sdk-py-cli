@@ -11,6 +11,6 @@ testAll() {
 
     ${ERDPY} --verbose unstake --pem="${KEYS}/alice.pem" --nodes-public-keys=${BLS_KEY} --proxy=${PROXY} --estimate-gas --recall-nonce
     ${ERDPY} --verbose unbond --pem="${KEYS}/alice.pem" --nodes-public-keys=${BLS_KEY} --proxy=${PROXY} --estimate-gas --recall-nonce
-    ${ERDPY} --verbose unjail --pem="${KEYS}/alice.pem" --nodes-public-keys=${BLS_KEY} --proxy=${PROXY} --estimate-gas --recall-nonce
+    ${ERDPY} --verbose unjail --pem="${KEYS}/alice.pem" --value="2500${DENOMINATION}" --nodes-public-keys=${BLS_KEY} --proxy=${PROXY} --estimate-gas --recall-nonce
     ${ERDPY} --verbose change-reward-address --pem="${KEYS}/alice.pem" --reward-address=${REWARD_ADDRESS} --proxy=${PROXY} --estimate-gas --recall-nonce
 }
