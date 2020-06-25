@@ -1,10 +1,9 @@
 import logging
-import os
 import sys
 from argparse import ArgumentParser
 
-from erdpy import (cli_contracts, cli_install, cli_validators, config, errors,
-                   facade, proxy, transactions)
+from erdpy import (cli_contracts, cli_install, cli_transactions,
+                   cli_validators, config, errors, facade, proxy)
 from erdpy._version import __version__
 
 logger = logging.getLogger("cli")
@@ -43,34 +42,7 @@ def setup_parser():
     cli_install.setup_parser(subparsers)
     cli_contracts.setup_parser(subparsers)
     cli_validators.setup_parser(subparsers)
-
-    sub = subparsers.add_parser("tx-prepare")
-    sub.add_argument("--pem", required=True)
-    sub.add_argument("--nonce", type=int, required=True)
-    sub.add_argument("--value", default="0")
-    sub.add_argument("--receiver", required=True)
-    sub.add_argument("--gas-price", default=config.DEFAULT_GAS_PRICE)
-    sub.add_argument("--gas-limit", required=True)
-    sub.add_argument("--data", default="")
-    sub.add_argument("--tag", default="untitled")
-    sub.add_argument("workspace", nargs='?', default=os.getcwd())
-    sub.set_defaults(func=tx_prepare)
-
-    sub = subparsers.add_parser("tx-send")
-    sub.add_argument("tx")
-    sub.add_argument("--proxy", required=True)
-    sub.set_defaults(func=tx_send)
-
-    sub = subparsers.add_parser("tx-prepare-and-send")
-    sub.add_argument("--pem", required=True)
-    sub.add_argument("--nonce", type=int, required=True)
-    sub.add_argument("--value", default="0")
-    sub.add_argument("--receiver", required=True)
-    sub.add_argument("--gas-price", default=config.DEFAULT_GAS_PRICE)
-    sub.add_argument("--gas-limit", required=True)
-    sub.add_argument("--data", default="")
-    sub.add_argument("--proxy", required=True)
-    sub.set_defaults(func=tx_prepare_and_send)
+    cli_transactions.setup_parser(subparsers)
 
     setup_parser_accounts(subparsers)
     setup_parser_wallet(subparsers)
@@ -248,18 +220,6 @@ def get_meta_nonce(args):
 
 def get_meta_block(args):
     facade.get_meta_block(args)
-
-
-def tx_prepare(args):
-    transactions.prepare(args)
-
-
-def tx_send(args):
-    facade.send_prepared_transaction(args)
-
-
-def tx_prepare_and_send(args):
-    facade.prepare_and_send_transaction(args)
 
 
 def generate_pem(args):

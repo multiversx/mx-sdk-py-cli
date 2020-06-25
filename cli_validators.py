@@ -36,15 +36,15 @@ def setup_parser(subparsers):
     sub.set_defaults(func=do_claim)
 
 
-def _add_common_arguments(subparser):
-    subparser.add_argument("--pem", required=True)
-    subparser.add_argument("--nonce", type=int, required=not("--recall-nonce" in sys.argv))
-    subparser.add_argument("--recall-nonce", action="store_true", default=False)
-    subparser.add_argument("--value", default="0")
-    subparser.add_argument("--gas-price", default=config.DEFAULT_GAS_PRICE)
-    subparser.add_argument("--gas-limit", required=not("--estimate-gas" in sys.argv))
-    subparser.add_argument("--estimate-gas", action="store_true", default=False)
-    subparser.add_argument("--proxy", required=True)
+def _add_common_arguments(sub):
+    sub.add_argument("--pem", required=True)
+    sub.add_argument("--nonce", type=int, required=not("--recall-nonce" in sys.argv))
+    sub.add_argument("--recall-nonce", action="store_true", default=False)
+    sub.add_argument("--value", default="0")
+    sub.add_argument("--gas-price", default=config.DEFAULT_GAS_PRICE)
+    sub.add_argument("--gas-limit", required=not("--estimate-gas" in sys.argv))
+    sub.add_argument("--estimate-gas", action="store_true", default=False)
+    sub.add_argument("--proxy", required=True)
 
 
 def do_stake(args):
