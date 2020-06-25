@@ -3,7 +3,7 @@ import os
 import sys
 from argparse import ArgumentParser
 
-from erdpy import (cli_contracts, cli_install, config, errors,
+from erdpy import (cli_contracts, cli_install, cli_validators, config, errors,
                    facade, proxy, transactions)
 from erdpy._version import __version__
 
@@ -42,6 +42,7 @@ def setup_parser():
 
     cli_install.setup_parser_install(subparsers)
     cli_contracts.setup_parser_contract(subparsers)
+    cli_validators.setup_parser_validators(subparsers)
 
     tx_prepare_parser = subparsers.add_parser("tx-prepare")
     tx_prepare_parser.add_argument("--pem", required=True)
@@ -72,7 +73,6 @@ def setup_parser():
     tx_prepare_and_send_parser.set_defaults(func=tx_prepare_and_send)
 
     setup_parser_accounts(subparsers)
-    setup_parser_validators(subparsers)
     setup_parser_wallet(subparsers)
     setup_parser_cost(subparsers)
     setup_parser_network(subparsers)
@@ -80,17 +80,6 @@ def setup_parser():
     setup_parser_queue(subparsers)
 
     return parser
-
-
-def _add_base_tx_arguments(subparser):
-    subparser.add_argument("--pem", required=True)
-    subparser.add_argument("--nonce", type=int, required=not("--recall-nonce" in sys.argv))
-    subparser.add_argument("--recall-nonce", action="store_true", default=False)
-    subparser.add_argument("--value", default="0")
-    subparser.add_argument("--gas-price", default=config.DEFAULT_GAS_PRICE)
-    subparser.add_argument("--gas-limit", required=not("--estimate-gas" in sys.argv))
-    subparser.add_argument("--estimate-gas", action="store_true", default=False)
-    subparser.add_argument("--proxy", required=True)
 
 
 def setup_parser_accounts(subparsers):
@@ -108,39 +97,6 @@ def setup_parser_accounts(subparsers):
     sub.add_argument("--proxy", required=True)
     sub.add_argument("--address", required=True)
     sub.set_defaults(func=get_account_transactions)
-
-
-def setup_parser_validators(subparsers):
-    sub = subparsers.add_parser("stake")
-    _add_base_tx_arguments(sub)
-    sub.add_argument("--number-of-nodes", required=True)
-    sub.add_argument("--nodes-public-keys", required=True)
-    sub.add_argument("--reward-address", default="")
-    sub.set_defaults(func=do_stake)
-
-    sub = subparsers.add_parser("unstake")
-    _add_base_tx_arguments(sub)
-    sub.add_argument("--nodes-public-keys", required=True)
-    sub.set_defaults(func=do_unstake)
-
-    sub = subparsers.add_parser("unjail")
-    _add_base_tx_arguments(sub)
-    sub.add_argument("--nodes-public-keys", required=True)
-    sub.set_defaults(func=do_unjail)
-
-    sub = subparsers.add_parser("unbond")
-    _add_base_tx_arguments(sub)
-    sub.add_argument("--nodes-public-keys", required=True)
-    sub.set_defaults(func=do_unbond)
-
-    sub = subparsers.add_parser("change-reward-address")
-    _add_base_tx_arguments(sub)
-    sub.add_argument("--reward-address", required=True)
-    sub.set_defaults(func=change_reward_address)
-
-    sub = subparsers.add_parser("claim")
-    _add_base_tx_arguments(sub)
-    sub.set_defaults(func=do_claim)
 
 
 def setup_parser_wallet(subparsers):
@@ -312,30 +268,6 @@ def generate_pem(args):
 
 def do_bech32(args):
     facade.do_bech32(args)
-
-
-def do_stake(args):
-    facade.prepare_and_send_stake_transaction(args)
-
-
-def do_unstake(args):
-    facade.prepare_and_send_unstake_transaction(args)
-
-
-def do_unbond(args):
-    facade.prepare_and_send_unbond_transaction(args)
-
-
-def do_unjail(args):
-    facade.prepare_and_send_unjail_transaction(args)
-
-
-def change_reward_address(args):
-    facade.prepare_and_send_change_reward_address_transaction(args)
-
-
-def do_claim(args):
-    facade.prepare_and_send_claim_transaction(args)
 
 
 def enqueue_transaction(args):
