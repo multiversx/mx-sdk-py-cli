@@ -132,11 +132,6 @@ class BunchOfTransactions:
         return num_sent, hashes
 
 
-def stake_prepare(args):
-    args = parse_args_for_stake(args)
-    prepare(args)
-
-
 def prepare(args):
     workspace = args.workspace
     utils.ensure_folder(workspace)

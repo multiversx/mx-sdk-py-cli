@@ -236,17 +236,17 @@ def prepare_and_send_stake_transaction(args):
     return prepare_and_send_transaction(args)
 
 
-def prepare_and_send_un_stake_transaction(args):
+def prepare_and_send_unstake_transaction(args):
     args = validators.parse_args_for_un_stake(args)
     return prepare_and_send_transaction(args)
 
 
-def prepare_and_send_un_jail_transaction(args):
+def prepare_and_send_unjail_transaction(args):
     args = validators.parse_args_for_un_jail(args)
     return prepare_and_send_transaction(args)
 
 
-def prepare_and_send_un_bond_transaction(args):
+def prepare_and_send_unbond_transaction(args):
     args = validators.parse_args_for_un_bond(args)
     return prepare_and_send_transaction(args)
 

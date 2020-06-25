@@ -82,6 +82,17 @@ def setup_parser():
     return parser
 
 
+def _add_base_tx_arguments(subparser):
+    subparser.add_argument("--pem", required=True)
+    subparser.add_argument("--nonce", type=int, required=not("--recall-nonce" in sys.argv))
+    subparser.add_argument("--recall-nonce", action="store_true", default=False)
+    subparser.add_argument("--value", default="0")
+    subparser.add_argument("--gas-price", default=config.DEFAULT_GAS_PRICE)
+    subparser.add_argument("--gas-limit", required=not("--estimate-gas" in sys.argv))
+    subparser.add_argument("--estimate-gas", action="store_true", default=False)
+    subparser.add_argument("--proxy", required=True)
+
+
 def setup_parser_accounts(subparsers):
     parser = subparsers.add_parser("account")
     subparsers = parser.add_subparsers()
@@ -100,63 +111,35 @@ def setup_parser_accounts(subparsers):
 
 
 def setup_parser_validators(subparsers):
-    # sub = subparsers.add_parser("stake-prepare")
-    # sub.add_argument("--pem", required=True)
-    # sub.add_argument("--nonce", type=int, required=True)
-    # sub.add_argument("--value", default="0")
-    # sub.add_argument("--gas-price", default=config.DEFAULT_GAS_PRICE)
-    # sub.add_argument("--gas-limit", required=True)
-    # sub.add_argument("--number-of-nodes", required=True)
-    # sub.add_argument("--nodes-public-keys", required=True)
-    # sub.add_argument("--reward-address", default="")
-    # sub.add_argument("--tag", default="untitled")
-    # sub.add_argument("workspace", nargs='?', default=os.getcwd())
-    # sub.set_defaults(func=stake_prepare)
-
-    # sub = subparsers.add_parser("stake-send")
-    # sub.add_argument("tx")
-    # sub.add_argument("--proxy", required=True)
-    # sub.set_defaults(func=stake_send)
-
-    def add_base_arguments(subparser):
-        subparser.add_argument("--pem", required=True)
-        subparser.add_argument("--nonce", type=int, required=not("--recall-nonce" in sys.argv))
-        subparser.add_argument("--recall-nonce", action="store_true", default=False)
-        subparser.add_argument("--value", default="0")
-        subparser.add_argument("--gas-price", default=config.DEFAULT_GAS_PRICE)
-        subparser.add_argument("--gas-limit", required=not("--estimate-gas" in sys.argv))
-        subparser.add_argument("--estimate-gas", action="store_true", default=False)
-        subparser.add_argument("--proxy", required=True)
-
     sub = subparsers.add_parser("stake")
-    add_base_arguments(sub)
+    _add_base_tx_arguments(sub)
     sub.add_argument("--number-of-nodes", required=True)
     sub.add_argument("--nodes-public-keys", required=True)
     sub.add_argument("--reward-address", default="")
-    sub.set_defaults(func=stake_prepare_and_send)
+    sub.set_defaults(func=do_stake)
 
     sub = subparsers.add_parser("unstake")
-    add_base_arguments(sub)
+    _add_base_tx_arguments(sub)
     sub.add_argument("--nodes-public-keys", required=True)
-    sub.set_defaults(func=do_un_stake)
+    sub.set_defaults(func=do_unstake)
 
     sub = subparsers.add_parser("unjail")
-    add_base_arguments(sub)
+    _add_base_tx_arguments(sub)
     sub.add_argument("--nodes-public-keys", required=True)
-    sub.set_defaults(func=do_un_jail)
+    sub.set_defaults(func=do_unjail)
 
     sub = subparsers.add_parser("unbond")
-    add_base_arguments(sub)
+    _add_base_tx_arguments(sub)
     sub.add_argument("--nodes-public-keys", required=True)
-    sub.set_defaults(func=do_un_bond)
+    sub.set_defaults(func=do_unbond)
 
     sub = subparsers.add_parser("change-reward-address")
-    add_base_arguments(sub)
+    _add_base_tx_arguments(sub)
     sub.add_argument("--reward-address", required=True)
     sub.set_defaults(func=change_reward_address)
 
     sub = subparsers.add_parser("claim")
-    add_base_arguments(sub)
+    _add_base_tx_arguments(sub)
     sub.set_defaults(func=do_claim)
 
 
@@ -331,28 +314,20 @@ def do_bech32(args):
     facade.do_bech32(args)
 
 
-def stake_prepare(args):
-    transactions.stake_prepare(args)
-
-
-def stake_send(args):
-    facade.send_prepared_transaction(args)
-
-
-def stake_prepare_and_send(args):
+def do_stake(args):
     facade.prepare_and_send_stake_transaction(args)
 
 
-def do_un_stake(args):
-    facade.prepare_and_send_un_stake_transaction(args)
+def do_unstake(args):
+    facade.prepare_and_send_unstake_transaction(args)
 
 
-def do_un_bond(args):
-    facade.prepare_and_send_un_bond_transaction(args)
+def do_unbond(args):
+    facade.prepare_and_send_unbond_transaction(args)
 
 
-def do_un_jail(args):
-    facade.prepare_and_send_un_jail_transaction(args)
+def do_unjail(args):
+    facade.prepare_and_send_unjail_transaction(args)
 
 
 def change_reward_address(args):
