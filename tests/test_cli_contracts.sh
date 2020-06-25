@@ -29,7 +29,7 @@ testRunMandos() {
 testContracts() {
     cleanSandbox
     testTrivialCommands
-    testContractsNew
+    testCreateContracts
     testBuildContracts
     testRunMandos
 }
