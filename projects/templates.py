@@ -1,9 +1,7 @@
 import json
 import logging
 import os
-import shutil
 from os import path
-from pathlib import Path
 
 from erdpy import dependencies, errors, utils
 from erdpy.projects import shared
@@ -114,17 +112,6 @@ class TemplateRust(Template):
     def _extend(self):
         logger.info("TemplateRust._extend")
 
-        package_path = Path(__file__).parent
-        launch_file = package_path.joinpath("vscode_launch_rust.json")
-        tasks_file = package_path.joinpath("vscode_tasks_rust.json")
-        vscode_directory = path.join(self.directory, ".vscode")
-
-        logger.info("Creating directory [.vscode]...")
-        os.mkdir(vscode_directory)
-        logger.info("Adding files: [launch.json], [tasks.json]")
-        shutil.copy(launch_file, path.join(vscode_directory, "launch.json"))
-        shutil.copy(tasks_file, path.join(vscode_directory, "tasks.json"))
-
     def _replace_placeholders(self):
         rust_module = dependencies.get_module_by_key("rust")
         self.rust_directory = rust_module.get_directory()
@@ -132,8 +119,6 @@ class TemplateRust(Template):
 
         cargo_path = path.join(self.directory, "Cargo.toml")
         cargo_debug_path = path.join(self.directory, "debug", "Cargo.toml")
-        launch_path = path.join(self.directory, ".vscode", "launch.json")
-        tasks_path = path.join(self.directory, ".vscode", "tasks.json")
         debug_main_path = path.join(self.directory, "debug", "src", "main.rs")
         test_paths = utils.list_files(path.join(self.directory, "test"))
 
@@ -155,15 +140,6 @@ class TemplateRust(Template):
         cargo_file_debug.save()
 
         logger.info("Applying replacements...")
-
-        self._replace_in_files(
-            [launch_path, tasks_path],
-            [
-                ("{{PROJECT_NAME}}", self.project_name),
-                ("{{PATH_RUST_BIN}}", self.rust_bin_directory),
-                ("{{RUSTUP_HOME}}", self.rust_directory),
-                ("{{CARGO_HOME}}", self.rust_directory)
-            ])
 
         self._replace_in_files(
             [debug_main_path],
