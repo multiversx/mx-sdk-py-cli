@@ -120,7 +120,8 @@ class TemplateRust(Template):
         cargo_path = path.join(self.directory, "Cargo.toml")
         cargo_debug_path = path.join(self.directory, "debug", "Cargo.toml")
         debug_main_path = path.join(self.directory, "debug", "src", "main.rs")
-        test_paths = utils.list_files(path.join(self.directory, "test"))
+        test_dir_path = path.join(self.directory, "test")
+        test_paths = utils.list_files(test_dir_path) if os.path.isdir(test_dir_path) else []
 
         logger.info("Updating cargo files...")
 
@@ -159,7 +160,7 @@ class TemplateRust(Template):
         self._replace_in_files(
             test_paths,
             [
-                (f"adder.wasm", f"myadder.wasm")
+                (f"{self.template_name}.wasm", f"{self.project_name}.wasm")
             ]
         )
 
