@@ -1,3 +1,4 @@
+import json
 import shutil
 from os import path
 
@@ -38,12 +39,20 @@ class TemplatesRepository:
         return has
 
     def get_template_folder(self, template):
-        return path.join(self.get_folder(), self.relative_path,  template)
+        return path.join(self.get_folder(), self.relative_path, template)
 
     def get_templates(self):
         folder = path.join(self.get_folder(), self.relative_path)
         templates = utils.get_subfolders(folder)
+        templates = [item for item in templates if self.is_template(item)]
         return templates
+
+    def is_template(self, subfolder):
+        elrond_json_file = self.get_metadata_file(subfolder)
+        return path.isfile(elrond_json_file)
+
+    def get_metadata_file(self, template_folder):
+        return path.join(self.get_folder(), self.relative_path, template_folder, "elrond.json")
 
     def copy_template(self, template, destination_path):
         if not self.has_template(template):
@@ -53,12 +62,6 @@ class TemplatesRepository:
         shutil.copytree(source_path, destination_path)
 
     def get_language(self, template):
-        directory = self.get_template_folder(template)
-
-        if shared.is_source_clang(directory):
-            return "C / C++"
-        if shared.is_source_sol(directory):
-            return "Solidity"
-        if shared.is_source_rust(directory):
-            return "Rust"
-        return "unknown"
+        metadata_file = self.get_metadata_file(template)
+        metadata = utils.read_json_file(metadata_file)
+        return metadata.get("language", "unknown")

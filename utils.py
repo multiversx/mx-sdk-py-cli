@@ -65,6 +65,11 @@ def write_toml_file(filename, data):
         toml.dump(data, f)
 
 
+def read_json_file(filename):
+    with open(filename) as f:
+        return json.load(f)
+
+
 def dump_out_json(data, outfile):
     json.dump(data, outfile, indent=4)
 
