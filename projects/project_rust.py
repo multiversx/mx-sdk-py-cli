@@ -63,8 +63,8 @@ class CargoFile:
 
         try:
             self._parse_file()
-        except Exception:
-            raise errors.BuildError("Can't read cargo file.")
+        except Exception as err:
+            raise errors.BuildError("Can't read or parse [Cargo.toml] file", err)
 
     def _parse_file(self):
         self.data = utils.read_toml_file(self.path)

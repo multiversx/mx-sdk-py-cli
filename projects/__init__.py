@@ -7,3 +7,5 @@ from erdpy.projects.project_rust import ProjectRust
 from erdpy.projects.project_sol import ProjectSol
 from erdpy.projects.templates import (create_from_template,
                                       list_project_templates)
+
+__all__ = ["build_project", "get_projects_in_workspace", "load_project", "run_tests", "Project", "ProjectClang", "ProjectCpp", "ProjectRust", "ProjectSol", "create_from_template", "list_project_templates"]

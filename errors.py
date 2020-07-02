@@ -1,6 +1,17 @@
 
 class KnownError(Exception):
-    pass
+    inner = None
+
+    def __init__(self, message, inner=None):
+        super().__init__(message)
+        self.inner = inner
+
+    def get_pretty(self) -> str:
+        if self.inner:
+            return f"""{self}
+... {self.inner}
+"""
+        return str(self)
 
 
 class ProgrammingError(KnownError):
@@ -33,13 +44,12 @@ class NotSupportedProject(KnownError):
 
 class PlatformNotSupported(KnownError):
     def __init__(self, action_or_item, platform):
-        super().__init__(
-            f"[{action_or_item}] is not supported on platform [{platform}].")
+        super().__init__(f"[{action_or_item}] is not supported on platform [{platform}].")
 
 
 class BuildError(KnownError):
-    def __init__(self, message):
-        super().__init__(f"Build error:\n {message}.")
+    def __init__(self, message, inner=None):
+        super().__init__(f"Build error: {message}.", inner)
 
 
 class BadSink(ProgrammingError):

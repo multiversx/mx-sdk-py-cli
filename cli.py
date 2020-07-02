@@ -13,7 +13,7 @@ def main():
     try:
         _do_main()
     except errors.KnownError as err:
-        logger.fatal(err)
+        logger.fatal(err.get_pretty())
         sys.exit(1)
 
 
