@@ -37,7 +37,7 @@ class ElrondProxy:
     def get_num_shards(self):
         url = f"{self.url}/network/config"
         response = do_get(url)
-        num_shards_without_meta = response["message"]["config"]["erd_num_shards_without_meta"] or 0
+        num_shards_without_meta = response["config"]["erd_num_shards_without_meta"] or 0
         return num_shards_without_meta + 1
 
     def get_last_block_nonce(self, shard_id):
@@ -74,13 +74,13 @@ class ElrondProxy:
     def _get_network_status(self, shard_id):
         url = f"{self.url}/network/status/{shard_id}"
         response = do_get(url)
-        details = response["message"]["status"]
+        details = response["status"]
         return details
 
     def _get_network_config(self):
         url = f"{self.url}/network/config"
         response = do_get(url)
-        details = response["message"]["config"]
+        details = response["config"]
         return details
 
     def send_transaction(self, payload):
