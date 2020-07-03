@@ -3,9 +3,8 @@ import logging
 from collections import OrderedDict
 from os import path
 
-from erdpy import utils
+from erdpy import config, utils
 from erdpy.accounts import Address
-from erdpy.validators.validators import parse_args_for_stake
 from erdpy.wallet import pem, signing
 
 logger = logging.getLogger("transactions")
@@ -20,6 +19,8 @@ class PlainTransaction:
         self.gasPrice = 0
         self.gasLimit = 0
         self.data = ""
+        self.chainID = config.CHAIN_ID
+        self.version = config.TX_VERSION
 
     def payload(self):
         return self.__dict__.copy()
@@ -44,6 +45,10 @@ class TransactionPayloadToSign:
 
         if self.data:
             ordered_fields["data"] = self.data
+
+        if config.WITH_CHAIN_ID_AND_TX_VERSION:
+            ordered_fields["chainID"] = config.CHAIN_ID
+            ordered_fields["version"] = config.TX_VERSION
 
         data_json = json.dumps(ordered_fields, separators=(',', ':')).encode("utf8")
         return data_json

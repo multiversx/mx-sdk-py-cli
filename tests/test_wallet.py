@@ -5,7 +5,7 @@ from pathlib import Path
 import nacl.encoding
 import nacl.signing
 
-from erdpy import utils
+from erdpy import config, utils
 from erdpy.transactions import PlainTransaction, TransactionPayloadToSign
 from erdpy.wallet import generate_pair, mnemonic_to_bip39seed, pem, signing, bip39seed_to_private_key
 
@@ -103,6 +103,41 @@ class WalletTestCase(unittest.TestCase):
         signature = signing.sign_transaction(payload, pem)
 
         self.assertEqual("4e160bcafb6cb8ab8fc3260d3faf24bf7ce1205b5685adb457803db6d67c648a614308d8354e40b40fbb90c227046d6997493f798b92acb1b4bc49173939e703", signature)
+
+    def test_sign_transaction_with_chain_and_version(self):
+        config.WITH_CHAIN_ID_AND_TX_VERSION = True
+        config.CHAIN_ID = "chainID"
+        config.TX_VERSION = 1
+
+        pem = self.testdata.joinpath("keys", "alice.pem")
+
+        # With data
+        transaction = PlainTransaction()
+        transaction.nonce = 0
+        transaction.value = "0"
+        transaction.sender = "erd1l453hd0gt5gzdp7czpuall8ggt2dcv5zwmfdf3sd3lguxseux2fsmsgldz"
+        transaction.receiver = "erd188nydpkagtpwvfklkl2tn0w6g40zdxkwfgwpjqc2a2m2n7ne9g8q2t22sr"
+        transaction.gasPrice = 200000000000000
+        transaction.gasLimit = 500000000
+        transaction.data = "foo"
+        payload = TransactionPayloadToSign(transaction)
+        signature = signing.sign_transaction(payload, pem)
+
+        self.assertEqual("be94075c4cf472abfcbe38c08d96c21e85c95ea69d8845d6414b6c30d1226486c55452f6068fd1835d64eb5d67ef6c3f8025123984893754f03958bd8aa59407", signature)
+
+        # Without data
+        transaction = PlainTransaction()
+        transaction.nonce = 0
+        transaction.value = "0"
+        transaction.sender = "erd1l453hd0gt5gzdp7czpuall8ggt2dcv5zwmfdf3sd3lguxseux2fsmsgldz"
+        transaction.receiver = "erd188nydpkagtpwvfklkl2tn0w6g40zdxkwfgwpjqc2a2m2n7ne9g8q2t22sr"
+        transaction.gasPrice = 200000000000000
+        transaction.gasLimit = 500000000
+        transaction.data = ""
+        payload = TransactionPayloadToSign(transaction)
+        signature = signing.sign_transaction(payload, pem)
+
+        self.assertEqual("1ad14993a3cf6a5e0898a29271a2924fc34f80ba2a391dd2ff5c2fcc554e5a71eda0e34044f99888ec1a1da6d4cf82345e848cec69ccd27e192f8b66c4beaa0c", signature)    
 
     def test_sign_transaction_trust_wallet_scenario(self):
         pem = self.testdata.joinpath("keys", "alice.pem")
