@@ -47,9 +47,10 @@ class StandaloneModule(DependencyModule):
         if overwrite:
             return False
 
-        destination_folder = self.get_directory()
-        exists = path.isdir(destination_folder)
-        return exists
+        return self.is_installed()
+
+    def is_installed(self):
+        return path.isdir(self.get_directory())
 
     def _download(self):
         url = self._get_download_url()
@@ -129,7 +130,9 @@ class Rust(DependencyModule):
     def _should_skip(self, overwrite):
         if overwrite:
             return False
+        return self.is_installed()
 
+    def is_installed(self):
         try:
             myprocess.run_process(["rustc", "--version"], env=self.get_env())
             return True

@@ -3,7 +3,7 @@ from erdpy.dependencies.modules import ArwenToolsModule, Rust, StandaloneModule
 
 def get_all_modules():
     return [
-        StandaloneModule(key="llvm", name="llvm", tag="v9", groups=["clang"],
+        StandaloneModule(key="llvm", name="llvm", tag="v9", groups=["clang", "cpp"],
                          urls_by_platform={
                              "linux": "vendor-llvm/v9-19feb/linux-amd64.tar.gz?t=19feb",
                              "osx": "vendor-llvm/v9-19feb/darwin-amd64.tar.gz",

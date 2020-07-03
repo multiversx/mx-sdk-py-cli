@@ -32,6 +32,11 @@ class BadUrlError(DownloadError):
         pass
 
 
+class DependencyMissing(KnownError):
+    def __init__(self, group):
+        super().__init__(f"Dependency missing. Group: {group}")
+
+
 class BadDirectory(KnownError):
     def __init__(self, directory):
         super().__init__(f"Bad directory: {directory}")

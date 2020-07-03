@@ -30,3 +30,11 @@ def _get_modules_by_group(group):
 
 def get_module_by_key(key):
     return [module for module in get_all_modules() if module.key == key][0]
+
+
+def is_installed(group_name, overwrite=False) -> bool:
+    modules = _get_modules_by_group(group_name)
+    for module in modules:
+        if not module.is_installed():
+            return False
+    return True
