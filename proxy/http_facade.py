@@ -34,10 +34,16 @@ def do_post(url, payload):
 
 
 def get_data(parsed, url):
-    err = parsed["error"]
-    code = parsed["code"]
-    if err == "" and code == "successful":
-        return parsed["data"]
+    err = parsed.get("error", None)
+    code = parsed.get("code", None)
+
+    if not err and not code:
+        # For the moment, be compatible with both Proxy response types.
+        # TODO: Remove this logic in the future.
+        return parsed
+
+    if not err and code == "successful":
+        return parsed.get("data", dict())
 
     raise errors.ProxyRequestError(url, f"code:{code}, error: {err}")
 
