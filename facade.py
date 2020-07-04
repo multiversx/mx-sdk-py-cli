@@ -287,6 +287,7 @@ def generate_pem(args):
 
     seed, pubkey = wallet.generate_pair()
     if mnemonic:
+        mnemonic = input("Enter mnemonic:\n")
         seed, pubkey = wallet.derive_keys(mnemonic)
 
     address = Address(pubkey)

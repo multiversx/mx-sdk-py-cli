@@ -49,7 +49,7 @@ def setup_parser():
     setup_parser_cost(subparsers)
     setup_parser_network(subparsers)
     setup_parser_blockatlas(subparsers)
-    setup_parser_queue(subparsers)
+    setup_parser_dispatcher(subparsers)
 
     return parser
 
@@ -77,7 +77,7 @@ def setup_parser_wallet(subparsers):
 
     subparser = wallet_subparsers.add_parser("generate")
     subparser.add_argument("pem")
-    subparser.add_argument("--mnemonic", required=False, default="")
+    subparser.add_argument("--mnemonic", action="store_true")
     subparser.set_defaults(func=generate_pem)
 
     subparser = wallet_subparsers.add_parser("bech32")
@@ -154,7 +154,7 @@ def setup_parser_blockatlas(subparsers):
     sub.set_defaults(func=facade.blockatlas_get_txs_by_address)
 
 
-def setup_parser_queue(subparsers):
+def setup_parser_dispatcher(subparsers):
     parser = subparsers.add_parser("dispatcher")
     subparsers = parser.add_subparsers()
 
