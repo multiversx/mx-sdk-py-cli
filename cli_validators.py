@@ -4,6 +4,9 @@ from erdpy import config, facade
 
 
 def setup_parser(subparsers):
+    parser = subparsers.add_parser("validator")
+    subparsers = parser.add_subparsers()
+
     sub = subparsers.add_parser("stake")
     _add_common_arguments(sub)
     sub.add_argument("--number-of-nodes", required=True)
