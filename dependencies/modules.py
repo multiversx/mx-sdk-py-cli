@@ -87,6 +87,9 @@ class StandaloneModule(DependencyModule):
             "LD_LIBRARY_PATH": f"{path.join(self.get_directory())}:{os.environ.get('LD_LIBRARY_PATH')}"
         }
 
+# TODO: clang, cpp modules seem to require "sudo apt install libtinfo5"
+# clang-9: error while loading shared libraries: libtinfo.so.5: cannot open shared object file: No such file or directory
+
 
 class SOLLModule(StandaloneModule):
     def __init__(self, key, name, tag, groups, urls_by_platform):
