@@ -22,6 +22,9 @@ class Project:
         self._copy_build_artifacts_to_output()
         self._create_deploy_files()
 
+    def clean(self):
+        utils.remove_folder(self._get_output_folder())
+
     def _ensure_dependencies_installed(self):
         module_keys = self.get_dependencies()
         for module_key in module_keys:
@@ -59,9 +62,11 @@ class Project:
         raise NotImplementedError()
 
     def _copy_to_output(self, file):
-        output_dir = path.join(self.directory, "output")
-        utils.ensure_folder(output_dir)
-        shutil.copy(file, output_dir)
+        utils.ensure_folder(self._get_output_folder())
+        shutil.copy(file, self._get_output_folder())
+
+    def _get_output_folder(self):
+        return path.join(self.directory, "output")
 
     def _create_deploy_files(self):
         file_wasm = self.get_file_wasm()

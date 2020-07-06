@@ -25,6 +25,10 @@ def setup_parser(subparsers):
     sub.add_argument("--no-optimization", action="store_true", default=False)
     sub.set_defaults(func=build)
 
+    sub = subparsers.add_parser("clean", description="Clean a Smart Contract project.")
+    sub.add_argument("project", nargs='?', default=os.getcwd())
+    sub.set_defaults(func=clean)
+
     sub = subparsers.add_parser("deploy", description="Deploy a Smart Contract.")
     sub.add_argument("project", nargs='?', default=os.getcwd(), help="the project directory")
     sub.add_argument("--proxy", required=True, help="the URL of the proxy")
@@ -96,6 +100,11 @@ def create(args):
     directory = args.directory
 
     projects.create_from_template(name, template, directory)
+
+
+def clean(args):
+    project = args.project
+    projects.clean_project(project)
 
 
 def build(args):

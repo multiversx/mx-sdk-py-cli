@@ -1,4 +1,5 @@
 import logging
+import os
 import subprocess
 from os import path
 from pathlib import Path
@@ -77,6 +78,7 @@ class ProjectClang(Project):
     def _copy_build_artifacts_to_output(self):
         wasm_file = self.find_file_globally("*.c").with_suffix(".wasm")
         self._copy_to_output(wasm_file)
+        os.remove(wasm_file)
 
     def _get_llvm_path(self):
         return dependencies.get_install_directory("llvm")

@@ -3,6 +3,7 @@ import logging
 import os
 import os.path
 import pathlib
+import shutil
 import stat
 import tarfile
 import zipfile
@@ -99,3 +100,7 @@ def list_files(folder: str) -> List[str]:
     files = os.listdir(folder)
     files = [os.path.join(folder, f) for f in files]
     return files
+
+
+def remove_folder(folder):
+    shutil.rmtree(folder, ignore_errors=True)

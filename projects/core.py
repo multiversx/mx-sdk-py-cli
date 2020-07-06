@@ -38,6 +38,14 @@ def build_project(directory, options):
     logger.info("Build ran.")
 
 
+def clean_project(directory):
+    directory = path.expanduser(directory)
+    guards.is_directory(directory)
+    project = load_project(directory)
+    project.clean()
+    logger.info("Project cleaned.")
+
+
 def run_tests(args):
     project = args.project
     directory = args.directory
