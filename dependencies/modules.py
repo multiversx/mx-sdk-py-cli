@@ -46,7 +46,8 @@ class StandaloneModule(DependencyModule):
         self._extract()
 
     def uninstall(self):
-        shutil.rmtree(self.get_directory())
+        if os.path.isdir(self.get_directory()):
+            shutil.rmtree(self.get_directory())
 
     def _should_skip(self, overwrite):
         if overwrite:
@@ -137,7 +138,8 @@ class Rust(DependencyModule):
         myprocess.run_process_async(args, env=self.get_env())
 
     def uninstall(self):
-        shutil.rmtree(self.get_directory())
+        if os.path.isdir(self.get_directory()):
+            shutil.rmtree(self.get_directory())
 
     def _should_skip(self, overwrite):
         if overwrite:
