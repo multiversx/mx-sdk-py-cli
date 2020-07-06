@@ -69,9 +69,12 @@ class StandaloneModule(DependencyModule):
         utils.untar(archive_path, destination_folder)
 
     def get_directory(self):
-        tools_folder = workstation.get_tools_folder()
-        folder = path.join(tools_folder, self.name, self.tag)
+        folder = path.join(self.get_parent_directory(), self.tag)
         return folder
+
+    def get_parent_directory(self):
+        tools_folder = workstation.get_tools_folder()
+        return path.join(tools_folder, self.name)
 
     def _get_download_url(self):
         platform = workstation.get_platform()
@@ -115,6 +118,9 @@ class ArwenToolsModule(StandaloneModule):
         utils.mark_executable(path.join(self.get_directory(), "arwen"))
         utils.mark_executable(path.join(self.get_directory(), "arwendebug"))
         utils.mark_executable(path.join(self.get_directory(), "test"))
+
+        utils.symlink(path.join(self.get_directory(), "arwendebug"), os.path.join(self.get_parent_directory(), "arwendebug"))
+        utils.symlink(path.join(self.get_directory(), "test"), os.path.join(self.get_parent_directory(), "mandos"))
 
 
 class Rust(DependencyModule):

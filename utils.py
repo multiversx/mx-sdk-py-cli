@@ -104,3 +104,9 @@ def list_files(folder: str) -> List[str]:
 
 def remove_folder(folder):
     shutil.rmtree(folder, ignore_errors=True)
+
+
+def symlink(real, link):
+    if os.path.exists(link):
+        os.remove(link)
+    os.symlink(real, link)
