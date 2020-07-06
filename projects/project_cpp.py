@@ -80,9 +80,11 @@ class ProjectCpp(Project):
         myprocess.run_process(args)
 
     def _copy_build_artifacts_to_output(self):
-        wasm_file = self.find_file_globally("*.cpp").with_suffix(".wasm")
-        self._copy_to_output(wasm_file)
-        os.remove(wasm_file)
+        source_file = self.find_file_globally("*.cpp")
+        self._copy_to_output(source_file.with_suffix(".wasm"))
+        os.remove(source_file.with_suffix(".wasm"))
+        os.remove(source_file.with_suffix(".ll"))
+        os.remove(source_file.with_suffix(".o"))
 
     def _get_llvm_path(self):
         return dependencies.get_install_directory("llvm")
