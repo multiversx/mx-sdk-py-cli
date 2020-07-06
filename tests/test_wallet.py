@@ -170,6 +170,41 @@ class WalletTestCase(unittest.TestCase):
 
         self.assertEqual("39ab0e18bfce04bf53c9610faa3b9e7cecfca919510a7631e529e9086279b70a4832df32a5d1b8fdceb4e9082f2995da97f9195532c8d611ee749bc312cbf90c", signature)
 
+    def test_sign_transaction_trust_wallet_scenario_with_chain_and_version(self):
+        config.WITH_CHAIN_ID_AND_TX_VERSION = True
+        config.CHAIN_ID = "m1.0"
+        config.TX_VERSION = 1
+
+        pem = self.testdata.joinpath("keys", "alice.pem")
+
+        # With data
+        transaction = PlainTransaction()
+        transaction.nonce = 0
+        transaction.value = "0"
+        transaction.sender = "erd1l453hd0gt5gzdp7czpuall8ggt2dcv5zwmfdf3sd3lguxseux2fsmsgldz"
+        transaction.receiver = "erd1cux02zersde0l7hhklzhywcxk4u9n4py5tdxyx7vrvhnza2r4gmq4vw35r"
+        transaction.gasPrice = 200000000000000
+        transaction.gasLimit = 500000000
+        transaction.data = "foo"
+        payload = TransactionPayloadToSign(transaction)
+        signature = signing.sign_transaction(payload, pem)
+
+        self.assertEqual("fd77f627294c2cad3c4b0c761cad70e886fa1cfd119803caa2bcbc2d5ed3518df3e7531de9daa8ab47b278ac97a0cca5797868bdaba759845ce8c2c91162c30f", signature)
+
+        # Without data
+        transaction = PlainTransaction()
+        transaction.nonce = 0
+        transaction.value = "0"
+        transaction.sender = "erd1l453hd0gt5gzdp7czpuall8ggt2dcv5zwmfdf3sd3lguxseux2fsmsgldz"
+        transaction.receiver = "erd1cux02zersde0l7hhklzhywcxk4u9n4py5tdxyx7vrvhnza2r4gmq4vw35r"
+        transaction.gasPrice = 200000000000000
+        transaction.gasLimit = 500000000
+        transaction.data = ""
+        payload = TransactionPayloadToSign(transaction)
+        signature = signing.sign_transaction(payload, pem)
+
+        self.assertEqual("c621788d31825a9ff5f6719e0677a734986c34aa2d1ea1c932854180898c6b8e970570c42c7880818efa37cc233499225bd45783008551a5b16ce12a54cc6506", signature)
+
     def test_generate_pair_pem(self):
         seed, pubkey = generate_pair()
         pem_file = Path(self.testdata_out, "foo.pem")
