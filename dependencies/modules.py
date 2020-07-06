@@ -1,9 +1,10 @@
 
 import logging
 import os
+import shutil
 from os import path
 
-from erdpy import config, downloader, workstation, errors, myprocess, utils
+from erdpy import config, downloader, errors, myprocess, utils, workstation
 
 logger = logging.getLogger("modules")
 
@@ -40,8 +41,12 @@ class StandaloneModule(DependencyModule):
             logger.debug("Already exists. Skip install.")
             return
 
+        self.uninstall()
         self._download()
         self._extract()
+
+    def uninstall(self):
+        shutil.rmtree(self.get_directory())
 
     def _should_skip(self, overwrite):
         if overwrite:
@@ -122,6 +127,7 @@ class Rust(DependencyModule):
             logger.debug("Already exists. Skip install.")
             return
 
+        self.uninstall()
         rustup_path = self._get_rustup_path()
         downloader.download("https://sh.rustup.rs", rustup_path)
         utils.mark_executable(rustup_path)
@@ -129,6 +135,9 @@ class Rust(DependencyModule):
         args = [rustup_path, "--verbose", "--default-toolchain", "nightly", "--profile",
                 "minimal", "--target", "wasm32-unknown-unknown", "--no-modify-path", "-y"]
         myprocess.run_process_async(args, env=self.get_env())
+
+    def uninstall(self):
+        shutil.rmtree(self.get_directory())
 
     def _should_skip(self, overwrite):
         if overwrite:

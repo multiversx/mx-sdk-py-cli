@@ -51,5 +51,5 @@ async def _read_stream(stream, sinks=None):
                         feedback.get_sink(sink).write(line)
             else:
                 break
-        except:
+        except Exception:
             print(traceback.format_exc())

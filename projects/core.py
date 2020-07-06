@@ -35,6 +35,7 @@ def build_project(directory, options):
     guards.is_directory(directory)
     project = load_project(directory)
     project.build(options)
+    logger.info("Build ran.")
 
 
 def run_tests(args):

@@ -28,6 +28,7 @@ def download(url, filename):
                 file.write(chunk)
                 progress = _report_download_progress(progress, chunk_number, total_size)
                 chunk_number += 1
+            print(f"100 %", end="\r", file=sys.stderr)
             print()
     except requests.HTTPError as err:
         raise errors.DownloadError(
@@ -39,6 +40,6 @@ def download(url, filename):
 def _report_download_progress(progress, chunk_number, total_size):
     num_chunks = total_size / CHUNK_SIZE + 1
     new_progress = int(chunk_number / num_chunks * 100)
-    if new_progress % 25 == 0:
+    if new_progress % 10 == 0:
         print(f"{progress} %", end="\r", file=sys.stderr)
     return new_progress
