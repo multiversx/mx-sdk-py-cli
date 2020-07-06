@@ -1,9 +1,7 @@
-import json
 import shutil
 from os import path
 
 from erdpy import downloader, errors, utils, workstation
-from erdpy.projects import shared
 
 
 class TemplatesRepository:
