@@ -120,7 +120,7 @@ class ArwenToolsModule(StandaloneModule):
         utils.mark_executable(path.join(self.get_directory(), "test"))
 
         utils.symlink(path.join(self.get_directory(), "arwendebug"), os.path.join(self.get_parent_directory(), "arwendebug"))
-        utils.symlink(path.join(self.get_directory(), "test"), os.path.join(self.get_parent_directory(), "mandos"))
+        utils.symlink(path.join(self.get_directory(), "test"), os.path.join(self.get_parent_directory(), "mandos-test"))
 
 
 class Rust(DependencyModule):
