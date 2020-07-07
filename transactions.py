@@ -19,8 +19,8 @@ class PlainTransaction:
         self.gasPrice = 0
         self.gasLimit = 0
         self.data = ""
-        self.chainID = config.CHAIN_ID
-        self.version = config.TX_VERSION
+        self.chainID = ""
+        self.version = 0
 
     def payload(self):
         return self.__dict__.copy()
@@ -47,8 +47,8 @@ class TransactionPayloadToSign:
             ordered_fields["data"] = self.data
 
         if config.WITH_CHAIN_ID_AND_TX_VERSION:
-            ordered_fields["chainID"] = config.CHAIN_ID
-            ordered_fields["version"] = config.TX_VERSION
+            ordered_fields["chainID"] = self.chainID
+            ordered_fields["version"] = self.version
 
         data_json = json.dumps(ordered_fields, separators=(',', ':')).encode("utf8")
         return data_json

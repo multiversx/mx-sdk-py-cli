@@ -106,8 +106,6 @@ class WalletTestCase(unittest.TestCase):
 
     def test_sign_transaction_with_chain_and_version(self):
         config.WITH_CHAIN_ID_AND_TX_VERSION = True
-        config.CHAIN_ID = "chainID"
-        config.TX_VERSION = 1
 
         pem = self.testdata.joinpath("keys", "alice.pem")
 
@@ -120,6 +118,8 @@ class WalletTestCase(unittest.TestCase):
         transaction.gasPrice = 200000000000000
         transaction.gasLimit = 500000000
         transaction.data = "foo"
+        transaction.chainID = "chainID"
+        transaction.version = 1
         payload = TransactionPayloadToSign(transaction)
         signature = signing.sign_transaction(payload, pem)
 
@@ -134,6 +134,8 @@ class WalletTestCase(unittest.TestCase):
         transaction.gasPrice = 200000000000000
         transaction.gasLimit = 500000000
         transaction.data = ""
+        transaction.chainID = "chainID"
+        transaction.version = 1
         payload = TransactionPayloadToSign(transaction)
         signature = signing.sign_transaction(payload, pem)
 
@@ -172,9 +174,6 @@ class WalletTestCase(unittest.TestCase):
 
     def test_sign_transaction_trust_wallet_scenario_with_chain_and_version(self):
         config.WITH_CHAIN_ID_AND_TX_VERSION = True
-        config.CHAIN_ID = "m1.0"
-        config.TX_VERSION = 1
-
         pem = self.testdata.joinpath("keys", "alice.pem")
 
         # With data
@@ -186,6 +185,8 @@ class WalletTestCase(unittest.TestCase):
         transaction.gasPrice = 200000000000000
         transaction.gasLimit = 500000000
         transaction.data = "foo"
+        transaction.chainID = "m1.0"
+        transaction.version = 1
         payload = TransactionPayloadToSign(transaction)
         signature = signing.sign_transaction(payload, pem)
 
@@ -200,6 +201,8 @@ class WalletTestCase(unittest.TestCase):
         transaction.gasPrice = 200000000000000
         transaction.gasLimit = 500000000
         transaction.data = ""
+        transaction.chainID = "m1.0"
+        transaction.version = 1
         payload = TransactionPayloadToSign(transaction)
         signature = signing.sign_transaction(payload, pem)
 

@@ -2,7 +2,7 @@ import logging
 import sys
 from argparse import ArgumentParser
 
-from erdpy import (cli_contracts, cli_install, cli_transactions,
+from erdpy import (cli_config, cli_contracts, cli_install, cli_transactions,
                    cli_validators, config, errors, facade, proxy)
 from erdpy._version import __version__
 
@@ -39,6 +39,7 @@ def setup_parser():
     parser.add_argument('-v', '--version', action='version', version=f"erdpy {__version__}")
     parser.add_argument("--verbose", action="store_true", default=False)
 
+    cli_config.setup_parser(subparsers)
     cli_install.setup_parser(subparsers)
     cli_contracts.setup_parser(subparsers)
     cli_validators.setup_parser(subparsers)

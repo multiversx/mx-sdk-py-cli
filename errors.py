@@ -97,3 +97,8 @@ class ExternalProcessError(KnownError):
         super().__init__(f"""External process error:
 Command line: {command_line}
 Output: {message}""")
+
+
+class UnknownConfigurationError(KnownError):
+    def __init__(self, name):
+        super().__init__(f"Configuration entry is not known: {name}.")
