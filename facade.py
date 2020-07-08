@@ -163,9 +163,9 @@ def get_num_shards(args):
 
 def get_last_block_nonce(args):
     proxy_url = args.proxy
-    shard_id = args.shard_id
+    shard = args.shard
     proxy = ElrondProxy(proxy_url)
-    nonce = proxy.get_last_block_nonce(shard_id)
+    nonce = proxy.get_last_block_nonce(shard)
     print(nonce)
     return nonce
 
@@ -184,13 +184,6 @@ def get_chain_id(args):
     chain_id = proxy.get_chain_id()
     print(chain_id)
     return chain_id
-
-
-def get_meta_nonce(args):
-    proxy = ElrondProxy(args.proxy)
-    nonce = proxy.get_meta_nonce()
-    print(nonce)
-    return nonce
 
 
 def get_meta_block(args):

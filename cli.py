@@ -3,8 +3,8 @@ import sys
 from argparse import ArgumentParser
 
 from erdpy import (cli_accounts, cli_blockatlas, cli_config, cli_contracts,
-                   cli_install, cli_transactions, cli_validators, cli_wallet,
-                   config, errors, facade, proxy)
+                   cli_install, cli_network, cli_transactions, cli_validators,
+                   cli_wallet, config, errors, facade, proxy)
 from erdpy._version import __version__
 
 logger = logging.getLogger("cli")
@@ -47,10 +47,10 @@ def setup_parser():
     cli_transactions.setup_parser(subparsers)
     cli_accounts.setup_parser(subparsers)
     cli_wallet.setup_parser(subparsers)
+    cli_network.setup_parser(subparsers)
     cli_blockatlas.setup_parser(subparsers)
 
     setup_parser_cost(subparsers)
-    setup_parser_network(subparsers)
     setup_parser_dispatcher(subparsers)
 
     return parser
@@ -74,33 +74,6 @@ def setup_parser_cost(subparsers):
     sub.add_argument("--function", required=False)
     sub.add_argument("--arguments", nargs='+', required=False)
     sub.set_defaults(func=get_transaction_cost)
-
-
-def setup_parser_network(subparsers):
-    parser = subparsers.add_parser("network")
-    subparsers = parser.add_subparsers()
-
-    sub = subparsers.add_parser("num-shards")
-    sub.add_argument("--proxy", required=True)
-    sub.set_defaults(func=get_num_shards)
-
-    sub = subparsers.add_parser("last-block-nonce")
-    sub.add_argument("--proxy", required=True)
-    sub.add_argument("--shard-id", required=True)
-    sub.set_defaults(func=get_last_block_nonce)
-
-    sub = subparsers.add_parser("chain-id")
-    sub.add_argument("--proxy", required=True)
-    sub.set_defaults(func=get_chain_id)
-
-    sub = subparsers.add_parser("meta-nonce")
-    sub.add_argument("--proxy", required=True)
-    sub.set_defaults(func=get_meta_nonce)
-
-    sub = subparsers.add_parser("meta-block")
-    sub.add_argument("--proxy", required=True)
-    sub.add_argument("--nonce", required=True, type=int)
-    sub.set_defaults(func=get_meta_block)
 
 
 def setup_parser_dispatcher(subparsers):
@@ -134,28 +107,8 @@ def get_transaction_cost(args):
     facade.get_transaction_cost(args)
 
 
-def get_num_shards(args):
-    facade.get_num_shards(args)
-
-
-def get_last_block_nonce(args):
-    facade.get_last_block_nonce(args)
-
-
 def get_gas_price(args):
     facade.get_gas_price(args)
-
-
-def get_chain_id(args):
-    facade.get_chain_id(args)
-
-
-def get_meta_nonce(args):
-    facade.get_meta_nonce(args)
-
-
-def get_meta_block(args):
-    facade.get_meta_block(args)
 
 
 def enqueue_transaction(args):
