@@ -3,8 +3,8 @@ import sys
 from argparse import ArgumentParser
 
 from erdpy import (cli_accounts, cli_config, cli_contracts, cli_install,
-                   cli_transactions, cli_validators, config, errors, facade,
-                   proxy)
+                   cli_transactions, cli_validators, cli_wallet, config,
+                   errors, facade, proxy)
 from erdpy._version import __version__
 
 logger = logging.getLogger("cli")
@@ -46,31 +46,14 @@ def setup_parser():
     cli_validators.setup_parser(subparsers)
     cli_transactions.setup_parser(subparsers)
     cli_accounts.setup_parser(subparsers)
+    cli_wallet.setup_parser(subparsers)
 
-    setup_parser_wallet(subparsers)
     setup_parser_cost(subparsers)
     setup_parser_network(subparsers)
     setup_parser_blockatlas(subparsers)
     setup_parser_dispatcher(subparsers)
 
     return parser
-
-
-def setup_parser_wallet(subparsers):
-    wallet_parser = subparsers.add_parser("wallet")
-    wallet_subparsers = wallet_parser.add_subparsers()
-
-    subparser = wallet_subparsers.add_parser("generate")
-    subparser.add_argument("pem")
-    subparser.add_argument("--mnemonic", action="store_true")
-    subparser.set_defaults(func=generate_pem)
-
-    subparser = wallet_subparsers.add_parser("bech32")
-    subparser.add_argument("value")
-    group = subparser.add_mutually_exclusive_group(required=True)
-    group.add_argument("--encode", action="store_true")
-    group.add_argument("--decode", action="store_true")
-    subparser.set_defaults(func=do_bech32)
 
 
 def setup_parser_cost(subparsers):
@@ -192,14 +175,6 @@ def get_meta_nonce(args):
 
 def get_meta_block(args):
     facade.get_meta_block(args)
-
-
-def generate_pem(args):
-    facade.generate_pem(args)
-
-
-def do_bech32(args):
-    facade.do_bech32(args)
 
 
 def enqueue_transaction(args):
