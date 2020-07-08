@@ -2,8 +2,9 @@ import logging
 import sys
 from argparse import ArgumentParser
 
-from erdpy import (cli_config, cli_contracts, cli_install, cli_transactions,
-                   cli_validators, config, errors, facade, proxy)
+from erdpy import (cli_accounts, cli_config, cli_contracts, cli_install,
+                   cli_transactions, cli_validators, config, errors, facade,
+                   proxy)
 from erdpy._version import __version__
 
 logger = logging.getLogger("cli")
@@ -44,8 +45,8 @@ def setup_parser():
     cli_contracts.setup_parser(subparsers)
     cli_validators.setup_parser(subparsers)
     cli_transactions.setup_parser(subparsers)
+    cli_accounts.setup_parser(subparsers)
 
-    setup_parser_accounts(subparsers)
     setup_parser_wallet(subparsers)
     setup_parser_cost(subparsers)
     setup_parser_network(subparsers)
@@ -53,23 +54,6 @@ def setup_parser():
     setup_parser_dispatcher(subparsers)
 
     return parser
-
-
-def setup_parser_accounts(subparsers):
-    parser = subparsers.add_parser("account")
-    subparsers = parser.add_subparsers()
-
-    sub = subparsers.add_parser("get")
-    sub.add_argument("--proxy", required=True)
-    sub.add_argument("--address", required=True)
-    sub.add_argument("--balance", required=False, nargs='?', const=True, default=False)
-    sub.add_argument("--nonce", required=False, nargs='?', const=True, default=False)
-    sub.set_defaults(func=get_account)
-
-    sub = subparsers.add_parser("get-transactions")
-    sub.add_argument("--proxy", required=True)
-    sub.add_argument("--address", required=True)
-    sub.set_defaults(func=get_account_transactions)
 
 
 def setup_parser_wallet(subparsers):
@@ -180,19 +164,6 @@ def setup_parser_dispatcher(subparsers):
 
     sub = subparsers.add_parser("clean")
     sub.set_defaults(func=clean_transactions_queue)
-
-
-def get_account(args):
-    if args.balance:
-        facade.get_account_balance(args)
-    elif args.nonce:
-        facade.get_account_nonce(args)
-    else:
-        facade.get_account(args)
-
-
-def get_account_transactions(args):
-    facade.get_account_transactions(args)
 
 
 def get_transaction_cost(args):
