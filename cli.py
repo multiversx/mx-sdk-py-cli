@@ -3,7 +3,7 @@ import sys
 from argparse import ArgumentParser
 
 from erdpy import (cli_accounts, cli_blockatlas, cli_config, cli_contracts,
-                   cli_cost, cli_dispatcher, cli_install, cli_network,
+                   cli_cost, cli_dispatcher, cli_deps, cli_network,
                    cli_transactions, cli_validators, cli_wallet, errors)
 from erdpy._version import __version__
 
@@ -41,7 +41,7 @@ def setup_parser():
     parser.add_argument("--verbose", action="store_true", default=False)
 
     cli_config.setup_parser(subparsers)
-    cli_install.setup_parser(subparsers)
+    cli_deps.setup_parser(subparsers)
     cli_contracts.setup_parser(subparsers)
     cli_validators.setup_parser(subparsers)
     cli_transactions.setup_parser(subparsers)
