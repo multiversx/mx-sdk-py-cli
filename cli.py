@@ -3,8 +3,8 @@ import sys
 from argparse import ArgumentParser
 
 from erdpy import (cli_accounts, cli_blockatlas, cli_config, cli_contracts,
-                   cli_install, cli_network, cli_transactions, cli_validators,
-                   cli_wallet, config, errors, facade, proxy)
+                   cli_cost, cli_install, cli_network, cli_transactions,
+                   cli_validators, cli_wallet, config, errors, facade)
 from erdpy._version import __version__
 
 logger = logging.getLogger("cli")
@@ -48,32 +48,12 @@ def setup_parser():
     cli_accounts.setup_parser(subparsers)
     cli_wallet.setup_parser(subparsers)
     cli_network.setup_parser(subparsers)
+    cli_cost.setup_parser(subparsers)
     cli_blockatlas.setup_parser(subparsers)
 
-    setup_parser_cost(subparsers)
     setup_parser_dispatcher(subparsers)
 
     return parser
-
-
-def setup_parser_cost(subparsers):
-    cost_parser = subparsers.add_parser("cost")
-    cost_subparsers = cost_parser.add_subparsers()
-
-    sub = cost_subparsers.add_parser("gas-price")
-    sub.add_argument("--proxy", required=True)
-    sub.set_defaults(func=get_gas_price)
-
-    sub = cost_subparsers.add_parser("transaction")
-    tx_types = [proxy.TxTypes.SC_CALL, proxy.TxTypes.MOVE_BALANCE, proxy.TxTypes.SC_DEPLOY]
-    sub.add_argument("tx_type", choices=tx_types)
-    sub.add_argument("--proxy", required=True)
-    sub.add_argument("--data", required=False)
-    sub.add_argument("--sc-address", required=False)
-    sub.add_argument("--sc-path", required=False)
-    sub.add_argument("--function", required=False)
-    sub.add_argument("--arguments", nargs='+', required=False)
-    sub.set_defaults(func=get_transaction_cost)
 
 
 def setup_parser_dispatcher(subparsers):
@@ -101,14 +81,6 @@ def setup_parser_dispatcher(subparsers):
 
     sub = subparsers.add_parser("clean")
     sub.set_defaults(func=clean_transactions_queue)
-
-
-def get_transaction_cost(args):
-    facade.get_transaction_cost(args)
-
-
-def get_gas_price(args):
-    facade.get_gas_price(args)
 
 
 def enqueue_transaction(args):

@@ -18,7 +18,7 @@ class TransactionCostEstimator:
         self.proxy_url = proxy_url
 
     def estimate_tx_cost(self, arguments):
-        tx_type = arguments.tx_type
+        tx_type = arguments.type
 
         if tx_type == TxTypes.MOVE_BALANCE:
             return self._estimate_move_balance(arguments.data)
