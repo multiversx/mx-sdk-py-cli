@@ -202,6 +202,7 @@ def get_transaction_cost(args):
     return result
 
 
+# DEPRECATED
 def send_prepared_transaction(args):
     proxy = ElrondProxy(args.proxy)
     prepared = PreparedTransaction.from_file(args.tx)
@@ -210,6 +211,7 @@ def send_prepared_transaction(args):
     return tx_hash
 
 
+# DEPRECATED
 def prepare_and_send_transaction(args):
     proxy = ElrondProxy(args.proxy)
 
@@ -222,6 +224,43 @@ def prepare_and_send_transaction(args):
     tx_hash = prepared.send(proxy)
     print(tx_hash)
     return tx_hash
+
+
+def create_transaction(args):
+    args = utils.as_object(args)
+
+    proxy = ElrondProxy(args.proxy)
+
+    if args.recall_nonce:
+        owner = Account(pem_file=args.pem)
+        owner.sync_nonce(proxy)
+        args.nonce = owner.nonce
+
+    if args.data_file:
+        args.data = utils.read_file(args.data_file)
+
+    output = utils.Object()
+    prepared = do_prepare_transaction(args)
+    output.tx = prepared.to_dictionary()
+
+    try:
+        if args.send:
+            output.hash = prepared.send(proxy)
+    finally:
+        # Save output even if there's an error during the actual send
+        args.outfile.writelines([output.to_json(), "\n"])
+
+
+def send_transaction(args):
+    args = utils.as_object(args)
+
+    proxy = ElrondProxy(args.proxy)
+
+    output = utils.Object()
+    prepared = PreparedTransaction.from_file(args.infile)
+    output.tx = prepared.to_dictionary()
+    output.hash = prepared.send(proxy)
+    args.outfile.writelines([output.to_json(), "\n"])
 
 
 def prepare_and_send_stake_transaction(args):

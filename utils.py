@@ -14,6 +14,15 @@ import toml
 logger = logging.getLogger("utils")
 
 
+class Object:
+    def __repr__(self):
+        return str(self.__dict__)
+
+    def to_json(self):
+        data_json = json.dumps(self.__dict__, indent=4)
+        return data_json
+
+
 def untar(archive_path, destination_folder):
     logger.debug(f"untar [{archive_path}] to [{destination_folder}].")
 
@@ -47,14 +56,18 @@ def read_lines(file):
     return lines
 
 
-def read_file(filename):
-    with open(filename) as f:
-        return f.read()
+def read_file(f):
+    if isinstance(f, str):
+        with open(f) as f:
+            return f.read()
+    return f.read()
 
 
-def write_file(filename, text):
-    with open(filename, "w") as f:
-        return f.write(text)
+def write_file(f, text):
+    if isinstance(f, str):
+        with open(f, "w") as f:
+            return f.write(text)
+    return f.write(text)
 
 
 def read_toml_file(filename):
@@ -119,3 +132,12 @@ def symlink(real, link):
 
 def str_to_bool(input: str) -> bool:
     return str(input).lower() in ["true", "1", "t", "y", "yes"]
+
+
+def as_object(input) -> Object:
+    if isinstance(input, dict):
+        result = Object()
+        result.__dict__.update(input)
+        return result
+
+    return input

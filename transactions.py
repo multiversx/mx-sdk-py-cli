@@ -72,16 +72,18 @@ class PreparedTransaction(PlainTransaction):
             self.data = transaction.data
 
     @classmethod
-    def from_file(cls, filename):
-        data_json = utils.read_file(filename).encode()
+    def from_file(cls, f):
+        data_json = utils.read_file(f).encode()
         return cls.from_json(data_json)
 
-    def save_to_file(self, filename):
-        utils.write_file(filename, self.to_json())
+    def save_to_file(self, f):
+        utils.write_file(f, self.to_json())
 
     @classmethod
     def from_json(cls, json_data):
         dictionary = json.loads(json_data)
+        # Handle both the old and the new format (wrapped tx or unwrapped)
+        dictionary = dictionary.get("tx", dictionary)
         return cls.from_dictionary(dictionary)
 
     def to_json(self):

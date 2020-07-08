@@ -24,6 +24,10 @@ class MetaChainSystemSCsCost:
     UNJAIL = 5000000
 
 
+def get_proxy() -> str:
+    return get_value("proxy")
+
+
 def get_chain_id() -> str:
     return get_value("chainID")
 
