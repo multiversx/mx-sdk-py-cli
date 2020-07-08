@@ -2,9 +2,9 @@ import logging
 import sys
 from argparse import ArgumentParser
 
-from erdpy import (cli_accounts, cli_config, cli_contracts, cli_install,
-                   cli_transactions, cli_validators, cli_wallet, config,
-                   errors, facade, proxy)
+from erdpy import (cli_accounts, cli_blockatlas, cli_config, cli_contracts,
+                   cli_install, cli_transactions, cli_validators, cli_wallet,
+                   config, errors, facade, proxy)
 from erdpy._version import __version__
 
 logger = logging.getLogger("cli")
@@ -47,10 +47,10 @@ def setup_parser():
     cli_transactions.setup_parser(subparsers)
     cli_accounts.setup_parser(subparsers)
     cli_wallet.setup_parser(subparsers)
+    cli_blockatlas.setup_parser(subparsers)
 
     setup_parser_cost(subparsers)
     setup_parser_network(subparsers)
-    setup_parser_blockatlas(subparsers)
     setup_parser_dispatcher(subparsers)
 
     return parser
@@ -101,25 +101,6 @@ def setup_parser_network(subparsers):
     sub.add_argument("--proxy", required=True)
     sub.add_argument("--nonce", required=True, type=int)
     sub.set_defaults(func=get_meta_block)
-
-
-def setup_parser_blockatlas(subparsers):
-    parser = subparsers.add_parser("blockatlas")
-    subparsers = parser.add_subparsers()
-
-    parser.add_argument("--url", required=True)
-    parser.add_argument("--coin", required=True)
-
-    sub = subparsers.add_parser("current-block-number")
-    sub.set_defaults(func=facade.blockatlas_get_current_block_number)
-
-    sub = subparsers.add_parser("block-by-number")
-    sub.add_argument("--number", required=True)
-    sub.set_defaults(func=facade.blockatlas_get_block_by_number)
-
-    sub = subparsers.add_parser("transactions")
-    sub.add_argument("--address", required=True)
-    sub.set_defaults(func=facade.blockatlas_get_txs_by_address)
 
 
 def setup_parser_dispatcher(subparsers):

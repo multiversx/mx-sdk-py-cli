@@ -3,7 +3,7 @@ import logging
 
 from erdpy import facade
 
-logger = logging.getLogger("cli.accounts")
+logger = logging.getLogger("cli.wallet")
 
 
 def setup_parser(subparsers):
