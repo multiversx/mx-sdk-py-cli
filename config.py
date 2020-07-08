@@ -1,11 +1,9 @@
 import os.path
 
-from erdpy import utils, errors
-
+from erdpy import errors, utils
 
 DOWNLOAD_MIRROR = "https://ide.elrond.com"
 MODULES_CONFIG_URL = "https://raw.githubusercontent.com/ElrondNetwork/elrond-sdk/master/deps.json"
-WITH_CHAIN_ID_AND_TX_VERSION = False
 
 ROOT_FOLDER_NAME = "elrondsdk"
 CONFIG_PATH = os.path.expanduser("~/elrondsdk/erdpy.json")
@@ -34,6 +32,10 @@ def get_tx_version() -> str:
     return get_value("txVersion")
 
 
+def get_with_chain_and_version() -> bool:
+    return utils.str_to_bool(get_value("withChainAndVersion"))
+
+
 def get_value(name) -> str:
     _guard_valid_name(name)
     data = _read_file()
@@ -56,7 +58,8 @@ def get_defaults() -> dict:
     return {
         "proxy": "https://api.elrond.com",
         "chainID": "Testnet",
-        "txVersion": "1"
+        "txVersion": "1",
+        "withChainAndVersion": False
     }
 
 

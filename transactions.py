@@ -46,7 +46,7 @@ class TransactionPayloadToSign:
         if self.data:
             ordered_fields["data"] = self.data
 
-        if config.WITH_CHAIN_ID_AND_TX_VERSION:
+        if config.get_with_chain_and_version():
             ordered_fields["chainID"] = self.chainID
             ordered_fields["version"] = self.version
 

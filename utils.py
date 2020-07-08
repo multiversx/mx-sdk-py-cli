@@ -115,3 +115,7 @@ def symlink(real, link):
     if os.path.exists(link):
         os.remove(link)
     os.symlink(real, link)
+
+
+def str_to_bool(input: str) -> bool:
+    return str(input).lower() in ["true", "1", "t", "y", "yes"]

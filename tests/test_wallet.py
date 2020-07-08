@@ -105,7 +105,7 @@ class WalletTestCase(unittest.TestCase):
         self.assertEqual("4e160bcafb6cb8ab8fc3260d3faf24bf7ce1205b5685adb457803db6d67c648a614308d8354e40b40fbb90c227046d6997493f798b92acb1b4bc49173939e703", signature)
 
     def test_sign_transaction_with_chain_and_version(self):
-        config.WITH_CHAIN_ID_AND_TX_VERSION = True
+        config.get_with_chain_and_version = lambda: True
 
         pem = self.testdata.joinpath("keys", "alice.pem")
 
@@ -173,7 +173,8 @@ class WalletTestCase(unittest.TestCase):
         self.assertEqual("39ab0e18bfce04bf53c9610faa3b9e7cecfca919510a7631e529e9086279b70a4832df32a5d1b8fdceb4e9082f2995da97f9195532c8d611ee749bc312cbf90c", signature)
 
     def test_sign_transaction_trust_wallet_scenario_with_chain_and_version(self):
-        config.WITH_CHAIN_ID_AND_TX_VERSION = True
+        config.get_with_chain_and_version = lambda: True
+
         pem = self.testdata.joinpath("keys", "alice.pem")
 
         # With data
