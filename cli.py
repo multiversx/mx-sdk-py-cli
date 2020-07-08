@@ -3,8 +3,8 @@ import sys
 from argparse import ArgumentParser
 
 from erdpy import (cli_accounts, cli_blockatlas, cli_config, cli_contracts,
-                   cli_cost, cli_install, cli_network, cli_transactions,
-                   cli_validators, cli_wallet, config, errors, facade)
+                   cli_cost, cli_dispatcher, cli_install, cli_network,
+                   cli_transactions, cli_validators, cli_wallet, errors)
 from erdpy._version import __version__
 
 logger = logging.getLogger("cli")
@@ -49,54 +49,10 @@ def setup_parser():
     cli_wallet.setup_parser(subparsers)
     cli_network.setup_parser(subparsers)
     cli_cost.setup_parser(subparsers)
+    cli_dispatcher.setup_parser(subparsers)
     cli_blockatlas.setup_parser(subparsers)
 
-    setup_parser_dispatcher(subparsers)
-
     return parser
-
-
-def setup_parser_dispatcher(subparsers):
-    parser = subparsers.add_parser("dispatcher")
-    subparsers = parser.add_subparsers()
-
-    sub = subparsers.add_parser("enqueue")
-    sub.add_argument("--value", default="0")
-    sub.add_argument("--receiver", required=True)
-    sub.add_argument("--gas-price", default=config.DEFAULT_GAS_PRICE)
-    sub.add_argument("--gas-limit", required=True)
-    sub.add_argument("--data", default="")
-    sub.set_defaults(func=enqueue_transaction)
-
-    sub = subparsers.add_parser("dispatch")
-    sub.add_argument("--proxy", required=True)
-    sub.add_argument("--pem", required=True)
-    sub.set_defaults(func=dispatch_transactions)
-
-    sub = subparsers.add_parser("dispatch-continuously")
-    sub.add_argument("--proxy", required=True)
-    sub.add_argument("--pem", required=True)
-    sub.add_argument("--interval", required=True)
-    sub.set_defaults(func=dispatch_transactions_continuously)
-
-    sub = subparsers.add_parser("clean")
-    sub.set_defaults(func=clean_transactions_queue)
-
-
-def enqueue_transaction(args):
-    facade.enqueue_transaction(args)
-
-
-def dispatch_transactions(args):
-    facade.dispatch_transactions(args)
-
-
-def dispatch_transactions_continuously(args):
-    facade.dispatch_transactions_continuously(args)
-
-
-def clean_transactions_queue(args):
-    facade.clean_transactions_queue()
 
 
 if __name__ == "__main__":
