@@ -37,8 +37,7 @@ def get_tx_version() -> int:
 
 
 def get_with_chain_and_version() -> bool:
-    return True
-    # return utils.str_to_bool(get_value("withChainAndVersion"))
+    return utils.str_to_bool(get_value("withChainAndVersion"))
 
 
 def get_value(name) -> str:
