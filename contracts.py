@@ -67,7 +67,7 @@ class SmartContract:
     def execute(self, proxy, caller, function, arguments, gas_price, gas_limit, value, chain, version):
         self.caller = caller
         self.caller.sync_nonce(proxy)
-        transaction = self.prepare_execute_transaction(caller, function, arguments, gas_price, gas_limit, value)
+        transaction = self.prepare_execute_transaction(caller, function, arguments, gas_price, gas_limit, value, chain, version)
         tx_hash = transaction.send(proxy)
         return tx_hash
 
@@ -104,7 +104,7 @@ class SmartContract:
     def upgrade(self, proxy, caller, arguments, gas_price, gas_limit, value, chain, version):
         self.caller = caller
         self.caller.sync_nonce(proxy)
-        transaction = self.prepare_upgrade_transaction(caller, arguments, gas_price, gas_limit, value)
+        transaction = self.prepare_upgrade_transaction(caller, arguments, gas_price, gas_limit, value, chain, version)
         tx_hash = transaction.send(proxy)
         return tx_hash
 
