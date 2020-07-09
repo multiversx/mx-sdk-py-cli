@@ -11,7 +11,7 @@ testAll() {
 
     ${ERDPY} --verbose tx-prepare ${SANDBOX} --tag="foobar" --pem="${KEYS}/alice.pem" --nonce=42 --receiver=${BOB} --value="1${DENOMINATION}" --gas-limit=50000 --chain=${CHAIN_ID}
     assertFileExists ${SANDBOX}/tx-foobar.json
-    ${ERDPY} --verbose tx-send ${SANDBOX}/tx-foobar.json --proxy=${PROXY} --chain=${CHAIN_ID}
+    ${ERDPY} --verbose tx-send ${SANDBOX}/tx-foobar.json --proxy=${PROXY}
 }
 
 testNewApi() {
