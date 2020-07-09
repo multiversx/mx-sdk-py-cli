@@ -38,6 +38,10 @@ def deploy_smart_contract(args):
     environment = TestnetEnvironment(proxy_url)
     owner = Account(pem_file=pem_file)
 
+    owner.nonce = args.nonce
+    if args.recall_nonce:
+        owner.sync_nonce(ElrondProxy(proxy_url))
+
     def flow():
         tx_hash, address = environment.deploy_contract(contract, owner, arguments, gas_price, gas_limit, value, chain, version)
         logger.info("Tx hash: %s", tx_hash)
@@ -64,6 +68,10 @@ def call_smart_contract(args):
     contract = SmartContract(contract_address)
     environment = TestnetEnvironment(proxy_url)
     caller = Account(pem_file=pem_file)
+
+    caller.nonce = args.nonce
+    if args.recall_nonce:
+        caller.sync_nonce(ElrondProxy(proxy_url))
 
     def flow():
         tx_hash = environment.execute_contract(contract, caller, function, arguments, gas_price, gas_limit, value, chain, version)
@@ -93,6 +101,10 @@ def upgrade_smart_contract(args):
     contract = SmartContract(contract_address, bytecode=bytecode, metadata=metadata)
     environment = TestnetEnvironment(proxy_url)
     caller = Account(pem_file=pem_file)
+
+    caller.nonce = args.nonce
+    if args.recall_nonce:
+        caller.sync_nonce(ElrondProxy(proxy_url))
 
     def flow():
         tx_hash = environment.upgrade_contract(contract, caller, arguments, gas_price, gas_limit, value, chain, version)
