@@ -22,6 +22,8 @@ def _prepare_tx(args):
     ordered_fields["gasPrice"] = int(args.gas_price)
     ordered_fields["gasLimit"] = int(args.gas_limit)
     ordered_fields["data"] = args.data
+    ordered_fields["chain"] = args.chain
+    ordered_fields["version"] = args.version
 
     return ordered_fields
 
@@ -113,7 +115,11 @@ class TransactionQueue:
 
         proxy = ElrondProxy(args.proxy)
         # Need to sync nonce
-        owner = Account(pem_file=args.pem)
+        if args.pem:
+            owner = Account(pem_file=args.pem)
+        elif args.keyfile and args.passfile:
+            owner = Account(key_file=args.keyfile, pass_file=args.passfile)
+
         owner.sync_nonce(proxy)
         nonce = owner.nonce
         old_nonce = nonce
@@ -123,6 +129,7 @@ class TransactionQueue:
         idx = txs_index
         while idx < len(txs):
             tx = txs[idx]
+            # TODO CHECK IF BUNCH OF TRANSACTION generate transactions with chain id and version
             bunch.add(owner, tx["receiver"], nonce, tx["value"], tx["data"], tx["gasPrice"], tx["gasLimit"])
             # increment nonce
             nonce += 1

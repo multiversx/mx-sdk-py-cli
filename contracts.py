@@ -1,3 +1,5 @@
+from binascii import unhexlify
+
 from Cryptodome.Hash import keccak
 
 from erdpy import config, errors
@@ -39,7 +41,7 @@ class SmartContract:
         plain.data = self.prepare_deploy_transaction_data(arguments)
 
         payload = TransactionPayloadToSign(plain)
-        signature = signing.sign_transaction(payload, owner.pem_file)
+        signature = signing.sign_transaction_with_seed(payload, unhexlify(owner.private_key_seed))
         prepared = PreparedTransaction(plain, signature)
         return prepared
 
@@ -85,7 +87,7 @@ class SmartContract:
         plain.data = self.prepare_execute_transaction_data(function, arguments)
 
         payload = TransactionPayloadToSign(plain)
-        signature = signing.sign_transaction(payload, caller.pem_file)
+        signature = signing.sign_transaction_with_seed(payload, unhexlify(caller.private_key_seed))
         prepared = PreparedTransaction(plain, signature)
         return prepared
 
@@ -120,7 +122,7 @@ class SmartContract:
         plain.data = self.prepare_upgrade_transaction_data(arguments)
 
         payload = TransactionPayloadToSign(plain)
-        signature = signing.sign_transaction(payload, owner.pem_file)
+        signature = signing.sign_transaction_with_seed(payload, unhexlify(owner.private_key_seed))
         prepared = PreparedTransaction(plain, signature)
         return prepared
 

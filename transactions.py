@@ -1,11 +1,12 @@
 import json
 import logging
+from binascii import unhexlify
 from collections import OrderedDict
 from os import path
 
 from erdpy import config, utils
-from erdpy.accounts import Address
-from erdpy.wallet import pem, signing
+from erdpy.accounts import Account
+from erdpy.wallet import signing
 
 logger = logging.getLogger("transactions")
 
@@ -122,7 +123,7 @@ class BunchOfTransactions:
         plain.data = data
 
         payload = TransactionPayloadToSign(plain)
-        signature = signing.sign_transaction(payload, sender.pem_file)
+        signature = signing.sign_transaction_with_seed(payload, unhexlify(sender.private_key_seed))
         prepared = PreparedTransaction(plain, signature)
 
         self.transactions.append(prepared)
@@ -150,20 +151,22 @@ def prepare(args):
 
 
 def do_prepare_transaction(args):
-    # "sender" taken from the PEM file
-    sender_bytes = pem.get_pubkey(args.pem)
-    sender_bech32 = Address(sender_bytes).bech32()
+    if args.pem:
+        account = Account(pem_file=args.pem)
+    elif args.keyfile and args.passfile:
+        account = Account(key_file=args.keyfile, pass_file=args.passfile)
 
     plain = PlainTransaction()
     plain.nonce = int(args.nonce)
     plain.value = args.value
-    plain.sender = sender_bech32
+    plain.sender = account.address.bech32()
     plain.receiver = args.receiver
     plain.gasPrice = int(args.gas_price)
     plain.gasLimit = int(args.gas_limit)
     plain.data = args.data
 
     payload = TransactionPayloadToSign(plain)
-    signature = signing.sign_transaction(payload, args.pem)
+    signature = signing.sign_transaction_with_seed(payload, unhexlify(account.private_key_seed))
+
     prepared = PreparedTransaction(plain, signature)
     return prepared

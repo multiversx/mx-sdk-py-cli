@@ -1,6 +1,7 @@
 import sys
 
 from erdpy import config, facade
+from erdpy.utils import is_arg_present
 
 
 def setup_parser(subparsers):
@@ -40,7 +41,10 @@ def setup_parser(subparsers):
 
 
 def _add_common_arguments(sub):
-    sub.add_argument("--pem", required=True)
+    sub.add_argument("--pem", required=not(is_arg_present("--keyfile", sys.argv)))
+    sub.add_argument("--keyfile", required=not(is_arg_present("--pem", sys.argv)))
+    sub.add_argument("--passfile", required=not(is_arg_present("--pem", sys.argv)))
+
     sub.add_argument("--nonce", type=int, required=not("--recall-nonce" in sys.argv))
     sub.add_argument("--recall-nonce", action="store_true", default=False)
     sub.add_argument("--value", default="0")

@@ -5,6 +5,7 @@ from os import path
 from erdpy import errors
 from erdpy.wallet import bech32, pem, generate_pair
 from erdpy import utils
+from erdpy.wallet.keyfile import get_password, load_from_key_file
 
 logger = logging.getLogger("accounts")
 
@@ -41,7 +42,7 @@ class AccountsRepository:
 
 
 class Account:
-    def __init__(self, address=None, pem_file=None):
+    def __init__(self, address=None, pem_file=None, key_file=None, pass_file=None):
         self.private_key_seed = None
         self.address = Address(address)
         self.pem_file = pem_file
@@ -51,6 +52,11 @@ class Account:
             seed, pubkey = pem.parse(pem_file)
             self.private_key_seed = seed.hex()
             self.address = Address(pubkey)
+        elif key_file and pass_file:
+            password = get_password(pass_file)
+            address_from_key_file, seed = load_from_key_file(key_file, password)
+            self.private_key_seed = seed.hex()
+            self.address = Address(address_from_key_file)
 
     def sync_nonce(self, proxy):
         logger.info(f"Account.sync_nonce()")
@@ -121,5 +127,5 @@ def _decode_bech32(value):
     hrp, value_bytes = bech32.bech32_decode(bech32_string)
     if hrp != Address.HRP:
         raise errors.BadAddressFormatError(value)
-    decodedBytes = bech32.convertbits(value_bytes, 5, 8, False)
-    return bytearray(decodedBytes)
+    decoded_bytes = bech32.convertbits(value_bytes, 5, 8, False)
+    return bytearray(decoded_bytes)

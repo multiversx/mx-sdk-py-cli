@@ -3,6 +3,7 @@ import sys
 from argparse import FileType
 
 from erdpy import config, facade, ide, projects
+from erdpy.utils import is_arg_present
 
 
 def setup_parser(subparsers):
@@ -32,7 +33,9 @@ def setup_parser(subparsers):
     sub = subparsers.add_parser("deploy", description="Deploy a Smart Contract.")
     sub.add_argument("project", nargs='?', default=os.getcwd(), help="the project directory")
     sub.add_argument("--proxy", required=True, help="the URL of the proxy")
-    sub.add_argument("--pem", required=True, help="the PEM file of the owner")
+    sub.add_argument("--pem", required=not (is_arg_present("--keyfile", sys.argv)), help="the PEM file of the owner")
+    sub.add_argument("--keyfile", required=not (is_arg_present("--pem", sys.argv)))
+    sub.add_argument("--passfile", required=not (is_arg_present("--pem", sys.argv)))
     sub.add_argument("--arguments", nargs='+', help="constructor arguments")
     sub.add_argument("--gas-price", default=config.DEFAULT_GAS_PRICE, help="the gas price")
     sub.add_argument("--gas-limit", required=True, help="the gas limit")
@@ -44,7 +47,11 @@ def setup_parser(subparsers):
     sub = subparsers.add_parser("call")
     sub.add_argument("contract")
     sub.add_argument("--proxy", required=True)
-    sub.add_argument("--pem", required=True)
+
+    sub.add_argument("--pem", required=not (is_arg_present("--keyfile", sys.argv)), help="the PEM file of the owner")
+    sub.add_argument("--keyfile", required=not (is_arg_present("--pem", sys.argv)))
+    sub.add_argument("--passfile", required=not (is_arg_present("--pem", sys.argv)))
+
     sub.add_argument("--function", required=True)
     sub.add_argument("--arguments", nargs='+')
     sub.add_argument("--gas-price", default=config.DEFAULT_GAS_PRICE)
@@ -56,7 +63,11 @@ def setup_parser(subparsers):
     sub.add_argument("contract")
     sub.add_argument("project")
     sub.add_argument("--proxy", required=True)
-    sub.add_argument("--pem", required=True)
+
+    sub.add_argument("--pem", required=not (is_arg_present("--keyfile", sys.argv)), help="the PEM file of the owner")
+    sub.add_argument("--keyfile", required=not (is_arg_present("--pem", sys.argv)))
+    sub.add_argument("--passfile", required=not (is_arg_present("--pem", sys.argv)))
+
     sub.add_argument("--arguments", nargs='+')
     sub.add_argument("--gas-price", default=config.DEFAULT_GAS_PRICE)
     sub.add_argument("--gas-limit", required=True)

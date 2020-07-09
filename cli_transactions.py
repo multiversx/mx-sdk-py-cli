@@ -3,6 +3,7 @@ import sys
 from argparse import FileType
 
 from erdpy import config, facade, transactions
+from erdpy.utils import is_arg_present
 
 
 def setup_parser(subparsers):
@@ -31,7 +32,8 @@ def setup_parser(subparsers):
 
     sub = subparsers.add_parser("new", description="Create a new regular transaction")
     _add_common_arguments(sub)
-    sub.add_argument("--outfile", type=FileType("w"), default=sys.stdout, help="where to save the signed transaction, the hash")
+    sub.add_argument("--outfile", type=FileType("w"), default=sys.stdout, help="where to save the signed transaction, "
+                                                                               "the hash")
     sub.add_argument("--send", action="store_true", default=False)
     sub.add_argument("--proxy", default=config.get_proxy())
     sub.set_defaults(func=create_transaction)
@@ -44,7 +46,10 @@ def setup_parser(subparsers):
 
 
 def _add_common_arguments(sub):
-    sub.add_argument("--pem", required=True)
+    sub.add_argument("--pem", required=not(is_arg_present("--keyfile", sys.argv)))
+    sub.add_argument("--keyfile", required=not(is_arg_present("--pem", sys.argv)))
+    sub.add_argument("--passfile", required=not(is_arg_present("--pem", sys.argv)))
+
     sub.add_argument("--nonce", type=int, required=not("--recall-nonce" in sys.argv))
     sub.add_argument("--recall-nonce", action="store_true", default=False)
     sub.add_argument("--value", default="0")

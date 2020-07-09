@@ -9,6 +9,14 @@ logger = logging.getLogger("wallet")
 
 def sign_transaction(transaction, pem_file):
     seed, _ = pem.parse(pem_file)
+    return sign_tx(transaction, seed)
+
+
+def sign_transaction_with_seed(transaction, seed):
+    return sign_tx(transaction, seed)
+
+
+def sign_tx(transaction, seed):
     signing_key = nacl.signing.SigningKey(seed)
 
     data_json = transaction.to_json()
