@@ -26,6 +26,8 @@ def deploy_smart_contract(args):
     gas_limit = args.gas_limit
     value = args.value
     metadata_upgradeable = args.metadata_upgradeable
+    chain = args.chain
+    version = args.version
 
     # TODO: apply guards
 
@@ -37,7 +39,7 @@ def deploy_smart_contract(args):
     owner = Account(pem_file=pem_file)
 
     def flow():
-        tx_hash, address = environment.deploy_contract(contract, owner, arguments, gas_price, gas_limit, value)
+        tx_hash, address = environment.deploy_contract(contract, owner, arguments, gas_price, gas_limit, value, chain, version)
         logger.info("Tx hash: %s", tx_hash)
         logger.info("Contract address: %s", address)
         utils.dump_out_json({"tx": tx_hash, "contract": address.bech32()}, args.outfile)
@@ -56,13 +58,15 @@ def call_smart_contract(args):
     gas_price = args.gas_price
     gas_limit = args.gas_limit
     value = args.value
+    chain = args.chain
+    version = args.version
 
     contract = SmartContract(contract_address)
     environment = TestnetEnvironment(proxy_url)
     caller = Account(pem_file=pem_file)
 
     def flow():
-        tx_hash = environment.execute_contract(contract, caller, function, arguments, gas_price, gas_limit, value)
+        tx_hash = environment.execute_contract(contract, caller, function, arguments, gas_price, gas_limit, value, chain, version)
         logger.info("Tx hash: %s", tx_hash)
 
     environment.run_flow(flow)
@@ -80,6 +84,8 @@ def upgrade_smart_contract(args):
     gas_limit = args.gas_limit
     value = args.value
     metadata_upgradeable = args.metadata_upgradeable
+    chain = args.chain
+    version = args.version
 
     project = load_project(project_directory)
     bytecode = project.get_bytecode()
@@ -89,7 +95,7 @@ def upgrade_smart_contract(args):
     caller = Account(pem_file=pem_file)
 
     def flow():
-        tx_hash = environment.upgrade_contract(contract, caller, arguments, gas_price, gas_limit, value)
+        tx_hash = environment.upgrade_contract(contract, caller, arguments, gas_price, gas_limit, value, chain, version)
         logger.info("Tx hash: %s", tx_hash)
 
     environment.run_flow(flow)

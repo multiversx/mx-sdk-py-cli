@@ -15,7 +15,7 @@ class SmartContract:
         self.bytecode = bytecode
         self.metadata = metadata or CodeMetadata()
 
-    def deploy(self, proxy, owner, arguments, gas_price, gas_limit, value):
+    def deploy(self, proxy, owner, arguments, gas_price, gas_limit, value, chain, version):
         self.owner = owner
         self.owner.sync_nonce(proxy)
         self.compute_address()
@@ -23,9 +23,9 @@ class SmartContract:
         tx_hash = transaction.send(proxy)
         return tx_hash, self.address
 
-    def prepare_deploy_transaction(self, owner, arguments, gas_price, gas_limit, value):
+    def prepare_deploy_transaction(self, owner, arguments, gas_price, gas_limit, value, chain, version):
         arguments = arguments or []
-        gas_price = int(gas_price or config.DEFAULT_GAS_PRICE)
+        gas_price = int(gas_price)
         gas_limit = int(gas_limit)
         value = str(value or "0")
 
@@ -37,6 +37,8 @@ class SmartContract:
         plain.gasPrice = gas_price
         plain.gasLimit = gas_limit
         plain.data = self.prepare_deploy_transaction_data(arguments)
+        plain.chainID = chain
+        plain.version = version
 
         payload = TransactionPayloadToSign(plain)
         signature = signing.sign_transaction(payload, owner.pem_file)
@@ -62,16 +64,16 @@ class SmartContract:
         address = bytes([0] * 8) + bytes([5, 0]) + address[10:30] + owner_bytes[30:]
         self.address = Address(address)
 
-    def execute(self, proxy, caller, function, arguments, gas_price, gas_limit, value):
+    def execute(self, proxy, caller, function, arguments, gas_price, gas_limit, value, chain, version):
         self.caller = caller
         self.caller.sync_nonce(proxy)
         transaction = self.prepare_execute_transaction(caller, function, arguments, gas_price, gas_limit, value)
         tx_hash = transaction.send(proxy)
         return tx_hash
 
-    def prepare_execute_transaction(self, caller, function, arguments, gas_price, gas_limit, value):
+    def prepare_execute_transaction(self, caller, function, arguments, gas_price, gas_limit, value, chain, version):
         arguments = arguments or []
-        gas_price = int(gas_price or config.DEFAULT_GAS_PRICE)
+        gas_price = int(gas_price)
         gas_limit = int(gas_limit)
         value = str(value or "0")
 
@@ -83,6 +85,8 @@ class SmartContract:
         plain.gasPrice = gas_price
         plain.gasLimit = gas_limit
         plain.data = self.prepare_execute_transaction_data(function, arguments)
+        plain.chainID = chain
+        plain.version = version
 
         payload = TransactionPayloadToSign(plain)
         signature = signing.sign_transaction(payload, caller.pem_file)
@@ -97,14 +101,14 @@ class SmartContract:
 
         return tx_data
 
-    def upgrade(self, proxy, caller, arguments, gas_price, gas_limit, value):
+    def upgrade(self, proxy, caller, arguments, gas_price, gas_limit, value, chain, version):
         self.caller = caller
         self.caller.sync_nonce(proxy)
         transaction = self.prepare_upgrade_transaction(caller, arguments, gas_price, gas_limit, value)
         tx_hash = transaction.send(proxy)
         return tx_hash
 
-    def prepare_upgrade_transaction(self, owner, arguments, gas_price, gas_limit, value):
+    def prepare_upgrade_transaction(self, owner, arguments, gas_price, gas_limit, value, chain, version):
         arguments = arguments or []
         gas_price = int(gas_price or config.DEFAULT_GAS_PRICE)
         gas_limit = int(gas_limit)
@@ -118,6 +122,8 @@ class SmartContract:
         plain.gasPrice = gas_price
         plain.gasLimit = gas_limit
         plain.data = self.prepare_upgrade_transaction_data(arguments)
+        plain.chainID = chain
+        plain.version = version
 
         payload = TransactionPayloadToSign(plain)
         signature = signing.sign_transaction(payload, owner.pem_file)

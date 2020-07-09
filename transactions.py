@@ -48,7 +48,7 @@ class TransactionPayloadToSign:
 
         if config.get_with_chain_and_version():
             ordered_fields["chainID"] = self.chainID
-            ordered_fields["version"] = self.version
+            ordered_fields["version"] = int(self.version)
 
         data_json = json.dumps(ordered_fields, separators=(',', ':')).encode("utf8")
         return data_json
