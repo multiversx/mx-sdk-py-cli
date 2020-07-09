@@ -40,7 +40,7 @@ def setup_parser(subparsers):
     sub.add_argument("--metadata-upgradeable", action="store_true", default=False, help="whether the contract is upgradeable")
     sub.add_argument("--outfile", type=FileType("w"), default=sys.stdout, help="where to save the command's output")
     sub.add_argument("--chain", default=config.get_chain_id())
-    sub.add_argument("--version", default=config.get_tx_version())
+    sub.add_argument("--version", type=int, default=config.get_tx_version())
     sub.set_defaults(func=deploy)
 
     sub = subparsers.add_parser("call")
@@ -53,7 +53,7 @@ def setup_parser(subparsers):
     sub.add_argument("--gas-limit", required=True)
     sub.add_argument("--value", default="0")
     sub.add_argument("--chain", default=config.get_chain_id())
-    sub.add_argument("--version", default=config.get_tx_version())
+    sub.add_argument("--version", type=int, default=config.get_tx_version())
     sub.set_defaults(func=call)
 
     sub = subparsers.add_parser("upgrade")
@@ -67,7 +67,7 @@ def setup_parser(subparsers):
     sub.add_argument("--value", default="0")
     sub.add_argument("--metadata-upgradeable", action="store_true", default=False)
     sub.add_argument("--chain", default=config.get_chain_id())
-    sub.add_argument("--version", default=config.get_tx_version())
+    sub.add_argument("--version", type=int, default=config.get_tx_version())
     sub.set_defaults(func=upgrade)
 
     sub = subparsers.add_parser("query")

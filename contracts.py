@@ -19,7 +19,7 @@ class SmartContract:
         self.owner = owner
         self.owner.sync_nonce(proxy)
         self.compute_address()
-        transaction = self.prepare_deploy_transaction(owner, arguments, gas_price, gas_limit, value)
+        transaction = self.prepare_deploy_transaction(owner, arguments, gas_price, gas_limit, value, chain, version)
         tx_hash = transaction.send(proxy)
         return tx_hash, self.address
 

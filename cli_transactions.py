@@ -54,7 +54,7 @@ def _add_common_arguments(sub):
     sub.add_argument("--data", default="")
     sub.add_argument("--data-file", type=FileType("r"), default=None, help="a file containing transaction data")
     sub.add_argument("--chain", default=config.get_chain_id())
-    sub.add_argument("--version", default=config.get_tx_version())
+    sub.add_argument("--version", type=int, default=config.get_tx_version())
 
 
 def tx_prepare(args):

@@ -162,6 +162,8 @@ def do_prepare_transaction(args):
     plain.gasPrice = int(args.gas_price)
     plain.gasLimit = int(args.gas_limit)
     plain.data = args.data
+    plain.chainID = args.chain
+    plain.version = int(args.version)
 
     payload = TransactionPayloadToSign(plain)
     signature = signing.sign_transaction(payload, args.pem)
