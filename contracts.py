@@ -1,10 +1,15 @@
+import base64
+import logging
+
 from Cryptodome.Hash import keccak
 
-from erdpy import config, errors
+from erdpy import config, errors, utils
 from erdpy.accounts import Address
 from erdpy.transactions import (PlainTransaction, PreparedTransaction,
                                 TransactionPayloadToSign)
 from erdpy.wallet import signing
+
+logger = logging.getLogger("cli.deps")
 
 VM_TYPE_ARWEN = "0500"
 
@@ -150,7 +155,23 @@ class SmartContract:
         }
 
         response = proxy.query_contract(payload)
-        return response["data"]["ReturnData"]
+        return_data = response["data"]["ReturnData"]
+        return [self._interpret_return_data(data) for data in return_data]
+
+    def _interpret_return_data(self, data):
+        try:
+            as_bytes = base64.b64decode(data)
+            as_hex = as_bytes.hex()
+            as_number = int(as_hex, 16)
+
+            result = utils.Object()
+            result.base64 = data
+            result.hex = as_hex
+            result.number = as_number
+            return result
+        except Exception:
+            logger.warn(f"Cannot interpret return data: {data}")
+            return None
 
 
 def _prepare_argument(argument):
