@@ -51,6 +51,8 @@ def _add_common_arguments(sub):
     sub.add_argument("--gas-price", default=config.DEFAULT_GAS_PRICE)
     sub.add_argument("--gas-limit", required=not("--estimate-gas" in sys.argv))
     sub.add_argument("--estimate-gas", action="store_true", default=False)
+    sub.add_argument("--chain", default=config.get_chain_id())
+    sub.add_argument("--version", type=int, default=config.get_tx_version())
     sub.add_argument("--proxy", required=True)
 
 
