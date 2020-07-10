@@ -99,7 +99,7 @@ class PreparedTransaction(PlainTransaction):
         return self.__dict__.copy()
 
     def send(self, proxy):
-        logger.info(f"PreparedTransaction.send:\n{self.to_json()}")
+        logger.info(f"PreparedTransaction.send: nonce={self.nonce}")
         tx_hash = proxy.send_transaction(self.to_dictionary())
         logger.info(f"Hash: {tx_hash}")
         return tx_hash
