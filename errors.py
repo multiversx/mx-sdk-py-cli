@@ -102,3 +102,19 @@ Output: {message}""")
 class UnknownConfigurationError(KnownError):
     def __init__(self, name):
         super().__init__(f"Configuration entry is not known: {name}.")
+        
+
+class UnknownDerivationFunction(KnownError):
+    def __init__(self):
+        super(UnknownDerivationFunction, self).__init__("unknown key derivation function")
+
+
+class UnknownCipher(KnownError):
+    def __init__(self, name):
+        super(UnknownCipher, self).__init__(f"unknown cipher: {name}")
+
+
+class InvalidKeystoreFilePassword(KnownError):
+    def __init__(self):
+        super(InvalidKeystoreFilePassword, self).__init__("provided keystore file password is invalid")
+

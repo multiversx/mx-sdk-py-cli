@@ -1,6 +1,6 @@
 import base64
-import sys
 
+from erdpy import errors
 from binascii import hexlify, unhexlify, b2a_base64
 from json import load
 from cryptography.hazmat.backends import default_backend
@@ -21,8 +21,7 @@ def load_from_key_file(key_file_json, password):
     # derive the decryption key
     kdf_name = keystore['crypto']['kdf']
     if kdf_name != 'scrypt':
-        print('unknown key derivation function', kdf_name)
-        sys.exit(1)
+        raise errors.UnknownDerivationFunction()
 
     salt = unhexlify(keystore['crypto']['kdfparams']['salt'])
     dklen = keystore['crypto']['kdfparams']['dklen']
@@ -36,8 +35,7 @@ def load_from_key_file(key_file_json, password):
     # decrypt the private key with half of the decryption key
     cipher_name = keystore['crypto']['cipher']
     if cipher_name != 'aes-128-ctr':
-        print('unknown cipher or mode', cipher_name)
-        sys.exit(1)
+        raise errors.UnknownCipher(name=cipher_name)
 
     iv = unhexlify(keystore['crypto']['cipherparams']['iv'])
     ciphertext = unhexlify(keystore['crypto']['ciphertext'])
@@ -54,8 +52,7 @@ def load_from_key_file(key_file_json, password):
     mac = h.finalize()
 
     if mac != unhexlify(keystore['crypto']['mac']):
-        print('invalid keystore (MAC does not match)')
-        sys.exit(1)
+        raise errors.InvalidKeystoreFilePassword()
 
     address_bech32 = keystore['bech32']
     private_key = ''.join([pemified_private_key[i:i + 64].decode() for i in range(0, len(pemified_private_key), 64)])

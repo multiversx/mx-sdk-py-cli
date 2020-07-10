@@ -40,7 +40,8 @@ def setup_parser(subparsers):
     sub.add_argument("--gas-price", default=config.DEFAULT_GAS_PRICE, help="the gas price")
     sub.add_argument("--gas-limit", required=True, help="the gas limit")
     sub.add_argument("--value", default="0", help="the value to transfer")
-    sub.add_argument("--metadata-upgradeable", action="store_true", default=False, help="whether the contract is upgradeable")
+    sub.add_argument("--metadata-upgradeable", action="store_true", default=False, help="whether the contract is "
+                                                                                        "upgradeable")
     sub.add_argument("--outfile", type=FileType("w"), default=sys.stdout, help="where to save the command's output")
     sub.set_defaults(func=deploy)
 
@@ -48,7 +49,7 @@ def setup_parser(subparsers):
     sub.add_argument("contract")
     sub.add_argument("--proxy", required=True)
 
-    sub.add_argument("--pem", required=not (is_arg_present("--keyfile", sys.argv)), help="the PEM file of the owner")
+    sub.add_argument("--pem", required=not (is_arg_present("--keyfile", sys.argv)), help="the PEM file")
     sub.add_argument("--keyfile", required=not (is_arg_present("--pem", sys.argv)))
     sub.add_argument("--passfile", required=not (is_arg_present("--pem", sys.argv)))
 
