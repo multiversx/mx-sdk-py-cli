@@ -42,7 +42,6 @@ class FileChannel(OutputChannel):
 
 
 __sinks = {
-    "nodedebug": Sink("nodedebug", channels=[FileChannel("nodedebug")]),
     "llvm": Sink("llvm", channels=[FileChannel("llvm")])
 }
 
