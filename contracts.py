@@ -1,12 +1,15 @@
-from binascii import unhexlify
+import base64
+import logging
 
 from Cryptodome.Hash import keccak
-
-from erdpy import config, errors
+from binascii import unhexlify
+from erdpy import config, errors, utils
 from erdpy.accounts import Address
 from erdpy.transactions import (PlainTransaction, PreparedTransaction,
                                 TransactionPayloadToSign)
 from erdpy.wallet import signing
+
+logger = logging.getLogger("cli.deps")
 
 VM_TYPE_ARWEN = "0500"
 
@@ -17,17 +20,16 @@ class SmartContract:
         self.bytecode = bytecode
         self.metadata = metadata or CodeMetadata()
 
-    def deploy(self, proxy, owner, arguments, gas_price, gas_limit, value):
+    def deploy(self, proxy, owner, arguments, gas_price, gas_limit, value, chain, version):
         self.owner = owner
-        self.owner.sync_nonce(proxy)
         self.compute_address()
-        transaction = self.prepare_deploy_transaction(owner, arguments, gas_price, gas_limit, value)
+        transaction = self.prepare_deploy_transaction(owner, arguments, gas_price, gas_limit, value, chain, version)
         tx_hash = transaction.send(proxy)
         return tx_hash, self.address
 
-    def prepare_deploy_transaction(self, owner, arguments, gas_price, gas_limit, value):
+    def prepare_deploy_transaction(self, owner, arguments, gas_price, gas_limit, value, chain, version):
         arguments = arguments or []
-        gas_price = int(gas_price or config.DEFAULT_GAS_PRICE)
+        gas_price = int(gas_price)
         gas_limit = int(gas_limit)
         value = str(value or "0")
 
@@ -39,6 +41,8 @@ class SmartContract:
         plain.gasPrice = gas_price
         plain.gasLimit = gas_limit
         plain.data = self.prepare_deploy_transaction_data(arguments)
+        plain.chainID = chain
+        plain.version = version
 
         payload = TransactionPayloadToSign(plain)
         signature = signing.sign_transaction_with_seed(payload, unhexlify(owner.private_key_seed))
@@ -64,16 +68,15 @@ class SmartContract:
         address = bytes([0] * 8) + bytes([5, 0]) + address[10:30] + owner_bytes[30:]
         self.address = Address(address)
 
-    def execute(self, proxy, caller, function, arguments, gas_price, gas_limit, value):
+    def execute(self, proxy, caller, function, arguments, gas_price, gas_limit, value, chain, version):
         self.caller = caller
-        self.caller.sync_nonce(proxy)
-        transaction = self.prepare_execute_transaction(caller, function, arguments, gas_price, gas_limit, value)
+        transaction = self.prepare_execute_transaction(caller, function, arguments, gas_price, gas_limit, value, chain, version)
         tx_hash = transaction.send(proxy)
         return tx_hash
 
-    def prepare_execute_transaction(self, caller, function, arguments, gas_price, gas_limit, value):
+    def prepare_execute_transaction(self, caller, function, arguments, gas_price, gas_limit, value, chain, version):
         arguments = arguments or []
-        gas_price = int(gas_price or config.DEFAULT_GAS_PRICE)
+        gas_price = int(gas_price)
         gas_limit = int(gas_limit)
         value = str(value or "0")
 
@@ -85,6 +88,8 @@ class SmartContract:
         plain.gasPrice = gas_price
         plain.gasLimit = gas_limit
         plain.data = self.prepare_execute_transaction_data(function, arguments)
+        plain.chainID = chain
+        plain.version = version
 
         payload = TransactionPayloadToSign(plain)
         signature = signing.sign_transaction_with_seed(payload, unhexlify(caller.private_key_seed))
@@ -99,14 +104,13 @@ class SmartContract:
 
         return tx_data
 
-    def upgrade(self, proxy, caller, arguments, gas_price, gas_limit, value):
+    def upgrade(self, proxy, caller, arguments, gas_price, gas_limit, value, chain, version):
         self.caller = caller
-        self.caller.sync_nonce(proxy)
-        transaction = self.prepare_upgrade_transaction(caller, arguments, gas_price, gas_limit, value)
+        transaction = self.prepare_upgrade_transaction(caller, arguments, gas_price, gas_limit, value, chain, version)
         tx_hash = transaction.send(proxy)
         return tx_hash
 
-    def prepare_upgrade_transaction(self, owner, arguments, gas_price, gas_limit, value):
+    def prepare_upgrade_transaction(self, owner, arguments, gas_price, gas_limit, value, chain, version):
         arguments = arguments or []
         gas_price = int(gas_price or config.DEFAULT_GAS_PRICE)
         gas_limit = int(gas_limit)
@@ -120,6 +124,8 @@ class SmartContract:
         plain.gasPrice = gas_price
         plain.gasLimit = gas_limit
         plain.data = self.prepare_upgrade_transaction_data(arguments)
+        plain.chainID = chain
+        plain.version = version
 
         payload = TransactionPayloadToSign(plain)
         signature = signing.sign_transaction_with_seed(payload, unhexlify(owner.private_key_seed))
@@ -146,7 +152,23 @@ class SmartContract:
         }
 
         response = proxy.query_contract(payload)
-        return response["data"]["ReturnData"]
+        return_data = response["data"]["ReturnData"]
+        return [self._interpret_return_data(data) for data in return_data]
+
+    def _interpret_return_data(self, data):
+        try:
+            as_bytes = base64.b64decode(data)
+            as_hex = as_bytes.hex()
+            as_number = int(as_hex, 16)
+
+            result = utils.Object()
+            result.base64 = data
+            result.hex = as_hex
+            result.number = as_number
+            return result
+        except Exception:
+            logger.warn(f"Cannot interpret return data: {data}")
+            return None
 
 
 def _prepare_argument(argument):

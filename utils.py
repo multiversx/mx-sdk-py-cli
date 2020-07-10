@@ -57,14 +57,14 @@ def read_lines(file):
 
 
 def read_file(f):
-    if isinstance(f, str):
+    if isinstance(f, str) or isinstance(f, pathlib.PosixPath):
         with open(f) as f:
             return f.read()
     return f.read()
 
 
 def write_file(f, text):
-    if isinstance(f, str):
+    if isinstance(f, str) or isinstance(f, pathlib.PosixPath):
         with open(f, "w") as f:
             return f.write(text)
     return f.write(text)

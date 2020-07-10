@@ -32,6 +32,8 @@ def setup_parser(subparsers):
 
     sub = subparsers.add_parser("deploy", description="Deploy a Smart Contract.")
     sub.add_argument("project", nargs='?', default=os.getcwd(), help="the project directory")
+    sub.add_argument("--nonce", type=int, required=not("--recall-nonce" in sys.argv))
+    sub.add_argument("--recall-nonce", action="store_true", default=False)
     sub.add_argument("--proxy", required=True, help="the URL of the proxy")
     sub.add_argument("--pem", required=not (is_arg_present("--keyfile", sys.argv)), help="the PEM file of the owner")
     sub.add_argument("--keyfile", required=not (is_arg_present("--pem", sys.argv)))
@@ -43,10 +45,14 @@ def setup_parser(subparsers):
     sub.add_argument("--metadata-upgradeable", action="store_true", default=False, help="whether the contract is "
                                                                                         "upgradeable")
     sub.add_argument("--outfile", type=FileType("w"), default=sys.stdout, help="where to save the command's output")
+    sub.add_argument("--chain", default=config.get_chain_id())
+    sub.add_argument("--version", type=int, default=config.get_tx_version())
     sub.set_defaults(func=deploy)
 
     sub = subparsers.add_parser("call")
     sub.add_argument("contract")
+    sub.add_argument("--nonce", type=int, required=not("--recall-nonce" in sys.argv))
+    sub.add_argument("--recall-nonce", action="store_true", default=False)
     sub.add_argument("--proxy", required=True)
 
     sub.add_argument("--pem", required=not (is_arg_present("--keyfile", sys.argv)), help="the PEM file")
@@ -58,11 +64,15 @@ def setup_parser(subparsers):
     sub.add_argument("--gas-price", default=config.DEFAULT_GAS_PRICE)
     sub.add_argument("--gas-limit", required=True)
     sub.add_argument("--value", default="0")
+    sub.add_argument("--chain", default=config.get_chain_id())
+    sub.add_argument("--version", type=int, default=config.get_tx_version())
     sub.set_defaults(func=call)
 
     sub = subparsers.add_parser("upgrade")
     sub.add_argument("contract")
     sub.add_argument("project")
+    sub.add_argument("--nonce", type=int, required=not("--recall-nonce" in sys.argv))
+    sub.add_argument("--recall-nonce", action="store_true", default=False)
     sub.add_argument("--proxy", required=True)
 
     sub.add_argument("--pem", required=not (is_arg_present("--keyfile", sys.argv)), help="the PEM file of the owner")
@@ -74,6 +84,8 @@ def setup_parser(subparsers):
     sub.add_argument("--gas-limit", required=True)
     sub.add_argument("--value", default="0")
     sub.add_argument("--metadata-upgradeable", action="store_true", default=False)
+    sub.add_argument("--chain", default=config.get_chain_id())
+    sub.add_argument("--version", type=int, default=config.get_tx_version())
     sub.set_defaults(func=upgrade)
 
     sub = subparsers.add_parser("query")
@@ -82,13 +94,6 @@ def setup_parser(subparsers):
     sub.add_argument("--function", required=True)
     sub.add_argument("--arguments", nargs='+')
     sub.set_defaults(func=query)
-
-    # TODO: arwendebug
-    # node_parser = subparsers.add_parser("nodedebug")
-    # group = node_parser.add_mutually_exclusive_group()
-    # group.add_argument('--stop', action='store_true')
-    # group.add_argument('--restart', action='store_true', default=True)
-    # node_parser.set_defaults(func=do_nodedebug)
 
     sub = subparsers.add_parser("test")
     sub.add_argument("project", nargs='?', default=os.getcwd())

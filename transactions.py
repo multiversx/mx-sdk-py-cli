@@ -49,7 +49,7 @@ class TransactionPayloadToSign:
 
         if config.get_with_chain_and_version():
             ordered_fields["chainID"] = self.chainID
-            ordered_fields["version"] = self.version
+            ordered_fields["version"] = int(self.version)
 
         data_json = json.dumps(ordered_fields, separators=(',', ':')).encode("utf8")
         return data_json
@@ -164,6 +164,8 @@ def do_prepare_transaction(args):
     plain.gasPrice = int(args.gas_price)
     plain.gasLimit = int(args.gas_limit)
     plain.data = args.data
+    plain.chainID = args.chain
+    plain.version = int(args.version)
 
     payload = TransactionPayloadToSign(plain)
     signature = signing.sign_transaction_with_seed(payload, unhexlify(account.private_key_seed))

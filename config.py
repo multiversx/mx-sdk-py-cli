@@ -32,8 +32,8 @@ def get_chain_id() -> str:
     return get_value("chainID")
 
 
-def get_tx_version() -> str:
-    return get_value("txVersion")
+def get_tx_version() -> int:
+    return int(get_value("txVersion"))
 
 
 def get_with_chain_and_version() -> bool:
