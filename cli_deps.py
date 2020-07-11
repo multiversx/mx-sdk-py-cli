@@ -39,7 +39,7 @@ def check(args: Any):
     tag_to_check = tag or default_tag
     installed = module.is_installed(tag_to_check)
     if installed:
-        logger.info(f"[{name} {tag_to_check}] is installed. Default version (tag) is [{default_tag}].")
+        print(f"[{name} {tag_to_check}] is installed. Default version (tag) is [{default_tag}].")
         return
 
-    raise errors.DependencyMissing(name)
+    raise errors.DependencyMissing(name, tag_to_check)
