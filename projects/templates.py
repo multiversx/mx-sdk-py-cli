@@ -7,12 +7,11 @@ from erdpy import errors, utils
 from erdpy.projects import shared
 from erdpy.projects.project_rust import CargoFile
 from erdpy.projects.templates_config import get_templates_repositories
-from texttable import Texttable
 
 logger = logging.getLogger("projects.templates")
 
 
-def list_project_templates(as_json=False):
+def list_project_templates():
     templates = []
 
     for repository in get_templates_repositories():
@@ -22,15 +21,8 @@ def list_project_templates(as_json=False):
 
     templates = sorted(templates, key=lambda item: item.name)
 
-    if as_json:
-        pretty_json = json.dumps([item.__dict__ for item in templates], indent=4)
-        print(pretty_json)
-    else:
-        table = Texttable()
-        table_data = [["Name", "Github", "Language"]]
-        table_data.extend([[item.name, item.github, item.language] for item in templates])
-        table.add_rows(table_data)
-        print(table.draw())
+    pretty_json = json.dumps([item.__dict__ for item in templates], indent=4)
+    print(pretty_json)
 
 
 class TemplateSummary():

@@ -1,7 +1,7 @@
 import logging
 from os import path
 
-from erdpy import dependencies, errors, utils, guards
+from erdpy import errors, utils, guards
 from erdpy.projects import shared
 from erdpy.projects.project_clang import ProjectClang
 from erdpy.projects.project_cpp import ProjectCpp

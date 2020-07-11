@@ -17,7 +17,6 @@ def setup_parser(subparsers):
     sub.set_defaults(func=create)
 
     sub = subparsers.add_parser("templates", description="List the available Smart Contract templates.")
-    sub.add_argument("--json", action="store_true", help="whether to print the list in JSON format")
     sub.set_defaults(func=list_templates)
 
     sub = subparsers.add_parser("build", description="Build a Smart Contract project using the appropriate buildchain.")
@@ -101,8 +100,7 @@ def setup_parser(subparsers):
 
 
 def list_templates(args):
-    json = args.json
-    projects.list_project_templates(json)
+    projects.list_project_templates()
 
 
 def create(args):

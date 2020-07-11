@@ -30,10 +30,10 @@ class Project:
         for module_key in module_keys:
             dependencies.install_module(module_key)
 
-    def get_dependencies(self):
+    def get_dependencies(self) -> list[str]:
         raise NotImplementedError()
 
-    def perform_build(self):
+    def perform_build(self) -> None:
         raise NotImplementedError()
 
     def get_file_wasm(self):
@@ -58,7 +58,7 @@ class Project:
         file = path.join(folder, files[0])
         return Path(file).resolve()
 
-    def _copy_build_artifacts_to_output(self):
+    def _copy_build_artifacts_to_output(self) -> None:
         raise NotImplementedError()
 
     def _copy_to_output(self, file):
