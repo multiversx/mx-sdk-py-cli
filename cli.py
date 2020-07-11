@@ -31,7 +31,6 @@ def _do_main():
 
     if not hasattr(args, "func"):
         parser.print_help()
-        print("HEEELP")
     else:
         args.func(args)
 
@@ -39,8 +38,7 @@ def _do_main():
 def setup_parser():
     parser = ArgumentParser(
         prog="erdpy",
-        formatter_class=argparse.RawDescriptionHelpFormatter,
-        usage="erdpy [-h] [-v] [--verbose] COMMAND-GROUP COMMAND options",
+        usage="erdpy [-h] [-v] [--verbose] COMMAND-GROUP [-h] COMMAND options",
         description="""
 -----------
 DESCRIPTION
@@ -50,7 +48,8 @@ for interacting with the Blockchain (in general) and with Smart Contracts (in pa
 
 erdpy targets a broad audience of users and developers.
 https://docs.elrond.com/tools/erdpy.
-        """
+        """,
+        formatter_class=argparse.RawDescriptionHelpFormatter
     )
 
     parser._positionals.title = "COMMAND GROUPS"

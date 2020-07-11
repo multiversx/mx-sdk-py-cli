@@ -104,7 +104,4 @@ class ClangBuildConfiguration:
     def _get_undefined_file(self):
         package_path = Path(__file__).parent
         # TODO: remove this logic
-        if self.debug:
-            return package_path.joinpath("list_api_debug.txt")
-        else:
-            return package_path.joinpath("list_api.txt")
+        return package_path.joinpath("list_api.txt")

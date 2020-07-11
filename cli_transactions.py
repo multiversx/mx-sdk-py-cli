@@ -33,8 +33,7 @@ def setup_parser(subparsers: Any) -> Any:
 
     sub = subparsers.add_parser("new", description="Create a new regular transaction")
     _add_common_arguments(sub)
-    sub.add_argument("--outfile", type=FileType("w"), default=sys.stdout, help="where to save the signed transaction, "
-                                                                               "the hash")
+    sub.add_argument("--outfile", type=FileType("w"), default=sys.stdout, help="where to save the signed transaction, the hash")
     sub.add_argument("--send", action="store_true", default=False)
     sub.add_argument("--proxy", default=config.get_proxy())
     sub.set_defaults(func=create_transaction)
