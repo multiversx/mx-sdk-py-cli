@@ -1,6 +1,6 @@
 import os.path
 
-from typing import Any
+from typing import Any, Dict
 from erdpy import errors, utils
 
 MODULES_CONFIG_URL = "https://raw.githubusercontent.com/ElrondNetwork/elrond-sdk/master/deps.json"
@@ -71,7 +71,7 @@ def _guard_valid_name(name: str):
         raise errors.UnknownConfigurationError(name)
 
 
-def get_defaults() -> dict[str, Any]:
+def get_defaults() -> Dict[str, Any]:
     return {
         "proxy": "https://api.elrond.com",
         "chainID": "Testnet",
@@ -87,11 +87,11 @@ def get_defaults() -> dict[str, Any]:
     }
 
 
-def _read_file() -> dict[str, Any]:
+def _read_file() -> Dict[str, Any]:
     if not os.path.isfile(CONFIG_PATH):
         return dict()
     return utils.read_json_file(CONFIG_PATH)
 
 
-def _write_file(data: dict[str, Any]):
+def _write_file(data: Dict[str, Any]):
     utils.write_json_file(CONFIG_PATH, data)

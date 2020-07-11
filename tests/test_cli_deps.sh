@@ -11,7 +11,7 @@ testAll() {
 
     ${ERDPY} --verbose deps check rust
     ${ERDPY} --verbose deps check clang
-    ${ERDPY} --verbose deps check arwentools --overwrite
+    ${ERDPY} --verbose deps check arwentools
 
     set +x
 }

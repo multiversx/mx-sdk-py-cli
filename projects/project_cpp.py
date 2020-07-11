@@ -87,7 +87,7 @@ class ProjectCpp(Project):
         os.remove(source_file.with_suffix(".o"))
 
     def _get_llvm_path(self):
-        return dependencies.get_install_directory("llvm")
+        return dependencies.get_module_directory("llvm")
 
     def get_dependencies(self):
         return ["llvm"]

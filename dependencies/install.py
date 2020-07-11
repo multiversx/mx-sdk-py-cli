@@ -1,40 +1,36 @@
 import logging
+from typing import List
 
-from erdpy.dependencies.config import get_all_modules
+from erdpy import config, errors
+from erdpy.dependencies.modules import (ArwenToolsModule, DependencyModule,
+                                        Rust, StandaloneModule)
 
 logger = logging.getLogger("install")
 
 
-def install_group(group_name, overwrite=False):
-    logger.info(f"install_group.group_name: {group_name}")
-
-    modules = _get_modules_by_group(group_name)
-    for module in modules:
-        module.install(overwrite)
-
-
-def install_module(key, overwrite=False):
+def install_module(key: str, tag: str = "", overwrite: bool = False):
     module = get_module_by_key(key)
-    module.install(overwrite)
+    module.install(tag, overwrite)
 
 
-def get_install_directory(key):
+def get_module_directory(key: str) -> str:
     module = get_module_by_key(key)
-    directory = module.get_directory()
+    default_tag = config.get_dependency_tag(key)
+    directory = module.get_directory(default_tag)
     return directory
 
 
-def _get_modules_by_group(group):
-    return [module for module in get_all_modules() if group in module.groups]
+def get_module_by_key(key: str) -> DependencyModule:
+    matches = [module for module in get_all_deps() if module.key == key or key in module.aliases]
+    if len(matches) != 1:
+        raise errors.UnknownDependency(key)
+
+    return matches[0]
 
 
-def get_module_by_key(key):
-    return [module for module in get_all_modules() if module.key == key][0]
-
-
-def is_installed(group_name, overwrite=False) -> bool:
-    modules = _get_modules_by_group(group_name)
-    for module in modules:
-        if not module.is_installed():
-            return False
-    return True
+def get_all_deps() -> List[DependencyModule]:
+    return [
+        StandaloneModule(key="llvm", aliases=["clang", "cpp"]),
+        ArwenToolsModule(key="arwentools", aliases=[]),
+        Rust(key="rust", aliases=[])
+    ]

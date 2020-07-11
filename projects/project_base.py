@@ -1,10 +1,10 @@
 import binascii
-import glob
 import logging
 from os import path
 from pathlib import Path
+from typing import List
 
-from erdpy import dependencies, errors, myprocess, utils
+from erdpy import dependencies, errors, utils
 import shutil
 
 logger = logging.getLogger("Project")
@@ -30,7 +30,7 @@ class Project:
         for module_key in module_keys:
             dependencies.install_module(module_key)
 
-    def get_dependencies(self) -> list[str]:
+    def get_dependencies(self) -> List[str]:
         raise NotImplementedError()
 
     def perform_build(self) -> None:

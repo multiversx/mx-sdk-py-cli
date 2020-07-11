@@ -3,6 +3,7 @@ import logging
 import os
 import shutil
 from os import path
+from typing import Dict, List
 
 from erdpy import config, downloader, errors, myprocess, utils, workstation
 
@@ -10,9 +11,12 @@ logger = logging.getLogger("modules")
 
 
 class DependencyModule:
-    def __init__(self, key: str, aliases: list[str]):
+    def __init__(self, key: str, aliases: List[str]):
         self.key = key
         self.aliases = aliases
+
+    def get_directory(self, tag: str) -> str:
+        raise NotImplementedError()
 
     def install(self, tag: str, overwrite: bool) -> None:
         # Fallback to default tag if not provided
@@ -48,12 +52,12 @@ class DependencyModule:
     def is_installed(self, tag: str) -> bool:
         raise NotImplementedError()
 
-    def get_env(self) -> dict[str, str]:
+    def get_env(self) -> Dict[str, str]:
         raise NotImplementedError()
 
 
 class StandaloneModule(DependencyModule):
-    def __init__(self, key: str, aliases: list[str]):
+    def __init__(self, key: str, aliases: List[str]):
         super().__init__(key, aliases)
 
     def _do_install(self, tag: str):
@@ -61,11 +65,11 @@ class StandaloneModule(DependencyModule):
         self._extract(tag)
 
     def uninstall(self, tag: str):
-        if os.path.isdir(self._get_directory(tag)):
-            shutil.rmtree(self._get_directory(tag))
+        if os.path.isdir(self.get_directory(tag)):
+            shutil.rmtree(self.get_directory(tag))
 
     def is_installed(self, tag: str):
-        return path.isdir(self._get_directory(tag))
+        return path.isdir(self.get_directory(tag))
 
     def _download(self, tag: str):
         url = self._get_download_url(tag)
@@ -74,10 +78,10 @@ class StandaloneModule(DependencyModule):
 
     def _extract(self, tag: str):
         archive_path = self._get_archive_path(tag)
-        destination_folder = self._get_directory(tag)
+        destination_folder = self.get_directory(tag)
         utils.untar(archive_path, destination_folder)
 
-    def _get_directory(self, tag: str):
+    def get_directory(self, tag: str):
         folder = path.join(self.get_parent_directory(), tag)
         return folder
 
@@ -101,11 +105,11 @@ class StandaloneModule(DependencyModule):
 
 
 class ArwenToolsModule(StandaloneModule):
-    def __init__(self, key: str, aliases: list[str]):
+    def __init__(self, key: str, aliases: List[str]):
         super().__init__(key, aliases)
 
     def _post_install(self, tag: str):
-        directory = self._get_directory(tag)
+        directory = self.get_directory(tag)
 
         utils.mark_executable(path.join(directory, "arwen"))
         utils.mark_executable(path.join(directory, "arwendebug"))
@@ -116,7 +120,7 @@ class ArwenToolsModule(StandaloneModule):
 
 
 class Rust(DependencyModule):
-    def __init__(self, key: str, aliases: list[str]):
+    def __init__(self, key: str, aliases: List[str]):
         super().__init__(key, aliases)
 
     def do_install(self):
@@ -129,8 +133,9 @@ class Rust(DependencyModule):
         myprocess.run_process_async(args, env=self.get_env())
 
     def uninstall(self, tag: str):
-        if os.path.isdir(self._get_directory()):
-            shutil.rmtree(self._get_directory())
+        directory = self.get_directory("")
+        if os.path.isdir(directory):
+            shutil.rmtree(directory)
 
     def is_installed(self, tag: str):
         try:
@@ -143,13 +148,15 @@ class Rust(DependencyModule):
         tools_folder = workstation.get_tools_folder()
         return path.join(tools_folder, "rustup.sh")
 
-    def _get_directory(self):
+    def get_directory(self, tag: str):
         tools_folder = workstation.get_tools_folder()
         return path.join(tools_folder, "vendor-rust")
 
     def get_env(self):
+        directory = self.get_directory("")
+
         return {
-            "PATH": f"{path.join(self._get_directory(), 'bin')}:{os.environ['PATH']}",
-            "RUSTUP_HOME": self._get_directory(),
-            "CARGO_HOME": self._get_directory()
+            "PATH": f"{path.join(directory, 'bin')}:{os.environ['PATH']}",
+            "RUSTUP_HOME": directory,
+            "CARGO_HOME": directory
         }

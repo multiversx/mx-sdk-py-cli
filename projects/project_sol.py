@@ -102,11 +102,11 @@ class ProjectSol(Project):
         myprocess.run_process(args)
 
     def _get_soll_path(self):
-        directory = dependencies.get_install_directory("soll")
+        directory = dependencies.get_module_directory("soll")
         return path.join(directory, "soll")
 
     def _get_llvm_path(self):
-        return dependencies.get_install_directory("llvm")
+        return dependencies.get_module_directory("llvm")
 
     def get_dependencies(self):
         return ["soll", "llvm"]

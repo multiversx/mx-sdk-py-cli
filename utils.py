@@ -7,7 +7,7 @@ import shutil
 import stat
 import tarfile
 import zipfile
-from typing import List, Any
+from typing import Dict, List, Any
 
 import toml
 
@@ -79,7 +79,7 @@ def write_toml_file(filename, data):
         toml.dump(data, f)
 
 
-def read_json_file(filename: str) -> dict[str, Any]:
+def read_json_file(filename: str) -> Dict[str, Any]:
     with open(filename) as f:
         return json.load(f)
 
