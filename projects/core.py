@@ -46,20 +46,6 @@ def clean_project(directory):
     logger.info("Project cleaned.")
 
 
-def run_tests(args):
-    project = args.project
-    directory = args.directory
-    wildcard = args.wildcard
-
-    logger.info("run_tests.project: %s", project)
-
-    dependencies.install_module("arwentools")
-
-    guards.is_directory(project)
-    project = load_project(project)
-    project.run_tests(directory, wildcard)
-
-
 def get_projects_in_workspace(workspace):
     guards.is_directory(workspace)
     subfolders = utils.get_subfolders(workspace)

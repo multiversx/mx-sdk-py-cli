@@ -95,12 +95,6 @@ def setup_parser(subparsers):
     sub.add_argument("--arguments", nargs='+')
     sub.set_defaults(func=query)
 
-    sub = subparsers.add_parser("test")
-    sub.add_argument("project", nargs='?', default=os.getcwd())
-    sub.add_argument("--directory", default="test")
-    sub.add_argument("--wildcard", required=False)
-    sub.set_defaults(func=run_tests)
-
     sub = subparsers.add_parser("ide")
     sub.add_argument("workspace", nargs='?', default=os.getcwd())
     sub.set_defaults(func=run_ide)
@@ -149,10 +143,6 @@ def upgrade(args):
 
 def query(args):
     facade.query_smart_contract(args)
-
-
-def run_tests(args):
-    projects.run_tests(args)
 
 
 def run_ide(args):
