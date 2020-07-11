@@ -151,3 +151,13 @@ def is_arg_present(key, args):
             return True
 
     return False
+
+
+# https://code.visualstudio.com/docs/python/debugging
+# https://code.visualstudio.com/docs/python/debugging
+def breakpoint():
+    import debugpy
+    debugpy.listen(5678)
+    print("Waiting for debugger attach")
+    debugpy.wait_for_client()
+    debugpy.breakpoint()
