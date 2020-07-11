@@ -1,8 +1,8 @@
 import os.path
 
+from typing import Any
 from erdpy import errors, utils
 
-DOWNLOAD_MIRROR = "https://ide.elrond.com"
 MODULES_CONFIG_URL = "https://raw.githubusercontent.com/ElrondNetwork/elrond-sdk/master/deps.json"
 
 ROOT_FOLDER_NAME = "elrondsdk"
@@ -40,38 +40,58 @@ def get_with_chain_and_version() -> bool:
     return utils.str_to_bool(get_value("withChainAndVersion"))
 
 
-def get_value(name) -> str:
+def get_dependency_tag(key: str) -> str:
+    return get_value(f"dependencies.{key}.tag")
+
+
+def set_dependency_tag(key: str, tag: str):
+    set_value(f"dependencies.{key}.tag", tag)
+
+
+def get_dependency_url(key: str, tag: str, platform: str) -> str:
+    url_template = get_value(f"dependencies.{key}.urlTemplate.{platform}")
+    return url_template.replace("{TAG}", tag)
+
+
+def get_value(name: str) -> str:
     _guard_valid_name(name)
     data = _read_file()
     return data.get(name, get_defaults()[name])
 
 
-def set_value(name, value):
+def set_value(name: str, value: Any):
     _guard_valid_name(name)
     data = _read_file()
     data[name] = value
     _write_file(data)
 
 
-def _guard_valid_name(name):
+def _guard_valid_name(name: str):
     if name not in get_defaults().keys():
         raise errors.UnknownConfigurationError(name)
 
 
-def get_defaults() -> dict:
+def get_defaults() -> dict[str, Any]:
     return {
         "proxy": "https://api.elrond.com",
         "chainID": "Testnet",
         "txVersion": "1",
-        "withChainAndVersion": False
+        "withChainAndVersion": False,
+        "dependencies.arwentools.tag": "v0.3.26-12-g466a26b",
+        "dependencies.arwentools.urlTemplate.linux": "https://ide.elrond.com/travis-builds/ARWEN_{TAG}_linux_amd64.tar.gz",
+        "dependencies.arwentools.urlTemplate.osx": "https://ide.elrond.com/travis-builds/ARWEN_{TAG}_darwin_amd64.tar.gz",
+        "dependencies.llvm.tag": "v9-19feb",
+        "dependencies.llvm.urlTemplate.linux": "https://ide.elrond.com/vendor-llvm/{TAG}/linux-amd64.tar.gz?t=19feb",
+        "dependencies.llvm.urlTemplate.osx": "https://ide.elrond.com/vendor-llvm/{TAG}/darwin-amd64.tar.gz?t=19feb",
+        "dependencies.rust.tag": "",
     }
 
 
-def _read_file() -> dict:
+def _read_file() -> dict[str, Any]:
     if not os.path.isfile(CONFIG_PATH):
         return dict()
     return utils.read_json_file(CONFIG_PATH)
 
 
-def _write_file(data: dict) -> dict:
+def _write_file(data: dict[str, Any]):
     utils.write_json_file(CONFIG_PATH, data)
