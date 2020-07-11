@@ -1,9 +1,11 @@
 import logging
 import sys
+import argparse
 from argparse import ArgumentParser
+from typing import Any, List
 
 from erdpy import (cli_accounts, cli_blockatlas, cli_config, cli_contracts,
-                   cli_cost, cli_dispatcher, cli_deps, cli_network,
+                   cli_cost, cli_deps, cli_dispatcher, cli_network,
                    cli_transactions, cli_validators, cli_wallet, errors)
 from erdpy._version import __version__
 
@@ -14,7 +16,7 @@ def main():
     try:
         _do_main()
     except errors.KnownError as err:
-        logger.fatal(err.get_pretty())
+        logger.critical(err.get_pretty())
         sys.exit(1)
 
 
@@ -29,28 +31,56 @@ def _do_main():
 
     if not hasattr(args, "func"):
         parser.print_help()
+        print("HEEELP")
     else:
         args.func(args)
 
 
 def setup_parser():
-    parser = ArgumentParser()
-    subparsers = parser.add_subparsers()
+    parser = ArgumentParser(
+        prog="erdpy",
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        usage="erdpy [-h] [-v] [--verbose] COMMAND-GROUP COMMAND options",
+        description="""
+-----------
+DESCRIPTION
+-----------
+erdpy is part of the elrond-sdk and consists of Command Line Tools and Python SDK
+for interacting with the Blockchain (in general) and with Smart Contracts (in particular).
 
-    parser.add_argument('-v', '--version', action='version', version=f"erdpy {__version__}")
+erdpy targets a broad audience of users and developers.
+https://docs.elrond.com/tools/erdpy.
+        """
+    )
+
+    parser._positionals.title = "COMMAND GROUPS"
+    parser._optionals.title = "TOP-LEVEL OPTIONS"
+
+    parser.add_argument("-v", "--version", action="version", version=f"erdpy {__version__}")
     parser.add_argument("--verbose", action="store_true", default=False)
 
-    cli_config.setup_parser(subparsers)
-    cli_deps.setup_parser(subparsers)
-    cli_contracts.setup_parser(subparsers)
-    cli_validators.setup_parser(subparsers)
-    cli_transactions.setup_parser(subparsers)
-    cli_accounts.setup_parser(subparsers)
-    cli_wallet.setup_parser(subparsers)
-    cli_network.setup_parser(subparsers)
-    cli_cost.setup_parser(subparsers)
-    cli_dispatcher.setup_parser(subparsers)
-    cli_blockatlas.setup_parser(subparsers)
+    subparsers = parser.add_subparsers()
+    commands: List[Any] = []
+
+    commands.append(cli_contracts.setup_parser(subparsers))
+    commands.append(cli_transactions.setup_parser(subparsers))
+    commands.append(cli_validators.setup_parser(subparsers))
+    commands.append(cli_accounts.setup_parser(subparsers))
+    commands.append(cli_wallet.setup_parser(subparsers))
+    commands.append(cli_network.setup_parser(subparsers))
+    commands.append(cli_cost.setup_parser(subparsers))
+    commands.append(cli_dispatcher.setup_parser(subparsers))
+    commands.append(cli_blockatlas.setup_parser(subparsers))
+    commands.append(cli_deps.setup_parser(subparsers))
+    commands.append(cli_config.setup_parser(subparsers))
+
+    parser.epilog = """
+----------------------
+COMMAND GROUPS summary
+----------------------
+"""
+    for choice, sub in subparsers.choices.items():
+        parser.epilog += (f"{choice.ljust(30)} {sub.description}\n")
 
     return parser
 

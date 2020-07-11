@@ -1,13 +1,14 @@
 import os
 import sys
 from argparse import FileType
+from typing import Any
 
 from erdpy import config, facade, ide, projects
 from erdpy.utils import is_arg_present
 
 
-def setup_parser(subparsers):
-    parser = subparsers.add_parser("contract")
+def setup_parser(subparsers: Any) -> Any:
+    parser = subparsers.add_parser("contract", description="Build, deploy and interact with Smart Contracts")
     subparsers = parser.add_subparsers()
 
     sub = subparsers.add_parser("new", description="Create a new Smart Contract project based on a template.")
@@ -41,8 +42,7 @@ def setup_parser(subparsers):
     sub.add_argument("--gas-price", default=config.DEFAULT_GAS_PRICE, help="the gas price")
     sub.add_argument("--gas-limit", required=True, help="the gas limit")
     sub.add_argument("--value", default="0", help="the value to transfer")
-    sub.add_argument("--metadata-upgradeable", action="store_true", default=False, help="whether the contract is "
-                                                                                        "upgradeable")
+    sub.add_argument("--metadata-upgradeable", action="store_true", default=False, help="whether the contract is upgradeable")
     sub.add_argument("--outfile", type=FileType("w"), default=sys.stdout, help="where to save the command's output")
     sub.add_argument("--chain", default=config.get_chain_id())
     sub.add_argument("--version", type=int, default=config.get_tx_version())
@@ -98,12 +98,14 @@ def setup_parser(subparsers):
     sub.add_argument("workspace", nargs='?', default=os.getcwd())
     sub.set_defaults(func=run_ide)
 
+    return subparsers
 
-def list_templates(args):
+
+def list_templates(args: Any):
     projects.list_project_templates()
 
 
-def create(args):
+def create(args: Any):
     name = args.name
     template = args.template
     directory = args.directory
@@ -111,12 +113,12 @@ def create(args):
     projects.create_from_template(name, template, directory)
 
 
-def clean(args):
+def clean(args: Any):
     project = args.project
     projects.clean_project(project)
 
 
-def build(args):
+def build(args: Any):
     project = args.project
     options = {
         "debug": args.debug,
@@ -127,35 +129,22 @@ def build(args):
     projects.build_project(project, options)
 
 
-def deploy(args):
+def deploy(args: Any):
     facade.deploy_smart_contract(args)
 
 
-def call(args):
+def call(args: Any):
     facade.call_smart_contract(args)
 
 
-def upgrade(args):
+def upgrade(args: Any):
     facade.upgrade_smart_contract(args)
 
 
-def query(args):
+def query(args: Any):
     facade.query_smart_contract(args)
 
 
-def run_ide(args):
+def run_ide(args: Any):
     workspace = args.workspace
     ide.run_ide(workspace)
-
-
-# def do_nodedebug(args):
-#     stop = args.stop
-#     restart = args.restart
-
-#     if restart:
-#         nodedebug.stop()
-#         nodedebug.start()
-#     elif stop:
-#         nodedebug.stop()
-#     else:
-#         nodedebug.start()

@@ -1,12 +1,13 @@
 import logging
+from typing import Any
 
 from erdpy import facade
 
 logger = logging.getLogger("cli.network")
 
 
-def setup_parser(subparsers):
-    parser = subparsers.add_parser("network")
+def setup_parser(subparsers: Any) -> Any:
+    parser = subparsers.add_parser("network", description="Get Network parameters, such as number of shards, chain identifier etc.")
     subparsers = parser.add_subparsers()
 
     sub = subparsers.add_parser("num-shards")
@@ -28,17 +29,17 @@ def setup_parser(subparsers):
     sub.set_defaults(func=get_meta_block)
 
 
-def get_num_shards(args):
+def get_num_shards(args: Any):
     facade.get_num_shards(args)
 
 
-def get_last_block_nonce(args):
+def get_last_block_nonce(args: Any):
     facade.get_last_block_nonce(args)
 
 
-def get_chain_id(args):
+def get_chain_id(args: Any):
     facade.get_chain_id(args)
 
 
-def get_meta_block(args):
+def get_meta_block(args: Any):
     facade.get_meta_block(args)

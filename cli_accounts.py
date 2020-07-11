@@ -1,12 +1,13 @@
 import logging
+from typing import Any
 
 from erdpy import facade
 
 logger = logging.getLogger("cli.accounts")
 
 
-def setup_parser(subparsers):
-    parser = subparsers.add_parser("account")
+def setup_parser(subparsers: Any) -> Any:
+    parser = subparsers.add_parser("account", description="Get Account data (nonce, balance) from the Network")
     subparsers = parser.add_subparsers()
 
     sub = subparsers.add_parser("get")
@@ -20,6 +21,8 @@ def setup_parser(subparsers):
     sub.add_argument("--proxy", required=True)
     sub.add_argument("--address", required=True)
     sub.set_defaults(func=get_account_transactions)
+
+    return subparsers
 
 
 def get_account(args):

@@ -1,5 +1,6 @@
 import logging
 import sys
+from typing import Any
 
 from erdpy import config, facade
 from erdpy.utils import is_arg_present
@@ -7,8 +8,8 @@ from erdpy.utils import is_arg_present
 logger = logging.getLogger("cli.dispatcher")
 
 
-def setup_parser(subparsers):
-    parser = subparsers.add_parser("dispatcher")
+def setup_parser(subparsers: Any) -> Any:
+    parser = subparsers.add_parser("dispatcher", description="Enqueue transactions, then bulk dispatch them")
     subparsers = parser.add_subparsers()
 
     sub = subparsers.add_parser("enqueue")
@@ -39,18 +40,20 @@ def setup_parser(subparsers):
     sub = subparsers.add_parser("clean")
     sub.set_defaults(func=clean_transactions_queue)
 
+    return subparsers
 
-def enqueue_transaction(args):
+
+def enqueue_transaction(args: Any):
     facade.enqueue_transaction(args)
 
 
-def dispatch_transactions(args):
+def dispatch_transactions(args: Any):
     facade.dispatch_transactions(args)
 
 
-def dispatch_transactions_continuously(args):
+def dispatch_transactions_continuously(args: Any):
     facade.dispatch_transactions_continuously(args)
 
 
-def clean_transactions_queue(args):
+def clean_transactions_queue(args: Any):
     facade.clean_transactions_queue()

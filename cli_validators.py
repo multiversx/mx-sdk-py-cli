@@ -1,11 +1,12 @@
 import sys
+from typing import Any
 
 from erdpy import config, facade
 from erdpy.utils import is_arg_present
 
 
-def setup_parser(subparsers):
-    parser = subparsers.add_parser("validator")
+def setup_parser(subparsers: Any) -> Any:
+    parser = subparsers.add_parser("validator", description="Stake, Unjail and other actions useful for Validators")
     subparsers = parser.add_subparsers()
 
     sub = subparsers.add_parser("stake")
@@ -39,8 +40,10 @@ def setup_parser(subparsers):
     _add_common_arguments(sub)
     sub.set_defaults(func=do_claim)
 
+    return subparsers
 
-def _add_common_arguments(sub):
+
+def _add_common_arguments(sub: Any):
     sub.add_argument("--pem", required=not(is_arg_present("--keyfile", sys.argv)))
     sub.add_argument("--keyfile", required=not(is_arg_present("--pem", sys.argv)))
     sub.add_argument("--passfile", required=not(is_arg_present("--pem", sys.argv)))
@@ -56,25 +59,25 @@ def _add_common_arguments(sub):
     sub.add_argument("--proxy", required=True)
 
 
-def do_stake(args):
+def do_stake(args: Any):
     facade.prepare_and_send_stake_transaction(args)
 
 
-def do_unstake(args):
+def do_unstake(args: Any):
     facade.prepare_and_send_unstake_transaction(args)
 
 
-def do_unbond(args):
+def do_unbond(args: Any):
     facade.prepare_and_send_unbond_transaction(args)
 
 
-def do_unjail(args):
+def do_unjail(args: Any):
     facade.prepare_and_send_unjail_transaction(args)
 
 
-def change_reward_address(args):
+def change_reward_address(args: Any):
     facade.prepare_and_send_change_reward_address_transaction(args)
 
 
-def do_claim(args):
+def do_claim(args: Any):
     facade.prepare_and_send_claim_transaction(args)

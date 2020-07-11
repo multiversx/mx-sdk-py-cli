@@ -7,8 +7,8 @@ from erdpy import config, utils
 logger = logging.getLogger("cli.config")
 
 
-def setup_parser(subparsers: Any):
-    parser = subparsers.add_parser("config")
+def setup_parser(subparsers: Any) -> Any:
+    parser = subparsers.add_parser("config", description="Configure elrond-sdk (default values etc.)")
     subparsers = parser.add_subparsers()
 
     sub = subparsers.add_parser("dump", description="Dumps configuration.")
@@ -22,6 +22,8 @@ def setup_parser(subparsers: Any):
     sub.add_argument("name")
     sub.add_argument("value")
     sub.set_defaults(func=set_value)
+
+    return subparsers
 
 
 def dump(args: Any):

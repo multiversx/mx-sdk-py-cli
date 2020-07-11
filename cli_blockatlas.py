@@ -1,12 +1,13 @@
 import logging
+from typing import Any
 
 from erdpy import facade
 
 logger = logging.getLogger("cli.blockatlas")
 
 
-def setup_parser(subparsers):
-    parser = subparsers.add_parser("blockatlas")
+def setup_parser(subparsers: Any) -> Any:
+    parser = subparsers.add_parser("blockatlas", description="Interact with an Block Atlas instance")
     subparsers = parser.add_subparsers()
 
     parser.add_argument("--url", required=True)
@@ -22,3 +23,5 @@ def setup_parser(subparsers):
     sub = subparsers.add_parser("transactions")
     sub.add_argument("--address", required=True)
     sub.set_defaults(func=facade.blockatlas_get_txs_by_address)
+
+    return subparsers

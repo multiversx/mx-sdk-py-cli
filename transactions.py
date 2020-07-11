@@ -3,6 +3,7 @@ import logging
 from binascii import unhexlify
 from collections import OrderedDict
 from os import path
+from typing import Any
 
 from erdpy import config, utils
 from erdpy.accounts import Account
@@ -140,7 +141,7 @@ class BunchOfTransactions:
         return num_sent, hashes
 
 
-def prepare(args):
+def prepare(args: Any) -> None:
     workspace = args.workspace
     utils.ensure_folder(workspace)
 

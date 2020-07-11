@@ -1,12 +1,13 @@
 import logging
+from typing import Any
 
 from erdpy import facade, proxy
 
 logger = logging.getLogger("cli.cost")
 
 
-def setup_parser(subparsers):
-    cost_parser = subparsers.add_parser("cost")
+def setup_parser(subparsers: Any) -> Any:
+    cost_parser = subparsers.add_parser("cost", description="Estimate cost of Transactions")
     cost_subparsers = cost_parser.add_subparsers()
 
     sub = cost_subparsers.add_parser("gas-price")
@@ -23,6 +24,8 @@ def setup_parser(subparsers):
     sub.add_argument("--function", required=False)
     sub.add_argument("--arguments", nargs='+', required=False)
     sub.set_defaults(func=get_transaction_cost)
+
+    return subparsers
 
 
 def get_transaction_cost(args):
