@@ -10,131 +10,116 @@ logger = logging.getLogger("modules")
 
 
 class DependencyModule:
-    def __init__(self, key, name, tag, groups):
+    def __init__(self, key: str, aliases: list[str]):
         self.key = key
-        self.name = name
-        self.tag = tag
-        self.groups = groups
+        self.aliases = aliases
 
-    def install(self, overwrite):
+    def install(self, tag: str, overwrite: bool) -> None:
+        # Fallback to default tag if not provided
+        tag = tag or config.get_dependency_tag(self.key)
+
+        logger.debug(f"install: key={self.key}, tag={tag}")
+
+        if self._should_skip(tag, overwrite):
+            logger.debug("Already exists. Skip install.")
+            return
+
+        self.uninstall(tag)
+        self._do_install(tag)
+
+        # Upon installation we update the default tag
+        config.set_dependency_tag(self.key, tag)
+        self._post_install(tag)
+
+    def _do_install(self, tag: str) -> None:
         raise NotImplementedError()
 
-    def uninstall(self):
+    def _post_install(self, tag: str):
+        pass
+
+    def _should_skip(self, tag: str, overwrite: bool) -> bool:
+        if overwrite:
+            return False
+        return self.is_installed(tag)
+
+    def uninstall(self, tag: str) -> None:
         raise NotImplementedError()
 
-    def is_installed(self):
+    def is_installed(self, tag: str) -> bool:
         raise NotImplementedError()
 
-    def get_env(self):
+    def get_env(self) -> dict[str, str]:
         raise NotImplementedError()
 
 
 class StandaloneModule(DependencyModule):
-    def __init__(self, key, name, tag, groups, urls_by_platform):
-        super().__init__(key, name, tag, groups)
-        self.urls_by_platform = urls_by_platform
+    def __init__(self, key: str, aliases: list[str]):
+        super().__init__(key, aliases)
 
-    def install(self, overwrite):
-        logger.debug(f"install: name={self.name}, tag={self.tag}")
+    def _do_install(self, tag: str):
+        self._download(tag)
+        self._extract(tag)
 
-        if self._should_skip(overwrite):
-            logger.debug("Already exists. Skip install.")
-            return
+    def uninstall(self, tag: str):
+        if os.path.isdir(self._get_directory(tag)):
+            shutil.rmtree(self._get_directory(tag))
 
-        self.uninstall()
-        self._download()
-        self._extract()
+    def is_installed(self, tag: str):
+        return path.isdir(self._get_directory(tag))
 
-    def uninstall(self):
-        if os.path.isdir(self.get_directory()):
-            shutil.rmtree(self.get_directory())
-
-    def _should_skip(self, overwrite):
-        if overwrite:
-            return False
-
-        return self.is_installed()
-
-    def is_installed(self):
-        return path.isdir(self.get_directory())
-
-    def _download(self):
-        url = self._get_download_url()
-        archive_path = self._get_archive_path()
+    def _download(self, tag: str):
+        url = self._get_download_url(tag)
+        archive_path = self._get_archive_path(tag)
         downloader.download(url, archive_path)
 
-    def _extract(self):
-        archive_path = self._get_archive_path()
-        destination_folder = self.get_directory()
+    def _extract(self, tag: str):
+        archive_path = self._get_archive_path(tag)
+        destination_folder = self._get_directory(tag)
         utils.untar(archive_path, destination_folder)
 
-    def get_directory(self):
-        folder = path.join(self.get_parent_directory(), self.tag)
+    def _get_directory(self, tag: str):
+        folder = path.join(self.get_parent_directory(), tag)
         return folder
 
     def get_parent_directory(self):
         tools_folder = workstation.get_tools_folder()
-        return path.join(tools_folder, self.name)
+        return path.join(tools_folder, self.key)
 
-    def _get_download_url(self):
+    def _get_download_url(self, tag: str) -> str:
         platform = workstation.get_platform()
-        url = self.urls_by_platform.get(platform)
-
+        url = config.get_dependency_url(self.key, tag, platform)
         if url is None:
-            raise errors.PlatformNotSupported(self.name, platform)
+            raise errors.PlatformNotSupported(self.key, platform)
 
-        url = f"{config.DOWNLOAD_MIRROR}/{url}"
+        url = url.replace("{TAG}", tag)
         return url
 
-    def _get_archive_path(self):
+    def _get_archive_path(self, tag: str) -> str:
         tools_folder = workstation.get_tools_folder()
-        archive = path.join(tools_folder, f"{self.name}.{self.tag}.tar.gz")
+        archive = path.join(tools_folder, f"{self.key}.{tag}.tar.gz")
         return archive
-
-    def get_env(self):
-        return {
-            "LD_LIBRARY_PATH": f"{path.join(self.get_directory())}:{os.environ.get('LD_LIBRARY_PATH')}"
-        }
-
-# TODO: clang, cpp modules seem to require "sudo apt install libtinfo5"
-# clang-9: error while loading shared libraries: libtinfo.so.5: cannot open shared object file: No such file or directory
-
-
-class SOLLModule(StandaloneModule):
-    def __init__(self, key, name, tag, groups, urls_by_platform):
-        super().__init__(key, name, tag, groups, urls_by_platform)
-
-    def install(self, overwrite):
-        super().install(overwrite)
-        utils.mark_executable(path.join(self.get_directory(), "soll"))
 
 
 class ArwenToolsModule(StandaloneModule):
-    def __init__(self, key, name, tag, groups, urls_by_platform):
-        super().__init__(key, name, tag, groups, urls_by_platform)
+    def __init__(self, key: str, aliases: list[str]):
+        super().__init__(key, aliases)
 
-    def install(self, overwrite):
-        super().install(overwrite)
-        utils.mark_executable(path.join(self.get_directory(), "arwen"))
-        utils.mark_executable(path.join(self.get_directory(), "arwendebug"))
-        utils.mark_executable(path.join(self.get_directory(), "test"))
+    def _post_install(self, tag: str):
+        directory = self._get_directory(tag)
 
-        utils.symlink(path.join(self.get_directory(), "arwendebug"), os.path.join(self.get_parent_directory(), "arwendebug"))
-        utils.symlink(path.join(self.get_directory(), "test"), os.path.join(self.get_parent_directory(), "mandos-test"))
+        utils.mark_executable(path.join(directory, "arwen"))
+        utils.mark_executable(path.join(directory, "arwendebug"))
+        utils.mark_executable(path.join(directory, "test"))
+
+        utils.symlink(path.join(directory, "arwendebug"), os.path.join(self.get_parent_directory(), "arwendebug"))
+        utils.symlink(path.join(directory, "test"), os.path.join(self.get_parent_directory(), "mandos-test"))
 
 
 class Rust(DependencyModule):
-    def __init__(self, key, name, tag, groups):
-        super().__init__(key, name, tag, groups)
+    def __init__(self, key: str, aliases: list[str]):
+        super().__init__(key, aliases)
 
-    def install(self, overwrite):
-        logger.debug(f"install: name={self.name}, tag={self.tag}")
-
-        if self._should_skip(overwrite):
-            logger.debug("Already exists. Skip install.")
-            return
-
-        self.uninstall()
+    def do_install(self):
         rustup_path = self._get_rustup_path()
         downloader.download("https://sh.rustup.rs", rustup_path)
         utils.mark_executable(rustup_path)
@@ -143,16 +128,11 @@ class Rust(DependencyModule):
                 "minimal", "--target", "wasm32-unknown-unknown", "--no-modify-path", "-y"]
         myprocess.run_process_async(args, env=self.get_env())
 
-    def uninstall(self):
-        if os.path.isdir(self.get_directory()):
-            shutil.rmtree(self.get_directory())
+    def uninstall(self, tag: str):
+        if os.path.isdir(self._get_directory()):
+            shutil.rmtree(self._get_directory())
 
-    def _should_skip(self, overwrite):
-        if overwrite:
-            return False
-        return self.is_installed()
-
-    def is_installed(self):
+    def is_installed(self, tag: str):
         try:
             myprocess.run_process(["rustc", "--version"], env=self.get_env())
             return True
@@ -163,13 +143,13 @@ class Rust(DependencyModule):
         tools_folder = workstation.get_tools_folder()
         return path.join(tools_folder, "rustup.sh")
 
-    def get_directory(self):
+    def _get_directory(self):
         tools_folder = workstation.get_tools_folder()
         return path.join(tools_folder, "vendor-rust")
 
     def get_env(self):
         return {
-            "PATH": f"{path.join(self.get_directory(), 'bin')}:{os.environ['PATH']}",
-            "RUSTUP_HOME": self.get_directory(),
-            "CARGO_HOME": self.get_directory()
+            "PATH": f"{path.join(self._get_directory(), 'bin')}:{os.environ['PATH']}",
+            "RUSTUP_HOME": self._get_directory(),
+            "CARGO_HOME": self._get_directory()
         }
