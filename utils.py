@@ -89,7 +89,7 @@ def write_json_file(filename: str, data: Any):
         json.dump(data, f, indent=4)
 
 
-def dump_out_json(data, outfile):
+def dump_out_json(data: Any, outfile: Any):
     json.dump(data, outfile, indent=4)
 
 

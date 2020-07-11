@@ -1,13 +1,18 @@
 import logging
+import sys
+from typing import Any
 
-from erdpy import config
+from erdpy import config, utils
 
 logger = logging.getLogger("cli.config")
 
 
-def setup_parser(subparsers):
+def setup_parser(subparsers: Any):
     parser = subparsers.add_parser("config")
     subparsers = parser.add_subparsers()
+
+    sub = subparsers.add_parser("dump", description="Dumps configuration.")
+    sub.set_defaults(func=dump)
 
     sub = subparsers.add_parser("get", description="Gets a configuration value.")
     sub.add_argument("name")
@@ -19,10 +24,15 @@ def setup_parser(subparsers):
     sub.set_defaults(func=set_value)
 
 
-def get_value(args):
+def dump(args: Any):
+    data = config.read_file()
+    utils.dump_out_json(data, sys.stdout)
+
+
+def get_value(args: Any):
     value = config.get_value(args.name)
     print(value)
 
 
-def set_value(args):
+def set_value(args: Any):
     config.set_value(args.name, args.value)

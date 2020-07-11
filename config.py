@@ -55,15 +55,15 @@ def get_dependency_url(key: str, tag: str, platform: str) -> str:
 
 def get_value(name: str) -> str:
     _guard_valid_name(name)
-    data = _read_file()
+    data = read_file()
     return data.get(name, get_defaults()[name])
 
 
 def set_value(name: str, value: Any):
     _guard_valid_name(name)
-    data = _read_file()
+    data = read_file()
     data[name] = value
-    _write_file(data)
+    write_file(data)
 
 
 def _guard_valid_name(name: str):
@@ -87,11 +87,11 @@ def get_defaults() -> Dict[str, Any]:
     }
 
 
-def _read_file() -> Dict[str, Any]:
+def read_file() -> Dict[str, Any]:
     if not os.path.isfile(CONFIG_PATH):
         return dict()
     return utils.read_json_file(CONFIG_PATH)
 
 
-def _write_file(data: Dict[str, Any]):
+def write_file(data: Dict[str, Any]):
     utils.write_json_file(CONFIG_PATH, data)
