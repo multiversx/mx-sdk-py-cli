@@ -3,8 +3,12 @@
 source "./shared.sh"
 
 testAll() {
+    set -x
+
     testGeneration
     testBech32
+
+    set +x
 }
 
 testGeneration() {

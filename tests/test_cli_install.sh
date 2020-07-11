@@ -3,6 +3,8 @@
 source "./shared.sh"
 
 testAll() {
+    set -x
+
     ${ERDPY} --verbose deps install rust
     ${ERDPY} --verbose deps install clang
     ${ERDPY} --verbose deps install arwentools --overwrite
@@ -10,4 +12,6 @@ testAll() {
     ${ERDPY} --verbose deps check rust
     ${ERDPY} --verbose deps check clang
     ${ERDPY} --verbose deps check arwentools --overwrite
+
+    set +x
 }

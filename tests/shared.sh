@@ -1,7 +1,5 @@
 export PYTHONPATH=../../
 
-set -x
-
 ERDPY="python3 -m erdpy.cli"
 SANDBOX=testdata-out/SANDBOX
 KEYS=../../examples/keys
