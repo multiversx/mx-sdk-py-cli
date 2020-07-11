@@ -3,7 +3,7 @@ import logging
 import os
 from os import path
 
-from erdpy import dependencies, errors, utils
+from erdpy import errors, utils
 from erdpy.projects import shared
 from erdpy.projects.project_rust import CargoFile
 from erdpy.projects.templates_config import get_templates_repositories
@@ -113,10 +113,6 @@ class TemplateRust(Template):
         logger.info("TemplateRust._extend")
 
     def _replace_placeholders(self):
-        rust_module = dependencies.get_module_by_key("rust")
-        self.rust_directory = rust_module.get_directory()
-        self.rust_bin_directory = path.join(self.rust_directory, "bin")
-
         cargo_path = path.join(self.directory, "Cargo.toml")
         cargo_debug_path = path.join(self.directory, "debug", "Cargo.toml")
         debug_main_path = path.join(self.directory, "debug", "src", "main.rs")
