@@ -33,8 +33,13 @@ class BadUrlError(DownloadError):
 
 
 class DependencyMissing(KnownError):
-    def __init__(self, group):
-        super().__init__(f"Dependency missing. Group: {group}")
+    def __init__(self, name):
+        super().__init__(f"Dependency missing: {name}")
+
+
+class UnknownDependency(KnownError):
+    def __init__(self, name):
+        super().__init__(f"Unknown dependency: {name}")
 
 
 class BadDirectory(KnownError):
@@ -117,4 +122,3 @@ class UnknownCipher(KnownError):
 class InvalidKeystoreFilePassword(KnownError):
     def __init__(self):
         super(InvalidKeystoreFilePassword, self).__init__("provided keystore file password is invalid")
-

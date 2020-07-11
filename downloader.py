@@ -10,7 +10,7 @@ logger = logging.getLogger("downloader")
 CHUNK_SIZE = 1024 * 16
 
 
-def download(url, filename):
+def download(url: str, filename: str) -> None:
     if url is None:
         raise errors.BadUrlError()
 

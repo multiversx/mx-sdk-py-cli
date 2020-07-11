@@ -7,7 +7,7 @@ import shutil
 import stat
 import tarfile
 import zipfile
-from typing import List
+from typing import List, Any
 
 import toml
 
@@ -23,7 +23,7 @@ class Object:
         return data_json
 
 
-def untar(archive_path, destination_folder):
+def untar(archive_path: str, destination_folder: str) -> None:
     logger.debug(f"untar [{archive_path}] to [{destination_folder}].")
 
     ensure_folder(destination_folder)
@@ -79,12 +79,12 @@ def write_toml_file(filename, data):
         toml.dump(data, f)
 
 
-def read_json_file(filename) -> dict:
+def read_json_file(filename: str) -> dict[str, Any]:
     with open(filename) as f:
         return json.load(f)
 
 
-def write_json_file(filename, data):
+def write_json_file(filename: str, data: Any):
     with open(filename, "w") as f:
         json.dump(data, f, indent=4)
 
@@ -97,7 +97,7 @@ def get_subfolders(folder):
     return [item.name for item in os.scandir(folder) if item.is_dir() and not item.name.startswith(".")]
 
 
-def mark_executable(file):
+def mark_executable(file: str) -> None:
     logger.debug(f"Mark [{file}] as executable")
     st = os.stat(file)
     os.chmod(file, st.st_mode | stat.S_IEXEC)
@@ -124,7 +124,7 @@ def remove_folder(folder):
     shutil.rmtree(folder, ignore_errors=True)
 
 
-def symlink(real, link):
+def symlink(real: str, link: str) -> None:
     if os.path.exists(link):
         os.remove(link)
     os.symlink(real, link)
