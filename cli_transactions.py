@@ -1,33 +1,34 @@
 import os
 import sys
 from argparse import FileType
+from typing import Any
 
 from erdpy import config, facade, transactions
 from erdpy.utils import is_arg_present
 
 
-def setup_parser(subparsers):
-    # DEPRECATED
-    sub = subparsers.add_parser("tx-prepare")
-    _add_common_arguments(sub)
-    sub.add_argument("--tag", default="untitled")
-    sub.add_argument("workspace", nargs='?', default=os.getcwd())
-    sub.set_defaults(func=tx_prepare)
+def setup_parser(subparsers: Any) -> Any:
+    # # DEPRECATED
+    # sub = subparsers.add_parser("tx-prepare")
+    # _add_common_arguments(sub)
+    # sub.add_argument("--tag", default="untitled")
+    # sub.add_argument("workspace", nargs='?', default=os.getcwd())
+    # sub.set_defaults(func=tx_prepare)
 
-    # DEPRECATED
-    sub = subparsers.add_parser("tx-send")
-    sub.add_argument("tx")
-    sub.add_argument("--proxy", required=True)
-    sub.set_defaults(func=tx_send)
+    # # DEPRECATED
+    # sub = subparsers.add_parser("tx-send")
+    # sub.add_argument("tx")
+    # sub.add_argument("--proxy", required=True)
+    # sub.set_defaults(func=tx_send)
 
-    # DEPRECATED
-    sub = subparsers.add_parser("tx-prepare-and-send")
-    _add_common_arguments(sub)
-    sub.add_argument("--proxy", required=True)
-    sub.set_defaults(func=tx_prepare_and_send)
+    # # DEPRECATED
+    # sub = subparsers.add_parser("tx-prepare-and-send")
+    # _add_common_arguments(sub)
+    # sub.add_argument("--proxy", required=True)
+    # sub.set_defaults(func=tx_prepare_and_send)
 
     # NEW API
-    parser = subparsers.add_parser("tx")
+    parser = subparsers.add_parser("tx", description="Create and broadcast Transactions")
     subparsers = parser.add_subparsers()
 
     sub = subparsers.add_parser("new", description="Create a new regular transaction")
@@ -44,8 +45,10 @@ def setup_parser(subparsers):
     sub.add_argument("--proxy", default=config.get_proxy())
     sub.set_defaults(func=send_transaction)
 
+    return subparsers
 
-def _add_common_arguments(sub):
+
+def _add_common_arguments(sub: Any):
     sub.add_argument("--pem", required=not(is_arg_present("--keyfile", sys.argv)))
     sub.add_argument("--keyfile", required=not(is_arg_present("--pem", sys.argv)))
     sub.add_argument("--passfile", required=not(is_arg_present("--pem", sys.argv)))
@@ -62,21 +65,21 @@ def _add_common_arguments(sub):
     sub.add_argument("--version", type=int, default=config.get_tx_version())
 
 
-def tx_prepare(args):
+def tx_prepare(args: Any):
     transactions.prepare(args)
 
 
-def tx_send(args):
+def tx_send(args: Any):
     facade.send_prepared_transaction(args)
 
 
-def tx_prepare_and_send(args):
+def tx_prepare_and_send(args: Any):
     facade.prepare_and_send_transaction(args)
 
 
-def create_transaction(args):
+def create_transaction(args: Any):
     facade.create_transaction(args)
 
 
-def send_transaction(args):
+def send_transaction(args: Any):
     facade.send_transaction(args)
