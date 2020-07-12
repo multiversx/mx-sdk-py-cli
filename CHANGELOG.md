@@ -352,3 +352,11 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
  - Removed some deprecated code.
  - `mypy`-related refactoring.
  - Fix accounts CLI. Trucate data for "account get-transactions"
+
+## [0.7.0] - 13.07.2022
+
+### Fixed
+
+ - Installation of `rust` (was broken upon refactoring).
+ - Re-added command `erdpy contract test`.
+ - Throw error when bad input for `erdpy validator ...`.
