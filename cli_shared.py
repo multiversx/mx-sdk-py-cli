@@ -73,5 +73,11 @@ def add_proxy_arg(sub: Any):
     sub.add_argument("--proxy", default=config.get_proxy(), help="🖧 the URL of the proxy (default: %(default)s)")
 
 
-def add_outfile_arg(sub: Any):
-    sub.add_argument("--outfile", type=FileType("w"), default=sys.stdout, help="where to save the command's output (default: stdout)")
+def add_outfile_arg(sub: Any, what: str = ""):
+    what = f"({what})" if what else ""
+    sub.add_argument("--outfile", type=FileType("w"), default=sys.stdout, help=f"where to save the output {what} (default: stdout)")
+
+
+def add_infile_arg(sub: Any, what: str = ""):
+    what = f"({what})" if what else ""
+    sub.add_argument("--infile", type=FileType("r"), default=None, help=f"input file {what}")

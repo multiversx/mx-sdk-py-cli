@@ -1,3 +1,4 @@
+from erdpy import cli_shared
 import os
 import sys
 from argparse import FileType
@@ -28,40 +29,30 @@ def setup_parser(subparsers: Any) -> Any:
     # sub.set_defaults(func=tx_prepare_and_send)
 
     # NEW API
-    parser = subparsers.add_parser("tx", description="Create and broadcast Transactions")
+    parser = cli_shared.add_group_subparser(subparsers, "tx", "Create and broadcast Transactions")
     subparsers = parser.add_subparsers()
 
-    sub = subparsers.add_parser("new", description="Create a new regular transaction")
+    sub = cli_shared.add_command_subparser(subparsers, "tx", "new", "Create a new transaction")
     _add_common_arguments(sub)
-    sub.add_argument("--outfile", type=FileType("w"), default=sys.stdout, help="where to save the signed transaction, the hash")
-    sub.add_argument("--send", action="store_true", default=False)
-    sub.add_argument("--proxy", default=config.get_proxy())
+    cli_shared.add_outfile_arg(sub, what="signed transaction, hash")
+    sub.add_argument("--send", action="store_true", default=False, help="✓ whether to broadcast (send) the transaction (default: %(default)s)")
+    cli_shared.add_proxy_arg(sub)
     sub.set_defaults(func=create_transaction)
 
-    sub = subparsers.add_parser("send", description="Send a previously saved transaction")
-    sub.add_argument("--infile", type=FileType("r"), default=None, help="a previously saved transaction")
-    sub.add_argument("--outfile", type=FileType("w"), default=sys.stdout, help="where to save the output (the hash)")
-    sub.add_argument("--proxy", default=config.get_proxy())
+    sub = cli_shared.add_command_subparser(subparsers, "tx", "send", "Send a previously saved transaction")
+    cli_shared.add_infile_arg(sub, what="a previously saved transaction")
+    cli_shared.add_outfile_arg(sub, what="the hash")
+    cli_shared.add_proxy_arg(sub)
     sub.set_defaults(func=send_transaction)
 
+    parser.epilog = cli_shared.build_group_epilog(subparsers)
     return subparsers
 
 
 def _add_common_arguments(sub: Any):
-    sub.add_argument("--pem", required=not(is_arg_present("--keyfile", sys.argv)))
-    sub.add_argument("--keyfile", required=not(is_arg_present("--pem", sys.argv)))
-    sub.add_argument("--passfile", required=not(is_arg_present("--pem", sys.argv)))
-
-    sub.add_argument("--nonce", type=int, required=not("--recall-nonce" in sys.argv))
-    sub.add_argument("--recall-nonce", action="store_true", default=False)
-    sub.add_argument("--value", default="0")
-    sub.add_argument("--receiver", required=True)
-    sub.add_argument("--gas-price", default=config.DEFAULT_GAS_PRICE)
-    sub.add_argument("--gas-limit", required=True)
-    sub.add_argument("--data", default="")
+    cli_shared.add_wallet_args(sub)
+    cli_shared.add_tx_args(sub)
     sub.add_argument("--data-file", type=FileType("r"), default=None, help="a file containing transaction data")
-    sub.add_argument("--chain", default=config.get_chain_id())
-    sub.add_argument("--version", type=int, default=config.get_tx_version())
 
 
 def tx_prepare(args: Any):
