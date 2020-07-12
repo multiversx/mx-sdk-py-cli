@@ -56,12 +56,6 @@ class ElrondProxy:
         nonce = metrics["erd_nonce"]
         return nonce
 
-    def get_meta_block(self, nonce):
-        url = f"{self.url}/block/meta/{nonce}"
-        response = do_get(url)
-        nonce = response["block"]
-        return nonce
-
     def get_gas_price(self):
         network_config = self._get_network_config()
         price = network_config["erd_min_gas_price"]

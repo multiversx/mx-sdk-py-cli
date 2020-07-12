@@ -1,3 +1,4 @@
+from erdpy import cli_shared
 import logging
 from typing import Any
 
@@ -7,26 +8,24 @@ logger = logging.getLogger("cli.network")
 
 
 def setup_parser(subparsers: Any) -> Any:
-    parser = subparsers.add_parser("network", description="Get Network parameters, such as number of shards, chain identifier etc.")
+    parser = cli_shared.add_group_subparser(subparsers, "network", "Get Network parameters, such as number of shards, chain identifier etc.")
     subparsers = parser.add_subparsers()
 
-    sub = subparsers.add_parser("num-shards")
-    sub.add_argument("--proxy", required=True)
+    sub = cli_shared.add_command_subparser(subparsers, "network", "num-shards", "Get the number of shards.")
+    cli_shared.add_proxy_arg(sub)
     sub.set_defaults(func=get_num_shards)
 
-    sub = subparsers.add_parser("block-nonce")
-    sub.add_argument("--proxy", required=True)
-    sub.add_argument("--shard", required=True)
+    sub = cli_shared.add_command_subparser(subparsers, "network", "block-nonce", "Get the latest block nonce, by shard.")
+    cli_shared.add_proxy_arg(sub)
+    sub.add_argument("--shard", required=True, help="the shard ID (use 4294967295 for metachain)")
     sub.set_defaults(func=get_last_block_nonce)
 
-    sub = subparsers.add_parser("chain")
-    sub.add_argument("--proxy", required=True)
+    sub = cli_shared.add_command_subparser(subparsers, "network", "chain", "Get the chain identifier.")
+    cli_shared.add_proxy_arg(sub)
     sub.set_defaults(func=get_chain_id)
 
-    sub = subparsers.add_parser("meta-block")
-    sub.add_argument("--proxy", required=True)
-    sub.add_argument("--nonce", required=True, type=int)
-    sub.set_defaults(func=get_meta_block)
+    parser.epilog = cli_shared.build_group_epilog(subparsers)
+    return subparsers
 
 
 def get_num_shards(args: Any):
@@ -39,7 +38,3 @@ def get_last_block_nonce(args: Any):
 
 def get_chain_id(args: Any):
     facade.get_chain_id(args)
-
-
-def get_meta_block(args: Any):
-    facade.get_meta_block(args)

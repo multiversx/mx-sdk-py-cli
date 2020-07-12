@@ -214,13 +214,6 @@ def get_chain_id(args):
     return chain_id
 
 
-def get_meta_block(args):
-    proxy = ElrondProxy(args.proxy)
-    block = proxy.get_meta_block(args.nonce)
-    print(block)
-    return block
-
-
 def get_transaction_cost(args: Any, tx_type: Any) -> Any:
     logger.debug("call_get_transaction_cost")
 
