@@ -325,3 +325,30 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 ### Other
 
 - Deprecated commands `stake-prepare` and `stake-send`. Will be replaced soon by `stake --prepare` and `tx send`.
+
+## [0.7.0] - 13.07.2022
+
+ - Redesigned CLI for creating and broadcasting transactions (`erdpy tx`).
+ - Included `chainID` and `version` in transactions (erdpy, erdjs), updated signature accordingly.
+ - Allow provisioning of wallet JSON **key-file** as well, in addition to PEM files (which will be deprecated). Many thanks to [flyingbasalt](https://github.com/flyingbasalt/erdkeys).
+ - Redesign `erdpy-up` to use light Python virtual environments (`venv`).
+ - Allow options `--no-modiy-path` and `--exact-version` in `erdpy-up`
+ - Renamed some CLI commands (for `wallet`, for `tx`).
+ - Cleanup templating logic for Smart Contracts - moved some features to Elrond IDE.
+ - erdtestjs fixes and design improvements / refactoring.
+ - Completely redesigned dependency management (`erdpy deps`), improved associated CLI.
+ - Refactor and group (under `erdpy group`) validator-related commands.
+ - Improved CLI help, added descriptions.
+ - Do not receive mnemonic as parameter in `erdpy wallet derive`, but ask for user input instead.
+ - Add Clean command for Smart Contract projects.
+ - Create symlinks for `arwentools` binaries.
+ - Updated references to `arwentools` components (Mandos, Arwen Debug).
+ - Added CLI group `erdpy config`, which manages `~/elrondsdk/elrond.json`.
+ - Deprecated `~/ElrondSCTools`, which will be removed by `erdpy-up`. The new installation folder is `~/elrondsdk`.
+ - Require Python 3.8 on MacOS.
+ - Smart Contracts `query` - return as base64, hex, number.
+ - Require nonce for SC `deploy` & `call`.
+ - Removed .py SC interaction samples, moved to `sc-examples` `sc-examples-rs` repositories, so that they become available in Elrond IDE.
+ - Removed some deprecated code.
+ - `mypy`-related refactoring.
+ - Fix accounts CLI. Trucate data for "account get-transactions"
