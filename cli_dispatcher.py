@@ -1,9 +1,7 @@
 import logging
-import sys
 from typing import Any
 
-from erdpy import config, facade
-from erdpy.utils import is_arg_present
+from erdpy import cli_shared, config, facade
 
 logger = logging.getLogger("cli.dispatcher")
 
@@ -23,18 +21,14 @@ def setup_parser(subparsers: Any) -> Any:
     sub.set_defaults(func=enqueue_transaction)
 
     sub = subparsers.add_parser("dispatch")
-    sub.add_argument("--proxy", required=True)
-
-    sub.add_argument("--pem", required=not(is_arg_present("--keyfile", sys.argv)))
-    sub.add_argument("--keyfile", required=not(is_arg_present("--pem", sys.argv)))
-    sub.add_argument("--passfile", required=not(is_arg_present("--pem", sys.argv)))
-
+    cli_shared.add_proxy_arg(sub)
+    cli_shared.add_wallet_args(sub)
     sub.set_defaults(func=dispatch_transactions)
 
     sub = subparsers.add_parser("dispatch-continuously")
-    sub.add_argument("--proxy", required=True)
-    sub.add_argument("--pem", required=True)
+    cli_shared.add_proxy_arg(sub)
     sub.add_argument("--interval", required=True)
+    cli_shared.add_wallet_args(sub)
     sub.set_defaults(func=dispatch_transactions_continuously)
 
     sub = subparsers.add_parser("clean")

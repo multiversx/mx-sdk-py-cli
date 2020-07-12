@@ -1,11 +1,8 @@
 import argparse
 import os
-import sys
-from argparse import FileType
-from typing import Any, Text
+from typing import Any
 
-from erdpy import config, facade, projects
-from erdpy.utils import is_arg_present
+from erdpy import cli_shared, facade, projects
 
 
 def setup_parser(subparsers: Any) -> Any:
@@ -19,59 +16,63 @@ def setup_parser(subparsers: Any) -> Any:
 
     subparsers = parser.add_subparsers()
 
-    sub = subparsers.add_parser("new", description="Create a new Smart Contract project based on a template.")
+    sub = _add_command_subparser(subparsers, "new", "Create a new Smart Contract project based on a template.")
     sub.add_argument("name")
     sub.add_argument("--template", required=True, help="the template to use")
-    sub.add_argument("--directory", type=str, default=os.getcwd(), help="the parent directory of the project")
+    sub.add_argument("--directory", type=str, default=os.getcwd(), help="🗀 the parent directory of the project (default: current directory)")
     sub.set_defaults(func=create)
 
-    sub = subparsers.add_parser("templates", description="List the available Smart Contract templates.")
+    sub = _add_command_subparser(subparsers, "templates", "List the available Smart Contract templates.")
     sub.set_defaults(func=list_templates)
 
-    sub = subparsers.add_parser("build", description="Build a Smart Contract project using the appropriate buildchain.")
-    sub.add_argument("project", nargs='?', default=os.getcwd(), help="the project directory")
-    sub.add_argument("--debug", action="store_true", default=False, help="set debug flag")
-    sub.add_argument("--no-optimization", action="store_true", default=False, help="bypass optimizations (for clang)")
+    sub = _add_command_subparser(subparsers, "build", "Build a Smart Contract project using the appropriate buildchain.")
+    _add_project_arg(sub)
+    sub.add_argument("--debug", action="store_true", default=False, help="set debug flag (default: %(default)s)")
+    sub.add_argument("--no-optimization", action="store_true", default=False, help="bypass optimizations (for clang) (default: %(default)s)")
     sub.set_defaults(func=build)
 
     sub = subparsers.add_parser("clean", description="Clean a Smart Contract project.")
-    sub.add_argument("project", nargs='?', default=os.getcwd())
+    _add_project_arg(sub)
     sub.set_defaults(func=clean)
 
-    sub = subparsers.add_parser(
-        "deploy",
-        usage="erdpy contract deploy [-h] options",
-        description="Deploy a Smart Contract.",
-        formatter_class=lambda prog: argparse.HelpFormatter(prog, max_help_position=40)
-    )
-    sub.add_argument("project", nargs='?', default=os.getcwd(), help="the project directory")
-    _add_common_arguments(sub)
-    sub.add_argument("--metadata-upgradeable", action="store_true", default=False, help="whether the contract is upgradeable")
-    sub.add_argument("--outfile", type=FileType("w"), default=sys.stdout, help="where to save the command's output")
+    sub = _add_command_subparser(subparsers, "deploy", "Deploy a Smart Contract.")
+    _add_project_arg(sub)
+    _add_metadata_arg(sub)
+    cli_shared.add_outfile_arg(sub)
+    cli_shared.add_wallet_args(sub)
+    cli_shared.add_proxy_arg(sub)
+    cli_shared.add_tx_args(sub)
+    _add_arguments_arg(sub)
+
     sub.set_defaults(func=deploy)
 
-    sub = subparsers.add_parser("call", description="Interact with a Smart Contract (execute function)")
-    sub.add_argument("contract")
-    _add_common_arguments(sub)
+    sub = _add_command_subparser(subparsers, "call", "Interact with a Smart Contract (execute function).")
+    _add_contract_arg(sub)
+    cli_shared.add_wallet_args(sub)
+    cli_shared.add_proxy_arg(sub)
+    cli_shared.add_tx_args(sub)
+    _add_function_arg(sub)
+    _add_arguments_arg(sub)
+
     sub.set_defaults(func=call)
 
-    sub = subparsers.add_parser("upgrade", description="Upgrade a previously-deployed Smart Contract")
-    sub.add_argument("contract")
-    sub.add_argument("project")
-    _add_common_arguments(sub)
-    sub.add_argument("--metadata-upgradeable", action="store_true", default=False)
+    sub = _add_command_subparser(subparsers, "upgrade", "Upgrade a previously-deployed Smart Contract")
+    _add_contract_arg(sub)
+    _add_project_arg(sub)
+    _add_metadata_arg(sub)
+    cli_shared.add_wallet_args(sub)
+    cli_shared.add_proxy_arg(sub)
+    cli_shared.add_tx_args(sub)
+    _add_arguments_arg(sub)
+
     sub.set_defaults(func=upgrade)
 
-    sub = subparsers.add_parser("query", description="Query a Smart Contract (call a pure function)")
-    sub.add_argument("contract")
-    sub.add_argument("--proxy", required=True)
-    sub.add_argument("--function", required=True)
-    sub.add_argument("--arguments", nargs='+')
+    sub = _add_command_subparser(subparsers, "query", "Query a Smart Contract (call a pure function)")
+    _add_contract_arg(sub)
+    cli_shared.add_proxy_arg(sub)
+    _add_function_arg(sub)
+    _add_arguments_arg(sub)
     sub.set_defaults(func=query)
-
-    # sub = subparsers.add_parser("ide")
-    # sub.add_argument("workspace", nargs='?', default=os.getcwd())
-    # sub.set_defaults(func=run_ide)
 
     parser.epilog = """
 ----------------
@@ -84,19 +85,33 @@ COMMANDS summary
     return subparsers
 
 
-def _add_common_arguments(sub: Any):
-    sub.add_argument("--nonce", type=int, required=not("--recall-nonce" in sys.argv), help="the nonce for the transaction")
-    sub.add_argument("--recall-nonce", action="store_true", default=False, help="whether to recall the nonce when creating the transaction")
-    sub.add_argument("--proxy", default=config.get_proxy(), help="the URL of the proxy")
-    sub.add_argument("--pem", required=not (is_arg_present("--keyfile", sys.argv)), help="the PEM file")
-    sub.add_argument("--keyfile", required=not (is_arg_present("--pem", sys.argv)), help="a JSON keyfile")
-    sub.add_argument("--passfile", required=not (is_arg_present("--pem", sys.argv)), help="a file containing keyfile's password")
-    sub.add_argument("--arguments", nargs='+', help="arguments for the contract transaction")
-    sub.add_argument("--gas-price", default=config.DEFAULT_GAS_PRICE, help="the gas price")
-    sub.add_argument("--gas-limit", required=True, help="the gas limit")
-    sub.add_argument("--value", default="0", help="the value to transfer")
-    sub.add_argument("--chain", default=config.get_chain_id(), help="the chain identifier")
-    sub.add_argument("--version", type=int, default=config.get_tx_version(), help="the transaction version")
+def _add_command_subparser(subparsers: Any, command: str, description: str):
+    return subparsers.add_parser(
+        command,
+        usage=f"erdpy contract {command} [-h] ...",
+        description=description,
+        formatter_class=cli_shared.wider_help_formatter
+    )
+
+
+def _add_project_arg(sub: Any):
+    sub.add_argument("project", nargs='?', default=os.getcwd(), help="🗀 the project directory (default: current directory)")
+
+
+def _add_contract_arg(sub: Any):
+    sub.add_argument("contract", help="🖄 the address of the Smart Contract")
+
+
+def _add_function_arg(sub: Any):
+    sub.add_argument("--function", required=True, help="the function to call")
+
+
+def _add_arguments_arg(sub: Any):
+    sub.add_argument("--arguments", nargs='+', help="arguments for the contract transaction, as numbers or hex-encoded. E.g. --arguments 42 0x64 1000 0xabba")
+
+
+def _add_metadata_arg(sub: Any):
+    sub.add_argument("--metadata-upgradeable", action="store_true", default=False, help="⚙ whether the contract is upgradeable (default: %(default)s)")
 
 
 def list_templates(args: Any):
@@ -141,8 +156,3 @@ def upgrade(args: Any):
 
 def query(args: Any):
     facade.query_smart_contract(args)
-
-
-# def run_ide(args: Any):
-#     workspace = args.workspace
-#     ide.run_ide(workspace)

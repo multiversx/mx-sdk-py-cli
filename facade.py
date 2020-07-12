@@ -1,4 +1,5 @@
 import logging
+from typing import Any
 
 from erdpy import utils, wallet
 from erdpy.accounts import Account, Address
@@ -15,7 +16,7 @@ from erdpy.wallet import pem
 logger = logging.getLogger("facade")
 
 
-def deploy_smart_contract(args):
+def deploy_smart_contract(args: Any):
     logger.debug("deploy_smart_contract")
 
     project_directory = args.project
@@ -54,7 +55,7 @@ def deploy_smart_contract(args):
     environment.run_flow(flow)
 
 
-def call_smart_contract(args):
+def call_smart_contract(args: Any):
     logger.debug("call_smart_contract")
 
     contract_address = args.contract
@@ -86,7 +87,7 @@ def call_smart_contract(args):
     environment.run_flow(flow)
 
 
-def upgrade_smart_contract(args):
+def upgrade_smart_contract(args: Any):
     logger.debug("upgrade_smart_contract")
 
     contract_address = args.contract
@@ -122,7 +123,7 @@ def upgrade_smart_contract(args):
     environment.run_flow(flow)
 
 
-def query_smart_contract(args):
+def query_smart_contract(args: Any):
     logger.debug("query_smart_contract")
 
     contract_address = args.contract

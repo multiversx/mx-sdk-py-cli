@@ -143,7 +143,7 @@ def as_object(input) -> Object:
     return input
 
 
-def is_arg_present(key, args):
+def is_arg_present(key: str, args: List[str]) -> bool:
     for arg in args:
         if arg.find("--data") != -1:
             continue

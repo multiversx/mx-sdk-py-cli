@@ -1,5 +1,6 @@
 import logging
 from os import path
+from typing import Any, Dict
 
 from erdpy import errors, utils, guards
 from erdpy.projects import shared
@@ -26,7 +27,7 @@ def load_project(directory):
         raise errors.NotSupportedProject(directory)
 
 
-def build_project(directory, options):
+def build_project(directory: str, options: Dict[str, Any]):
     directory = path.expanduser(directory)
 
     logger.info("build_project.directory: %s", directory)
@@ -38,7 +39,7 @@ def build_project(directory, options):
     logger.info("Build ran.")
 
 
-def clean_project(directory):
+def clean_project(directory: str):
     directory = path.expanduser(directory)
     guards.is_directory(directory)
     project = load_project(directory)

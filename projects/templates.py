@@ -32,7 +32,7 @@ class TemplateSummary():
         self.language = repository.get_language(name)
 
 
-def create_from_template(name, template_name, directory):
+def create_from_template(name: str, template_name: str, directory: str):
     directory = path.expanduser(directory)
 
     logger.info("create_from_template.name: %s", name)
