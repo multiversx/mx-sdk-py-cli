@@ -1,39 +1,34 @@
 import logging
 from typing import Any
 
-from erdpy import cli_shared, config, facade
+from erdpy import cli_shared, facade
 
 logger = logging.getLogger("cli.dispatcher")
 
 
 def setup_parser(subparsers: Any) -> Any:
-    parser = subparsers.add_parser("dispatcher", description="Enqueue transactions, then bulk dispatch them")
+    parser = cli_shared.add_group_subparser(subparsers, "dispatcher", "Enqueue transactions, then bulk dispatch them")
     subparsers = parser.add_subparsers()
 
-    sub = subparsers.add_parser("enqueue")
-    sub.add_argument("--value", default="0")
-    sub.add_argument("--receiver", required=True)
-    sub.add_argument("--gas-price", default=config.DEFAULT_GAS_PRICE)
-    sub.add_argument("--gas-limit", required=True)
-    sub.add_argument("--data", default="")
-    sub.add_argument("--chain", default=config.get_chain_id())
-    sub.add_argument("--version", default=config.get_tx_version())
+    sub = cli_shared.add_command_subparser(subparsers, "dispatcher", "enqueue", "Enqueue a transaction")
+    cli_shared.add_tx_args(sub, with_nonce=False)
     sub.set_defaults(func=enqueue_transaction)
 
-    sub = subparsers.add_parser("dispatch")
+    sub = cli_shared.add_command_subparser(subparsers, "dispatcher", "dispatch", "Dispatch queued transactions")
     cli_shared.add_proxy_arg(sub)
     cli_shared.add_wallet_args(sub)
     sub.set_defaults(func=dispatch_transactions)
 
-    sub = subparsers.add_parser("dispatch-continuously")
+    sub = cli_shared.add_command_subparser(subparsers, "dispatcher", "dispatch-continuously", "Continuously dispatch queued transactions")
     cli_shared.add_proxy_arg(sub)
-    sub.add_argument("--interval", required=True)
     cli_shared.add_wallet_args(sub)
+    sub.add_argument("--interval", required=True, help="the interval to retrieve transactions from the queue, in seconds")
     sub.set_defaults(func=dispatch_transactions_continuously)
 
-    sub = subparsers.add_parser("clean")
+    sub = cli_shared.add_command_subparser(subparsers, "dispatcher", "clean", "Clear queue of transactions")
     sub.set_defaults(func=clean_transactions_queue)
 
+    parser.epilog = cli_shared.build_group_epilog(subparsers)
     return subparsers
 
 

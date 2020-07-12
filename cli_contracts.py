@@ -33,7 +33,7 @@ def setup_parser(subparsers: Any) -> Any:
     cli_shared.add_outfile_arg(sub)
     cli_shared.add_wallet_args(sub)
     cli_shared.add_proxy_arg(sub)
-    cli_shared.add_tx_args(sub)
+    cli_shared.add_tx_args(sub, with_receiver=False, with_data=False)
     _add_arguments_arg(sub)
 
     sub.set_defaults(func=deploy)
@@ -42,7 +42,7 @@ def setup_parser(subparsers: Any) -> Any:
     _add_contract_arg(sub)
     cli_shared.add_wallet_args(sub)
     cli_shared.add_proxy_arg(sub)
-    cli_shared.add_tx_args(sub)
+    cli_shared.add_tx_args(sub, with_receiver=False, with_data=False)
     _add_function_arg(sub)
     _add_arguments_arg(sub)
 
@@ -54,7 +54,7 @@ def setup_parser(subparsers: Any) -> Any:
     _add_metadata_arg(sub)
     cli_shared.add_wallet_args(sub)
     cli_shared.add_proxy_arg(sub)
-    cli_shared.add_tx_args(sub)
+    cli_shared.add_tx_args(sub, with_receiver=False, with_data=False)
     _add_arguments_arg(sub)
 
     sub.set_defaults(func=upgrade)
