@@ -1,3 +1,4 @@
+from erdpy import cli_shared
 import logging
 import sys
 from typing import Any
@@ -8,22 +9,27 @@ logger = logging.getLogger("cli.config")
 
 
 def setup_parser(subparsers: Any) -> Any:
-    parser = subparsers.add_parser("config", description="Configure elrond-sdk (default values etc.)")
+    parser = cli_shared.add_group_subparser(subparsers, "config", "Configure elrond-sdk (default values etc.)")
     subparsers = parser.add_subparsers()
 
-    sub = subparsers.add_parser("dump", description="Dumps configuration.")
+    sub = cli_shared.add_command_subparser(subparsers, "config", "dump", "Dumps configuration.")
     sub.set_defaults(func=dump)
 
-    sub = subparsers.add_parser("get", description="Gets a configuration value.")
-    sub.add_argument("name")
+    sub = cli_shared.add_command_subparser(subparsers, "config", "get", "Gets a configuration value.")
+    _add_name_arg(sub)
     sub.set_defaults(func=get_value)
 
-    sub = subparsers.add_parser("set", description="Sets a configuration value.")
-    sub.add_argument("name")
-    sub.add_argument("value")
+    sub = cli_shared.add_command_subparser(subparsers, "config", "set", "Sets a configuration value.")
+    _add_name_arg(sub)
+    sub.add_argument("value", help="the new value")
     sub.set_defaults(func=set_value)
 
+    parser.epilog = cli_shared.build_group_epilog(subparsers)
     return subparsers
+
+
+def _add_name_arg(sub: Any):
+    sub.add_argument("name", help="the name of the configuration entry")
 
 
 def dump(args: Any):
