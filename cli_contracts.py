@@ -27,6 +27,12 @@ def setup_parser(subparsers: Any) -> Any:
     _add_project_arg(sub)
     sub.set_defaults(func=clean)
 
+    sub = cli_shared.add_command_subparser(subparsers, "contract", "test", "Run Mandos tests.")
+    _add_project_arg(sub)
+    sub.add_argument("--directory", default="test", help="🗀 the directory containing the tests (default: %(default)s)")
+    sub.add_argument("--wildcard", required=False, help="wildcard to match only specific test files")
+    sub.set_defaults(func=run_tests)
+
     sub = cli_shared.add_command_subparser(subparsers, "contract", "deploy", "Deploy a Smart Contract.")
     _add_project_arg(sub)
     _add_metadata_arg(sub)
@@ -116,6 +122,10 @@ def build(args: Any):
     }
 
     projects.build_project(project, options)
+
+
+def run_tests(args: Any):
+    projects.run_tests(args)
 
 
 def deploy(args: Any):

@@ -1,3 +1,4 @@
+from erdpy import dependencies
 import logging
 from os import path
 from typing import Any, Dict
@@ -45,6 +46,20 @@ def clean_project(directory: str):
     project = load_project(directory)
     project.clean()
     logger.info("Project cleaned.")
+
+
+def run_tests(args: Any):
+    project = args.project
+    directory = args.directory
+    wildcard = args.wildcard
+
+    logger.info("run_tests.project: %s", project)
+
+    dependencies.install_module("arwentools")
+
+    guards.is_directory(project)
+    project = load_project(project)
+    project.run_tests(directory, wildcard)
 
 
 def get_projects_in_workspace(workspace):

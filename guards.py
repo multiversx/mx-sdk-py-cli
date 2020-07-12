@@ -7,7 +7,7 @@ def is_file(input):
         raise errors.BadInputError(input, "is not a valid file")
 
 
-def is_directory(directory):
+def is_directory(directory: str):
     if not os.path.isdir(directory):
         raise errors.BadDirectory(directory)
 

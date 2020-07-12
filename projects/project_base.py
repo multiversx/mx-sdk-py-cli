@@ -1,8 +1,11 @@
 import binascii
+from erdpy.dependencies.modules import StandaloneModule
+from erdpy import myprocess
+import glob
 import logging
 from os import path
 from pathlib import Path
-from typing import List
+from typing import List, cast
 
 from erdpy import dependencies, errors, utils
 import shutil
@@ -80,3 +83,21 @@ class Project:
     def get_bytecode(self):
         bytecode = utils.read_file(self.get_file_wasm().with_suffix(".hex"))
         return bytecode
+
+    def run_tests(self, tests_directory: str, wildcard: str = ""):
+        arwentools = cast(StandaloneModule, dependencies.get_module_by_key("arwentools"))
+        tool_env = arwentools.get_env()
+        tool = path.join(arwentools.get_parent_directory(), "mandos-test")
+        test_folder = path.join(self.directory, tests_directory)
+
+        if not wildcard:
+            args = [tool, test_folder]
+            myprocess.run_process(args, env=tool_env)
+        else:
+            pattern = path.join(test_folder, wildcard)
+            test_files = glob.glob(pattern)
+
+            for test_file in test_files:
+                print("Run test for:", test_file)
+                args = [tool, test_file]
+                myprocess.run_process(args, env=tool_env)
