@@ -115,14 +115,19 @@ class UnknownConfigurationError(KnownError):
 
 class UnknownDerivationFunction(KnownError):
     def __init__(self):
-        super(UnknownDerivationFunction, self).__init__("unknown key derivation function")
+        super().__init__("Unknown key derivation function.")
 
 
 class UnknownCipher(KnownError):
     def __init__(self, name: str):
-        super(UnknownCipher, self).__init__(f"unknown cipher: {name}")
+        super().__init__(f"Unknown cipher: {name}.")
 
 
 class InvalidKeystoreFilePassword(KnownError):
     def __init__(self):
-        super(InvalidKeystoreFilePassword, self).__init__("provided keystore file password is invalid")
+        super().__init__("Provided keystore file password is invalid.")
+
+
+class BadUserInput(KnownError):
+    def __init__(self, message: str):
+        super().__init__(f"Bad user input: {message}.")

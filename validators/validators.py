@@ -1,8 +1,10 @@
 import binascii
 import logging
 
+from erdpy import errors
 from erdpy.accounts import Address
-from erdpy.config import MIN_GAS_LIMIT, GAS_PER_DATA_BYTE, MetaChainSystemSCsCost
+from erdpy.config import (GAS_PER_DATA_BYTE, MIN_GAS_LIMIT,
+                          MetaChainSystemSCsCost)
 
 logger = logging.getLogger("validators")
 
@@ -20,7 +22,7 @@ def parse_args_for_stake(args):
     num_of_nodes = int(args.number_of_nodes)
     keys = args.nodes_public_keys.split(',')
     if num_of_nodes != len(keys):
-        logger.info("number of nodes is not equals with number of provided validators keys")
+        raise errors.BadUserInput("check number of nodes")
         return
 
     reward_address = args.reward_address
