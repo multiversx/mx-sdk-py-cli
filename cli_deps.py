@@ -1,3 +1,4 @@
+from erdpy import cli_shared
 import logging
 from typing import Any
 
@@ -7,22 +8,23 @@ logger = logging.getLogger("cli.deps")
 
 
 def setup_parser(subparsers: Any) -> Any:
-    parser = subparsers.add_parser("deps", description="Manage dependencies or elrond-sdk modules")
+    parser = cli_shared.add_group_subparser(subparsers, "deps", "Manage dependencies or elrond-sdk modules")
     subparsers = parser.add_subparsers()
 
     choices = ["clang", "cpp", "rust", "arwentools"]
 
-    sub = subparsers.add_parser("install", description="Install dependencies or elrond-sdk modules.")
+    sub = cli_shared.add_command_subparser(subparsers, "deps", "install", "Install dependencies or elrond-sdk modules.")
     sub.add_argument("name", choices=choices, help="the dependency to install")
     sub.add_argument("--overwrite", action="store_true", default=False, help="whether to overwrite an existing installation")
     sub.add_argument("--tag", help="the tag or version to install")
     sub.set_defaults(func=install)
 
-    sub = subparsers.add_parser("check", description="Check whether a dependency is installed.")
+    sub = cli_shared.add_command_subparser(subparsers, "deps", "check", "Check whether a dependency is installed.")
     sub.add_argument("name", choices=choices, help="the dependency to check")
     sub.add_argument("--tag", help="the tag or version to check")
     sub.set_defaults(func=check)
 
+    parser.epilog = cli_shared.build_group_epilog(subparsers)
     return subparsers
 
 
