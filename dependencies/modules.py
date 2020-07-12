@@ -118,12 +118,16 @@ class ArwenToolsModule(StandaloneModule):
         utils.symlink(path.join(directory, "arwendebug"), os.path.join(self.get_parent_directory(), "arwendebug"))
         utils.symlink(path.join(directory, "test"), os.path.join(self.get_parent_directory(), "mandos-test"))
 
+    def get_env(self):
+        return {
+        }
+
 
 class Rust(DependencyModule):
     def __init__(self, key: str, aliases: List[str]):
         super().__init__(key, aliases)
 
-    def do_install(self):
+    def _do_install(self, tag: str) -> None:
         rustup_path = self._get_rustup_path()
         downloader.download("https://sh.rustup.rs", rustup_path)
         utils.mark_executable(rustup_path)
