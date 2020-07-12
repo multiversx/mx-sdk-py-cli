@@ -372,22 +372,22 @@ def do_bech32(args):
     return result
 
 
-def blockatlas_get_current_block_number(args):
+def blockatlas_get_current_block_number(args: Any) -> Any:
     client = BlockAtlas(args.url, args.coin)
     number = client.get_current_block_number()
     print(number)
     return number
 
 
-def blockatlas_get_block_by_number(args):
+def blockatlas_get_block_by_number(args: Any) -> Any:
     client = BlockAtlas(args.url, args.coin)
     block = client.get_block_by_number(args.number)
     print(block)
     return block
 
 
-def blockatlas_get_txs_by_address(args):
+def blockatlas_get_txs_by_address(args: Any) -> Any:
     client = BlockAtlas(args.url, args.coin)
     transactions = client.get_txs_by_address(args.address)
-    print(transactions)
+    utils.dump_out_json(transactions, args.outfile)
     return transactions

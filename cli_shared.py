@@ -18,6 +18,7 @@ def add_group_subparser(subparsers: Any, group: str, description: str) -> Any:
         formatter_class=argparse.RawDescriptionHelpFormatter
     )
     parser._positionals.title = "COMMANDS"
+    parser._optionals.title = "OPTIONS"
 
     return parser
 
@@ -32,8 +33,6 @@ COMMANDS summary
         epilog += (f"{choice.ljust(30)} {sub.description}\n")
 
     return epilog
-
-
 
 
 def add_command_subparser(subparsers: Any, group: str, command: str, description: str):
