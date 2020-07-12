@@ -1,3 +1,6 @@
+from erdpy import cli_contracts
+from erdpy.facade import get_transaction_cost
+from erdpy import cli_shared
 import logging
 from typing import Any
 
@@ -7,30 +10,34 @@ logger = logging.getLogger("cli.cost")
 
 
 def setup_parser(subparsers: Any) -> Any:
-    cost_parser = subparsers.add_parser("cost", description="Estimate cost of Transactions")
-    cost_subparsers = cost_parser.add_subparsers()
+    parser = cli_shared.add_group_subparser(subparsers, "cost", "Estimate cost of Transactions")
+    subparsers = parser.add_subparsers()
 
-    sub = cost_subparsers.add_parser("gas-price")
-    sub.add_argument("--proxy", required=True)
+    sub = cli_shared.add_command_subparser(subparsers, "cost", "gas-price", "Query minimum gas price")
+    cli_shared.add_proxy_arg(sub)
     sub.set_defaults(func=get_gas_price)
 
-    sub = cost_subparsers.add_parser("transaction")
-    tx_types = [proxy.TxTypes.SC_CALL, proxy.TxTypes.MOVE_BALANCE, proxy.TxTypes.SC_DEPLOY]
-    sub.add_argument("type", choices=tx_types)
-    sub.add_argument("--proxy", required=True)
-    sub.add_argument("--data", required=False)
-    sub.add_argument("--sc-address", required=False)
-    sub.add_argument("--sc-path", required=False)
-    sub.add_argument("--function", required=False)
-    sub.add_argument("--arguments", nargs='+', required=False)
-    sub.set_defaults(func=get_transaction_cost)
+    sub = cli_shared.add_command_subparser(subparsers, "cost", "tx-transfer", "Query cost of regular transaction (transfer)")
+    cli_shared.add_proxy_arg(sub)
+    sub.add_argument("--data", required=True, help="a transaction payload, required to estimate the cost")
+    sub.set_defaults(func=lambda args: get_transaction_cost(args, proxy.TxTypes.MOVE_BALANCE))
 
+    sub = cli_shared.add_command_subparser(subparsers, "cost", "sc-deploy", "Query cost of Smart Contract deploy transaction")
+    cli_shared.add_proxy_arg(sub)
+    cli_contracts._add_project_arg(sub)
+    cli_contracts._add_arguments_arg(sub)
+    sub.set_defaults(func=lambda args: get_transaction_cost(args, proxy.TxTypes.SC_DEPLOY))
+
+    sub = cli_shared.add_command_subparser(subparsers, "cost", "sc-call", "Query cost of Smart Contract call transaction")
+    cli_shared.add_proxy_arg(sub)
+    cli_contracts._add_contract_arg(sub)
+    cli_contracts._add_function_arg(sub)
+    cli_contracts._add_arguments_arg(sub)
+    sub.set_defaults(func=lambda args: get_transaction_cost(args, proxy.TxTypes.SC_CALL))
+
+    parser.epilog = cli_shared.build_group_epilog(subparsers)
     return subparsers
 
 
-def get_transaction_cost(args):
-    facade.get_transaction_cost(args)
-
-
-def get_gas_price(args):
+def get_gas_price(args: Any):
     facade.get_gas_price(args)

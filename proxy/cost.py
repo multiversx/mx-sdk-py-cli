@@ -17,15 +17,13 @@ class TransactionCostEstimator:
     def __init__(self, proxy_url):
         self.proxy_url = proxy_url
 
-    def estimate_tx_cost(self, arguments):
-        tx_type = arguments.type
-
+    def estimate_tx_cost(self, arguments, tx_type):
         if tx_type == TxTypes.MOVE_BALANCE:
             return self._estimate_move_balance(arguments.data)
         elif tx_type == TxTypes.SC_DEPLOY:
-            return self._estimate_sc_deploy(arguments.sc_path)
+            return self._estimate_sc_deploy(arguments.project)
         else:
-            return self._estimate_sc_call(arguments.sc_address, arguments.function, arguments.arguments)
+            return self._estimate_sc_call(arguments.contract, arguments.function, arguments.arguments)
 
     def _estimate_move_balance(self, data):
         sender = self._SENDER_ADDRESS

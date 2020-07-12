@@ -198,7 +198,7 @@ def get_last_block_nonce(args):
     return nonce
 
 
-def get_gas_price(args):
+def get_gas_price(args: Any) -> Any:
     proxy_url = args.proxy
     proxy = ElrondProxy(proxy_url)
     price = proxy.get_gas_price()
@@ -221,11 +221,12 @@ def get_meta_block(args):
     return block
 
 
-def get_transaction_cost(args):
+def get_transaction_cost(args: Any, tx_type: Any) -> Any:
     logger.debug("call_get_transaction_cost")
 
     cost_estimator = TransactionCostEstimator(args.proxy)
-    result = cost_estimator.estimate_tx_cost(args)
+    result = cost_estimator.estimate_tx_cost(args, tx_type)
+    print("Note: gas estimator is deprecated, will be updated on a future release.")
     print(result)
     return result
 
