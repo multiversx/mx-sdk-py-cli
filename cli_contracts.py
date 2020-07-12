@@ -1,4 +1,3 @@
-import argparse
 import os
 from typing import Any
 
@@ -6,36 +5,29 @@ from erdpy import cli_shared, facade, projects
 
 
 def setup_parser(subparsers: Any) -> Any:
-    parser = subparsers.add_parser(
-        "contract",
-        usage="erdpy contract COMMAND [-h] options",
-        description="Build, deploy and interact with Smart Contracts",
-        formatter_class=argparse.RawDescriptionHelpFormatter
-    )
-    parser._positionals.title = "COMMANDS"
-
+    parser = cli_shared.add_group_subparser(subparsers, "contract", "Build, deploy and interact with Smart Contracts")
     subparsers = parser.add_subparsers()
 
-    sub = _add_command_subparser(subparsers, "new", "Create a new Smart Contract project based on a template.")
+    sub = cli_shared.add_command_subparser(subparsers, "contract", "new", "Create a new Smart Contract project based on a template.")
     sub.add_argument("name")
     sub.add_argument("--template", required=True, help="the template to use")
     sub.add_argument("--directory", type=str, default=os.getcwd(), help="🗀 the parent directory of the project (default: current directory)")
     sub.set_defaults(func=create)
 
-    sub = _add_command_subparser(subparsers, "templates", "List the available Smart Contract templates.")
+    sub = cli_shared.add_command_subparser(subparsers, "contract", "templates", "List the available Smart Contract templates.")
     sub.set_defaults(func=list_templates)
 
-    sub = _add_command_subparser(subparsers, "build", "Build a Smart Contract project using the appropriate buildchain.")
+    sub = cli_shared.add_command_subparser(subparsers, "contract", "build", "Build a Smart Contract project using the appropriate buildchain.")
     _add_project_arg(sub)
     sub.add_argument("--debug", action="store_true", default=False, help="set debug flag (default: %(default)s)")
     sub.add_argument("--no-optimization", action="store_true", default=False, help="bypass optimizations (for clang) (default: %(default)s)")
     sub.set_defaults(func=build)
 
-    sub = subparsers.add_parser("clean", description="Clean a Smart Contract project.")
+    sub = cli_shared.add_command_subparser(subparsers, "contract", "clean", "Clean a Smart Contract project.")
     _add_project_arg(sub)
     sub.set_defaults(func=clean)
 
-    sub = _add_command_subparser(subparsers, "deploy", "Deploy a Smart Contract.")
+    sub = cli_shared.add_command_subparser(subparsers, "contract", "deploy", "Deploy a Smart Contract.")
     _add_project_arg(sub)
     _add_metadata_arg(sub)
     cli_shared.add_outfile_arg(sub)
@@ -46,7 +38,7 @@ def setup_parser(subparsers: Any) -> Any:
 
     sub.set_defaults(func=deploy)
 
-    sub = _add_command_subparser(subparsers, "call", "Interact with a Smart Contract (execute function).")
+    sub = cli_shared.add_command_subparser(subparsers, "contract", "call", "Interact with a Smart Contract (execute function).")
     _add_contract_arg(sub)
     cli_shared.add_wallet_args(sub)
     cli_shared.add_proxy_arg(sub)
@@ -56,7 +48,7 @@ def setup_parser(subparsers: Any) -> Any:
 
     sub.set_defaults(func=call)
 
-    sub = _add_command_subparser(subparsers, "upgrade", "Upgrade a previously-deployed Smart Contract")
+    sub = cli_shared.add_command_subparser(subparsers, "contract", "upgrade", "Upgrade a previously-deployed Smart Contract")
     _add_contract_arg(sub)
     _add_project_arg(sub)
     _add_metadata_arg(sub)
@@ -67,31 +59,15 @@ def setup_parser(subparsers: Any) -> Any:
 
     sub.set_defaults(func=upgrade)
 
-    sub = _add_command_subparser(subparsers, "query", "Query a Smart Contract (call a pure function)")
+    sub = cli_shared.add_command_subparser(subparsers, "contract", "query", "Query a Smart Contract (call a pure function)")
     _add_contract_arg(sub)
     cli_shared.add_proxy_arg(sub)
     _add_function_arg(sub)
     _add_arguments_arg(sub)
     sub.set_defaults(func=query)
 
-    parser.epilog = """
-----------------
-COMMANDS summary
-----------------
-"""
-    for choice, sub in subparsers.choices.items():
-        parser.epilog += (f"{choice.ljust(30)} {sub.description}\n")
-
+    parser.epilog = cli_shared.build_group_epilog(subparsers)
     return subparsers
-
-
-def _add_command_subparser(subparsers: Any, command: str, description: str):
-    return subparsers.add_parser(
-        command,
-        usage=f"erdpy contract {command} [-h] ...",
-        description=description,
-        formatter_class=cli_shared.wider_help_formatter
-    )
 
 
 def _add_project_arg(sub: Any):

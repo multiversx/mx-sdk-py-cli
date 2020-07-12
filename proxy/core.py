@@ -1,3 +1,4 @@
+from erdpy.accounts import Address
 import logging
 
 from erdpy.proxy.http_facade import do_get, do_post
@@ -9,30 +10,37 @@ logger = logging.getLogger("proxy")
 
 
 class ElrondProxy:
-    def __init__(self, url):
+    def __init__(self, url: str):
         self.url = url
 
-    def get_account_nonce(self, address):
+    def get_account_nonce(self, address: Address):
         url = f"{self.url}/address/{address.bech32()}"
         response = do_get(url)
         nonce = response["account"]["nonce"]
         return nonce
 
-    def get_account_balance(self, address):
+    def get_account_balance(self, address: Address):
         url = f"{self.url}/address/{address.bech32()}/balance"
         response = do_get(url)
         balance = response["balance"]
         return balance
 
-    def get_account(self, address):
+    def get_account(self, address: Address):
         url = f"{self.url}/address/{address.bech32()}"
         response = do_get(url)
         return response
 
-    def get_account_transactions(self, address):
+    def get_account_transactions(self, address: Address):
+        TRUNCATE_DATA_THRESHOLD = 75
+
         url = f"{self.url}/address/{address.bech32()}/transactions"
         response = do_get(url)
-        return response
+        transactions = response.get("transactions", [])
+        for transaction in transactions:
+            data = transaction.get("data", "")
+            data = (data[:TRUNCATE_DATA_THRESHOLD] + ' ... truncated ...') if len(data) > TRUNCATE_DATA_THRESHOLD else data
+            transaction["data"] = data
+        return transactions
 
     def get_num_shards(self):
         network_config = self._get_network_config()

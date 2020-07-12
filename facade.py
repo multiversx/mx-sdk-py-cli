@@ -141,7 +141,7 @@ def query_smart_contract(args: Any):
     environment.run_flow(flow)
 
 
-def get_account_nonce(args):
+def get_account_nonce(args: Any) -> Any:
     proxy_url = args.proxy
     address = args.address
 
@@ -151,7 +151,7 @@ def get_account_nonce(args):
     return nonce
 
 
-def get_account_balance(args):
+def get_account_balance(args: Any) -> Any:
     proxy_url = args.proxy
     address = args.address
 
@@ -161,7 +161,7 @@ def get_account_balance(args):
     return balance
 
 
-def get_account(args):
+def get_account(args: Any) -> Any:
     proxy_url = args.proxy
     address = args.address
 
@@ -171,14 +171,14 @@ def get_account(args):
     return account
 
 
-def get_account_transactions(args):
+def get_account_transactions(args: Any) -> Any:
     proxy_url = args.proxy
     address = args.address
 
     proxy = ElrondProxy(proxy_url)
-    account = proxy.get_account_transactions(Address(address))
-    print(account)
-    return account
+    response = proxy.get_account_transactions(Address(address))
+    utils.dump_out_json(response, args.outfile)
+    return response
 
 
 def get_num_shards(args):

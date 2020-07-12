@@ -1,3 +1,4 @@
+from erdpy import cli_shared
 import logging
 from typing import Any
 
@@ -7,25 +8,32 @@ logger = logging.getLogger("cli.accounts")
 
 
 def setup_parser(subparsers: Any) -> Any:
-    parser = subparsers.add_parser("account", description="Get Account data (nonce, balance) from the Network")
+    parser = cli_shared.add_group_subparser(subparsers, "account", "Get Account data (nonce, balance) from the Network")
     subparsers = parser.add_subparsers()
 
-    sub = subparsers.add_parser("get")
-    sub.add_argument("--proxy", required=True)
-    sub.add_argument("--address", required=True)
-    sub.add_argument("--balance", required=False, nargs='?', const=True, default=False)
-    sub.add_argument("--nonce", required=False, nargs='?', const=True, default=False)
+    sub = cli_shared.add_command_subparser(subparsers, "account", "get", "Query account details (nonce, balance etc.)")
+    cli_shared.add_proxy_arg(sub)
+    _add_address_arg(sub)
+    mutex = sub.add_mutually_exclusive_group()
+    mutex.add_argument("--balance", action="store_true", help="whether to only fetch the balance")
+    mutex.add_argument("--nonce", action="store_true", help="whether to only fetch the nonce")
     sub.set_defaults(func=get_account)
 
-    sub = subparsers.add_parser("get-transactions")
-    sub.add_argument("--proxy", required=True)
-    sub.add_argument("--address", required=True)
+    sub = cli_shared.add_command_subparser(subparsers, "account", "get-transactions", "Query account transactions")
+    cli_shared.add_proxy_arg(sub)
+    cli_shared.add_outfile_arg(sub)
+    _add_address_arg(sub)
     sub.set_defaults(func=get_account_transactions)
 
+    parser.epilog = cli_shared.build_group_epilog(subparsers)
     return subparsers
 
 
-def get_account(args):
+def _add_address_arg(sub: Any):
+    sub.add_argument("--address", required=True, help="🖄 the address to query")
+
+
+def get_account(args: Any):
     if args.balance:
         facade.get_account_balance(args)
     elif args.nonce:
@@ -34,5 +42,5 @@ def get_account(args):
         facade.get_account(args)
 
 
-def get_account_transactions(args):
+def get_account_transactions(args: Any):
     facade.get_account_transactions(args)

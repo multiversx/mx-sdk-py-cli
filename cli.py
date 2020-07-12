@@ -38,7 +38,7 @@ def _do_main():
 def setup_parser():
     parser = ArgumentParser(
         prog="erdpy",
-        usage="erdpy [-h] [-v] [--verbose] COMMAND-GROUP [-h] COMMAND options",
+        usage="erdpy [-h] [-v] [--verbose] COMMAND-GROUP [-h] COMMAND ...",
         description="""
 -----------
 DESCRIPTION

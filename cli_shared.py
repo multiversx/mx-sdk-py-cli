@@ -10,6 +10,41 @@ def wider_help_formatter(prog: Text):
     return argparse.HelpFormatter(prog, max_help_position=50, width=120)
 
 
+def add_group_subparser(subparsers: Any, group: str, description: str) -> Any:
+    parser = subparsers.add_parser(
+        group,
+        usage=f"erdpy {group} COMMAND [-h] ...",
+        description=description,
+        formatter_class=argparse.RawDescriptionHelpFormatter
+    )
+    parser._positionals.title = "COMMANDS"
+
+    return parser
+
+
+def build_group_epilog(subparsers: Any) -> str:
+    epilog = """
+----------------
+COMMANDS summary
+----------------
+"""
+    for choice, sub in subparsers.choices.items():
+        epilog += (f"{choice.ljust(30)} {sub.description}\n")
+
+    return epilog
+
+
+
+
+def add_command_subparser(subparsers: Any, group: str, command: str, description: str):
+    return subparsers.add_parser(
+        command,
+        usage=f"erdpy {group} {command} [-h] ...",
+        description=description,
+        formatter_class=wider_help_formatter
+    )
+
+
 def add_tx_args(sub: Any):
     sub.add_argument("--nonce", type=int, required=not("--recall-nonce" in sys.argv), help="# the nonce for the transaction")
     sub.add_argument("--recall-nonce", action="store_true", default=False, help="⭮ whether to recall the nonce when creating the transaction (default: %(default)s)")
