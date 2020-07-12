@@ -43,9 +43,9 @@ def setup_parser(subparsers: Any) -> Any:
 
 
 def _add_common_arguments(sub: Any):
+    cli_shared.add_proxy_arg(sub)
     cli_shared.add_wallet_args(sub)
-    cli_shared.add_tx_args(sub, with_receiver=False, with_data=False)
-    sub.add_argument("--estimate-gas", action="store_true", default=False)
+    cli_shared.add_tx_args(sub, with_receiver=False, with_data=False, with_estimate_gas=True)
 
 
 def _add_nodes_arg(sub: Any):

@@ -44,7 +44,7 @@ def add_command_subparser(subparsers: Any, group: str, command: str, description
     )
 
 
-def add_tx_args(sub: Any, with_nonce: bool = True, with_receiver: bool = True, with_data: bool = True):
+def add_tx_args(sub: Any, with_nonce: bool = True, with_receiver: bool = True, with_data: bool = True, with_estimate_gas: bool = False):
     if with_nonce:
         sub.add_argument("--nonce", type=int, required=not("--recall-nonce" in sys.argv), help="# the nonce for the transaction")
         sub.add_argument("--recall-nonce", action="store_true", default=False, help="⭮ whether to recall the nonce when creating the transaction (default: %(default)s)")
@@ -53,7 +53,10 @@ def add_tx_args(sub: Any, with_nonce: bool = True, with_receiver: bool = True, w
         sub.add_argument("--receiver", required=True, help="🖄 the address of the receiver")
 
     sub.add_argument("--gas-price", default=config.DEFAULT_GAS_PRICE, help="⛽ the gas price (default: %(default)d)")
-    sub.add_argument("--gas-limit", required=True, help="⛽ the gas limit")
+    sub.add_argument("--gas-limit", required=not("--estimate-gas" in sys.argv), help="⛽ the gas limit")
+    if with_estimate_gas:
+        sub.add_argument("--estimate-gas", action="store_true", default=False, help="⛽ whether to estimate the gas limit (default: %(default)d)")
+
     sub.add_argument("--value", default="0", help="the value to transfer (default: %(default)s)")
 
     if with_data:

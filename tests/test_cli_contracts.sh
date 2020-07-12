@@ -3,7 +3,6 @@
 source "./shared.sh"
 
 testTrivialCommands() {
-    ${ERDPY} contract --help
     ${ERDPY} contract templates
 }
 
