@@ -113,7 +113,7 @@ class BunchOfTransactions:
     def add_prepared(self, transaction):
         self.transactions.append(transaction)
 
-    def add(self, sender, receiver_address, nonce, value, data, gas_price, gas_limit):
+    def add(self, sender, receiver_address, nonce, value, data, gas_price, gas_limit, chain, version):
         plain = PlainTransaction()
         plain.nonce = int(nonce)
         plain.value = str(value)
@@ -122,6 +122,8 @@ class BunchOfTransactions:
         plain.gasPrice = gas_price
         plain.gasLimit = gas_limit
         plain.data = data
+        plain.chainID = chain
+        plain.version = version
 
         payload = TransactionPayloadToSign(plain)
         signature = signing.sign_transaction_with_seed(payload, unhexlify(sender.private_key_seed))
