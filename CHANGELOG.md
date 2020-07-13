@@ -353,7 +353,7 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
  - `mypy`-related refactoring.
  - Fix accounts CLI. Trucate data for "account get-transactions"
 
-## [0.7.0] - 13.07.2022
+## [0.7.1] - 13.07.2022
 
 ### Fixed
 
