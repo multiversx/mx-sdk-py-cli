@@ -353,10 +353,16 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
  - `mypy`-related refactoring.
  - Fix accounts CLI. Trucate data for "account get-transactions"
 
-## [0.7.1] - 13.07.2022
+## [0.7.1] - 13.07.2020
 
 ### Fixed
 
  - Installation of `rust` (was broken upon refactoring).
  - Re-added command `erdpy contract test`.
  - Throw error when bad input for `erdpy validator ...`.
+
+## [0.7.2] - 13.07.2020
+
+### Fixed
+
+ - Fixed call to `BunchOfTransactions`.
