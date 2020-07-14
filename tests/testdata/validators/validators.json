@@ -1,0 +1,13 @@
+{
+  "validators" : [
+    {
+      "pemFilePath": "./tests/testdata/validators/valPem1.pem"
+    },
+    {
+      "pemFilePath": "./tests/testdata/validators/valPem2.pem"
+    },
+      {
+      "pemFilePath": "./tests/testdata/validators/valPem3.pem"
+    }
+  ]
+}

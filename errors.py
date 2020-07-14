@@ -62,7 +62,7 @@ class PlatformNotSupported(KnownError):
 
 
 class BuildError(KnownError):
-    def __init__(self, message: str, inner: Union[Error, None] = None):
+    def __init__(self, message, inner=None):
         super().__init__(f"Build error: {message}.", inner)
 
 
@@ -131,3 +131,9 @@ class InvalidKeystoreFilePassword(KnownError):
 class BadUserInput(KnownError):
     def __init__(self, message: str):
         super().__init__(f"Bad user input: {message}.")
+
+
+class CannotSignMessageWithBLSKey(KnownError):
+    def __init__(self):
+        super(CannotSignMessageWithBLSKey, self).__init__("cannot sign message with BLS key")
+

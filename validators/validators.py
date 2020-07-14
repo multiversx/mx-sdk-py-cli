@@ -1,10 +1,18 @@
 import binascii
+import json
 import logging
 
 from erdpy import errors
 from erdpy.accounts import Address
 from erdpy.config import (GAS_PER_DATA_BYTE, MIN_GAS_LIMIT,
                           MetaChainSystemSCsCost)
+from os import path
+
+from erdpy import guards
+from erdpy.accounts import Address, Account
+from erdpy.config import MIN_GAS_LIMIT, GAS_PER_DATA_BYTE, MetaChainSystemSCsCost
+from erdpy.wallet.pem import parse_validator_pem
+from erdpy.wallet.signing import sign_message_with_bls_key
 
 logger = logging.getLogger("validators")
 
@@ -18,18 +26,35 @@ def estimate_system_sc_call(args, base_cost, factor=1):
     return gas_limit
 
 
+def _read_json_file(file_path):
+    val_file = path.expanduser(file_path)
+    guards.is_file(val_file)
+    with open(file_path,  "r") as json_file:
+        try:
+            data = json.load(json_file)
+        except Exception:
+            raise Exception("cannot read validators data")
+        return data
+
+
 def parse_args_for_stake(args):
-    num_of_nodes = int(args.number_of_nodes)
-    keys = args.nodes_public_keys.split(',')
-    if num_of_nodes != len(keys):
-        raise errors.BadUserInput("check number of nodes")
-        return
+    validators_data_file = args.validators_data_file
+    validators_data = _read_json_file(validators_data_file)
 
     reward_address = args.reward_address
 
+    if args.pem:
+        account = Account(pem_file=args.pem)
+    elif args.keyfile and args.passfile:
+        account = Account(key_file=args.keyfile, pass_file=args.passfile)
+
+    num_of_nodes = len(validators_data["validators"])
     stake_data = 'stake@' + binascii.hexlify(num_of_nodes.to_bytes(1, byteorder="little")).decode()
-    for key in keys:
-        stake_data += '@' + key + '@' + convert_to_hex('genesis')
+    for validator in validators_data["validators"]:
+        # get validator
+        seed, bls_key = parse_validator_pem(validator["pemFilePath"])
+        signed_message = sign_message_with_bls_key(account.address.pubkey().hex(), seed.hex())
+        stake_data += f"@{bls_key}@{signed_message}"
 
     if reward_address:
         reward_address = Address(args.reward_address)
@@ -39,7 +64,7 @@ def parse_args_for_stake(args):
     args.data = stake_data
 
     if args.estimate_gas:
-        args.gas_limit = estimate_system_sc_call(args, MetaChainSystemSCsCost.STAKE, len(keys))
+        args.gas_limit = estimate_system_sc_call(args, MetaChainSystemSCsCost.STAKE, num_of_nodes)
 
     return args
 

@@ -4,14 +4,14 @@ from erdpy import cli_shared, facade
 
 
 def setup_parser(subparsers: Any) -> Any:
-    parser = cli_shared.add_group_subparser(subparsers, "validator", "Stake, Unjail and other actions useful for Validators")
+    parser = cli_shared.add_group_subparser(subparsers, "validator", "Stake, Unjail and other actions useful for "
+                                                                     "Validators")
     subparsers = parser.add_subparsers()
 
     sub = cli_shared.add_command_subparser(subparsers, "validator", "stake", "Stake value into the Network")
     _add_common_arguments(sub)
-    sub.add_argument("--number-of-nodes", required=True, help="number of nodes to register")
-    _add_nodes_arg(sub)
     sub.add_argument("--reward-address", default="", help="the reward address")
+    sub.add_argument("--validators-data-file", required=True)
     sub.set_defaults(func=do_stake)
 
     sub = cli_shared.add_command_subparser(subparsers, "validator", "unstake", "Unstake value")

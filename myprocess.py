@@ -15,7 +15,7 @@ def run_process(args: List[str], env: Any = None):
     try:
         output = subprocess.check_output(args, shell=False, universal_newlines=True, stderr=subprocess.STDOUT, env=env)
         logger.info("Successful run. Output:")
-        print(output or "[No output]")
+        # print(output or "[No output]")
         return output
     except subprocess.CalledProcessError as error:
         raise errors.ExternalProcessError(error.cmd, error.output)
@@ -30,7 +30,8 @@ def run_process_async(args: List[str], env: Any = None):
 
 
 async def async_subprocess(args, env=None, sinks=None):
-    process = await asyncio.create_subprocess_exec(*args, env=env, stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.PIPE)
+    process = await asyncio.create_subprocess_exec(*args, env=env, stdout=asyncio.subprocess.PIPE,
+                                                   stderr=asyncio.subprocess.PIPE)
 
     await asyncio.wait([
         _read_stream(process.stdout, sinks),

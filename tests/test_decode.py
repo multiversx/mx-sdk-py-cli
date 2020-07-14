@@ -1,4 +1,5 @@
 import unittest
+from ctypes import CDLL
 
 from erdpy.wallet.keyfile import load_from_key_file, get_password
 
@@ -15,7 +16,9 @@ class TestDecode(unittest.TestCase):
         self.assertEqual("erd1cps3p86d0rkluvx6n2l2j2xudy9dgdk4qtjf3pjpga8s5748nezqpxtsdd", address)
         self.assertEqual("Erdpy#123", password)
 
+    def test_second(self):
+        so_file = "/home/miiu/Projects/elrond-sdk/erdpy/tests/testdata/libmclbn384_256.so"
+        my_functions = CDLL(so_file)
 
-
-
+        print(type(my_functions))
 

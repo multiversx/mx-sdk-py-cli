@@ -25,6 +25,26 @@ def parse(pem_file):
     return seed, pubkey
 
 
+def parse_validator_pem(pem_file):
+    pem_file = path.expanduser(pem_file)
+    guards.is_file(pem_file)
+
+    lines = utils.read_lines(pem_file)
+
+    first_line = lines[0]
+    start = first_line.find('for ') + len('for ')
+    stop = first_line.rfind('-----')
+    bls_key = first_line[start:stop]
+
+    lines = [line for line in lines if "-----" not in line]
+    key_base64 = "".join(lines)
+    key_hex = base64.b64decode(key_base64).decode()
+    key_bytes = bytes.fromhex(key_hex)
+
+    seed = key_bytes
+    return seed, bls_key
+
+
 def write(pem_file, seed, pubkey, name=None):
     pem_file = path.expanduser(pem_file)
 
