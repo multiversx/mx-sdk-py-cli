@@ -292,7 +292,7 @@ def send_transaction(args):
     args.outfile.writelines([output.to_json(), "\n"])
 
 
-def prepare_and_send_stake_transaction(args):
+def prepare_and_send_stake_transaction(args: Any):
     args = validators.parse_args_for_stake(args)
     return prepare_and_send_transaction(args)
 

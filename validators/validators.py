@@ -1,5 +1,6 @@
 import binascii
 import logging
+from typing import Any
 
 from erdpy import errors
 from erdpy.accounts import Address
@@ -18,7 +19,7 @@ def estimate_system_sc_call(args, base_cost, factor=1):
     return gas_limit
 
 
-def parse_args_for_stake(args):
+def parse_args_for_stake(args: Any):
     num_of_nodes = int(args.number_of_nodes)
     keys = args.nodes_public_keys.split(',')
     if num_of_nodes != len(keys):
