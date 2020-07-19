@@ -8,7 +8,7 @@ MODULES_CONFIG_URL = "https://raw.githubusercontent.com/ElrondNetwork/elrond-sdk
 ROOT_FOLDER_NAME = "elrondsdk"
 CONFIG_PATH = os.path.expanduser("~/elrondsdk/erdpy.json")
 
-DEFAULT_GAS_PRICE = 200000000000
+DEFAULT_GAS_PRICE = 1000000000
 GAS_PER_DATA_BYTE = 1500
 MIN_GAS_LIMIT = 50000
 
