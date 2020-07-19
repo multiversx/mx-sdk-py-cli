@@ -147,6 +147,45 @@ class WalletTestCase(unittest.TestCase):
 
         self.assertEqual("c621788d31825a9ff5f6719e0677a734986c34aa2d1ea1c932854180898c6b8e970570c42c7880818efa37cc233499225bd45783008551a5b16ce12a54cc6506", signature)
 
+    def test_sign_transaction_docs_scenario(self):
+        pem = str(self.testdata.joinpath("keys", "alice.pem"))
+
+        # With data
+        transaction = PlainTransaction()
+        transaction.nonce = 7
+        transaction.value = "10000000000000000000"  # 10 ERD
+        transaction.sender = "erd1l453hd0gt5gzdp7czpuall8ggt2dcv5zwmfdf3sd3lguxseux2fsmsgldz"
+        transaction.receiver = "erd1cux02zersde0l7hhklzhywcxk4u9n4py5tdxyx7vrvhnza2r4gmq4vw35r"
+        transaction.gasPrice = 1000000000
+        transaction.gasLimit = 70000
+        transaction.data = "for the book"
+        transaction.chainID = "m1.0"
+        transaction.version = 1
+        payload = TransactionPayloadToSign(transaction)
+        serialized = payload.to_json().decode()
+        signature = signing.sign_transaction(payload, pem)
+
+        self.assertEqual("""{"nonce":7,"value":"10000000000000000000","receiver":"erd1cux02zersde0l7hhklzhywcxk4u9n4py5tdxyx7vrvhnza2r4gmq4vw35r","sender":"erd1l453hd0gt5gzdp7czpuall8ggt2dcv5zwmfdf3sd3lguxseux2fsmsgldz","gasPrice":1000000000,"gasLimit":70000,"data":"for the book","chainID":"m1.0","version":1}""", serialized)
+        self.assertEqual("c58aeeef4f6c9a9a0d8fc693fe131810a491a53c82f88fabde3a3d4164fb227df6a6b9c0e84c5c8db4610eaddd5e1dbdaef5fc01d3f03acef1b11851c283c400", signature)
+
+        # Without data
+        transaction = PlainTransaction()
+        transaction.nonce = 8
+        transaction.value = "10000000000000000000"
+        transaction.sender = "erd1l453hd0gt5gzdp7czpuall8ggt2dcv5zwmfdf3sd3lguxseux2fsmsgldz"
+        transaction.receiver = "erd1cux02zersde0l7hhklzhywcxk4u9n4py5tdxyx7vrvhnza2r4gmq4vw35r"
+        transaction.gasPrice = 1000000000
+        transaction.gasLimit = 50000
+        transaction.data = ""
+        transaction.chainID = "m1.0"
+        transaction.version = 1
+        payload = TransactionPayloadToSign(transaction)
+        serialized = payload.to_json().decode()
+        signature = signing.sign_transaction(payload, pem)
+
+        self.assertEqual("""{"nonce":8,"value":"10000000000000000000","receiver":"erd1cux02zersde0l7hhklzhywcxk4u9n4py5tdxyx7vrvhnza2r4gmq4vw35r","sender":"erd1l453hd0gt5gzdp7czpuall8ggt2dcv5zwmfdf3sd3lguxseux2fsmsgldz","gasPrice":1000000000,"gasLimit":50000,"chainID":"m1.0","version":1}""", serialized)
+        self.assertEqual("a3d244037dd1857774a2f7e6845896c3ad1a29c6c4429c563de4c66f906f8b4ba6e41ac98677b32251d735a6fd2ec948a542c0a4f2686c2f1d5534368bd9560f", signature)
+
     def test_generate_pair_pem(self):
         seed, pubkey = generate_pair()
         pem_file = Path(self.testdata_out, "foo.pem")
