@@ -17,12 +17,3 @@ runHighImportanceTests() {
     source ./test_cli_validators.sh && testAll
     source ./test_cli_tx.sh && testNewApi
 }
-
-runHighImportanceTestsWithChainIDAndVersion() {
-    ${ERDPY} --verbose config set withChainAndVersion true
-
-    runHighImportanceTests
-
-    ${ERDPY} --verbose config set withChainAndVersion false
-}
-
