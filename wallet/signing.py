@@ -35,7 +35,7 @@ def sign_message_with_bls_key(message, seed):
     try:
         path = workstation.get_tools_folder()
         path_to_mcl_signer = f'{path}/signer/signer'
-        signed_message = myprocess.run_process([path_to_mcl_signer, message, seed])
+        signed_message = myprocess.run_process([path_to_mcl_signer, message, seed], dump_to_stdout=False)
         return signed_message
     except Exception:
-        raise CannotSignMessageWithBLSKey
+        raise CannotSignMessageWithBLSKey()

@@ -1,17 +1,13 @@
 import binascii
 import json
 import logging
+
 from typing import Any
-
-from erdpy import errors
-from erdpy.accounts import Address
-from erdpy.config import (GAS_PER_DATA_BYTE, MIN_GAS_LIMIT,
-                          MetaChainSystemSCsCost)
 from os import path
-
 from erdpy import guards
 from erdpy.accounts import Address, Account
 from erdpy.config import MIN_GAS_LIMIT, GAS_PER_DATA_BYTE, MetaChainSystemSCsCost
+from erdpy.errors import CannotReadValidatorsData
 from erdpy.wallet.pem import parse_validator_pem
 from erdpy.wallet.signing import sign_message_with_bls_key
 
@@ -34,7 +30,7 @@ def _read_json_file(file_path):
         try:
             data = json.load(json_file)
         except Exception:
-            raise Exception("cannot read validators data")
+            raise CannotReadValidatorsData()
         return data
 
 

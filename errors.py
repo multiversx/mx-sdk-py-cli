@@ -137,3 +137,8 @@ class CannotSignMessageWithBLSKey(KnownError):
     def __init__(self):
         super(CannotSignMessageWithBLSKey, self).__init__("cannot sign message with BLS key")
 
+
+class CannotReadValidatorsData(KnownError):
+    def __init__(self):
+        super(CannotReadValidatorsData, self).__init__("cannot read validators data")
+
