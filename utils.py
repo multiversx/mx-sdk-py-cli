@@ -48,7 +48,7 @@ def ensure_folder(folder):
     pathlib.Path(folder).mkdir(parents=True, exist_ok=True)
 
 
-def read_lines(file):
+def read_lines(file: str):
     with open(file) as f:
         lines = f.readlines()
     lines = [line.strip() for line in lines]

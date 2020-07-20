@@ -1,6 +1,7 @@
 import binascii
 import json
 import logging
+from typing import Any
 
 from erdpy import errors
 from erdpy.accounts import Address
@@ -37,7 +38,7 @@ def _read_json_file(file_path):
         return data
 
 
-def parse_args_for_stake(args):
+def parse_args_for_stake(args: Any):
     validators_data_file = args.validators_data_file
     validators_data = _read_json_file(validators_data_file)
 

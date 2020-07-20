@@ -1,6 +1,7 @@
 import base64
 import textwrap
 from os import path
+from typing import Tuple
 
 from erdpy import utils, guards
 
@@ -10,7 +11,7 @@ def get_pubkey(pem_file):
     return pubkey
 
 
-def parse(pem_file):
+def parse(pem_file: str) -> Tuple[bytes, bytes]:
     pem_file = path.expanduser(pem_file)
     guards.is_file(pem_file)
 

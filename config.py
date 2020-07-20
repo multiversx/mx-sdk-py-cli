@@ -8,7 +8,7 @@ MODULES_CONFIG_URL = "https://raw.githubusercontent.com/ElrondNetwork/elrond-sdk
 ROOT_FOLDER_NAME = "elrondsdk"
 CONFIG_PATH = os.path.expanduser("~/elrondsdk/erdpy.json")
 
-DEFAULT_GAS_PRICE = 200000000000
+DEFAULT_GAS_PRICE = 1000000000
 GAS_PER_DATA_BYTE = 1500
 MIN_GAS_LIMIT = 50000
 
@@ -34,10 +34,6 @@ def get_chain_id() -> str:
 
 def get_tx_version() -> int:
     return int(get_value("txVersion"))
-
-
-def get_with_chain_and_version() -> bool:
-    return utils.str_to_bool(get_value("withChainAndVersion"))
 
 
 def get_dependency_tag(key: str) -> str:
@@ -76,7 +72,6 @@ def get_defaults() -> Dict[str, Any]:
         "proxy": "https://api.elrond.com",
         "chainID": "Testnet",
         "txVersion": "1",
-        "withChainAndVersion": False,
         "dependencies.arwentools.tag": "v0.3.26-12-g466a26b",
         "dependencies.arwentools.urlTemplate.linux": "https://ide.elrond.com/travis-builds/ARWEN_{TAG}_linux_amd64.tar.gz",
         "dependencies.arwentools.urlTemplate.osx": "https://ide.elrond.com/travis-builds/ARWEN_{TAG}_darwin_amd64.tar.gz",

@@ -1,4 +1,5 @@
 import logging
+from typing import Any
 import nacl.encoding
 import nacl.signing
 
@@ -9,7 +10,7 @@ from erdpy.wallet import pem
 logger = logging.getLogger("wallet")
 
 
-def sign_transaction(transaction, pem_file):
+def sign_transaction(transaction: Any, pem_file: str) -> str:
     seed, _ = pem.parse(pem_file)
     return sign_tx(transaction, seed)
 
@@ -18,7 +19,7 @@ def sign_transaction_with_seed(transaction, seed):
     return sign_tx(transaction, seed)
 
 
-def sign_tx(transaction, seed):
+def sign_tx(transaction, seed) -> str:
     signing_key = nacl.signing.SigningKey(seed)
 
     data_json = transaction.to_json()

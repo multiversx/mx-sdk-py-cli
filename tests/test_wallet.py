@@ -53,13 +53,15 @@ class WalletTestCase(unittest.TestCase):
         transaction.gasPrice = 43
         transaction.gasLimit = 44
         transaction.data = "foobar"
+        transaction.chainID = "BoN"
+        transaction.version = 1
         serialized = TransactionPayloadToSign(transaction).to_json().decode()
-        self.assertEqual("""{"nonce":0,"value":"42","receiver":"bob","sender":"alice","gasPrice":43,"gasLimit":44,"data":"foobar"}""", serialized)
+        self.assertEqual("""{"nonce":0,"value":"42","receiver":"bob","sender":"alice","gasPrice":43,"gasLimit":44,"data":"foobar","chainID":"BoN","version":1}""", serialized)
 
         # Without data field
         transaction.data = ""
         serialized = TransactionPayloadToSign(transaction).to_json().decode()
-        self.assertEqual("""{"nonce":0,"value":"42","receiver":"bob","sender":"alice","gasPrice":43,"gasLimit":44}""", serialized)
+        self.assertEqual("""{"nonce":0,"value":"42","receiver":"bob","sender":"alice","gasPrice":43,"gasLimit":44,"chainID":"BoN","version":1}""", serialized)
 
         # With actual addresses
         transaction = PlainTransaction()
@@ -70,43 +72,12 @@ class WalletTestCase(unittest.TestCase):
         transaction.gasPrice = 200000000000000
         transaction.gasLimit = 500000000
         transaction.data = "foo"
+        transaction.chainID = "BoN"
+        transaction.version = 1
         serialized = TransactionPayloadToSign(transaction).to_json().decode()
-        self.assertEqual("""{"nonce":0,"value":"0","receiver":"erd188nydpkagtpwvfklkl2tn0w6g40zdxkwfgwpjqc2a2m2n7ne9g8q2t22sr","sender":"erd1l453hd0gt5gzdp7czpuall8ggt2dcv5zwmfdf3sd3lguxseux2fsmsgldz","gasPrice":200000000000000,"gasLimit":500000000,"data":"foo"}""", serialized)
+        self.assertEqual("""{"nonce":0,"value":"0","receiver":"erd188nydpkagtpwvfklkl2tn0w6g40zdxkwfgwpjqc2a2m2n7ne9g8q2t22sr","sender":"erd1l453hd0gt5gzdp7czpuall8ggt2dcv5zwmfdf3sd3lguxseux2fsmsgldz","gasPrice":200000000000000,"gasLimit":500000000,"data":"foo","chainID":"BoN","version":1}""", serialized)
 
     def test_sign_transaction(self):
-        pem = self.testdata.joinpath("keys", "alice.pem")
-
-        # With data
-        transaction = PlainTransaction()
-        transaction.nonce = 0
-        transaction.value = "0"
-        transaction.sender = "erd1l453hd0gt5gzdp7czpuall8ggt2dcv5zwmfdf3sd3lguxseux2fsmsgldz"
-        transaction.receiver = "erd188nydpkagtpwvfklkl2tn0w6g40zdxkwfgwpjqc2a2m2n7ne9g8q2t22sr"
-        transaction.gasPrice = 200000000000000
-        transaction.gasLimit = 500000000
-        transaction.data = "foo"
-        payload = TransactionPayloadToSign(transaction)
-        signature = signing.sign_transaction(payload, pem)
-
-        self.assertEqual("8e68002bdd45d04508b7325d1cab9195680acf03a4cd5cba23629a85074bf92a88275f1f2bc3c2bd19d8f5cd62bde83186d86932b04e0f5b88a374a824547009", signature)
-
-        # Without data
-        transaction = PlainTransaction()
-        transaction.nonce = 0
-        transaction.value = "0"
-        transaction.sender = "erd1l453hd0gt5gzdp7czpuall8ggt2dcv5zwmfdf3sd3lguxseux2fsmsgldz"
-        transaction.receiver = "erd188nydpkagtpwvfklkl2tn0w6g40zdxkwfgwpjqc2a2m2n7ne9g8q2t22sr"
-        transaction.gasPrice = 200000000000000
-        transaction.gasLimit = 500000000
-        transaction.data = ""
-        payload = TransactionPayloadToSign(transaction)
-        signature = signing.sign_transaction(payload, pem)
-
-        self.assertEqual("4e160bcafb6cb8ab8fc3260d3faf24bf7ce1205b5685adb457803db6d67c648a614308d8354e40b40fbb90c227046d6997493f798b92acb1b4bc49173939e703", signature)
-
-    def test_sign_transaction_with_chain_and_version(self):
-        config.get_with_chain_and_version = lambda: True
-
         pem = self.testdata.joinpath("keys", "alice.pem")
 
         # With data
@@ -153,39 +124,6 @@ class WalletTestCase(unittest.TestCase):
         transaction.gasPrice = 200000000000000
         transaction.gasLimit = 500000000
         transaction.data = "foo"
-        payload = TransactionPayloadToSign(transaction)
-        signature = signing.sign_transaction(payload, pem)
-
-        self.assertEqual("3c807eddeb5c9d7864ca3a97da8d2bffcef84826228567d4c7478812fdd09858f438a5cade3341bb2b02a2a8717d271b9163735d65f61795f5dd946f519fc500", signature)
-
-        # Without data
-        transaction = PlainTransaction()
-        transaction.nonce = 0
-        transaction.value = "0"
-        transaction.sender = "erd1l453hd0gt5gzdp7czpuall8ggt2dcv5zwmfdf3sd3lguxseux2fsmsgldz"
-        transaction.receiver = "erd1cux02zersde0l7hhklzhywcxk4u9n4py5tdxyx7vrvhnza2r4gmq4vw35r"
-        transaction.gasPrice = 200000000000000
-        transaction.gasLimit = 500000000
-        transaction.data = ""
-        payload = TransactionPayloadToSign(transaction)
-        signature = signing.sign_transaction(payload, pem)
-
-        self.assertEqual("39ab0e18bfce04bf53c9610faa3b9e7cecfca919510a7631e529e9086279b70a4832df32a5d1b8fdceb4e9082f2995da97f9195532c8d611ee749bc312cbf90c", signature)
-
-    def test_sign_transaction_trust_wallet_scenario_with_chain_and_version(self):
-        config.get_with_chain_and_version = lambda: True
-
-        pem = self.testdata.joinpath("keys", "alice.pem")
-
-        # With data
-        transaction = PlainTransaction()
-        transaction.nonce = 0
-        transaction.value = "0"
-        transaction.sender = "erd1l453hd0gt5gzdp7czpuall8ggt2dcv5zwmfdf3sd3lguxseux2fsmsgldz"
-        transaction.receiver = "erd1cux02zersde0l7hhklzhywcxk4u9n4py5tdxyx7vrvhnza2r4gmq4vw35r"
-        transaction.gasPrice = 200000000000000
-        transaction.gasLimit = 500000000
-        transaction.data = "foo"
         transaction.chainID = "m1.0"
         transaction.version = 1
         payload = TransactionPayloadToSign(transaction)
@@ -208,6 +146,45 @@ class WalletTestCase(unittest.TestCase):
         signature = signing.sign_transaction(payload, pem)
 
         self.assertEqual("c621788d31825a9ff5f6719e0677a734986c34aa2d1ea1c932854180898c6b8e970570c42c7880818efa37cc233499225bd45783008551a5b16ce12a54cc6506", signature)
+
+    def test_sign_transaction_docs_scenario(self):
+        pem = str(self.testdata.joinpath("keys", "alice.pem"))
+
+        # With data
+        transaction = PlainTransaction()
+        transaction.nonce = 7
+        transaction.value = "10000000000000000000"  # 10 ERD
+        transaction.sender = "erd1l453hd0gt5gzdp7czpuall8ggt2dcv5zwmfdf3sd3lguxseux2fsmsgldz"
+        transaction.receiver = "erd1cux02zersde0l7hhklzhywcxk4u9n4py5tdxyx7vrvhnza2r4gmq4vw35r"
+        transaction.gasPrice = 1000000000
+        transaction.gasLimit = 70000
+        transaction.data = "for the book"
+        transaction.chainID = "m1.0"
+        transaction.version = 1
+        payload = TransactionPayloadToSign(transaction)
+        serialized = payload.to_json().decode()
+        signature = signing.sign_transaction(payload, pem)
+
+        self.assertEqual("""{"nonce":7,"value":"10000000000000000000","receiver":"erd1cux02zersde0l7hhklzhywcxk4u9n4py5tdxyx7vrvhnza2r4gmq4vw35r","sender":"erd1l453hd0gt5gzdp7czpuall8ggt2dcv5zwmfdf3sd3lguxseux2fsmsgldz","gasPrice":1000000000,"gasLimit":70000,"data":"for the book","chainID":"m1.0","version":1}""", serialized)
+        self.assertEqual("c58aeeef4f6c9a9a0d8fc693fe131810a491a53c82f88fabde3a3d4164fb227df6a6b9c0e84c5c8db4610eaddd5e1dbdaef5fc01d3f03acef1b11851c283c400", signature)
+
+        # Without data
+        transaction = PlainTransaction()
+        transaction.nonce = 8
+        transaction.value = "10000000000000000000"
+        transaction.sender = "erd1l453hd0gt5gzdp7czpuall8ggt2dcv5zwmfdf3sd3lguxseux2fsmsgldz"
+        transaction.receiver = "erd1cux02zersde0l7hhklzhywcxk4u9n4py5tdxyx7vrvhnza2r4gmq4vw35r"
+        transaction.gasPrice = 1000000000
+        transaction.gasLimit = 50000
+        transaction.data = ""
+        transaction.chainID = "m1.0"
+        transaction.version = 1
+        payload = TransactionPayloadToSign(transaction)
+        serialized = payload.to_json().decode()
+        signature = signing.sign_transaction(payload, pem)
+
+        self.assertEqual("""{"nonce":8,"value":"10000000000000000000","receiver":"erd1cux02zersde0l7hhklzhywcxk4u9n4py5tdxyx7vrvhnza2r4gmq4vw35r","sender":"erd1l453hd0gt5gzdp7czpuall8ggt2dcv5zwmfdf3sd3lguxseux2fsmsgldz","gasPrice":1000000000,"gasLimit":50000,"chainID":"m1.0","version":1}""", serialized)
+        self.assertEqual("a3d244037dd1857774a2f7e6845896c3ad1a29c6c4429c563de4c66f906f8b4ba6e41ac98677b32251d735a6fd2ec948a542c0a4f2686c2f1d5534368bd9560f", signature)
 
     def test_generate_pair_pem(self):
         seed, pubkey = generate_pair()
