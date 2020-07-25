@@ -1,18 +1,21 @@
+import base64
+from erdpy.proxy.core import ElrondProxy
+from erdpy import errors
 import json
 import logging
 from binascii import unhexlify
 from collections import OrderedDict
 from os import path
-from typing import Any
+from typing import Any, Dict
 
-from erdpy import config, utils
+from erdpy import utils
 from erdpy.accounts import Account
 from erdpy.wallet import signing
 
 logger = logging.getLogger("transactions")
 
 
-class PlainTransaction:
+class Transaction:
     def __init__(self):
         self.nonce = 0
         self.value = "0"
@@ -23,117 +26,93 @@ class PlainTransaction:
         self.data = ""
         self.chainID = ""
         self.version = 0
+        self.signature = ""
 
-    def payload(self):
-        return self.__dict__.copy()
+    # The data field is base64-encoded. erdpy only supports utf-8 "data" at this moment.
+    def data_encoded(self) -> str:
+        data_bytes = self.data.encode("utf-8")
+        data_base64 = base64.b64encode(data_bytes).decode()
+        return data_base64
 
-
-class TransactionPayloadToSign:
-    def __init__(self, transaction):
-        self.__dict__.update(transaction.payload())
-
-        # When signing the transaction, we base64 encode the "Data" field
-        if transaction.data:
-            self.data = transaction.data
-
-    def to_json(self):
-        ordered_fields = OrderedDict()
-        ordered_fields["nonce"] = self.nonce
-        ordered_fields["value"] = self.value
-        ordered_fields["receiver"] = self.receiver
-        ordered_fields["sender"] = self.sender
-        ordered_fields["gasPrice"] = self.gasPrice
-        ordered_fields["gasLimit"] = self.gasLimit
-
-        if self.data:
-            ordered_fields["data"] = self.data
-
-        ordered_fields["chainID"] = self.chainID
-        ordered_fields["version"] = int(self.version)
-
-        data_json = json.dumps(ordered_fields, separators=(',', ':')).encode("utf8")
-        return data_json
-
-
-class PreparedTransaction(PlainTransaction):
-    def __init__(self, transaction=None, signature=None, dictionary=None):
-        if dictionary:
-            self._init_with_dictionary(dictionary)
-        else:
-            self._init_default(transaction, signature)
-
-    def _init_with_dictionary(self, dictionary):
-        self.__dict__.update(dictionary)
-
-    def _init_default(self, transaction, signature):
-        self.__dict__.update(transaction.payload())
-        self.signature = signature
-
-        if transaction.data:
-            self.data = transaction.data
+    def serialize_for_signing(self) -> bytes:
+        dictionary = self.to_dictionary()
+        serialized = json.dumps(dictionary, separators=(',', ':')).encode("utf8")
+        return serialized
 
     @classmethod
-    def from_file(cls, f):
-        data_json = utils.read_file(f).encode()
-        return cls.from_json(data_json)
+    def load_from_file(cls, f: Any):
+        data_json: bytes = utils.read_file(f).encode()
+        fields = json.loads(data_json).get("tx", None)
+        instance = cls()
+        instance.__dict__.update(fields)
+        return instance
 
-    def save_to_file(self, f):
+    def save_to_file(self, f: Any):
         utils.write_file(f, self.to_json())
-
-    @classmethod
-    def from_json(cls, json_data):
-        dictionary = json.loads(json_data)
-        # Handle both the old and the new format (wrapped tx or unwrapped)
-        dictionary = dictionary.get("tx", dictionary)
-        return cls.from_dictionary(dictionary)
 
     def to_json(self):
         data_json = json.dumps(self.to_dictionary(), indent=4)
         return data_json
 
-    @classmethod
-    def from_dictionary(cls, dictionary):
-        return cls(dictionary=dictionary)
+    def send(self, proxy: Any):
+        if not self.signature:
+            raise errors.TransactionIsNotSigned()
 
-    def to_dictionary(self):
-        return self.__dict__.copy()
+        logger.info(f"Transaction.send: nonce={self.nonce}")
 
-    def send(self, proxy):
-        logger.info(f"PreparedTransaction.send: nonce={self.nonce}")
-        tx_hash = proxy.send_transaction(self.to_dictionary())
+        dictionary = self.to_dictionary()
+        tx_hash = proxy.send_transaction(dictionary)
         logger.info(f"Hash: {tx_hash}")
         return tx_hash
+
+    def to_dictionary(self) -> Dict[str, Any]:
+        dictionary: Dict[str, Any] = OrderedDict()
+        dictionary["nonce"] = self.nonce
+        dictionary["value"] = self.value
+        dictionary["receiver"] = self.receiver
+        dictionary["sender"] = self.sender
+        dictionary["gasPrice"] = self.gasPrice
+        dictionary["gasLimit"] = self.gasLimit
+
+        if self.data:
+            dictionary["data"] = self.data_encoded()
+
+        dictionary["chainID"] = self.chainID
+        dictionary["version"] = int(self.version)
+
+        if self.signature:
+            dictionary["signature"] = self.signature
+
+        return dictionary
 
 
 class BunchOfTransactions:
     def __init__(self):
         self.transactions = []
 
-    def add_prepared(self, transaction):
+    def add_prepared(self, transaction: Transaction):
         self.transactions.append(transaction)
 
-    def add(self, sender, receiver_address, nonce, value, data, gas_price, gas_limit, chain, version):
-        plain = PlainTransaction()
-        plain.nonce = int(nonce)
-        plain.value = str(value)
-        plain.sender = sender.address.bech32()
-        plain.receiver = receiver_address
-        plain.gasPrice = gas_price
-        plain.gasLimit = gas_limit
-        plain.data = data
-        plain.chainID = chain
-        plain.version = version
+    def add(self, sender: Account, receiver_address: str, nonce: Any, value: Any, data: str, gas_price: int, gas_limit: int, chain: str, version: int):
+        tx = Transaction()
+        tx.nonce = int(nonce)
+        tx.value = str(value)
+        tx.sender = sender.address.bech32()
+        tx.receiver = receiver_address
+        tx.gasPrice = gas_price
+        tx.gasLimit = gas_limit
+        tx.data = data
+        tx.chainID = chain
+        tx.version = version
 
-        payload = TransactionPayloadToSign(plain)
-        signature = signing.sign_transaction_with_seed(payload, unhexlify(sender.private_key_seed))
-        prepared = PreparedTransaction(plain, signature)
-
-        self.transactions.append(prepared)
+        seed: bytes = unhexlify(sender.private_key_seed)
+        tx.signature = signing.sign_transaction_with_seed(tx, seed)
+        self.transactions.append(tx)
 
     def add_in_sequence(self):
         pass
 
-    def send(self, proxy):
+    def send(self, proxy: ElrondProxy):
         logger.info(f"BunchOfTransactions.send: {len(self.transactions)} transactions")
         payload = [transaction.to_dictionary() for transaction in self.transactions]
         num_sent, hashes = proxy.send_transactions(payload)
@@ -146,31 +125,30 @@ def prepare(args: Any) -> None:
     workspace = args.workspace
     utils.ensure_folder(workspace)
 
-    prepared = do_prepare_transaction(args)
+    tx = do_prepare_transaction(args)
     prepared_filename = path.join(workspace, f"tx-{args.tag}.json")
-    prepared.save_to_file(prepared_filename)
+    tx.save_to_file(prepared_filename)
     logger.info(f"Saved prepared transaction to {prepared_filename}")
 
 
-def do_prepare_transaction(args):
+def do_prepare_transaction(args: Any) -> Transaction:
+    account = Account()
     if args.pem:
         account = Account(pem_file=args.pem)
     elif args.keyfile and args.passfile:
         account = Account(key_file=args.keyfile, pass_file=args.passfile)
 
-    plain = PlainTransaction()
-    plain.nonce = int(args.nonce)
-    plain.value = args.value
-    plain.sender = account.address.bech32()
-    plain.receiver = args.receiver
-    plain.gasPrice = int(args.gas_price)
-    plain.gasLimit = int(args.gas_limit)
-    plain.data = args.data
-    plain.chainID = args.chain
-    plain.version = int(args.version)
+    tx = Transaction()
+    tx.nonce = int(args.nonce)
+    tx.value = args.value
+    tx.sender = account.address.bech32()
+    tx.receiver = args.receiver
+    tx.gasPrice = int(args.gas_price)
+    tx.gasLimit = int(args.gas_limit)
+    tx.data = args.data
+    tx.chainID = args.chain
+    tx.version = int(args.version)
 
-    payload = TransactionPayloadToSign(plain)
-    signature = signing.sign_transaction_with_seed(payload, unhexlify(account.private_key_seed))
-
-    prepared = PreparedTransaction(plain, signature)
-    return prepared
+    seed: bytes = unhexlify(account.private_key_seed)
+    tx.signature = signing.sign_transaction_with_seed(tx, seed)
+    return tx

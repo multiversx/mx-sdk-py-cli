@@ -1,6 +1,7 @@
-from erdpy.accounts import Address
 import logging
+from typing import Any, List
 
+from erdpy.accounts import Address
 from erdpy.proxy.http_facade import do_get, do_post
 
 METACHAIN_ID = 4294967295
@@ -94,7 +95,7 @@ class ElrondProxy:
         tx_hash = response["txHash"]
         return tx_hash
 
-    def send_transactions(self, payload):
+    def send_transactions(self, payload: List[Any]):
         url = f"{self.url}/transaction/send-multiple"
         response = do_post(url, payload)
         # Proxy and Observers have different response format:

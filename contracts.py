@@ -5,7 +5,7 @@ from Cryptodome.Hash import keccak
 from binascii import unhexlify
 from erdpy import config, errors, utils
 from erdpy.accounts import Address
-from erdpy.transactions import (PlainTransaction, PreparedTransaction,
+from erdpy.transactions import (Transaction, PreparedTransaction,
                                 TransactionPayloadToSign)
 from erdpy.wallet import signing
 
@@ -33,7 +33,7 @@ class SmartContract:
         gas_limit = int(gas_limit)
         value = str(value or "0")
 
-        plain = PlainTransaction()
+        plain = Transaction()
         plain.nonce = owner.nonce
         plain.value = value
         plain.sender = owner.address.bech32()
@@ -80,7 +80,7 @@ class SmartContract:
         gas_limit = int(gas_limit)
         value = str(value or "0")
 
-        plain = PlainTransaction()
+        plain = Transaction()
         plain.nonce = caller.nonce
         plain.value = value
         plain.sender = caller.address.bech32()
@@ -116,7 +116,7 @@ class SmartContract:
         gas_limit = int(gas_limit)
         value = str(value or "0")
 
-        plain = PlainTransaction()
+        plain = Transaction()
         plain.nonce = owner.nonce
         plain.value = value
         plain.sender = owner.address.bech32()

@@ -9,7 +9,7 @@ from erdpy.dispatcher.transactions.queue import TransactionQueue
 from erdpy.environments import TestnetEnvironment
 from erdpy.projects import load_project
 from erdpy.proxy import ElrondProxy, TransactionCostEstimator
-from erdpy.transactions import PreparedTransaction, do_prepare_transaction
+from erdpy.transactions import Transaction, do_prepare_transaction
 from erdpy.validators import validators
 from erdpy.wallet import pem
 
@@ -224,34 +224,7 @@ def get_transaction_cost(args: Any, tx_type: Any) -> Any:
     return result
 
 
-# DEPRECATED
-def send_prepared_transaction(args):
-    proxy = ElrondProxy(args.proxy)
-    prepared = PreparedTransaction.from_file(args.tx)
-    tx_hash = prepared.send(proxy)
-    print(tx_hash)
-    return tx_hash
-
-
-# DEPRECATED
-def prepare_and_send_transaction(args):
-    proxy = ElrondProxy(args.proxy)
-
-    if args.recall_nonce:
-        if args.pem:
-            owner = Account(pem_file=args.pem)
-        elif args.keyfile and args.passfile:
-            owner = Account(key_file=args.keyfile, pass_file=args.passfile)
-        owner.sync_nonce(proxy)
-        args.nonce = owner.nonce
-
-    prepared = do_prepare_transaction(args)
-    tx_hash = prepared.send(proxy)
-    print(tx_hash)
-    return tx_hash
-
-
-def create_transaction(args):
+def create_transaction(args: Any):
     args = utils.as_object(args)
 
     proxy = ElrondProxy(args.proxy)
@@ -280,13 +253,13 @@ def create_transaction(args):
         args.outfile.writelines([output.to_json(), "\n"])
 
 
-def send_transaction(args):
+def send_transaction(args: Any):
     args = utils.as_object(args)
 
     proxy = ElrondProxy(args.proxy)
 
     output = utils.Object()
-    prepared = PreparedTransaction.from_file(args.infile)
+    prepared = Transaction.load_from_file(args.infile)
     output.tx = prepared.to_dictionary()
     output.hash = prepared.send(proxy)
     args.outfile.writelines([output.to_json(), "\n"])

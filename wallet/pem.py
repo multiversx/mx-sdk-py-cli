@@ -1,17 +1,18 @@
 import base64
+from pathlib import Path
 import textwrap
 from os import path
-from typing import Tuple
+from typing import Tuple, Union
 
 from erdpy import utils, guards
 
 
-def get_pubkey(pem_file):
+def get_pubkey(pem_file: Union[str, Path]):
     _, pubkey = parse(pem_file)
     return pubkey
 
 
-def parse(pem_file: str) -> Tuple[bytes, bytes]:
+def parse(pem_file: Union[str, Path]) -> Tuple[bytes, bytes]:
     pem_file = path.expanduser(pem_file)
     guards.is_file(pem_file)
 
@@ -46,7 +47,7 @@ def parse_validator_pem(pem_file):
     return seed, bls_key
 
 
-def write(pem_file, seed, pubkey, name=None):
+def write(pem_file: Union[str, Path], seed: bytes, pubkey: bytes, name: str = ""):
     pem_file = path.expanduser(pem_file)
 
     if not name:
