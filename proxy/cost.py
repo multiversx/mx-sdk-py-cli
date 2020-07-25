@@ -1,6 +1,8 @@
 import base64
 import logging
+from os import confstr
 
+from erdpy import config
 from erdpy.projects import load_project
 from erdpy.proxy.http_facade import do_post
 from erdpy.proxy.tx_types import TxTypes
@@ -75,7 +77,9 @@ class TransactionCostEstimator:
             "value": "0",
             "receiver": receiver,
             "sender": sender,
-            "data": data
+            "data": data,
+            "chainID": config.get_chain_id(),
+            "version": config.get_tx_version()
         }
 
         url = f"{self.proxy_url}/transaction/cost"

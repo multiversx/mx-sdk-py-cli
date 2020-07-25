@@ -5,8 +5,7 @@ from Cryptodome.Hash import keccak
 from binascii import unhexlify
 from erdpy import config, errors, utils
 from erdpy.accounts import Address
-from erdpy.transactions import (Transaction, PreparedTransaction,
-                                TransactionPayloadToSign)
+from erdpy.transactions import Transaction
 from erdpy.wallet import signing
 
 logger = logging.getLogger("cli.deps")
@@ -33,21 +32,19 @@ class SmartContract:
         gas_limit = int(gas_limit)
         value = str(value or "0")
 
-        plain = Transaction()
-        plain.nonce = owner.nonce
-        plain.value = value
-        plain.sender = owner.address.bech32()
-        plain.receiver = Address.zero().bech32()
-        plain.gasPrice = gas_price
-        plain.gasLimit = gas_limit
-        plain.data = self.prepare_deploy_transaction_data(arguments)
-        plain.chainID = chain
-        plain.version = version
+        tx = Transaction()
+        tx.nonce = owner.nonce
+        tx.value = value
+        tx.sender = owner.address.bech32()
+        tx.receiver = Address.zero().bech32()
+        tx.gasPrice = gas_price
+        tx.gasLimit = gas_limit
+        tx.data = self.prepare_deploy_transaction_data(arguments)
+        tx.chainID = chain
+        tx.version = version
+        tx.signature = signing.sign_transaction_with_seed(tx, unhexlify(owner.private_key_seed))
 
-        payload = TransactionPayloadToSign(plain)
-        signature = signing.sign_transaction_with_seed(payload, unhexlify(owner.private_key_seed))
-        prepared = PreparedTransaction(plain, signature)
-        return prepared
+        return tx
 
     def prepare_deploy_transaction_data(self, arguments):
         tx_data = f"{self.bytecode}@{VM_TYPE_ARWEN}@{self.metadata.to_hex()}"
@@ -80,21 +77,18 @@ class SmartContract:
         gas_limit = int(gas_limit)
         value = str(value or "0")
 
-        plain = Transaction()
-        plain.nonce = caller.nonce
-        plain.value = value
-        plain.sender = caller.address.bech32()
-        plain.receiver = self.address.bech32()
-        plain.gasPrice = gas_price
-        plain.gasLimit = gas_limit
-        plain.data = self.prepare_execute_transaction_data(function, arguments)
-        plain.chainID = chain
-        plain.version = version
-
-        payload = TransactionPayloadToSign(plain)
-        signature = signing.sign_transaction_with_seed(payload, unhexlify(caller.private_key_seed))
-        prepared = PreparedTransaction(plain, signature)
-        return prepared
+        tx = Transaction()
+        tx.nonce = caller.nonce
+        tx.value = value
+        tx.sender = caller.address.bech32()
+        tx.receiver = self.address.bech32()
+        tx.gasPrice = gas_price
+        tx.gasLimit = gas_limit
+        tx.data = self.prepare_execute_transaction_data(function, arguments)
+        tx.chainID = chain
+        tx.version = version
+        tx.signature = signing.sign_transaction_with_seed(tx, unhexlify(caller.private_key_seed))
+        return tx
 
     def prepare_execute_transaction_data(self, function, arguments):
         tx_data = function
@@ -116,21 +110,18 @@ class SmartContract:
         gas_limit = int(gas_limit)
         value = str(value or "0")
 
-        plain = Transaction()
-        plain.nonce = owner.nonce
-        plain.value = value
-        plain.sender = owner.address.bech32()
-        plain.receiver = self.address.bech32()
-        plain.gasPrice = gas_price
-        plain.gasLimit = gas_limit
-        plain.data = self.prepare_upgrade_transaction_data(arguments)
-        plain.chainID = chain
-        plain.version = version
-
-        payload = TransactionPayloadToSign(plain)
-        signature = signing.sign_transaction_with_seed(payload, unhexlify(owner.private_key_seed))
-        prepared = PreparedTransaction(plain, signature)
-        return prepared
+        tx = Transaction()
+        tx.nonce = owner.nonce
+        tx.value = value
+        tx.sender = owner.address.bech32()
+        tx.receiver = self.address.bech32()
+        tx.gasPrice = gas_price
+        tx.gasLimit = gas_limit
+        tx.data = self.prepare_upgrade_transaction_data(arguments)
+        tx.chainID = chain
+        tx.version = version
+        tx.signature = signing.sign_transaction_with_seed(tx, unhexlify(owner.private_key_seed))
+        return tx
 
     def prepare_upgrade_transaction_data(self, arguments):
         tx_data = f"upgradeContract@{self.bytecode}@{self.metadata.to_hex()}"
