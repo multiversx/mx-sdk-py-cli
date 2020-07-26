@@ -1,13 +1,13 @@
 {
   "validators" : [
     {
-      "pemFilePath": "valPem1.pem"
+      "pemFile": "valPem1.pem"
     },
     {
-      "pemFilePath": "valPem2.pem"
+      "pemFile": "valPem2.pem"
     },
       {
-      "pemFilePath": "valPem3.pem"
+      "pemFile": "valPem3.pem"
     }
   ]
 }
