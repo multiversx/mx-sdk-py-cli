@@ -1,3 +1,5 @@
+from binascii import unhexlify
+from erdpy.interfaces import IAccount
 import logging
 import os
 from os import path
@@ -42,7 +44,7 @@ class AccountsRepository:
         return accounts
 
 
-class Account:
+class Account(IAccount):
     def __init__(self, address: Any = None, pem_file: Union[str, None] = None, key_file: str = "", pass_file: str = ""):
         self.address = Address(address)
         self.pem_file = pem_file
@@ -62,6 +64,9 @@ class Account:
         logger.info("Account.sync_nonce()")
         self.nonce = proxy.get_account_nonce(self.address)
         logger.info(f"Account.sync_nonce() done: {self.nonce}")
+
+    def get_seed(self) -> bytes:
+        return unhexlify(self.private_key_seed)
 
 
 class Address:

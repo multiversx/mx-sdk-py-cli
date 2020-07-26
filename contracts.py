@@ -4,7 +4,7 @@ import logging
 from Cryptodome.Hash import keccak
 from binascii import unhexlify
 from erdpy import config, errors, utils
-from erdpy.accounts import Address
+from erdpy.accounts import Account, Address
 from erdpy.transactions import Transaction
 from erdpy.wallet import signing
 
@@ -26,7 +26,7 @@ class SmartContract:
         tx_hash = transaction.send(proxy)
         return tx_hash, self.address
 
-    def prepare_deploy_transaction(self, owner, arguments, gas_price, gas_limit, value, chain, version):
+    def prepare_deploy_transaction(self, owner: Account, arguments, gas_price, gas_limit, value, chain, version):
         arguments = arguments or []
         gas_price = int(gas_price)
         gas_limit = int(gas_limit)
@@ -42,8 +42,8 @@ class SmartContract:
         tx.data = self.prepare_deploy_transaction_data(arguments)
         tx.chainID = chain
         tx.version = version
-        tx.signature = signing.sign_transaction_with_seed(tx, unhexlify(owner.private_key_seed))
 
+        tx.sign(owner)
         return tx
 
     def prepare_deploy_transaction_data(self, arguments):
@@ -71,7 +71,7 @@ class SmartContract:
         tx_hash = transaction.send(proxy)
         return tx_hash
 
-    def prepare_execute_transaction(self, caller, function, arguments, gas_price, gas_limit, value, chain, version):
+    def prepare_execute_transaction(self, caller: Account, function, arguments, gas_price, gas_limit, value, chain, version):
         arguments = arguments or []
         gas_price = int(gas_price)
         gas_limit = int(gas_limit)
@@ -87,7 +87,8 @@ class SmartContract:
         tx.data = self.prepare_execute_transaction_data(function, arguments)
         tx.chainID = chain
         tx.version = version
-        tx.signature = signing.sign_transaction_with_seed(tx, unhexlify(caller.private_key_seed))
+
+        tx.sign(caller)
         return tx
 
     def prepare_execute_transaction_data(self, function, arguments):
@@ -104,7 +105,7 @@ class SmartContract:
         tx_hash = transaction.send(proxy)
         return tx_hash
 
-    def prepare_upgrade_transaction(self, owner, arguments, gas_price, gas_limit, value, chain, version):
+    def prepare_upgrade_transaction(self, owner: Account, arguments, gas_price, gas_limit, value, chain, version):
         arguments = arguments or []
         gas_price = int(gas_price or config.DEFAULT_GAS_PRICE)
         gas_limit = int(gas_limit)
@@ -120,7 +121,8 @@ class SmartContract:
         tx.data = self.prepare_upgrade_transaction_data(arguments)
         tx.chainID = chain
         tx.version = version
-        tx.signature = signing.sign_transaction_with_seed(tx, unhexlify(owner.private_key_seed))
+
+        tx.sign(owner)
         return tx
 
     def prepare_upgrade_transaction_data(self, arguments):

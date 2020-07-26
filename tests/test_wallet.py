@@ -1,14 +1,16 @@
 import logging
-from typing import Any
 import unittest
 from pathlib import Path
+from typing import Any
 
 import nacl.encoding
 import nacl.signing
 
 from erdpy import utils
+from erdpy.accounts import Account
 from erdpy.transactions import Transaction
-from erdpy.wallet import generate_pair, mnemonic_to_bip39seed, pem, signing, bip39seed_to_private_key
+from erdpy.wallet import (bip39seed_to_private_key, generate_pair,
+                          mnemonic_to_bip39seed, pem)
 
 logging.basicConfig(level=logging.INFO)
 
@@ -18,6 +20,8 @@ class WalletTestCase(unittest.TestCase):
         self.testdata = Path(__file__).parent.joinpath("testdata")
         self.testdata_out = Path(__file__).parent.joinpath("testdata-out")
         utils.ensure_folder(self.testdata_out)
+
+        self.alice = Account(pem_file=str(self.testdata.joinpath("keys", "alice.pem")))
 
     def test_nacl_playground_signing(self):
         private_key_hex = "b8211b08edc8aca591bedf1b9aba47e4077e54ac7d4ceb2f1bc9e10c064d3e6c7a5679a427f6df7adf2310ddf5e570fd51e47e6b1511124d6b250b989b017588"
@@ -56,12 +60,12 @@ class WalletTestCase(unittest.TestCase):
         transaction.data = "foobar"
         transaction.chainID = "BoN"
         transaction.version = 1
-        serialized = transaction.serialize_for_signing().decode()
+        serialized = transaction.serialize().decode()
         self.assertEqual("""{"nonce":0,"value":"42","receiver":"bob","sender":"alice","gasPrice":43,"gasLimit":44,"data":"Zm9vYmFy","chainID":"BoN","version":1}""", serialized)
 
         # Without data field
         transaction.data = ""
-        serialized = transaction.serialize_for_signing().decode()
+        serialized = transaction.serialize().decode()
         self.assertEqual("""{"nonce":0,"value":"42","receiver":"bob","sender":"alice","gasPrice":43,"gasLimit":44,"chainID":"BoN","version":1}""", serialized)
 
         # With actual addresses
@@ -75,12 +79,10 @@ class WalletTestCase(unittest.TestCase):
         transaction.data = "foo"
         transaction.chainID = "BoN"
         transaction.version = 1
-        serialized = transaction.serialize_for_signing().decode()
+        serialized = transaction.serialize().decode()
         self.assertEqual("""{"nonce":0,"value":"0","receiver":"erd188nydpkagtpwvfklkl2tn0w6g40zdxkwfgwpjqc2a2m2n7ne9g8q2t22sr","sender":"erd1l453hd0gt5gzdp7czpuall8ggt2dcv5zwmfdf3sd3lguxseux2fsmsgldz","gasPrice":200000000000000,"gasLimit":500000000,"data":"Zm9v","chainID":"BoN","version":1}""", serialized)
 
     def test_sign_transaction(self):
-        pem_file = self.testdata.joinpath("keys", "alice.pem")
-
         # With data
         transaction = Transaction()
         transaction.nonce = 0
@@ -92,9 +94,9 @@ class WalletTestCase(unittest.TestCase):
         transaction.data = "foo"
         transaction.chainID = "chainID"
         transaction.version = 1
-        signature = signing.sign_transaction(transaction, pem_file)
+        transaction.sign(self.alice)
 
-        self.assertEqual("f9878caeba4285a9fe66fa8127eb9f7e3f178de40f96727f639e31f0a503efd154d73752781ad06c788876342df39cec27863f5dd88e23c33a4f5a0c57015905", signature)
+        self.assertEqual("f9878caeba4285a9fe66fa8127eb9f7e3f178de40f96727f639e31f0a503efd154d73752781ad06c788876342df39cec27863f5dd88e23c33a4f5a0c57015905", transaction.signature)
 
         # Without data
         transaction = Transaction()
@@ -107,13 +109,11 @@ class WalletTestCase(unittest.TestCase):
         transaction.data = ""
         transaction.chainID = "chainID"
         transaction.version = 1
-        signature = signing.sign_transaction(transaction, pem_file)
+        transaction.sign(self.alice)
 
-        self.assertEqual("1ad14993a3cf6a5e0898a29271a2924fc34f80ba2a391dd2ff5c2fcc554e5a71eda0e34044f99888ec1a1da6d4cf82345e848cec69ccd27e192f8b66c4beaa0c", signature)    
+        self.assertEqual("1ad14993a3cf6a5e0898a29271a2924fc34f80ba2a391dd2ff5c2fcc554e5a71eda0e34044f99888ec1a1da6d4cf82345e848cec69ccd27e192f8b66c4beaa0c", transaction.signature)    
 
     def test_sign_transaction_trust_wallet_scenario(self):
-        pem = self.testdata.joinpath("keys", "alice.pem")
-
         # With data
         transaction = Transaction()
         transaction.nonce = 0
@@ -125,9 +125,9 @@ class WalletTestCase(unittest.TestCase):
         transaction.data = "foo"
         transaction.chainID = "1"
         transaction.version = 1
-        signature = signing.sign_transaction(transaction, pem)
+        transaction.sign(self.alice)
 
-        self.assertEqual("6747ac00f180feae138973c8361fbb207b35b89c1b81eb1e4356bbc89cee45a8e4911a4a336193a1d641b9ff15523d12ad4028c9ff6f6cccb9db6bf97e1cfe0c", signature)
+        self.assertEqual("6747ac00f180feae138973c8361fbb207b35b89c1b81eb1e4356bbc89cee45a8e4911a4a336193a1d641b9ff15523d12ad4028c9ff6f6cccb9db6bf97e1cfe0c", transaction.signature)
 
         # Without data
         transaction = Transaction()
@@ -140,13 +140,11 @@ class WalletTestCase(unittest.TestCase):
         transaction.data = ""
         transaction.chainID = "1"
         transaction.version = 1
-        signature = signing.sign_transaction(transaction, pem)
+        transaction.sign(self.alice)
 
-        self.assertEqual("4cdae626df77c63af0803d02341982c5df8e6d6461da6071e52385f423e93816b8778e093a19b44108eb1f240ea17b8f7748e8d345152c6a33f989d380587509", signature)
+        self.assertEqual("4cdae626df77c63af0803d02341982c5df8e6d6461da6071e52385f423e93816b8778e093a19b44108eb1f240ea17b8f7748e8d345152c6a33f989d380587509", transaction.signature)
 
     def test_sign_transaction_docs_scenario(self):
-        pem = str(self.testdata.joinpath("keys", "alice.pem"))
-
         # With data
         transaction = Transaction()
         transaction.nonce = 7
@@ -158,11 +156,11 @@ class WalletTestCase(unittest.TestCase):
         transaction.data = "for the book"
         transaction.chainID = "1"
         transaction.version = 1
-        serialized = transaction.serialize_for_signing().decode()
-        signature = signing.sign_transaction(transaction, pem)
+        serialized = transaction.serialize().decode()
+        transaction.sign(self.alice)
 
         self.assertEqual("""{"nonce":7,"value":"10000000000000000000","receiver":"erd1cux02zersde0l7hhklzhywcxk4u9n4py5tdxyx7vrvhnza2r4gmq4vw35r","sender":"erd1l453hd0gt5gzdp7czpuall8ggt2dcv5zwmfdf3sd3lguxseux2fsmsgldz","gasPrice":1000000000,"gasLimit":70000,"data":"Zm9yIHRoZSBib29r","chainID":"1","version":1}""", serialized)
-        self.assertEqual("1702bb7696f992525fb77597956dd74059b5b01e88c813066ad1f6053c6afca97d6eaf7039b2a21cccc7d73b3e5959be4f4c16f862438c7d61a30c91e3d16c01", signature)
+        self.assertEqual("1702bb7696f992525fb77597956dd74059b5b01e88c813066ad1f6053c6afca97d6eaf7039b2a21cccc7d73b3e5959be4f4c16f862438c7d61a30c91e3d16c01", transaction.signature)
 
         # Without data
         transaction = Transaction()
@@ -175,11 +173,11 @@ class WalletTestCase(unittest.TestCase):
         transaction.data = ""
         transaction.chainID = "1"
         transaction.version = 1
-        serialized = transaction.serialize_for_signing().decode()
-        signature = signing.sign_transaction(transaction, pem)
+        serialized = transaction.serialize().decode()
+        transaction.sign(self.alice)
 
         self.assertEqual("""{"nonce":8,"value":"10000000000000000000","receiver":"erd1cux02zersde0l7hhklzhywcxk4u9n4py5tdxyx7vrvhnza2r4gmq4vw35r","sender":"erd1l453hd0gt5gzdp7czpuall8ggt2dcv5zwmfdf3sd3lguxseux2fsmsgldz","gasPrice":1000000000,"gasLimit":50000,"chainID":"1","version":1}""", serialized)
-        self.assertEqual("4a6d8186eae110894e7417af82c9bf9592696c0600faf110972e0e5310d8485efc656b867a2336acec2b4c1e5f76c9cc70ba1803c6a46455ed7f1e2989a90105", signature)
+        self.assertEqual("4a6d8186eae110894e7417af82c9bf9592696c0600faf110972e0e5310d8485efc656b867a2336acec2b4c1e5f76c9cc70ba1803c6a46455ed7f1e2989a90105", transaction.signature)
 
     def test_generate_pair_pem(self):
         seed, pubkey = generate_pair()

@@ -1,21 +1,20 @@
 import base64
-from erdpy.proxy.core import ElrondProxy
-from erdpy import errors
 import json
 import logging
-from binascii import unhexlify
 from collections import OrderedDict
 from os import path
 from typing import Any, Dict
 
-from erdpy import utils
+from erdpy import errors, utils
 from erdpy.accounts import Account
+from erdpy.interfaces import ITransaction
+from erdpy.proxy.core import ElrondProxy
 from erdpy.wallet import signing
 
 logger = logging.getLogger("transactions")
 
 
-class Transaction:
+class Transaction(ITransaction):
     def __init__(self):
         self.nonce = 0
         self.value = "0"
@@ -34,7 +33,10 @@ class Transaction:
         data_base64 = base64.b64encode(data_bytes).decode()
         return data_base64
 
-    def serialize_for_signing(self) -> bytes:
+    def sign(self, account: Account):
+        self.signature = signing.sign_transaction(self, account)
+
+    def serialize(self) -> bytes:
         dictionary = self.to_dictionary()
         serialized = json.dumps(dictionary, separators=(',', ':')).encode("utf8")
         return serialized
@@ -105,8 +107,7 @@ class BunchOfTransactions:
         tx.chainID = chain
         tx.version = version
 
-        seed: bytes = unhexlify(sender.private_key_seed)
-        tx.signature = signing.sign_transaction_with_seed(tx, seed)
+        tx.sign(sender)
         self.transactions.append(tx)
 
     def add_in_sequence(self):
@@ -149,6 +150,5 @@ def do_prepare_transaction(args: Any) -> Transaction:
     tx.chainID = args.chain
     tx.version = int(args.version)
 
-    seed: bytes = unhexlify(account.private_key_seed)
-    tx.signature = signing.sign_transaction_with_seed(tx, seed)
+    tx.sign(account)
     return tx
