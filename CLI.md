@@ -417,6 +417,7 @@ optional arguments:
   --value VALUE                      the value to transfer (default: 0)
   --chain CHAIN                      the chain identifier (default: v1.0.147)
   --version VERSION                  the transaction version (default: 1)
+  --outfile OUTFILE                  where to save the output (signed transaction, hash) (default: stdout)
   --reward-address REWARD_ADDRESS    the reward address
   --validators-file VALIDATORS_FILE  a JSON file describing the Nodes
 
@@ -444,6 +445,7 @@ optional arguments:
   --value VALUE                          the value to transfer (default: 0)
   --chain CHAIN                          the chain identifier (default: v1.0.147)
   --version VERSION                      the transaction version (default: 1)
+  --outfile OUTFILE                      where to save the output (signed transaction, hash) (default: stdout)
   --nodes-public-keys NODES_PUBLIC_KEYS  the public keys of the nodes as CSV (addrA,addrB)
 
 ```
@@ -470,6 +472,7 @@ optional arguments:
   --value VALUE                          the value to transfer (default: 0)
   --chain CHAIN                          the chain identifier (default: v1.0.147)
   --version VERSION                      the transaction version (default: 1)
+  --outfile OUTFILE                      where to save the output (signed transaction, hash) (default: stdout)
   --nodes-public-keys NODES_PUBLIC_KEYS  the public keys of the nodes as CSV (addrA,addrB)
 
 ```
@@ -496,6 +499,7 @@ optional arguments:
   --value VALUE                          the value to transfer (default: 0)
   --chain CHAIN                          the chain identifier (default: v1.0.147)
   --version VERSION                      the transaction version (default: 1)
+  --outfile OUTFILE                      where to save the output (signed transaction, hash) (default: stdout)
   --nodes-public-keys NODES_PUBLIC_KEYS  the public keys of the nodes as CSV (addrA,addrB)
 
 ```
@@ -522,6 +526,7 @@ optional arguments:
   --value VALUE                    the value to transfer (default: 0)
   --chain CHAIN                    the chain identifier (default: v1.0.147)
   --version VERSION                the transaction version (default: 1)
+  --outfile OUTFILE                where to save the output (signed transaction, hash) (default: stdout)
   --reward-address REWARD_ADDRESS  the new reward address
 
 ```
@@ -548,6 +553,7 @@ optional arguments:
   --value VALUE          the value to transfer (default: 0)
   --chain CHAIN          the chain identifier (default: v1.0.147)
   --version VERSION      the transaction version (default: 1)
+  --outfile OUTFILE      where to save the output (signed transaction, hash) (default: stdout)
 
 ```
 ## Group **Account**
