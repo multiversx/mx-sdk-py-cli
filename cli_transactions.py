@@ -2,7 +2,7 @@ from erdpy import cli_shared
 from argparse import FileType
 from typing import Any
 
-from erdpy import facade, transactions
+from erdpy import facade
 
 
 def setup_parser(subparsers: Any) -> Any:

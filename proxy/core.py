@@ -1,5 +1,5 @@
 import logging
-from typing import Any, List
+from typing import Any, List, Tuple
 
 from erdpy.accounts import Address
 from erdpy.proxy.http_facade import do_get, do_post
@@ -89,13 +89,13 @@ class ElrondProxy:
 
         return payload
 
-    def send_transaction(self, payload):
+    def send_transaction(self, payload: Any) -> str:
         url = f"{self.url}/transaction/send"
         response = do_post(url, payload)
         tx_hash = response["txHash"]
         return tx_hash
 
-    def send_transactions(self, payload: List[Any]):
+    def send_transactions(self, payload: List[Any]) -> Tuple[int, List[str]]:
         url = f"{self.url}/transaction/send-multiple"
         response = do_post(url, payload)
         # Proxy and Observers have different response format:

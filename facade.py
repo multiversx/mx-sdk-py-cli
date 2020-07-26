@@ -1,8 +1,7 @@
-from erdpy import errors
 import logging
 from typing import Any
 
-from erdpy import utils, wallet
+from erdpy import errors, utils, wallet
 from erdpy.accounts import Account, Address
 from erdpy.blockatlas import BlockAtlas
 from erdpy.contracts import CodeMetadata, SmartContract
@@ -233,16 +232,13 @@ def create_transaction(args: Any):
     if args.data_file:
         args.data = utils.read_file(args.data_file)
 
-    output = utils.Object()
     tx = do_prepare_transaction(args)
-    output.tx = tx.to_dictionary()
 
     try:
         if args.send:
-            output.hash = tx.send(ElrondProxy(args.proxy))
+            tx.send(ElrondProxy(args.proxy))
     finally:
-        # Save output even if there's an error during the actual send
-        args.outfile.writelines([output.to_json(), "\n"])
+        tx.dump_to(args.outfile)
 
 
 def _prepare_nonce(args: Any):
@@ -261,68 +257,91 @@ def _prepare_nonce(args: Any):
 def send_transaction(args: Any):
     args = utils.as_object(args)
 
-    proxy = ElrondProxy(args.proxy)
-
-    output = utils.Object()
     tx = Transaction.load_from_file(args.infile)
-    output.tx = tx.to_dictionary()
-    output.hash = tx.send(proxy)
-    args.outfile.writelines([output.to_json(), "\n"])
+
+    try:
+        tx.send(ElrondProxy(args.proxy))
+    finally:
+        tx.dump_to(args.outfile)
 
 
 def prepare_and_send_stake_transaction(args: Any):
     _prepare_nonce(args)
     args = validators.parse_args_for_stake(args)
     tx = do_prepare_transaction(args)
-    tx.send(ElrondProxy(args.proxy))
+
+    try:
+        tx.send(ElrondProxy(args.proxy))
+    finally:
+        tx.dump_to(args.outfile)
 
 
-def prepare_and_send_unstake_transaction(args):
+def prepare_and_send_unstake_transaction(args: Any):
     _prepare_nonce(args)
     args = validators.parse_args_for_un_stake(args)
     tx = do_prepare_transaction(args)
-    tx.send(ElrondProxy(args.proxy))
+
+    try:
+        tx.send(ElrondProxy(args.proxy))
+    finally:
+        tx.dump_to(args.outfile)
 
 
-def prepare_and_send_unjail_transaction(args):
+def prepare_and_send_unjail_transaction(args: Any):
     _prepare_nonce(args)
     args = validators.parse_args_for_un_jail(args)
     tx = do_prepare_transaction(args)
-    tx.send(ElrondProxy(args.proxy))
+
+    try:
+        tx.send(ElrondProxy(args.proxy))
+    finally:
+        tx.dump_to(args.outfile)
 
 
-def prepare_and_send_unbond_transaction(args):
+def prepare_and_send_unbond_transaction(args: Any):
     _prepare_nonce(args)
     args = validators.parse_args_for_un_bond(args)
     tx = do_prepare_transaction(args)
-    tx.send(ElrondProxy(args.proxy))
+
+    try:
+        tx.send(ElrondProxy(args.proxy))
+    finally:
+        tx.dump_to(args.outfile)
 
 
-def prepare_and_send_change_reward_address_transaction(args):
+def prepare_and_send_change_reward_address_transaction(args: Any):
     _prepare_nonce(args)
     args = validators.parse_args_for_changing_reward_address(args)
     tx = do_prepare_transaction(args)
-    tx.send(ElrondProxy(args.proxy))
+
+    try:
+        tx.send(ElrondProxy(args.proxy))
+    finally:
+        tx.dump_to(args.outfile)
 
 
-def prepare_and_send_claim_transaction(args):
+def prepare_and_send_claim_transaction(args: Any):
     _prepare_nonce(args)
     args = validators.parse_args_for_claim(args)
     tx = do_prepare_transaction(args)
-    tx.send(ElrondProxy(args.proxy))
+
+    try:
+        tx.send(ElrondProxy(args.proxy))
+    finally:
+        tx.dump_to(args.outfile)
 
 
-def enqueue_transaction(args):
+def enqueue_transaction(args: Any):
     queue = TransactionQueue()
     queue.enqueue_transaction(args)
 
 
-def dispatch_transactions(args):
+def dispatch_transactions(args: Any):
     queue = TransactionQueue()
     queue.dispatch_transactions(args)
 
 
-def dispatch_transactions_continuously(args):
+def dispatch_transactions_continuously(args: Any):
     queue = TransactionQueue()
     queue.dispatch_transactions_continuously(args)
 
@@ -332,7 +351,7 @@ def clean_transactions_queue():
     queue.clean_transactions_queue()
 
 
-def generate_pem(args):
+def generate_pem(args: Any):
     pem_file = args.pem
     mnemonic = args.mnemonic
 
@@ -346,7 +365,7 @@ def generate_pem(args):
     logger.info(f"Created PEM file [{pem_file}] for [{address.bech32()}]")
 
 
-def do_bech32(args):
+def do_bech32(args: Any):
     encode = args.encode
     value = args.value
     address = Address(value)

@@ -135,7 +135,7 @@ def str_to_bool(input: str) -> bool:
     return str(input).lower() in ["true", "1", "t", "y", "yes"]
 
 
-def as_object(input) -> Object:
+def as_object(input: Any) -> Object:
     if isinstance(input, dict):
         result = Object()
         result.__dict__.update(input)

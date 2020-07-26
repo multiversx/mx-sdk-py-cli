@@ -46,6 +46,7 @@ def _add_common_arguments(sub: Any):
     cli_shared.add_proxy_arg(sub)
     cli_shared.add_wallet_args(sub)
     cli_shared.add_tx_args(sub, with_receiver=False, with_data=False, with_estimate_gas=True)
+    cli_shared.add_outfile_arg(sub, what="signed transaction, hash")
 
 
 def _add_nodes_arg(sub: Any):

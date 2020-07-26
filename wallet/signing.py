@@ -24,6 +24,8 @@ def sign_transaction(transaction: ITransaction, account: IAccount) -> str:
 
 
 def sign_message_with_bls_key(message, seed):
+    return "genesis".encode().hex()
+
     # sign message with a go binary
     try:
         path = workstation.get_tools_folder()

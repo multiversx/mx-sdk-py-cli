@@ -2,13 +2,11 @@ import base64
 import json
 import logging
 from collections import OrderedDict
-from os import path
 from typing import Any, Dict
 
 from erdpy import errors, utils
 from erdpy.accounts import Account
-from erdpy.interfaces import ITransaction
-from erdpy.proxy.core import ElrondProxy
+from erdpy.interfaces import IElrondProxy, ITransaction
 from erdpy.wallet import signing
 
 logger = logging.getLogger("transactions")
@@ -16,6 +14,7 @@ logger = logging.getLogger("transactions")
 
 class Transaction(ITransaction):
     def __init__(self):
+        self.hash = ""
         self.nonce = 0
         self.value = "0"
         self.sender = ""
@@ -54,23 +53,23 @@ class Transaction(ITransaction):
         instance.data = instance.data_decoded()
         return instance
 
-    def save_to_file(self, f: Any):
-        utils.write_file(f, self.to_json())
+    def dump_to(self, f: Any):
+        dump: Any = utils.Object()
+        dump.tx = self.to_dictionary()
+        dump.hash = self.hash or ""
+        dump.data = self.data
+        f.writelines([dump.to_json(), "\n"])
 
-    def to_json(self):
-        data_json = json.dumps(self.to_dictionary(), indent=4)
-        return data_json
-
-    def send(self, proxy: Any):
+    def send(self, proxy: IElrondProxy):
         if not self.signature:
             raise errors.TransactionIsNotSigned()
 
         logger.info(f"Transaction.send: nonce={self.nonce}")
 
         dictionary = self.to_dictionary()
-        tx_hash = proxy.send_transaction(dictionary)
-        logger.info(f"Hash: {tx_hash}")
-        return tx_hash
+        self.hash = proxy.send_transaction(dictionary)
+        logger.info(f"Hash: {self.hash}")
+        return self.hash
 
     def to_dictionary(self) -> Dict[str, Any]:
         dictionary: Dict[str, Any] = OrderedDict()
@@ -118,23 +117,13 @@ class BunchOfTransactions:
     def add_in_sequence(self):
         pass
 
-    def send(self, proxy: ElrondProxy):
+    def send(self, proxy: IElrondProxy):
         logger.info(f"BunchOfTransactions.send: {len(self.transactions)} transactions")
         payload = [transaction.to_dictionary() for transaction in self.transactions]
         num_sent, hashes = proxy.send_transactions(payload)
         logger.info(f"Sent: {num_sent}")
         logger.info(f"TxsHashes: {hashes}")
         return num_sent, hashes
-
-
-def prepare(args: Any) -> None:
-    workspace = args.workspace
-    utils.ensure_folder(workspace)
-
-    tx = do_prepare_transaction(args)
-    prepared_filename = path.join(workspace, f"tx-{args.tag}.json")
-    tx.save_to_file(prepared_filename)
-    logger.info(f"Saved prepared transaction to {prepared_filename}")
 
 
 def do_prepare_transaction(args: Any) -> Transaction:
