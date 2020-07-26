@@ -35,8 +35,8 @@ def _read_json_file(file_path):
 
 
 def parse_args_for_stake(args: Any):
-    validators_data_file = args.validators_data_file
-    validators_data = _read_json_file(validators_data_file)
+    validators_file = args.validators_file
+    validators_data = _read_json_file(validators_file)
 
     reward_address = args.reward_address
 

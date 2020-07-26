@@ -11,7 +11,7 @@ def setup_parser(subparsers: Any) -> Any:
     sub = cli_shared.add_command_subparser(subparsers, "validator", "stake", "Stake value into the Network")
     _add_common_arguments(sub)
     sub.add_argument("--reward-address", default="", help="the reward address")
-    sub.add_argument("--validators-data-file", required=True)
+    sub.add_argument("--validators-file", required=True, help="a JSON file describing the Nodes")
     sub.set_defaults(func=do_stake)
 
     sub = cli_shared.add_command_subparser(subparsers, "validator", "unstake", "Unstake value")
