@@ -5,7 +5,7 @@ SANDBOX=testdata-out/SANDBOX
 KEYS=../../examples/keys
 DENOMINATION="000000000000000000"
 PROXY="https://api.elrond.com"
-CHAIN_ID="BoN"
+CHAIN_ID="v1.0.147"
 
 cleanSandbox() {
     rm -rf ${SANDBOX}

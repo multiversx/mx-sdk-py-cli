@@ -33,6 +33,10 @@ class Transaction(ITransaction):
         data_base64 = base64.b64encode(data_bytes).decode()
         return data_base64
 
+    # Useful when loading a tx from a file (when data is already encoded in base64)
+    def data_decoded(self) -> str:
+        return base64.b64decode(self.data).decode()
+
     def sign(self, account: Account):
         self.signature = signing.sign_transaction(self, account)
 
@@ -47,6 +51,7 @@ class Transaction(ITransaction):
         fields = json.loads(data_json).get("tx", None)
         instance = cls()
         instance.__dict__.update(fields)
+        instance.data = instance.data_decoded()
         return instance
 
     def save_to_file(self, f: Any):
