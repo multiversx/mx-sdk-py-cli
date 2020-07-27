@@ -142,3 +142,12 @@ class CannotReadValidatorsData(KnownError):
     def __init__(self):
         super(CannotReadValidatorsData, self).__init__("cannot read validators data")
 
+
+class TransactionIsNotSigned(KnownError):
+    def __init__(self):
+        super().__init__("Transaction is not signed.")
+
+
+class NoWalletProvided(KnownError):
+    def __init__(self):
+        super().__init__("No wallet provided.")

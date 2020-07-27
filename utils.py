@@ -3,11 +3,12 @@ import logging
 import os
 import os.path
 import pathlib
+from pathlib import Path
 import shutil
 import stat
 import tarfile
 import zipfile
-from typing import Dict, List, Any
+from typing import Dict, List, Any, Union
 
 import toml
 
@@ -44,7 +45,7 @@ def unzip(archive_path, destination_folder):
     logger.debug("unzip done.")
 
 
-def ensure_folder(folder):
+def ensure_folder(folder: Union[str, Path]):
     pathlib.Path(folder).mkdir(parents=True, exist_ok=True)
 
 
@@ -56,14 +57,14 @@ def read_lines(file: str):
     return lines
 
 
-def read_file(f):
+def read_file(f: Any) -> str:
     if isinstance(f, str) or isinstance(f, pathlib.PosixPath):
         with open(f) as f:
             return f.read()
     return f.read()
 
 
-def write_file(f, text):
+def write_file(f: Any, text: str):
     if isinstance(f, str) or isinstance(f, pathlib.PosixPath):
         with open(f, "w") as f:
             return f.write(text)
@@ -134,7 +135,7 @@ def str_to_bool(input: str) -> bool:
     return str(input).lower() in ["true", "1", "t", "y", "yes"]
 
 
-def as_object(input) -> Object:
+def as_object(input: Any) -> Object:
     if isinstance(input, dict):
         result = Object()
         result.__dict__.update(input)

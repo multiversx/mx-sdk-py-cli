@@ -1,6 +1,9 @@
+from binascii import unhexlify
+from erdpy.interfaces import IAccount
 import logging
 import os
 from os import path
+from typing import Any, Union
 
 from erdpy import errors
 from erdpy.wallet import bech32, pem, generate_pair
@@ -41,12 +44,11 @@ class AccountsRepository:
         return accounts
 
 
-class Account:
-    def __init__(self, address=None, pem_file=None, key_file=None, pass_file=None):
-        self.private_key_seed = None
+class Account(IAccount):
+    def __init__(self, address: Any = None, pem_file: Union[str, None] = None, key_file: str = "", pass_file: str = ""):
         self.address = Address(address)
         self.pem_file = pem_file
-        self.nonce = 0
+        self.nonce: int = 0
 
         if pem_file:
             seed, pubkey = pem.parse(pem_file)
@@ -58,10 +60,13 @@ class Account:
             self.private_key_seed = seed.hex()
             self.address = Address(address_from_key_file)
 
-    def sync_nonce(self, proxy):
-        logger.info(f"Account.sync_nonce()")
+    def sync_nonce(self, proxy: Any):
+        logger.info("Account.sync_nonce()")
         self.nonce = proxy.get_account_nonce(self.address)
         logger.info(f"Account.sync_nonce() done: {self.nonce}")
+
+    def get_seed(self) -> bytes:
+        return unhexlify(self.private_key_seed)
 
 
 class Address:
@@ -90,11 +95,11 @@ class Address:
         else:
             raise errors.BadAddressFormatError(value)
 
-    def hex(self):
+    def hex(self) -> str:
         self._assert_validity()
         return self._value_hex
 
-    def bech32(self):
+    def bech32(self) -> str:
         self._assert_validity()
         pubkey = self.pubkey()
         return bech32.bech32_encode(self.HRP, bech32.convertbits(pubkey, 8, 5))

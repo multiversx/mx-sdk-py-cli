@@ -35,8 +35,8 @@ def _read_json_file(file_path):
 
 
 def parse_args_for_stake(args: Any):
-    validators_data_file = args.validators_data_file
-    validators_data = _read_json_file(validators_data_file)
+    validators_file = args.validators_file
+    validators_data = _read_json_file(validators_file)
 
     reward_address = args.reward_address
 
@@ -49,7 +49,9 @@ def parse_args_for_stake(args: Any):
     stake_data = 'stake@' + binascii.hexlify(num_of_nodes.to_bytes(1, byteorder="little")).decode()
     for validator in validators_data["validators"]:
         # get validator
-        seed, bls_key = parse_validator_pem(validator["pemFilePath"])
+        validator_pem = validator.get("pemFile", None)
+        validator_pem = path.join(path.dirname(validators_file), validator_pem)
+        seed, bls_key = parse_validator_pem(validator_pem)
         signed_message = sign_message_with_bls_key(account.address.pubkey().hex(), seed.hex())
         stake_data += f"@{bls_key}@{signed_message}"
 
@@ -66,7 +68,7 @@ def parse_args_for_stake(args: Any):
     return args
 
 
-def parse_args_for_un_stake(args):
+def parse_args_for_un_stake(args: Any):
     parsed_keys, num_keys = parse_keys(args.nodes_public_keys)
     args.data = 'unStake' + parsed_keys
     args.receiver = _STAKE_SMART_CONTRACT_ADDRESS
@@ -77,7 +79,7 @@ def parse_args_for_un_stake(args):
     return args
 
 
-def parse_args_for_un_bond(args):
+def parse_args_for_un_bond(args: Any):
     parsed_keys, num_keys = parse_keys(args.nodes_public_keys)
     args.data = 'unBond' + parsed_keys
     args.receiver = _STAKE_SMART_CONTRACT_ADDRESS
@@ -88,7 +90,7 @@ def parse_args_for_un_bond(args):
     return args
 
 
-def parse_args_for_un_jail(args):
+def parse_args_for_un_jail(args: Any):
     parsed_keys, num_keys = parse_keys(args.nodes_public_keys)
     args.data = 'unJail' + parsed_keys
     args.receiver = _STAKE_SMART_CONTRACT_ADDRESS
@@ -99,7 +101,7 @@ def parse_args_for_un_jail(args):
     return args
 
 
-def parse_args_for_changing_reward_address(args):
+def parse_args_for_changing_reward_address(args: Any):
     reward_address = Address(args.reward_address)
     args.data = 'changeRewardAddress@' + reward_address.hex()
     args.receiver = _STAKE_SMART_CONTRACT_ADDRESS
@@ -110,7 +112,7 @@ def parse_args_for_changing_reward_address(args):
     return args
 
 
-def parse_args_for_claim(args):
+def parse_args_for_claim(args: Any):
     args.data = 'claim'
     args.receiver = _STAKE_SMART_CONTRACT_ADDRESS
 

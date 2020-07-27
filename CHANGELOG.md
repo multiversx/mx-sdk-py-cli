@@ -4,6 +4,15 @@ All notable changes will be documented in this file.
 
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
+## [8.0.0] - 26.07.2020
+
+ - Updated signing procedure with respect to the `data` field (which is now base64-encoded)
+ - Redesigned the CLI for `validator stake`
+ - Refactoring and design improvements
+
+
+**Note that below, the change log is in chronological order. Will be soon updated to be in inverse chronological order (how it should have been in the first place).**
+
 ## [0.0.4]
 
 - Initial release

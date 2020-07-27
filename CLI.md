@@ -214,10 +214,10 @@ optional arguments:
   --proxy PROXY                          🖧 the URL of the proxy (default: https://api.elrond.com)
   --nonce NONCE                          # the nonce for the transaction
   --recall-nonce                         ⭮ whether to recall the nonce when creating the transaction (default: False)
-  --gas-price GAS_PRICE                  ⛽ the gas price (default: 200000000000)
+  --gas-price GAS_PRICE                  ⛽ the gas price (default: 1000000000)
   --gas-limit GAS_LIMIT                  ⛽ the gas limit
   --value VALUE                          the value to transfer (default: 0)
-  --chain CHAIN                          the chain identifier (default: testnet-elrond-all-in-one-test)
+  --chain CHAIN                          the chain identifier (default: v1.0.147)
   --version VERSION                      the transaction version (default: 1)
   --arguments ARGUMENTS [ARGUMENTS ...]  arguments for the contract transaction, as numbers or hex-encoded. E.g.
                                          --arguments 42 0x64 1000 0xabba
@@ -243,10 +243,10 @@ optional arguments:
   --proxy PROXY                          🖧 the URL of the proxy (default: https://api.elrond.com)
   --nonce NONCE                          # the nonce for the transaction
   --recall-nonce                         ⭮ whether to recall the nonce when creating the transaction (default: False)
-  --gas-price GAS_PRICE                  ⛽ the gas price (default: 200000000000)
+  --gas-price GAS_PRICE                  ⛽ the gas price (default: 1000000000)
   --gas-limit GAS_LIMIT                  ⛽ the gas limit
   --value VALUE                          the value to transfer (default: 0)
-  --chain CHAIN                          the chain identifier (default: testnet-elrond-all-in-one-test)
+  --chain CHAIN                          the chain identifier (default: v1.0.147)
   --version VERSION                      the transaction version (default: 1)
   --function FUNCTION                    the function to call
   --arguments ARGUMENTS [ARGUMENTS ...]  arguments for the contract transaction, as numbers or hex-encoded. E.g.
@@ -275,10 +275,10 @@ optional arguments:
   --proxy PROXY                          🖧 the URL of the proxy (default: https://api.elrond.com)
   --nonce NONCE                          # the nonce for the transaction
   --recall-nonce                         ⭮ whether to recall the nonce when creating the transaction (default: False)
-  --gas-price GAS_PRICE                  ⛽ the gas price (default: 200000000000)
+  --gas-price GAS_PRICE                  ⛽ the gas price (default: 1000000000)
   --gas-limit GAS_LIMIT                  ⛽ the gas limit
   --value VALUE                          the value to transfer (default: 0)
-  --chain CHAIN                          the chain identifier (default: testnet-elrond-all-in-one-test)
+  --chain CHAIN                          the chain identifier (default: v1.0.147)
   --version VERSION                      the transaction version (default: 1)
   --arguments ARGUMENTS [ARGUMENTS ...]  arguments for the contract transaction, as numbers or hex-encoded. E.g.
                                          --arguments 42 0x64 1000 0xabba
@@ -344,11 +344,11 @@ optional arguments:
   --nonce NONCE          # the nonce for the transaction
   --recall-nonce         ⭮ whether to recall the nonce when creating the transaction (default: False)
   --receiver RECEIVER    🖄 the address of the receiver
-  --gas-price GAS_PRICE  ⛽ the gas price (default: 200000000000)
+  --gas-price GAS_PRICE  ⛽ the gas price (default: 1000000000)
   --gas-limit GAS_LIMIT  ⛽ the gas limit
   --value VALUE          the value to transfer (default: 0)
   --data DATA            the payload, or 'memo' of the transaction (default: )
-  --chain CHAIN          the chain identifier (default: testnet-elrond-all-in-one-test)
+  --chain CHAIN          the chain identifier (default: v1.0.147)
   --version VERSION      the transaction version (default: 1)
   --data-file DATA_FILE  a file containing transaction data
   --outfile OUTFILE      where to save the output (signed transaction, hash) (default: stdout)
@@ -422,22 +422,22 @@ usage: erdpy validator stake [-h] ...
 Stake value into the Network
 
 optional arguments:
-  -h, --help                             show this help message and exit
-  --proxy PROXY                          🖧 the URL of the proxy (default: https://api.elrond.com)
-  --pem PEM                              🔑 the PEM file, if keyfile not provided
-  --keyfile KEYFILE                      🔑 a JSON keyfile, if PEM not provided
-  --passfile PASSFILE                    🔑 a file containing keyfile's password, if keyfile provided
-  --nonce NONCE                          # the nonce for the transaction
-  --recall-nonce                         ⭮ whether to recall the nonce when creating the transaction (default: False)
-  --gas-price GAS_PRICE                  ⛽ the gas price (default: 200000000000)
-  --gas-limit GAS_LIMIT                  ⛽ the gas limit
-  --estimate-gas                         ⛽ whether to estimate the gas limit (default: 0)
-  --value VALUE                          the value to transfer (default: 0)
-  --chain CHAIN                          the chain identifier (default: testnet-elrond-all-in-one-test)
-  --version VERSION                      the transaction version (default: 1)
-  --number-of-nodes NUMBER_OF_NODES      number of nodes to register
-  --nodes-public-keys NODES_PUBLIC_KEYS  the public keys of the nodes as CSV (addrA,addrB)
-  --reward-address REWARD_ADDRESS        the reward address
+  -h, --help                         show this help message and exit
+  --proxy PROXY                      🖧 the URL of the proxy (default: https://api.elrond.com)
+  --pem PEM                          🔑 the PEM file, if keyfile not provided
+  --keyfile KEYFILE                  🔑 a JSON keyfile, if PEM not provided
+  --passfile PASSFILE                🔑 a file containing keyfile's password, if keyfile provided
+  --nonce NONCE                      # the nonce for the transaction
+  --recall-nonce                     ⭮ whether to recall the nonce when creating the transaction (default: False)
+  --gas-price GAS_PRICE              ⛽ the gas price (default: 1000000000)
+  --gas-limit GAS_LIMIT              ⛽ the gas limit
+  --estimate-gas                     ⛽ whether to estimate the gas limit (default: 0)
+  --value VALUE                      the value to transfer (default: 0)
+  --chain CHAIN                      the chain identifier (default: v1.0.147)
+  --version VERSION                  the transaction version (default: 1)
+  --outfile OUTFILE                  where to save the output (signed transaction, hash) (default: stdout)
+  --reward-address REWARD_ADDRESS    the reward address
+  --validators-file VALIDATORS_FILE  a JSON file describing the Nodes
 
 ```
 ### Validator.Unstake
@@ -457,12 +457,13 @@ optional arguments:
   --passfile PASSFILE                    🔑 a file containing keyfile's password, if keyfile provided
   --nonce NONCE                          # the nonce for the transaction
   --recall-nonce                         ⭮ whether to recall the nonce when creating the transaction (default: False)
-  --gas-price GAS_PRICE                  ⛽ the gas price (default: 200000000000)
+  --gas-price GAS_PRICE                  ⛽ the gas price (default: 1000000000)
   --gas-limit GAS_LIMIT                  ⛽ the gas limit
   --estimate-gas                         ⛽ whether to estimate the gas limit (default: 0)
   --value VALUE                          the value to transfer (default: 0)
-  --chain CHAIN                          the chain identifier (default: testnet-elrond-all-in-one-test)
+  --chain CHAIN                          the chain identifier (default: v1.0.147)
   --version VERSION                      the transaction version (default: 1)
+  --outfile OUTFILE                      where to save the output (signed transaction, hash) (default: stdout)
   --nodes-public-keys NODES_PUBLIC_KEYS  the public keys of the nodes as CSV (addrA,addrB)
 
 ```
@@ -483,12 +484,13 @@ optional arguments:
   --passfile PASSFILE                    🔑 a file containing keyfile's password, if keyfile provided
   --nonce NONCE                          # the nonce for the transaction
   --recall-nonce                         ⭮ whether to recall the nonce when creating the transaction (default: False)
-  --gas-price GAS_PRICE                  ⛽ the gas price (default: 200000000000)
+  --gas-price GAS_PRICE                  ⛽ the gas price (default: 1000000000)
   --gas-limit GAS_LIMIT                  ⛽ the gas limit
   --estimate-gas                         ⛽ whether to estimate the gas limit (default: 0)
   --value VALUE                          the value to transfer (default: 0)
-  --chain CHAIN                          the chain identifier (default: testnet-elrond-all-in-one-test)
+  --chain CHAIN                          the chain identifier (default: v1.0.147)
   --version VERSION                      the transaction version (default: 1)
+  --outfile OUTFILE                      where to save the output (signed transaction, hash) (default: stdout)
   --nodes-public-keys NODES_PUBLIC_KEYS  the public keys of the nodes as CSV (addrA,addrB)
 
 ```
@@ -509,12 +511,13 @@ optional arguments:
   --passfile PASSFILE                    🔑 a file containing keyfile's password, if keyfile provided
   --nonce NONCE                          # the nonce for the transaction
   --recall-nonce                         ⭮ whether to recall the nonce when creating the transaction (default: False)
-  --gas-price GAS_PRICE                  ⛽ the gas price (default: 200000000000)
+  --gas-price GAS_PRICE                  ⛽ the gas price (default: 1000000000)
   --gas-limit GAS_LIMIT                  ⛽ the gas limit
   --estimate-gas                         ⛽ whether to estimate the gas limit (default: 0)
   --value VALUE                          the value to transfer (default: 0)
-  --chain CHAIN                          the chain identifier (default: testnet-elrond-all-in-one-test)
+  --chain CHAIN                          the chain identifier (default: v1.0.147)
   --version VERSION                      the transaction version (default: 1)
+  --outfile OUTFILE                      where to save the output (signed transaction, hash) (default: stdout)
   --nodes-public-keys NODES_PUBLIC_KEYS  the public keys of the nodes as CSV (addrA,addrB)
 
 ```
@@ -535,12 +538,13 @@ optional arguments:
   --passfile PASSFILE              🔑 a file containing keyfile's password, if keyfile provided
   --nonce NONCE                    # the nonce for the transaction
   --recall-nonce                   ⭮ whether to recall the nonce when creating the transaction (default: False)
-  --gas-price GAS_PRICE            ⛽ the gas price (default: 200000000000)
+  --gas-price GAS_PRICE            ⛽ the gas price (default: 1000000000)
   --gas-limit GAS_LIMIT            ⛽ the gas limit
   --estimate-gas                   ⛽ whether to estimate the gas limit (default: 0)
   --value VALUE                    the value to transfer (default: 0)
-  --chain CHAIN                    the chain identifier (default: testnet-elrond-all-in-one-test)
+  --chain CHAIN                    the chain identifier (default: v1.0.147)
   --version VERSION                the transaction version (default: 1)
+  --outfile OUTFILE                where to save the output (signed transaction, hash) (default: stdout)
   --reward-address REWARD_ADDRESS  the new reward address
 
 ```
@@ -561,12 +565,13 @@ optional arguments:
   --passfile PASSFILE    🔑 a file containing keyfile's password, if keyfile provided
   --nonce NONCE          # the nonce for the transaction
   --recall-nonce         ⭮ whether to recall the nonce when creating the transaction (default: False)
-  --gas-price GAS_PRICE  ⛽ the gas price (default: 200000000000)
+  --gas-price GAS_PRICE  ⛽ the gas price (default: 1000000000)
   --gas-limit GAS_LIMIT  ⛽ the gas limit
   --estimate-gas         ⛽ whether to estimate the gas limit (default: 0)
   --value VALUE          the value to transfer (default: 0)
-  --chain CHAIN          the chain identifier (default: testnet-elrond-all-in-one-test)
+  --chain CHAIN          the chain identifier (default: v1.0.147)
   --version VERSION      the transaction version (default: 1)
+  --outfile OUTFILE      where to save the output (signed transaction, hash) (default: stdout)
 
 ```
 ## Group **Account**
@@ -875,11 +880,11 @@ Enqueue a transaction
 optional arguments:
   -h, --help             show this help message and exit
   --receiver RECEIVER    🖄 the address of the receiver
-  --gas-price GAS_PRICE  ⛽ the gas price (default: 200000000000)
+  --gas-price GAS_PRICE  ⛽ the gas price (default: 1000000000)
   --gas-limit GAS_LIMIT  ⛽ the gas limit
   --value VALUE          the value to transfer (default: 0)
   --data DATA            the payload, or 'memo' of the transaction (default: )
-  --chain CHAIN          the chain identifier (default: testnet-elrond-all-in-one-test)
+  --chain CHAIN          the chain identifier (default: v1.0.147)
   --version VERSION      the transaction version (default: 1)
 
 ```
