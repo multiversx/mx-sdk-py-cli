@@ -6,7 +6,7 @@ from typing import Any, List
 
 from erdpy import (cli_accounts, cli_blockatlas, cli_config, cli_contracts,
                    cli_cost, cli_deps, cli_dispatcher, cli_network,
-                   cli_transactions, cli_validators, cli_wallet, errors)
+                   cli_transactions, cli_validators, cli_wallet, errors, cli_block)
 from erdpy._version import __version__
 
 logger = logging.getLogger("cli")
@@ -72,6 +72,7 @@ https://docs.elrond.com/tools/erdpy.
     commands.append(cli_blockatlas.setup_parser(subparsers))
     commands.append(cli_deps.setup_parser(subparsers))
     commands.append(cli_config.setup_parser(subparsers))
+    commands.append(cli_block.setup_parser(subparsers))
 
     parser.epilog = """
 ----------------------

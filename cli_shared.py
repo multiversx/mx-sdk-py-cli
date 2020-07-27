@@ -30,7 +30,7 @@ COMMANDS summary
 ----------------
 """
     for choice, sub in subparsers.choices.items():
-        epilog += (f"{choice.ljust(30)} {sub.description}\n")
+        epilog += f"{choice.ljust(30)} {sub.description}\n"
 
     return epilog
 

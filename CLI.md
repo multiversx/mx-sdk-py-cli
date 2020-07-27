@@ -13,6 +13,7 @@
   - [Group **Transactions**](#group-transactions)
     - [Transactions.New](#transactionsnew)
     - [Transactions.Send](#transactionssend)
+    - [Transactions.Get](#transactionsget)
   - [Group **Validator**](#group-validator)
     - [Validator.Stake](#validatorstake)
     - [Validator.Unstake](#validatorunstake)
@@ -44,6 +45,8 @@
     - [BlockAtlas.CurrentBlockNumber](#blockatlascurrentblocknumber)
     - [BlockAtlas.BlockByNumber](#blockatlasblockbynumber)
     - [BlockAtlas.Transactions](#blockatlastransactions)
+  - [Group **Block**](#group-block)
+    - [Block.Get](#blockget) 
   - [Group **Dependencies**](#group-dependencies)
     - [Dependencies.Install](#dependenciesinstall)
     - [Dependencies.Check](#dependenciescheck)
@@ -311,7 +314,7 @@ usage: erdpy tx COMMAND [-h] ...
 Create and broadcast Transactions
 
 COMMANDS:
-  {new,send}
+  {new,send,get}
 
 OPTIONS:
   -h, --help  show this help message and exit
@@ -321,6 +324,7 @@ COMMANDS summary
 ----------------
 new                            Create a new transaction
 send                           Send a previously saved transaction
+get                            Get a transaction by hash
 
 ```
 ### Transactions.New
@@ -368,6 +372,20 @@ optional arguments:
   --proxy PROXY      🖧 the URL of the proxy (default: https://api.elrond.com)
 
 ```
+### Transactions.Get
+```
+$ erdpy tx get --help
+usage: erdpy tx get [-h] ...
+
+Get a transaction by hash
+
+optional arguments:
+  -h, --help         show this help message and exit
+  --hash HASH        the hash of transaction
+  --sender SENDER    🖧 the sender adress of transaction (default: "", if this argument is provided the response will be faster)
+  --proxy PROXY      🖧 the URL of the proxy (default: https://api.elrond.com)
+```
+
 ## Group **Validator**
 
 
@@ -980,6 +998,43 @@ optional arguments:
   --outfile OUTFILE  where to save the output (default: stdout)
 
 ```
+## Group **Block**
+
+
+
+```
+$ erdpy block --help
+usage: erdpy block COMMAND [-h] ...
+
+COMMANDS:
+  {get}
+
+OPTIONS:
+  -h, --help  show this help message and exit
+
+----------------
+COMMANDS summary
+----------------
+get                            Get a block by hash or nonce
+```
+
+### Block.Get
+
+
+```
+$ erdpy block get --help
+usage: erdpy block get [-h] ...
+
+Get a block by hash or nonce
+
+optional arguments:
+  -h, --help         show this help message and exit
+  --hash HASH        🖧 the hash of block
+  --nonce NONCE      🖧 the nonce of block
+  --shard SHARDID    🖧 the shard of block
+  --proxy PROXY      🖧 the URL of the proxy (default: https://api.elrond.com)
+```
+
 ## Group **Dependencies**
 
 

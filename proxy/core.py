@@ -1,5 +1,8 @@
-from erdpy.accounts import Address
 import logging
+
+from typing import Any
+from erdpy.accounts import Address
+
 
 from erdpy.proxy.http_facade import do_get, do_post
 
@@ -105,4 +108,22 @@ class ElrondProxy:
     def query_contract(self, payload):
         url = f"{self.url}/vm-values/query"
         response = do_post(url, payload)
+        return response
+
+    def get_block_by_nonce(self, nonce, with_txs=False):
+        url = f"{self.url}/block/by-nonce/{nonce}?withTxs={with_txs}"
+        response = do_get(url)
+        return response
+
+    def get_block_by_hash(self, block_hash, with_txs=False):
+        url = f"{self.url}/block/by-hash/{block_hash}?withTxs={with_txs}"
+        response = do_get(url)
+        return response
+
+    def get_transaction(self, tx_hash: str, sender_address: str) -> Any:
+        url = f"{self.url}/transaction/{tx_hash}"
+        if sender_address != "":
+            url += f"?sender={sender_address}"
+
+        response = do_get(url)
         return response
