@@ -4,6 +4,10 @@ All notable changes will be documented in this file.
 
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
+## [8.0.1] - 29.07.2020
+
+ - Add SDK helpers to generate relayed transactions.
+
 ## [8.0.0] - 26.07.2020
 
  - Updated signing procedure with respect to the `data` field (which is now base64-encoded)
