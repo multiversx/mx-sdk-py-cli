@@ -3,6 +3,7 @@ from typing import Any
 
 from erdpy import errors, utils, wallet
 from erdpy.accounts import Account, Address
+from erdpy.block import block
 from erdpy.blockatlas import BlockAtlas
 from erdpy.contracts import CodeMetadata, SmartContract
 from erdpy.dispatcher.transactions.queue import TransactionQueue
@@ -265,6 +266,15 @@ def send_transaction(args: Any):
         tx.dump_to(args.outfile)
 
 
+def get_transaction(args):
+    args = utils.as_object(args)
+
+    proxy = ElrondProxy(args.proxy)
+
+    response = proxy.get_transaction(args.hash, args.sender)
+    print(response)
+
+
 def prepare_and_send_stake_transaction(args: Any):
     _prepare_nonce(args)
     args = validators.parse_args_for_stake(args)
@@ -394,3 +404,7 @@ def blockatlas_get_txs_by_address(args: Any) -> Any:
     transactions = client.get_txs_by_address(args.address)
     utils.dump_out_json(transactions, args.outfile)
     return transactions
+
+
+def get_block(args: Any) -> Any:
+    block.get_block(args)

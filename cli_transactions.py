@@ -22,6 +22,12 @@ def setup_parser(subparsers: Any) -> Any:
     cli_shared.add_proxy_arg(sub)
     sub.set_defaults(func=send_transaction)
 
+    sub = cli_shared.add_command_subparser(subparsers, "tx", "get", "Get a transaction")
+    sub.add_argument("--hash", required=True, help="the hash")
+    sub.add_argument("--sender", required=False, help="the sender address")
+    cli_shared.add_proxy_arg(sub)
+    sub.set_defaults(func=get_transaction)
+
     parser.epilog = cli_shared.build_group_epilog(subparsers)
     return subparsers
 
@@ -38,3 +44,8 @@ def create_transaction(args: Any):
 
 def send_transaction(args: Any):
     facade.send_transaction(args)
+
+
+def get_transaction(args: Any):
+    facade.get_transaction(args)
+
