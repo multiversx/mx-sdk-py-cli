@@ -1,8 +1,9 @@
 import logging
-from typing import Any, List, Tuple
+from typing import Any, Dict, List, Tuple
 
 from erdpy.accounts import Address
 from erdpy.proxy.http_facade import do_get, do_post
+from erdpy.proxy.messages import NetworkConfig
 
 METACHAIN_ID = 4294967295
 ANY_SHARD_ID = 0
@@ -14,11 +15,11 @@ class ElrondProxy:
     def __init__(self, url: str):
         self.url = url
 
-    def get_account_nonce(self, address: Address):
+    def get_account_nonce(self, address: Address) -> int:
         url = f"{self.url}/address/{address.bech32()}"
         response = do_get(url)
         nonce = response["account"]["nonce"]
-        return nonce
+        return int(nonce)
 
     def get_account_balance(self, address: Address):
         url = f"{self.url}/address/{address.bech32()}/balance"
@@ -44,9 +45,8 @@ class ElrondProxy:
         return transactions
 
     def get_num_shards(self):
-        network_config = self._get_network_config()
-        num_shards_without_meta = network_config.get("erd_num_shards_without_meta", 0)
-        return num_shards_without_meta + 1
+        network_config = self.get_network_config()
+        return network_config.num_shards
 
     def get_last_block_nonce(self, shard_id):
         if shard_id == "metachain":
@@ -58,36 +58,25 @@ class ElrondProxy:
         return nonce
 
     def get_gas_price(self):
-        network_config = self._get_network_config()
-        price = network_config["erd_min_gas_price"]
-        return price
+        network_config = self.get_network_config()
+        return network_config.min_gas_price
 
     def get_chain_id(self):
-        network_config = self._get_network_config()
-        chain_id = network_config["erd_chain_id"]
-        return chain_id
+        network_config = self.get_network_config()
+        return network_config.chain_id
 
     def _get_network_status(self, shard_id):
         url = f"{self.url}/network/status/{shard_id}"
         response = do_get(url)
         payload = response.get("status", None)
-        if not payload:
-            payload = response.get("message", None)
-            if payload:
-                payload = payload.get("status", None)
-
         return payload
 
-    def _get_network_config(self):
+    def get_network_config(self) -> NetworkConfig:
         url = f"{self.url}/network/config"
         response = do_get(url)
         payload = response.get("config", None)
-        if not payload:
-            payload = response.get("message", None)
-            if payload:
-                payload = payload.get("config", None)
-
-        return payload
+        result = NetworkConfig(payload)
+        return result
 
     def send_transaction(self, payload: Any) -> str:
         url = f"{self.url}/transaction/send"
@@ -103,7 +92,7 @@ class ElrondProxy:
         hashes = response.get("txsHashes", None)
         return num_sent, hashes
 
-    def query_contract(self, payload):
+    def query_contract(self, payload: Any):
         url = f"{self.url}/vm-values/query"
         response = do_post(url, payload)
         return response

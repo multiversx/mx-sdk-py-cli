@@ -1,5 +1,5 @@
 from binascii import unhexlify
-from erdpy.interfaces import IAccount
+from erdpy.interfaces import IAccount, IAddress
 import logging
 import os
 from os import path
@@ -69,7 +69,7 @@ class Account(IAccount):
         return unhexlify(self.private_key_seed)
 
 
-class Address:
+class Address(IAddress):
     HRP = "erd"
     PUBKEY_LENGTH = 32
     PUBKEY_STRING_LENGTH = PUBKEY_LENGTH * 2    # hex-encoded

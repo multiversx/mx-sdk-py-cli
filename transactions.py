@@ -5,7 +5,7 @@ from collections import OrderedDict
 from typing import Any, Dict
 
 from erdpy import errors, utils
-from erdpy.accounts import Account
+from erdpy.accounts import Account, Address
 from erdpy.interfaces import IElrondProxy, ITransaction
 from erdpy.wallet import signing
 
@@ -41,6 +41,10 @@ class Transaction(ITransaction):
 
     def serialize(self) -> bytes:
         dictionary = self.to_dictionary()
+        serialized = self._dict_to_json(dictionary)
+        return serialized
+
+    def _dict_to_json(self, dictionary: Dict[str, Any]):
         serialized = json.dumps(dictionary, separators=(',', ':')).encode("utf8")
         return serialized
 
@@ -90,6 +94,23 @@ class Transaction(ITransaction):
             dictionary["signature"] = self.signature
 
         return dictionary
+
+    # Creates the payload for a "user" / "inner" transaction
+    def to_dictionary_as_inner(self) -> Dict[str, Any]:
+        dictionary = self.to_dictionary()
+        dictionary["receiver"] = base64.b64encode(Address(self.receiver).pubkey()).decode()
+        dictionary["sender"] = base64.b64encode(Address(self.sender).pubkey()).decode()
+        dictionary["chainID"] = base64.b64encode(self.chainID.encode()).decode()
+        dictionary["signature"] = base64.b64encode(bytes(bytearray.fromhex(self.signature))).decode()
+        dictionary["value"] = int(self.value)
+
+        return dictionary
+
+    def wrap_inner(self, inner: ITransaction) -> None:
+        inner_dictionary = inner.to_dictionary_as_inner()
+        serialized = self._dict_to_json(inner_dictionary)
+        serialized_hex = serialized.hex()
+        self.data = f"relayedTx@{serialized_hex}"
 
 
 class BunchOfTransactions:
