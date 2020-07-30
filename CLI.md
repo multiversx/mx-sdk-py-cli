@@ -211,7 +211,7 @@ optional arguments:
   --pem PEM                              🔑 the PEM file, if keyfile not provided
   --keyfile KEYFILE                      🔑 a JSON keyfile, if PEM not provided
   --passfile PASSFILE                    🔑 a file containing keyfile's password, if keyfile provided
-  --proxy PROXY                          🖧 the URL of the proxy (default: https://api.elrond.com)
+  --proxy PROXY                          🖧 the URL of the proxy (default: https://testnet-api.elrond.com)
   --nonce NONCE                          # the nonce for the transaction
   --recall-nonce                         ⭮ whether to recall the nonce when creating the transaction (default: False)
   --gas-price GAS_PRICE                  ⛽ the gas price (default: 1000000000)
@@ -240,7 +240,7 @@ optional arguments:
   --pem PEM                              🔑 the PEM file, if keyfile not provided
   --keyfile KEYFILE                      🔑 a JSON keyfile, if PEM not provided
   --passfile PASSFILE                    🔑 a file containing keyfile's password, if keyfile provided
-  --proxy PROXY                          🖧 the URL of the proxy (default: https://api.elrond.com)
+  --proxy PROXY                          🖧 the URL of the proxy (default: https://testnet-api.elrond.com)
   --nonce NONCE                          # the nonce for the transaction
   --recall-nonce                         ⭮ whether to recall the nonce when creating the transaction (default: False)
   --gas-price GAS_PRICE                  ⛽ the gas price (default: 1000000000)
@@ -272,7 +272,7 @@ optional arguments:
   --pem PEM                              🔑 the PEM file, if keyfile not provided
   --keyfile KEYFILE                      🔑 a JSON keyfile, if PEM not provided
   --passfile PASSFILE                    🔑 a file containing keyfile's password, if keyfile provided
-  --proxy PROXY                          🖧 the URL of the proxy (default: https://api.elrond.com)
+  --proxy PROXY                          🖧 the URL of the proxy (default: https://testnet-api.elrond.com)
   --nonce NONCE                          # the nonce for the transaction
   --recall-nonce                         ⭮ whether to recall the nonce when creating the transaction (default: False)
   --gas-price GAS_PRICE                  ⛽ the gas price (default: 1000000000)
@@ -298,7 +298,7 @@ positional arguments:
 
 optional arguments:
   -h, --help                             show this help message and exit
-  --proxy PROXY                          🖧 the URL of the proxy (default: https://api.elrond.com)
+  --proxy PROXY                          🖧 the URL of the proxy (default: https://testnet-api.elrond.com)
   --function FUNCTION                    the function to call
   --arguments ARGUMENTS [ARGUMENTS ...]  arguments for the contract transaction, as numbers or hex-encoded. E.g.
                                          --arguments 42 0x64 1000 0xabba
@@ -353,7 +353,7 @@ optional arguments:
   --data-file DATA_FILE  a file containing transaction data
   --outfile OUTFILE      where to save the output (signed transaction, hash) (default: stdout)
   --send                 ✓ whether to broadcast (send) the transaction (default: False)
-  --proxy PROXY          🖧 the URL of the proxy (default: https://api.elrond.com)
+  --proxy PROXY          🖧 the URL of the proxy (default: https://testnet-api.elrond.com)
 
 ```
 ### Transactions.Send
@@ -369,7 +369,7 @@ optional arguments:
   -h, --help         show this help message and exit
   --infile INFILE    input file (a previously saved transaction)
   --outfile OUTFILE  where to save the output (the hash) (default: stdout)
-  --proxy PROXY      🖧 the URL of the proxy (default: https://api.elrond.com)
+  --proxy PROXY      🖧 the URL of the proxy (default: https://testnet-api.elrond.com)
 
 ```
 ### Transactions.Get
@@ -383,7 +383,7 @@ optional arguments:
   -h, --help         show this help message and exit
   --hash HASH        the hash of transaction
   --sender SENDER    🖧 the sender adress of transaction (default: "", if this argument is provided the response will be faster)
-  --proxy PROXY      🖧 the URL of the proxy (default: https://api.elrond.com)
+  --proxy PROXY      🖧 the URL of the proxy (default: https://testnet-api.elrond.com)
 ```
 
 ## Group **Validator**
@@ -423,7 +423,7 @@ Stake value into the Network
 
 optional arguments:
   -h, --help                         show this help message and exit
-  --proxy PROXY                      🖧 the URL of the proxy (default: https://api.elrond.com)
+  --proxy PROXY                      🖧 the URL of the proxy (default: https://testnet-api.elrond.com)
   --pem PEM                          🔑 the PEM file, if keyfile not provided
   --keyfile KEYFILE                  🔑 a JSON keyfile, if PEM not provided
   --passfile PASSFILE                🔑 a file containing keyfile's password, if keyfile provided
@@ -451,7 +451,7 @@ Unstake value
 
 optional arguments:
   -h, --help                             show this help message and exit
-  --proxy PROXY                          🖧 the URL of the proxy (default: https://api.elrond.com)
+  --proxy PROXY                          🖧 the URL of the proxy (default: https://testnet-api.elrond.com)
   --pem PEM                              🔑 the PEM file, if keyfile not provided
   --keyfile KEYFILE                      🔑 a JSON keyfile, if PEM not provided
   --passfile PASSFILE                    🔑 a file containing keyfile's password, if keyfile provided
@@ -478,7 +478,7 @@ Unjail a Validator Node
 
 optional arguments:
   -h, --help                             show this help message and exit
-  --proxy PROXY                          🖧 the URL of the proxy (default: https://api.elrond.com)
+  --proxy PROXY                          🖧 the URL of the proxy (default: https://testnet-api.elrond.com)
   --pem PEM                              🔑 the PEM file, if keyfile not provided
   --keyfile KEYFILE                      🔑 a JSON keyfile, if PEM not provided
   --passfile PASSFILE                    🔑 a file containing keyfile's password, if keyfile provided
@@ -505,7 +505,7 @@ Unbond
 
 optional arguments:
   -h, --help                             show this help message and exit
-  --proxy PROXY                          🖧 the URL of the proxy (default: https://api.elrond.com)
+  --proxy PROXY                          🖧 the URL of the proxy (default: https://testnet-api.elrond.com)
   --pem PEM                              🔑 the PEM file, if keyfile not provided
   --keyfile KEYFILE                      🔑 a JSON keyfile, if PEM not provided
   --passfile PASSFILE                    🔑 a file containing keyfile's password, if keyfile provided
@@ -532,7 +532,7 @@ Change the reward address
 
 optional arguments:
   -h, --help                       show this help message and exit
-  --proxy PROXY                    🖧 the URL of the proxy (default: https://api.elrond.com)
+  --proxy PROXY                    🖧 the URL of the proxy (default: https://testnet-api.elrond.com)
   --pem PEM                        🔑 the PEM file, if keyfile not provided
   --keyfile KEYFILE                🔑 a JSON keyfile, if PEM not provided
   --passfile PASSFILE              🔑 a file containing keyfile's password, if keyfile provided
@@ -559,7 +559,7 @@ Claim rewards
 
 optional arguments:
   -h, --help             show this help message and exit
-  --proxy PROXY          🖧 the URL of the proxy (default: https://api.elrond.com)
+  --proxy PROXY          🖧 the URL of the proxy (default: https://testnet-api.elrond.com)
   --pem PEM              🔑 the PEM file, if keyfile not provided
   --keyfile KEYFILE      🔑 a JSON keyfile, if PEM not provided
   --passfile PASSFILE    🔑 a file containing keyfile's password, if keyfile provided
@@ -607,7 +607,7 @@ Query account details (nonce, balance etc.)
 
 optional arguments:
   -h, --help         show this help message and exit
-  --proxy PROXY      🖧 the URL of the proxy (default: https://api.elrond.com)
+  --proxy PROXY      🖧 the URL of the proxy (default: https://testnet-api.elrond.com)
   --address ADDRESS  🖄 the address to query
   --balance          whether to only fetch the balance
   --nonce            whether to only fetch the nonce
@@ -624,7 +624,7 @@ Query account transactions
 
 optional arguments:
   -h, --help         show this help message and exit
-  --proxy PROXY      🖧 the URL of the proxy (default: https://api.elrond.com)
+  --proxy PROXY      🖧 the URL of the proxy (default: https://testnet-api.elrond.com)
   --outfile OUTFILE  where to save the output (default: stdout)
   --address ADDRESS  🖄 the address to query
 
@@ -720,7 +720,7 @@ Get the number of shards.
 
 optional arguments:
   -h, --help     show this help message and exit
-  --proxy PROXY  🖧 the URL of the proxy (default: https://api.elrond.com)
+  --proxy PROXY  🖧 the URL of the proxy (default: https://testnet-api.elrond.com)
 
 ```
 ### Network.BlockNonce
@@ -734,7 +734,7 @@ Get the latest block nonce, by shard.
 
 optional arguments:
   -h, --help     show this help message and exit
-  --proxy PROXY  🖧 the URL of the proxy (default: https://api.elrond.com)
+  --proxy PROXY  🖧 the URL of the proxy (default: https://testnet-api.elrond.com)
   --shard SHARD  the shard ID (use 4294967295 for metachain)
 
 ```
@@ -749,7 +749,7 @@ Get the chain identifier.
 
 optional arguments:
   -h, --help     show this help message and exit
-  --proxy PROXY  🖧 the URL of the proxy (default: https://api.elrond.com)
+  --proxy PROXY  🖧 the URL of the proxy (default: https://testnet-api.elrond.com)
 
 ```
 ## Group **Cost**
@@ -787,7 +787,7 @@ Query minimum gas price
 
 optional arguments:
   -h, --help     show this help message and exit
-  --proxy PROXY  🖧 the URL of the proxy (default: https://api.elrond.com)
+  --proxy PROXY  🖧 the URL of the proxy (default: https://testnet-api.elrond.com)
 
 ```
 ### Cost.TxTransfer
@@ -801,7 +801,7 @@ Query cost of regular transaction (transfer)
 
 optional arguments:
   -h, --help     show this help message and exit
-  --proxy PROXY  🖧 the URL of the proxy (default: https://api.elrond.com)
+  --proxy PROXY  🖧 the URL of the proxy (default: https://testnet-api.elrond.com)
   --data DATA    a transaction payload, required to estimate the cost
 
 ```
@@ -819,7 +819,7 @@ positional arguments:
 
 optional arguments:
   -h, --help                             show this help message and exit
-  --proxy PROXY                          🖧 the URL of the proxy (default: https://api.elrond.com)
+  --proxy PROXY                          🖧 the URL of the proxy (default: https://testnet-api.elrond.com)
   --arguments ARGUMENTS [ARGUMENTS ...]  arguments for the contract transaction, as numbers or hex-encoded. E.g.
                                          --arguments 42 0x64 1000 0xabba
 
@@ -838,7 +838,7 @@ positional arguments:
 
 optional arguments:
   -h, --help                             show this help message and exit
-  --proxy PROXY                          🖧 the URL of the proxy (default: https://api.elrond.com)
+  --proxy PROXY                          🖧 the URL of the proxy (default: https://testnet-api.elrond.com)
   --function FUNCTION                    the function to call
   --arguments ARGUMENTS [ARGUMENTS ...]  arguments for the contract transaction, as numbers or hex-encoded. E.g.
                                          --arguments 42 0x64 1000 0xabba
@@ -899,7 +899,7 @@ Dispatch queued transactions
 
 optional arguments:
   -h, --help           show this help message and exit
-  --proxy PROXY        🖧 the URL of the proxy (default: https://api.elrond.com)
+  --proxy PROXY        🖧 the URL of the proxy (default: https://testnet-api.elrond.com)
   --pem PEM            🔑 the PEM file, if keyfile not provided
   --keyfile KEYFILE    🔑 a JSON keyfile, if PEM not provided
   --passfile PASSFILE  🔑 a file containing keyfile's password, if keyfile provided
@@ -916,7 +916,7 @@ Continuously dispatch queued transactions
 
 optional arguments:
   -h, --help           show this help message and exit
-  --proxy PROXY        🖧 the URL of the proxy (default: https://api.elrond.com)
+  --proxy PROXY        🖧 the URL of the proxy (default: https://testnet-api.elrond.com)
   --pem PEM            🔑 the PEM file, if keyfile not provided
   --keyfile KEYFILE    🔑 a JSON keyfile, if PEM not provided
   --passfile PASSFILE  🔑 a file containing keyfile's password, if keyfile provided
@@ -1037,7 +1037,7 @@ optional arguments:
   --hash HASH        🖧 the hash of block
   --nonce NONCE      🖧 the nonce of block
   --shard SHARDID    🖧 the shard of block
-  --proxy PROXY      🖧 the URL of the proxy (default: https://api.elrond.com)
+  --proxy PROXY      🖧 the URL of the proxy (default: https://testnet-api.elrond.com)
 ```
 
 ## Group **Dependencies**
