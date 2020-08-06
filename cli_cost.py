@@ -1,10 +1,8 @@
-from erdpy import cli_contracts
-from erdpy.facade import get_transaction_cost
-from erdpy import cli_shared
 import logging
 from typing import Any
 
-from erdpy import facade, proxy
+from erdpy import cli_contracts, cli_shared, facade, proxy
+from erdpy.facade import get_transaction_cost
 
 logger = logging.getLogger("cli.cost")
 
@@ -24,7 +22,7 @@ def setup_parser(subparsers: Any) -> Any:
 
     sub = cli_shared.add_command_subparser(subparsers, "cost", "sc-deploy", "Query cost of Smart Contract deploy transaction")
     cli_shared.add_proxy_arg(sub)
-    cli_contracts._add_project_or_wasm_arg(sub)
+    cli_contracts._add_project_or_bytecode_arg(sub)
     cli_contracts._add_arguments_arg(sub)
     sub.set_defaults(func=lambda args: get_transaction_cost(args, proxy.TxTypes.SC_DEPLOY))
 

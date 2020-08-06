@@ -25,7 +25,7 @@ testRunMandos() {
     #${ERDPY} --verbose contract test --directory="tests" ${SANDBOX}/sc-busd-rs
 }
 
-testContracts() {
+testAll() {
     set -x
 
     cleanSandbox

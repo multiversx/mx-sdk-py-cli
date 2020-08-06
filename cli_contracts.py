@@ -42,7 +42,7 @@ def setup_parser(subparsers: Any) -> Any:
     sub.set_defaults(func=run_tests)
 
     sub = cli_shared.add_command_subparser(subparsers, "contract", "deploy", "Deploy a Smart Contract.")
-    _add_project_or_wasm_arg(sub)
+    _add_project_or_bytecode_arg(sub)
     _add_metadata_arg(sub)
     cli_shared.add_outfile_arg(sub)
     cli_shared.add_wallet_args(sub)
@@ -64,7 +64,7 @@ def setup_parser(subparsers: Any) -> Any:
 
     sub = cli_shared.add_command_subparser(subparsers, "contract", "upgrade", "Upgrade a previously-deployed Smart Contract")
     _add_contract_arg(sub)
-    _add_project_or_wasm_arg(sub)
+    _add_project_or_bytecode_arg(sub)
     _add_metadata_arg(sub)
     cli_shared.add_wallet_args(sub)
     cli_shared.add_proxy_arg(sub)
@@ -88,10 +88,10 @@ def _add_project_arg(sub: Any):
     sub.add_argument("project", nargs='?', default=os.getcwd(), help="🗀 the project directory (default: current directory)")
 
 
-def _add_project_or_wasm_arg(sub: Any):
+def _add_project_or_bytecode_arg(sub: Any):
     group = sub.add_mutually_exclusive_group(required=True)
     group.add_argument("--project", default=os.getcwd(), help="🗀 the project directory (default: current directory)")
-    group.add_argument("--wasm", help="the WASM file")
+    group.add_argument("--bytecode", help="the WASM file")
 
 
 def _add_contract_arg(sub: Any):
