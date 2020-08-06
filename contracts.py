@@ -2,13 +2,12 @@ import base64
 import logging
 
 from Cryptodome.Hash import keccak
-from binascii import unhexlify
+
 from erdpy import config, errors, utils
 from erdpy.accounts import Account, Address
 from erdpy.transactions import Transaction
-from erdpy.wallet import signing
 
-logger = logging.getLogger("cli.deps")
+logger = logging.getLogger("contracts")
 
 VM_TYPE_ARWEN = "0500"
 
@@ -137,7 +136,6 @@ class SmartContract:
         arguments = arguments or []
         prepared_arguments = [_prepare_argument(argument) for argument in arguments]
 
-        # TODO: move to proxy/core.py?
         payload = {
             "ScAddress": self.address.bech32(),
             "FuncName": function,
@@ -183,10 +181,9 @@ def _prepare_argument(argument):
 
 
 class CodeMetadata:
-    def __init__(self, upgradeable=False):
+    def __init__(self, upgradeable=True, payable=False):
         self.upgradeable = upgradeable
+        self.payable = payable
 
     def to_hex(self):
-        if self.upgradeable:
-            return "0100"
-        return "0000"
+        return ("01" if self.upgradeable else "00") + ("02" if self.payable else "00")

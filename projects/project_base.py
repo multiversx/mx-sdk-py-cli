@@ -1,14 +1,13 @@
 import binascii
-from erdpy.dependencies.modules import StandaloneModule
-from erdpy import myprocess
 import glob
 import logging
+import shutil
 from os import path
 from pathlib import Path
 from typing import List, cast
 
-from erdpy import dependencies, errors, utils
-import shutil
+from erdpy import dependencies, errors, myprocess, utils
+from erdpy.dependencies.modules import StandaloneModule
 
 logger = logging.getLogger("Project")
 
@@ -81,8 +80,9 @@ class Project:
             file.write(bytecode_hex)
 
     def get_bytecode(self):
-        bytecode = utils.read_file(self.get_file_wasm().with_suffix(".hex"))
-        return bytecode
+        bytecode = utils.read_file(self.get_file_wasm(), binary=True)
+        bytecode_hex = bytecode.hex()
+        return bytecode_hex
 
     def run_tests(self, tests_directory: str, wildcard: str = ""):
         arwentools = cast(StandaloneModule, dependencies.get_module_by_key("arwentools"))

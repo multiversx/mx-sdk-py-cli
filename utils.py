@@ -3,12 +3,12 @@ import logging
 import os
 import os.path
 import pathlib
-from pathlib import Path
 import shutil
 import stat
 import tarfile
 import zipfile
-from typing import Dict, List, Any, Union
+from pathlib import Path
+from typing import Any, Dict, List, Union
 
 import toml
 
@@ -57,9 +57,10 @@ def read_lines(file: str):
     return lines
 
 
-def read_file(f: Any) -> str:
+def read_file(f: Any, binary=False) -> Union[str, bytes]:
+    mode = "rb" if binary else "r"
     if isinstance(f, str) or isinstance(f, pathlib.PosixPath):
-        with open(f) as f:
+        with open(f, mode) as f:
             return f.read()
     return f.read()
 

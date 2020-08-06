@@ -24,7 +24,7 @@ def setup_parser(subparsers: Any) -> Any:
 
     sub = cli_shared.add_command_subparser(subparsers, "cost", "sc-deploy", "Query cost of Smart Contract deploy transaction")
     cli_shared.add_proxy_arg(sub)
-    cli_contracts._add_project_arg(sub)
+    cli_contracts._add_project_or_wasm_arg(sub)
     cli_contracts._add_arguments_arg(sub)
     sub.set_defaults(func=lambda args: get_transaction_cost(args, proxy.TxTypes.SC_DEPLOY))
 

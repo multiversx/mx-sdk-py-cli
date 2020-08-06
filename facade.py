@@ -5,141 +5,15 @@ from erdpy import errors, utils, wallet
 from erdpy.accounts import Account, Address
 from erdpy.block import block
 from erdpy.blockatlas import BlockAtlas
-from erdpy.contracts import CodeMetadata, SmartContract
+
 from erdpy.dispatcher.transactions.queue import TransactionQueue
-from erdpy.environments import TestnetEnvironment
-from erdpy.projects import load_project
+
 from erdpy.proxy import ElrondProxy, TransactionCostEstimator
 from erdpy.transactions import Transaction, do_prepare_transaction
 from erdpy.validators import validators
 from erdpy.wallet import pem
 
 logger = logging.getLogger("facade")
-
-
-def deploy_smart_contract(args: Any):
-    logger.debug("deploy_smart_contract")
-
-    project_directory = args.project
-    proxy_url = args.proxy
-    arguments = args.arguments
-    gas_price = args.gas_price
-    gas_limit = args.gas_limit
-    value = args.value
-    metadata_upgradeable = args.metadata_upgradeable
-    chain = args.chain
-    version = args.version
-
-    # TODO: apply guards
-
-    project = load_project(project_directory)
-    bytecode = project.get_bytecode()
-    metadata = CodeMetadata(metadata_upgradeable)
-    contract = SmartContract(bytecode=bytecode, metadata=metadata)
-    environment = TestnetEnvironment(proxy_url)
-
-    if args.pem:
-        owner = Account(pem_file=args.pem)
-    elif args.keyfile and args.passfile:
-        owner = Account(key_file=args.keyfile, pass_file=args.passfile)
-
-    owner.nonce = args.nonce
-    if args.recall_nonce:
-        owner.sync_nonce(ElrondProxy(proxy_url))
-
-    def flow():
-        tx_hash, address = environment.deploy_contract(contract, owner, arguments, gas_price, gas_limit, value, chain, version)
-        logger.info("Tx hash: %s", tx_hash)
-        logger.info("Contract address: %s", address)
-        utils.dump_out_json({"tx": tx_hash, "contract": address.bech32()}, args.outfile)
-
-    environment.run_flow(flow)
-
-
-def call_smart_contract(args: Any):
-    logger.debug("call_smart_contract")
-
-    contract_address = args.contract
-    proxy_url = args.proxy
-    function = args.function
-    arguments = args.arguments
-    gas_price = args.gas_price
-    gas_limit = args.gas_limit
-    value = args.value
-    chain = args.chain
-    version = args.version
-
-    contract = SmartContract(contract_address)
-    environment = TestnetEnvironment(proxy_url)
-
-    if args.pem:
-        caller = Account(pem_file=args.pem)
-    elif args.keyfile and args.passfile:
-        caller = Account(key_file=args.keyfile, pass_file=args.passfile)
-
-    caller.nonce = args.nonce
-    if args.recall_nonce:
-        caller.sync_nonce(ElrondProxy(proxy_url))
-
-    def flow():
-        tx_hash = environment.execute_contract(contract, caller, function, arguments, gas_price, gas_limit, value, chain, version)
-        logger.info("Tx hash: %s", tx_hash)
-
-    environment.run_flow(flow)
-
-
-def upgrade_smart_contract(args: Any):
-    logger.debug("upgrade_smart_contract")
-
-    contract_address = args.contract
-    project_directory = args.project
-    proxy_url = args.proxy
-    arguments = args.arguments
-    gas_price = args.gas_price
-    gas_limit = args.gas_limit
-    value = args.value
-    metadata_upgradeable = args.metadata_upgradeable
-    chain = args.chain
-    version = args.version
-
-    project = load_project(project_directory)
-    bytecode = project.get_bytecode()
-    metadata = CodeMetadata(metadata_upgradeable)
-    contract = SmartContract(contract_address, bytecode=bytecode, metadata=metadata)
-    environment = TestnetEnvironment(proxy_url)
-
-    if args.pem:
-        caller = Account(pem_file=args.pem)
-    elif args.keyfile and args.passfile:
-        caller = Account(key_file=args.keyfile, pass_file=args.passfile)
-
-    caller.nonce = args.nonce
-    if args.recall_nonce:
-        caller.sync_nonce(ElrondProxy(proxy_url))
-
-    def flow():
-        tx_hash = environment.upgrade_contract(contract, caller, arguments, gas_price, gas_limit, value, chain, version)
-        logger.info("Tx hash: %s", tx_hash)
-
-    environment.run_flow(flow)
-
-
-def query_smart_contract(args: Any):
-    logger.debug("query_smart_contract")
-
-    contract_address = args.contract
-    proxy_url = args.proxy
-    function = args.function
-    arguments = args.arguments
-
-    contract = SmartContract(contract_address)
-    environment = TestnetEnvironment(proxy_url)
-
-    def flow():
-        result = environment.query_contract(contract, function, arguments)
-        print(result)
-
-    environment.run_flow(flow)
 
 
 def get_account_nonce(args: Any) -> Any:

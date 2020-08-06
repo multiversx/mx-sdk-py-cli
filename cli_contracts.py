@@ -1,7 +1,15 @@
+import logging
 import os
 from typing import Any
 
-from erdpy import cli_shared, facade, projects
+from erdpy import cli_shared, errors, projects, utils
+from erdpy.accounts import Account
+from erdpy.contracts import CodeMetadata, SmartContract
+from erdpy.environments import TestnetEnvironment
+from erdpy.projects import load_project
+from erdpy.proxy.core import ElrondProxy
+
+logger = logging.getLogger("cli.contracts")
 
 
 def setup_parser(subparsers: Any) -> Any:
@@ -34,7 +42,7 @@ def setup_parser(subparsers: Any) -> Any:
     sub.set_defaults(func=run_tests)
 
     sub = cli_shared.add_command_subparser(subparsers, "contract", "deploy", "Deploy a Smart Contract.")
-    _add_project_arg(sub)
+    _add_project_or_wasm_arg(sub)
     _add_metadata_arg(sub)
     cli_shared.add_outfile_arg(sub)
     cli_shared.add_wallet_args(sub)
@@ -56,7 +64,7 @@ def setup_parser(subparsers: Any) -> Any:
 
     sub = cli_shared.add_command_subparser(subparsers, "contract", "upgrade", "Upgrade a previously-deployed Smart Contract")
     _add_contract_arg(sub)
-    _add_project_arg(sub)
+    _add_project_or_wasm_arg(sub)
     _add_metadata_arg(sub)
     cli_shared.add_wallet_args(sub)
     cli_shared.add_proxy_arg(sub)
@@ -80,6 +88,12 @@ def _add_project_arg(sub: Any):
     sub.add_argument("project", nargs='?', default=os.getcwd(), help="🗀 the project directory (default: current directory)")
 
 
+def _add_project_or_wasm_arg(sub: Any):
+    group = sub.add_mutually_exclusive_group(required=True)
+    group.add_argument("--project", default=os.getcwd(), help="🗀 the project directory (default: current directory)")
+    group.add_argument("--wasm", help="the WASM file")
+
+
 def _add_contract_arg(sub: Any):
     sub.add_argument("contract", help="🖄 the address of the Smart Contract")
 
@@ -93,7 +107,9 @@ def _add_arguments_arg(sub: Any):
 
 
 def _add_metadata_arg(sub: Any):
-    sub.add_argument("--metadata-upgradeable", action="store_true", default=False, help="⚙ whether the contract is upgradeable (default: %(default)s)")
+    sub.add_argument("--metadata-not-upgradeable", dest="metadata_upgradeable", action="store_false", help="‼ mark the contract as NOT upgradeable (default: upgradeable)")
+    sub.add_argument("--metadata-payable", dest="metadata_payable", action="store_true", help="‼ mark the contract as payable (default: not payable)")
+    sub.set_defaults(metadata_upgradeable=True, metadata_payable=False)
 
 
 def list_templates(args: Any):
@@ -129,16 +145,115 @@ def run_tests(args: Any):
 
 
 def deploy(args: Any):
-    facade.deploy_smart_contract(args)
+    logger.debug("deploy")
+
+    proxy_url = args.proxy
+    arguments = args.arguments
+    gas_price = args.gas_price
+    gas_limit = args.gas_limit
+    value = args.value
+    chain = args.chain
+    version = args.version
+
+    environment = TestnetEnvironment(proxy_url)
+    contract = _prepare_contract(args)
+    sender = _prepare_sender(args)
+
+    def flow():
+        tx_hash, address = environment.deploy_contract(contract, sender, arguments, gas_price, gas_limit, value, chain, version)
+        logger.info("Tx hash: %s", tx_hash)
+        logger.info("Contract address: %s", address)
+        utils.dump_out_json({"tx": tx_hash, "contract": address.bech32()}, args.outfile)
+
+    environment.run_flow(flow)
+
+
+def _prepare_contract(args: Any) -> SmartContract:
+    if args.project:
+        project = load_project(args.project)
+        bytecode = project.get_bytecode()
+    else:
+        bytecode = utils.read_file(args.wasm, binary=True).hex()
+
+    metadata = CodeMetadata(args.metadata_upgradeable, args.metadata_payable)
+    contract = SmartContract(bytecode=bytecode, metadata=metadata)
+    return contract
+
+
+def _prepare_sender(args: Any) -> Account:
+    if args.pem:
+        sender = Account(pem_file=args.pem)
+    elif args.keyfile and args.passfile:
+        sender = Account(key_file=args.keyfile, pass_file=args.passfile)
+    else:
+        raise errors.NoWalletProvided()
+
+    sender.nonce = args.nonce
+    if args.recall_nonce:
+        sender.sync_nonce(ElrondProxy(args.proxy))
 
 
 def call(args: Any):
-    facade.call_smart_contract(args)
+    logger.debug("call")
+
+    contract_address = args.contract
+    proxy_url = args.proxy
+    function = args.function
+    arguments = args.arguments
+    gas_price = args.gas_price
+    gas_limit = args.gas_limit
+    value = args.value
+    chain = args.chain
+    version = args.version
+
+    contract = SmartContract(contract_address)
+    environment = TestnetEnvironment(proxy_url)
+    sender = _prepare_sender(args)
+
+    def flow():
+        tx_hash = environment.execute_contract(contract, sender, function, arguments, gas_price, gas_limit, value, chain, version)
+        logger.info("Tx hash: %s", tx_hash)
+
+    environment.run_flow(flow)
 
 
 def upgrade(args: Any):
-    facade.upgrade_smart_contract(args)
+    logger.debug("upgrade")
+
+    contract_address = args.contract
+    proxy_url = args.proxy
+    arguments = args.arguments
+    gas_price = args.gas_price
+    gas_limit = args.gas_limit
+    value = args.value
+    chain = args.chain
+    version = args.version
+
+    contract = _prepare_contract(args)
+    contract.address = contract_address
+    environment = TestnetEnvironment(proxy_url)
+    sender = _prepare_sender(args)
+
+    def flow():
+        tx_hash = environment.upgrade_contract(contract, sender, arguments, gas_price, gas_limit, value, chain, version)
+        logger.info("Tx hash: %s", tx_hash)
+
+    environment.run_flow(flow)
 
 
 def query(args: Any):
-    facade.query_smart_contract(args)
+    logger.debug("query")
+
+    contract_address = args.contract
+    proxy_url = args.proxy
+    function = args.function
+    arguments = args.arguments
+
+    contract = SmartContract(contract_address)
+    environment = TestnetEnvironment(proxy_url)
+
+    def flow():
+        result = environment.query_contract(contract, function, arguments)
+        print(result)
+
+    environment.run_flow(flow)
