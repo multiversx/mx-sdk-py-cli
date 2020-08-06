@@ -1,12 +1,12 @@
 import base64
-
-from erdpy import errors
-from binascii import hexlify, unhexlify, b2a_base64
+from binascii import b2a_base64, hexlify, unhexlify
 from json import load
+
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import hashes, hmac
 from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
 from cryptography.hazmat.primitives.kdf.scrypt import Scrypt
+from erdpy import errors
 
 
 # References:
@@ -67,4 +67,4 @@ def load_from_key_file(key_file_json, password):
 
 def get_password(pass_file):
     with open(pass_file) as pass_f:
-        return pass_f.read()
+        return pass_f.read().strip()
