@@ -5,7 +5,6 @@ from typing import Any
 from erdpy import cli_shared, errors, projects, utils
 from erdpy.accounts import Account
 from erdpy.contracts import CodeMetadata, SmartContract
-from erdpy.environments import TestnetEnvironment
 from erdpy.projects import load_project
 from erdpy.proxy.core import ElrondProxy
 
@@ -49,6 +48,7 @@ def setup_parser(subparsers: Any) -> Any:
     cli_shared.add_proxy_arg(sub)
     cli_shared.add_tx_args(sub, with_receiver=False, with_data=False)
     _add_arguments_arg(sub)
+    _add_send_arg(sub)
 
     sub.set_defaults(func=deploy)
 
@@ -59,6 +59,7 @@ def setup_parser(subparsers: Any) -> Any:
     cli_shared.add_tx_args(sub, with_receiver=False, with_data=False)
     _add_function_arg(sub)
     _add_arguments_arg(sub)
+    _add_send_arg(sub)
 
     sub.set_defaults(func=call)
 
@@ -70,6 +71,7 @@ def setup_parser(subparsers: Any) -> Any:
     cli_shared.add_proxy_arg(sub)
     cli_shared.add_tx_args(sub, with_receiver=False, with_data=False)
     _add_arguments_arg(sub)
+    _add_send_arg(sub)
 
     sub.set_defaults(func=upgrade)
 
@@ -112,6 +114,10 @@ def _add_metadata_arg(sub: Any):
     sub.set_defaults(metadata_upgradeable=True, metadata_payable=False)
 
 
+def _add_send_arg(sub: Any):
+    sub.add_argument("--send", action="store_true", default=False, help="✓ whether to broadcast the transaction (default: %(default)s)")
+
+
 def list_templates(args: Any):
     projects.list_project_templates()
 
@@ -147,7 +153,6 @@ def run_tests(args: Any):
 def deploy(args: Any):
     logger.debug("deploy")
 
-    proxy_url = args.proxy
     arguments = args.arguments
     gas_price = args.gas_price
     gas_limit = args.gas_limit
@@ -155,17 +160,17 @@ def deploy(args: Any):
     chain = args.chain
     version = args.version
 
-    environment = TestnetEnvironment(proxy_url)
     contract = _prepare_contract(args)
     sender = _prepare_sender(args)
 
-    def flow():
-        tx_hash, address = environment.deploy_contract(contract, sender, arguments, gas_price, gas_limit, value, chain, version)
-        logger.info("Tx hash: %s", tx_hash)
-        logger.info("Contract address: %s", address)
-        utils.dump_out_json({"tx": tx_hash, "contract": address.bech32()}, args.outfile)
+    tx = contract.deploy(sender, arguments, gas_price, gas_limit, value, chain, version)
+    logger.info("Contract address: %s", contract.address)
 
-    environment.run_flow(flow)
+    try:
+        if args.send:
+            tx.send(ElrondProxy(args.proxy))
+    finally:
+        tx.dump_to(args.outfile)
 
 
 def _prepare_contract(args: Any) -> SmartContract:
@@ -197,7 +202,6 @@ def call(args: Any):
     logger.debug("call")
 
     contract_address = args.contract
-    proxy_url = args.proxy
     function = args.function
     arguments = args.arguments
     gas_price = args.gas_price
@@ -207,21 +211,20 @@ def call(args: Any):
     version = args.version
 
     contract = SmartContract(contract_address)
-    environment = TestnetEnvironment(proxy_url)
     sender = _prepare_sender(args)
 
-    def flow():
-        tx_hash = environment.execute_contract(contract, sender, function, arguments, gas_price, gas_limit, value, chain, version)
-        logger.info("Tx hash: %s", tx_hash)
-
-    environment.run_flow(flow)
+    tx = contract.execute(sender, function, arguments, gas_price, gas_limit, value, chain, version)
+    try:
+        if args.send:
+            tx.send(ElrondProxy(args.proxy))
+    finally:
+        tx.dump_to(args.outfile)
 
 
 def upgrade(args: Any):
     logger.debug("upgrade")
 
     contract_address = args.contract
-    proxy_url = args.proxy
     arguments = args.arguments
     gas_price = args.gas_price
     gas_limit = args.gas_limit
@@ -231,29 +234,22 @@ def upgrade(args: Any):
 
     contract = _prepare_contract(args)
     contract.address = contract_address
-    environment = TestnetEnvironment(proxy_url)
     sender = _prepare_sender(args)
 
-    def flow():
-        tx_hash = environment.upgrade_contract(contract, sender, arguments, gas_price, gas_limit, value, chain, version)
-        logger.info("Tx hash: %s", tx_hash)
-
-    environment.run_flow(flow)
+    tx = contract.upgrade(sender, arguments, gas_price, gas_limit, value, chain, version)
+    try:
+        if args.send:
+            tx.send(ElrondProxy(args.proxy))
+    finally:
+        tx.dump_to(args.outfile)
 
 
 def query(args: Any):
     logger.debug("query")
 
     contract_address = args.contract
-    proxy_url = args.proxy
     function = args.function
     arguments = args.arguments
 
     contract = SmartContract(contract_address)
-    environment = TestnetEnvironment(proxy_url)
-
-    def flow():
-        result = environment.query_contract(contract, function, arguments)
-        print(result)
-
-    environment.run_flow(flow)
+    contract.query(ElrondProxy(args.proxy), function, arguments)

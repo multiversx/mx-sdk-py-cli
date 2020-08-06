@@ -4,7 +4,7 @@ import logging
 from Cryptodome.Hash import keccak
 
 from erdpy import config, errors, utils
-from erdpy.accounts import Account, Address
+from erdpy.accounts import Address
 from erdpy.transactions import Transaction
 
 logger = logging.getLogger("contracts")
@@ -18,14 +18,10 @@ class SmartContract:
         self.bytecode = bytecode
         self.metadata = metadata or CodeMetadata()
 
-    def deploy(self, proxy, owner, arguments, gas_price, gas_limit, value, chain, version):
+    def deploy(self, owner, arguments, gas_price, gas_limit, value, chain, version) -> Transaction:
         self.owner = owner
         self.compute_address()
-        transaction = self.prepare_deploy_transaction(owner, arguments, gas_price, gas_limit, value, chain, version)
-        tx_hash = transaction.send(proxy)
-        return tx_hash, self.address
 
-    def prepare_deploy_transaction(self, owner: Account, arguments, gas_price, gas_limit, value, chain, version):
         arguments = arguments or []
         gas_price = int(gas_price)
         gas_limit = int(gas_limit)
@@ -64,13 +60,9 @@ class SmartContract:
         address = bytes([0] * 8) + bytes([5, 0]) + address[10:30] + owner_bytes[30:]
         self.address = Address(address)
 
-    def execute(self, proxy, caller, function, arguments, gas_price, gas_limit, value, chain, version):
+    def execute(self, caller, function, arguments, gas_price, gas_limit, value, chain, version) -> Transaction:
         self.caller = caller
-        transaction = self.prepare_execute_transaction(caller, function, arguments, gas_price, gas_limit, value, chain, version)
-        tx_hash = transaction.send(proxy)
-        return tx_hash
 
-    def prepare_execute_transaction(self, caller: Account, function, arguments, gas_price, gas_limit, value, chain, version):
         arguments = arguments or []
         gas_price = int(gas_price)
         gas_limit = int(gas_limit)
@@ -98,13 +90,9 @@ class SmartContract:
 
         return tx_data
 
-    def upgrade(self, proxy, caller, arguments, gas_price, gas_limit, value, chain, version):
-        self.caller = caller
-        transaction = self.prepare_upgrade_transaction(caller, arguments, gas_price, gas_limit, value, chain, version)
-        tx_hash = transaction.send(proxy)
-        return tx_hash
+    def upgrade(self, owner, arguments, gas_price, gas_limit, value, chain, version) -> Transaction:
+        self.owner = owner
 
-    def prepare_upgrade_transaction(self, owner: Account, arguments, gas_price, gas_limit, value, chain, version):
         arguments = arguments or []
         gas_price = int(gas_price or config.DEFAULT_GAS_PRICE)
         gas_limit = int(gas_limit)
