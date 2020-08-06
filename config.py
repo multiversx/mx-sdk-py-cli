@@ -1,6 +1,6 @@
 import os.path
-
 from typing import Any, Dict
+
 from erdpy import errors, utils
 
 MODULES_CONFIG_URL = "https://raw.githubusercontent.com/ElrondNetwork/elrond-sdk/master/deps.json"
@@ -72,7 +72,7 @@ def get_defaults() -> Dict[str, Any]:
         "proxy": "https://testnet-api.elrond.com",
         "chainID": "v1.0.147",
         "txVersion": "1",
-        "dependencies.arwentools.tag": "v0.3.26-12-g466a26b",
+        "dependencies.arwentools.tag": "v0.3.28",
         "dependencies.arwentools.urlTemplate.linux": "https://ide.elrond.com/travis-builds/ARWEN_{TAG}_linux_amd64.tar.gz",
         "dependencies.arwentools.urlTemplate.osx": "https://ide.elrond.com/travis-builds/ARWEN_{TAG}_darwin_amd64.tar.gz",
         "dependencies.llvm.tag": "v9-19feb",
