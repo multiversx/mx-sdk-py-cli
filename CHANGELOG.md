@@ -4,11 +4,18 @@ All notable changes will be documented in this file.
 
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
-## [8.0.1] - 29.07.2020
+## [0.8.2] - 06.08.2020
+ - Strip password for keyfile (remove left & right spaces, newlines)
+ - Allow one to specify path to WASM (bytecode) for `contract deploy` and `contract upgrade`
+ - Update reference to Arwen Tools
+ - Allow sending SC transactions in offline mode (`--send` defaults to `false`).
+
+
+## [0.8.1] - 29.07.2020
 
  - Add SDK helpers to generate relayed transactions.
 
-## [8.0.0] - 26.07.2020
+## [0.8.0] - 26.07.2020
 
  - Updated signing procedure with respect to the `data` field (which is now base64-encoded)
  - Redesigned the CLI for `validator stake`
