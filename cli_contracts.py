@@ -170,7 +170,7 @@ def deploy(args: Any):
         if args.send:
             tx.send(ElrondProxy(args.proxy))
     finally:
-        tx.dump_to(args.outfile)
+        tx.dump_to(args.outfile, extra={"address": contract.address})
 
 
 def _prepare_contract(args: Any) -> SmartContract:
