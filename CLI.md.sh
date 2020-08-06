@@ -51,6 +51,10 @@ generate() {
     group "Transactions" "tx"
     command "Transactions.New" "tx new"
     command "Transactions.Send" "tx send"
+    command "Transactions.Get" "tx get"
+
+    group "Blocks" "block"
+    command "Blocks.Get" "block get"
 
     group "Validator" "validator"
     command "Validator.Stake" "validator stake"
