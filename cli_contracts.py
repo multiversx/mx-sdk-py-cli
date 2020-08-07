@@ -170,15 +170,15 @@ def deploy(args: Any):
         if args.send:
             tx.send(ElrondProxy(args.proxy))
     finally:
-        tx.dump_to(args.outfile, extra={"address": contract.address})
+        tx.dump_to(args.outfile, extra={"address": contract.address.bech32()})
 
 
 def _prepare_contract(args: Any) -> SmartContract:
-    if args.project:
+    if args.bytecode:
+        bytecode = utils.read_file(args.bytecode, binary=True).hex()
+    else:
         project = load_project(args.project)
         bytecode = project.get_bytecode()
-    else:
-        bytecode = utils.read_file(args.wasm, binary=True).hex()
 
     metadata = CodeMetadata(args.metadata_upgradeable, args.metadata_payable)
     contract = SmartContract(bytecode=bytecode, metadata=metadata)
@@ -196,6 +196,8 @@ def _prepare_sender(args: Any) -> Account:
     sender.nonce = args.nonce
     if args.recall_nonce:
         sender.sync_nonce(ElrondProxy(args.proxy))
+
+    return sender
 
 
 def call(args: Any):
