@@ -54,6 +54,7 @@ def setup_parser(subparsers: Any) -> Any:
 
     sub = cli_shared.add_command_subparser(subparsers, "contract", "call", "Interact with a Smart Contract (execute function).")
     _add_contract_arg(sub)
+    cli_shared.add_outfile_arg(sub)
     cli_shared.add_wallet_args(sub)
     cli_shared.add_proxy_arg(sub)
     cli_shared.add_tx_args(sub, with_receiver=False, with_data=False)
@@ -65,6 +66,7 @@ def setup_parser(subparsers: Any) -> Any:
 
     sub = cli_shared.add_command_subparser(subparsers, "contract", "upgrade", "Upgrade a previously-deployed Smart Contract")
     _add_contract_arg(sub)
+    cli_shared.add_outfile_arg(sub)
     _add_project_or_bytecode_arg(sub)
     _add_metadata_arg(sub)
     cli_shared.add_wallet_args(sub)
