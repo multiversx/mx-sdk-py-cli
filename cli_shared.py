@@ -1,9 +1,9 @@
 import argparse
-from argparse import FileType
-
 import sys
-from erdpy import config, utils
+from argparse import FileType
 from typing import Any, Text
+
+from erdpy import config, utils
 
 
 def wider_help_formatter(prog: Text):
@@ -68,6 +68,7 @@ def add_tx_args(sub: Any, with_nonce: bool = True, with_receiver: bool = True, w
 
 def add_wallet_args(sub: Any):
     sub.add_argument("--pem", required=not (utils.is_arg_present("--keyfile", sys.argv)), help="🔑 the PEM file, if keyfile not provided")
+    sub.add_argument("--pem-index", default=0, help="🔑 the index in the PEM file (default: %(default)s)")
     sub.add_argument("--keyfile", required=not (utils.is_arg_present("--pem", sys.argv)), help="🔑 a JSON keyfile, if PEM not provided")
     sub.add_argument("--passfile", required=not (utils.is_arg_present("--pem", sys.argv)), help="🔑 a file containing keyfile's password, if keyfile provided")
 

@@ -1,13 +1,12 @@
-from binascii import unhexlify
-from erdpy.interfaces import IAccount, IAddress
 import logging
 import os
+from binascii import unhexlify
 from os import path
 from typing import Any, Union
 
-from erdpy import errors
-from erdpy.wallet import bech32, pem, generate_pair
-from erdpy import utils
+from erdpy import errors, utils
+from erdpy.interfaces import IAccount, IAddress
+from erdpy.wallet import bech32, generate_pair, pem
 from erdpy.wallet.keyfile import get_password, load_from_key_file
 
 logger = logging.getLogger("accounts")
@@ -45,13 +44,13 @@ class AccountsRepository:
 
 
 class Account(IAccount):
-    def __init__(self, address: Any = None, pem_file: Union[str, None] = None, key_file: str = "", pass_file: str = ""):
+    def __init__(self, address: Any = None, pem_file: Union[str, None] = None, pem_index: int = 0, key_file: str = "", pass_file: str = ""):
         self.address = Address(address)
         self.pem_file = pem_file
         self.nonce: int = 0
 
         if pem_file:
-            seed, pubkey = pem.parse(pem_file)
+            seed, pubkey = pem.parse(pem_file, pem_index)
             self.private_key_seed = seed.hex()
             self.address = Address(pubkey)
         elif key_file and pass_file:

@@ -187,7 +187,7 @@ def _prepare_contract(args: Any) -> SmartContract:
 
 def _prepare_sender(args: Any) -> Account:
     if args.pem:
-        sender = Account(pem_file=args.pem)
+        sender = Account(pem_file=args.pem, pem_index=args.pem_index)
     elif args.keyfile and args.passfile:
         sender = Account(key_file=args.keyfile, pass_file=args.passfile)
     else:

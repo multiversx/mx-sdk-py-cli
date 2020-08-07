@@ -210,6 +210,7 @@ optional arguments:
   --metadata-payable                     ‼ mark the contract as payable (default: not payable)
   --outfile OUTFILE                      where to save the output (default: stdout)
   --pem PEM                              🔑 the PEM file, if keyfile not provided
+  --pem-index PEM_INDEX                  🔑 the index in the PEM file (default: 0)
   --keyfile KEYFILE                      🔑 a JSON keyfile, if PEM not provided
   --passfile PASSFILE                    🔑 a file containing keyfile's password, if keyfile provided
   --proxy PROXY                          🖧 the URL of the proxy (default: https://testnet-api.elrond.com)
@@ -240,6 +241,7 @@ positional arguments:
 optional arguments:
   -h, --help                             show this help message and exit
   --pem PEM                              🔑 the PEM file, if keyfile not provided
+  --pem-index PEM_INDEX                  🔑 the index in the PEM file (default: 0)
   --keyfile KEYFILE                      🔑 a JSON keyfile, if PEM not provided
   --passfile PASSFILE                    🔑 a file containing keyfile's password, if keyfile provided
   --proxy PROXY                          🖧 the URL of the proxy (default: https://testnet-api.elrond.com)
@@ -275,6 +277,7 @@ optional arguments:
   --metadata-not-upgradeable             ‼ mark the contract as NOT upgradeable (default: upgradeable)
   --metadata-payable                     ‼ mark the contract as payable (default: not payable)
   --pem PEM                              🔑 the PEM file, if keyfile not provided
+  --pem-index PEM_INDEX                  🔑 the index in the PEM file (default: 0)
   --keyfile KEYFILE                      🔑 a JSON keyfile, if PEM not provided
   --passfile PASSFILE                    🔑 a file containing keyfile's password, if keyfile provided
   --proxy PROXY                          🖧 the URL of the proxy (default: https://testnet-api.elrond.com)
@@ -345,6 +348,7 @@ Create a new transaction
 optional arguments:
   -h, --help             show this help message and exit
   --pem PEM              🔑 the PEM file, if keyfile not provided
+  --pem-index PEM_INDEX  🔑 the index in the PEM file (default: 0)
   --keyfile KEYFILE      🔑 a JSON keyfile, if PEM not provided
   --passfile PASSFILE    🔑 a file containing keyfile's password, if keyfile provided
   --nonce NONCE          # the nonce for the transaction
@@ -467,6 +471,7 @@ optional arguments:
   -h, --help                         show this help message and exit
   --proxy PROXY                      🖧 the URL of the proxy (default: https://testnet-api.elrond.com)
   --pem PEM                          🔑 the PEM file, if keyfile not provided
+  --pem-index PEM_INDEX              🔑 the index in the PEM file (default: 0)
   --keyfile KEYFILE                  🔑 a JSON keyfile, if PEM not provided
   --passfile PASSFILE                🔑 a file containing keyfile's password, if keyfile provided
   --nonce NONCE                      # the nonce for the transaction
@@ -495,6 +500,7 @@ optional arguments:
   -h, --help                             show this help message and exit
   --proxy PROXY                          🖧 the URL of the proxy (default: https://testnet-api.elrond.com)
   --pem PEM                              🔑 the PEM file, if keyfile not provided
+  --pem-index PEM_INDEX                  🔑 the index in the PEM file (default: 0)
   --keyfile KEYFILE                      🔑 a JSON keyfile, if PEM not provided
   --passfile PASSFILE                    🔑 a file containing keyfile's password, if keyfile provided
   --nonce NONCE                          # the nonce for the transaction
@@ -522,6 +528,7 @@ optional arguments:
   -h, --help                             show this help message and exit
   --proxy PROXY                          🖧 the URL of the proxy (default: https://testnet-api.elrond.com)
   --pem PEM                              🔑 the PEM file, if keyfile not provided
+  --pem-index PEM_INDEX                  🔑 the index in the PEM file (default: 0)
   --keyfile KEYFILE                      🔑 a JSON keyfile, if PEM not provided
   --passfile PASSFILE                    🔑 a file containing keyfile's password, if keyfile provided
   --nonce NONCE                          # the nonce for the transaction
@@ -549,6 +556,7 @@ optional arguments:
   -h, --help                             show this help message and exit
   --proxy PROXY                          🖧 the URL of the proxy (default: https://testnet-api.elrond.com)
   --pem PEM                              🔑 the PEM file, if keyfile not provided
+  --pem-index PEM_INDEX                  🔑 the index in the PEM file (default: 0)
   --keyfile KEYFILE                      🔑 a JSON keyfile, if PEM not provided
   --passfile PASSFILE                    🔑 a file containing keyfile's password, if keyfile provided
   --nonce NONCE                          # the nonce for the transaction
@@ -576,6 +584,7 @@ optional arguments:
   -h, --help                       show this help message and exit
   --proxy PROXY                    🖧 the URL of the proxy (default: https://testnet-api.elrond.com)
   --pem PEM                        🔑 the PEM file, if keyfile not provided
+  --pem-index PEM_INDEX            🔑 the index in the PEM file (default: 0)
   --keyfile KEYFILE                🔑 a JSON keyfile, if PEM not provided
   --passfile PASSFILE              🔑 a file containing keyfile's password, if keyfile provided
   --nonce NONCE                    # the nonce for the transaction
@@ -603,6 +612,7 @@ optional arguments:
   -h, --help             show this help message and exit
   --proxy PROXY          🖧 the URL of the proxy (default: https://testnet-api.elrond.com)
   --pem PEM              🔑 the PEM file, if keyfile not provided
+  --pem-index PEM_INDEX  🔑 the index in the PEM file (default: 0)
   --keyfile KEYFILE      🔑 a JSON keyfile, if PEM not provided
   --passfile PASSFILE    🔑 a file containing keyfile's password, if keyfile provided
   --nonce NONCE          # the nonce for the transaction
@@ -939,11 +949,12 @@ usage: erdpy dispatcher dispatch [-h] ...
 Dispatch queued transactions
 
 optional arguments:
-  -h, --help           show this help message and exit
-  --proxy PROXY        🖧 the URL of the proxy (default: https://testnet-api.elrond.com)
-  --pem PEM            🔑 the PEM file, if keyfile not provided
-  --keyfile KEYFILE    🔑 a JSON keyfile, if PEM not provided
-  --passfile PASSFILE  🔑 a file containing keyfile's password, if keyfile provided
+  -h, --help             show this help message and exit
+  --proxy PROXY          🖧 the URL of the proxy (default: https://testnet-api.elrond.com)
+  --pem PEM              🔑 the PEM file, if keyfile not provided
+  --pem-index PEM_INDEX  🔑 the index in the PEM file (default: 0)
+  --keyfile KEYFILE      🔑 a JSON keyfile, if PEM not provided
+  --passfile PASSFILE    🔑 a file containing keyfile's password, if keyfile provided
 
 ```
 ### Dispatcher.DispatchContinuously
@@ -956,12 +967,13 @@ usage: erdpy dispatcher dispatch-continuously [-h] ...
 Continuously dispatch queued transactions
 
 optional arguments:
-  -h, --help           show this help message and exit
-  --proxy PROXY        🖧 the URL of the proxy (default: https://testnet-api.elrond.com)
-  --pem PEM            🔑 the PEM file, if keyfile not provided
-  --keyfile KEYFILE    🔑 a JSON keyfile, if PEM not provided
-  --passfile PASSFILE  🔑 a file containing keyfile's password, if keyfile provided
-  --interval INTERVAL  the interval to retrieve transactions from the queue, in seconds
+  -h, --help             show this help message and exit
+  --proxy PROXY          🖧 the URL of the proxy (default: https://testnet-api.elrond.com)
+  --pem PEM              🔑 the PEM file, if keyfile not provided
+  --pem-index PEM_INDEX  🔑 the index in the PEM file (default: 0)
+  --keyfile KEYFILE      🔑 a JSON keyfile, if PEM not provided
+  --passfile PASSFILE    🔑 a file containing keyfile's password, if keyfile provided
+  --interval INTERVAL    the interval to retrieve transactions from the queue, in seconds
 
 ```
 ### Dispatcher.Clean

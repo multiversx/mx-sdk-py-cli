@@ -151,7 +151,7 @@ class BunchOfTransactions:
 def do_prepare_transaction(args: Any) -> Transaction:
     account = Account()
     if args.pem:
-        account = Account(pem_file=args.pem)
+        account = Account(pem_file=args.pem, pem_index=args.pem_index)
     elif args.keyfile and args.passfile:
         account = Account(key_file=args.keyfile, pass_file=args.passfile)
 

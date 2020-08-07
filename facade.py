@@ -5,9 +5,7 @@ from erdpy import errors, utils, wallet
 from erdpy.accounts import Account, Address
 from erdpy.block import block
 from erdpy.blockatlas import BlockAtlas
-
 from erdpy.dispatcher.transactions.queue import TransactionQueue
-
 from erdpy.proxy import ElrondProxy, TransactionCostEstimator
 from erdpy.transactions import Transaction, do_prepare_transaction
 from erdpy.validators import validators
@@ -119,7 +117,7 @@ def create_transaction(args: Any):
 def _prepare_nonce(args: Any):
     if args.recall_nonce:
         if args.pem:
-            account = Account(pem_file=args.pem)
+            account = Account(pem_file=args.pem, pem_index=args.pem_index)
         elif args.keyfile and args.passfile:
             account = Account(key_file=args.keyfile, pass_file=args.passfile)
         else:

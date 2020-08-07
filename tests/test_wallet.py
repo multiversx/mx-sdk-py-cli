@@ -5,9 +5,8 @@ from typing import Any
 
 import nacl.encoding
 import nacl.signing
-
 from erdpy import utils
-from erdpy.accounts import Account
+from erdpy.accounts import Account, Address
 from erdpy.transactions import Transaction
 from erdpy.wallet import (bip39seed_to_private_key, generate_pair,
                           mnemonic_to_bip39seed, pem)
@@ -40,6 +39,25 @@ class WalletTestCase(unittest.TestCase):
         address = pem.get_pubkey(pem_file)
 
         self.assertEqual("fd691bb5e85d102687d81079dffce842d4dc328276d2d4c60d8fd1c3433c3293", address.hex())
+
+    def test_pem_parse_multiple(self):
+        pem_file = self.testdata.joinpath("keys", "walletKey.pem")
+
+        seed, address = pem.parse(pem_file, index=0)
+        self.assertEqual("1f4dd8b7d18b5d0785c9d0802ec14d553dba356812b85c7e3414373388472010", seed.hex())
+        self.assertEqual(Address("erd1sjsk3n2d0krq3pyxxtgf0q7j3t56sgusqaujj4n82l39t9h7jers6gslr4").hex(), address.hex())
+
+        seed, address = pem.parse(pem_file, index=1)
+        self.assertEqual("2565dbbdb62301e4c7b12b8a41cd3b2fbd7ae687c8d9741937aa48cf246aeb25", seed.hex())
+        self.assertEqual(Address("erd10536tc3s886yqxtln74u6mztuwl5gy9k9gp8fttxda0klgxg979srtg5wt").hex(), address.hex())
+
+        seed, address = pem.parse(pem_file, index=2)
+        self.assertEqual("08de69d398f4a5ffdce0f1a8569704dbc8b58aaf7ba3e726134e32f1e8bf04ad", seed.hex())
+        self.assertEqual(Address("erd1n230jlgfepdvf28vqt3zeawexg2jhvxqxjuqdfsss0xc62xcqcps9k54ag").hex(), address.hex())
+
+        seed, address = pem.parse(pem_file, index=3)
+        self.assertEqual("4d9dcc1c09a6d00c4c9a389e662d9fe26e0bf4c859776d4d338b5a9c41fc12d4", seed.hex())
+        self.assertEqual(Address("erd143907zxv0ujxr9q4mda7rmczn2xwhmqn7p9lfz666z8hd2lcks2szt5yql").hex(), address.hex())
 
     def test_pem_parse(self):
         pem_file = self.testdata.joinpath("keys", "alice.pem")

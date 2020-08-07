@@ -1,10 +1,11 @@
 import base64
-from pathlib import Path
+import itertools
 import textwrap
 from os import path
+from pathlib import Path
 from typing import Tuple, Union
 
-from erdpy import utils, guards
+from erdpy import guards, utils
 
 
 def get_pubkey(pem_file: Union[str, Path]):
@@ -12,13 +13,15 @@ def get_pubkey(pem_file: Union[str, Path]):
     return pubkey
 
 
-def parse(pem_file: Union[str, Path]) -> Tuple[bytes, bytes]:
+def parse(pem_file: Union[str, Path], index: int = 0) -> Tuple[bytes, bytes]:
     pem_file = path.expanduser(pem_file)
     guards.is_file(pem_file)
 
     lines = utils.read_lines(pem_file)
-    lines = [line for line in lines if "-----" not in line]
-    key_base64 = "".join(lines)
+    keys_lines = [list(key_lines) for is_next_key, key_lines in itertools.groupby(lines, lambda line: "-----" in line) if not is_next_key]
+    keys = ["".join(key_lines) for key_lines in keys_lines]
+
+    key_base64 = keys[index]
     key_hex = base64.b64decode(key_base64).decode()
     key_bytes = bytes.fromhex(key_hex)
 

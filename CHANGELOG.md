@@ -9,6 +9,7 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
  - Allow one to specify path to WASM (bytecode) for `contract deploy` and `contract upgrade`
  - Update reference to Arwen Tools
  - Allow sending SC transactions in offline mode (`--send` defaults to `false`).
+ - Allow multi-pem files (selection via `--pem-index` parameter).
 
 
 ## [0.8.1] - 29.07.2020
