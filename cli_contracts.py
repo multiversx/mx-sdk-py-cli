@@ -3,7 +3,7 @@ import os
 from typing import Any
 
 from erdpy import cli_shared, errors, projects, utils
-from erdpy.accounts import Account
+from erdpy.accounts import Account, Address
 from erdpy.contracts import CodeMetadata, SmartContract
 from erdpy.projects import load_project
 from erdpy.proxy.core import ElrondProxy
@@ -237,7 +237,7 @@ def upgrade(args: Any):
     version = args.version
 
     contract = _prepare_contract(args)
-    contract.address = contract_address
+    contract.address = Address(contract_address)
     sender = _prepare_sender(args)
 
     tx = contract.upgrade(sender, arguments, gas_price, gas_limit, value, chain, version)
@@ -256,4 +256,5 @@ def query(args: Any):
     arguments = args.arguments
 
     contract = SmartContract(contract_address)
-    contract.query(ElrondProxy(args.proxy), function, arguments)
+    result = contract.query(ElrondProxy(args.proxy), function, arguments)
+    print(result)

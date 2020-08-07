@@ -1,5 +1,6 @@
 import base64
 import logging
+from typing import Any, List
 
 from Cryptodome.Hash import keccak
 
@@ -120,7 +121,7 @@ class SmartContract:
 
         return tx_data
 
-    def query(self, proxy, function, arguments):
+    def query(self, proxy, function, arguments) -> List[Any]:
         arguments = arguments or []
         prepared_arguments = [_prepare_argument(argument) for argument in arguments]
 
