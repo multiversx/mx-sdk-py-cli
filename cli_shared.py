@@ -84,4 +84,4 @@ def add_outfile_arg(sub: Any, what: str = ""):
 
 def add_infile_arg(sub: Any, what: str = ""):
     what = f"({what})" if what else ""
-    sub.add_argument("--infile", type=FileType("r"), default=None, help=f"input file {what}")
+    sub.add_argument("--infile", type=FileType("r"), required=True, help=f"input file {what}")
