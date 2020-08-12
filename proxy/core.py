@@ -1,4 +1,3 @@
-from erdpy.accounts import Address
 import logging
 from typing import Any, Dict, List, Tuple
 
@@ -55,7 +54,7 @@ class ElrondProxy:
         else:
             metrics = self._get_network_status(shard_id)
 
-        nonce = metrics["erd_nonce"]
+        nonce = metrics.get("erd_highest_final_nonce", 0)
         return nonce
 
     def get_gas_price(self):
@@ -108,10 +107,15 @@ class ElrondProxy:
         response = do_get(url)
         return response
 
-    def get_transaction(self, tx_hash: str, sender_address: str) -> Any:
-        url = f"{self.url}/transaction/{tx_hash}"
-        if sender_address != "":
-            url += f"?sender={sender_address}"
+    def get_transaction(self, tx_hash: str, sender_address: str = "") -> Any:
+        url = f"{self.url}/transaction/{tx_hash}?sender={sender_address}"
+        response = do_get(url)
+        return response
+
+    def get_hyperblock(self, key) -> Any:
+        url = f"{self.url}/hyperblock/by-hash/{key}"
+        if str(key).isnumeric():
+            url = f"{self.url}/hyperblock/by-nonce/{key}"
 
         response = do_get(url)
         return response
