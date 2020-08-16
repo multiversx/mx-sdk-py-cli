@@ -1,13 +1,12 @@
 import logging
 from typing import Any
 
-from erdpy import errors, wallet
-from erdpy.accounts import Account, Address
+from erdpy import errors
+from erdpy.accounts import Account
 from erdpy.dispatcher.transactions.queue import TransactionQueue
 from erdpy.proxy import ElrondProxy, TransactionCostEstimator
 from erdpy.transactions import do_prepare_transaction
 from erdpy.validators import validators
-from erdpy.wallet import pem
 
 logger = logging.getLogger("facade")
 
@@ -119,27 +118,3 @@ def dispatch_transactions_continuously(args: Any):
 def clean_transactions_queue():
     queue = TransactionQueue()
     queue.clean_transactions_queue()
-
-
-def generate_pem(args: Any):
-    pem_file = args.pem
-    mnemonic = args.mnemonic
-
-    seed, pubkey = wallet.generate_pair()
-    if mnemonic:
-        mnemonic = input("Enter mnemonic:\n")
-        seed, pubkey = wallet.derive_keys(mnemonic)
-
-    address = Address(pubkey)
-    pem.write(pem_file, seed, pubkey, name=address.bech32())
-    logger.info(f"Created PEM file [{pem_file}] for [{address.bech32()}]")
-
-
-def do_bech32(args: Any):
-    encode = args.encode
-    value = args.value
-    address = Address(value)
-
-    result = address.bech32() if encode else address.hex()
-    print(result)
-    return result
