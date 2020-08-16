@@ -66,40 +66,6 @@ class WalletTestCase(unittest.TestCase):
         self.assertEqual("1a927e2af5306a9bb2ea777f73e06ecc0ac9aaa72fb4ea3fecf659451394cccf", seed.hex())
         self.assertEqual("fd691bb5e85d102687d81079dffce842d4dc328276d2d4c60d8fd1c3433c3293", address.hex())
 
-    def test_serialize_transaction_payload(self):
-        # With data field
-        transaction = Transaction()
-        transaction.nonce = 0
-        transaction.value = "42"
-        transaction.sender = "alice"
-        transaction.receiver = "bob"
-        transaction.gasPrice = 43
-        transaction.gasLimit = 44
-        transaction.data = "foobar"
-        transaction.chainID = "BoN"
-        transaction.version = 1
-        serialized = transaction.serialize().decode()
-        self.assertEqual("""{"nonce":0,"value":"42","receiver":"bob","sender":"alice","gasPrice":43,"gasLimit":44,"data":"Zm9vYmFy","chainID":"BoN","version":1}""", serialized)
-
-        # Without data field
-        transaction.data = ""
-        serialized = transaction.serialize().decode()
-        self.assertEqual("""{"nonce":0,"value":"42","receiver":"bob","sender":"alice","gasPrice":43,"gasLimit":44,"chainID":"BoN","version":1}""", serialized)
-
-        # With actual addresses
-        transaction = Transaction()
-        transaction.nonce = 0
-        transaction.value = "0"
-        transaction.sender = "erd1l453hd0gt5gzdp7czpuall8ggt2dcv5zwmfdf3sd3lguxseux2fsmsgldz"
-        transaction.receiver = "erd188nydpkagtpwvfklkl2tn0w6g40zdxkwfgwpjqc2a2m2n7ne9g8q2t22sr"
-        transaction.gasPrice = 200000000000000
-        transaction.gasLimit = 500000000
-        transaction.data = "foo"
-        transaction.chainID = "BoN"
-        transaction.version = 1
-        serialized = transaction.serialize().decode()
-        self.assertEqual("""{"nonce":0,"value":"0","receiver":"erd188nydpkagtpwvfklkl2tn0w6g40zdxkwfgwpjqc2a2m2n7ne9g8q2t22sr","sender":"erd1l453hd0gt5gzdp7czpuall8ggt2dcv5zwmfdf3sd3lguxseux2fsmsgldz","gasPrice":200000000000000,"gasLimit":500000000,"data":"Zm9v","chainID":"BoN","version":1}""", serialized)
-
     def test_sign_transaction(self):
         # With data
         transaction = Transaction()

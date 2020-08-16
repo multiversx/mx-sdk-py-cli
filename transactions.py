@@ -48,6 +48,12 @@ class Transaction(ITransaction):
         serialized = json.dumps(dictionary, separators=(',', ':')).encode("utf8")
         return serialized
 
+    def serialize_as_inner(self):
+        inner_dictionary = self.to_dictionary_as_inner()
+        serialized = self._dict_to_json(inner_dictionary)
+        serialized_hex = serialized.hex()
+        return f"relayedTx@{serialized_hex}"
+
     @classmethod
     def load_from_file(cls, f: Any):
         data_json: bytes = utils.read_file(f).encode()
@@ -108,10 +114,7 @@ class Transaction(ITransaction):
         return dictionary
 
     def wrap_inner(self, inner: ITransaction) -> None:
-        inner_dictionary = inner.to_dictionary_as_inner()
-        serialized = self._dict_to_json(inner_dictionary)
-        serialized_hex = serialized.hex()
-        self.data = f"relayedTx@{serialized_hex}"
+        self.data = inner.serialize_as_inner()
 
 
 class BunchOfTransactions:
