@@ -7,7 +7,7 @@ from erdpy.block import block
 from erdpy.blockatlas import BlockAtlas
 from erdpy.dispatcher.transactions.queue import TransactionQueue
 from erdpy.proxy import ElrondProxy, TransactionCostEstimator
-from erdpy.transactions import Transaction, do_prepare_transaction
+from erdpy.transactions import do_prepare_transaction
 from erdpy.validators import validators
 from erdpy.wallet import pem
 
@@ -97,24 +97,7 @@ def get_transaction_cost(args: Any, tx_type: Any) -> Any:
     return result
 
 
-def create_transaction(args: Any):
-    args = utils.as_object(args)
-
-    _prepare_nonce(args)
-
-    if args.data_file:
-        args.data = utils.read_file(args.data_file)
-
-    tx = do_prepare_transaction(args)
-
-    try:
-        if args.send:
-            tx.send(ElrondProxy(args.proxy))
-    finally:
-        tx.dump_to(args.outfile)
-
-
-def _prepare_nonce(args: Any):
+def prepare_nonce_in_args(args: Any):
     if args.recall_nonce:
         if args.pem:
             account = Account(pem_file=args.pem, pem_index=args.pem_index)
@@ -127,28 +110,8 @@ def _prepare_nonce(args: Any):
         args.nonce = account.nonce
 
 
-def send_transaction(args: Any):
-    args = utils.as_object(args)
-
-    tx = Transaction.load_from_file(args.infile)
-
-    try:
-        tx.send(ElrondProxy(args.proxy))
-    finally:
-        tx.dump_to(args.outfile)
-
-
-def get_transaction(args):
-    args = utils.as_object(args)
-
-    proxy = ElrondProxy(args.proxy)
-
-    response = proxy.get_transaction(args.hash, args.sender)
-    print(response)
-
-
 def prepare_and_send_stake_transaction(args: Any):
-    _prepare_nonce(args)
+    prepare_nonce_in_args(args)
     args = validators.parse_args_for_stake(args)
     tx = do_prepare_transaction(args)
 
@@ -159,7 +122,7 @@ def prepare_and_send_stake_transaction(args: Any):
 
 
 def prepare_and_send_unstake_transaction(args: Any):
-    _prepare_nonce(args)
+    prepare_nonce_in_args(args)
     args = validators.parse_args_for_un_stake(args)
     tx = do_prepare_transaction(args)
 
@@ -170,7 +133,7 @@ def prepare_and_send_unstake_transaction(args: Any):
 
 
 def prepare_and_send_unjail_transaction(args: Any):
-    _prepare_nonce(args)
+    prepare_nonce_in_args(args)
     args = validators.parse_args_for_un_jail(args)
     tx = do_prepare_transaction(args)
 
@@ -181,7 +144,7 @@ def prepare_and_send_unjail_transaction(args: Any):
 
 
 def prepare_and_send_unbond_transaction(args: Any):
-    _prepare_nonce(args)
+    prepare_nonce_in_args(args)
     args = validators.parse_args_for_un_bond(args)
     tx = do_prepare_transaction(args)
 
@@ -192,7 +155,7 @@ def prepare_and_send_unbond_transaction(args: Any):
 
 
 def prepare_and_send_change_reward_address_transaction(args: Any):
-    _prepare_nonce(args)
+    prepare_nonce_in_args(args)
     args = validators.parse_args_for_changing_reward_address(args)
     tx = do_prepare_transaction(args)
 
@@ -203,7 +166,7 @@ def prepare_and_send_change_reward_address_transaction(args: Any):
 
 
 def prepare_and_send_claim_transaction(args: Any):
-    _prepare_nonce(args)
+    prepare_nonce_in_args(args)
     args = validators.parse_args_for_claim(args)
     tx = do_prepare_transaction(args)
 

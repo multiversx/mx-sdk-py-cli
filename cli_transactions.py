@@ -1,7 +1,9 @@
 from argparse import FileType
 from typing import Any
 
-from erdpy import cli_shared, facade
+from erdpy import cli_shared, facade, utils
+from erdpy.proxy.core import ElrondProxy
+from erdpy.transactions import Transaction, do_prepare_transaction
 
 
 def setup_parser(subparsers: Any) -> Any:
@@ -38,12 +40,37 @@ def _add_common_arguments(sub: Any):
 
 
 def create_transaction(args: Any):
-    facade.create_transaction(args)
+    args = utils.as_object(args)
+
+    facade.prepare_nonce_in_args(args)
+
+    if args.data_file:
+        args.data = utils.read_file(args.data_file)
+
+    tx = do_prepare_transaction(args)
+
+    try:
+        if args.send:
+            tx.send(ElrondProxy(args.proxy))
+    finally:
+        tx.dump_to(args.outfile)
 
 
 def send_transaction(args: Any):
-    facade.send_transaction(args)
+    args = utils.as_object(args)
+
+    tx = Transaction.load_from_file(args.infile)
+
+    try:
+        tx.send(ElrondProxy(args.proxy))
+    finally:
+        tx.dump_to(args.outfile)
 
 
 def get_transaction(args: Any):
-    facade.get_transaction(args)
+    args = utils.as_object(args)
+
+    proxy = ElrondProxy(args.proxy)
+
+    response = proxy.get_transaction(args.hash, args.sender)
+    print(response)
