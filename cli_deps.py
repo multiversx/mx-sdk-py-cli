@@ -11,7 +11,7 @@ def setup_parser(subparsers: Any) -> Any:
     parser = cli_shared.add_group_subparser(subparsers, "deps", "Manage dependencies or elrond-sdk modules")
     subparsers = parser.add_subparsers()
 
-    choices = ["clang", "cpp", "rust", "arwentools"]
+    choices = ["clang", "cpp", "rust", "arwentools", "nodejs"]
 
     sub = cli_shared.add_command_subparser(subparsers, "deps", "install", "Install dependencies or elrond-sdk modules.")
     sub.add_argument("name", choices=choices, help="the dependency to install")

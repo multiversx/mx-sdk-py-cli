@@ -2,7 +2,7 @@ import logging
 from typing import List
 
 from erdpy import config, errors
-from erdpy.dependencies.modules import (ArwenToolsModule, DependencyModule,
+from erdpy.dependencies.modules import (ArwenToolsModule, DependencyModule, NodejsModule,
                                         Rust, StandaloneModule)
 
 logger = logging.getLogger("install")
@@ -32,5 +32,6 @@ def get_all_deps() -> List[DependencyModule]:
     return [
         StandaloneModule(key="llvm", aliases=["clang", "cpp"]),
         ArwenToolsModule(key="arwentools", aliases=[]),
-        Rust(key="rust", aliases=[])
+        Rust(key="rust", aliases=[]),
+        NodejsModule(key="nodejs", aliases=[])
     ]

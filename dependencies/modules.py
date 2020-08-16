@@ -123,6 +123,18 @@ class ArwenToolsModule(StandaloneModule):
         }
 
 
+class NodejsModule(StandaloneModule):
+    def __init__(self, key: str, aliases: List[str]):
+        super().__init__(key, aliases)
+
+    def _post_install(self, tag: str):
+        pass
+
+    def get_env(self):
+        return {
+        }
+
+
 class Rust(DependencyModule):
     def __init__(self, key: str, aliases: List[str]):
         super().__init__(key, aliases)

@@ -70,7 +70,7 @@ def _guard_valid_name(name: str):
 def get_defaults() -> Dict[str, Any]:
     return {
         "proxy": "https://testnet-api.elrond.com",
-        "chainID": "v1.0.147",
+        "chainID": "Testnet",
         "txVersion": "1",
         "dependencies.arwentools.tag": "v0.3.28",
         "dependencies.arwentools.urlTemplate.linux": "https://ide.elrond.com/travis-builds/ARWEN_{TAG}_linux_amd64.tar.gz",
@@ -79,6 +79,9 @@ def get_defaults() -> Dict[str, Any]:
         "dependencies.llvm.urlTemplate.linux": "https://ide.elrond.com/vendor-llvm/{TAG}/linux-amd64.tar.gz?t=19feb",
         "dependencies.llvm.urlTemplate.osx": "https://ide.elrond.com/vendor-llvm/{TAG}/darwin-amd64.tar.gz?t=19feb",
         "dependencies.rust.tag": "",
+        "dependencies.nodejs.tag": "v12.18.3",
+        "dependencies.nodejs.urlTemplate.linux": "https://nodejs.org/dist/{TAG}/node-{TAG}-linux-x64.tar.xz",
+        "dependencies.nodejs.urlTemplate.osx": "https://nodejs.org/dist/{TAG}/node-{TAG}-darwin-x64.tar.gz"
     }
 
 
