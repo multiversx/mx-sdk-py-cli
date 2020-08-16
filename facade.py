@@ -3,8 +3,6 @@ from typing import Any
 
 from erdpy import errors, utils, wallet
 from erdpy.accounts import Account, Address
-from erdpy.block import block
-from erdpy.blockatlas import BlockAtlas
 from erdpy.dispatcher.transactions.queue import TransactionQueue
 from erdpy.proxy import ElrondProxy, TransactionCostEstimator
 from erdpy.transactions import do_prepare_transaction
@@ -218,28 +216,3 @@ def do_bech32(args: Any):
     result = address.bech32() if encode else address.hex()
     print(result)
     return result
-
-
-def blockatlas_get_current_block_number(args: Any) -> Any:
-    client = BlockAtlas(args.url, args.coin)
-    number = client.get_current_block_number()
-    print(number)
-    return number
-
-
-def blockatlas_get_block_by_number(args: Any) -> Any:
-    client = BlockAtlas(args.url, args.coin)
-    block = client.get_block_by_number(args.number)
-    print(block)
-    return block
-
-
-def blockatlas_get_txs_by_address(args: Any) -> Any:
-    client = BlockAtlas(args.url, args.coin)
-    transactions = client.get_txs_by_address(args.address)
-    utils.dump_out_json(transactions, args.outfile)
-    return transactions
-
-
-def get_block(args: Any) -> Any:
-    block.get_block(args)
