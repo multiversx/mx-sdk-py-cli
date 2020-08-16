@@ -12,46 +12,6 @@ from erdpy.wallet import pem
 logger = logging.getLogger("facade")
 
 
-def get_account_nonce(args: Any) -> Any:
-    proxy_url = args.proxy
-    address = args.address
-
-    proxy = ElrondProxy(proxy_url)
-    nonce = proxy.get_account_nonce(Address(address))
-    print(nonce)
-    return nonce
-
-
-def get_account_balance(args: Any) -> Any:
-    proxy_url = args.proxy
-    address = args.address
-
-    proxy = ElrondProxy(proxy_url)
-    balance = proxy.get_account_balance(Address(address))
-    print(balance)
-    return balance
-
-
-def get_account(args: Any) -> Any:
-    proxy_url = args.proxy
-    address = args.address
-
-    proxy = ElrondProxy(proxy_url)
-    account = proxy.get_account(Address(address))
-    print(account)
-    return account
-
-
-def get_account_transactions(args: Any) -> Any:
-    proxy_url = args.proxy
-    address = args.address
-
-    proxy = ElrondProxy(proxy_url)
-    response = proxy.get_account_transactions(Address(address))
-    utils.dump_out_json(response, args.outfile)
-    return response
-
-
 def get_num_shards(args):
     proxy_url = args.proxy
     proxy = ElrondProxy(proxy_url)

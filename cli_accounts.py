@@ -1,8 +1,10 @@
+from erdpy import utils
+from erdpy.accounts import Address
+from erdpy.proxy.core import ElrondProxy
 from erdpy import cli_shared
 import logging
 from typing import Any
 
-from erdpy import facade
 
 logger = logging.getLogger("cli.accounts")
 
@@ -34,13 +36,23 @@ def _add_address_arg(sub: Any):
 
 
 def get_account(args: Any):
+    proxy_url = args.proxy
+    address = args.address
+    proxy = ElrondProxy(proxy_url)
+    account = proxy.get_account(Address(address))
+
     if args.balance:
-        facade.get_account_balance(args)
+        print(account.get("balance", 0))
     elif args.nonce:
-        facade.get_account_nonce(args)
+        print(account.get("nonce", 0))
     else:
-        facade.get_account(args)
+        print(account)
 
 
 def get_account_transactions(args: Any):
-    facade.get_account_transactions(args)
+    proxy_url = args.proxy
+    address = args.address
+    proxy = ElrondProxy(proxy_url)
+
+    response = proxy.get_account_transactions(Address(address))
+    utils.dump_out_json(response, args.outfile)
