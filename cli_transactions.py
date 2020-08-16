@@ -1,7 +1,7 @@
 from argparse import FileType
 from typing import Any
 
-from erdpy import cli_shared, facade, utils
+from erdpy import cli_shared, utils
 from erdpy.proxy.core import ElrondProxy
 from erdpy.transactions import Transaction, do_prepare_transaction
 
@@ -43,7 +43,7 @@ def _add_common_arguments(sub: Any):
 def create_transaction(args: Any):
     args = utils.as_object(args)
 
-    facade.prepare_nonce_in_args(args)
+    cli_shared.prepare_nonce_in_args(args)
 
     if args.data_file:
         args.data = utils.read_file(args.data_file)

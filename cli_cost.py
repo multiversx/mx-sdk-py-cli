@@ -1,8 +1,9 @@
+from erdpy.proxy.core import ElrondProxy
+from erdpy.proxy.cost import TransactionCostEstimator
 import logging
 from typing import Any
 
-from erdpy import cli_contracts, cli_shared, facade, proxy
-from erdpy.facade import get_transaction_cost
+from erdpy import cli_contracts, cli_shared, proxy
 
 logger = logging.getLogger("cli.cost")
 
@@ -37,5 +38,19 @@ def setup_parser(subparsers: Any) -> Any:
     return subparsers
 
 
-def get_gas_price(args: Any):
-    facade.get_gas_price(args)
+def get_gas_price(args: Any) -> Any:
+    proxy_url = args.proxy
+    proxy = ElrondProxy(proxy_url)
+    price = proxy.get_gas_price()
+    print(price)
+    return price
+
+
+def get_transaction_cost(args: Any, tx_type: Any) -> Any:
+    logger.debug("call_get_transaction_cost")
+
+    cost_estimator = TransactionCostEstimator(args.proxy)
+    result = cost_estimator.estimate_tx_cost(args, tx_type)
+    print("Note: gas estimator is deprecated, will be updated on a future release.")
+    print(result)
+    return result

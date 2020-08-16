@@ -44,14 +44,6 @@ def get_last_block_nonce(args):
     return nonce
 
 
-def get_gas_price(args: Any) -> Any:
-    proxy_url = args.proxy
-    proxy = ElrondProxy(proxy_url)
-    price = proxy.get_gas_price()
-    print(price)
-    return price
-
-
 def get_chain_id(args):
     proxy_url = args.proxy
     proxy = ElrondProxy(proxy_url)
