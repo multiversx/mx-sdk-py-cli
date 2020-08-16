@@ -1,7 +1,7 @@
 import logging
 from typing import Any
 
-from erdpy import errors, utils, wallet
+from erdpy import errors, wallet
 from erdpy.accounts import Account, Address
 from erdpy.dispatcher.transactions.queue import TransactionQueue
 from erdpy.proxy import ElrondProxy, TransactionCostEstimator
@@ -10,39 +10,6 @@ from erdpy.validators import validators
 from erdpy.wallet import pem
 
 logger = logging.getLogger("facade")
-
-
-def get_num_shards(args):
-    proxy_url = args.proxy
-    proxy = ElrondProxy(proxy_url)
-    num_shards = proxy.get_num_shards()
-    print(num_shards)
-    return num_shards
-
-
-def get_last_block_nonce(args):
-    proxy_url = args.proxy
-    shard = args.shard
-    proxy = ElrondProxy(proxy_url)
-    nonce = proxy.get_last_block_nonce(shard)
-    print(nonce)
-    return nonce
-
-
-def get_gas_price(args: Any) -> Any:
-    proxy_url = args.proxy
-    proxy = ElrondProxy(proxy_url)
-    price = proxy.get_gas_price()
-    print(price)
-    return price
-
-
-def get_chain_id(args):
-    proxy_url = args.proxy
-    proxy = ElrondProxy(proxy_url)
-    chain_id = proxy.get_chain_id()
-    print(chain_id)
-    return chain_id
 
 
 def get_transaction_cost(args: Any, tx_type: Any) -> Any:

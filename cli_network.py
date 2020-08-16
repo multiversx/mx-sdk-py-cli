@@ -1,8 +1,7 @@
+from erdpy.proxy.core import ElrondProxy
 from erdpy import cli_shared
 import logging
 from typing import Any
-
-from erdpy import facade
 
 logger = logging.getLogger("cli.network")
 
@@ -28,13 +27,34 @@ def setup_parser(subparsers: Any) -> Any:
     return subparsers
 
 
-def get_num_shards(args: Any):
-    facade.get_num_shards(args)
+def get_num_shards(args):
+    proxy_url = args.proxy
+    proxy = ElrondProxy(proxy_url)
+    num_shards = proxy.get_num_shards()
+    print(num_shards)
+    return num_shards
 
 
-def get_last_block_nonce(args: Any):
-    facade.get_last_block_nonce(args)
+def get_last_block_nonce(args):
+    proxy_url = args.proxy
+    shard = args.shard
+    proxy = ElrondProxy(proxy_url)
+    nonce = proxy.get_last_block_nonce(shard)
+    print(nonce)
+    return nonce
 
 
-def get_chain_id(args: Any):
-    facade.get_chain_id(args)
+def get_gas_price(args: Any) -> Any:
+    proxy_url = args.proxy
+    proxy = ElrondProxy(proxy_url)
+    price = proxy.get_gas_price()
+    print(price)
+    return price
+
+
+def get_chain_id(args):
+    proxy_url = args.proxy
+    proxy = ElrondProxy(proxy_url)
+    chain_id = proxy.get_chain_id()
+    print(chain_id)
+    return chain_id
