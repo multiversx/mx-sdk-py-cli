@@ -45,9 +45,9 @@ def parse_args_for_stake(args: Any):
     elif args.keyfile and args.passfile:
         account = Account(key_file=args.keyfile, pass_file=args.passfile)
 
-    num_of_nodes = len(validators_data["validators"])
+    num_of_nodes = len(validators_data.get("validators", []))
     stake_data = 'stake@' + binascii.hexlify(num_of_nodes.to_bytes(1, byteorder="little")).decode()
-    for validator in validators_data["validators"]:
+    for validator in validators_data.get("validators", []):
         # get validator
         validator_pem = validator.get("pemFile", None)
         validator_pem = path.join(path.dirname(validators_file), validator_pem)

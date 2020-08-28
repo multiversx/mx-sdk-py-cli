@@ -18,13 +18,13 @@ class ElrondProxy:
     def get_account_nonce(self, address: Address) -> int:
         url = f"{self.url}/address/{address.bech32()}"
         response = do_get(url)
-        nonce = response["account"]["nonce"]
+        nonce = response.get("account").get("nonce")
         return int(nonce)
 
     def get_account_balance(self, address: Address):
         url = f"{self.url}/address/{address.bech32()}/balance"
         response = do_get(url)
-        balance = response["balance"]
+        balance = response.get("balance")
         return balance
 
     def get_account(self, address: Address):
@@ -81,7 +81,7 @@ class ElrondProxy:
     def send_transaction(self, payload: Any) -> str:
         url = f"{self.url}/transaction/send"
         response = do_post(url, payload)
-        tx_hash = response["txHash"]
+        tx_hash = response.get("txHash")
         return tx_hash
 
     def send_transactions(self, payload: List[Any]) -> Tuple[int, List[str]]:

@@ -75,7 +75,7 @@ class CargoFile:
 
     @property
     def package_name(self):
-        return self.data["package"]["name"]
+        return self.data.get("package", {}).get("name")
 
     @package_name.setter
     def package_name(self, value):
@@ -83,7 +83,7 @@ class CargoFile:
 
     @property
     def version(self):
-        return self.data["package"]["version"]
+        return self.data.get("package", {}).get("version")
 
     @version.setter
     def version(self, value):
@@ -91,7 +91,7 @@ class CargoFile:
 
     @property
     def authors(self):
-        return self.data["package"]["authors"]
+        return self.data.get("package", {}).get("authors")
 
     @authors.setter
     def authors(self, value):
@@ -99,7 +99,7 @@ class CargoFile:
 
     @property
     def edition(self):
-        return self.data["package"]["edition"]
+        return self.data.get("package", {}).get("edition")
 
     @edition.setter
     def edition(self, value):
@@ -107,7 +107,7 @@ class CargoFile:
 
     @property
     def bin_name(self):
-        return self.data["bin"][0]["name"]
+        return self.data.get("bin", [{}])[0].get("name")
 
     @bin_name.setter
     def bin_name(self, value):
