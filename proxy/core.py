@@ -18,14 +18,14 @@ class ElrondProxy:
     def get_account_nonce(self, address: Address) -> int:
         url = f"{self.url}/address/{address.bech32()}"
         response = do_get(url)
-        nonce = response.get("account").get("nonce")
+        nonce = response.get("account").get("nonce", 0)
         return int(nonce)
 
     def get_account_balance(self, address: Address):
         url = f"{self.url}/address/{address.bech32()}/balance"
         response = do_get(url)
-        balance = response.get("balance")
-        return balance
+        balance = response.get("balance", 0)
+        return int(balance)
 
     def get_account(self, address: Address):
         url = f"{self.url}/address/{address.bech32()}"
@@ -68,13 +68,13 @@ class ElrondProxy:
     def _get_network_status(self, shard_id):
         url = f"{self.url}/network/status/{shard_id}"
         response = do_get(url)
-        payload = response.get("status", None)
+        payload = response.get("status")
         return payload
 
     def get_network_config(self) -> NetworkConfig:
         url = f"{self.url}/network/config"
         response = do_get(url)
-        payload = response.get("config", None)
+        payload = response.get("config")
         result = NetworkConfig(payload)
         return result
 
@@ -89,7 +89,7 @@ class ElrondProxy:
         response = do_post(url, payload)
         # Proxy and Observers have different response format:
         num_sent = response.get("numOfSentTxs", 0) or response.get("txsSent", 0)
-        hashes = response.get("txsHashes", None)
+        hashes = response.get("txsHashes")
         return num_sent, hashes
 
     def query_contract(self, payload: Any):

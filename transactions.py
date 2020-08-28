@@ -57,7 +57,7 @@ class Transaction(ITransaction):
     @classmethod
     def load_from_file(cls, f: Any):
         data_json: bytes = utils.read_file(f).encode()
-        fields = json.loads(data_json).get("tx", None)
+        fields = json.loads(data_json).get("tx")
         instance = cls()
         instance.__dict__.update(fields)
         instance.data = instance.data_decoded()

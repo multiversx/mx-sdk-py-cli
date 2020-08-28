@@ -130,7 +130,15 @@ class TransactionQueue:
         while idx < len(txs):
             tx = txs[idx]
             # TODO CHECK IF BUNCH OF TRANSACTION generate transactions with chain id and version
-            bunch.add(owner, tx.get("receiver"), nonce, tx.get("value"), tx.get("data"), tx.get("gasPrice"), tx.get("gasLimit"))
+            bunch.add(
+                owner,
+                tx.get("receiver"),
+                nonce,
+                tx.get("value"),
+                tx.get("data"),
+                tx.get("gasPrice"),
+                tx.get("gasLimit")
+            )
             # increment nonce
             nonce += 1
             idx += 1
