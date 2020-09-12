@@ -79,6 +79,16 @@ def get_defaults() -> Dict[str, Any]:
         "dependencies.llvm.urlTemplate.linux": "https://ide.elrond.com/vendor-llvm/{TAG}/linux-amd64.tar.gz?t=19feb",
         "dependencies.llvm.urlTemplate.osx": "https://ide.elrond.com/vendor-llvm/{TAG}/darwin-amd64.tar.gz?t=19feb",
         "dependencies.rust.tag": "",
+        "dependencies.elrond_go.tag": "v1.1.0",
+        "dependencies.elrond_go.urlTemplate.linux": "https://github.com/ElrondNetwork/elrond-go/archive/{TAG}.tar.gz",
+        "dependencies.elrond_go.urlTemplate.osx": "https://github.com/ElrondNetwork/elrond-go/archive/{TAG}.tar.gz",
+        "dependencies.elrond_go.url": "https://github.com/ElrondNetwork/elrond-go/archive/{TAG}.tar.gz",
+        "dependencies.elrond_config_mainnet.tag": "v1.1.0.0",
+        "dependencies.elrond_config_mainnet.urlTemplate.linux": "https://github.com/ElrondNetwork/elrond-config-mainnet/archive/{TAG}.tar.gz",
+        "dependencies.elrond_config_mainnet.urlTemplate.osx": "https://github.com/ElrondNetwork/elrond-config-mainnet/archive/{TAG}.tar.gz",
+        "dependencies.elrond_proxy_go.tag": "v1.1.0",
+        "dependencies.elrond_proxy_go.urlTemplate.linux": "https://github.com/ElrondNetwork/elrond-proxy-go/archive/{TAG}.tar.gz",
+        "dependencies.elrond_proxy_go.urlTemplate.osx": "https://github.com/ElrondNetwork/elrond-proxy-go/archive/{TAG}.tar.gz",
     }
 
 

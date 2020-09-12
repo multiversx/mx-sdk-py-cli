@@ -57,7 +57,11 @@ class DependencyModule:
 
 
 class StandaloneModule(DependencyModule):
-    def __init__(self, key: str, aliases: List[str]):
+
+    def __init__(self, key: str, aliases: List[str] = None):
+        if aliases is None:
+            aliases = list()
+
         super().__init__(key, aliases)
 
     def _do_install(self, tag: str):
@@ -105,7 +109,11 @@ class StandaloneModule(DependencyModule):
 
 
 class ArwenToolsModule(StandaloneModule):
-    def __init__(self, key: str, aliases: List[str]):
+
+    def __init__(self, key: str, aliases: List[str] = None):
+        if aliases is None:
+            aliases = list()
+
         super().__init__(key, aliases)
 
     def _post_install(self, tag: str):
@@ -124,7 +132,10 @@ class ArwenToolsModule(StandaloneModule):
 
 
 class Rust(DependencyModule):
-    def __init__(self, key: str, aliases: List[str]):
+    def __init__(self, key: str, aliases: List[str] = None):
+        if aliases is None:
+            aliases = list()
+
         super().__init__(key, aliases)
 
     def _do_install(self, tag: str) -> None:

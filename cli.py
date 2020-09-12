@@ -4,10 +4,22 @@ import argparse
 from argparse import ArgumentParser
 from typing import Any, List
 
-from erdpy import (cli_accounts, cli_blockatlas, cli_config, cli_contracts,
-                   cli_cost, cli_deps, cli_dispatcher, cli_network,
-                   cli_transactions, cli_validators, cli_wallet, errors, cli_block)
-from erdpy._version import __version__
+import cli_accounts
+import cli_blockatlas
+import cli_config
+import cli_contracts
+import cli_cost
+import cli_deps
+import cli_dispatcher
+import cli_network
+import cli_transactions
+import cli_validators
+import cli_wallet
+import cli_testnet
+import errors
+import cli_block
+
+from _version import __version__
 
 logger = logging.getLogger("cli")
 
@@ -73,6 +85,7 @@ https://docs.elrond.com/tools/erdpy.
     commands.append(cli_deps.setup_parser(subparsers))
     commands.append(cli_config.setup_parser(subparsers))
     commands.append(cli_block.setup_parser(subparsers))
+    commands.append(cli_testnet.setup_parser(subparsers))
 
     parser.epilog = """
 ----------------------

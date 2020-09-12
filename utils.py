@@ -73,11 +73,11 @@ def write_file(f: Any, text: str):
 
 
 def read_toml_file(filename):
-    return toml.load(filename)
+    return toml.load(str(filename))
 
 
 def write_toml_file(filename, data):
-    with open(filename, "w") as f:
+    with open(str(filename), "w") as f:
         toml.dump(data, f)
 
 

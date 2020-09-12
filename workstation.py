@@ -1,20 +1,13 @@
 import sys
-import pathlib
-from os import path
+from pathlib import Path
 
 from erdpy import config, utils
 
 
 def get_tools_folder():
-    home = get_home_folder()
-    folder = path.join(home, config.ROOT_FOLDER_NAME)
+    folder = Path.home() / config.ROOT_FOLDER_NAME
     utils.ensure_folder(folder)
     return folder
-
-
-def get_home_folder():
-    home = str(pathlib.Path.home())
-    return home
 
 
 def get_platform():
