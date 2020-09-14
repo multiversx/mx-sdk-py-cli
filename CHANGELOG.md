@@ -4,6 +4,13 @@ All notable changes will be documented in this file.
 
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
+## [0.8.4] - 14.09.2020
+ - Fix templates patching to work with elrond-wasm `0.6.0`.
+ - Update build with respect to elrond-wasm `0.6.0`.
+ - Update reference to newest Mandos `v0.3.35`, update tests runner.
+ - Remove dependency on `list_api.txt` for C projects.
+ - Trim whitespace for "wallet derive --mnemonic".
+
 ## [0.8.3] - 12.08.2020
  - Fix proxy requests, implement `hyperblock` route.
 
