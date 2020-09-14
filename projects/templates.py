@@ -119,6 +119,10 @@ class TemplateRust(Template):
         cargo_file.version = "0.0.1"
         cargo_file.authors = ["you"]
         cargo_file.edition = "2018"
+
+        for dependency in cargo_file.get_dependencies().values():
+            del dependency["path"]
+
         cargo_file.save()
 
         cargo_file_debug = CargoFile(cargo_debug_path)
@@ -126,6 +130,11 @@ class TemplateRust(Template):
         cargo_file_debug.version = "0.0.1"
         cargo_file_debug.authors = ["you"]
         cargo_file_debug.edition = "2018"
+
+        for dependency in cargo_file_debug.get_dependencies().values():
+            del dependency["path"]
+        cargo_file_debug.get_dependency(self.template_name)["path"] = ".."
+
         cargo_file_debug.save()
 
         logger.info("Applying replacements...")

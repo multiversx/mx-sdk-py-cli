@@ -11,9 +11,9 @@ def get_templates_repositories():
         ),
 
         TemplatesRepository(
-            key="sc-examples-rs",
-            url="https://github.com/ElrondNetwork/sc-examples-rs/archive/master.zip",
-            github="ElrondNetwork/sc-examples-rs",
-            relative_path="sc-examples-rs-master"
+            key="elrond-wasm-rs",
+            url="https://github.com/ElrondNetwork/elrond-wasm-rs/archive/master.zip",
+            github="ElrondNetwork/elrond-wasm-rs",
+            relative_path="elrond-wasm-rs-master/examples"
         )
     ]
