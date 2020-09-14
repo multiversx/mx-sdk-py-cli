@@ -32,8 +32,7 @@ class DownloadError(KnownError):
 
 
 class BadUrlError(DownloadError):
-    def __init__(self):
-        pass
+    pass
 
 
 class DependencyMissing(KnownError):
@@ -49,6 +48,11 @@ class UnknownDependency(KnownError):
 class BadDirectory(KnownError):
     def __init__(self, directory: str):
         super().__init__(f"Bad directory: {directory}")
+
+
+class BadFile(KnownError):
+    def __init__(self, filename: str, inner=None):
+        super().__init__(f"Bad file: {filename}.", inner)
 
 
 class NotSupportedProject(KnownError):

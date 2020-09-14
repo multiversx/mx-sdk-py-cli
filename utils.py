@@ -12,6 +12,8 @@ from typing import Any, Dict, List, Union
 
 import toml
 
+from erdpy import errors
+
 logger = logging.getLogger("utils")
 
 
@@ -58,11 +60,14 @@ def read_lines(file: str):
 
 
 def read_file(f: Any, binary=False) -> Union[str, bytes]:
-    mode = "rb" if binary else "r"
-    if isinstance(f, str) or isinstance(f, pathlib.PosixPath):
-        with open(f, mode) as f:
-            return f.read()
-    return f.read()
+    try:
+        mode = "rb" if binary else "r"
+        if isinstance(f, str) or isinstance(f, pathlib.PosixPath):
+            with open(f, mode) as f:
+                return f.read()
+        return f.read()
+    except Exception as err:
+        raise errors.BadFile(f, err)
 
 
 def write_file(f: Any, text: str):
@@ -116,9 +121,13 @@ def find_in_dictionary(dictionary, compound_path):
     return node
 
 
-def list_files(folder: str) -> List[str]:
+def list_files(folder: str, suffix: str = None) -> List[str]:
     files = os.listdir(folder)
     files = [os.path.join(folder, f) for f in files]
+
+    if suffix:
+        files = [e for e in files if e.lower().endswith(suffix.lower())]
+
     return files
 
 
