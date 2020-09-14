@@ -156,7 +156,7 @@ class TemplateRust(Template):
         self._replace_in_files(
             [debug_main_path],
             [
-                # Example "use simple_coin::*" to "use my_project::*"
+                # Example: replace "use simple-erc20::*" to "use my_token::*"
                 (f"use {self.template_name.replace('-', '_')}::*", f"use {self.project_name.replace('-', '_')}::*")
             ]
         )
