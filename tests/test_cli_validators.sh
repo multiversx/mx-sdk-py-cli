@@ -7,18 +7,18 @@ testAll() {
     REWARD_ADDRESS="erd1l453hd0gt5gzdp7czpuall8ggt2dcv5zwmfdf3sd3lguxseux2fsmsgldz"
 
     echo "Stake with recall nonce"
-    ${ERDPY} --verbose validator stake --pem="${KEYS}/alice.pem" --value="2500000${DENOMINATION}" --validators-file=./testdata/validators/validators.json --reward-address=${REWARD_ADDRESS} --proxy=${PROXY} --estimate-gas --recall-nonce
+    ${ERDPY} --verbose validator stake --pem="${KEYS}/alice.pem" --value="2500000${DENOMINATION}" --validators-file=./testdata/validators/validators.json --reward-address=${REWARD_ADDRESS} --chain=${CHAIN_ID} --proxy=${PROXY} --estimate-gas --recall-nonce
     echo "Stake with provided nonce"
-    ${ERDPY} --verbose validator stake --pem="${KEYS}/alice.pem" --value="2500000${DENOMINATION}" --validators-file=./testdata/validators/validators.json --reward-address=${REWARD_ADDRESS} --proxy=${PROXY} --estimate-gas --nonce=42
+    ${ERDPY} --verbose validator stake --pem="${KEYS}/alice.pem" --value="2500000${DENOMINATION}" --validators-file=./testdata/validators/validators.json --reward-address=${REWARD_ADDRESS} --chain=${CHAIN_ID} --proxy=${PROXY} --estimate-gas --nonce=42
 
     echo "Unstake"
-    ${ERDPY} --verbose validator unstake --pem="${KEYS}/alice.pem" --nodes-public-keys=${BLS_KEY} --proxy=${PROXY} --estimate-gas --recall-nonce
+    ${ERDPY} --verbose validator unstake --pem="${KEYS}/alice.pem" --nodes-public-keys=${BLS_KEY} --chain=${CHAIN_ID} --proxy=${PROXY} --estimate-gas --recall-nonce
     echo "Unbond"
-    ${ERDPY} --verbose validator unbond --pem="${KEYS}/alice.pem" --nodes-public-keys=${BLS_KEY} --proxy=${PROXY} --estimate-gas --recall-nonce
+    ${ERDPY} --verbose validator unbond --pem="${KEYS}/alice.pem" --nodes-public-keys=${BLS_KEY} --chain=${CHAIN_ID} --proxy=${PROXY} --estimate-gas --recall-nonce
     echo "Unjail"
-    ${ERDPY} --verbose validator unjail --pem="${KEYS}/alice.pem" --value="2500${DENOMINATION}" --nodes-public-keys=${BLS_KEY} --proxy=${PROXY} --estimate-gas --recall-nonce
+    ${ERDPY} --verbose validator unjail --pem="${KEYS}/alice.pem" --value="2500${DENOMINATION}" --nodes-public-keys=${BLS_KEY} --chain=${CHAIN_ID} --proxy=${PROXY} --estimate-gas --recall-nonce
     echo "Change reward address"
-    ${ERDPY} --verbose validator change-reward-address --pem="${KEYS}/alice.pem" --reward-address=${REWARD_ADDRESS} --proxy=${PROXY} --estimate-gas --recall-nonce
+    ${ERDPY} --verbose validator change-reward-address --pem="${KEYS}/alice.pem" --reward-address=${REWARD_ADDRESS} --chain=${CHAIN_ID} --proxy=${PROXY} --estimate-gas --recall-nonce
 
     set +x
 }

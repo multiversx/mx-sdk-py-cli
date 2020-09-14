@@ -3,11 +3,10 @@
 source "./shared.sh"
 
 testAll() {
-    set -x
-
+    echo "network.num-shards"
     ${ERDPY} --verbose network num-shards --proxy=${PROXY}
+    echo "network.block-nonce"
     ${ERDPY} --verbose network block-nonce --shard=0 --proxy=${PROXY}
+    echo "network.chain"
     ${ERDPY} --verbose network chain --proxy=${PROXY}
-
-    set +x
 }

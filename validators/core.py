@@ -1,12 +1,13 @@
 import binascii
 import json
 import logging
-
-from typing import Any
 from os import path
+from typing import Any
+
 from erdpy import guards
-from erdpy.accounts import Address, Account
-from erdpy.config import MIN_GAS_LIMIT, GAS_PER_DATA_BYTE, MetaChainSystemSCsCost
+from erdpy.accounts import Account, Address
+from erdpy.config import (GAS_PER_DATA_BYTE, MIN_GAS_LIMIT,
+                          MetaChainSystemSCsCost)
 from erdpy.errors import CannotReadValidatorsData
 from erdpy.wallet.pem import parse_validator_pem
 from erdpy.wallet.signing import sign_message_with_bls_key
@@ -69,7 +70,7 @@ def parse_args_for_stake(args: Any):
 
 
 def parse_args_for_un_stake(args: Any):
-    parsed_keys, num_keys = parse_keys(args.nodes_public_keys)
+    parsed_keys, num_keys = _parse_keys(args.nodes_public_keys)
     args.data = 'unStake' + parsed_keys
     args.receiver = _STAKE_SMART_CONTRACT_ADDRESS
 
@@ -80,7 +81,7 @@ def parse_args_for_un_stake(args: Any):
 
 
 def parse_args_for_un_bond(args: Any):
-    parsed_keys, num_keys = parse_keys(args.nodes_public_keys)
+    parsed_keys, num_keys = _parse_keys(args.nodes_public_keys)
     args.data = 'unBond' + parsed_keys
     args.receiver = _STAKE_SMART_CONTRACT_ADDRESS
 
@@ -91,7 +92,7 @@ def parse_args_for_un_bond(args: Any):
 
 
 def parse_args_for_un_jail(args: Any):
-    parsed_keys, num_keys = parse_keys(args.nodes_public_keys)
+    parsed_keys, num_keys = _parse_keys(args.nodes_public_keys)
     args.data = 'unJail' + parsed_keys
     args.receiver = _STAKE_SMART_CONTRACT_ADDRESS
 
@@ -122,13 +123,9 @@ def parse_args_for_claim(args: Any):
     return args
 
 
-def parse_keys(bls_public_keys):
+def _parse_keys(bls_public_keys):
     keys = bls_public_keys.split(',')
     parsed_keys = ''
     for key in keys:
         parsed_keys += '@' + key
     return parsed_keys, len(keys)
-
-
-def convert_to_hex(key):
-    return binascii.hexlify(bytes(key, 'utf-8')).decode()
