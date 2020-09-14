@@ -57,14 +57,13 @@ class ProjectClang(Project):
     def _do_wasm(self):
         logger.info("_do_wasm")
         tool = path.join(self._get_llvm_path(), "wasm-ld")
-        undefined_file = str(self.build_configuration.undefined_file)
         args = [
             tool,
             "--no-entry",
             str(self.file_o),
             "-o", self.find_file_globally("*.c").with_suffix(".wasm"),
             "--strip-all",
-            f"-allow-undefined-file={undefined_file}"
+            "-allow-undefined"
         ]
 
         if self.options.get("verbose", False):
@@ -94,14 +93,9 @@ class ClangBuildConfiguration:
         self.project = project
         self.debug = debug
         self.exports = self._get_exports()
-        self.undefined_file = self._get_undefined_file()
 
     def _get_exports(self):
         file_export = self.project.find_file_globally("*.export")
         lines = utils.read_lines(file_export)
         return lines
 
-    def _get_undefined_file(self):
-        package_path = Path(__file__).parent
-        # TODO: remove this logic
-        return package_path.joinpath("list_api.txt")

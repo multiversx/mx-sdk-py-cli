@@ -1,9 +1,7 @@
-from erdpy import cli_shared
 import logging
 from typing import Any
 
-from erdpy import config, dependencies, errors
-
+from erdpy import cli_shared, config, dependencies, errors
 from erdpy.dependencies.install import get_deps_dict
 
 logger = logging.getLogger("cli.deps")

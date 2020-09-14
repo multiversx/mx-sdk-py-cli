@@ -1,4 +1,3 @@
-from erdpy.accounts import Address
 import logging
 from typing import Any, Dict, List, Tuple
 
@@ -19,14 +18,14 @@ class ElrondProxy:
     def get_account_nonce(self, address: Address) -> int:
         url = f"{self.url}/address/{address.bech32()}"
         response = do_get(url)
-        nonce = response["account"]["nonce"]
+        nonce = response.get("account").get("nonce", 0)
         return int(nonce)
 
     def get_account_balance(self, address: Address):
         url = f"{self.url}/address/{address.bech32()}/balance"
         response = do_get(url)
-        balance = response["balance"]
-        return balance
+        balance = response.get("balance", 0)
+        return int(balance)
 
     def get_account(self, address: Address):
         url = f"{self.url}/address/{address.bech32()}"
@@ -55,7 +54,7 @@ class ElrondProxy:
         else:
             metrics = self._get_network_status(shard_id)
 
-        nonce = metrics["erd_nonce"]
+        nonce = metrics.get("erd_highest_final_nonce", 0)
         return nonce
 
     def get_gas_price(self):
@@ -69,20 +68,20 @@ class ElrondProxy:
     def _get_network_status(self, shard_id):
         url = f"{self.url}/network/status/{shard_id}"
         response = do_get(url)
-        payload = response.get("status", None)
+        payload = response.get("status")
         return payload
 
     def get_network_config(self) -> NetworkConfig:
         url = f"{self.url}/network/config"
         response = do_get(url)
-        payload = response.get("config", None)
+        payload = response.get("config")
         result = NetworkConfig(payload)
         return result
 
     def send_transaction(self, payload: Any) -> str:
         url = f"{self.url}/transaction/send"
         response = do_post(url, payload)
-        tx_hash = response["txHash"]
+        tx_hash = response.get("txHash")
         return tx_hash
 
     def send_transactions(self, payload: List[Any]) -> Tuple[int, List[str]]:
@@ -90,7 +89,7 @@ class ElrondProxy:
         response = do_post(url, payload)
         # Proxy and Observers have different response format:
         num_sent = response.get("numOfSentTxs", 0) or response.get("txsSent", 0)
-        hashes = response.get("txsHashes", None)
+        hashes = response.get("txsHashes")
         return num_sent, hashes
 
     def query_contract(self, payload: Any):
@@ -108,10 +107,15 @@ class ElrondProxy:
         response = do_get(url)
         return response
 
-    def get_transaction(self, tx_hash: str, sender_address: str) -> Any:
-        url = f"{self.url}/transaction/{tx_hash}"
-        if sender_address != "":
-            url += f"?sender={sender_address}"
+    def get_transaction(self, tx_hash: str, sender_address: str = "") -> Any:
+        url = f"{self.url}/transaction/{tx_hash}?sender={sender_address}"
+        response = do_get(url)
+        return response
+
+    def get_hyperblock(self, key) -> Any:
+        url = f"{self.url}/hyperblock/by-hash/{key}"
+        if str(key).isnumeric():
+            url = f"{self.url}/hyperblock/by-nonce/{key}"
 
         response = do_get(url)
         return response

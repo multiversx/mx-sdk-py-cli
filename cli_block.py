@@ -1,7 +1,8 @@
+from erdpy import block
 import sys
 from typing import Any
 
-from erdpy import cli_shared, utils, facade
+from erdpy import cli_shared, utils
 
 
 def setup_parser(subparsers: Any) -> Any:
@@ -20,5 +21,4 @@ def setup_parser(subparsers: Any) -> Any:
 
 
 def get_block(args: Any) -> Any:
-    facade.get_block(args)
-
+    block.get_block(args)

@@ -1,8 +1,9 @@
-from erdpy import cli_shared
 import logging
 from typing import Any
 
-from erdpy import facade
+from erdpy import cli_shared, wallet
+from erdpy.accounts import Address
+from erdpy.wallet import pem
 
 logger = logging.getLogger("cli.wallet")
 
@@ -47,8 +48,25 @@ def setup_parser(subparsers: Any) -> Any:
 
 
 def generate_pem(args: Any):
-    facade.generate_pem(args)
+    pem_file = args.pem
+    mnemonic = args.mnemonic
+
+    seed, pubkey = wallet.generate_pair()
+    if mnemonic:
+        mnemonic = input("Enter mnemonic:\n")
+        mnemonic = mnemonic.strip()
+        seed, pubkey = wallet.derive_keys(mnemonic)
+
+    address = Address(pubkey)
+    pem.write(pem_file, seed, pubkey, name=address.bech32())
+    logger.info(f"Created PEM file [{pem_file}] for [{address.bech32()}]")
 
 
 def do_bech32(args: Any):
-    facade.do_bech32(args)
+    encode = args.encode
+    value = args.value
+    address = Address(value)
+
+    result = address.bech32() if encode else address.hex()
+    print(result)
+    return result

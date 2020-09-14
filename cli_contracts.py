@@ -36,7 +36,7 @@ def setup_parser(subparsers: Any) -> Any:
 
     sub = cli_shared.add_command_subparser(subparsers, "contract", "test", "Run Mandos tests.")
     _add_project_arg(sub)
-    sub.add_argument("--directory", default="test", help="🗀 the directory containing the tests (default: %(default)s)")
+    sub.add_argument("--directory", default="mandos", help="🗀 the directory containing the tests (default: %(default)s)")
     sub.add_argument("--wildcard", required=False, help="wildcard to match only specific test files")
     sub.set_defaults(func=run_tests)
 

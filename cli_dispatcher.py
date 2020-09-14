@@ -1,7 +1,8 @@
+from erdpy.dispatcher.transactions.queue import TransactionQueue
 import logging
 from typing import Any
 
-from erdpy import cli_shared, facade
+from erdpy import cli_shared
 
 logger = logging.getLogger("cli.dispatcher")
 
@@ -33,16 +34,20 @@ def setup_parser(subparsers: Any) -> Any:
 
 
 def enqueue_transaction(args: Any):
-    facade.enqueue_transaction(args)
+    queue = TransactionQueue()
+    queue.enqueue_transaction(args)
 
 
 def dispatch_transactions(args: Any):
-    facade.dispatch_transactions(args)
+    queue = TransactionQueue()
+    queue.dispatch_transactions(args)
 
 
 def dispatch_transactions_continuously(args: Any):
-    facade.dispatch_transactions_continuously(args)
+    queue = TransactionQueue()
+    queue.dispatch_transactions_continuously(args)
 
 
-def clean_transactions_queue(args: Any):
-    facade.clean_transactions_queue()
+def clean_transactions_queue():
+    queue = TransactionQueue()
+    queue.clean_transactions_queue()

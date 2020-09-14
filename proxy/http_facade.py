@@ -1,5 +1,4 @@
 import requests
-
 from erdpy import errors
 
 
@@ -34,13 +33,8 @@ def do_post(url, payload):
 
 
 def get_data(parsed, url):
-    err = parsed.get("error", None)
-    code = parsed.get("code", None)
-
-    if not err and not code:
-        # For the moment, be compatible with both Proxy response types.
-        # TODO: Remove this logic in the future.
-        return parsed
+    err = parsed.get("error")
+    code = parsed.get("code")
 
     if not err and code == "successful":
         return parsed.get("data", dict())

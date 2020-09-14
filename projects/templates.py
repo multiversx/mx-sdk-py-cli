@@ -86,13 +86,10 @@ class Template:
     def apply(self, template_name, project_name):
         self.template_name = template_name
         self.project_name = project_name
-        self._extend()
-        self._replace_placeholders()
+        self._patch()
 
-    def _extend(self):
-        pass
-
-    def _replace_placeholders(self):
+    def _patch(self):
+        """Implemented by derived classes"""
         pass
 
 
@@ -101,42 +98,74 @@ class TemplateClang(Template):
 
 
 class TemplateRust(Template):
-    def _extend(self):
-        logger.info("TemplateRust._extend")
+    CARGO_TOML = "Cargo.toml"
 
-    def _replace_placeholders(self):
-        cargo_path = path.join(self.directory, "Cargo.toml")
-        cargo_debug_path = path.join(self.directory, "debug", "Cargo.toml")
-        debug_main_path = path.join(self.directory, "debug", "src", "main.rs")
-        test_dir_path = path.join(self.directory, "test")
-        test_paths = utils.list_files(test_dir_path) if os.path.isdir(test_dir_path) else []
+    def _patch(self):
+        logger.info("Patching cargo files...")
+        self._patch_cargo()
+        self._patch_cargo_wasm()
+        self._patch_cargo_debug()
 
-        logger.info("Updating cargo files...")
+        logger.info("Patching source code...")
+        self._patch_source_code_wasm()
+        self._patch_source_code_debug()
+        self._patch_source_code_tests()
+
+        logger.info("Patching test files...")
+        self._patch_mandos_tests()
+
+    def _patch_cargo(self):
+        cargo_path = path.join(self.directory, TemplateRust.CARGO_TOML)
 
         cargo_file = CargoFile(cargo_path)
         cargo_file.package_name = self.project_name
-        cargo_file.bin_name = self.project_name
         cargo_file.version = "0.0.1"
         cargo_file.authors = ["you"]
         cargo_file.edition = "2018"
+
+        for dependency in cargo_file.get_dependencies().values():
+            del dependency["path"]
+
         cargo_file.save()
+
+    def _patch_cargo_wasm(self):
+        cargo_path = path.join(self.directory, "wasm", TemplateRust.CARGO_TOML)
+
+        cargo_file = CargoFile(cargo_path)
+        cargo_file.package_name = f"{self.project_name}-wasm"
+        cargo_file.version = "0.0.1"
+        cargo_file.authors = ["you"]
+        cargo_file.edition = "2018"
+
+        for dependency in cargo_file.get_dependencies().values():
+            del dependency["path"]
+        cargo_file.get_dependency(self.template_name)["path"] = ".."
+
+        cargo_file.save()
+
+        self._replace_in_files(
+            [cargo_path],
+            [
+                (f"[dependencies.{self.template_name}]", f"[dependencies.{self.project_name}]")
+            ]
+        )
+
+    def _patch_cargo_debug(self):
+        cargo_debug_path = path.join(self.directory, "debug", TemplateRust.CARGO_TOML)
+        if not path.exists(cargo_debug_path):
+            return
 
         cargo_file_debug = CargoFile(cargo_debug_path)
         cargo_file_debug.package_name = f"{self.project_name}-debug"
         cargo_file_debug.version = "0.0.1"
         cargo_file_debug.authors = ["you"]
         cargo_file_debug.edition = "2018"
+
+        for dependency in cargo_file_debug.get_dependencies().values():
+            del dependency["path"]
+        cargo_file_debug.get_dependency(self.template_name)["path"] = ".."
+
         cargo_file_debug.save()
-
-        logger.info("Applying replacements...")
-
-        self._replace_in_files(
-            [debug_main_path],
-            [
-                # Example "use simple_coin::*" to "use my_project::*"
-                (f"use {self.template_name.replace('-', '_')}::*", f"use {self.project_name.replace('-', '_')}::*")
-            ]
-        )
 
         self._replace_in_files(
             [cargo_debug_path],
@@ -145,6 +174,51 @@ class TemplateRust(Template):
             ]
         )
 
+    def _patch_source_code_wasm(self):
+        lib_path = path.join(self.directory, "wasm", "src", "lib.rs")
+
+        self._replace_in_files(
+            [lib_path],
+            [
+                (f"pub use {self.template_name.replace('-', '_')}::*", f"use {self.project_name.replace('-', '_')}::*")
+            ]
+        )
+
+    def _patch_source_code_debug(self):
+        debug_main_path = path.join(self.directory, "debug", "src", "main.rs")
+        if not path.exists(debug_main_path):
+            return
+
+        self._replace_in_files(
+            [debug_main_path],
+            [
+                # Example: replace "use simple-erc20::*" to "use my_token::*"
+                (f"use {self.template_name.replace('-', '_')}::*", f"use {self.project_name.replace('-', '_')}::*")
+            ]
+        )
+
+    def _patch_source_code_tests(self):
+        test_dir_path = path.join(self.directory, "tests")
+        if not path.isdir(test_dir_path):
+            return
+
+        test_paths = utils.list_files(test_dir_path)
+        self._replace_in_files(
+            test_paths,
+            [
+                # Example: replace "use simple-erc20::*" to "use my_token::*"
+                (f"use {self.template_name.replace('-', '_')}::*", f"use {self.project_name.replace('-', '_')}::*"),
+                # Example: replace "extern crate adder;" to "extern crate myadder"
+                (f"extern crate {self.template_name.replace('-', '_')};", f"extern create {self.project_name.replace('-', '_')};")
+            ]
+        )
+
+    def _patch_mandos_tests(self):
+        test_dir_path = path.join(self.directory, "mandos")
+        if not path.isdir(test_dir_path):
+            return
+
+        test_paths = [e for e in utils.list_files(test_dir_path, suffix=".json")]
         self._replace_in_files(
             test_paths,
             [

@@ -1,4 +1,7 @@
 import argparse
+from erdpy.proxy.core import ElrondProxy
+from erdpy import errors
+from erdpy.accounts import Account
 import sys
 from argparse import FileType
 from typing import Any, Text
@@ -85,3 +88,16 @@ def add_outfile_arg(sub: Any, what: str = ""):
 def add_infile_arg(sub: Any, what: str = ""):
     what = f"({what})" if what else ""
     sub.add_argument("--infile", type=FileType("r"), required=True, help=f"input file {what}")
+
+
+def prepare_nonce_in_args(args: Any):
+    if args.recall_nonce:
+        if args.pem:
+            account = Account(pem_file=args.pem, pem_index=args.pem_index)
+        elif args.keyfile and args.passfile:
+            account = Account(key_file=args.keyfile, pass_file=args.passfile)
+        else:
+            raise errors.NoWalletProvided()
+
+        account.sync_nonce(ElrondProxy(args.proxy))
+        args.nonce = account.nonce

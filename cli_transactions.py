@@ -1,7 +1,9 @@
 from argparse import FileType
 from typing import Any
 
-from erdpy import cli_shared, facade
+from erdpy import cli_shared, utils
+from erdpy.proxy.core import ElrondProxy
+from erdpy.transactions import Transaction, do_prepare_transaction
 
 
 def setup_parser(subparsers: Any) -> Any:
@@ -12,6 +14,7 @@ def setup_parser(subparsers: Any) -> Any:
     _add_common_arguments(sub)
     cli_shared.add_outfile_arg(sub, what="signed transaction, hash")
     sub.add_argument("--send", action="store_true", default=False, help="✓ whether to broadcast (send) the transaction (default: %(default)s)")
+    sub.add_argument("--relay", action="store_true", default=False, help="whether to relay the transaction (default: %(default)s)")
     cli_shared.add_proxy_arg(sub)
     sub.set_defaults(func=create_transaction)
 
@@ -38,12 +41,41 @@ def _add_common_arguments(sub: Any):
 
 
 def create_transaction(args: Any):
-    facade.create_transaction(args)
+    args = utils.as_object(args)
+
+    cli_shared.prepare_nonce_in_args(args)
+
+    if args.data_file:
+        args.data = utils.read_file(args.data_file)
+
+    tx = do_prepare_transaction(args)
+
+    if args.relay:
+        args.outfile.write(tx.serialize_as_inner())
+        return
+
+    try:
+        if args.send:
+            tx.send(ElrondProxy(args.proxy))
+    finally:
+        tx.dump_to(args.outfile)
 
 
 def send_transaction(args: Any):
-    facade.send_transaction(args)
+    args = utils.as_object(args)
+
+    tx = Transaction.load_from_file(args.infile)
+
+    try:
+        tx.send(ElrondProxy(args.proxy))
+    finally:
+        tx.dump_to(args.outfile)
 
 
 def get_transaction(args: Any):
-    facade.get_transaction(args)
+    args = utils.as_object(args)
+
+    proxy = ElrondProxy(args.proxy)
+
+    response = proxy.get_transaction(args.hash, args.sender)
+    print(response)

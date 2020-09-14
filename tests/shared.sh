@@ -4,8 +4,8 @@ ERDPY="python3 -m erdpy.cli"
 SANDBOX=testdata-out/SANDBOX
 KEYS=../../examples/keys
 DENOMINATION="000000000000000000"
-PROXY="https://testnet-api.elrond.com"
-CHAIN_ID="v1.0.147"
+PROXY="https://api-testnet.elrond.com"
+CHAIN_ID="T"
 
 cleanSandbox() {
     rm -rf ${SANDBOX}

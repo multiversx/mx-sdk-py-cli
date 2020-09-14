@@ -1,6 +1,9 @@
+from erdpy.transactions import do_prepare_transaction
+from erdpy.proxy.core import ElrondProxy
+from erdpy import validators
 from typing import Any
 
-from erdpy import cli_shared, facade
+from erdpy import cli_shared
 
 
 def setup_parser(subparsers: Any) -> Any:
@@ -54,24 +57,66 @@ def _add_nodes_arg(sub: Any):
 
 
 def do_stake(args: Any):
-    facade.prepare_and_send_stake_transaction(args)
+    cli_shared.prepare_nonce_in_args(args)
+    args = validators.parse_args_for_stake(args)
+    tx = do_prepare_transaction(args)
+
+    try:
+        tx.send(ElrondProxy(args.proxy))
+    finally:
+        tx.dump_to(args.outfile)
 
 
 def do_unstake(args: Any):
-    facade.prepare_and_send_unstake_transaction(args)
+    cli_shared.prepare_nonce_in_args(args)
+    args = validators.parse_args_for_un_stake(args)
+    tx = do_prepare_transaction(args)
 
-
-def do_unbond(args: Any):
-    facade.prepare_and_send_unbond_transaction(args)
+    try:
+        tx.send(ElrondProxy(args.proxy))
+    finally:
+        tx.dump_to(args.outfile)
 
 
 def do_unjail(args: Any):
-    facade.prepare_and_send_unjail_transaction(args)
+    cli_shared.prepare_nonce_in_args(args)
+    args = validators.parse_args_for_un_jail(args)
+    tx = do_prepare_transaction(args)
+
+    try:
+        tx.send(ElrondProxy(args.proxy))
+    finally:
+        tx.dump_to(args.outfile)
+
+
+def do_unbond(args: Any):
+    cli_shared.prepare_nonce_in_args(args)
+    args = validators.parse_args_for_un_bond(args)
+    tx = do_prepare_transaction(args)
+
+    try:
+        tx.send(ElrondProxy(args.proxy))
+    finally:
+        tx.dump_to(args.outfile)
 
 
 def change_reward_address(args: Any):
-    facade.prepare_and_send_change_reward_address_transaction(args)
+    cli_shared.prepare_nonce_in_args(args)
+    args = validators.parse_args_for_changing_reward_address(args)
+    tx = do_prepare_transaction(args)
+
+    try:
+        tx.send(ElrondProxy(args.proxy))
+    finally:
+        tx.dump_to(args.outfile)
 
 
 def do_claim(args: Any):
-    facade.prepare_and_send_claim_transaction(args)
+    cli_shared.prepare_nonce_in_args(args)
+    args = validators.parse_args_for_claim(args)
+    tx = do_prepare_transaction(args)
+
+    try:
+        tx.send(ElrondProxy(args.proxy))
+    finally:
+        tx.dump_to(args.outfile)
