@@ -86,13 +86,10 @@ class Template:
     def apply(self, template_name, project_name):
         self.template_name = template_name
         self.project_name = project_name
-        self._extend()
         self._replace_placeholders()
 
-    def _extend(self):
-        pass
-
     def _replace_placeholders(self):
+        """Implemented by derived classes"""
         pass
 
 
@@ -101,9 +98,6 @@ class TemplateClang(Template):
 
 
 class TemplateRust(Template):
-    def _extend(self):
-        logger.info("TemplateRust._extend")
-
     def _replace_placeholders(self):
         cargo_path = path.join(self.directory, "Cargo.toml")
         cargo_debug_path = path.join(self.directory, "debug", "Cargo.toml")

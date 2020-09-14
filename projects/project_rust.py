@@ -2,7 +2,7 @@ import logging
 import subprocess
 from os import path
 from pathlib import Path
-from typing import Any, List, MutableMapping
+from typing import Any, MutableMapping
 
 from erdpy import dependencies, errors, myprocess, utils
 from erdpy.projects.project_base import Project
