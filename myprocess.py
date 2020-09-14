@@ -4,7 +4,7 @@ import subprocess
 import traceback
 from typing import Any, List
 
-from erdpy import feedback, errors
+from erdpy import errors, feedback
 
 logger = logging.getLogger("myprocess")
 
@@ -22,17 +22,17 @@ def run_process(args: List[str], env: Any = None, dump_to_stdout: bool = True):
         raise errors.ExternalProcessError(error.cmd, error.output)
 
 
-def run_process_async(args: List[str], env: Any = None):
+def run_process_async(args: List[str], env: Any = None, cwd: str = None):
     loop = asyncio.get_event_loop()
-    result = loop.run_until_complete(async_subprocess(args, env))
+    result = loop.run_until_complete(async_subprocess(args, env=env, sinks=None, cwd=cwd))
     loop.close()
     asyncio.set_event_loop(asyncio.new_event_loop())
     return result
 
 
-async def async_subprocess(args, env=None, sinks=None):
+async def async_subprocess(args, env=None, sinks=None, cwd: str = None):
     process = await asyncio.create_subprocess_exec(*args, env=env, stdout=asyncio.subprocess.PIPE,
-                                                   stderr=asyncio.subprocess.PIPE)
+                                                   stderr=asyncio.subprocess.PIPE, cwd=cwd)
 
     await asyncio.wait([
         _read_stream(process.stdout, sinks),

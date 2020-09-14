@@ -17,7 +17,7 @@ class ProjectRust(Project):
 
     def clean(self):
         super().clean()
-        utils.remove_folder(path.join(self.directory, "target"))
+        utils.remove_folder(path.join(self.directory, "wasm", "target"))
 
     def _get_cargo_file(self):
         cargo_path = path.join(self.directory, "Cargo.toml")
@@ -38,22 +38,22 @@ class ProjectRust(Project):
             args = [
                 "cargo",
                 "build",
-                "--manifest-path",
-                self.cargo_file.path,
                 "--target=wasm32-unknown-unknown",
                 "--release"
             ]
 
             env["RUSTFLAGS"] = "-C link-arg=-s"
 
-        result = myprocess.run_process_async(args, env=env)
+        cwd = path.join(self.directory, "wasm")
+        result = myprocess.run_process_async(args, env=env, cwd=cwd)
         if result != 0:
             raise errors.BuildError(f"error code = {result}, see output")
 
     def _copy_build_artifacts_to_output(self):
-        name = f"{self.cargo_file.bin_name}.wasm"
-        wasm_file = Path(self.directory, "target", "wasm32-unknown-unknown", "release", name).resolve()
-        self._copy_to_output(wasm_file)
+        name_with_suffix = f"{self.cargo_file.package_name}_wasm.wasm"
+        name_without_suffix = f"{self.cargo_file.package_name}.wasm"
+        wasm_file = Path(self.directory, "wasm", "target", "wasm32-unknown-unknown", "release", name_with_suffix).resolve()
+        self._copy_to_output(wasm_file, name_without_suffix)
 
     def get_dependencies(self):
         return ["rust"]

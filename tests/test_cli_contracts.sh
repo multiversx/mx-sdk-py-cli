@@ -11,16 +11,20 @@ testCreateContracts() {
     ${ERDPY} contract new --template adder --directory ${SANDBOX} myadder
     ${ERDPY} contract new --template factorial --directory ${SANDBOX} myfactorial
     ${ERDPY} contract new --template simple-erc20 --directory ${SANDBOX} mytoken
+    ${ERDPY} contract new --template crypto-bubbles --directory ${SANDBOX} mybubbles
 
-
-    git clone --depth=1 --branch=master https://github.com/ElrondNetwork/sc-busd-rs.git ${SANDBOX}/sc-busd-rs
-    rm -rf ${SANDBOX}/sc-busd-rs/.git
+    # BUSD contract isn't yet migrated to elrond-wasm 0.6.0
+    # git clone --depth=1 --branch=master https://github.com/ElrondNetwork/sc-busd-rs.git ${SANDBOX}/sc-busd-rs
+    # rm -rf ${SANDBOX}/sc-busd-rs/.git
 }
 
 testBuildContracts() {
     ${ERDPY} contract build ${SANDBOX}/myanswer
     ${ERDPY} contract build ${SANDBOX}/myadder
-    #${ERDPY} contract build ${SANDBOX}/sc-busd-rs
+    ${ERDPY} contract build ${SANDBOX}/myfactorial
+    ${ERDPY} contract build ${SANDBOX}/mytoken
+    ${ERDPY} contract build ${SANDBOX}/mybubbles
+    ${ERDPY} contract build ${SANDBOX}/sc-busd-rs
 }
 
 testRunMandos() {
@@ -29,13 +33,9 @@ testRunMandos() {
 }
 
 testAll() {
-    set -x
-
     cleanSandbox
     testTrivialCommands
     testCreateContracts
     testBuildContracts
-    testRunMandos
-
-    set +x
+    #testRunMandos
 }
