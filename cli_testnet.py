@@ -1,8 +1,7 @@
 import logging
-import cli_shared
 from typing import Any
 
-from erdpy.testnet import setup as testnet
+from erdpy import cli_shared, testnet
 
 logger = logging.getLogger("cli.testnet")
 

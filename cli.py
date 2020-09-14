@@ -1,25 +1,24 @@
+import argparse
 import logging
 import sys
-import argparse
 from argparse import ArgumentParser
 from typing import Any, List
 
-import cli_accounts
-import cli_blockatlas
-import cli_config
-import cli_contracts
-import cli_cost
-import cli_deps
-import cli_dispatcher
-import cli_network
-import cli_transactions
-import cli_validators
-import cli_wallet
-import cli_testnet
-import errors
-import cli_block
-
-from _version import __version__
+import erdpy.cli_accounts
+import erdpy.cli_block
+import erdpy.cli_blockatlas
+import erdpy.cli_config
+import erdpy.cli_contracts
+import erdpy.cli_cost
+import erdpy.cli_deps
+import erdpy.cli_dispatcher
+import erdpy.cli_network
+import erdpy.cli_testnet
+import erdpy.cli_transactions
+import erdpy.cli_validators
+import erdpy.cli_wallet
+from erdpy import errors
+from erdpy._version import __version__
 
 logger = logging.getLogger("cli")
 
@@ -73,19 +72,19 @@ https://docs.elrond.com/tools/erdpy.
     subparsers = parser.add_subparsers()
     commands: List[Any] = []
 
-    commands.append(cli_contracts.setup_parser(subparsers))
-    commands.append(cli_transactions.setup_parser(subparsers))
-    commands.append(cli_validators.setup_parser(subparsers))
-    commands.append(cli_accounts.setup_parser(subparsers))
-    commands.append(cli_wallet.setup_parser(subparsers))
-    commands.append(cli_network.setup_parser(subparsers))
-    commands.append(cli_cost.setup_parser(subparsers))
-    commands.append(cli_dispatcher.setup_parser(subparsers))
-    commands.append(cli_blockatlas.setup_parser(subparsers))
-    commands.append(cli_deps.setup_parser(subparsers))
-    commands.append(cli_config.setup_parser(subparsers))
-    commands.append(cli_block.setup_parser(subparsers))
-    commands.append(cli_testnet.setup_parser(subparsers))
+    commands.append(erdpy.cli_contracts.setup_parser(subparsers))
+    commands.append(erdpy.cli_transactions.setup_parser(subparsers))
+    commands.append(erdpy.cli_validators.setup_parser(subparsers))
+    commands.append(erdpy.cli_accounts.setup_parser(subparsers))
+    commands.append(erdpy.cli_wallet.setup_parser(subparsers))
+    commands.append(erdpy.cli_network.setup_parser(subparsers))
+    commands.append(erdpy.cli_cost.setup_parser(subparsers))
+    commands.append(erdpy.cli_dispatcher.setup_parser(subparsers))
+    commands.append(erdpy.cli_blockatlas.setup_parser(subparsers))
+    commands.append(erdpy.cli_deps.setup_parser(subparsers))
+    commands.append(erdpy.cli_config.setup_parser(subparsers))
+    commands.append(erdpy.cli_block.setup_parser(subparsers))
+    commands.append(erdpy.cli_testnet.setup_parser(subparsers))
 
     parser.epilog = """
 ----------------------

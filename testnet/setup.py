@@ -1,16 +1,16 @@
-import os
 import logging
-from erdpy import myprocess
+import os
 import shutil
 
 import erdpy.utils as utils
+from erdpy import myprocess
+from erdpy.dependencies.install import install_module
 from erdpy.testnet.TestnetConfiguration import TestnetConfiguration
 
 logger = logging.getLogger("testnet")
 
-from erdpy.dependencies.install import install_module
+DEPENDENCY_KEYS = ["elrond_config_testnet", "elrond_go", "elrond_proxy_go"]
 
-DEPENDENCY_KEYS = ["elrond_config_mainnet", "elrond_go", "elrond_proxy_go"]
 
 def install_dependencies():
     # TODO verify if Go compiler is available, and has a recent version
@@ -146,7 +146,6 @@ def write_validator_keys_as_initial_nodes(testnet_config):
     # TODO how to transform the validatoyKey.pem files into the initialNodes
     # entries in every node's nodesSetup.json?
     logger.warn("nodesSetup.json not updated with initialNodes")
-    pass
 
 
 def copy_config_to_proxy(testnet_config):
