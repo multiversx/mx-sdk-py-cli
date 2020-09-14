@@ -1,5 +1,5 @@
-import sys
 import os
+import sys
 from pathlib import Path
 
 sys.path = [os.getcwd() + '/..'] + sys.path
@@ -57,7 +57,7 @@ def test_merge_configs():
 def test_init():
     config = dict()
     config['folders'] = {
-        'elrond_config_mainnet': '{ELRONDSDK}/elrond-config-mainnet',
+        'elrond_config_testnet': '{ELRONDSDK}/elrond-config-testnet',
         'elrond_go': '{ELRONDSDK}/elrond-go',
         'elrond_proxy_go': '{ELRONDSDK}/elrond-proxy-go',
         'testnet': '{ELRONDSDK}/testnet',

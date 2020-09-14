@@ -1,12 +1,12 @@
-import time
-import logging
 import itertools
+import logging
+import time
+from collections import defaultdict
 from pathlib import Path
 from typing import Any, Dict
-from collections import defaultdict
 
-import erdpy.utils as utils
 import erdpy.config
+import erdpy.utils as utils
 from erdpy import workstation
 
 logger = logging.getLogger("testnet")
@@ -90,7 +90,7 @@ class TestnetConfiguration:
         return merge_configs(default, sdk_testnet_config)
 
     def node_config_source(self):
-        return self.folders['elrond_config_mainnet']
+        return self.folders['elrond_config_testnet']
 
     def node_source(self):
         return self.folders['elrond_go']
@@ -232,8 +232,8 @@ class TestnetConfiguration:
             'proxy': True,
         }
         config['folders'] = {
-            'elrond_config_mainnet':
-                '{ELRONDSDK}/elrond_config_mainnet/{TAG}/elrond-config-mainnet-{NOvTAG}',
+            'elrond_config_testnet':
+                '{ELRONDSDK}/elrond_config_testnet/{TAG}/elrond-config-testnet-{NOvTAG}',
             'elrond_go':
                 '{ELRONDSDK}/elrond_go/{TAG}/elrond-go-{NOvTAG}',
             'elrond_proxy_go':
