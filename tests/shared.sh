@@ -1,4 +1,5 @@
-export PYTHONPATH=../../
+export PYTHONPATH=$(realpath ../../)
+echo "PYTHONPATH = ${PYTHONPATH}"
 
 ERDPY="python3 -m erdpy.cli"
 SANDBOX=testdata-out/SANDBOX
@@ -9,6 +10,7 @@ CHAIN_ID="T"
 
 cleanSandbox() {
     rm -rf ${SANDBOX}
+    mkdir -p ${SANDBOX}
 }
 
 assertFileExists() {

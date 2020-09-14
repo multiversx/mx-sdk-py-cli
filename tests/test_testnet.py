@@ -1,10 +1,9 @@
 import os
 import sys
-from pathlib import Path
-
-sys.path = [os.getcwd() + '/..'] + sys.path
 
 from erdpy.testnet import configuration
+
+sys.path = [os.getcwd() + '/..'] + sys.path
 
 
 def test_merge_configs():

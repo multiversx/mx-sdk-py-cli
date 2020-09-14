@@ -1,0 +1,35 @@
+[features]
+loglevel = "*:INFO"
+proxy = true
+
+[folders]
+elrond_config_testnet = "{ELRONDSDK}/elrond_config_testnet/{TAG}/elrond-config-testnet-{NOvTAG}"
+elrond_go = "{ELRONDSDK}/elrond_go/{TAG}/elrond-go-{NOvTAG}"
+elrond_proxy_go = "{ELRONDSDK}/elrond_proxy_go/{TAG}/elrond-proxy-go-{NOvTAG}"
+
+[metashard]
+consensus_size = 1
+metashardID = 4294967295
+observers = 1
+validators = 1
+
+[networking]
+host = "127.0.0.1"
+port_seednode = 9999
+p2p_id_seednode = "16Uiu2HAkw5SNNtSvH1zJiQ6Gc3WoGNSxiyNueRKe6fuAuh57G3Bk"
+port_proxy = 7950
+port_first_observer = 21100
+port_first_observer_rest_api = 10000
+port_first_validator = 21500
+port_first_validator_rest_api = 21500
+
+[shards]
+consensus_size = 1
+count = 1
+observers_per_shard = 1
+validators_per_shard = 1
+
+[timing]
+genesis_delay = 30
+nodes_start_time = 60
+seednode_start_time = 5

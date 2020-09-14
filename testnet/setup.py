@@ -76,8 +76,7 @@ def copy_config_to_nodes(testnet_config):
     for node_config in testnet_config.all_nodes_config_folders():
         shutil.copytree(
             config_source,
-            node_config,
-            dirs_exist_ok=True)
+            node_config)
 
 
 def generate_validator_keys(testnet_config):
@@ -106,8 +105,7 @@ def copy_config_to_seednode(testnet_config):
     seednode_config = testnet_config.seednode_config_folder()
     shutil.copytree(
         config_source,
-        seednode_config,
-        dirs_exist_ok=True)
+        seednode_config)
 
 
 def write_seednode_port(testnet_config):
