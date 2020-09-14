@@ -1,10 +1,10 @@
 
-from erdpy.wallet import pem
-from erdpy.accounts import Address
-from erdpy import wallet
-from erdpy import cli_shared
 import logging
 from typing import Any
+
+from erdpy import cli_shared, wallet
+from erdpy.accounts import Address
+from erdpy.wallet import pem
 
 logger = logging.getLogger("cli.wallet")
 
@@ -36,6 +36,7 @@ def generate_pem(args: Any):
     seed, pubkey = wallet.generate_pair()
     if mnemonic:
         mnemonic = input("Enter mnemonic:\n")
+        mnemonic = mnemonic.strip()
         seed, pubkey = wallet.derive_keys(mnemonic)
 
     address = Address(pubkey)
