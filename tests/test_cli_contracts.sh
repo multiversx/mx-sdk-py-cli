@@ -9,6 +9,9 @@ testTrivialCommands() {
 testCreateContracts() {
     ${ERDPY} contract new --template ultimate-answer --directory ${SANDBOX} myanswer
     ${ERDPY} contract new --template adder --directory ${SANDBOX} myadder
+    ${ERDPY} contract new --template factorial --directory ${SANDBOX} myfactorial
+    ${ERDPY} contract new --template simple-erc20 --directory ${SANDBOX} mytoken
+
 
     git clone --depth=1 --branch=master https://github.com/ElrondNetwork/sc-busd-rs.git ${SANDBOX}/sc-busd-rs
     rm -rf ${SANDBOX}/sc-busd-rs/.git

@@ -86,9 +86,9 @@ class Template:
     def apply(self, template_name, project_name):
         self.template_name = template_name
         self.project_name = project_name
-        self._replace_placeholders()
+        self._patch()
 
-    def _replace_placeholders(self):
+    def _patch(self):
         """Implemented by derived classes"""
         pass
 
@@ -98,14 +98,19 @@ class TemplateClang(Template):
 
 
 class TemplateRust(Template):
-    def _replace_placeholders(self):
-        cargo_path = path.join(self.directory, "Cargo.toml")
-        cargo_debug_path = path.join(self.directory, "debug", "Cargo.toml")
-        debug_main_path = path.join(self.directory, "debug", "src", "main.rs")
-        test_dir_path = path.join(self.directory, "test")
-        test_paths = utils.list_files(test_dir_path) if os.path.isdir(test_dir_path) else []
+    def _patch(self):
+        logger.info("Patching cargo files...")
+        self._patch_cargo()
+        self._patch_cargo_debug()
 
-        logger.info("Updating cargo files...")
+        logger.info("Patching source code...")
+        self._patch_source_code_debug()
+
+        logger.info("Patching test files...")
+        self._patch_mandos_tests()
+
+    def _patch_cargo(self):
+        cargo_path = path.join(self.directory, "Cargo.toml")
 
         cargo_file = CargoFile(cargo_path)
         cargo_file.package_name = self.project_name
@@ -119,6 +124,11 @@ class TemplateRust(Template):
 
         cargo_file.save()
 
+    def _patch_cargo_debug(self):
+        cargo_debug_path = path.join(self.directory, "debug", "Cargo.toml")
+        if not path.exists(cargo_debug_path):
+            return
+
         cargo_file_debug = CargoFile(cargo_debug_path)
         cargo_file_debug.package_name = f"{self.project_name}-debug"
         cargo_file_debug.version = "0.0.1"
@@ -131,7 +141,17 @@ class TemplateRust(Template):
 
         cargo_file_debug.save()
 
-        logger.info("Applying replacements...")
+        self._replace_in_files(
+            [cargo_debug_path],
+            [
+                (f"[dependencies.{self.template_name}]", f"[dependencies.{self.project_name}]")
+            ]
+        )
+
+    def _patch_source_code_debug(self):
+        debug_main_path = path.join(self.directory, "debug", "src", "main.rs")
+        if not path.exists(debug_main_path):
+            return
 
         self._replace_in_files(
             [debug_main_path],
@@ -141,12 +161,9 @@ class TemplateRust(Template):
             ]
         )
 
-        self._replace_in_files(
-            [cargo_debug_path],
-            [
-                (f"[dependencies.{self.template_name}]", f"[dependencies.{self.project_name}]")
-            ]
-        )
+    def _patch_mandos_tests(self):
+        test_dir_path = path.join(self.directory, "test")
+        test_paths = utils.list_files(test_dir_path) if os.path.isdir(test_dir_path) else []
 
         self._replace_in_files(
             test_paths,
