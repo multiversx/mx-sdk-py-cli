@@ -28,8 +28,9 @@ testBuildContracts() {
 }
 
 testRunMandos() {
-    ${ERDPY} --verbose contract test --directory="test" ${SANDBOX}/myadder
-    #${ERDPY} --verbose contract test --directory="tests" ${SANDBOX}/sc-busd-rs
+    ${ERDPY} --verbose contract test --directory="mandos" ${SANDBOX}/myadder
+    ${ERDPY} --verbose contract test --directory="mandos" ${SANDBOX}/mytoken
+    ${ERDPY} --verbose contract test --directory="mandos" ${SANDBOX}/mybubbles
 }
 
 testAll() {
@@ -37,5 +38,5 @@ testAll() {
     testTrivialCommands
     testCreateContracts
     testBuildContracts
-    #testRunMandos
+    testRunMandos
 }
