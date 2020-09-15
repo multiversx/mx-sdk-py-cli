@@ -61,7 +61,7 @@ def configure(args):
 
     # Seed node
     copy_config_to_seednode(testnet_config)
-    write_seednode_port(testnet_config)
+    patch_seednode_config(testnet_config)
 
     # Proxy
     copy_config_to_proxy(testnet_config)
@@ -104,20 +104,19 @@ def copy_validator_keys(testnet_config: TestnetConfiguration):
 
 
 def copy_config_to_seednode(testnet_config: TestnetConfiguration):
-    config_source = testnet_config.node_config_source()
+    config_source = testnet_config.node_source() / 'cmd' / 'seednode' / 'config'
     seednode_config = testnet_config.seednode_config_folder()
-    seednode_config_toml = testnet_config.node_source() / 'cmd' / 'seednode' / 'config' / 'config.toml'
     makefolder(seednode_config)
     shutil.copy(config_source / 'p2p.toml', seednode_config / 'p2p.toml')
-    shutil.copy(seednode_config_toml, seednode_config / 'config.toml')
+    shutil.copy(config_source / 'config.toml', seednode_config / 'config.toml')
 
 
-def write_seednode_port(testnet_config: TestnetConfiguration):
+def patch_seednode_config(testnet_config: TestnetConfiguration):
     seednode_config = testnet_config.seednode_config_folder()
     seednode_config_file = seednode_config / 'p2p.toml'
 
     data = utils.read_toml_file(seednode_config_file)
-    data['Node']['Port'] = testnet_config.networking['port_seednode']
+    data['Node']['Port'] = str(testnet_config.networking['port_seednode'])
     utils.write_toml_file(seednode_config_file, data)
 
 
