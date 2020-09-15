@@ -1,11 +1,9 @@
 import logging
-import os
 import shutil
 
 import erdpy.utils as utils
-from erdpy import myprocess
 from erdpy.dependencies.install import install_module
-from erdpy.testnet import wallets
+from erdpy.testnet import genesis_json, nodes_setup_json, wallets
 from erdpy.testnet.config import TestnetConfiguration
 
 logger = logging.getLogger("testnet")
@@ -28,8 +26,6 @@ def configure(args):
 
     create_folders(testnet_config)
     copy_config_to_nodes(testnet_config)
-
-    generate_validator_keys(testnet_config)
     copy_validator_keys(testnet_config)
 
     update_nodes_config(
@@ -44,8 +40,8 @@ def configure(args):
         testnet_config.networking['port_first_observer'],
     )
 
-    write_validator_keys_as_initial_nodes(testnet_config, testnet_config.validator_config_folders())
-    write_validator_keys_as_initial_nodes(testnet_config, testnet_config.observer_config_folders())
+    create_genesis_file(testnet_config, testnet_config.validator_config_folders())
+    create_genesis_file(testnet_config, testnet_config.observer_config_folders())
 
     copy_config_to_seednode(testnet_config)
     write_seednode_port(testnet_config)
@@ -81,25 +77,10 @@ def copy_config_to_nodes(testnet_config: TestnetConfiguration):
             node_config)
 
 
-def generate_validator_keys(testnet_config: TestnetConfiguration):
-    keygen_folder = testnet_config.keygenerator_folder()
-    prev_cwd = os.getcwd()
-    os.chdir(keygen_folder)
-    myprocess.run_process(['go', 'build'])
-    myprocess.run_process([
-        './keygenerator',
-        '--key-type', 'validator',
-        '--num-keys', str(testnet_config.num_all_validators()),
-    ])
-    os.chdir(prev_cwd)
-
-
 def copy_validator_keys(testnet_config: TestnetConfiguration):
     validator_key_files = testnet_config.validator_key_files()
     for index, key_file in enumerate(validator_key_files):
-        shutil.copy(
-            testnet_config.keygenerator_key_file(index),
-            key_file)
+        shutil.copy(wallets.get_validator_key_file(index), key_file)
 
 
 def copy_config_to_seednode(testnet_config: TestnetConfiguration):
@@ -120,6 +101,8 @@ def write_seednode_port(testnet_config: TestnetConfiguration):
 
 
 def update_nodes_config(testnet_config: TestnetConfiguration, nodes_config_folders, port_first):
+    nodes_setup = nodes_setup_json.build(testnet_config)
+
     for index, config_folder in enumerate(nodes_config_folders):
         # Edit the p2p.toml file
         config = config_folder / 'p2p.toml'
@@ -130,28 +113,17 @@ def update_nodes_config(testnet_config: TestnetConfiguration, nodes_config_folde
         ]
         utils.write_toml_file(config, data)
 
-        # Edit the nodesSetup.json file
+        # Overwrite the nodesSetup.json file
         config = config_folder / 'nodesSetup.json'
-        data = utils.read_json_file(str(config))
-        data["startTime"] = testnet_config.genesis_time()
-        data["minTransactionVersion"] = "1"
-        data["chainID"] = "local-testnet"
-        data["hysteresis"] = 0
-        data["minNodesPerShard"] = testnet_config.shards['consensus_size']
-        data["consensusGroupSize"] = testnet_config.shards['consensus_size']
-        data["metaChainConsensusGroupSize"] = testnet_config.metashard['consensus_size']
-        data["metaChainMinNodes"] = testnet_config.metashard['validators']
-        utils.write_json_file(str(config), data)
+        utils.write_json_file(str(config), nodes_setup)
 
 
-def write_validator_keys_as_initial_nodes(testnet_config: TestnetConfiguration, nodes_config_folders):
-    addresses = list(wallets.get_validators_addresses(testnet_config))
+def create_genesis_file(testnet_config: TestnetConfiguration, nodes_config_folders):
+    genesis = genesis_json.build(testnet_config)
 
     for index, config_folder in enumerate(nodes_config_folders):
-        config = config_folder / 'nodesSetup.json'
-        data = utils.read_json_file(str(config))
-        data["initialNodes"] = addresses
-        utils.write_json_file(str(config), data)
+        config = config_folder / 'genesis.json'
+        utils.write_json_file(str(config), genesis)
 
 
 def copy_config_to_proxy(testnet_config: TestnetConfiguration):

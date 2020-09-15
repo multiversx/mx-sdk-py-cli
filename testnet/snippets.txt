@@ -1,0 +1,28 @@
+def generate_validator_keys(testnet_config: TestnetConfiguration):
+    keygen_folder = testnet_config.keygenerator_folder()
+    prev_cwd = os.getcwd()
+    os.chdir(keygen_folder)
+    myprocess.run_process(['go', 'build'])
+    myprocess.run_process([
+        './keygenerator',
+        '--key-type', 'validator',
+        '--num-keys', str(testnet_config.num_all_validators()),
+    ])
+    os.chdir(prev_cwd)
+
+
+def copy_validator_keys(testnet_config: TestnetConfiguration):
+    validator_key_files = testnet_config.validator_key_files()
+    for index, key_file in enumerate(validator_key_files):
+        shutil.copy(
+            testnet_config.keygenerator_key_file(index),
+            key_file)
+
+
+def keygenerator_folder(self):
+    return self.node_source() / 'cmd' / 'keygenerator'
+
+
+def keygenerator_key_file(self, index):
+    index = str(index)
+    return self.keygenerator_folder() / ('node-' + index) / 'validatorKey.pem'

@@ -1,29 +1,78 @@
-from erdpy.accounts import Address
-from erdpy.testnet.config import TestnetConfiguration
-from erdpy.wallet import derive_keys, pem
+import shutil
+from pathlib import Path
+from typing import Dict, Tuple
 
-# Non-private mnemonics, for developer use
-VALIDATOR_REWARDS_MNEMONIC = "teach wonder cheap pottery merge jeans ketchup spider federal agent armed tobacco myth priority hurt pony thing dune switch grace jewel chunk luggage genius"
-USER_ACCOUNTS_MNEMONIC = "moral volcano peasant pass circle pen over picture flat shop clap goat never lyrics gather prepare woman film husband gravity behind test tiger improve"
+from erdpy import errors, utils
+from erdpy.accounts import Account
+from erdpy.wallet import pem
 
-
-def get_validators_addresses(testnet_config: TestnetConfiguration):
-    for validator_index in range(testnet_config.num_all_validators()):
-        rewards_address = get_rewards_address(validator_index)
-        bls_pubkey = get_bls_pubkey(testnet_config, validator_index)
-        yield {
-            "address": rewards_address.bech32(),
-            "pubkey": bls_pubkey,
-        }
+MAX_NUM_NODES = 12
 
 
-def get_rewards_address(validator_index):
-    _, public_key = derive_keys(VALIDATOR_REWARDS_MNEMONIC, validator_index)
-    address = Address(public_key)
-    return address
+def copy_validator_key_to(validator_index: int, destination: str):
+    shutil.copy(get_validator_key_file(validator_index), destination)
 
 
-def get_bls_pubkey(testnet_config: TestnetConfiguration, validator_index):
-    pem_file = testnet_config.validator_config_folder(validator_index) / "validatorKey.pem"
-    _, bls_key = pem.parse_validator_pem(pem_file)
-    return bls_key
+def get_validator_key_file(validator_index: int):
+    _guard_validator_index(validator_index)
+    return _get_validators_folder().joinpath("validatorKey{:02}.pem".format(validator_index))
+
+
+def get_validator_wallets(num_validators: int) -> Dict[str, Account]:
+    result = {}
+
+    for i in range(0, num_validators):
+        pem_file = get_validator_wallet_file(i)
+        nickname = "validator{:02}".format(i)
+        account = Account(pem_file=pem_file)
+        result[nickname] = account
+
+    return result
+
+
+def get_validators(num_validators: int) -> Dict[str, Tuple[str, Account]]:
+    result = {}
+
+    for i in range(0, num_validators):
+        validator_pem_file = get_validator_key_file(i)
+        _, pubkey = pem.parse_validator_pem(validator_pem_file)
+
+        pem_file = get_validator_wallet_file(i)
+        nickname = "validator{:02}".format(i)
+        account = Account(pem_file=pem_file)
+        result[nickname] = [pubkey, account]
+
+    return result
+
+
+def get_validator_wallet_file(validator_index: int):
+    _guard_validator_index(validator_index)
+    return _get_validators_folder().joinpath("wallet{:02}.pem".format(validator_index))
+
+
+def _guard_validator_index(validator_index: int):
+    if validator_index >= MAX_NUM_NODES:
+        raise errors.TestnetError(f"Invalid validator index: {validator_index} >= {MAX_NUM_NODES}.")
+
+
+def _get_validators_folder():
+    return _get_folder().joinpath("validators")
+
+
+def get_users() -> Dict[str, Account]:
+    result = {}
+
+    for pem_file in utils.list_files(_get_users_folder(), ".pem"):
+        nickname = Path(pem_file).stem
+        account = Account(pem_file=pem_file)
+        result[nickname] = account
+
+    return result
+
+
+def _get_users_folder():
+    return _get_folder().joinpath("users")
+
+
+def _get_folder():
+    return Path(__file__).parent.absolute().joinpath("wallets")

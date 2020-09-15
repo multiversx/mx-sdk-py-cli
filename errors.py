@@ -155,3 +155,8 @@ class TransactionIsNotSigned(KnownError):
 class NoWalletProvided(KnownError):
     def __init__(self):
         super().__init__("No wallet provided.")
+
+
+class TestnetError(KnownError):
+    def __init__(self, message: str):
+        super().__init__(message)

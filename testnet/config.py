@@ -101,16 +101,9 @@ class TestnetConfiguration:
     def proxy_config_source(self):
         return self.folders['elrond_proxy_go'] / 'cmd' / 'proxy' / 'config'
 
-    def keygenerator_folder(self):
-        return self.node_source() / 'cmd' / 'keygenerator'
-
     def validator_key_files(self):
         for config_folder in self.validator_config_folders():
             yield config_folder / 'validatorKey.pem'
-
-    def keygenerator_key_file(self, index):
-        index = str(index)
-        return self.keygenerator_folder() / ('node-' + index) / 'validatorKey.pem'
 
     def root(self):
         return self.folders['testnet']
@@ -175,9 +168,6 @@ class TestnetConfiguration:
         testnet = self.root()
         for i in range(self.num_all_validators()):
             yield testnet / 'validator{:02}'.format(i)
-
-    def validator_config_folder(self, validator_index):
-        return self.root() / 'validator{:02}'.format(validator_index) / 'config'
 
     def validator_config_folders(self):
         for folder in self.validator_folders():
