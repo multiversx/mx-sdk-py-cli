@@ -1,4 +1,5 @@
 import shutil
+from collections import OrderedDict
 from pathlib import Path
 from typing import Dict, Tuple
 
@@ -60,9 +61,9 @@ def _get_validators_folder():
 
 
 def get_users() -> Dict[str, Account]:
-    result = {}
+    result = OrderedDict()
 
-    for pem_file in utils.list_files(_get_users_folder(), ".pem"):
+    for pem_file in sorted(utils.list_files(_get_users_folder(), ".pem")):
         nickname = Path(pem_file).stem
         account = Account(pem_file=pem_file)
         result[nickname] = account

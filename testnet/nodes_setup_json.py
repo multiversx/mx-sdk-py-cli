@@ -23,7 +23,7 @@ def build(testnet_config: TestnetConfiguration) -> Any:
         "hysteresis": 0,
         "adaptivity": False,
         "chainID": "local-testnet",
-        "minTransactionVersion": "1",
+        "minTransactionVersion": 1,
         "initialNodes": initial_nodes
     }
 

@@ -127,7 +127,7 @@ def patch_nodes_p2p_config(testnet_config: TestnetConfiguration, nodes_config_fo
         # Edit the p2p.toml file
         config = config_folder / 'p2p.toml'
         data = utils.read_toml_file(config)
-        data['Node']['Port'] = port_first + index
+        data['Node']['Port'] = str(port_first + index)
         data['KadDhtPeerDiscovery']['InitialPeerList'] = [
             testnet_config.seednode_address()
         ]
