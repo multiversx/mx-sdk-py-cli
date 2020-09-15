@@ -176,6 +176,9 @@ class TestnetConfiguration:
         for i in range(self.num_all_validators()):
             yield testnet / 'validator{:02}'.format(i)
 
+    def validator_config_folder(self, validator_index):
+        return self.root() / 'validator{:02}'.format(validator_index) / 'config'
+
     def validator_config_folders(self):
         for folder in self.validator_folders():
             yield folder / 'config'

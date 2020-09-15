@@ -1,6 +1,7 @@
 import hashlib
 import hmac
 import struct
+
 import nacl.signing
 
 BIP39_SALT_MODIFIER = "mnemonic"
@@ -10,9 +11,9 @@ ELROND_DERIVATION_PATH = [44, 508, 0, 0]
 HARDENED_OFFSET = 0x80000000
 
 
-def derive_keys(mnemonic):
+def derive_keys(mnemonic, account_index=0):
     seed = mnemonic_to_bip39seed(mnemonic)
-    private_key = bip39seed_to_private_key(seed)
+    private_key = bip39seed_to_private_key(seed, account_index)
     public_key = bytes(nacl.signing.SigningKey(private_key).verify_key)
     return private_key, public_key
 
@@ -32,8 +33,8 @@ def mnemonic_to_bip39seed(mnemonic, passphrase=""):
 # https://ethereum.stackexchange.com/a/72871/59887s
 # https://github.com/alepop/ed25519-hd-key/blob/master/src/index.ts#L22
 def bip39seed_to_master_key(seed):
-    hash = hmac.new(BIP32_SEED_MODIFIER, seed, hashlib.sha512).digest()
-    key, chain_code = hash[:32], hash[32:]
+    hashed = hmac.new(BIP32_SEED_MODIFIER, seed, hashlib.sha512).digest()
+    key, chain_code = hashed[:32], hashed[32:]
     return key, chain_code
 
 
@@ -51,7 +52,7 @@ def bip39seed_to_private_key(seed, account_index=0):
 def _ckd_priv(key, chain_code, index):
     index_buffer = struct.pack('>I', index)
     data = bytearray([0]) + bytearray(key) + bytearray(index_buffer)
-    hash = hmac.new(chain_code, data, hashlib.sha512).digest()
-    key, chain_code = hash[:32], hash[32:]
+    hashed = hmac.new(chain_code, data, hashlib.sha512).digest()
+    key, chain_code = hashed[:32], hashed[32:]
 
     return key, chain_code

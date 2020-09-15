@@ -5,7 +5,8 @@ import shutil
 import erdpy.utils as utils
 from erdpy import myprocess
 from erdpy.dependencies.install import install_module
-from erdpy.testnet.TestnetConfiguration import TestnetConfiguration
+from erdpy.testnet import wallets
+from erdpy.testnet.config import TestnetConfiguration
 
 logger = logging.getLogger("testnet")
 
@@ -43,7 +44,8 @@ def configure(args):
         testnet_config.networking['port_first_observer'],
     )
 
-    write_validator_keys_as_initial_nodes(testnet_config)
+    write_validator_keys_as_initial_nodes(testnet_config, testnet_config.validator_config_folders())
+    write_validator_keys_as_initial_nodes(testnet_config, testnet_config.observer_config_folders())
 
     copy_config_to_seednode(testnet_config)
     write_seednode_port(testnet_config)
@@ -59,7 +61,7 @@ def clean(args):
     shutil.rmtree(testnet_config.root())
 
 
-def create_folders(testnet_config):
+def create_folders(testnet_config: TestnetConfiguration):
     makefolder(testnet_config.seednode_folder())
 
     if testnet_config.features['proxy'] is True:
@@ -71,7 +73,7 @@ def create_folders(testnet_config):
         makefolder(folder)
 
 
-def copy_config_to_nodes(testnet_config):
+def copy_config_to_nodes(testnet_config: TestnetConfiguration):
     config_source = testnet_config.node_config_source()
     for node_config in testnet_config.all_nodes_config_folders():
         shutil.copytree(
@@ -79,7 +81,7 @@ def copy_config_to_nodes(testnet_config):
             node_config)
 
 
-def generate_validator_keys(testnet_config):
+def generate_validator_keys(testnet_config: TestnetConfiguration):
     keygen_folder = testnet_config.keygenerator_folder()
     prev_cwd = os.getcwd()
     os.chdir(keygen_folder)
@@ -92,7 +94,7 @@ def generate_validator_keys(testnet_config):
     os.chdir(prev_cwd)
 
 
-def copy_validator_keys(testnet_config):
+def copy_validator_keys(testnet_config: TestnetConfiguration):
     validator_key_files = testnet_config.validator_key_files()
     for index, key_file in enumerate(validator_key_files):
         shutil.copy(
@@ -100,7 +102,7 @@ def copy_validator_keys(testnet_config):
             key_file)
 
 
-def copy_config_to_seednode(testnet_config):
+def copy_config_to_seednode(testnet_config: TestnetConfiguration):
     config_source = testnet_config.node_config_source()
     seednode_config = testnet_config.seednode_config_folder()
     shutil.copytree(
@@ -108,7 +110,7 @@ def copy_config_to_seednode(testnet_config):
         seednode_config)
 
 
-def write_seednode_port(testnet_config):
+def write_seednode_port(testnet_config: TestnetConfiguration):
     seednode_config = testnet_config.seednode_config_folder()
     seednode_config_file = seednode_config / 'p2p.toml'
 
@@ -117,7 +119,7 @@ def write_seednode_port(testnet_config):
     utils.write_toml_file(seednode_config_file, data)
 
 
-def update_nodes_config(testnet_config, nodes_config_folders, port_first):
+def update_nodes_config(testnet_config: TestnetConfiguration, nodes_config_folders, port_first):
     for index, config_folder in enumerate(nodes_config_folders):
         # Edit the p2p.toml file
         config = config_folder / 'p2p.toml'
@@ -140,13 +142,17 @@ def update_nodes_config(testnet_config, nodes_config_folders, port_first):
         utils.write_json_file(str(config), data)
 
 
-def write_validator_keys_as_initial_nodes(testnet_config):
-    # TODO how to transform the validatoyKey.pem files into the initialNodes
-    # entries in every node's nodesSetup.json?
-    logger.warn("nodesSetup.json not updated with initialNodes")
+def write_validator_keys_as_initial_nodes(testnet_config: TestnetConfiguration, nodes_config_folders):
+    addresses = list(wallets.get_validators_addresses(testnet_config))
+
+    for index, config_folder in enumerate(nodes_config_folders):
+        config = config_folder / 'nodesSetup.json'
+        data = utils.read_json_file(str(config))
+        data["initialNodes"] = addresses
+        utils.write_json_file(str(config), data)
 
 
-def copy_config_to_proxy(testnet_config):
+def copy_config_to_proxy(testnet_config: TestnetConfiguration):
     proxy_config_source = testnet_config.proxy_config_source()
     node_config_source = testnet_config.node_config_source()
     proxy_config = testnet_config.proxy_config_folder()
@@ -165,7 +171,7 @@ def copy_config_to_proxy(testnet_config):
         proxy_config)
 
 
-def write_observers_list_to_proxy_config(testnet_config):
+def write_observers_list_to_proxy_config(testnet_config: TestnetConfiguration):
     proxy_config_file = testnet_config.proxy_config_folder() / 'config.toml'
     observers = testnet_config.observer_addresses_sharded_for_proxy_config()
     data = utils.read_toml_file(proxy_config_file)
