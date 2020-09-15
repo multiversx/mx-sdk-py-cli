@@ -143,15 +143,13 @@ class TestnetConfiguration:
 
     def num_all_validators(self):
         count = (
-            self.shards['count'] * self.shards['validators_per_shard']
-            + self.metashard['validators']
+            self.shards['count'] * self.shards['validators_per_shard'] + self.metashard['validators']
         )
         return count
 
     def num_all_observers(self):
         count = (
-            self.shards['count'] * self.shards['observers_per_shard']
-            + self.metashard['observers']
+            self.shards['count'] * self.shards['observers_per_shard'] + self.metashard['observers']
         )
         return count
 
