@@ -136,6 +136,8 @@ def update_nodes_config(testnet_config: TestnetConfiguration, nodes_config_folde
         data["startTime"] = testnet_config.genesis_time()
         data["minTransactionVersion"] = "1"
         data["chainID"] = "local-testnet"
+        data["hysteresis"] = 0
+        data["minNodesPerShard"] = testnet_config.shards['consensus_size']
         data["consensusGroupSize"] = testnet_config.shards['consensus_size']
         data["metaChainConsensusGroupSize"] = testnet_config.metashard['consensus_size']
         data["metaChainMinNodes"] = testnet_config.metashard['validators']
