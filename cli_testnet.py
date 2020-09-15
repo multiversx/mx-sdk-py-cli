@@ -74,24 +74,20 @@ def setup_parser(subparsers: Any) -> Any:
 
 def testnet_start(args):
     logger.info("Starting testnet...")
-    pass
 
 
 def testnet_stop(args):
     logger.info("Stop testnet...")
-    pass
 
 
 def testnet_config(args):
     logger.info("Configuring testnet...")
     testnet.configure(args)
-    pass
 
 
 def testnet_clean(args):
     logger.info("Cleaning testnet...")
     testnet.clean(args)
-    pass
 
 
 def testnet_prerequisites(args):

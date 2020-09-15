@@ -1,7 +1,9 @@
 import logging
+import os
 import shutil
 
 import erdpy.utils as utils
+from erdpy import myprocess
 from erdpy.dependencies.install import install_module
 from erdpy.testnet import genesis_json, nodes_setup_json, wallets
 from erdpy.testnet.config import TestnetConfiguration
@@ -66,6 +68,8 @@ def configure(args):
     # Proxy
     copy_config_to_proxy(testnet_config)
     write_observers_list_to_proxy_config(testnet_config)
+
+    build_binaries(testnet_config)
 
 
 def clean(args):
@@ -176,3 +180,32 @@ def write_observers_list_to_proxy_config(testnet_config: TestnetConfiguration):
 
 def makefolder(path):
     path.mkdir(parents=True, exist_ok=True)
+
+
+def build_binaries(testnet_config: TestnetConfiguration):
+    logger.info("Building seednode...")
+    seednode_folder = testnet_config.node_source() / "cmd" / "seednode"
+    myprocess.run_process(['go', 'build'], cwd=seednode_folder)
+
+    logger.info("Building node...")
+    node_folder = testnet_config.node_source() / "cmd" / "node"
+    myprocess.run_process(['go', 'build'], cwd=node_folder)
+
+    logger.info("Building arwen...")
+    node_folder_root = testnet_config.node_source()
+    env = dict(os.environ)
+    env["ARWEN_PATH"] = node_folder
+    myprocess.run_process(['make', 'arwen'], cwd=node_folder_root, env=env)
+
+    logger.info("Building proxy...")
+    proxy_folder = testnet_config.proxy_source() / "cmd" / "proxy"
+    myprocess.run_process(['go', 'build'], cwd=proxy_folder)
+
+    # Now copy the binaries to the testnet folder
+    shutil.copy(seednode_folder / "seednode", testnet_config.seednode_folder())
+
+    for destination in testnet_config.all_nodes_folders():
+        shutil.copy(node_folder / "node", destination)
+        shutil.copy(node_folder / "arwen", destination)
+
+    shutil.copy(proxy_folder / "proxy", testnet_config.proxy_folder())

@@ -9,11 +9,11 @@ from erdpy import errors, feedback
 logger = logging.getLogger("myprocess")
 
 
-def run_process(args: List[str], env: Any = None, dump_to_stdout: bool = True):
-    logger.info(f"run_process: {args}")
+def run_process(args: List[str], env: Any = None, dump_to_stdout: bool = True, cwd: str = None):
+    logger.info(f"run_process: {args}, in folder: {cwd}")
 
     try:
-        output = subprocess.check_output(args, shell=False, universal_newlines=True, stderr=subprocess.STDOUT, env=env)
+        output = subprocess.check_output(args, shell=False, universal_newlines=True, stderr=subprocess.STDOUT, env=env, cwd=cwd)
         logger.info("Successful run. Output:")
         if dump_to_stdout:
             print(output or "[No output]")
