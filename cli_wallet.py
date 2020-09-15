@@ -26,6 +26,8 @@ def setup_parser(subparsers: Any) -> Any:
                      help="path of the output PEM file")
     sub.add_argument("--mnemonic", action="store_true",
                      help="whether to derive from an existing mnemonic")
+    sub.add_argument("--index",
+                     help="the account index", type=int, default=0)
     sub.set_defaults(func=generate_pem)
 
     sub = cli_shared.add_command_subparser(
@@ -50,12 +52,13 @@ def setup_parser(subparsers: Any) -> Any:
 def generate_pem(args: Any):
     pem_file = args.pem
     mnemonic = args.mnemonic
+    index = args.index
 
     seed, pubkey = wallet.generate_pair()
     if mnemonic:
         mnemonic = input("Enter mnemonic:\n")
         mnemonic = mnemonic.strip()
-        seed, pubkey = wallet.derive_keys(mnemonic)
+        seed, pubkey = wallet.derive_keys(mnemonic, index)
 
     address = Address(pubkey)
     pem.write(pem_file, seed, pubkey, name=address.bech32())
