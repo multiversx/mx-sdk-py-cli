@@ -62,8 +62,6 @@ def configure(args):
     # Seed node
     copy_config_to_seednode(testnet_config)
     write_seednode_port(testnet_config)
-    overwrite_nodes_setup(testnet_config, [testnet_config.seednode_config_folder()])
-    overwrite_genesis_file(testnet_config, [testnet_config.seednode_config_folder()])
 
     # Proxy
     copy_config_to_proxy(testnet_config)
@@ -108,9 +106,10 @@ def copy_validator_keys(testnet_config: TestnetConfiguration):
 def copy_config_to_seednode(testnet_config: TestnetConfiguration):
     config_source = testnet_config.node_config_source()
     seednode_config = testnet_config.seednode_config_folder()
-    shutil.copytree(
-        config_source,
-        seednode_config)
+    seednode_config_toml = testnet_config.node_source() / 'cmd' / 'seednode' / 'config' / 'config.toml'
+    makefolder(seednode_config)
+    shutil.copy(config_source / 'p2p.toml', seednode_config / 'p2p.toml')
+    shutil.copy(seednode_config_toml, seednode_config / 'config.toml')
 
 
 def write_seednode_port(testnet_config: TestnetConfiguration):
