@@ -25,27 +25,45 @@ def configure(args):
     logger.info('testnet folder is %s', testnet_config.root())
 
     create_folders(testnet_config)
+
+    # Validators and Observers
     copy_config_to_nodes(testnet_config)
     copy_validator_keys(testnet_config)
 
-    update_nodes_config(
+    patch_nodes_p2p_config(
         testnet_config,
         testnet_config.validator_config_folders(),
         testnet_config.networking['port_first_validator'],
     )
-
-    update_nodes_config(
+    patch_nodes_p2p_config(
         testnet_config,
         testnet_config.observer_config_folders(),
         testnet_config.networking['port_first_observer'],
     )
+    overwrite_nodes_setup(
+        testnet_config,
+        testnet_config.validator_config_folders(),
+    )
+    overwrite_nodes_setup(
+        testnet_config,
+        testnet_config.observer_config_folders(),
+    )
+    overwrite_genesis_file(
+        testnet_config,
+        testnet_config.validator_config_folders()
+    )
+    overwrite_genesis_file(
+        testnet_config,
+        testnet_config.observer_config_folders()
+    )
 
-    create_genesis_file(testnet_config, testnet_config.validator_config_folders())
-    create_genesis_file(testnet_config, testnet_config.observer_config_folders())
-
+    # Seed node
     copy_config_to_seednode(testnet_config)
     write_seednode_port(testnet_config)
+    overwrite_nodes_setup(testnet_config, [testnet_config.seednode_config_folder()])
+    overwrite_genesis_file(testnet_config, [testnet_config.seednode_config_folder()])
 
+    # Proxy
     copy_config_to_proxy(testnet_config)
     write_observers_list_to_proxy_config(testnet_config)
 
@@ -100,9 +118,7 @@ def write_seednode_port(testnet_config: TestnetConfiguration):
     utils.write_toml_file(seednode_config_file, data)
 
 
-def update_nodes_config(testnet_config: TestnetConfiguration, nodes_config_folders, port_first):
-    nodes_setup = nodes_setup_json.build(testnet_config)
-
+def patch_nodes_p2p_config(testnet_config: TestnetConfiguration, nodes_config_folders, port_first):
     for index, config_folder in enumerate(nodes_config_folders):
         # Edit the p2p.toml file
         config = config_folder / 'p2p.toml'
@@ -113,12 +129,16 @@ def update_nodes_config(testnet_config: TestnetConfiguration, nodes_config_folde
         ]
         utils.write_toml_file(config, data)
 
-        # Overwrite the nodesSetup.json file
+
+def overwrite_nodes_setup(testnet_config: TestnetConfiguration, nodes_config_folders):
+    nodes_setup = nodes_setup_json.build(testnet_config)
+
+    for index, config_folder in enumerate(nodes_config_folders):
         config = config_folder / 'nodesSetup.json'
         utils.write_json_file(str(config), nodes_setup)
 
 
-def create_genesis_file(testnet_config: TestnetConfiguration, nodes_config_folders):
+def overwrite_genesis_file(testnet_config: TestnetConfiguration, nodes_config_folders):
     genesis = genesis_json.build(testnet_config)
 
     for index, config_folder in enumerate(nodes_config_folders):
