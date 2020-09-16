@@ -11,7 +11,7 @@ elrond_proxy_go = "{ELRONDSDK}/elrond_proxy_go/{TAG}/elrond-proxy-go-{NOvTAG}"
 consensus_size = 1
 metashardID = 4294967295
 observers = 1
-validators = 2
+validators = 1
 
 [networking]
 host = "127.0.0.1"
@@ -27,7 +27,7 @@ port_first_validator_rest_api = 10100
 consensus_size = 1
 count = 1
 observers_per_shard = 1
-validators_per_shard = 2
+validators_per_shard = 1
 
 [timing]
 genesis_delay = 30

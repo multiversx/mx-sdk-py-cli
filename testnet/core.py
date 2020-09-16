@@ -71,13 +71,14 @@ async def run(args, env=None, cwd: str = None, delay: int = 0):
 
 
 async def _read_stream(stream, pid):
+    markers_of_interest = ["started committing block", "ERROR", "WARN"]
     while True:
         try:
             line = await stream.readline()
             if line:
                 line = line.decode("utf-8", "replace").strip()
-                if "ERROR" in line:
-                    print(f"[{pid}]", line)
+                if any(e in line for e in markers_of_interest):
+                    print(f"[PID={pid}]", line)
             else:
                 break
         except Exception:

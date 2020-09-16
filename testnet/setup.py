@@ -114,16 +114,19 @@ def copy_config_to_seednode(testnet_config: TestnetConfiguration):
     shutil.copy(config_source / 'config.toml', seednode_config / 'config.toml')
 
 
+# TODO: extract logic to separate file "p2p_toml.py"
 def patch_seednode_config(testnet_config: TestnetConfiguration):
     seednode_config = testnet_config.seednode_config_folder()
     seednode_config_file = seednode_config / 'p2p.toml'
 
     data = utils.read_toml_file(seednode_config_file)
     data['Node']['Port'] = str(testnet_config.networking['port_seednode'])
+    data['KadDhtPeerDiscovery']['ProtocolID'] = '/erd/kad/sandbox'
     data['Sharding']['Type'] = "NilListSharder"
     utils.write_toml_file(seednode_config_file, data)
 
 
+# TODO: extract logic to separate file "p2p_toml.py"
 def patch_nodes_p2p_config(testnet_config: TestnetConfiguration, nodes_config_folders, port_first):
     for index, config_folder in enumerate(nodes_config_folders):
         # Edit the p2p.toml file
@@ -133,6 +136,7 @@ def patch_nodes_p2p_config(testnet_config: TestnetConfiguration, nodes_config_fo
         data['KadDhtPeerDiscovery']['InitialPeerList'] = [
             testnet_config.seednode_address()
         ]
+        data['KadDhtPeerDiscovery']['ProtocolID'] = '/erd/kad/sandbox'
         data['Sharding']['Type'] = "NilListSharder"
         utils.write_toml_file(config, data)
 
