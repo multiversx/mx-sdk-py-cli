@@ -19,6 +19,11 @@ def get_validator_key_file(validator_index: int):
     return _get_validators_folder().joinpath("validatorKey{:02}.pem".format(validator_index))
 
 
+def get_observer_key_file(observer_index: int):
+    _guard_validator_index(observer_index)
+    return _get_observers_folder().joinpath("observerKey{:02}.pem".format(observer_index))
+
+
 def get_validator_wallets(num_validators: int) -> Dict[str, Account]:
     result = {}
 
@@ -58,6 +63,10 @@ def _guard_validator_index(validator_index: int):
 
 def _get_validators_folder():
     return _get_folder().joinpath("validators")
+
+
+def _get_observers_folder():
+    return _get_folder().joinpath("observers")
 
 
 def get_users() -> Dict[str, Account]:

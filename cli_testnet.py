@@ -74,6 +74,7 @@ def setup_parser(subparsers: Any) -> Any:
 
 def testnet_start(args):
     logger.info("Starting testnet...")
+    testnet.start(args)
 
 
 def testnet_stop(args):

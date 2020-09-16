@@ -3,7 +3,7 @@ import logging
 import time
 from collections import defaultdict
 from pathlib import Path
-from typing import Any, Dict
+from typing import Any, Dict, Iterator
 
 import erdpy.config
 import erdpy.utils as utils
@@ -12,6 +12,23 @@ from erdpy import workstation
 logger = logging.getLogger("testnet")
 
 ConfigurationType = Dict[str, Dict[str, Any]]
+
+
+class Node:
+    def __init__(self, index: int, folder: Path, shard: str, port: int) -> None:
+        self.index = index
+        self.folder = folder
+        self.shard = shard
+        self.port = port
+
+    def config_folder(self):
+        return self.folder / 'config'
+
+    def key_file_path(self):
+        return self.config_folder() / 'validatorKey.pem'
+
+    def __repr__(self) -> str:
+        return f"Node {self.index}, shard={self.shard}, port={self.port}, folder={self.folder}"
 
 
 class TestnetConfiguration:
@@ -164,6 +181,14 @@ class TestnetConfiguration:
             self.observer_config_folders(),
         )
 
+    def validators(self) -> Iterator[Node]:
+        first_port = self.networking['port_first_validator']
+
+        for i, folder in enumerate(self.validator_folders()):
+            shard = self._get_shard_of_node(i)
+            port = first_port + i
+            yield Node(index=i, folder=folder, shard=shard, port=port)
+
     def validator_folders(self):
         testnet = self.root()
         for i in range(self.num_all_validators()):
@@ -172,6 +197,18 @@ class TestnetConfiguration:
     def validator_config_folders(self):
         for folder in self.validator_folders():
             yield folder / 'config'
+
+    def observers(self) -> Iterator[Node]:
+        first_port = self.networking['port_first_observer']
+
+        for i, folder in enumerate(self.observer_folders()):
+            shard = self._get_shard_of_node(i)
+            port = first_port + i
+            yield Node(index=i, folder=folder, shard=shard, port=port)
+
+    def _get_shard_of_node(self, observer_index: int):
+        shard = int(observer_index // self.num_observers_per_shard())
+        return shard if shard < self.num_shards() else self.metashard['metashardID']
 
     def observer_config_folders(self):
         for folder in self.observer_folders():
@@ -276,3 +313,4 @@ def merge_configs(leftcfg: ConfigurationType, rightcfg: ConfigurationType) -> Co
             result[key] = rightcfg[key]
 
     return result
+

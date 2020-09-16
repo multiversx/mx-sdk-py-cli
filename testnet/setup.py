@@ -98,9 +98,12 @@ def copy_config_to_nodes(testnet_config: TestnetConfiguration):
 
 
 def copy_validator_keys(testnet_config: TestnetConfiguration):
-    validator_key_files = testnet_config.validator_key_files()
-    for index, key_file in enumerate(validator_key_files):
-        shutil.copy(wallets.get_validator_key_file(index), key_file)
+    for index, validator in enumerate(testnet_config.validators()):
+        shutil.copy(wallets.get_validator_key_file(index), validator.key_file_path())
+
+    # Currently, observers require validator PEM files as well
+    for index, observer in enumerate(testnet_config.observers()):
+        shutil.copy(wallets.get_observer_key_file(index), observer.key_file_path())
 
 
 def copy_config_to_seednode(testnet_config: TestnetConfiguration):
