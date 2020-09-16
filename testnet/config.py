@@ -15,11 +15,11 @@ ConfigurationType = Dict[str, Dict[str, Any]]
 
 
 class Node:
-    def __init__(self, index: int, folder: Path, shard: str, port: int) -> None:
+    def __init__(self, index: int, folder: Path, shard: str, api_port: int) -> None:
         self.index = index
         self.folder = folder
         self.shard = shard
-        self.port = port
+        self.api_port = api_port
 
     def config_folder(self):
         return self.folder / 'config'
@@ -28,7 +28,7 @@ class Node:
         return self.config_folder() / 'validatorKey.pem'
 
     def __repr__(self) -> str:
-        return f"Node {self.index}, shard={self.shard}, port={self.port}, folder={self.folder}"
+        return f"Node {self.index}, shard={self.shard}, port={self.api_port}, folder={self.folder}"
 
 
 class TestnetConfiguration:
@@ -182,12 +182,12 @@ class TestnetConfiguration:
         )
 
     def validators(self) -> Iterator[Node]:
-        first_port = self.networking['port_first_validator']
+        first_port = self.networking['port_first_validator_rest_api']
 
         for i, folder in enumerate(self.validator_folders()):
             shard = self._get_shard_of_node(i)
             port = first_port + i
-            yield Node(index=i, folder=folder, shard=shard, port=port)
+            yield Node(index=i, folder=folder, shard=shard, api_port=port)
 
     def validator_folders(self):
         testnet = self.root()
@@ -199,12 +199,12 @@ class TestnetConfiguration:
             yield folder / 'config'
 
     def observers(self) -> Iterator[Node]:
-        first_port = self.networking['port_first_observer']
+        first_port = self.networking['port_first_observer_rest_api']
 
         for i, folder in enumerate(self.observer_folders()):
             shard = self._get_shard_of_node(i)
-            port = first_port + i
-            yield Node(index=i, folder=folder, shard=shard, port=port)
+            api_port = first_port + i
+            yield Node(index=i, folder=folder, shard=shard, api_port=api_port)
 
     def _get_shard_of_node(self, observer_index: int):
         shard = int(observer_index // self.num_observers_per_shard())
@@ -281,7 +281,7 @@ class TestnetConfiguration:
             'port_first_observer': 21100,
             'port_first_observer_rest_api': 10000,
             'port_first_validator': 21500,
-            'port_first_validator_rest_api': 21500,
+            'port_first_validator_rest_api': 10100,
         }
         config['shards'] = {
             'consensus_size': 1,

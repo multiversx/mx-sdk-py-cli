@@ -34,7 +34,7 @@ async def do_start(args: Any):
             "--log-logger-name",
             "--log-correlation",
             f"--destination-shard-as-observer={observer.shard}",
-            f"--rest-api-interface=localhost:{observer.port}"
+            f"--rest-api-interface=localhost:{observer.api_port}"
         ], cwd=observer.folder, delay=5))
 
     # Validators
@@ -46,7 +46,7 @@ async def do_start(args: Any):
             "--log-level=*:DEBUG",
             "--log-logger-name",
             "--log-correlation",
-            f"--rest-api-interface=localhost:{validator.port}"
+            f"--rest-api-interface=localhost:{validator.api_port}"
         ], cwd=validator.folder, delay=5))
 
     await asyncio.gather(*to_run)
