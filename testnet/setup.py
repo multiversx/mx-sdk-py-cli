@@ -120,6 +120,7 @@ def patch_seednode_config(testnet_config: TestnetConfiguration):
 
     data = utils.read_toml_file(seednode_config_file)
     data['Node']['Port'] = str(testnet_config.networking['port_seednode'])
+    data['Sharding']['Type'] = "NilListSharder"
     utils.write_toml_file(seednode_config_file, data)
 
 
@@ -132,6 +133,7 @@ def patch_nodes_p2p_config(testnet_config: TestnetConfiguration, nodes_config_fo
         data['KadDhtPeerDiscovery']['InitialPeerList'] = [
             testnet_config.seednode_address()
         ]
+        data['Sharding']['Type'] = "NilListSharder"
         utils.write_toml_file(config, data)
 
 
