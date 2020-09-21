@@ -10,6 +10,10 @@ from erdpy.wallet import pem
 MAX_NUM_NODES = 12
 
 
+def copy_all_to(destination: str):
+    shutil.copytree(_get_folder(), destination)
+
+
 def copy_validator_key_to(validator_index: int, destination: str):
     shutil.copy(get_validator_key_file(validator_index), destination)
 

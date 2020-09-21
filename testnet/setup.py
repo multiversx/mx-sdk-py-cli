@@ -68,6 +68,7 @@ def configure(args):
     patch_proxy_config(testnet_config)
 
     build_binaries(testnet_config)
+    copy_wallets(testnet_config)
 
 
 def clean(args):
@@ -206,3 +207,7 @@ def build_binaries(testnet_config: TestnetConfiguration):
         shutil.copy(node_folder / "arwen", destination)
 
     shutil.copy(proxy_folder / "proxy", testnet_config.proxy_folder())
+
+
+def copy_wallets(testnet_config: TestnetConfiguration):
+    wallets.copy_all_to(testnet_config.root() / "wallets")
