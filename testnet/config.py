@@ -39,6 +39,9 @@ class TestnetConfiguration:
         sdk_folder = workstation.get_tools_folder()
 
         for key, path in self.config['folders'].items():
+            if key == "testnet":
+                continue
+
             path = path.replace('{ELRONDSDK}', str(sdk_folder))
 
             default_tag = erdpy.config.get_dependency_tag(key)

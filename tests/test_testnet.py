@@ -1,7 +1,8 @@
 import os
 import sys
 
-from erdpy.testnet import configuration
+from erdpy import workstation
+from erdpy.testnet import config
 
 sys.path = [os.getcwd() + '/..'] + sys.path
 
@@ -27,8 +28,6 @@ def test_merge_configs():
     }
     right['timing'] = {
         'genesis_delay': 30,
-        'nodes_start_time': 60,
-        'seednode_start_time': 5,
     }
 
     expected_merged = dict()
@@ -39,9 +38,7 @@ def test_merge_configs():
         'validators': 4,
     }
     expected_merged['timing'] = {
-        'genesis_delay': 30,
-        'nodes_start_time': 60,
-        'seednode_start_time': 5,
+        'genesis_delay': 30
     }
     expected_merged['networking'] = {
         'port_proxy': 7950,
@@ -49,18 +46,21 @@ def test_merge_configs():
         'somekey': 'somestring',
     }
 
-    result_merged = configuration.merge_configs(left, right)
+    result_merged = config.merge_configs(left, right)
     assert expected_merged == result_merged
 
 
 def test_init():
-    config = dict()
-    config['folders'] = {
-        'elrond_config_testnet': '{ELRONDSDK}/elrond-config-testnet',
-        'elrond_go': '{ELRONDSDK}/elrond-go',
-        'elrond_proxy_go': '{ELRONDSDK}/elrond-proxy-go',
-        'testnet': '{ELRONDSDK}/testnet',
+    data = dict()
+    data['folders'] = {
+        'elrond_config_testnet': '{ELRONDSDK}/foo',
+        'elrond_go': '{ELRONDSDK}/bar',
+        'elrond_proxy_go': '{ELRONDSDK}/foobar',
+        'testnet': '/some/where/mytestnet',
     }
 
-    testnet_config = configuration.TestnetConfiguration(config)
-    print(testnet_config.config)
+    testnet_config = config.TestnetConfiguration(data)
+    assert testnet_config.config["folders"]["elrond_config_testnet"] == workstation.get_tools_folder() / "foo"
+    assert testnet_config.config["folders"]["elrond_go"] == workstation.get_tools_folder() / "bar"
+    assert testnet_config.config["folders"]["elrond_proxy_go"] == workstation.get_tools_folder() / "foobar"
+    assert testnet_config.config["folders"]["testnet"] == "/some/where/mytestnet"
