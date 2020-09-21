@@ -109,7 +109,6 @@ class StandaloneModule(DependencyModule):
 
 
 class ArwenToolsModule(StandaloneModule):
-
     def __init__(self, key: str, aliases: List[str] = None):
         if aliases is None:
             aliases = list()
@@ -128,6 +127,30 @@ class ArwenToolsModule(StandaloneModule):
 
     def get_env(self):
         return {
+        }
+
+
+class GolangModule(StandaloneModule):
+    def __init__(self, key: str, aliases: List[str] = None):
+        if aliases is None:
+            aliases = list()
+
+        super().__init__(key, aliases)
+
+    def _post_install(self, tag: str):
+        parent_directory = self.get_parent_directory()
+        utils.ensure_folder(path.join(parent_directory, "GOPATH"))
+        utils.ensure_folder(path.join(parent_directory, "GOCACHE"))
+
+    def get_env(self):
+        directory = self.get_directory(config.get_dependency_tag(self.key))
+        parent_directory = self.get_parent_directory()
+
+        return {
+            "PATH": f"{path.join(directory, 'go/bin')}:{os.environ['PATH']}",
+            "GOPATH": path.join(parent_directory, "GOPATH"),
+            "GOCACHE": path.join(parent_directory, "GOCACHE"),
+            "GOROOT": path.join(directory, "go")
         }
 
 
