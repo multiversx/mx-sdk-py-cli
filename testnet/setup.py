@@ -13,7 +13,8 @@ DEPENDENCY_KEYS = ["elrond_config_testnet", "elrond_go", "elrond_proxy_go"]
 
 
 def install_dependencies():
-    # TODO verify if Go compiler is available, and has a recent version
+    dependencies.install_module("golang")
+
     for key in DEPENDENCY_KEYS:
         name: str = key
         tag: str = ""
