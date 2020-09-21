@@ -1,5 +1,5 @@
 
-from typing import List
+from typing import Any, List
 
 from erdpy.accounts import Account
 from erdpy.testnet import wallets
@@ -8,7 +8,7 @@ from erdpy.testnet.config import TestnetConfiguration
 ENTIRE_SUPPLY = 20000000000000000000000000
 
 
-def build(testnet_config: TestnetConfiguration) -> List[any]:
+def build(testnet_config: TestnetConfiguration) -> List[Any]:
     num_validators = testnet_config.num_all_validators()
     genesis = []
     remaining_supply = ENTIRE_SUPPLY

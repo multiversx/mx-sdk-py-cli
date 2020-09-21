@@ -5,7 +5,7 @@ import shutil
 import erdpy.utils as utils
 from erdpy import myprocess
 from erdpy.dependencies.install import install_module
-from erdpy.testnet import genesis_json, nodes_setup_json, wallets
+from erdpy.testnet import genesis_json, nodes_setup_json, p2p_toml, wallets
 from erdpy.testnet.config import TestnetConfiguration
 
 logger = logging.getLogger("testnet")
@@ -61,7 +61,7 @@ def configure(args):
 
     # Seed node
     copy_config_to_seednode(testnet_config)
-    patch_seednode_config(testnet_config)
+    patch_seednode_p2p_config(testnet_config)
 
     # Proxy
     copy_config_to_proxy(testnet_config)
@@ -114,30 +114,20 @@ def copy_config_to_seednode(testnet_config: TestnetConfiguration):
     shutil.copy(config_source / 'config.toml', seednode_config / 'config.toml')
 
 
-# TODO: extract logic to separate file "p2p_toml.py"
-def patch_seednode_config(testnet_config: TestnetConfiguration):
+def patch_seednode_p2p_config(testnet_config: TestnetConfiguration):
     seednode_config = testnet_config.seednode_config_folder()
     seednode_config_file = seednode_config / 'p2p.toml'
 
     data = utils.read_toml_file(seednode_config_file)
-    data['Node']['Port'] = str(testnet_config.networking['port_seednode'])
-    data['KadDhtPeerDiscovery']['ProtocolID'] = '/erd/kad/sandbox'
-    data['Sharding']['Type'] = "NilListSharder"
+    p2p_toml.patch_for_seednode(data, testnet_config)
     utils.write_toml_file(seednode_config_file, data)
 
 
-# TODO: extract logic to separate file "p2p_toml.py"
 def patch_nodes_p2p_config(testnet_config: TestnetConfiguration, nodes_config_folders, port_first):
     for index, config_folder in enumerate(nodes_config_folders):
-        # Edit the p2p.toml file
         config = config_folder / 'p2p.toml'
         data = utils.read_toml_file(config)
-        data['Node']['Port'] = str(port_first + index)
-        data['KadDhtPeerDiscovery']['InitialPeerList'] = [
-            testnet_config.seednode_address()
-        ]
-        data['KadDhtPeerDiscovery']['ProtocolID'] = '/erd/kad/sandbox'
-        data['Sharding']['Type'] = "NilListSharder"
+        p2p_toml.patch(data, testnet_config, index, port_first)
         utils.write_toml_file(config, data)
 
 
