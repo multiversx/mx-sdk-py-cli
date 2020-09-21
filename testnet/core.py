@@ -8,11 +8,15 @@ from erdpy.testnet.config import TestnetConfiguration
 logger = logging.getLogger("testnet")
 
 
+
 def start(args: Any):
-    loop = asyncio.get_event_loop()
-    loop.run_until_complete(do_start(args))
-    loop.close()
-    asyncio.set_event_loop(asyncio.new_event_loop())
+    try:
+        loop = asyncio.get_event_loop()
+        loop.run_until_complete(do_start(args))
+        loop.close()
+        asyncio.set_event_loop(asyncio.new_event_loop())
+    except KeyboardInterrupt:
+        pass
 
 
 async def do_start(args: Any):
