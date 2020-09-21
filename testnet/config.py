@@ -221,7 +221,7 @@ class TestnetConfiguration:
 
     def observer_addresses(self):
         host = self.networking['host']
-        first_port = self.networking['port_first_observer']
+        first_port = self.networking['port_first_observer_rest_api']
         for port in range(self.num_all_observers()):
             port = first_port + port
             yield f"http://{host}:{port}"
@@ -251,6 +251,9 @@ class TestnetConfiguration:
                     'Address': address
                 })
         return observers
+
+    def proxy_port(self):
+        return self.networking["port_proxy"]
 
     @classmethod
     def default(cls):
@@ -313,4 +316,3 @@ def merge_configs(leftcfg: ConfigurationType, rightcfg: ConfigurationType) -> Co
             result[key] = rightcfg[key]
 
     return result
-

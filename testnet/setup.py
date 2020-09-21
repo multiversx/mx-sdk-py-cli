@@ -65,7 +65,7 @@ def configure(args):
 
     # Proxy
     copy_config_to_proxy(testnet_config)
-    write_observers_list_to_proxy_config(testnet_config)
+    patch_proxy_config(testnet_config)
 
     build_binaries(testnet_config)
 
@@ -166,12 +166,12 @@ def copy_config_to_proxy(testnet_config: TestnetConfiguration):
         proxy_config)
 
 
-def write_observers_list_to_proxy_config(testnet_config: TestnetConfiguration):
+def patch_proxy_config(testnet_config: TestnetConfiguration):
     proxy_config_file = testnet_config.proxy_config_folder() / 'config.toml'
     observers = testnet_config.observer_addresses_sharded_for_proxy_config()
     data = utils.read_toml_file(proxy_config_file)
     data['Observers'] = observers
-    data['GeneralSettings']['ServerPort'] = testnet_config.networking['port_proxy']
+    data['GeneralSettings']['ServerPort'] = testnet_config.proxy_port()
     utils.write_toml_file(proxy_config_file, data)
 
 

@@ -49,6 +49,11 @@ async def do_start(args: Any):
             f"--rest-api-interface=localhost:{validator.api_port}"
         ], cwd=validator.folder, delay=5))
 
+    # Proxy
+    to_run.append(run([
+        "./proxy",
+    ], cwd=testnet_config.proxy_folder(), delay=50))
+
     await asyncio.gather(*to_run)
 
 
