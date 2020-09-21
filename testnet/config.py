@@ -293,9 +293,7 @@ class TestnetConfiguration:
             'validators_per_shard': 1,
         }
         config['timing'] = {
-            'genesis_delay': 30,
-            'nodes_start_time': 60,
-            'seednode_start_time': 5,
+            'genesis_delay': 30
         }
 
         return config

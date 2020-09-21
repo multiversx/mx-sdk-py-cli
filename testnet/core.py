@@ -9,6 +9,10 @@ logger = logging.getLogger("testnet")
 
 
 
+NODES_START_DELAY = 5
+PROXY_START_DELAY = 40
+
+
 def start(args: Any):
     try:
         loop = asyncio.get_event_loop()
@@ -39,7 +43,7 @@ async def do_start(args: Any):
             "--log-correlation",
             f"--destination-shard-as-observer={observer.shard}",
             f"--rest-api-interface=localhost:{observer.api_port}"
-        ], cwd=observer.folder, delay=5))
+        ], cwd=observer.folder, delay=NODES_START_DELAY))
 
     # Validators
     for validator in testnet_config.validators():
@@ -51,12 +55,12 @@ async def do_start(args: Any):
             "--log-logger-name",
             "--log-correlation",
             f"--rest-api-interface=localhost:{validator.api_port}"
-        ], cwd=validator.folder, delay=5))
+        ], cwd=validator.folder, delay=NODES_START_DELAY))
 
     # Proxy
     to_run.append(run([
         "./proxy",
-    ], cwd=testnet_config.proxy_folder(), delay=50))
+    ], cwd=testnet_config.proxy_folder(), delay=PROXY_START_DELAY))
 
     await asyncio.gather(*to_run)
 
