@@ -4,7 +4,8 @@ import shutil
 import erdpy.utils as utils
 from erdpy import dependencies, myprocess
 from erdpy.dependencies.install import install_module
-from erdpy.testnet import genesis_json, nodes_setup_json, p2p_toml, wallets
+from erdpy.testnet import (genesis_json, node_config_toml, nodes_setup_json,
+                           p2p_toml, wallets)
 from erdpy.testnet.config import TestnetConfiguration
 
 logger = logging.getLogger("testnet")
@@ -31,6 +32,7 @@ def configure(args):
     # Validators and Observers
     copy_config_to_nodes(testnet_config)
     copy_validator_keys(testnet_config)
+    patch_node_config(testnet_config)
 
     patch_nodes_p2p_config(
         testnet_config,
@@ -105,6 +107,14 @@ def copy_validator_keys(testnet_config: TestnetConfiguration):
     # Currently, observers require validator PEM files as well
     for index, observer in enumerate(testnet_config.observers()):
         shutil.copy(wallets.get_observer_key_file(index), observer.key_file_path())
+
+
+def patch_node_config(testnet_config: TestnetConfiguration):
+    for node_config in testnet_config.all_nodes_config_folders():
+        config_file = node_config / 'config.toml'
+        data = utils.read_toml_file(config_file)
+        node_config_toml.patch(data, testnet_config)
+        utils.write_toml_file(config_file, data)
 
 
 def copy_config_to_seednode(testnet_config: TestnetConfiguration):
