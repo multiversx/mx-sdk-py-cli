@@ -4,13 +4,14 @@ import shutil
 import erdpy.utils as utils
 from erdpy import dependencies, myprocess
 from erdpy.dependencies.install import install_module
-from erdpy.testnet import (genesis_json, node_config_toml, nodes_setup_json,
-                           p2p_toml, wallets)
+from erdpy.testnet import (genesis_json, genesis_smart_contracts_json,
+                           node_config_toml, nodes_setup_json, p2p_toml,
+                           wallets)
 from erdpy.testnet.config import TestnetConfiguration
 
 logger = logging.getLogger("testnet")
 
-DEPENDENCY_KEYS = ["elrond_config_testnet", "elrond_go", "elrond_proxy_go"]
+DEPENDENCY_KEYS = ["elrond_go", "elrond_proxy_go"]
 
 
 def install_dependencies():

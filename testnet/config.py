@@ -75,7 +75,6 @@ class TestnetConfiguration:
         local_config = cls.get_local_config(filename)
         sdk_testnet_config = cls.get_sdk_testnet_config()
         final_config = merge_configs(sdk_testnet_config, local_config)
-
         return cls(final_config)
 
     @classmethod
@@ -110,7 +109,7 @@ class TestnetConfiguration:
         return merge_configs(default, sdk_testnet_config)
 
     def node_config_source(self):
-        return self.folders['elrond_config_testnet']
+        return self.node_source() / 'cmd' / 'node' / 'config'
 
     def node_source(self):
         return self.folders['elrond_go']
@@ -266,8 +265,6 @@ class TestnetConfiguration:
             'proxy': True,
         }
         config['folders'] = {
-            'elrond_config_testnet':
-                '{ELRONDSDK}/elrond_config_testnet/{TAG}/elrond-config-testnet-{NOvTAG}',
             'elrond_go':
                 '{ELRONDSDK}/elrond_go/{TAG}/elrond-go-{NOvTAG}',
             'elrond_proxy_go':

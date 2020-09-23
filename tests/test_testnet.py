@@ -53,14 +53,12 @@ def test_merge_configs():
 def test_init():
     data = dict()
     data['folders'] = {
-        'elrond_config_testnet': '{ELRONDSDK}/foo',
         'elrond_go': '{ELRONDSDK}/bar',
         'elrond_proxy_go': '{ELRONDSDK}/foobar',
         'testnet': '/some/where/mytestnet',
     }
 
     testnet_config = config.TestnetConfiguration(data)
-    assert testnet_config.config["folders"]["elrond_config_testnet"] == workstation.get_tools_folder() / "foo"
     assert testnet_config.config["folders"]["elrond_go"] == workstation.get_tools_folder() / "bar"
     assert testnet_config.config["folders"]["elrond_proxy_go"] == workstation.get_tools_folder() / "foobar"
     assert testnet_config.config["folders"]["testnet"] == "/some/where/mytestnet"

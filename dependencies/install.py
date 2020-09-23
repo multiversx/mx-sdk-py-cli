@@ -45,7 +45,6 @@ def get_all_deps() -> List[DependencyModule]:
         Rust(key="rust"),
         NodejsModule(key="nodejs", aliases=[]),
         StandaloneModule(key="elrond_go"),
-        StandaloneModule(key="elrond_config_testnet"),
         StandaloneModule(key="elrond_proxy_go"),
         GolangModule(key="golang")
     ]

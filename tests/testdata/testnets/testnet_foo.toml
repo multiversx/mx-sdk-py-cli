@@ -3,7 +3,6 @@ loglevel = "*:INFO"
 proxy = true
 
 [folders]
-elrond_config_testnet = "{ELRONDSDK}/elrond_config_testnet/{TAG}/elrond-config-testnet-{NOvTAG}"
 elrond_go = "{ELRONDSDK}/elrond_go/{TAG}/elrond-go-{NOvTAG}"
 elrond_proxy_go = "{ELRONDSDK}/elrond_proxy_go/{TAG}/elrond-proxy-go-{NOvTAG}"
 
