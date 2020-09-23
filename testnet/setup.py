@@ -117,6 +117,11 @@ def patch_node_config(testnet_config: TestnetConfiguration):
         node_config_toml.patch(data, testnet_config)
         utils.write_toml_file(config_file, data)
 
+        genesis_smart_contracts_file = node_config / 'genesisSmartContracts.json'
+        data = utils.read_json_file(genesis_smart_contracts_file)
+        genesis_smart_contracts_json.patch(data, testnet_config)
+        utils.write_json_file(genesis_smart_contracts_file, data)
+
 
 def copy_config_to_seednode(testnet_config: TestnetConfiguration):
     config_source = testnet_config.node_source() / 'cmd' / 'seednode' / 'config'
