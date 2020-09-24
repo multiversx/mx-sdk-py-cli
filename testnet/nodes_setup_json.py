@@ -3,14 +3,15 @@ from typing import Any
 from erdpy.accounts import Account
 from erdpy.testnet import wallets
 from erdpy.testnet.config import TestnetConfiguration
+from erdpy.testnet.genesis import get_delegation_address, is_foundational_node
 
 
 def build(testnet_config: TestnetConfiguration) -> Any:
     num_validators = testnet_config.num_all_validators()
     initial_nodes = []
 
-    for nickname, validator in wallets.get_validators(num_validators).items():
-        entry = _build_initial_nodes_entry(nickname, *validator)
+    for nickname, [pubkey, account] in wallets.get_validators(num_validators).items():
+        entry = _build_initial_nodes_entry(nickname, pubkey, account)
         initial_nodes.append(entry)
 
     return {
@@ -29,8 +30,10 @@ def build(testnet_config: TestnetConfiguration) -> Any:
 
 
 def _build_initial_nodes_entry(nickname: str, pubkey: str, account: Account) -> Any:
+    address = get_delegation_address().bech32() if is_foundational_node(nickname) else account.address.bech32()
+
     return {
         "nickname": nickname,
-        "address": account.address.bech32(),
+        "address": address,
         "pubkey": pubkey,
     }
