@@ -188,6 +188,7 @@ def patch_proxy_config(testnet_config: TestnetConfiguration):
     observers = testnet_config.observer_addresses_sharded_for_proxy_config()
     data = utils.read_toml_file(proxy_config_file)
     data['Observers'] = observers
+    data['FullHistoryNodes'] = observers
     data['GeneralSettings']['ServerPort'] = testnet_config.proxy_port()
     utils.write_toml_file(proxy_config_file, data)
 

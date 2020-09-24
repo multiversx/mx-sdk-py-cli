@@ -78,4 +78,4 @@ def get_transaction(args: Any):
     proxy = ElrondProxy(args.proxy)
 
     response = proxy.get_transaction(args.hash, args.sender)
-    print(response)
+    utils.dump_out_json(response)

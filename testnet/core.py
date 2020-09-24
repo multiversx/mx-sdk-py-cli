@@ -38,7 +38,7 @@ async def do_start(args: Any):
             "./node",
             "--use-log-view",
             "--log-save",
-            "--log-level=*:DEBUG",
+            f"--log-level=*:DEBUG",
             "--log-logger-name",
             "--log-correlation",
             f"--destination-shard-as-observer={observer.shard}",

@@ -1,24 +1,23 @@
-from erdpy import block
-import sys
 from typing import Any
 
 from erdpy import cli_shared, utils
+from erdpy.proxy.core import ElrondProxy
 
 
 def setup_parser(subparsers: Any) -> Any:
-    parser = cli_shared.add_group_subparser(subparsers, "block", "Get Block data from the Network")
+    parser = cli_shared.add_group_subparser(subparsers, "hyperblock", "Get Hyperblock from the Network")
     subparsers = parser.add_subparsers()
 
-    sub = cli_shared.add_command_subparser(subparsers, "block", "get", "Get block")
+    sub = cli_shared.add_command_subparser(subparsers, "hyperblock", "get", "Get hyperblock")
 
     cli_shared.add_proxy_arg(sub)
-    sub.add_argument("--hash", required=not (utils.is_arg_present("--nonce", sys.argv)), help="the hash of block")
-    sub.add_argument("--nonce", required=not (utils.is_arg_present("--hash", sys.argv)), help="the nonce of block")
-    sub.add_argument("--shard", type=int, required=True, help="the shard of block")
-    sub.add_argument("--with-txs", action="store_true", default=False, help="the returned block will contains all "
-                                                                            "transactions")
-    sub.set_defaults(func=get_block)
+    sub.add_argument("--key", required=True, help="the hash or the nonce of the hyperblock")
+
+    sub.set_defaults(func=get_hyperblock)
 
 
-def get_block(args: Any) -> Any:
-    block.get_block(args)
+def get_hyperblock(args: Any) -> Any:
+    proxy_url = args.proxy
+    proxy = ElrondProxy(proxy_url)
+    response = proxy.get_hyperblock(args.key)
+    utils.dump_out_json(response)
