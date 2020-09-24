@@ -53,8 +53,8 @@ generate() {
     command "Transactions.Send" "tx send"
     command "Transactions.Get" "tx get"
 
-    group "Blocks" "block"
-    command "Blocks.Get" "block get"
+    group "Hyperblocks" "hyperblock"
+    command "Hyperblock.Get" "hyperblock get"
 
     group "Validator" "validator"
     command "Validator.Stake" "validator stake"
@@ -71,6 +71,12 @@ generate() {
     group "Wallet" "wallet"
     command "Wallet.Derive" "wallet derive"
     command "Wallet.Bech32" "wallet bech32"
+
+    group "Testnet" "testnet"
+    command "Testnet.Prerequisites" "testnet prerequisites"
+    command "Testnet.Config" "testnet config"
+    command "Testnet.Start" "testnet start"
+    command "Testnet.Clean" "testnet clean"
 
     group "Network" "network"
     command "Network.NumShards" "network num-shards"

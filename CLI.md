@@ -14,8 +14,8 @@
     - [Transactions.New](#transactionsnew)
     - [Transactions.Send](#transactionssend)
     - [Transactions.Get](#transactionsget)
-  - [Group **Blocks**](#group-blocks)
-    - [Blocks.Get](#blocksget)
+  - [Group **Hyperblocks**](#group-hyperblocks)
+    - [Hyperblock.Get](#hyperblockget)
   - [Group **Validator**](#group-validator)
     - [Validator.Stake](#validatorstake)
     - [Validator.Unstake](#validatorunstake)
@@ -29,6 +29,11 @@
   - [Group **Wallet**](#group-wallet)
     - [Wallet.Derive](#walletderive)
     - [Wallet.Bech32](#walletbech32)
+  - [Group **Testnet**](#group-testnet)
+    - [Testnet.Prerequisites](#testnetprerequisites)
+    - [Testnet.Config](#testnetconfig)
+    - [Testnet.Start](#testnetstart)
+    - [Testnet.Clean](#testnetclean)
   - [Group **Network**](#group-network)
     - [Network.NumShards](#networknumshards)
     - [Network.BlockNonce](#networkblocknonce)
@@ -54,7 +59,7 @@
     - [Configuration.Dump](#configurationdump)
     - [Configuration.Get](#configurationget)
     - [Configuration.Set](#configurationset)
-
+  
 ## Overview
 
 **erdpy** exposes a number of CLI **commands**, organized within **groups**.
@@ -75,7 +80,7 @@ https://docs.elrond.com/tools/erdpy.
         
 
 COMMAND GROUPS:
-  {contract,tx,validator,account,wallet,network,cost,dispatcher,blockatlas,deps,config,block}
+  {contract,tx,validator,account,wallet,network,cost,dispatcher,blockatlas,deps,config,hyperblock,testnet}
 
 TOP-LEVEL OPTIONS:
   -h, --help            show this help message and exit
@@ -96,7 +101,8 @@ dispatcher                     Enqueue transactions, then bulk dispatch them
 blockatlas                     Interact with an Block Atlas instance
 deps                           Manage dependencies or elrond-sdk modules
 config                         Configure elrond-sdk (default values etc.)
-block                          Get Block data from the Network
+hyperblock                     Get Hyperblock from the Network
+testnet                        Set up, start and control local testnets
 
 ```
 ## Group **Contract**
@@ -219,7 +225,7 @@ optional arguments:
   --gas-price GAS_PRICE                  ⛽ the gas price (default: 1000000000)
   --gas-limit GAS_LIMIT                  ⛽ the gas limit
   --value VALUE                          the value to transfer (default: 0)
-  --chain CHAIN                          the chain identifier (default: v1.0.147)
+  --chain CHAIN                          the chain identifier (default: T)
   --version VERSION                      the transaction version (default: 1)
   --arguments ARGUMENTS [ARGUMENTS ...]  arguments for the contract transaction, as numbers or hex-encoded. E.g.
                                          --arguments 42 0x64 1000 0xabba
@@ -240,6 +246,7 @@ positional arguments:
 
 optional arguments:
   -h, --help                             show this help message and exit
+  --outfile OUTFILE                      where to save the output (default: stdout)
   --pem PEM                              🔑 the PEM file, if keyfile not provided
   --pem-index PEM_INDEX                  🔑 the index in the PEM file (default: 0)
   --keyfile KEYFILE                      🔑 a JSON keyfile, if PEM not provided
@@ -250,7 +257,7 @@ optional arguments:
   --gas-price GAS_PRICE                  ⛽ the gas price (default: 1000000000)
   --gas-limit GAS_LIMIT                  ⛽ the gas limit
   --value VALUE                          the value to transfer (default: 0)
-  --chain CHAIN                          the chain identifier (default: v1.0.147)
+  --chain CHAIN                          the chain identifier (default: T)
   --version VERSION                      the transaction version (default: 1)
   --function FUNCTION                    the function to call
   --arguments ARGUMENTS [ARGUMENTS ...]  arguments for the contract transaction, as numbers or hex-encoded. E.g.
@@ -272,6 +279,7 @@ positional arguments:
 
 optional arguments:
   -h, --help                             show this help message and exit
+  --outfile OUTFILE                      where to save the output (default: stdout)
   --project PROJECT                      🗀 the project directory (default: current directory)
   --bytecode BYTECODE                    the WASM file
   --metadata-not-upgradeable             ‼ mark the contract as NOT upgradeable (default: upgradeable)
@@ -286,7 +294,7 @@ optional arguments:
   --gas-price GAS_PRICE                  ⛽ the gas price (default: 1000000000)
   --gas-limit GAS_LIMIT                  ⛽ the gas limit
   --value VALUE                          the value to transfer (default: 0)
-  --chain CHAIN                          the chain identifier (default: v1.0.147)
+  --chain CHAIN                          the chain identifier (default: T)
   --version VERSION                      the transaction version (default: 1)
   --arguments ARGUMENTS [ARGUMENTS ...]  arguments for the contract transaction, as numbers or hex-encoded. E.g.
                                          --arguments 42 0x64 1000 0xabba
@@ -358,11 +366,12 @@ optional arguments:
   --gas-limit GAS_LIMIT  ⛽ the gas limit
   --value VALUE          the value to transfer (default: 0)
   --data DATA            the payload, or 'memo' of the transaction (default: )
-  --chain CHAIN          the chain identifier (default: v1.0.147)
+  --chain CHAIN          the chain identifier (default: T)
   --version VERSION      the transaction version (default: 1)
   --data-file DATA_FILE  a file containing transaction data
   --outfile OUTFILE      where to save the output (signed transaction, hash) (default: stdout)
   --send                 ✓ whether to broadcast (send) the transaction (default: False)
+  --relay                whether to relay the transaction (default: False)
   --proxy PROXY          🖧 the URL of the proxy (default: https://testnet-api.elrond.com)
 
 ```
@@ -398,14 +407,14 @@ optional arguments:
   --proxy PROXY    🖧 the URL of the proxy (default: https://testnet-api.elrond.com)
 
 ```
-## Group **Blocks**
+## Group **Hyperblocks**
 
 
 ```
-$ erdpy block --help
-usage: erdpy block COMMAND [-h] ...
+$ erdpy hyperblock --help
+usage: erdpy hyperblock COMMAND [-h] ...
 
-Get Block data from the Network
+Get Hyperblock from the Network
 
 COMMANDS:
   {get}
@@ -414,22 +423,19 @@ OPTIONS:
   -h, --help  show this help message and exit
 
 ```
-### Blocks.Get
+### Hyperblock.Get
 
 
 ```
-$ erdpy block get --help
-usage: erdpy block get [-h] ...
+$ erdpy hyperblock get --help
+usage: erdpy hyperblock get [-h] ...
 
-Get block
+Get hyperblock
 
 optional arguments:
   -h, --help     show this help message and exit
   --proxy PROXY  🖧 the URL of the proxy (default: https://testnet-api.elrond.com)
-  --hash HASH    the hash of block
-  --nonce NONCE  the nonce of block
-  --shard SHARD  the shard of block
-  --with-txs     the returned block will contains all transactions
+  --key KEY      the hash or the nonce of the hyperblock
 
 ```
 ## Group **Validator**
@@ -480,7 +486,7 @@ optional arguments:
   --gas-limit GAS_LIMIT              ⛽ the gas limit
   --estimate-gas                     ⛽ whether to estimate the gas limit (default: 0)
   --value VALUE                      the value to transfer (default: 0)
-  --chain CHAIN                      the chain identifier (default: v1.0.147)
+  --chain CHAIN                      the chain identifier (default: T)
   --version VERSION                  the transaction version (default: 1)
   --outfile OUTFILE                  where to save the output (signed transaction, hash) (default: stdout)
   --reward-address REWARD_ADDRESS    the reward address
@@ -509,7 +515,7 @@ optional arguments:
   --gas-limit GAS_LIMIT                  ⛽ the gas limit
   --estimate-gas                         ⛽ whether to estimate the gas limit (default: 0)
   --value VALUE                          the value to transfer (default: 0)
-  --chain CHAIN                          the chain identifier (default: v1.0.147)
+  --chain CHAIN                          the chain identifier (default: T)
   --version VERSION                      the transaction version (default: 1)
   --outfile OUTFILE                      where to save the output (signed transaction, hash) (default: stdout)
   --nodes-public-keys NODES_PUBLIC_KEYS  the public keys of the nodes as CSV (addrA,addrB)
@@ -537,7 +543,7 @@ optional arguments:
   --gas-limit GAS_LIMIT                  ⛽ the gas limit
   --estimate-gas                         ⛽ whether to estimate the gas limit (default: 0)
   --value VALUE                          the value to transfer (default: 0)
-  --chain CHAIN                          the chain identifier (default: v1.0.147)
+  --chain CHAIN                          the chain identifier (default: T)
   --version VERSION                      the transaction version (default: 1)
   --outfile OUTFILE                      where to save the output (signed transaction, hash) (default: stdout)
   --nodes-public-keys NODES_PUBLIC_KEYS  the public keys of the nodes as CSV (addrA,addrB)
@@ -565,7 +571,7 @@ optional arguments:
   --gas-limit GAS_LIMIT                  ⛽ the gas limit
   --estimate-gas                         ⛽ whether to estimate the gas limit (default: 0)
   --value VALUE                          the value to transfer (default: 0)
-  --chain CHAIN                          the chain identifier (default: v1.0.147)
+  --chain CHAIN                          the chain identifier (default: T)
   --version VERSION                      the transaction version (default: 1)
   --outfile OUTFILE                      where to save the output (signed transaction, hash) (default: stdout)
   --nodes-public-keys NODES_PUBLIC_KEYS  the public keys of the nodes as CSV (addrA,addrB)
@@ -593,7 +599,7 @@ optional arguments:
   --gas-limit GAS_LIMIT            ⛽ the gas limit
   --estimate-gas                   ⛽ whether to estimate the gas limit (default: 0)
   --value VALUE                    the value to transfer (default: 0)
-  --chain CHAIN                    the chain identifier (default: v1.0.147)
+  --chain CHAIN                    the chain identifier (default: T)
   --version VERSION                the transaction version (default: 1)
   --outfile OUTFILE                where to save the output (signed transaction, hash) (default: stdout)
   --reward-address REWARD_ADDRESS  the new reward address
@@ -621,7 +627,7 @@ optional arguments:
   --gas-limit GAS_LIMIT  ⛽ the gas limit
   --estimate-gas         ⛽ whether to estimate the gas limit (default: 0)
   --value VALUE          the value to transfer (default: 0)
-  --chain CHAIN          the chain identifier (default: v1.0.147)
+  --chain CHAIN          the chain identifier (default: T)
   --version VERSION      the transaction version (default: 1)
   --outfile OUTFILE      where to save the output (signed transaction, hash) (default: stdout)
 
@@ -699,7 +705,7 @@ OPTIONS:
 ----------------
 COMMANDS summary
 ----------------
-derive                         derive a PEM file from a mnemonic or generate a new PEM file (for tests only!)
+derive                         Derive a PEM file from a mnemonic or generate a new PEM file (for tests only!)
 bech32                         Helper for encoding and decoding bech32 addresses
 
 ```
@@ -710,14 +716,15 @@ bech32                         Helper for encoding and decoding bech32 addresses
 $ erdpy wallet derive --help
 usage: erdpy wallet derive [-h] ...
 
-derive a PEM file from a mnemonic or generate a new PEM file (for tests only!)
+Derive a PEM file from a mnemonic or generate a new PEM file (for tests only!)
 
 positional arguments:
-  pem         path of the output PEM file
+  pem            path of the output PEM file
 
 optional arguments:
-  -h, --help  show this help message and exit
-  --mnemonic  whether to derive from an existing mnemonic
+  -h, --help     show this help message and exit
+  --mnemonic     whether to derive from an existing mnemonic
+  --index INDEX  the account index
 
 ```
 ### Wallet.Bech32
@@ -736,6 +743,78 @@ optional arguments:
   -h, --help  show this help message and exit
   --encode    whether to encode
   --decode    whether to decode
+
+```
+## Group **Testnet**
+
+
+```
+$ erdpy testnet --help
+usage: erdpy testnet COMMAND [-h] ...
+
+Set up, start and control local testnets
+
+COMMANDS:
+  {prerequisites,start,stop,config,clean}
+
+OPTIONS:
+  -h, --help            show this help message and exit
+
+```
+### Testnet.Prerequisites
+
+
+```
+$ erdpy testnet prerequisites --help
+usage: erdpy testnet prerequisites [-h] ...
+
+Download and verify the prerequisites for running a testnet
+
+optional arguments:
+  -h, --help               show this help message and exit
+  --configfile CONFIGFILE  An optional configuration file describing the testnet
+
+```
+### Testnet.Config
+
+
+```
+$ erdpy testnet config --help
+usage: erdpy testnet config [-h] ...
+
+Configure a testnet (required before starting it the first time or after clean)
+
+optional arguments:
+  -h, --help               show this help message and exit
+  --configfile CONFIGFILE  An optional configuration file describing the testnet
+
+```
+### Testnet.Start
+
+
+```
+$ erdpy testnet start --help
+usage: erdpy testnet start [-h] ...
+
+Start a testnet
+
+optional arguments:
+  -h, --help               show this help message and exit
+  --configfile CONFIGFILE  An optional configuration file describing the testnet
+
+```
+### Testnet.Clean
+
+
+```
+$ erdpy testnet clean --help
+usage: erdpy testnet clean [-h] ...
+
+Erase the currently configured testnet (must be already stopped)
+
+optional arguments:
+  -h, --help               show this help message and exit
+  --configfile CONFIGFILE  An optional configuration file describing the testnet
 
 ```
 ## Group **Network**
@@ -935,7 +1014,7 @@ optional arguments:
   --gas-limit GAS_LIMIT  ⛽ the gas limit
   --value VALUE          the value to transfer (default: 0)
   --data DATA            the payload, or 'memo' of the transaction (default: )
-  --chain CHAIN          the chain identifier (default: v1.0.147)
+  --chain CHAIN          the chain identifier (default: T)
   --version VERSION      the transaction version (default: 1)
 
 ```
@@ -1088,12 +1167,13 @@ usage: erdpy deps install [-h] ...
 Install dependencies or elrond-sdk modules.
 
 positional arguments:
-  {clang,cpp,rust,arwentools}  the dependency to install
+  {llvm,clang,cpp,arwentools,rust,nodejs,elrond_go,elrond_proxy_go,golang}
+                                                  the dependency to install
 
 optional arguments:
-  -h, --help                   show this help message and exit
-  --overwrite                  whether to overwrite an existing installation
-  --tag TAG                    the tag or version to install
+  -h, --help                                      show this help message and exit
+  --overwrite                                     whether to overwrite an existing installation
+  --tag TAG                                       the tag or version to install
 
 ```
 ### Dependencies.Check
@@ -1106,11 +1186,12 @@ usage: erdpy deps check [-h] ...
 Check whether a dependency is installed.
 
 positional arguments:
-  {clang,cpp,rust,arwentools}  the dependency to check
+  {llvm,clang,cpp,arwentools,rust,nodejs,elrond_go,elrond_proxy_go,golang}
+                                                  the dependency to check
 
 optional arguments:
-  -h, --help                   show this help message and exit
-  --tag TAG                    the tag or version to check
+  -h, --help                                      show this help message and exit
+  --tag TAG                                       the tag or version to check
 
 ```
 ## Group **Configuration**
