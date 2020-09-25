@@ -13,9 +13,7 @@ testStart() {
     cp ./testdata/testnets/testnet_foo.toml ${SANDBOX}/testnet_foo/testnet.toml
     cd ${SANDBOX}/testnet_foo
     ${ERDPY} --verbose testnet config
-    cd ./testnet/seednode
-    ./seednode
-    #${ERDPY} --verbose testnet start
+    ${ERDPY} --verbose testnet start
 
     popd
 }
