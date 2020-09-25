@@ -222,10 +222,12 @@ def build_binaries(testnet_config: TestnetConfiguration):
     myprocess.run_process(['go', 'build'], cwd=proxy_folder, env=golang_env)
 
     # Now copy the binaries to the testnet folder
+    # TODO: don't hardcode the Arwen version.
     libwasmer_path = path.join(golang.get_gopath(), "pkg/mod/github.com/!elrond!network/arwen-wasm-vm@v0.3.35/wasmer/libwasmer_darwin_amd64.dylib")
 
     shutil.copy(seednode_folder / "seednode", testnet_config.seednode_folder())
-    shutil.copy(libwasmer_path, testnet_config.seednode_folder())
+    if workstation.get_platform() == "osx":
+        shutil.copy(libwasmer_path, testnet_config.seednode_folder())
 
     for destination in testnet_config.all_nodes_folders():
         shutil.copy(node_folder / "node", destination)

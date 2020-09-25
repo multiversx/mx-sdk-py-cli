@@ -18,5 +18,6 @@ def patch_for_seednode(data: Any, testnet_config: TestnetConfiguration):
     port_seednode = testnet_config.networking['port_seednode']
 
     data['Node']['Port'] = str(port_seednode)
+    data['Node']['MaximumExpectedPeerCount'] = 16
     data['KadDhtPeerDiscovery']['ProtocolID'] = PROTOCOL_ID
     data['Sharding']['Type'] = "NilListSharder"
