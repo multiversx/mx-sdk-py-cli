@@ -1,8 +1,9 @@
 import logging
 import shutil
+from os import path
 
 import erdpy.utils as utils
-from erdpy import dependencies, myprocess
+from erdpy import dependencies, myprocess, workstation
 from erdpy.dependencies.install import install_module
 from erdpy.testnet import (genesis_json, genesis_smart_contracts_json,
                            node_config_toml, nodes_setup_json, p2p_toml,
@@ -198,7 +199,8 @@ def makefolder(path):
 
 
 def build_binaries(testnet_config: TestnetConfiguration):
-    golang_env = dependencies.get_module_by_key("golang").get_env()
+    golang = dependencies.get_module_by_key("golang")
+    golang_env = golang.get_env()
     myprocess.run_process(['go', 'env'], env=golang_env)
 
     logger.info("Building seednode...")
@@ -225,6 +227,10 @@ def build_binaries(testnet_config: TestnetConfiguration):
     for destination in testnet_config.all_nodes_folders():
         shutil.copy(node_folder / "node", destination)
         shutil.copy(node_folder / "arwen", destination)
+
+        if workstation.get_platform() == "osx":
+            libwasmer_path = path.join(golang.get_gopath(), "pkg/mod/github.com/!elrond!network/arwen-wasm-vm@v0.3.35/wasmer/libwasmer_darwin_amd64.dylib")
+            shutil.copy(libwasmer_path, destination)
 
     shutil.copy(proxy_folder / "proxy", testnet_config.proxy_folder())
 

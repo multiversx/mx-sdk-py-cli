@@ -148,10 +148,13 @@ class GolangModule(StandaloneModule):
 
         return {
             "PATH": f"{path.join(directory, 'go/bin')}:{os.environ['PATH']}",
-            "GOPATH": path.join(parent_directory, "GOPATH"),
+            "GOPATH": self.get_gopath(),
             "GOCACHE": path.join(parent_directory, "GOCACHE"),
             "GOROOT": path.join(directory, "go")
         }
+
+    def get_gopath(self):
+        return path.join(self.get_parent_directory(), "GOPATH")
 
 
 class NodejsModule(StandaloneModule):
