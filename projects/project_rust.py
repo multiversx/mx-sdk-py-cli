@@ -50,7 +50,8 @@ class ProjectRust(Project):
             raise errors.BuildError(f"error code = {result}, see output")
 
     def _copy_build_artifacts_to_output(self):
-        name_with_suffix = f"{self.cargo_file.package_name}_wasm.wasm"
+        name = self.cargo_file.package_name.replace("-", "_")
+        name_with_suffix = f"{name}_wasm.wasm"
         name_without_suffix = f"{self.cargo_file.package_name}.wasm"
         wasm_file = Path(self.directory, "wasm", "target", "wasm32-unknown-unknown", "release", name_with_suffix).resolve()
         self._copy_to_output(wasm_file, name_without_suffix)
