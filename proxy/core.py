@@ -1,6 +1,7 @@
 import logging
-from typing import Any, Dict, List, Tuple
+from typing import Any, List, Tuple
 
+from erdpy import utils
 from erdpy.accounts import Address
 from erdpy.proxy.http_facade import do_get, do_post
 from erdpy.proxy.messages import NetworkConfig
@@ -83,6 +84,12 @@ class ElrondProxy:
         response = do_post(url, payload)
         tx_hash = response.get("txHash")
         return tx_hash
+
+    def simulate_transaction(self, payload: Any) -> str:
+        url = f"{self.url}/transaction/simulate"
+        utils.dump_out_json(payload)
+        response = do_post(url, payload)
+        return response
 
     def send_transactions(self, payload: List[Any]) -> Tuple[int, List[str]]:
         url = f"{self.url}/transaction/send-multiple"

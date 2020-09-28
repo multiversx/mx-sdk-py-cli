@@ -53,8 +53,9 @@ class TestnetConfiguration:
             # built by GitHub, the folder will contain the tag in two variants:
             # with the 'v' prefix (e.g. "v1.1.0"), but also without (e.g.
             # "1.1.0"), hence the need for {NOvTAG}.
-            default_no_v_tag = default_tag.replace('v', '')
-            path = path.replace('{NOvTAG}', default_no_v_tag)
+            if default_tag.startswith("v"):
+                default_tag = default_tag[1:]
+            path = path.replace('{NOvTAG}', default_tag)
 
             self.config['folders'][key] = Path(path).expanduser()
 

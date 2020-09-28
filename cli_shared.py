@@ -1,12 +1,11 @@
 import argparse
-from erdpy.proxy.core import ElrondProxy
-from erdpy import errors
-from erdpy.accounts import Account
 import sys
 from argparse import FileType
 from typing import Any, Text
 
-from erdpy import config, utils
+from erdpy import config, errors, utils
+from erdpy.accounts import Account
+from erdpy.proxy.core import ElrondProxy
 
 
 def wider_help_formatter(prog: Text):
@@ -101,3 +100,16 @@ def prepare_nonce_in_args(args: Any):
 
         account.sync_nonce(ElrondProxy(args.proxy))
         args.nonce = account.nonce
+
+
+def add_broadcast_args(sub: Any):
+    sub.add_argument("--send", action="store_true", default=False, help="✓ whether to broadcast the transaction (default: %(default)s)")
+    sub.add_argument("--simulate", action="store_true", default=False, help="whether to simulate the transaction (default: %(default)s)")
+    sub.add_argument("--relay", action="store_true", default=False, help="whether to relay the transaction (default: %(default)s)")
+
+
+def check_broadcast_args(args: Any):
+    if args.relay and args.send:
+        raise errors.BadUsage("Cannot directly send a relayed transaction. Use 'erdpy tx new --relay' first, then 'erdpy tx send --data-file'")
+    if args.send and args.simulate:
+        raise errors.BadUsage("Cannot both 'simulate' and 'send' a transaction")

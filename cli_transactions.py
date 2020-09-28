@@ -13,8 +13,7 @@ def setup_parser(subparsers: Any) -> Any:
     sub = cli_shared.add_command_subparser(subparsers, "tx", "new", "Create a new transaction")
     _add_common_arguments(sub)
     cli_shared.add_outfile_arg(sub, what="signed transaction, hash")
-    sub.add_argument("--send", action="store_true", default=False, help="✓ whether to broadcast (send) the transaction (default: %(default)s)")
-    sub.add_argument("--relay", action="store_true", default=False, help="whether to relay the transaction (default: %(default)s)")
+    cli_shared.add_broadcast_args(sub)
     cli_shared.add_proxy_arg(sub)
     sub.set_defaults(func=create_transaction)
 
@@ -43,6 +42,7 @@ def _add_common_arguments(sub: Any):
 def create_transaction(args: Any):
     args = utils.as_object(args)
 
+    cli_shared.check_broadcast_args(args)
     cli_shared.prepare_nonce_in_args(args)
 
     if args.data_file:
@@ -57,6 +57,9 @@ def create_transaction(args: Any):
     try:
         if args.send:
             tx.send(ElrondProxy(args.proxy))
+        elif args.simulate:
+            response = tx.simulate(ElrondProxy(args.proxy))
+            utils.dump_out_json(response)
     finally:
         tx.dump_to(args.outfile)
 

@@ -82,6 +82,13 @@ class Transaction(ITransaction):
         logger.info(f"Hash: {self.hash}")
         return self.hash
 
+    def simulate(self, proxy: IElrondProxy):
+        if not self.signature:
+            raise errors.TransactionIsNotSigned()
+
+        dictionary = self.to_dictionary()
+        return proxy.simulate_transaction(dictionary)
+
     def to_dictionary(self) -> Dict[str, Any]:
         dictionary: Dict[str, Any] = OrderedDict()
         dictionary["nonce"] = self.nonce

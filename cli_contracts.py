@@ -7,6 +7,7 @@ from erdpy.accounts import Account, Address
 from erdpy.contracts import CodeMetadata, SmartContract
 from erdpy.projects import load_project
 from erdpy.proxy.core import ElrondProxy
+from erdpy.transactions import Transaction
 
 logger = logging.getLogger("cli.contracts")
 
@@ -48,7 +49,7 @@ def setup_parser(subparsers: Any) -> Any:
     cli_shared.add_proxy_arg(sub)
     cli_shared.add_tx_args(sub, with_receiver=False, with_data=False)
     _add_arguments_arg(sub)
-    _add_send_arg(sub)
+    cli_shared.add_broadcast_args(sub)
 
     sub.set_defaults(func=deploy)
 
@@ -60,7 +61,7 @@ def setup_parser(subparsers: Any) -> Any:
     cli_shared.add_tx_args(sub, with_receiver=False, with_data=False)
     _add_function_arg(sub)
     _add_arguments_arg(sub)
-    _add_send_arg(sub)
+    cli_shared.add_broadcast_args(sub)
 
     sub.set_defaults(func=call)
 
@@ -73,7 +74,7 @@ def setup_parser(subparsers: Any) -> Any:
     cli_shared.add_proxy_arg(sub)
     cli_shared.add_tx_args(sub, with_receiver=False, with_data=False)
     _add_arguments_arg(sub)
-    _add_send_arg(sub)
+    cli_shared.add_broadcast_args(sub)
 
     sub.set_defaults(func=upgrade)
 
@@ -116,10 +117,6 @@ def _add_metadata_arg(sub: Any):
     sub.set_defaults(metadata_upgradeable=True, metadata_payable=False)
 
 
-def _add_send_arg(sub: Any):
-    sub.add_argument("--send", action="store_true", default=False, help="✓ whether to broadcast the transaction (default: %(default)s)")
-
-
 def list_templates(args: Any):
     projects.list_project_templates()
 
@@ -154,6 +151,7 @@ def run_tests(args: Any):
 
 def deploy(args: Any):
     logger.debug("deploy")
+    cli_shared.check_broadcast_args(args)
 
     arguments = args.arguments
     gas_price = args.gas_price
@@ -169,8 +167,7 @@ def deploy(args: Any):
     logger.info("Contract address: %s", contract.address)
 
     try:
-        if args.send:
-            tx.send(ElrondProxy(args.proxy))
+        _send_or_simulate(tx, args)
     finally:
         tx.dump_to(args.outfile, extra={"address": contract.address.bech32()})
 
@@ -204,6 +201,7 @@ def _prepare_sender(args: Any) -> Account:
 
 def call(args: Any):
     logger.debug("call")
+    cli_shared.check_broadcast_args(args)
 
     contract_address = args.contract
     function = args.function
@@ -219,14 +217,14 @@ def call(args: Any):
 
     tx = contract.execute(sender, function, arguments, gas_price, gas_limit, value, chain, version)
     try:
-        if args.send:
-            tx.send(ElrondProxy(args.proxy))
+        _send_or_simulate(tx, args)
     finally:
         tx.dump_to(args.outfile)
 
 
 def upgrade(args: Any):
     logger.debug("upgrade")
+    cli_shared.check_broadcast_args(args)
 
     contract_address = args.contract
     arguments = args.arguments
@@ -242,8 +240,7 @@ def upgrade(args: Any):
 
     tx = contract.upgrade(sender, arguments, gas_price, gas_limit, value, chain, version)
     try:
-        if args.send:
-            tx.send(ElrondProxy(args.proxy))
+        _send_or_simulate(tx, args)
     finally:
         tx.dump_to(args.outfile)
 
@@ -258,3 +255,11 @@ def query(args: Any):
     contract = SmartContract(contract_address)
     result = contract.query(ElrondProxy(args.proxy), function, arguments)
     print(result)
+
+
+def _send_or_simulate(tx: Transaction, args: Any):
+    if args.send:
+        tx.send(ElrondProxy(args.proxy))
+    elif args.simulate:
+        response = tx.simulate(ElrondProxy(args.proxy))
+        utils.dump_out_json(response)
