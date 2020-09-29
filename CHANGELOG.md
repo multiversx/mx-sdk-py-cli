@@ -4,6 +4,11 @@ All notable changes will be documented in this file.
 
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
+## [0.8.7] - 29.09.2020
+ - Allow one to start a local testnet via `erdpy testnet ...` commands.
+ - Simulate transactions via `--simulate` flag (both regular and smart contract transactions).
+ - Rust build - fix name of binary artifact ("-" vs. "_").
+
 ## [0.8.5] - 14.09.2020
  - Fix templates patching to work with elrond-wasm `0.6.0`.
  - Update build with respect to elrond-wasm `0.6.0`.

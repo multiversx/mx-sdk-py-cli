@@ -59,7 +59,7 @@
     - [Configuration.Dump](#configurationdump)
     - [Configuration.Get](#configurationget)
     - [Configuration.Set](#configurationset)
-  
+
 ## Overview
 
 **erdpy** exposes a number of CLI **commands**, organized within **groups**.
@@ -230,6 +230,8 @@ optional arguments:
   --arguments ARGUMENTS [ARGUMENTS ...]  arguments for the contract transaction, as numbers or hex-encoded. E.g.
                                          --arguments 42 0x64 1000 0xabba
   --send                                 ✓ whether to broadcast the transaction (default: False)
+  --simulate                             whether to simulate the transaction (default: False)
+  --relay                                whether to relay the transaction (default: False)
 
 ```
 ### Contract.Call
@@ -263,6 +265,8 @@ optional arguments:
   --arguments ARGUMENTS [ARGUMENTS ...]  arguments for the contract transaction, as numbers or hex-encoded. E.g.
                                          --arguments 42 0x64 1000 0xabba
   --send                                 ✓ whether to broadcast the transaction (default: False)
+  --simulate                             whether to simulate the transaction (default: False)
+  --relay                                whether to relay the transaction (default: False)
 
 ```
 ### Contract.Upgrade
@@ -299,6 +303,8 @@ optional arguments:
   --arguments ARGUMENTS [ARGUMENTS ...]  arguments for the contract transaction, as numbers or hex-encoded. E.g.
                                          --arguments 42 0x64 1000 0xabba
   --send                                 ✓ whether to broadcast the transaction (default: False)
+  --simulate                             whether to simulate the transaction (default: False)
+  --relay                                whether to relay the transaction (default: False)
 
 ```
 ### Contract.Query
@@ -370,7 +376,8 @@ optional arguments:
   --version VERSION      the transaction version (default: 1)
   --data-file DATA_FILE  a file containing transaction data
   --outfile OUTFILE      where to save the output (signed transaction, hash) (default: stdout)
-  --send                 ✓ whether to broadcast (send) the transaction (default: False)
+  --send                 ✓ whether to broadcast the transaction (default: False)
+  --simulate             whether to simulate the transaction (default: False)
   --relay                whether to relay the transaction (default: False)
   --proxy PROXY          🖧 the URL of the proxy (default: https://testnet-api.elrond.com)
 

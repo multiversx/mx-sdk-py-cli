@@ -8,9 +8,8 @@ from erdpy.testnet.config import TestnetConfiguration
 logger = logging.getLogger("testnet")
 
 
-
 NODES_START_DELAY = 5
-PROXY_START_DELAY = 40
+PROXY_START_DELAY = 30
 
 
 def start(args: Any):
