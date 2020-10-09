@@ -25,8 +25,7 @@ def sign_transaction(transaction: ITransaction, account: IAccount) -> str:
 
 def sign_message_with_bls_key(message, seed):
     dependencies.install_module("mcl_signer")
-    module = dependencies.get_module_by_key("mcl_signer")
-    tool = path.join(module.get_parent_directory(), "signer")
+    tool = path.join(dependencies.get_module_directory("mcl_signer"), "signer")
 
     try:
         signed_message = myprocess.run_process([tool, message, seed], dump_to_stdout=False)

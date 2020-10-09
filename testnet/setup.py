@@ -123,6 +123,11 @@ def patch_node_config(testnet_config: TestnetConfiguration):
         node_config_toml.patch_api(data, testnet_config)
         utils.write_toml_file(config_file, data)
 
+        config_file = node_config / 'systemSmartContractsConfig.toml'
+        data = utils.read_toml_file(config_file)
+        node_config_toml.patch_system_smart_contracts(data, testnet_config)
+        utils.write_toml_file(config_file, data)
+
         genesis_smart_contracts_file = node_config / 'genesisSmartContracts.json'
         data = utils.read_json_file(genesis_smart_contracts_file)
         genesis_smart_contracts_json.patch(data, testnet_config)

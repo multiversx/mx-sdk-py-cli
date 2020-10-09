@@ -16,3 +16,10 @@ def patch_api(data: Any, testnet_config: TestnetConfiguration):
     routes = data['APIPackages']['transaction']['Routes']
     for route in routes:
         route["Open"] = True
+
+
+def patch_system_smart_contracts(data: Any, testnet_config: TestnetConfiguration):
+    data['StakingSystemSCConfig']['StakeEnableEpoch'] = 0
+    data['StakingSystemSCConfig']['ActivateBLSPubKeyMessageVerification'] = True
+    data['ESDTSystemSCConfig']['EnabledEpoch'] = 0
+

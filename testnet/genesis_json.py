@@ -30,7 +30,7 @@ def build(testnet_config: TestnetConfiguration) -> List[Any]:
 
     for nickname, account in wallets.get_users().items():
         # The last user (mike) gets all remaining tokens
-        value = remaining_supply if is_last_user(nickname) else 10000000000000000000000
+        value = remaining_supply if is_last_user(nickname) else 100000000000000000000000
         delegated_value = remaining_to_delegate if is_last_user(nickname) else 100000000000000000000
         entry = _build_user_entry(nickname, account, value, delegated_value, delegation_address)
         genesis_items.append(entry)
