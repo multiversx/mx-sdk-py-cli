@@ -1,10 +1,10 @@
 import logging
+from os import path
 from typing import Any
 
 import nacl.encoding
 import nacl.signing
-
-from erdpy import myprocess, workstation
+from erdpy import dependencies, myprocess
 from erdpy.errors import CannotSignMessageWithBLSKey
 from erdpy.interfaces import IAccount, ITransaction
 
@@ -24,13 +24,12 @@ def sign_transaction(transaction: ITransaction, account: IAccount) -> str:
 
 
 def sign_message_with_bls_key(message, seed):
-    return "genesis".encode().hex()
+    dependencies.install_module("mcl_signer")
+    module = dependencies.get_module_by_key("mcl_signer")
+    tool = path.join(module.get_parent_directory(), "signer")
 
-    # sign message with a go binary
     try:
-        path = workstation.get_tools_folder()
-        path_to_mcl_signer = f'{path}/signer/signer'
-        signed_message = myprocess.run_process([path_to_mcl_signer, message, seed], dump_to_stdout=False)
+        signed_message = myprocess.run_process([tool, message, seed], dump_to_stdout=False)
         return signed_message
     except Exception:
         raise CannotSignMessageWithBLSKey()

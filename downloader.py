@@ -1,6 +1,7 @@
 
 import logging
 import sys
+
 import requests
 
 from erdpy import errors
@@ -28,7 +29,7 @@ def download(url: str, filename: str) -> None:
                 file.write(chunk)
                 progress = _report_download_progress(progress, chunk_number, total_size)
                 chunk_number += 1
-            print(f"100 %", end="\r", file=sys.stderr)
+            print("100 %", end="\r", file=sys.stderr)
             print()
     except requests.HTTPError as err:
         raise errors.DownloadError(

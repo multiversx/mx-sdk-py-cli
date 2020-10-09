@@ -3,8 +3,8 @@ from typing import Dict, List
 
 from erdpy import config, errors
 from erdpy.dependencies.modules import (ArwenToolsModule, DependencyModule,
-                                        GolangModule, NodejsModule, Rust,
-                                        StandaloneModule)
+                                        GolangModule, MclSignerModule,
+                                        NodejsModule, Rust, StandaloneModule)
 
 logger = logging.getLogger("install")
 
@@ -46,5 +46,6 @@ def get_all_deps() -> List[DependencyModule]:
         NodejsModule(key="nodejs", aliases=[]),
         StandaloneModule(key="elrond_go"),
         StandaloneModule(key="elrond_proxy_go"),
-        GolangModule(key="golang")
+        GolangModule(key="golang"),
+        MclSignerModule(key="mcl_signer")
     ]

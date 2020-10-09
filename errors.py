@@ -35,6 +35,10 @@ class BadUrlError(DownloadError):
     pass
 
 
+class UnknownArchiveType(KnownError):
+    pass
+
+
 class DependencyMissing(KnownError):
     def __init__(self, name: str, tag: str):
         super().__init__(f"Dependency missing: {name} {tag}")
