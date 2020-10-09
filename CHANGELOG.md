@@ -4,6 +4,12 @@ All notable changes will be documented in this file.
 
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
+## [0.8.9] - 09.10.2020
+ - Minor `erdpy-up` improvements.
+ - Minor `erdpy testnet ...` fixes regarding the patched configuration of the Node (`config.toml`).
+ - Reference newest `arwentools`.
+ - Fix response casing for `contract query`.
+
 ## [0.8.7] - 29.09.2020
  - Allow one to start a local testnet via `erdpy testnet ...` commands.
  - Simulate transactions via `--simulate` flag (both regular and smart contract transactions).
