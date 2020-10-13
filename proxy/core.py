@@ -31,7 +31,8 @@ class ElrondProxy:
     def get_account(self, address: Address):
         url = f"{self.url}/address/{address.bech32()}"
         response = do_get(url)
-        return response
+        account = response.get("account", dict())
+        return account
 
     def get_account_transactions(self, address: Address):
         TRUNCATE_DATA_THRESHOLD = 75
