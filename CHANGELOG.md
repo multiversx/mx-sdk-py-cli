@@ -4,6 +4,11 @@ All notable changes will be documented in this file.
 
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
+## [0.9.1] - 15.10.2020
+ - Adjust `erdpy validator` commands to use the `MCL signer` (external component).
+ - Fix `erdpy account` with flags `--nonce, --balance`.
+ - Possible fix for setup / installation: https://github.com/ElrondNetwork/elrond-sdk/issues/58.
+
 ## [0.8.9] - 09.10.2020
  - Minor `erdpy-up` improvements.
  - Minor `erdpy testnet ...` fixes regarding the patched configuration of the Node (`config.toml`).
