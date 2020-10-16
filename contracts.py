@@ -132,10 +132,14 @@ class SmartContract:
         }
 
         response = proxy.query_contract(payload)
-        return_data = response.get("data", {}).get("returnData")
+        response_data = response.get("data", {})
+        return_data = response_data.get("returnData", response_data.get("ReturnData"))
         return [self._interpret_return_data(data) for data in return_data]
 
     def _interpret_return_data(self, data):
+        if not data:
+            return data
+
         try:
             as_bytes = base64.b64decode(data)
             as_hex = as_bytes.hex()
