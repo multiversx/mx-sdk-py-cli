@@ -22,7 +22,6 @@ class Project:
         self._ensure_dependencies_installed()
         self.perform_build()
         self._copy_build_artifacts_to_output()
-        self._create_deploy_files()
 
     def clean(self):
         utils.remove_folder(self._get_output_folder())
@@ -71,15 +70,6 @@ class Project:
 
     def _get_output_folder(self):
         return path.join(self.directory, "output")
-
-    def _create_deploy_files(self):
-        file_wasm = self.get_file_wasm()
-        file_wasm_hex = file_wasm.with_suffix(".hex")
-
-        with open(file_wasm, "rb") as file:
-            bytecode_hex = binascii.hexlify(file.read())
-        with open(file_wasm_hex, "wb+") as file:
-            file.write(bytecode_hex)
 
     def get_bytecode(self):
         bytecode = utils.read_file(self.get_file_wasm(), binary=True)
