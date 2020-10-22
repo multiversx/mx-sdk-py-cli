@@ -226,6 +226,12 @@ class TemplateRust(Template):
             ]
         )
 
+        for file in test_paths:
+            data = utils.read_json_file(file)
+            # Patch fields
+            data["name"] = data.get("name", "").replace(self.template_name, self.project_name)
+            utils.write_json_file(file, data)
+
     def _replace_in_files(self, files, replacements):
         for file in files:
             content = utils.read_file(file)
