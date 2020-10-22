@@ -3,6 +3,7 @@ import logging
 import os
 import shutil
 from os import path
+from pathlib import Path
 from typing import Dict, List
 
 from erdpy import config, downloader, errors, myprocess, utils, workstation
@@ -169,7 +170,13 @@ class NodejsModule(StandaloneModule):
         super().__init__(key, aliases)
 
     def _post_install(self, tag: str):
-        pass
+        # We'll create a symlink towards the payload folder
+        subfolder_to_bypass = self._get_download_url(tag).split("/")[-1]
+        subfolder_to_bypass = subfolder_to_bypass.replace(f".{self.archive_type}", "")
+        payload_folder = path.join(self.get_directory(tag), subfolder_to_bypass)
+        link = path.join(self.get_parent_directory(), "latest")
+        
+        utils.symlink(payload_folder, link)
 
     def get_env(self):
         return {
