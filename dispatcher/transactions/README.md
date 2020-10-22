@@ -13,7 +13,7 @@ erdpy dispatcher enqueue --value="100" --receiver="erd1cux02zersde0l7hhklzhywcxk
 This operation manages the nonce sequence, signs the transactions and sends them to the blockchain.
 
 ```
-erdpy dispatcher dispatch --proxy="https://testnet-api.elrond.com" --pem="alice.pem"
+erdpy dispatcher dispatch --proxy="https://api-testnet.elrond.com" --pem="alice.pem"
 ```
 
 ### Continuously dispatch transactions
@@ -21,7 +21,7 @@ erdpy dispatcher dispatch --proxy="https://testnet-api.elrond.com" --pem="alice.
 Same as above, but in a continuous, neverending process. The dispatch takes place at the specified time interval (in seconds).
 
 ```
-erdpy dispatcher dispatch-continuously --proxy="https://testnet-api.elrond.com" -pem="./examples/keys/alice.pem" --interval=30
+erdpy dispatcher dispatch-continuously --proxy="https://api-testnet.elrond.com" -pem="./examples/keys/alice.pem" --interval=30
 ```
 
 ### Unregister (clear) all enqueued transactions

@@ -1,4 +1,3 @@
-import binascii
 import glob
 import logging
 import shutil
