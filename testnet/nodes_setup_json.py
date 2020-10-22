@@ -5,6 +5,8 @@ from erdpy.testnet import wallets
 from erdpy.testnet.config import TestnetConfiguration
 from erdpy.testnet.genesis import get_delegation_address, is_foundational_node
 
+CHAIN_ID = "local-testnet"
+
 
 def build(testnet_config: TestnetConfiguration) -> Any:
     num_validators = testnet_config.num_all_validators()
@@ -23,7 +25,7 @@ def build(testnet_config: TestnetConfiguration) -> Any:
         "metaChainMinNodes": testnet_config.metashard["validators"],
         "hysteresis": 0,
         "adaptivity": False,
-        "chainID": "local-testnet",
+        "chainID": CHAIN_ID,
         "minTransactionVersion": 1,
         "initialNodes": initial_nodes
     }

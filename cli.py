@@ -17,7 +17,7 @@ import erdpy.cli_testnet
 import erdpy.cli_transactions
 import erdpy.cli_validators
 import erdpy.cli_wallet
-from erdpy import errors
+from erdpy import errors, scope
 from erdpy._version import __version__
 
 logger = logging.getLogger("cli")
@@ -42,6 +42,8 @@ def _do_main():
         logging.basicConfig(level=logging.DEBUG)
     else:
         logging.basicConfig(level=logging.WARN)
+
+    scope.initialize()
 
     if not hasattr(args, "func"):
         parser.print_help()

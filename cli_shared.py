@@ -3,7 +3,7 @@ import sys
 from argparse import FileType
 from typing import Any, Text
 
-from erdpy import config, errors, utils
+from erdpy import config, errors, scope, utils
 from erdpy.accounts import Account
 from erdpy.proxy.core import ElrondProxy
 
@@ -64,8 +64,8 @@ def add_tx_args(sub: Any, with_nonce: bool = True, with_receiver: bool = True, w
     if with_data:
         sub.add_argument("--data", default="", help="the payload, or 'memo' of the transaction (default: %(default)s)")
 
-    sub.add_argument("--chain", default=config.get_chain_id(), help="the chain identifier (default: %(default)s)")
-    sub.add_argument("--version", type=int, default=config.get_tx_version(), help="the transaction version (default: %(default)s)")
+    sub.add_argument("--chain", default=scope.get_chain_id(), help="the chain identifier (default: %(default)s)")
+    sub.add_argument("--version", type=int, default=scope.get_tx_version(), help="the transaction version (default: %(default)s)")
 
 
 def add_wallet_args(sub: Any):
@@ -76,7 +76,7 @@ def add_wallet_args(sub: Any):
 
 
 def add_proxy_arg(sub: Any):
-    sub.add_argument("--proxy", default=config.get_proxy(), help="🖧 the URL of the proxy (default: %(default)s)")
+    sub.add_argument("--proxy", default=scope.get_proxy(), help="🖧 the URL of the proxy (default: %(default)s)")
 
 
 def add_outfile_arg(sub: Any, what: str = ""):
