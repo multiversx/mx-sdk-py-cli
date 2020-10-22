@@ -29,6 +29,9 @@ def main():
     except errors.KnownError as err:
         logger.critical(err.get_pretty())
         sys.exit(1)
+    except KeyboardInterrupt:
+        print("erdpy process killed by user.")
+        sys.exit(1)
 
 
 def _do_main():
