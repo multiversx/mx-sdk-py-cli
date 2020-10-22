@@ -31,13 +31,15 @@ async def do_start(args: Any):
     # Seed node
     to_run.append(run(["./seednode", "--log-save"], cwd=testnet_config.seednode_folder()))
 
+    loglevel = _patch_loglevel(testnet_config.loglevel())
+
     # Observers
     for observer in testnet_config.observers():
         to_run.append(run([
             "./node",
             "--use-log-view",
             "--log-save",
-            f"--log-level=*:DEBUG",
+            f"--log-level={loglevel}",
             "--log-logger-name",
             "--log-correlation",
             f"--destination-shard-as-observer={observer.shard}",
@@ -50,7 +52,7 @@ async def do_start(args: Any):
             "./node",
             "--use-log-view",
             "--log-save",
-            "--log-level=*:DEBUG",
+            f"--log-level={loglevel}",
             "--log-logger-name",
             "--log-correlation",
             f"--rest-api-interface=localhost:{validator.api_port}"
@@ -83,15 +85,29 @@ async def run(args, env=None, cwd: str = None, delay: int = 0):
 
 
 async def _read_stream(stream, pid):
-    markers_of_interest = ["started committing block", "ERROR", "WARN"]
     while True:
         try:
             line = await stream.readline()
             if line:
                 line = line.decode("utf-8", "replace").strip()
-                if any(e in line for e in markers_of_interest):
-                    print(f"[PID={pid}]", line)
+                if _is_interesting_logline(line):
+                    _dump_interesting_log_line(pid, line)
             else:
                 break
         except Exception:
             print(traceback.format_exc())
+
+
+def _patch_loglevel(loglevel: str) -> str:
+    loglevel = loglevel or "*:DEBUG"
+    if "arwen/host:" not in loglevel:
+        loglevel += ",arwen/host:TRACE"
+    return loglevel
+
+
+def _is_interesting_logline(logline):
+    return any(e in logline for e in ["started committing block", "ERROR", "WARN", "arwen"])
+
+
+def _dump_interesting_log_line(pid: str, logline: str) -> str:
+    print(f"[PID={pid}]", logline)

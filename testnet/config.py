@@ -258,11 +258,14 @@ class TestnetConfiguration:
     def proxy_port(self):
         return self.networking["port_proxy"]
 
+    def loglevel(self):
+        return self.features.get("loglevel", "")
+
     @classmethod
     def default(cls):
         config = dict()
         config['features'] = {
-            'loglevel': '*:INFO',
+            'loglevel': '*:DEBUG',
             'proxy': True,
         }
         config['folders'] = {
