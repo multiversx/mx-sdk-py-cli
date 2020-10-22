@@ -3,8 +3,6 @@ from typing import Any, Dict
 
 from erdpy import errors, utils
 
-MODULES_CONFIG_URL = "https://raw.githubusercontent.com/ElrondNetwork/elrond-sdk/master/deps.json"
-
 ROOT_FOLDER_NAME = "elrondsdk"
 CONFIG_PATH = os.path.expanduser("~/elrondsdk/erdpy.json")
 
