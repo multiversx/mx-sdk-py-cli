@@ -67,8 +67,8 @@ def _guard_valid_name(name: str):
 
 def get_defaults() -> Dict[str, Any]:
     return {
-        "proxy": "https://testnet-api.elrond.com",
-        "chainID": "Testnet",
+        "proxy": "https://api-testnet.elrond.com",
+        "chainID": "T",
         "txVersion": "1",
         "dependencies.arwentools.tag": "v0.4.1",
         "dependencies.arwentools.urlTemplate.linux": "https://ide.elrond.com/travis-builds/ARWEN_{TAG}_linux_amd64.tar.gz",
