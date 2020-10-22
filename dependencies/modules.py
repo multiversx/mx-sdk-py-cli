@@ -3,7 +3,6 @@ import logging
 import os
 import shutil
 from os import path
-from pathlib import Path
 from typing import Dict, List
 
 from erdpy import config, downloader, errors, myprocess, utils, workstation
@@ -175,11 +174,14 @@ class NodejsModule(StandaloneModule):
         subfolder_to_bypass = subfolder_to_bypass.replace(f".{self.archive_type}", "")
         payload_folder = path.join(self.get_directory(tag), subfolder_to_bypass)
         link = path.join(self.get_parent_directory(), "latest")
-        
+
         utils.symlink(payload_folder, link)
 
     def get_env(self):
+        bin_folder = path.join(self.get_parent_directory(), "latest", "bin")
+
         return {
+            "PATH": f"{bin_folder}:{os.environ['PATH']}",
         }
 
 
