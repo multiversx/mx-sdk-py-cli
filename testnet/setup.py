@@ -78,8 +78,7 @@ def configure(args):
 def clean(args):
     testnet_config = TestnetConfiguration.from_file(args.configfile)
     logger.info('testnet folder is %s', testnet_config.root())
-
-    shutil.rmtree(testnet_config.root())
+    utils.remove_folder(testnet_config.root())
 
 
 def create_folders(testnet_config: TestnetConfiguration):

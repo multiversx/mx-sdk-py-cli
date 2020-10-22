@@ -38,17 +38,6 @@ def setup_parser(subparsers: Any) -> Any:
                      help=help_config_file)
     sub.set_defaults(func=testnet_start)
 
-    # Stop
-    sub = cli_shared.add_command_subparser(
-        subparsers,
-        "testnet",
-        "stop",
-        "Stop a running testnet"
-    )
-    sub.add_argument("--configfile", type=str, required=False, default=None,
-                     help=help_config_file)
-    sub.set_defaults(func=testnet_stop)
-
     # Config
     sub = cli_shared.add_command_subparser(
         subparsers,
@@ -75,10 +64,6 @@ def setup_parser(subparsers: Any) -> Any:
 def testnet_start(args):
     logger.info("Starting testnet...")
     testnet.start(args)
-
-
-def testnet_stop(args):
-    logger.info("Stop testnet...")
 
 
 def testnet_config(args):
