@@ -1,10 +1,9 @@
-from erdpy import utils
-from erdpy.accounts import Address
-from erdpy.proxy.core import ElrondProxy
-from erdpy import cli_shared
 import logging
 from typing import Any
 
+from erdpy import cli_shared, utils
+from erdpy.accounts import Address
+from erdpy.proxy.core import ElrondProxy
 
 logger = logging.getLogger("cli.accounts")
 
@@ -46,7 +45,7 @@ def get_account(args: Any):
     elif args.nonce:
         print(account.get("nonce", 0))
     else:
-        print(account)
+        utils.dump_out_json(account)
 
 
 def get_account_transactions(args: Any):

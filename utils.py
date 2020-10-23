@@ -101,6 +101,7 @@ def dump_out_json(data: Any, outfile: Any = None):
     if not outfile:
         outfile = sys.stdout
     json.dump(data, outfile, indent=4)
+    outfile.write("\n")
 
 
 def get_subfolders(folder):
