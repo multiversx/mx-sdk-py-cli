@@ -71,6 +71,7 @@ def configure(args):
     copy_config_to_proxy(testnet_config)
     patch_proxy_config(testnet_config)
 
+    patch_source_code(testnet_config)
     build_binaries(testnet_config)
     copy_wallets(testnet_config)
 
@@ -195,16 +196,32 @@ def copy_config_to_proxy(testnet_config: TestnetConfiguration):
 
 def patch_proxy_config(testnet_config: TestnetConfiguration):
     proxy_config_file = testnet_config.proxy_config_folder() / 'config.toml'
-    observers = testnet_config.observer_addresses_sharded_for_proxy_config()
+    nodes = testnet_config.api_addresses_sharded_for_proxy_config()
     data = utils.read_toml_file(proxy_config_file)
-    data['Observers'] = observers
-    data['FullHistoryNodes'] = observers
+    data['Observers'] = nodes
+    data['FullHistoryNodes'] = nodes
     data['GeneralSettings']['ServerPort'] = testnet_config.proxy_port()
     utils.write_toml_file(proxy_config_file, data)
 
 
 def makefolder(path):
     path.mkdir(parents=True, exist_ok=True)
+
+
+def patch_source_code(testnet_config: TestnetConfiguration):
+    logger.info("Patching the source code...")
+
+    folder = testnet_config.node_source()
+
+    file = path.join(folder, "core/constants.go")
+    content = utils.read_file(file)
+    content = content.replace("const MaxNumShards = 256", "const MaxNumShards = 4")
+    utils.write_file(file, content)
+
+    file = path.join(folder, "cmd/node/main.go")
+    content = utils.read_file(file)
+    content = content.replace("secondsToWaitForP2PBootstrap = 20", "secondsToWaitForP2PBootstrap = 1")
+    utils.write_file(file, content)
 
 
 def build_binaries(testnet_config: TestnetConfiguration):

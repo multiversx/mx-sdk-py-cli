@@ -16,6 +16,11 @@ def build(testnet_config: TestnetConfiguration) -> Any:
         entry = _build_initial_nodes_entry(nickname, pubkey, account)
         initial_nodes.append(entry)
 
+    # Then, patch the list of initial nodes, so that higher indexes will become metachain nodes.
+    num_metachain_nodes = testnet_config.num_validators_in_metashard()
+    num_nodes = len(initial_nodes)
+    initial_nodes = initial_nodes[num_nodes - num_metachain_nodes:] + initial_nodes[:num_nodes - num_metachain_nodes]
+
     return {
         "startTime": testnet_config.genesis_time(),
         "roundDuration": 6000,

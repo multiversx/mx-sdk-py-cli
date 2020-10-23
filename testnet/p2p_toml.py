@@ -7,6 +7,7 @@ PROTOCOL_ID = '/erd/kad/sandbox'
 
 def patch(data: Any, testnet_config: TestnetConfiguration, node_index: int, port_first: int) -> Any:
     data['Node']['Port'] = str(port_first + node_index)
+    data['Node']['ThresholdMinConnectedPeers'] = 1
     data['KadDhtPeerDiscovery']['InitialPeerList'] = [
         testnet_config.seednode_address()
     ]

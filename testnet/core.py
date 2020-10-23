@@ -8,8 +8,10 @@ from erdpy.testnet.config import TestnetConfiguration
 logger = logging.getLogger("testnet")
 
 
-NODES_START_DELAY = 5
-PROXY_START_DELAY = 30
+NODES_START_DELAY = 1
+PROXY_START_DELAY = 10
+
+is_after_genesis = False
 
 
 def start(args: Any):
@@ -106,6 +108,13 @@ def _patch_loglevel(loglevel: str) -> str:
 
 
 def _is_interesting_logline(logline):
+    global is_after_genesis
+
+    if "started committing block" in logline:
+        is_after_genesis = True
+
+    if not is_after_genesis:
+        return any(e in logline for e in ["started committing block", "ERROR", "WARN"])    
     return any(e in logline for e in ["started committing block", "ERROR", "WARN", "arwen"])
 
 

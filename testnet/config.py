@@ -1,7 +1,6 @@
 import itertools
 import logging
 import time
-from collections import defaultdict
 from pathlib import Path
 from typing import Any, Dict, Iterator
 
@@ -26,6 +25,9 @@ class Node:
 
     def key_file_path(self):
         return self.config_folder() / 'validatorKey.pem'
+
+    def api_address(self):
+        return f"http://localhost:{self.api_port}"
 
     def __repr__(self) -> str:
         return f"Node {self.index}, shard={self.shard}, port={self.api_port}, folder={self.folder}"
@@ -172,6 +174,12 @@ class TestnetConfiguration:
     def num_observers_per_shard(self):
         return self.shards['observers_per_shard']
 
+    def num_validators_per_shard(self):
+        return self.shards['validators_per_shard']
+
+    def num_validators_in_metashard(self):
+        return self.metashard['validators']
+
     def all_nodes_folders(self):
         return itertools.chain(
             self.validator_folders(),
@@ -188,9 +196,13 @@ class TestnetConfiguration:
         first_port = self.networking['port_first_validator_rest_api']
 
         for i, folder in enumerate(self.validator_folders()):
-            shard = self._get_shard_of_node(i)
+            shard = self._get_shard_of_validator(i)
             port = first_port + i
             yield Node(index=i, folder=folder, shard=shard, api_port=port)
+
+    def _get_shard_of_validator(self, observer_index: int):
+        shard = int(observer_index // self.num_validators_per_shard())
+        return shard if shard < self.num_shards() else self.metashard['metashardID']
 
     def validator_folders(self):
         testnet = self.root()
@@ -205,11 +217,11 @@ class TestnetConfiguration:
         first_port = self.networking['port_first_observer_rest_api']
 
         for i, folder in enumerate(self.observer_folders()):
-            shard = self._get_shard_of_node(i)
+            shard = self._get_shard_of_observer(i)
             api_port = first_port + i
             yield Node(index=i, folder=folder, shard=shard, api_port=api_port)
 
-    def _get_shard_of_node(self, observer_index: int):
+    def _get_shard_of_observer(self, observer_index: int):
         shard = int(observer_index // self.num_observers_per_shard())
         return shard if shard < self.num_shards() else self.metashard['metashardID']
 
@@ -229,31 +241,30 @@ class TestnetConfiguration:
             port = first_port + port
             yield f"http://{host}:{port}"
 
-    def observer_addresses_sharded(self):
-        sharded_observers = defaultdict(list)
-        observers_per_shard = self.num_observers_per_shard()
-        num_shards = self.num_shards()
-        shard = 0
-        for i, address in enumerate(self.observer_addresses()):
-            if shard < num_shards:
-                if i > 0 and i % observers_per_shard == 0:
-                    shard += 1
-                    if shard == num_shards:
-                        shard = self.metashard['metashardID']
+    def validator_addresses(self):
+        host = self.networking['host']
+        first_port = self.networking['port_first_observer_rest_api']
+        for port in range(self.num_all_observers()):
+            port = first_port + port
+            yield f"http://{host}:{port}"
 
-            sharded_observers[shard].append(address)
+    def api_addresses_sharded_for_proxy_config(self):
+        nodes = list()
+        for node in list(self.observers()):
+            nodes.append({
+                'ShardId': node.shard,
+                'Address': node.api_address(),
+                'Type': 'Observer'
+            })
 
-        return sharded_observers
+        for node in list(self.validators()):
+            nodes.append({
+                'ShardId': node.shard,
+                'Address': node.api_address(),
+                'Type': 'Validator'
+            })
 
-    def observer_addresses_sharded_for_proxy_config(self):
-        observers = list()
-        for shard, addresses in self.observer_addresses_sharded().items():
-            for address in addresses:
-                observers.append({
-                    'ShardId': shard,
-                    'Address': address
-                })
-        return observers
+        return nodes
 
     def proxy_port(self):
         return self.networking["port_proxy"]
@@ -277,7 +288,7 @@ class TestnetConfiguration:
         config['metashard'] = {
             'consensus_size': 1,
             'metashardID': 4294967295,
-            'observers': 1,
+            'observers': 0,
             'validators': 1,
         }
         config['networking'] = {
@@ -293,11 +304,11 @@ class TestnetConfiguration:
         config['shards'] = {
             'consensus_size': 1,
             'count': 1,
-            'observers_per_shard': 1,
+            'observers_per_shard': 0,
             'validators_per_shard': 1,
         }
         config['timing'] = {
-            'genesis_delay': 30
+            'genesis_delay': 10
         }
 
         return config
