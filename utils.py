@@ -27,6 +27,13 @@ class Object:
         return data_json
 
 
+class ObjectEncoder(json.JSONEncoder):
+    def default(self, obj):
+        if isinstance(obj, Object):
+            return obj.__dict__
+        return json.JSONEncoder.default(self, obj)
+
+
 def omit_fields(data: Any, fields: List[str] = []):
     if isinstance(data, dict):
         for field in fields:
@@ -108,7 +115,8 @@ def write_json_file(filename: str, data: Any):
 def dump_out_json(data: Any, outfile: Any = None):
     if not outfile:
         outfile = sys.stdout
-    json.dump(data, outfile, indent=4)
+
+    json.dump(data, outfile, indent=4, cls=ObjectEncoder)
     outfile.write("\n")
 
 
