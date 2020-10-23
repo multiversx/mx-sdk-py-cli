@@ -254,7 +254,7 @@ def query(args: Any):
 
     contract = SmartContract(contract_address)
     result = contract.query(ElrondProxy(args.proxy), function, arguments)
-    print(result)
+    utils.dump_out_json(result)
 
 
 def _send_or_simulate(tx: Transaction, args: Any):

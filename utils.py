@@ -27,6 +27,14 @@ class Object:
         return data_json
 
 
+def omit_fields(data: Any, fields: List[str] = []):
+    if isinstance(data, dict):
+        for field in fields:
+            data.pop(field, None)
+        return data
+    raise errors.ProgrammingError("omit_fields: only dictionaries are supported.")
+
+
 def untar(archive_path: str, destination_folder: str) -> None:
     logger.debug(f"untar [{archive_path}] to [{destination_folder}].")
 

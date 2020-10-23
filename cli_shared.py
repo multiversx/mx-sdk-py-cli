@@ -1,7 +1,8 @@
 import argparse
+import ast
 import sys
 from argparse import FileType
-from typing import Any, Text
+from typing import Any, List, Text
 
 from erdpy import config, errors, scope, utils
 from erdpy.accounts import Account
@@ -87,6 +88,16 @@ def add_outfile_arg(sub: Any, what: str = ""):
 def add_infile_arg(sub: Any, what: str = ""):
     what = f"({what})" if what else ""
     sub.add_argument("--infile", type=FileType("r"), required=True, help=f"input file {what}")
+
+
+def add_omit_fields_arg(sub: Any):
+    sub.add_argument("--omit-fields", default="[]", type=str, required=False, help="omit fields in the output payload (default: %(default)s)")
+
+
+def parse_omit_fields_arg(args: Any) -> List[str]:
+    literal = args.omit_fields
+    parsed = ast.literal_eval(literal)
+    return parsed
 
 
 def prepare_nonce_in_args(args: Any):

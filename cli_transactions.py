@@ -27,6 +27,7 @@ def setup_parser(subparsers: Any) -> Any:
     sub.add_argument("--hash", required=True, help="the hash")
     sub.add_argument("--sender", required=False, help="the sender address")
     cli_shared.add_proxy_arg(sub)
+    cli_shared.add_omit_fields_arg(sub)
     sub.set_defaults(func=get_transaction)
 
     parser.epilog = cli_shared.build_group_epilog(subparsers)
@@ -77,8 +78,10 @@ def send_transaction(args: Any):
 
 def get_transaction(args: Any):
     args = utils.as_object(args)
+    omit_fields = cli_shared.parse_omit_fields_arg(args)
 
     proxy = ElrondProxy(args.proxy)
 
-    response = proxy.get_transaction(args.hash, args.sender)
-    utils.dump_out_json(response)
+    transaction = proxy.get_transaction(args.hash, args.sender)
+    utils.omit_fields(transaction, omit_fields)
+    utils.dump_out_json(transaction)
