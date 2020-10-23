@@ -3,11 +3,11 @@ import os
 from pathlib import Path
 from typing import Any, Dict
 
-from erdpy import cli_shared, errors, utils
+from erdpy import cli_shared, errors, utils, workstation
 
 logger = logging.getLogger("cli.data")
 
-DATA_PATH = os.path.expanduser("~/elrondsdk/erdpy.data-storage.json")
+DATA_FILENAME = "erdpy.data-storage.json"
 
 
 def setup_parser(subparsers: Any) -> Any:
@@ -22,12 +22,14 @@ def setup_parser(subparsers: Any) -> Any:
     sub = cli_shared.add_command_subparser(subparsers, "data", "store", "Stores a key-value pair within a partition")
     sub.add_argument("--key", required=True, help="the key")
     sub.add_argument("--value", required=True, help="the value to save")
-    sub.add_argument("--partition", default="global", help="the storage partition (default: %(default)s)")
+    sub.add_argument("--partition", default="*", help="the storage partition (default: %(default)s)")
+    sub.add_argument("--use-global", action="store_true", default=False, help="use the global storage (default: %(default)s)")
     sub.set_defaults(func=store)
 
     sub = cli_shared.add_command_subparser(subparsers, "data", "load", "Loads a key-value pair from a storage partition")
     sub.add_argument("--key", required=True, help="the key")
-    sub.add_argument("--partition", default="global", help="the storage partition (default: %(default)s)")
+    sub.add_argument("--partition", default="*", help="the storage partition (default: %(default)s)")
+    sub.add_argument("--use-global", action="store_true", default=False, help="use the global storage (default: %(default)s)")
     sub.set_defaults(func=load)
 
     parser.epilog = cli_shared.build_group_epilog(subparsers)
@@ -60,14 +62,15 @@ def store(args: Any):
     key = args.key
     value = args.value
     partition = args.partition
+    use_global = args.use_global
 
-    data = _read_file()
+    data = _read_file(use_global)
     if partition not in data:
         data[partition] = dict()
 
     data_in_partition = data[partition]
     data_in_partition[key] = value
-    _write_file(data)
+    _write_file(use_global, data)
 
     logger.info(f"Data has been stored at key = '{key}', in partition = '{partition}'.")
 
@@ -75,18 +78,29 @@ def store(args: Any):
 def load(args: Any):
     key = args.key
     partition = args.partition
+    use_global = args.use_global
 
-    data = _read_file()
+    data = _read_file(use_global)
     data_in_partition = data.get(partition, dict())
     value = data_in_partition.get(key, "")
     print(value)
 
 
-def _read_file() -> Dict[str, Any]:
-    if not os.path.isfile(DATA_PATH):
+def _read_file(use_global: bool) -> Dict[str, Any]:
+    filename = _get_filename(use_global)
+
+    if not os.path.isfile(filename):
         return dict()
-    return utils.read_json_file(DATA_PATH)
+    return utils.read_json_file(filename)
 
 
-def _write_file(data: Dict[str, Any]):
-    utils.write_json_file(DATA_PATH, data)
+def _write_file(use_global: bool, data: Dict[str, Any]):
+    filename = _get_filename(use_global)
+
+    utils.write_json_file(filename, data)
+
+
+def _get_filename(use_global: bool):
+    if use_global:
+        return workstation.get_tools_folder() / DATA_FILENAME
+    return Path(os.getcwd()) / DATA_FILENAME
