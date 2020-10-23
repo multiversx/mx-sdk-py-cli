@@ -36,6 +36,9 @@ def main():
 
 
 def _do_main():
+    logging.basicConfig(level=logging.INFO)
+    scope.initialize()
+
     parser = setup_parser()
     args = parser.parse_args()
 
@@ -43,8 +46,6 @@ def _do_main():
         logging.basicConfig(level=logging.DEBUG)
     else:
         logging.basicConfig(level=logging.WARN)
-
-    scope.initialize()
 
     if not hasattr(args, "func"):
         parser.print_help()
