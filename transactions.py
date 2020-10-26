@@ -63,6 +63,14 @@ class Transaction(ITransaction):
         instance.data = instance.data_decoded()
         return instance
 
+    def to_dump_dict(self, extra: Any = {}):
+        dump_dict: Dict[str, Any] = dict()
+        dump_dict['tx'] = self.to_dictionary()
+        dump_dict['hash'] = self.hash or ""
+        dump_dict['data'] = self.data
+        dump_dict.update(extra)
+        return dump_dict
+
     def dump_to(self, f: Any, extra: Any = {}):
         dump: Any = utils.Object()
         dump.tx = self.to_dictionary()

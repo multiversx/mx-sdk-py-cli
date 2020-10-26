@@ -39,19 +39,22 @@ def setup_parser(subparsers: Any) -> Any:
 def parse(args: Any):
     logger.warning("Always review --expression parameters before executing this command!")
 
-    file: str = Path(args.file).expanduser()
+    file = Path(args.file).expanduser()
     expression: str = args.expression
     suffix = file.suffix
     data = None
 
     if suffix == ".json":
-        data = utils.read_json_file(file)
+        data = utils.read_json_file(str(file))
     else:
         raise errors.BadUsage(f"File isn't parsable: {file}")
 
-    result = eval(expression, {
-        "data": data
-    })
+    try:
+        result = eval(expression, {
+            "data": data
+        })
+    except KeyError:
+        result = ""
 
     print(result)
 

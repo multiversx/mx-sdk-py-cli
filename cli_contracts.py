@@ -1,6 +1,6 @@
 import logging
 import os
-from typing import Any
+from typing import Any, Dict
 
 from erdpy import cli_shared, errors, projects, utils
 from erdpy.accounts import Account, Address
@@ -166,10 +166,36 @@ def deploy(args: Any):
     tx = contract.deploy(sender, arguments, gas_price, gas_limit, value, chain, version)
     logger.info("Contract address: %s", contract.address)
 
+    result = None
     try:
-        _send_or_simulate(tx, args)
+        result = _send_or_simulate(tx, args)
     finally:
-        tx.dump_to(args.outfile, extra={"address": contract.address.bech32()})
+        txdict = tx.to_dump_dict()
+        txdict['address'] = contract.address.bech32()
+        dump_tx_and_result(txdict, result, args)
+
+
+def dump_tx_and_result(tx: Any, result: Any, args: Any):
+    dump = dict()
+    dump['emitted_tx'] = tx
+
+    try:
+        returnCode = ''
+        returnMessage = ''
+        dump['result'] = result['result']
+        for scrHash, scr in dump['result']['scResults'].items():
+            if scr['receiver'] == tx['tx']['sender']:
+                retCode = scr['data'][1:]
+                retCode = bytes.fromhex(retCode).decode('ascii')
+                returnCode = retCode
+                returnMessage = scr['returnMessage']
+
+        dump['result']['returnCode'] = returnCode
+        dump['result']['returnMessage'] = returnMessage
+    except TypeError:
+        pass
+
+    utils.dump_out_json(dump, outfile=args.outfile)
 
 
 def _prepare_contract(args: Any) -> SmartContract:
@@ -217,9 +243,10 @@ def call(args: Any):
 
     tx = contract.execute(sender, function, arguments, gas_price, gas_limit, value, chain, version)
     try:
-        _send_or_simulate(tx, args)
+        result = _send_or_simulate(tx, args)
     finally:
-        tx.dump_to(args.outfile)
+        txdict = tx.to_dump_dict()
+        dump_tx_and_result(txdict, result, args)
 
 
 def upgrade(args: Any):
@@ -240,9 +267,10 @@ def upgrade(args: Any):
 
     tx = contract.upgrade(sender, arguments, gas_price, gas_limit, value, chain, version)
     try:
-        _send_or_simulate(tx, args)
+        result = _send_or_simulate(tx, args)
     finally:
-        tx.dump_to(args.outfile)
+        txdict = tx.to_dump_dict()
+        dump_tx_and_result(txdict, result, args)
 
 
 def query(args: Any):
@@ -260,6 +288,7 @@ def query(args: Any):
 def _send_or_simulate(tx: Transaction, args: Any):
     if args.send:
         tx.send(ElrondProxy(args.proxy))
+        return None
     elif args.simulate:
         response = tx.simulate(ElrondProxy(args.proxy))
-        utils.dump_out_json(response)
+        return response

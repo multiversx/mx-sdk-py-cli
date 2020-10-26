@@ -88,7 +88,6 @@ class ElrondProxy:
 
     def simulate_transaction(self, payload: Any) -> str:
         url = f"{self.url}/transaction/simulate"
-        utils.dump_out_json(payload)
         response = do_post(url, payload)
         return response
 
