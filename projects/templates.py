@@ -180,7 +180,7 @@ class TemplateRust(Template):
         self._replace_in_files(
             [lib_path],
             [
-                (f"pub use {self.template_name.replace('-', '_')}::*", f"use {self.project_name.replace('-', '_')}::*")
+                (f"use {self.template_name.replace('-', '_')}::*", f"use {self.project_name.replace('-', '_')}::*")
             ]
         )
 
