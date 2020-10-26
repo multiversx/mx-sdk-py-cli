@@ -1,65 +1,5 @@
 # Command Line Interface
 
-  - [Overview](#overview)
-  - [Group **Contract**](#group-contract)
-    - [Contract.New](#contractnew)
-    - [Contract.Templates](#contracttemplates)
-    - [Contract.Build](#contractbuild)
-    - [Contract.Clean](#contractclean)
-    - [Contract.Deploy](#contractdeploy)
-    - [Contract.Call](#contractcall)
-    - [Contract.Upgrade](#contractupgrade)
-    - [Contract.Query](#contractquery)
-  - [Group **Transactions**](#group-transactions)
-    - [Transactions.New](#transactionsnew)
-    - [Transactions.Send](#transactionssend)
-    - [Transactions.Get](#transactionsget)
-  - [Group **Hyperblocks**](#group-hyperblocks)
-    - [Hyperblock.Get](#hyperblockget)
-  - [Group **Validator**](#group-validator)
-    - [Validator.Stake](#validatorstake)
-    - [Validator.Unstake](#validatorunstake)
-    - [Validator.Unjail](#validatorunjail)
-    - [Validator.Unbond](#validatorunbond)
-    - [Validator.ChangeRewardAddress](#validatorchangerewardaddress)
-    - [Validator.Claim](#validatorclaim)
-  - [Group **Account**](#group-account)
-    - [Account.Get](#accountget)
-    - [Account.GetTransactions](#accountgettransactions)
-  - [Group **Wallet**](#group-wallet)
-    - [Wallet.Derive](#walletderive)
-    - [Wallet.Bech32](#walletbech32)
-  - [Group **Testnet**](#group-testnet)
-    - [Testnet.Prerequisites](#testnetprerequisites)
-    - [Testnet.Config](#testnetconfig)
-    - [Testnet.Start](#testnetstart)
-    - [Testnet.Clean](#testnetclean)
-  - [Group **Network**](#group-network)
-    - [Network.NumShards](#networknumshards)
-    - [Network.BlockNonce](#networkblocknonce)
-    - [Network.Chain](#networkchain)
-  - [Group **Cost**](#group-cost)
-    - [Cost.GasPrice](#costgasprice)
-    - [Cost.TxTransfer](#costtxtransfer)
-    - [Cost.ScDeploy](#costscdeploy)
-    - [Cost.ScCall](#costsccall)
-  - [Group **Dispatcher**](#group-dispatcher)
-    - [Dispatcher.Enqueue](#dispatcherenqueue)
-    - [Dispatcher.Dispatch](#dispatcherdispatch)
-    - [Dispatcher.DispatchContinuously](#dispatcherdispatchcontinuously)
-    - [Dispatcher.Clean](#dispatcherclean)
-  - [Group **BlockAtlas**](#group-blockatlas)
-    - [BlockAtlas.CurrentBlockNumber](#blockatlascurrentblocknumber)
-    - [BlockAtlas.BlockByNumber](#blockatlasblockbynumber)
-    - [BlockAtlas.Transactions](#blockatlastransactions)
-  - [Group **Dependencies**](#group-dependencies)
-    - [Dependencies.Install](#dependenciesinstall)
-    - [Dependencies.Check](#dependenciescheck)
-  - [Group **Configuration**](#group-configuration)
-    - [Configuration.Dump](#configurationdump)
-    - [Configuration.Get](#configurationget)
-    - [Configuration.Set](#configurationset)
-
 ## Overview
 
 **erdpy** exposes a number of CLI **commands**, organized within **groups**.
@@ -80,7 +20,7 @@ https://docs.elrond.com/tools/erdpy.
         
 
 COMMAND GROUPS:
-  {contract,tx,validator,account,wallet,network,cost,dispatcher,blockatlas,deps,config,hyperblock,testnet}
+  {contract,tx,validator,account,wallet,network,cost,dispatcher,blockatlas,deps,config,hyperblock,testnet,data}
 
 TOP-LEVEL OPTIONS:
   -h, --help            show this help message and exit
@@ -103,6 +43,7 @@ deps                           Manage dependencies or elrond-sdk modules
 config                         Configure elrond-sdk (default values etc.)
 hyperblock                     Get Hyperblock from the Network
 testnet                        Set up, start and control local testnets
+data                           Data manipulation omnitool
 
 ```
 ## Group **Contract**
@@ -408,10 +349,11 @@ usage: erdpy tx get [-h] ...
 Get a transaction
 
 optional arguments:
-  -h, --help       show this help message and exit
-  --hash HASH      the hash
-  --sender SENDER  the sender address
-  --proxy PROXY    🖧 the URL of the proxy (default: https://api-testnet.elrond.com)
+  -h, --help                 show this help message and exit
+  --hash HASH                the hash
+  --sender SENDER            the sender address
+  --proxy PROXY              🖧 the URL of the proxy (default: https://api-testnet.elrond.com)
+  --omit-fields OMIT_FIELDS  omit fields in the output payload (default: [])
 
 ```
 ## Group **Hyperblocks**
@@ -671,11 +613,12 @@ usage: erdpy account get [-h] ...
 Query account details (nonce, balance etc.)
 
 optional arguments:
-  -h, --help         show this help message and exit
-  --proxy PROXY      🖧 the URL of the proxy (default: https://api-testnet.elrond.com)
-  --address ADDRESS  🖄 the address to query
-  --balance          whether to only fetch the balance
-  --nonce            whether to only fetch the nonce
+  -h, --help                 show this help message and exit
+  --proxy PROXY              🖧 the URL of the proxy (default: https://api-testnet.elrond.com)
+  --address ADDRESS          🖄 the address to query
+  --balance                  whether to only fetch the balance
+  --nonce                    whether to only fetch the nonce
+  --omit-fields OMIT_FIELDS  omit fields in the output payload (default: [])
 
 ```
 ### Account.GetTransactions
@@ -762,7 +705,7 @@ usage: erdpy testnet COMMAND [-h] ...
 Set up, start and control local testnets
 
 COMMANDS:
-  {prerequisites,start,stop,config,clean}
+  {prerequisites,start,config,clean}
 
 OPTIONS:
   -h, --help            show this help message and exit
@@ -1174,7 +1117,7 @@ usage: erdpy deps install [-h] ...
 Install dependencies or elrond-sdk modules.
 
 positional arguments:
-  {llvm,clang,cpp,arwentools,rust,nodejs,elrond_go,elrond_proxy_go,golang}
+  {llvm,clang,cpp,arwentools,rust,nodejs,elrond_go,elrond_proxy_go,golang,mcl_signer}
                                                   the dependency to install
 
 optional arguments:
@@ -1193,7 +1136,7 @@ usage: erdpy deps check [-h] ...
 Check whether a dependency is installed.
 
 positional arguments:
-  {llvm,clang,cpp,arwentools,rust,nodejs,elrond_go,elrond_proxy_go,golang}
+  {llvm,clang,cpp,arwentools,rust,nodejs,elrond_go,elrond_proxy_go,golang,mcl_signer}
                                                   the dependency to check
 
 optional arguments:
@@ -1268,5 +1211,76 @@ positional arguments:
 
 optional arguments:
   -h, --help  show this help message and exit
+
+```
+## Group **Data**
+
+
+```
+$ erdpy data --help
+usage: erdpy data COMMAND [-h] ...
+
+Data manipulation omnitool
+
+COMMANDS:
+  {parse,store,load}
+
+OPTIONS:
+  -h, --help          show this help message and exit
+
+----------------
+COMMANDS summary
+----------------
+parse                          Parses values from a given file
+store                          Stores a key-value pair within a partition
+load                           Loads a key-value pair from a storage partition
+
+```
+### Data.Dump
+
+
+```
+$ erdpy data parse --help
+usage: erdpy data parse [-h] ...
+
+Parses values from a given file
+
+optional arguments:
+  -h, --help               show this help message and exit
+  --file FILE              path of the file to parse
+  --expression EXPRESSION  the Python-Dictionary expression to evaluate in order to extract the data
+
+```
+### Data.Store
+
+
+```
+$ erdpy data store --help
+usage: erdpy data store [-h] ...
+
+Stores a key-value pair within a partition
+
+optional arguments:
+  -h, --help             show this help message and exit
+  --key KEY              the key
+  --value VALUE          the value to save
+  --partition PARTITION  the storage partition (default: *)
+  --use-global           use the global storage (default: False)
+
+```
+### Data.Load
+
+
+```
+$ erdpy data load --help
+usage: erdpy data load [-h] ...
+
+Loads a key-value pair from a storage partition
+
+optional arguments:
+  -h, --help             show this help message and exit
+  --key KEY              the key
+  --partition PARTITION  the storage partition (default: *)
+  --use-global           use the global storage (default: False)
 
 ```

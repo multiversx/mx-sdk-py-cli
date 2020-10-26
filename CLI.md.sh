@@ -108,5 +108,9 @@ generate() {
     command "Configuration.Dump" "config dump"
     command "Configuration.Get" "config get"
     command "Configuration.Set" "config set"
-}
 
+    group "Data" "data"
+    command "Data.Dump" "data parse"
+    command "Data.Store" "data store"
+    command "Data.Load" "data load"
+}
