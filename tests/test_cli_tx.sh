@@ -20,5 +20,5 @@ testAll() {
     ${ERDPY} --verbose tx new --pem="${USERS}/alice.pem" --receiver=${BOB} --value="1${DENOMINATION}" --nonce=44 --data-file=${SANDBOX}/txInner.txt --gas-limit=200000 --chain=${CHAIN_ID} --outfile=${SANDBOX}/txWrapper.txt
 
     echo "tx new --simulate"
-    ${ERDPY} --verbose tx new --simulate --pem="${USERS}/alice.pem" --receiver=${BOB} --value="1${DENOMINATION}" --nonce=42 --data="foo" --gas-limit=70000 --chain=${CHAIN_ID} --outfile=${SANDBOX}/tx42.txt
+    ${ERDPY} --verbose tx new --simulate --pem="${USERS}/alice.pem" --receiver=${BOB} --value="1${DENOMINATION}" --nonce=42 --data="foo" --gas-limit=70000 --chain=${CHAIN_ID} --proxy=${PROXY} --outfile=${SANDBOX}/tx42.txt
 }
