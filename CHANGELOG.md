@@ -4,6 +4,9 @@ All notable changes will be documented in this file.
 
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
+## [0.9.3] - 26.10.2020
+ - Add better output for simulated deployments.
+
 ## [0.9.2] - 26.10.2020
  - Do not build `.hex` file anymore at `contract build`.
  - Patch field `name` in contract templates / mandos tests.
