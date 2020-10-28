@@ -4,6 +4,9 @@ All notable changes will be documented in this file.
 
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
+## [0.9.5] - 28.10.2020
+ - Add dependency tag for elrond-wasm-rs.
+
 ## [0.9.4] - 27.10.2020
  - Minor fix for Rust templates.
 
