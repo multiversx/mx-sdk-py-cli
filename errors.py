@@ -1,12 +1,11 @@
 
-from shutil import Error
 from typing import Any, Union
 
 
 class KnownError(Exception):
     inner = None
 
-    def __init__(self, message: str, inner: Union[Error, None] = None):
+    def __init__(self, message: str, inner: Union[Any, None] = None):
         super().__init__(message)
         self.inner = inner
 
