@@ -4,7 +4,7 @@ from binascii import unhexlify
 from os import path
 from typing import Any, Union
 
-from erdpy import errors, utils
+from erdpy import constants, errors, utils
 from erdpy.interfaces import IAccount, IAddress
 from erdpy.wallet import bech32, generate_pair, pem
 from erdpy.wallet.keyfile import get_password, load_from_key_file
@@ -108,6 +108,9 @@ class Address(IAddress):
         self._assert_validity()
         pubkey = bytes.fromhex(self._value_hex)
         return pubkey
+
+    def is_contract_address(self):
+        return self.hex().startswith(constants.SC_HEX_PUBKEY_PREFIX)
 
     def _assert_validity(self):
         if self._value_hex is None:

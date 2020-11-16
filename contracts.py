@@ -4,13 +4,11 @@ from typing import Any, List
 
 from Cryptodome.Hash import keccak
 
-from erdpy import config, errors, utils
+from erdpy import config, constants, errors, utils
 from erdpy.accounts import Address
 from erdpy.transactions import Transaction
 
 logger = logging.getLogger("contracts")
-
-VM_TYPE_ARWEN = "0500"
 
 
 class SmartContract:
@@ -43,7 +41,7 @@ class SmartContract:
         return tx
 
     def prepare_deploy_transaction_data(self, arguments):
-        tx_data = f"{self.bytecode}@{VM_TYPE_ARWEN}@{self.metadata.to_hex()}"
+        tx_data = f"{self.bytecode}@{constants.VM_TYPE_ARWEN}@{self.metadata.to_hex()}"
 
         for arg in arguments:
             tx_data += f"@{_prepare_argument(arg)}"
