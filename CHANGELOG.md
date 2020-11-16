@@ -4,6 +4,10 @@ All notable changes will be documented in this file.
 
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
+## [...] - ...
+ - Add helper function `is_contract_address`, minor refactoring. 
+ - Adjust testnet URL in examples, in CLI help etc.
+
 ## [0.9.5] - 28.10.2020
  - Add dependency tag for elrond-wasm-rs.
 
