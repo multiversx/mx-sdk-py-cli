@@ -1,18 +1,26 @@
 import base64
-import logging
 import unittest
 from pathlib import Path
 
-from erdpy import projects
+from erdpy import projects, utils
 from erdpy.accounts import Account
 from erdpy.contracts import SmartContract
-from erdpy.environments import DebugEnvironment
 
 
-class ProjectTestCase(unittest.TestCase):
+class MyTestCase(unittest.TestCase):
     def setUp(self):
         self.testdata = Path(__file__).parent.joinpath("testdata")
-        self.environment = DebugEnvironment()
+        self.testdata_out = Path(__file__).parent.joinpath("testdata-out")
+        self.devnet_wallets = Path(__file__).parent.parent.joinpath("testnet", "wallets")
+
+        utils.ensure_folder(self.testdata_out)
+
+
+class ProjectTestCase(MyTestCase):
+    def setUp(self):
+        super().setUp()
+        self.testdata = Path(__file__).parent.joinpath("testdata")
+        self.environment = None
         self.alice = Account(
             "aaaaaaaa112233441122334411223344112233441122334411223344aaaaaaaa")
         self.bob = Account(

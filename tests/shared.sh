@@ -4,6 +4,7 @@ echo "PYTHONPATH = ${PYTHONPATH}"
 ERDPY="python3 -m erdpy.cli"
 SANDBOX=testdata-out/SANDBOX
 USERS=../testnet/wallets/users
+VALIDATORS=../testnet/wallets/validators
 DENOMINATION="000000000000000000"
 PROXY="http://localhost:7950"
 CHAIN_ID="local-testnet"

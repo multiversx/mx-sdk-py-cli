@@ -1,12 +1,11 @@
 import logging
-import unittest
 from pathlib import Path
 from typing import Any
 
 import nacl.encoding
 import nacl.signing
-from erdpy import utils
 from erdpy.accounts import Account, Address
+from erdpy.tests.utils import MyTestCase
 from erdpy.transactions import Transaction
 from erdpy.wallet import (bip39seed_to_private_key, generate_pair,
                           mnemonic_to_bip39seed, pem)
@@ -14,13 +13,10 @@ from erdpy.wallet import (bip39seed_to_private_key, generate_pair,
 logging.basicConfig(level=logging.INFO)
 
 
-class WalletTestCase(unittest.TestCase):
+class WalletTestCase(MyTestCase):
     def setUp(self):
-        self.testdata = Path(__file__).parent.joinpath("testdata")
-        self.testdata_out = Path(__file__).parent.joinpath("testdata-out")
-        utils.ensure_folder(self.testdata_out)
-
-        self.alice = Account(pem_file=str(self.testdata.joinpath("keys", "alice.pem")))
+        super().setUp()
+        self.alice = Account(pem_file=str(self.devnet_wallets.joinpath("users", "alice.pem")))
 
     def test_nacl_playground_signing(self):
         private_key_hex = "b8211b08edc8aca591bedf1b9aba47e4077e54ac7d4ceb2f1bc9e10c064d3e6c7a5679a427f6df7adf2310ddf5e570fd51e47e6b1511124d6b250b989b017588"
@@ -35,13 +31,13 @@ class WalletTestCase(unittest.TestCase):
         self.assertEqual(64, len(signature))
 
     def test_pem_get_pubkey(self):
-        pem_file = self.testdata.joinpath("keys", "alice.pem")
+        pem_file = self.devnet_wallets.joinpath("users", "alice.pem")
         address = pem.get_pubkey(pem_file)
 
-        self.assertEqual("fd691bb5e85d102687d81079dffce842d4dc328276d2d4c60d8fd1c3433c3293", address.hex())
+        self.assertEqual("0139472eff6886771a982f3083da5d421f24c29181e63888228dc81ca60d69e1", address.hex())
 
     def test_pem_parse_multiple(self):
-        pem_file = self.testdata.joinpath("keys", "walletKey.pem")
+        pem_file = self.testdata.joinpath("walletKey.pem")
 
         seed, address = pem.parse(pem_file, index=0)
         self.assertEqual("1f4dd8b7d18b5d0785c9d0802ec14d553dba356812b85c7e3414373388472010", seed.hex())
@@ -60,11 +56,11 @@ class WalletTestCase(unittest.TestCase):
         self.assertEqual(Address("erd143907zxv0ujxr9q4mda7rmczn2xwhmqn7p9lfz666z8hd2lcks2szt5yql").hex(), address.hex())
 
     def test_pem_parse(self):
-        pem_file = self.testdata.joinpath("keys", "alice.pem")
+        pem_file = self.devnet_wallets.joinpath("users", "alice.pem")
         seed, address = pem.parse(pem_file)
 
-        self.assertEqual("1a927e2af5306a9bb2ea777f73e06ecc0ac9aaa72fb4ea3fecf659451394cccf", seed.hex())
-        self.assertEqual("fd691bb5e85d102687d81079dffce842d4dc328276d2d4c60d8fd1c3433c3293", address.hex())
+        self.assertEqual("413f42575f7f26fad3317a778771212fdb80245850981e48b58a4f25e344e8f9", seed.hex())
+        self.assertEqual("0139472eff6886771a982f3083da5d421f24c29181e63888228dc81ca60d69e1", address.hex())
 
     def test_sign_transaction(self):
         # With data
@@ -80,7 +76,7 @@ class WalletTestCase(unittest.TestCase):
         transaction.version = 1
         transaction.sign(self.alice)
 
-        self.assertEqual("f9878caeba4285a9fe66fa8127eb9f7e3f178de40f96727f639e31f0a503efd154d73752781ad06c788876342df39cec27863f5dd88e23c33a4f5a0c57015905", transaction.signature)
+        self.assertEqual("0e69f27e24aba2f3b7a8842dc7e7c085a0bfb5b29112b258318eed73de9c8809889756f8afaa74c7b3c7ce20a028b68ba90466a249aaf999a1a78dcf7f4eb40c", transaction.signature)
 
         # Without data
         transaction = Transaction()
@@ -95,77 +91,7 @@ class WalletTestCase(unittest.TestCase):
         transaction.version = 1
         transaction.sign(self.alice)
 
-        self.assertEqual("1ad14993a3cf6a5e0898a29271a2924fc34f80ba2a391dd2ff5c2fcc554e5a71eda0e34044f99888ec1a1da6d4cf82345e848cec69ccd27e192f8b66c4beaa0c", transaction.signature)    
-
-    def test_sign_transaction_trust_wallet_scenario(self):
-        # With data
-        transaction = Transaction()
-        transaction.nonce = 0
-        transaction.value = "0"
-        transaction.sender = "erd1l453hd0gt5gzdp7czpuall8ggt2dcv5zwmfdf3sd3lguxseux2fsmsgldz"
-        transaction.receiver = "erd1cux02zersde0l7hhklzhywcxk4u9n4py5tdxyx7vrvhnza2r4gmq4vw35r"
-        transaction.gasPrice = 1000000000
-        transaction.gasLimit = 50000
-        transaction.data = "foo"
-        transaction.chainID = "1"
-        transaction.version = 1
-        transaction.sign(self.alice)
-        serialized = transaction.serialize().decode()
-
-        self.assertEqual("""{"nonce":0,"value":"0","receiver":"erd1cux02zersde0l7hhklzhywcxk4u9n4py5tdxyx7vrvhnza2r4gmq4vw35r","sender":"erd1l453hd0gt5gzdp7czpuall8ggt2dcv5zwmfdf3sd3lguxseux2fsmsgldz","gasPrice":1000000000,"gasLimit":50000,"data":"Zm9v","chainID":"1","version":1,"signature":"b5fddb8c16fa7f6123cb32edc854f1e760a3eb62c6dc420b5a4c0473c58befd45b621b31a448c5b59e21428f2bc128c80d0ee1caa4f2bf05a12be857ad451b00"}""", serialized)
-        self.assertEqual("b5fddb8c16fa7f6123cb32edc854f1e760a3eb62c6dc420b5a4c0473c58befd45b621b31a448c5b59e21428f2bc128c80d0ee1caa4f2bf05a12be857ad451b00", transaction.signature)
-
-        # Without data
-        transaction = Transaction()
-        transaction.nonce = 0
-        transaction.value = "0"
-        transaction.sender = "erd1l453hd0gt5gzdp7czpuall8ggt2dcv5zwmfdf3sd3lguxseux2fsmsgldz"
-        transaction.receiver = "erd1cux02zersde0l7hhklzhywcxk4u9n4py5tdxyx7vrvhnza2r4gmq4vw35r"
-        transaction.gasPrice = 1000000000
-        transaction.gasLimit = 50000
-        transaction.data = ""
-        transaction.chainID = "1"
-        transaction.version = 1
-        transaction.sign(self.alice)
-        serialized = transaction.serialize().decode()
-
-        self.assertEqual("""{"nonce":0,"value":"0","receiver":"erd1cux02zersde0l7hhklzhywcxk4u9n4py5tdxyx7vrvhnza2r4gmq4vw35r","sender":"erd1l453hd0gt5gzdp7czpuall8ggt2dcv5zwmfdf3sd3lguxseux2fsmsgldz","gasPrice":1000000000,"gasLimit":50000,"chainID":"1","version":1,"signature":"3079d37bfbdbe66fbb4c4b186144f9d9ad5b4b08fbcd6083be0688cf1171123109dfdefdbabf91425c757ca109b6db6d674cb9aeebb19a1a51333565abb53109"}""", serialized)
-        self.assertEqual("3079d37bfbdbe66fbb4c4b186144f9d9ad5b4b08fbcd6083be0688cf1171123109dfdefdbabf91425c757ca109b6db6d674cb9aeebb19a1a51333565abb53109", transaction.signature)
-
-    def test_sign_transaction_docs_scenario(self):
-        # With data
-        transaction = Transaction()
-        transaction.nonce = 7
-        transaction.value = "10000000000000000000"  # 10 ERD
-        transaction.sender = "erd1l453hd0gt5gzdp7czpuall8ggt2dcv5zwmfdf3sd3lguxseux2fsmsgldz"
-        transaction.receiver = "erd1cux02zersde0l7hhklzhywcxk4u9n4py5tdxyx7vrvhnza2r4gmq4vw35r"
-        transaction.gasPrice = 1000000000
-        transaction.gasLimit = 70000
-        transaction.data = "for the book"
-        transaction.chainID = "1"
-        transaction.version = 1
-        serialized = transaction.serialize().decode()
-        transaction.sign(self.alice)
-
-        self.assertEqual("""{"nonce":7,"value":"10000000000000000000","receiver":"erd1cux02zersde0l7hhklzhywcxk4u9n4py5tdxyx7vrvhnza2r4gmq4vw35r","sender":"erd1l453hd0gt5gzdp7czpuall8ggt2dcv5zwmfdf3sd3lguxseux2fsmsgldz","gasPrice":1000000000,"gasLimit":70000,"data":"Zm9yIHRoZSBib29r","chainID":"1","version":1}""", serialized)
-        self.assertEqual("1702bb7696f992525fb77597956dd74059b5b01e88c813066ad1f6053c6afca97d6eaf7039b2a21cccc7d73b3e5959be4f4c16f862438c7d61a30c91e3d16c01", transaction.signature)
-
-        # Without data
-        transaction = Transaction()
-        transaction.nonce = 8
-        transaction.value = "10000000000000000000"
-        transaction.sender = "erd1l453hd0gt5gzdp7czpuall8ggt2dcv5zwmfdf3sd3lguxseux2fsmsgldz"
-        transaction.receiver = "erd1cux02zersde0l7hhklzhywcxk4u9n4py5tdxyx7vrvhnza2r4gmq4vw35r"
-        transaction.gasPrice = 1000000000
-        transaction.gasLimit = 50000
-        transaction.data = ""
-        transaction.chainID = "1"
-        transaction.version = 1
-        serialized = transaction.serialize().decode()
-        transaction.sign(self.alice)
-
-        self.assertEqual("""{"nonce":8,"value":"10000000000000000000","receiver":"erd1cux02zersde0l7hhklzhywcxk4u9n4py5tdxyx7vrvhnza2r4gmq4vw35r","sender":"erd1l453hd0gt5gzdp7czpuall8ggt2dcv5zwmfdf3sd3lguxseux2fsmsgldz","gasPrice":1000000000,"gasLimit":50000,"chainID":"1","version":1}""", serialized)
-        self.assertEqual("4a6d8186eae110894e7417af82c9bf9592696c0600faf110972e0e5310d8485efc656b867a2336acec2b4c1e5f76c9cc70ba1803c6a46455ed7f1e2989a90105", transaction.signature)
+        self.assertEqual("83efd1bc35790ecc220b0ed6ddd1fcb44af6653dd74e37b3a49dcc1f002a1b98b6f79779192cca68bdfefd037bc81f4fa606628b751023122191f8c062362805", transaction.signature)    
 
     def test_generate_pair_pem(self):
         seed, pubkey = generate_pair()

@@ -3,10 +3,6 @@ import logging
 import unittest
 from pathlib import Path
 
-from erdpy import projects
-from erdpy.accounts import Account
-from erdpy.contracts import SmartContract
-from erdpy.environments import DebugEnvironment
 from erdpy.tests import utils
 
 logging.basicConfig(level=logging.ERROR)
@@ -16,6 +12,7 @@ class ProjectSolidityTestCase(utils.ProjectTestCase):
     def setUp(self):
         super().setUp()
 
+    @unittest.skip
     def test_solidity_hello(self):
         _, contract = self.build("solidity_hello")
 
@@ -26,6 +23,7 @@ class ProjectSolidityTestCase(utils.ProjectTestCase):
 
         self.environment.run_flow(myflow)
 
+    @unittest.skip
     def test_solidity_soll_001(self):
         _, contract = self.build("solidity_soll_001")
 
@@ -40,6 +38,7 @@ class ProjectSolidityTestCase(utils.ProjectTestCase):
 
         self.environment.run_flow(myflow)
 
+    @unittest.skip
     def test_solidity_soll_003(self):
         _, contract = self.build("solidity_soll_003")
 
