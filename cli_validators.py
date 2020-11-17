@@ -1,9 +1,8 @@
-from erdpy.transactions import do_prepare_transaction
-from erdpy.proxy.core import ElrondProxy
-from erdpy import validators
 from typing import Any
 
-from erdpy import cli_shared
+from erdpy import cli_shared, utils, validators
+from erdpy.proxy.core import ElrondProxy
+from erdpy.transactions import Transaction, do_prepare_transaction
 
 
 def setup_parser(subparsers: Any) -> Any:
@@ -49,6 +48,7 @@ def _add_common_arguments(sub: Any):
     cli_shared.add_proxy_arg(sub)
     cli_shared.add_wallet_args(sub)
     cli_shared.add_tx_args(sub, with_receiver=False, with_data=False, with_estimate_gas=True)
+    cli_shared.add_broadcast_args(sub, relay=False)
     cli_shared.add_outfile_arg(sub, what="signed transaction, hash")
 
 
@@ -57,66 +57,80 @@ def _add_nodes_arg(sub: Any):
 
 
 def do_stake(args: Any):
+    cli_shared.check_broadcast_args(args)
     cli_shared.prepare_nonce_in_args(args)
     args = validators.parse_args_for_stake(args)
     tx = do_prepare_transaction(args)
 
     try:
-        tx.send(ElrondProxy(args.proxy))
+        _send_or_simulate(tx, args)
     finally:
         tx.dump_to(args.outfile)
 
 
 def do_unstake(args: Any):
+    cli_shared.check_broadcast_args(args)
     cli_shared.prepare_nonce_in_args(args)
     args = validators.parse_args_for_un_stake(args)
     tx = do_prepare_transaction(args)
 
     try:
-        tx.send(ElrondProxy(args.proxy))
+        _send_or_simulate(tx, args)
     finally:
         tx.dump_to(args.outfile)
 
 
 def do_unjail(args: Any):
+    cli_shared.check_broadcast_args(args)
     cli_shared.prepare_nonce_in_args(args)
     args = validators.parse_args_for_un_jail(args)
     tx = do_prepare_transaction(args)
 
     try:
-        tx.send(ElrondProxy(args.proxy))
+        _send_or_simulate(tx, args)
     finally:
         tx.dump_to(args.outfile)
 
 
 def do_unbond(args: Any):
+    cli_shared.check_broadcast_args(args)
     cli_shared.prepare_nonce_in_args(args)
     args = validators.parse_args_for_un_bond(args)
     tx = do_prepare_transaction(args)
 
     try:
-        tx.send(ElrondProxy(args.proxy))
+        _send_or_simulate(tx, args)
     finally:
         tx.dump_to(args.outfile)
 
 
 def change_reward_address(args: Any):
+    cli_shared.check_broadcast_args(args)
     cli_shared.prepare_nonce_in_args(args)
     args = validators.parse_args_for_changing_reward_address(args)
     tx = do_prepare_transaction(args)
 
     try:
-        tx.send(ElrondProxy(args.proxy))
+        _send_or_simulate(tx, args)
     finally:
         tx.dump_to(args.outfile)
 
 
 def do_claim(args: Any):
+    cli_shared.check_broadcast_args(args)
     cli_shared.prepare_nonce_in_args(args)
     args = validators.parse_args_for_claim(args)
     tx = do_prepare_transaction(args)
 
     try:
-        tx.send(ElrondProxy(args.proxy))
+        _send_or_simulate(tx, args)
     finally:
         tx.dump_to(args.outfile)
+
+
+def _send_or_simulate(tx: Transaction, args: Any):
+    if args.send:
+        tx.send(ElrondProxy(args.proxy))
+    elif args.simulate:
+        response = tx.simulate(ElrondProxy(args.proxy))
+        utils.dump_out_json(response)

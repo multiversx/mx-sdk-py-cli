@@ -27,7 +27,7 @@ def estimate_system_sc_call(args, base_cost, factor=1):
 def _read_json_file(file_path):
     val_file = path.expanduser(file_path)
     guards.is_file(val_file)
-    with open(file_path,  "r") as json_file:
+    with open(file_path, "r") as json_file:
         try:
             data = json.load(json_file)
         except Exception:
