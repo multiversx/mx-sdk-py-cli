@@ -102,8 +102,11 @@ async def _read_stream(stream, pid):
 
 def _patch_loglevel(loglevel: str) -> str:
     loglevel = loglevel or "*:DEBUG"
-    if "arwen/host:" not in loglevel:
-        loglevel += ",arwen/host:TRACE"
+    if "arwen:" not in loglevel:
+        loglevel += ",arwen:TRACE"
+    if "process/smartcontract:" not in loglevel:
+        loglevel += ",process/smartcontract:TRACE"
+
     return loglevel
 
 
@@ -114,8 +117,8 @@ def _is_interesting_logline(logline):
         is_after_genesis = True
 
     if not is_after_genesis:
-        return any(e in logline for e in ["started committing block", "ERROR", "WARN"])    
-    return any(e in logline for e in ["started committing block", "ERROR", "WARN", "arwen"])
+        return any(e in logline for e in ["started committing block", "ERROR", "WARN"])
+    return any(e in logline for e in ["started committing block", "ERROR", "WARN", "arwen", "smartcontract"])
 
 
 def _dump_interesting_log_line(pid: str, logline: str) -> str:
