@@ -1,8 +1,7 @@
 import base64
 import logging
-from os import confstr
 
-from erdpy import config, scope
+from erdpy import scope
 from erdpy.projects import load_project
 from erdpy.proxy.http_facade import do_post
 from erdpy.proxy.tx_types import TxTypes

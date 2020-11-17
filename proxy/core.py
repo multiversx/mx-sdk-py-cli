@@ -1,7 +1,6 @@
 import logging
 from typing import Any, List, Tuple
 
-from erdpy import transactions, utils
 from erdpy.accounts import Address
 from erdpy.proxy.http_facade import do_get, do_post
 from erdpy.proxy.messages import NetworkConfig
