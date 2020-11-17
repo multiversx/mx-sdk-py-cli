@@ -123,7 +123,7 @@ def add_broadcast_args(sub: Any, simulate=True, relay=False):
 
 
 def check_broadcast_args(args: Any):
-    if args.relay and args.send:
+    if hasattr(args, "relay") and args.relay and args.send:
         raise errors.BadUsage("Cannot directly send a relayed transaction. Use 'erdpy tx new --relay' first, then 'erdpy tx send --data-file'")
     if args.send and args.simulate:
         raise errors.BadUsage("Cannot both 'simulate' and 'send' a transaction")

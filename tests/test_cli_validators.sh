@@ -3,20 +3,20 @@
 source "./shared.sh"
 
 testAll() {
-    BLS_KEY="b617d8bc442bda59510f77e04a1680e8b2d3293c8c4083d94260db96a4d732deaaf9855fa0cef2273f5a67b4f442c725efc06a5d366b9f15a66da9eb8208a09c9ab4066b6b3d38c3cf1ea7fab6489a90713b3b56d87de68c6558c80d7533bf27"
-    REWARD_ADDRESS="erd1l453hd0gt5gzdp7czpuall8ggt2dcv5zwmfdf3sd3lguxseux2fsmsgldz"
+    BLS_KEY="e7beaa95b3877f47348df4dd1cb578a4f7cabf7a20bfeefe5cdd263878ff132b765e04fef6f40c93512b666c47ed7719b8902f6c922c04247989b7137e837cc81a62e54712471c97a2ddab75aa9c2f58f813ed4c0fa722bde0ab718bff382208"
+    REWARD_ADDRESS="erd1k2s324ww2g0yj38qn2ch2jwctdy8mnfxep94q9arncc6xecg3xaq6mjse8"
 
     echo "Stake with recall nonce"
-    ${ERDPY} --verbose validator stake --pem="${KEYS}/alice.pem" --value="2500${DENOMINATION}" --validators-file=./testdata/validators/validators.json --reward-address=${REWARD_ADDRESS} --chain=${CHAIN_ID} --proxy=${PROXY} --estimate-gas --recall-nonce
+    ${ERDPY} --verbose validator stake --pem="${USERS}/alice.pem" --value="2500${DENOMINATION}" --validators-file=./testdata/validators.json --reward-address=${REWARD_ADDRESS} --chain=${CHAIN_ID} --proxy=${PROXY} --estimate-gas --recall-nonce --send
     echo "Stake with provided nonce"
-    ${ERDPY} --verbose validator stake --pem="${KEYS}/alice.pem" --value="2500${DENOMINATION}" --validators-file=./testdata/validators/validators.json --reward-address=${REWARD_ADDRESS} --chain=${CHAIN_ID} --proxy=${PROXY} --estimate-gas --nonce=42
+    ${ERDPY} --verbose validator stake --pem="${USERS}/alice.pem" --value="2500${DENOMINATION}" --validators-file=./testdata/validators.json --reward-address=${REWARD_ADDRESS} --chain=${CHAIN_ID} --proxy=${PROXY} --estimate-gas --nonce=42 --send
 
     echo "Unstake"
-    ${ERDPY} --verbose validator unstake --pem="${KEYS}/alice.pem" --nodes-public-keys=${BLS_KEY} --chain=${CHAIN_ID} --proxy=${PROXY} --estimate-gas --recall-nonce
+    ${ERDPY} --verbose validator unstake --pem="${USERS}/alice.pem" --nodes-public-keys=${BLS_KEY} --chain=${CHAIN_ID} --proxy=${PROXY} --estimate-gas --recall-nonce --send
     echo "Unbond"
-    ${ERDPY} --verbose validator unbond --pem="${KEYS}/alice.pem" --nodes-public-keys=${BLS_KEY} --chain=${CHAIN_ID} --proxy=${PROXY} --estimate-gas --recall-nonce
+    ${ERDPY} --verbose validator unbond --pem="${USERS}/alice.pem" --nodes-public-keys=${BLS_KEY} --chain=${CHAIN_ID} --proxy=${PROXY} --estimate-gas --recall-nonce --send
     echo "Unjail"
-    ${ERDPY} --verbose validator unjail --pem="${KEYS}/alice.pem" --value="2500${DENOMINATION}" --nodes-public-keys=${BLS_KEY} --chain=${CHAIN_ID} --proxy=${PROXY} --estimate-gas --recall-nonce
+    ${ERDPY} --verbose validator unjail --pem="${USERS}/alice.pem" --value="2500${DENOMINATION}" --nodes-public-keys=${BLS_KEY} --chain=${CHAIN_ID} --proxy=${PROXY} --estimate-gas --recall-nonce --send
     echo "Change reward address"
-    ${ERDPY} --verbose validator change-reward-address --pem="${KEYS}/alice.pem" --reward-address=${REWARD_ADDRESS} --chain=${CHAIN_ID} --proxy=${PROXY} --estimate-gas --recall-nonce
+    ${ERDPY} --verbose validator change-reward-address --pem="${USERS}/alice.pem" --reward-address=${REWARD_ADDRESS} --chain=${CHAIN_ID} --proxy=${PROXY} --estimate-gas --recall-nonce --send
 }

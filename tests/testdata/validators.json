@@ -1,13 +1,13 @@
 {
-  "validators" : [
+  "validators": [
     {
-      "pemFile": "valPem1.pem"
+      "pemFile": "../../testnet/wallets/validators/validatorKey00.pem"
     },
     {
-      "pemFile": "valPem2.pem"
+      "pemFile": "../../testnet/wallets/validators/validatorKey01.pem"
     },
-      {
-      "pemFile": "valPem3.pem"
+    {
+      "pemFile": "../../testnet/wallets/validators/validatorKey02.pem"
     }
   ]
 }
