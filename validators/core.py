@@ -14,7 +14,7 @@ from erdpy.wallet.signing import sign_message_with_bls_key
 
 logger = logging.getLogger("validators")
 
-_STAKE_SMART_CONTRACT_ADDRESS = "erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqplllst77y4l"
+AUCTION_SMART_CONTRACT_ADDRESS = "erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqplllst77y4l"
 
 
 def estimate_system_sc_call(args, base_cost, factor=1):
@@ -35,12 +35,13 @@ def _read_json_file(file_path):
         return data
 
 
-def parse_args_for_stake(args: Any):
+def prepare_args_for_stake(args: Any):
     validators_file = args.validators_file
     validators_data = _read_json_file(validators_file)
 
     reward_address = args.reward_address
 
+    # TODO: Refactor, so that only address is received here.
     if args.pem:
         account = Account(pem_file=args.pem)
     elif args.keyfile and args.passfile:
@@ -60,67 +61,55 @@ def parse_args_for_stake(args: Any):
         reward_address = Address(args.reward_address)
         stake_data += '@' + reward_address.hex()
 
-    args.receiver = _STAKE_SMART_CONTRACT_ADDRESS
+    args.receiver = AUCTION_SMART_CONTRACT_ADDRESS
     args.data = stake_data
 
     if args.estimate_gas:
         args.gas_limit = estimate_system_sc_call(args, MetaChainSystemSCsCost.STAKE, num_of_nodes)
 
-    return args
 
-
-def parse_args_for_un_stake(args: Any):
+def prepare_args_for_unstake(args: Any):
     parsed_keys, num_keys = _parse_keys(args.nodes_public_keys)
     args.data = 'unStake' + parsed_keys
-    args.receiver = _STAKE_SMART_CONTRACT_ADDRESS
+    args.receiver = AUCTION_SMART_CONTRACT_ADDRESS
 
     if args.estimate_gas:
         args.gas_limit = estimate_system_sc_call(args, MetaChainSystemSCsCost.UNSTAKE, num_keys)
 
-    return args
 
-
-def parse_args_for_un_bond(args: Any):
+def prepare_args_for_unbond(args: Any):
     parsed_keys, num_keys = _parse_keys(args.nodes_public_keys)
     args.data = 'unBond' + parsed_keys
-    args.receiver = _STAKE_SMART_CONTRACT_ADDRESS
+    args.receiver = AUCTION_SMART_CONTRACT_ADDRESS
 
     if args.estimate_gas:
         args.gas_limit = estimate_system_sc_call(args, MetaChainSystemSCsCost.UNBOND, num_keys)
 
-    return args
 
-
-def parse_args_for_un_jail(args: Any):
+def prepare_args_for_unjail(args: Any):
     parsed_keys, num_keys = _parse_keys(args.nodes_public_keys)
     args.data = 'unJail' + parsed_keys
-    args.receiver = _STAKE_SMART_CONTRACT_ADDRESS
+    args.receiver = AUCTION_SMART_CONTRACT_ADDRESS
 
     if args.estimate_gas:
         args.gas_limit = estimate_system_sc_call(args, MetaChainSystemSCsCost.UNJAIL, num_keys)
 
-    return args
 
-
-def parse_args_for_changing_reward_address(args: Any):
+def prepare_args_for_change_reward_address(args: Any):
     reward_address = Address(args.reward_address)
     args.data = 'changeRewardAddress@' + reward_address.hex()
-    args.receiver = _STAKE_SMART_CONTRACT_ADDRESS
+    args.receiver = AUCTION_SMART_CONTRACT_ADDRESS
 
     if args.estimate_gas:
         args.gas_limit = estimate_system_sc_call(args, MetaChainSystemSCsCost.CHANGE_REWARD_ADDRESS)
 
-    return args
 
-
-def parse_args_for_claim(args: Any):
+def prepare_args_for_claim(args: Any):
     args.data = 'claim'
-    args.receiver = _STAKE_SMART_CONTRACT_ADDRESS
+    args.receiver = AUCTION_SMART_CONTRACT_ADDRESS
 
     if args.estimate_gas:
         args.gas_limit = estimate_system_sc_call(args, MetaChainSystemSCsCost.CLAIM)
-
-    return args
 
 
 def _parse_keys(bls_public_keys):

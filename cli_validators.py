@@ -59,7 +59,7 @@ def _add_nodes_arg(sub: Any):
 def do_stake(args: Any):
     cli_shared.check_broadcast_args(args)
     cli_shared.prepare_nonce_in_args(args)
-    args = validators.parse_args_for_stake(args)
+    validators.prepare_args_for_stake(args)
     tx = do_prepare_transaction(args)
 
     try:
@@ -71,7 +71,7 @@ def do_stake(args: Any):
 def do_unstake(args: Any):
     cli_shared.check_broadcast_args(args)
     cli_shared.prepare_nonce_in_args(args)
-    args = validators.parse_args_for_un_stake(args)
+    validators.prepare_args_for_unstake(args)
     tx = do_prepare_transaction(args)
 
     try:
@@ -83,7 +83,7 @@ def do_unstake(args: Any):
 def do_unjail(args: Any):
     cli_shared.check_broadcast_args(args)
     cli_shared.prepare_nonce_in_args(args)
-    args = validators.parse_args_for_un_jail(args)
+    validators.prepare_args_for_unjail(args)
     tx = do_prepare_transaction(args)
 
     try:
@@ -95,7 +95,7 @@ def do_unjail(args: Any):
 def do_unbond(args: Any):
     cli_shared.check_broadcast_args(args)
     cli_shared.prepare_nonce_in_args(args)
-    args = validators.parse_args_for_un_bond(args)
+    validators.prepare_args_for_unbond(args)
     tx = do_prepare_transaction(args)
 
     try:
@@ -107,7 +107,7 @@ def do_unbond(args: Any):
 def change_reward_address(args: Any):
     cli_shared.check_broadcast_args(args)
     cli_shared.prepare_nonce_in_args(args)
-    args = validators.parse_args_for_changing_reward_address(args)
+    validators.prepare_args_for_change_reward_address(args)
     tx = do_prepare_transaction(args)
 
     try:
@@ -119,7 +119,7 @@ def change_reward_address(args: Any):
 def do_claim(args: Any):
     cli_shared.check_broadcast_args(args)
     cli_shared.prepare_nonce_in_args(args)
-    args = validators.parse_args_for_claim(args)
+    validators.prepare_args_for_claim(args)
     tx = do_prepare_transaction(args)
 
     try:
