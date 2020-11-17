@@ -1,6 +1,6 @@
 import logging
 
-from erdpy.blockatlas.http_facade import do_get, do_post
+from erdpy.blockatlas.http_facade import do_get
 
 logger = logging.getLogger("block-atlas")
 

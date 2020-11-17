@@ -118,4 +118,5 @@ class ElrondProxy:
             url = f"{self.url}/hyperblock/by-nonce/{key}"
 
         response = do_get(url)
+        response = response.get("hyperblock", {})
         return response
