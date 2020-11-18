@@ -22,4 +22,3 @@ def patch_system_smart_contracts(data: Any, testnet_config: TestnetConfiguration
     data['StakingSystemSCConfig']['StakeEnableEpoch'] = 0
     data['StakingSystemSCConfig']['ActivateBLSPubKeyMessageVerification'] = True
     data['ESDTSystemSCConfig']['EnabledEpoch'] = 0
-
