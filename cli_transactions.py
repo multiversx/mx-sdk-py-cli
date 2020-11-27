@@ -13,7 +13,7 @@ def setup_parser(subparsers: Any) -> Any:
     sub = cli_shared.add_command_subparser(subparsers, "tx", "new", "Create a new transaction")
     _add_common_arguments(sub)
     cli_shared.add_outfile_arg(sub, what="signed transaction, hash")
-    cli_shared.add_broadcast_args(sub)
+    cli_shared.add_broadcast_args(sub, relay=True)
     cli_shared.add_proxy_arg(sub)
     sub.set_defaults(func=create_transaction)
 
@@ -51,7 +51,7 @@ def create_transaction(args: Any):
 
     tx = do_prepare_transaction(args)
 
-    if args.relay:
+    if hasattr(args, "relay") and args.relay:
         args.outfile.write(tx.serialize_as_inner())
         return
 
