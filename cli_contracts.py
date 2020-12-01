@@ -1,6 +1,6 @@
 import logging
 import os
-from typing import Any, Dict
+from typing import Any
 
 from erdpy import cli_shared, errors, projects, utils
 from erdpy.accounts import Account, Address
@@ -61,7 +61,7 @@ def setup_parser(subparsers: Any) -> Any:
     cli_shared.add_tx_args(sub, with_receiver=False, with_data=False)
     _add_function_arg(sub)
     _add_arguments_arg(sub)
-    cli_shared.add_broadcast_args(sub)
+    cli_shared.add_broadcast_args(sub, relay=True)
 
     sub.set_defaults(func=call)
 
