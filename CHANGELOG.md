@@ -4,6 +4,10 @@ All notable changes will be documented in this file.
 
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
+## [0.9.8] - 10.12.2020
+ - Fix devnet config wrt. latest node changes.
+ - Fix path to templates (for contract new).
+
 ## [0.9.7] - 03.12.2020
  - Refactor (mostly around validator commands).
  - Add "send", "simulate" for `validator` commands.
