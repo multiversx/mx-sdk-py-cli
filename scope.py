@@ -17,15 +17,11 @@ def initialize():
     testnet_toml = path.join(cwd, "testnet.toml")
 
     if os.path.exists(testnet_toml):
-        logger.info("running in local testnet")
-
         global chain_id, proxy
 
         testnet_config = TestnetConfiguration.from_file(testnet_toml)
         chain_id = CHAIN_ID
         proxy = f"http://localhost:{testnet_config.proxy_port()}"
-
-    logger.info(f"initialized. chain = {chain_id}, proxy = {proxy}")
 
 
 def get_chain_id():

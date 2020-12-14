@@ -96,14 +96,13 @@ class TestnetConfiguration:
             if not filename.exists():
                 return dict()
 
-        logger.info('using local testnet config from %s', filename)
         return utils.read_toml_file(filename)
 
     @classmethod
     def get_sdk_testnet_config(cls):
         default = cls.default()
         filename = workstation.get_tools_folder() / "testnet.toml"
-        logger.info('sdk_testnet_config filename %s', filename)
+
         if not filename.exists():
             logger.info('writing sdk_testnet_config from defaults')
             utils.write_toml_file(str(filename), default)
