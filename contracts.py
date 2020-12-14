@@ -131,7 +131,7 @@ class SmartContract:
 
         response = proxy.query_contract(payload)
         response_data = response.get("data", {})
-        return_data = response_data.get("returnData", response_data.get("ReturnData"))
+        return_data = response_data.get("returnData", response_data.get("ReturnData")) or []
         return [self._interpret_return_data(data) for data in return_data]
 
     def _interpret_return_data(self, data):
