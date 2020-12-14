@@ -70,7 +70,7 @@ def get_defaults() -> Dict[str, Any]:
         "proxy": "https://testnet-api.elrond.com",
         "chainID": "T",
         "txVersion": "1",
-        "dependencies.arwentools.tag": "v0.4.1",
+        "dependencies.arwentools.tag": "v0.5.4-48-gf8b5cff",
         "dependencies.arwentools.urlTemplate.linux": "https://ide.elrond.com/travis-builds/ARWEN_{TAG}_linux_amd64.tar.gz",
         "dependencies.arwentools.urlTemplate.osx": "https://ide.elrond.com/travis-builds/ARWEN_{TAG}_darwin_amd64.tar.gz",
         "dependencies.llvm.tag": "v9-19feb",
@@ -93,7 +93,7 @@ def get_defaults() -> Dict[str, Any]:
         "dependencies.mcl_signer.tag": "v1.0.0",
         "dependencies.mcl_signer.urlTemplate.linux": "https://github.com/ElrondNetwork/elrond-sdk-go-tools/releases/download/{TAG}/mcl_signer_{TAG}_ubuntu-latest.tar.gz",
         "dependencies.mcl_signer.urlTemplate.osx": "https://github.com/ElrondNetwork/elrond-sdk-go-tools/releases/download/{TAG}/mcl_signer_{TAG}_macos-latest.tar.gz",
-        "dependencies.elrond_wasm_rs.tag": "v0.9.8.1-beta",
+        "dependencies.elrond_wasm_rs.tag": "v0.9.8.2-beta",
     }
 
 
