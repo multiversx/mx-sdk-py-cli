@@ -4,6 +4,12 @@ All notable changes will be documented in this file.
 
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
+## [0.9.9] - 14.12.2020
+ - Update reference to templates, to arwentools.
+ - Handle empty query response.
+ - Remove some redundant logging.
+ - Automatically copy devnet wallets into the project (at `contract new`).
+
 ## [0.9.8] - 10.12.2020
  - Fix devnet config wrt. latest node changes.
  - Fix path to templates (for contract new).
