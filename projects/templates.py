@@ -7,6 +7,7 @@ from erdpy import errors, utils
 from erdpy.projects import shared
 from erdpy.projects.project_rust import CargoFile
 from erdpy.projects.templates_config import get_templates_repositories
+from erdpy.testnet import wallets
 
 logger = logging.getLogger("projects.templates")
 
@@ -54,6 +55,10 @@ def create_from_template(name: str, template_name: str, directory: str):
     template.apply(template_name, name)
 
     logger.info("Project created, template applied.")
+
+    wallets.copy_all_to(path.join(project_directory, "wallets"))
+
+    logger.info("Test wallets have been copied into the project.")
 
 
 def _download_templates_repositories():
