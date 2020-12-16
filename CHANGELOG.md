@@ -4,6 +4,9 @@ All notable changes will be documented in this file.
 
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
+## [1.0.0] - 16.12.2020
+ - Update reference to templates.
+
 ## [0.9.9] - 14.12.2020
  - Update reference to templates, to arwentools.
  - Handle empty query response.
