@@ -149,6 +149,9 @@ class TemplateRust(Template):
         for dependency in cargo_file.get_dev_dependencies().values():
             del dependency["path"]
 
+        # Patch the path towards the project crate (one folder above):
+        cargo_file.get_dependency(self.template_name)["path"] = ".."
+
         cargo_file.save()
 
         self._replace_in_files(
