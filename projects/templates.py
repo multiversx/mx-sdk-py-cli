@@ -214,7 +214,7 @@ class TemplateRust(Template):
                 # Example: replace "use simple-erc20::*" to "use my_token::*"
                 (f"use {self.template_name.replace('-', '_')}::*", f"use {self.project_name.replace('-', '_')}::*"),
                 # Example: replace "extern crate adder;" to "extern crate myadder"
-                (f"extern crate {self.template_name.replace('-', '_')};", f"extern create {self.project_name.replace('-', '_')};")
+                (f"extern crate {self.template_name.replace('-', '_')};", f"extern crate {self.project_name.replace('-', '_')};")
             ]
         )
 
