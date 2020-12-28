@@ -8,12 +8,15 @@ import stat
 import sys
 import tarfile
 import zipfile
+import toml
+import binascii
+
 from pathlib import Path
 from typing import Any, Dict, List, Union
-
-import toml
-
-from erdpy import errors
+from os import path
+from erdpy import errors, guards
+from erdpy.accounts import Address
+from erdpy.errors import CannotReadValidatorsData
 
 logger = logging.getLogger("utils")
 
@@ -40,6 +43,31 @@ def omit_fields(data: Any, fields: List[str] = []):
             data.pop(field, None)
         return data
     raise errors.ProgrammingError("omit_fields: only dictionaries are supported.")
+
+
+def get_sc_address_from_tx(data: Any):
+    if not isinstance(data, dict):
+        raise errors.ProgrammingError("error")
+    key = "smartContractResults"
+
+    if key not in data.keys():
+        raise errors.ProgrammingError("error")
+
+    # TODO improve robustness of this code in case of fail transaction
+    try:
+        sc_result = data[key][0]
+        data_field = sc_result['data']
+
+        data_field_split = data_field.split('@')
+        arg_1 = binascii.unhexlify(data_field_split[1])
+        if not arg_1 == b'ok':
+            raise errors.ProgrammingError(arg_1.decode("utf-8"))
+
+        sc_address = binascii.unhexlify(data_field_split[2])
+        address = Address(sc_address)
+        print("Contract address: ", address)
+    except:
+        raise errors.ProgrammingError("cannot get the smart contract address from transaction results, please try again")
 
 
 def untar(archive_path: str, destination_folder: str) -> None:
@@ -192,3 +220,22 @@ def breakpoint():
     print("Waiting for debugger attach")
     debugpy.wait_for_client()
     debugpy.breakpoint()
+
+
+def read_json_file_validators(file_path):
+    val_file = path.expanduser(file_path)
+    guards.is_file(val_file)
+    with open(file_path, "r") as json_file:
+        try:
+            data = json.load(json_file)
+        except Exception:
+            raise CannotReadValidatorsData()
+        return data
+
+
+def parse_keys(bls_public_keys):
+    keys = bls_public_keys.split(',')
+    parsed_keys = ''
+    for key in keys:
+        parsed_keys += '@' + key
+    return parsed_keys, len(keys)

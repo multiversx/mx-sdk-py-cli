@@ -1,8 +1,7 @@
 from typing import Any
 
-from erdpy import cli_shared, utils, validators
-from erdpy.proxy.core import ElrondProxy
-from erdpy.transactions import Transaction, do_prepare_transaction
+from erdpy import cli_shared, validators
+from erdpy.transactions import do_prepare_transaction
 
 
 def setup_parser(subparsers: Any) -> Any:
@@ -31,7 +30,8 @@ def setup_parser(subparsers: Any) -> Any:
     _add_nodes_arg(sub)
     sub.set_defaults(func=do_unbond)
 
-    sub = cli_shared.add_command_subparser(subparsers, "validator", "change-reward-address", "Change the reward address")
+    sub = cli_shared.add_command_subparser(subparsers, "validator", "change-reward-address",
+                                           "Change the reward address")
     _add_common_arguments(sub)
     sub.add_argument("--reward-address", required=True, help="the new reward address")
     sub.set_defaults(func=change_reward_address)
@@ -63,7 +63,7 @@ def do_stake(args: Any):
     tx = do_prepare_transaction(args)
 
     try:
-        _send_or_simulate(tx, args)
+        cli_shared.send_or_simulate(tx, args)
     finally:
         tx.dump_to(args.outfile)
 
@@ -75,7 +75,7 @@ def do_unstake(args: Any):
     tx = do_prepare_transaction(args)
 
     try:
-        _send_or_simulate(tx, args)
+        cli_shared.send_or_simulate(tx, args)
     finally:
         tx.dump_to(args.outfile)
 
@@ -87,7 +87,7 @@ def do_unjail(args: Any):
     tx = do_prepare_transaction(args)
 
     try:
-        _send_or_simulate(tx, args)
+        cli_shared.send_or_simulate(tx, args)
     finally:
         tx.dump_to(args.outfile)
 
@@ -99,7 +99,7 @@ def do_unbond(args: Any):
     tx = do_prepare_transaction(args)
 
     try:
-        _send_or_simulate(tx, args)
+        cli_shared.send_or_simulate(tx, args)
     finally:
         tx.dump_to(args.outfile)
 
@@ -111,7 +111,7 @@ def change_reward_address(args: Any):
     tx = do_prepare_transaction(args)
 
     try:
-        _send_or_simulate(tx, args)
+        cli_shared.send_or_simulate(tx, args)
     finally:
         tx.dump_to(args.outfile)
 
@@ -123,14 +123,6 @@ def do_claim(args: Any):
     tx = do_prepare_transaction(args)
 
     try:
-        _send_or_simulate(tx, args)
+        cli_shared.send_or_simulate(tx, args)
     finally:
         tx.dump_to(args.outfile)
-
-
-def _send_or_simulate(tx: Transaction, args: Any):
-    if args.send:
-        tx.send(ElrondProxy(args.proxy))
-    elif args.simulate:
-        response = tx.simulate(ElrondProxy(args.proxy))
-        utils.dump_out_json(response)

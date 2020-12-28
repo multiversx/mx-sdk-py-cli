@@ -103,10 +103,10 @@ class ElrondProxy:
         response = do_post(url, payload)
         return response
 
-    def get_transaction(self, tx_hash: str, sender_address: str = "") -> Any:
+    def get_transaction(self, tx_hash: str, sender_address: str = "", with_results: bool = False) -> Any:
         url = f"{self.url}/transaction/{tx_hash}"
-        if sender_address:
-            url = f"{self.url}/transaction/{tx_hash}?sender={sender_address}"
+        url += f"?sender={sender_address}"
+        url += f"&withResults={with_results}"
 
         response = do_get(url)
         transaction = response.get("transaction", dict())

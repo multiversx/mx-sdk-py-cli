@@ -1,14 +1,11 @@
 import binascii
-import json
 import logging
 from os import path
 from typing import Any
 
-from erdpy import guards
 from erdpy.accounts import Account, Address
-from erdpy.config import (GAS_PER_DATA_BYTE, MIN_GAS_LIMIT,
-                          MetaChainSystemSCsCost)
-from erdpy.errors import CannotReadValidatorsData
+from erdpy.config import MetaChainSystemSCsCost, MIN_GAS_LIMIT, GAS_PER_DATA_BYTE
+from erdpy.utils import parse_keys, read_json_file_validators
 from erdpy.wallet.pem import parse_validator_pem
 from erdpy.wallet.signing import sign_message_with_bls_key
 
@@ -17,27 +14,9 @@ logger = logging.getLogger("validators")
 AUCTION_SMART_CONTRACT_ADDRESS = "erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqplllst77y4l"
 
 
-def estimate_system_sc_call(args, base_cost, factor=1):
-    num_bytes = len(args.data)
-    gas_limit = MIN_GAS_LIMIT + num_bytes * GAS_PER_DATA_BYTE
-    gas_limit += factor * base_cost
-    return gas_limit
-
-
-def _read_json_file(file_path):
-    val_file = path.expanduser(file_path)
-    guards.is_file(val_file)
-    with open(file_path, "r") as json_file:
-        try:
-            data = json.load(json_file)
-        except Exception:
-            raise CannotReadValidatorsData()
-        return data
-
-
 def prepare_args_for_stake(args: Any):
     validators_file = args.validators_file
-    validators_data = _read_json_file(validators_file)
+    validators_data = read_json_file_validators(validators_file)
 
     reward_address = args.reward_address
 
@@ -69,7 +48,7 @@ def prepare_args_for_stake(args: Any):
 
 
 def prepare_args_for_unstake(args: Any):
-    parsed_keys, num_keys = _parse_keys(args.nodes_public_keys)
+    parsed_keys, num_keys = parse_keys(args.nodes_public_keys)
     args.data = 'unStake' + parsed_keys
     args.receiver = AUCTION_SMART_CONTRACT_ADDRESS
 
@@ -78,7 +57,7 @@ def prepare_args_for_unstake(args: Any):
 
 
 def prepare_args_for_unbond(args: Any):
-    parsed_keys, num_keys = _parse_keys(args.nodes_public_keys)
+    parsed_keys, num_keys = parse_keys(args.nodes_public_keys)
     args.data = 'unBond' + parsed_keys
     args.receiver = AUCTION_SMART_CONTRACT_ADDRESS
 
@@ -87,7 +66,7 @@ def prepare_args_for_unbond(args: Any):
 
 
 def prepare_args_for_unjail(args: Any):
-    parsed_keys, num_keys = _parse_keys(args.nodes_public_keys)
+    parsed_keys, num_keys = parse_keys(args.nodes_public_keys)
     args.data = 'unJail' + parsed_keys
     args.receiver = AUCTION_SMART_CONTRACT_ADDRESS
 
@@ -112,9 +91,8 @@ def prepare_args_for_claim(args: Any):
         args.gas_limit = estimate_system_sc_call(args, MetaChainSystemSCsCost.CLAIM)
 
 
-def _parse_keys(bls_public_keys):
-    keys = bls_public_keys.split(',')
-    parsed_keys = ''
-    for key in keys:
-        parsed_keys += '@' + key
-    return parsed_keys, len(keys)
+def estimate_system_sc_call(args, base_cost, factor=1):
+    num_bytes = len(args.data)
+    gas_limit = MIN_GAS_LIMIT + num_bytes * GAS_PER_DATA_BYTE
+    gas_limit += factor * base_cost
+    return gas_limit

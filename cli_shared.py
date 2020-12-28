@@ -7,6 +7,7 @@ from typing import Any, List, Text
 from erdpy import config, errors, scope, utils
 from erdpy.accounts import Account
 from erdpy.proxy.core import ElrondProxy
+from erdpy.transactions import Transaction
 
 
 def wider_help_formatter(prog: Text):
@@ -127,3 +128,11 @@ def check_broadcast_args(args: Any):
         raise errors.BadUsage("Cannot directly send a relayed transaction. Use 'erdpy tx new --relay' first, then 'erdpy tx send --data-file'")
     if args.send and args.simulate:
         raise errors.BadUsage("Cannot both 'simulate' and 'send' a transaction")
+
+
+def send_or_simulate(tx: Transaction, args: Any):
+    if args.send:
+        tx.send(ElrondProxy(args.proxy))
+    elif args.simulate:
+        response = tx.simulate(ElrondProxy(args.proxy))
+        utils.dump_out_json(response)
