@@ -109,7 +109,6 @@ class TemplateRust(Template):
         logger.info("Patching cargo files...")
         self._patch_cargo()
         self._patch_cargo_wasm()
-        self._patch_cargo_debug()
 
         logger.info("Patching source code...")
         self._patch_source_code_wasm()
@@ -130,6 +129,8 @@ class TemplateRust(Template):
 
         for dependency in cargo_file.get_dependencies().values():
             del dependency["path"]
+        for dependency in cargo_file.get_dev_dependencies().values():
+            del dependency["path"]
 
         cargo_file.save()
 
@@ -144,36 +145,14 @@ class TemplateRust(Template):
 
         for dependency in cargo_file.get_dependencies().values():
             del dependency["path"]
-        cargo_file.get_dependency(self.template_name)["path"] = ".."
+        # Currently, the following logic is not really needed (we don't have dev-dependencies in wasm/Cargo.toml):
+        for dependency in cargo_file.get_dev_dependencies().values():
+            del dependency["path"]
 
         cargo_file.save()
 
         self._replace_in_files(
             [cargo_path],
-            [
-                (f"[dependencies.{self.template_name}]", f"[dependencies.{self.project_name}]")
-            ]
-        )
-
-    def _patch_cargo_debug(self):
-        cargo_debug_path = path.join(self.directory, "debug", TemplateRust.CARGO_TOML)
-        if not path.exists(cargo_debug_path):
-            return
-
-        cargo_file_debug = CargoFile(cargo_debug_path)
-        cargo_file_debug.package_name = f"{self.project_name}-debug"
-        cargo_file_debug.version = "0.0.1"
-        cargo_file_debug.authors = ["you"]
-        cargo_file_debug.edition = "2018"
-
-        for dependency in cargo_file_debug.get_dependencies().values():
-            del dependency["path"]
-        cargo_file_debug.get_dependency(self.template_name)["path"] = ".."
-
-        cargo_file_debug.save()
-
-        self._replace_in_files(
-            [cargo_debug_path],
             [
                 (f"[dependencies.{self.template_name}]", f"[dependencies.{self.project_name}]")
             ]
