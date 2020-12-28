@@ -4,6 +4,11 @@ All notable changes will be documented in this file.
 
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
+## [1.0.3] - 28.12.2020
+ - `erdpy contract new`: Fix typo (`crate` / `create`).
+ - `erdpy contract new`: remove `path` of `dev-dependencies`, for rust templates.
+ - `erdpy contract new`: remove debug-related logic (not needed anymore).
+
 ## [1.0.2] - 28.12.2020
  - Update reference to templates.
 
