@@ -121,9 +121,21 @@ class CargoFile:
             self.data["dependencies"] = {}
         return self.data["dependencies"]
 
+    def get_dev_dependencies(self) -> MutableMapping[str, Any]:
+        if "dev-dependencies" not in self.data:
+            self.data["dev-dependencies"] = {}
+        return self.data["dev-dependencies"]
+
     def get_dependency(self, name) -> MutableMapping[str, Any]:
         dependencies = self.get_dependencies()
         dependency = dependencies.get(name)
         if dependency is None:
             raise errors.BuildError(f"Can't get cargo dependency: {name}")
+        return dependency
+
+    def get_dev_dependency(self, name) -> MutableMapping[str, Any]:
+        dependencies = self.get_dev_dependencies()
+        dependency = dependencies.get(name)
+        if dependency is None:
+            raise errors.BuildError(f"Can't get cargo dev-dependency: {name}")
         return dependency
