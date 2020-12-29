@@ -109,7 +109,7 @@ def _prepare_args(command: str, args: Any):
 
 def prepare_args_change_service_fee(args: Any):
     data = 'changeServiceFee'
-    data += '@' + binascii.hexlify(str.encode(str(args.service_fee))).decode()
+    data += '@' + string_to_hex_bytes(str(args.service_fee))
 
     args.data = data
     args.receiver = args.delegation_contract
@@ -119,8 +119,7 @@ def prepare_args_change_service_fee(args: Any):
 
 def prepare_args_modify_delegation_cap(args: Any):
     data = 'modifyTotalDelegationCap'
-    # string_to_hex_bytes(str(args.delegation_cap))
-    data += '@' + binascii.hexlify(str.encode(str(args.delegation_cap))).decode()
+    data += '@' + string_to_hex_bytes(str(args.delegation_cap))
 
     args.data = data
     args.receiver = args.delegation_contract
