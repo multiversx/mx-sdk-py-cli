@@ -1,7 +1,9 @@
+import binascii
 import sys
 from typing import Any
 
-from erdpy import cli_shared, utils
+from erdpy import cli_shared, utils, errors
+from erdpy.accounts import Address
 from erdpy.delegation import staking_provider
 from erdpy.proxy import ElrondProxy
 from erdpy.transactions import do_prepare_transaction
@@ -102,7 +104,7 @@ def setup_parser(subparsers: Any) -> Any:
 
     sub.add_argument("--set", action="store_true", required=not (utils.is_arg_present("--unset", sys.argv)),
                      help="set automatic activation True")
-    sub.add_argument("--unset", required=not (utils.is_arg_present("--set", sys.argv)),
+    sub.add_argument("--unset", action="store_true", required=not (utils.is_arg_present("--set", sys.argv)),
                      help="set automatic activation False")
 
     sub.add_argument("--delegation-contract", required=True, help="address of the delegation contract")
@@ -138,7 +140,7 @@ def get_contract_address_by_deploy_tx_hash(args: Any):
 
     transaction = proxy.get_transaction(args.create_tx_hash, with_results=True)
     utils.omit_fields(transaction, omit_fields)
-    utils.get_sc_address_from_tx(transaction)
+    _get_sc_address_from_tx(transaction)
 
 
 def add_new_nodes(args: Any):
@@ -249,3 +251,27 @@ def automatic_activation(args: Any):
         tx.dump_to(args.outfile)
 
 
+def _get_sc_address_from_tx(data: Any):
+    if not isinstance(data, dict):
+        raise errors.ProgrammingError("error")
+
+    sc_results = data.get('smartContractResults')
+    if sc_results is None:
+        raise errors.ProgrammingError("smart contract results missing")
+
+    # TODO improve robustness of this code in case of failed transaction
+    try:
+        sc_result = sc_results[0]
+        data_field = sc_result['data']
+
+        data_field_split = data_field.split('@')
+        arg_1 = binascii.unhexlify(data_field_split[1])
+        if not arg_1 == b'ok':
+            raise errors.ProgrammingError(arg_1.decode("utf-8"))
+
+        sc_address = binascii.unhexlify(data_field_split[2])
+        address = Address(sc_address)
+        print("Contract address: ", address)
+    except:
+        raise errors.ProgrammingError(
+            "cannot get the smart contract address from transaction results, please try again")

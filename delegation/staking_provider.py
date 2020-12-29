@@ -4,8 +4,7 @@ from os import path
 
 from erdpy.accounts import Account
 from erdpy.config import MetaChainSystemSCsCost
-from erdpy.utils import read_json_file_validators, parse_keys
-from erdpy.validators.core import estimate_system_sc_call
+from erdpy.validators.core import estimate_system_sc_call, read_json_file_validators, parse_keys
 from erdpy.wallet.pem import parse_validator_pem
 from erdpy.wallet.signing import sign_message_with_bls_key
 
@@ -20,7 +19,8 @@ def prepare_args_for_create_new_staking_contract(args: Any):
     args.receiver = DELEGATION_MANAGER_SC_ADDRESS
 
     if args.estimate_gas:
-        args.gas_limit = estimate_system_sc_call(args, MetaChainSystemSCsCost.DELEGATION_MGR_OPS, 3)
+        # factor is equals 2 because there 2 delegation manager operations when a contract is created
+        args.gas_limit = estimate_system_sc_call(args, MetaChainSystemSCsCost.DELEGATION_MANAGER_OPS, factor=2)
 
 
 def string_to_hex_bytes(number_str: str) -> str:
@@ -95,7 +95,7 @@ def prepare_args_for_unstake_nodes(args: Any):
 
 
 def prepare_args_for_unjail_nodes(args: Any):
-    _prepare_args("unjail", args)
+    _prepare_args("unJailNodes", args)
 
 
 def _prepare_args(command: str, args: Any):

@@ -1,11 +1,13 @@
 import binascii
+import json
 import logging
 from os import path
 from typing import Any
 
+from erdpy import guards
 from erdpy.accounts import Account, Address
 from erdpy.config import MetaChainSystemSCsCost, MIN_GAS_LIMIT, GAS_PER_DATA_BYTE
-from erdpy.utils import parse_keys, read_json_file_validators
+from erdpy.errors import CannotReadValidatorsData
 from erdpy.wallet.pem import parse_validator_pem
 from erdpy.wallet.signing import sign_message_with_bls_key
 
@@ -96,3 +98,22 @@ def estimate_system_sc_call(args, base_cost, factor=1):
     gas_limit = MIN_GAS_LIMIT + num_bytes * GAS_PER_DATA_BYTE
     gas_limit += factor * base_cost
     return gas_limit
+
+
+def read_json_file_validators(file_path):
+    val_file = path.expanduser(file_path)
+    guards.is_file(val_file)
+    with open(file_path, "r") as json_file:
+        try:
+            data = json.load(json_file)
+        except Exception:
+            raise CannotReadValidatorsData()
+        return data
+
+
+def parse_keys(bls_public_keys):
+    keys = bls_public_keys.split(',')
+    parsed_keys = ''
+    for key in keys:
+        parsed_keys += '@' + key
+    return parsed_keys, len(keys)
