@@ -8,12 +8,13 @@ testStart() {
     cleanSandbox
     mkdir -p ${SANDBOX}/testnet_foo
 
+    ${ERDPY} config set dependencies.elrond_proxy_go.tag fix-node-ref
     ${ERDPY} testnet prerequisites
     
     cp ./testdata/testnets/testnet_foo.toml ${SANDBOX}/testnet_foo/testnet.toml
     cd ${SANDBOX}/testnet_foo
     ${ERDPY} --verbose testnet config
-    ${ERDPY} --verbose testnet start
+    #${ERDPY} --verbose testnet start
 
     popd
 }
