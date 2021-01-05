@@ -18,7 +18,8 @@ def parse(pem_file: Union[str, Path], index: int = 0) -> Tuple[bytes, bytes]:
     guards.is_file(pem_file)
 
     lines = utils.read_lines(pem_file)
-    keys_lines = [list(key_lines) for is_next_key, key_lines in itertools.groupby(lines, lambda line: "-----" in line) if not is_next_key]
+    keys_lines = [list(key_lines) for is_next_key, key_lines in itertools.groupby(lines, lambda line: "-----" in line)
+                  if not is_next_key]
     keys = ["".join(key_lines) for key_lines in keys_lines]
 
     key_base64 = keys[index]
@@ -30,24 +31,55 @@ def parse(pem_file: Union[str, Path], index: int = 0) -> Tuple[bytes, bytes]:
     return seed, pubkey
 
 
-def parse_validator_pem(pem_file):
+def parse_validator_pem(pem_file, index: int = 0):
     pem_file = path.expanduser(pem_file)
     guards.is_file(pem_file)
 
     lines = utils.read_lines(pem_file)
+    bls_keys = read_bls_keys(lines)
+    private_keys = read_validators_private_keys(lines)
 
-    first_line = lines[0]
-    start = first_line.find('for ') + len('for ')
-    stop = first_line.rfind('-----')
-    bls_key = first_line[start:stop]
+    private_key = private_keys[index]
+    key_bytes = get_bytes_from_private_key(private_key)
 
-    lines = [line for line in lines if "-----" not in line]
-    key_base64 = "".join(lines)
+    bls_key = bls_keys[index]
+    seed = key_bytes
+    return seed, bls_key
+
+
+def read_bls_keys(lines):
+    bls_keys = []
+
+    for line in lines:
+        splited_line = line.split(" ")
+        if len(splited_line) < 5:
+            continue
+        if "BEGIN" in splited_line[0]:
+            continue
+
+        token = splited_line[4].replace('-----\n', '')
+        bls_keys.append(token)
+
+    return bls_keys
+
+
+def read_validators_private_keys(lines):
+    private_keys = []
+
+    private_keys_lines = [list(key_lines) for is_next_key, key_lines in
+                          itertools.groupby(lines, lambda line: "-----" in line) if not is_next_key]
+    for key_list in private_keys_lines:
+        private_keys.append(key_list[0] + key_list[1])
+
+    return private_keys
+
+
+def get_bytes_from_private_key(private_key):
+    key_base64 = private_key
     key_hex = base64.b64decode(key_base64).decode()
     key_bytes = bytes.fromhex(key_hex)
 
-    seed = key_bytes
-    return seed, bls_key
+    return key_bytes
 
 
 def write(pem_file: Union[str, Path], seed: bytes, pubkey: bytes, name: str = ""):
