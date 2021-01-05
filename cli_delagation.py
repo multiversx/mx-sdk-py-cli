@@ -10,10 +10,9 @@ from erdpy.transactions import do_prepare_transaction
 
 
 def setup_parser(subparsers: Any) -> Any:
-    parser = cli_shared.add_group_subparser(subparsers, "staking-provider", "Create New Delegation Contract, "
-                                                                            "Change base issuing cont, "
-                                                                            "Change min deposit, "
-                                                                            "Get all contract addresses")
+    parser = cli_shared.add_group_subparser(subparsers, "staking-provider", "Create New Delegation Contract "
+                                                                            "and some more staking-provider related "
+                                                                            "options")
     subparsers = parser.add_subparsers()
 
     # create new delegation contract
