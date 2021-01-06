@@ -63,6 +63,7 @@ async def do_start(args: Any):
     # Proxy
     to_run.append(run([
         "./proxy",
+        "--log-save"
     ], cwd=testnet_config.proxy_folder(), delay=PROXY_START_DELAY))
 
     await asyncio.gather(*to_run)

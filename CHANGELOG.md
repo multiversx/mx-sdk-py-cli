@@ -4,6 +4,10 @@ All notable changes will be documented in this file.
 
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
+## [1.0.4] - TBD
+ - `erdpy testnet`: Fixes for MacOS, enable log-save for Proxy.
+ - TBD
+
 ## [1.0.3] - 28.12.2020
  - `erdpy contract new`: Fix typo (`crate` / `create`).
  - `erdpy contract new`: remove `path` of `dev-dependencies`, for rust templates.
