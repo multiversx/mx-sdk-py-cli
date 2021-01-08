@@ -8,15 +8,12 @@ import stat
 import sys
 import tarfile
 import zipfile
-import toml
-import binascii
-
 from pathlib import Path
 from typing import Any, Dict, List, Union
-from os import path
-from erdpy import errors, guards
-from erdpy.accounts import Address
-from erdpy.errors import CannotReadValidatorsData
+
+import toml
+
+from erdpy import errors
 
 logger = logging.getLogger("utils")
 
@@ -195,4 +192,3 @@ def breakpoint():
     print("Waiting for debugger attach")
     debugpy.wait_for_client()
     debugpy.breakpoint()
-
