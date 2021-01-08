@@ -19,6 +19,7 @@ import erdpy.cli_transactions
 import erdpy.cli_validators
 import erdpy.cli_wallet
 import erdpy.cli_delagation
+import erdpy.cli_dns
 from erdpy import errors, scope
 from erdpy._version import __version__
 
@@ -95,6 +96,7 @@ https://docs.elrond.com/tools/erdpy.
     commands.append(erdpy.cli_testnet.setup_parser(subparsers))
     commands.append(erdpy.cli_data.setup_parser(subparsers))
     commands.append(erdpy.cli_delagation.setup_parser(subparsers))
+    commands.append(erdpy.cli_dns.setup_parser(subparsers))
 
     parser.epilog = """
 ----------------------
