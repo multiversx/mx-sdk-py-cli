@@ -24,11 +24,11 @@ def setup_parser(subparsers: Any) -> Any:
     _add_name_arg(sub)
     sub.set_defaults(func=name_hash)
 
-    sub = cli_shared.add_command_subparser(subparsers, "dns", "address-for-name", "DNS contract address (bech32) that corresponds to a name")
+    sub = cli_shared.add_command_subparser(subparsers, "dns", "dns-address-for-name", "DNS contract address (bech32) that corresponds to a name")
     _add_name_arg(sub)
     sub.set_defaults(func=dns_address_for_name)
 
-    sub = cli_shared.add_command_subparser(subparsers, "dns", "address-for-name-hex", "DNS contract address (hex) that corresponds to a name")
+    sub = cli_shared.add_command_subparser(subparsers, "dns", "dns-address-for-name-hex", "DNS contract address (hex) that corresponds to a name")
     _add_name_arg(sub)
     sub.set_defaults(func=dns_address_for_name_hex)
 
@@ -40,6 +40,11 @@ def setup_parser(subparsers: Any) -> Any:
     cli_shared.add_tx_args(sub, with_receiver=False, with_data=False)
     sub.add_argument("--name", help="the name to register")
     sub.set_defaults(func=dns_register)
+
+    sub = cli_shared.add_command_subparser(subparsers, "dns", "resolve", "Find the address for a name")
+    _add_name_arg(sub)
+    cli_shared.add_proxy_arg(sub)
+    sub.set_defaults(func=resolve)
 
     parser.epilog = cli_shared.build_group_epilog(subparsers)
     return subparsers
@@ -73,6 +78,17 @@ def dns_address_for_name_hex(args: Any):
     name = args.name
     dns_address = compute_dns_address_for_name(name)
     print(dns_address.hex())
+
+
+def resolve(args: Any):
+    name = args.name
+    name_arg = "0x{}".format(str.encode(name).hex())
+    dns_address = compute_dns_address_for_name(name)
+    contract = SmartContract(dns_address)
+    result = contract.query(ElrondProxy(args.proxy), "resolve", [name_arg])
+    if len(result) > 0:
+        address = Address(result[0].hex)
+        print(address.bech32())
 
 
 def dns_register(args: Any):
