@@ -263,6 +263,8 @@ def build_binaries(testnet_config: TestnetConfiguration):
             shutil.copy(libwasmer_path, destination)
 
     shutil.copy(proxy_folder / "proxy", testnet_config.proxy_folder())
+    if workstation.get_platform() == "osx":
+        shutil.copy(libwasmer_path, testnet_config.proxy_folder())
 
 
 def _get_arwen_version(testnet_config: TestnetConfiguration):

@@ -20,6 +20,8 @@ class MetaChainSystemSCsCost:
     CHANGE_REWARD_ADDRESS = 5000000
     CHANGE_VALIDATOR_KEYS = 5000000
     UNJAIL = 5000000
+    DELEGATION_MANAGER_OPS = 50000000
+    DELEGATION_OPS = 1000000
 
 
 def get_proxy() -> str:
@@ -93,7 +95,7 @@ def get_defaults() -> Dict[str, Any]:
         "dependencies.mcl_signer.tag": "v1.0.0",
         "dependencies.mcl_signer.urlTemplate.linux": "https://github.com/ElrondNetwork/elrond-sdk-go-tools/releases/download/{TAG}/mcl_signer_{TAG}_ubuntu-latest.tar.gz",
         "dependencies.mcl_signer.urlTemplate.osx": "https://github.com/ElrondNetwork/elrond-sdk-go-tools/releases/download/{TAG}/mcl_signer_{TAG}_macos-latest.tar.gz",
-        "dependencies.elrond_wasm_rs.tag": "v0.10.1",
+        "dependencies.elrond_wasm_rs.tag": "v0.10.2",
     }
 
 
