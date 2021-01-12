@@ -1,4 +1,5 @@
 import logging
+import shutil
 import subprocess
 from os import path
 from pathlib import Path
@@ -33,31 +34,44 @@ class ProjectRust(Project):
     def run_cargo(self):
         env = self._get_env()
 
-        if self.debug:
-            args = ["cargo", "build"]
-        else:
-            args = [
-                "cargo",
-                "build",
-                "--target=wasm32-unknown-unknown",
-                "--release"
-            ]
+        args = [
+            "cargo",
+            "build",
+            "--target=wasm32-unknown-unknown",
+            "--release",
+            "--out-dir",
+            self._get_output_folder(),
+            "-Z"
+            "unstable-options"
+        ]
+        self._decorate_cargo_args(args)
 
-            env["RUSTFLAGS"] = "-C link-arg=-s"
+        env["RUSTFLAGS"] = "-C link-arg=-s"
 
         cwd = path.join(self.directory, "wasm")
         return_code = myprocess.run_process_async(args, env=env, cwd=cwd)
         if return_code != 0:
             raise errors.BuildError(f"error code = {return_code}, see output")
 
+    def _decorate_cargo_args(self, args):
+        target_dir = self.options.get("cargo_target_dir")
+        if target_dir:
+            args.extend(["--target-dir", target_dir])
+
     def _generate_abi(self):
         if not self._has_abi():
             return
 
+        args = [
+            "cargo",
+            "run"
+        ]
+        self._decorate_cargo_args(args)
+
         env = self._get_env()
         cwd = path.join(self.directory, "abi")
         sink = myprocess.FileOutputSink(self._get_abi_filepath())
-        return_code = myprocess.run_process_async(["cargo", "run"], env=env, cwd=cwd, stdout_sink=sink)
+        return_code = myprocess.run_process_async(args, env=env, cwd=cwd, stdout_sink=sink)
         if return_code != 0:
             raise errors.BuildError(f"error code = {return_code}, see output")
 
@@ -72,13 +86,16 @@ class ProjectRust(Project):
     def _get_abi_folder(self):
         return Path(self.directory, "abi")
 
-    def _copy_build_artifacts_to_output(self):
+    def _do_after_build(self):
         name = self.cargo_file.package_name.replace("-", "_")
-        wasm_file = Path(self.directory, "wasm", "target", "wasm32-unknown-unknown", "release", f"{name}_wasm.wasm").resolve()
-        self._copy_to_output(wasm_file, f"{name}.wasm")
+        wasm_file = Path(self._get_output_folder(), f"{name}_wasm.wasm").resolve()
+        wasm_file_renamed = Path(self._get_output_folder(), f"{name}.wasm")
+        shutil.move(wasm_file, wasm_file_renamed)
 
         if self._has_abi():
-            self._copy_to_output(self._get_abi_filepath(), f"{name}.abi.json")
+            abi_file = self._get_abi_filepath()
+            abi_file_renamed = Path(self._get_output_folder(), f"{name}.abi.json")
+            shutil.move(abi_file, abi_file_renamed)
 
     def get_dependencies(self):
         return ["rust"]
