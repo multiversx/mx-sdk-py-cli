@@ -7,41 +7,66 @@ testTrivialCommands() {
 }
 
 testCreateContracts() {
-    ${ERDPY} contract new --template ultimate-answer --directory ${SANDBOX} myanswer
-    ${ERDPY} contract new --template simple-counter --directory ${SANDBOX} mycounter
-    ${ERDPY} contract new --template erc20-c --directory ${SANDBOX} mytoken-c
+    ${ERDPY} contract new --template ultimate-answer --directory ${SANDBOX} myanswer-c || return 1
+    ${ERDPY} contract new --template simple-counter --directory ${SANDBOX} mycounter-c || return 1
+    ${ERDPY} contract new --template erc20-c --directory ${SANDBOX} myerc20-c || return 1
 
-    ${ERDPY} contract new --template adder --directory ${SANDBOX} myadder
-    ${ERDPY} contract new --template factorial --directory ${SANDBOX} myfactorial
-    ${ERDPY} contract new --template simple-erc20 --directory ${SANDBOX} mytoken
-    ${ERDPY} contract new --template crypto-bubbles --directory ${SANDBOX} mybubbles
-
-    # BUSD contract isn't yet migrated to elrond-wasm 0.6.0
-    # git clone --depth=1 --branch=master https://github.com/ElrondNetwork/sc-busd-rs.git ${SANDBOX}/sc-busd-rs
-    # rm -rf ${SANDBOX}/sc-busd-rs/.git
+    ${ERDPY} contract new --template adder --directory ${SANDBOX} myadder-rs || return 1
+    ${ERDPY} contract new --template factorial --directory ${SANDBOX} myfactorial-rs || return 1
+    ${ERDPY} contract new --template simple-erc20 --directory ${SANDBOX} myerc20-rs || return 1
+    ${ERDPY} contract new --template crypto-bubbles --directory ${SANDBOX} mybubbles-rs || return 1
+    ${ERDPY} contract new --template lottery-egld --directory ${SANDBOX} mylottery-rs || return 1
+    ${ERDPY} contract new --template crowdfunding-egld --directory ${SANDBOX} myfunding-rs || return 1
 }
 
 testBuildContracts() {
-    ${ERDPY} contract build ${SANDBOX}/myanswer
-    ${ERDPY} contract build ${SANDBOX}/mycounter
-    ${ERDPY} contract build ${SANDBOX}/mytoken-c
-    ${ERDPY} contract build ${SANDBOX}/myadder
-    ${ERDPY} contract build ${SANDBOX}/myfactorial
-    ${ERDPY} contract build ${SANDBOX}/mytoken
-    ${ERDPY} contract build ${SANDBOX}/mybubbles
-    ${ERDPY} contract build ${SANDBOX}/sc-busd-rs
+    ${ERDPY} contract build ${SANDBOX}/myanswer-c || return 1
+    assertFileExists ${SANDBOX}/myanswer-c/output/answer.wasm || return 1
+
+    ${ERDPY} contract build ${SANDBOX}/mycounter-c || return 1
+    assertFileExists ${SANDBOX}/mycounter-c/output/counter.wasm || return 1
+
+    ${ERDPY} contract build ${SANDBOX}/myerc20-c || return 1
+    assertFileExists ${SANDBOX}/myerc20-c/output/erc20.wasm || return 1
+    
+    ${ERDPY} contract build ${SANDBOX}/myadder-rs || return 1
+    assertFileExists ${SANDBOX}/myadder-rs/output/myadder_rs.wasm || return 1
+    assertFileExists ${SANDBOX}/myadder-rs/output/myadder_rs.abi.json || return 1
+
+    ${ERDPY} contract build ${SANDBOX}/myfactorial-rs || return 1
+    assertFileExists ${SANDBOX}/myfactorial-rs/output/myfactorial_rs.wasm || return 1
+    assertFileExists ${SANDBOX}/myfactorial-rs/output/myfactorial_rs.abi.json || return 1
+
+    ${ERDPY} contract build ${SANDBOX}/myerc20-rs || return 1
+    assertFileExists ${SANDBOX}/myerc20-rs/output/myerc20_rs.wasm || return 1
+    assertFileExists ${SANDBOX}/myerc20-rs/output/myerc20_rs.abi.json || return 1
+    
+    ${ERDPY} contract build ${SANDBOX}/mybubbles-rs || return 1
+    assertFileExists ${SANDBOX}/mybubbles-rs/output/mybubbles_rs.wasm || return 1
+    assertFileExists ${SANDBOX}/mybubbles-rs/output/mybubbles_rs.abi.json || return 1
+
+    ${ERDPY} contract build ${SANDBOX}/mylottery-rs || return 1
+    assertFileExists ${SANDBOX}/mylottery-rs/output/mylottery_rs.wasm || return 1
+    assertFileExists ${SANDBOX}/mylottery-rs/output/mylottery_rs.abi.json || return 1
+
+    ${ERDPY} contract build ${SANDBOX}/myfunding-rs || return 1
+    assertFileExists ${SANDBOX}/myfunding-rs/output/myfunding_rs.wasm || return 1
+    assertFileExists ${SANDBOX}/myfunding-rs/output/myfunding_rs.abi.json || return 1
 }
 
 testRunMandos() {
-    ${ERDPY} --verbose contract test --directory="mandos" ${SANDBOX}/myadder
-    ${ERDPY} --verbose contract test --directory="mandos" ${SANDBOX}/mytoken
-    ${ERDPY} --verbose contract test --directory="mandos" ${SANDBOX}/mybubbles
+    ${ERDPY} --verbose contract test --directory="mandos" ${SANDBOX}/myadder-rs || return 1
+    ${ERDPY} --verbose contract test --directory="mandos" ${SANDBOX}/myfactorial-rs || return 1
+    ${ERDPY} --verbose contract test --directory="mandos" ${SANDBOX}/myerc20-rs || return 1
+    ${ERDPY} --verbose contract test --directory="mandos" ${SANDBOX}/mybubbles-rs || return 1
+    ${ERDPY} --verbose contract test --directory="mandos" ${SANDBOX}/mylottery-rs || return 1
+    ${ERDPY} --verbose contract test --directory="mandos" ${SANDBOX}/myfunding-rs || return 1
 }
 
 testAll() {
-    cleanSandbox
-    testTrivialCommands
-    testCreateContracts
-    testBuildContracts
-    testRunMandos
+    cleanSandbox || return 1
+    testTrivialCommands || return 1
+    testCreateContracts || return 1
+    testBuildContracts || return 1
+    testRunMandos || return 1
 }
