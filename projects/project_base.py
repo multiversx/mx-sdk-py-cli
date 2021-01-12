@@ -61,11 +61,11 @@ class Project:
     def _copy_build_artifacts_to_output(self) -> None:
         raise NotImplementedError()
 
-    def _move_to_output(self, source: str, destination: str = None):
+    def _copy_to_output(self, source: str, destination: str = None):
         output_folder = self._get_output_folder()
         utils.ensure_folder(output_folder)
         destination = path.join(output_folder, destination) if destination else output_folder
-        shutil.move(source, destination)
+        shutil.copy(source, destination)
 
     def _get_output_folder(self):
         return path.join(self.directory, "output")

@@ -75,10 +75,10 @@ class ProjectRust(Project):
     def _copy_build_artifacts_to_output(self):
         name = self.cargo_file.package_name.replace("-", "_")
         wasm_file = Path(self.directory, "wasm", "target", "wasm32-unknown-unknown", "release", f"{name}_wasm.wasm").resolve()
-        self._move_to_output(wasm_file, f"{name}.wasm")
+        self._copy_to_output(wasm_file, f"{name}.wasm")
 
         if self._has_abi():
-            self._move_to_output(self._get_abi_filepath(), f"{name}.abi.json")
+            self._copy_to_output(self._get_abi_filepath(), f"{name}.abi.json")
 
     def get_dependencies(self):
         return ["rust"]
