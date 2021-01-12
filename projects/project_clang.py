@@ -76,7 +76,7 @@ class ProjectClang(Project):
 
     def _copy_build_artifacts_to_output(self):
         source_file = self.find_file_globally("*.c")
-        self._copy_to_output(source_file.with_suffix(".wasm"))
+        self._move_to_output(source_file.with_suffix(".wasm"))
         os.remove(source_file.with_suffix(".wasm"))
         os.remove(source_file.with_suffix(".ll"))
         os.remove(source_file.with_suffix(".o"))

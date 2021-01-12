@@ -26,6 +26,7 @@ class ProjectRust(Project):
     def perform_build(self):
         try:
             self.run_cargo()
+            self._generate_abi()
         except subprocess.CalledProcessError as err:
             raise errors.BuildError(err.output)
 
@@ -45,16 +46,39 @@ class ProjectRust(Project):
             env["RUSTFLAGS"] = "-C link-arg=-s"
 
         cwd = path.join(self.directory, "wasm")
-        result = myprocess.run_process_async(args, env=env, cwd=cwd)
-        if result != 0:
-            raise errors.BuildError(f"error code = {result}, see output")
+        return_code = myprocess.run_process_async(args, env=env, cwd=cwd)
+        if return_code != 0:
+            raise errors.BuildError(f"error code = {return_code}, see output")
+
+    def _generate_abi(self):
+        if not self._has_abi():
+            return
+
+        env = self._get_env()
+        cwd = path.join(self.directory, "abi")
+        sink = myprocess.FileOutputSink(self._get_abi_filepath())
+        return_code = myprocess.run_process_async(["cargo", "run"], env=env, cwd=cwd, stdout_sink=sink)
+        if return_code != 0:
+            raise errors.BuildError(f"error code = {return_code}, see output")
+
+        utils.prettify_json_file(self._get_abi_filepath())
+
+    def _has_abi(self):
+        return Path(self._get_abi_folder(), "Cargo.toml").is_file()
+
+    def _get_abi_filepath(self):
+        return Path(self._get_abi_folder(), "abi.json")
+
+    def _get_abi_folder(self):
+        return Path(self.directory, "abi")
 
     def _copy_build_artifacts_to_output(self):
         name = self.cargo_file.package_name.replace("-", "_")
-        name_with_suffix = f"{name}_wasm.wasm"
-        name_without_suffix = f"{self.cargo_file.package_name}.wasm"
-        wasm_file = Path(self.directory, "wasm", "target", "wasm32-unknown-unknown", "release", name_with_suffix).resolve()
-        self._copy_to_output(wasm_file, name_without_suffix)
+        wasm_file = Path(self.directory, "wasm", "target", "wasm32-unknown-unknown", "release", f"{name}_wasm.wasm").resolve()
+        self._move_to_output(wasm_file, f"{name}.wasm")
+
+        if self._has_abi():
+            self._move_to_output(self._get_abi_filepath(), f"{name}.abi.json")
 
     def get_dependencies(self):
         return ["rust"]
