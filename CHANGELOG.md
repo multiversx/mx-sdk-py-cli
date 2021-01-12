@@ -6,8 +6,13 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 
 ## [1.0.4] - TBD
+ - Add commands for the delegation manager contract.
+ - For Rust projects, run ABI generator upon building the WASM file.
+ - For Rust projects, patch contract templates wrt. ABI module.
+ - Cache templates repository (30 seconds). 
+ - Add github workflow for erdpy.
+ - Optimize running time for tests, build time (for rust projects).
  - `erdpy testnet`: Fixes for MacOS, enable log-save for Proxy.
- - Add commands for the delegation manager contract
 
 ## [1.0.3] - 28.12.2020
  - `erdpy contract new`: Fix typo (`crate` / `create`).
