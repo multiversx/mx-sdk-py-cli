@@ -1,4 +1,5 @@
 import shutil
+import time
 from os import path
 
 from erdpy import downloader, errors, utils, workstation
@@ -12,14 +13,27 @@ class TemplatesRepository:
         self.relative_path = relative_path
 
     def download(self):
-        archive = self._get_archive_path()
-        downloader.download(self.url, archive)
+        self._download_if_old()
+
         templates_folder = self.get_folder()
         try:
             shutil.rmtree(templates_folder)
         except FileNotFoundError:
             pass
+
+        archive = self._get_archive_path()
         utils.unzip(archive, templates_folder)
+
+    def _download_if_old(self):
+        CACHE_DURATION = 30
+        archive = self._get_archive_path()
+
+        if path.isfile(archive):
+            if time.time() - path.getmtime(archive) < CACHE_DURATION:
+                return
+
+        downloader.download(self.url, archive)
+
 
     def _get_archive_path(self):
         tools_folder = workstation.get_tools_folder()

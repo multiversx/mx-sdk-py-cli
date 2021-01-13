@@ -18,6 +18,7 @@ def setup_parser(subparsers: Any) -> Any:
     mutex = sub.add_mutually_exclusive_group()
     mutex.add_argument("--balance", action="store_true", help="whether to only fetch the balance")
     mutex.add_argument("--nonce", action="store_true", help="whether to only fetch the nonce")
+    mutex.add_argument("--username", action="store_true", help="whether to only fetch the username")
     cli_shared.add_omit_fields_arg(sub)
     sub.set_defaults(func=get_account)
 
@@ -46,6 +47,8 @@ def get_account(args: Any):
         print(account.get("balance", 0))
     elif args.nonce:
         print(account.get("nonce", 0))
+    elif args.username:
+        print(account.get("username", 0))
     else:
         utils.omit_fields(account, omit_fields)
         utils.dump_out_json(account)

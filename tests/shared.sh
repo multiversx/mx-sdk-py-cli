@@ -18,5 +18,8 @@ assertFileExists() {
     if [ ! -f "$1" ]
     then
         echo "Error: file [$1] does not exist!" 1>&2
+        return 1
     fi
+
+    return 0
 }

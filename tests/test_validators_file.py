@@ -1,11 +1,13 @@
 import unittest
+from pathlib import Path
 
 from erdpy.validators.validators_file import ValidatorsFile
 
 
 class ValidatorsFileTestCase(unittest.TestCase):
     def setUp(self) -> None:
-        self.validators_file_path = "testdata/validators.json"
+        self.testdata = Path(__file__).parent.joinpath("testdata")
+        self.validators_file_path = self.testdata / "validators.json"
 
     def test_read_validators_files_num_of_nodes(self):
         validators_file = ValidatorsFile(self.validators_file_path)

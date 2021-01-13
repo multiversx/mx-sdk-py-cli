@@ -105,7 +105,7 @@ class ElrondProxy:
 
     def get_transaction(self, tx_hash: str, sender_address: str = "", with_results: bool = False) -> Any:
         url = f"{self.url}/transaction/{tx_hash}"
-        url += f"?sender={sender_address}"
+        url += f"?sender={sender_address or ''}"
         url += f"&withResults={with_results}"
 
         response = do_get(url)
