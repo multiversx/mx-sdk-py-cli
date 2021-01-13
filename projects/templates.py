@@ -124,9 +124,10 @@ class TemplateRust(Template):
 
         cargo_file = CargoFile(cargo_path)
         cargo_file.package_name = self.project_name
-        cargo_file.version = "0.0.1"
+        cargo_file.version = "0.0.0"
         cargo_file.authors = ["you"]
         cargo_file.edition = "2018"
+        cargo_file.publish = False
 
         for dependency in cargo_file.get_dependencies().values():
             del dependency["path"]
@@ -140,9 +141,10 @@ class TemplateRust(Template):
 
         cargo_file = CargoFile(cargo_path)
         cargo_file.package_name = f"{self.project_name}-wasm"
-        cargo_file.version = "0.0.1"
+        cargo_file.version = "0.0.0"
         cargo_file.authors = ["you"]
         cargo_file.edition = "2018"
+        cargo_file.publish = False
 
         for dependency in cargo_file.get_dependencies().values():
             del dependency["path"]
@@ -169,9 +171,10 @@ class TemplateRust(Template):
 
         cargo_file = CargoFile(cargo_path)
         cargo_file.package_name = f"{self.project_name}-abi"
-        cargo_file.version = "0.0.1"
+        cargo_file.version = "0.0.0"
         cargo_file.authors = ["you"]
         cargo_file.edition = "2018"
+        cargo_file.publish = False
 
         for dependency in cargo_file.get_dependencies().values():
             del dependency["path"]

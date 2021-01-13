@@ -149,6 +149,14 @@ class CargoFile:
     def edition(self, value):
         self._get_package().update({"edition": value})
 
+    @property
+    def publish(self):
+        return self._get_package().get("publish")
+
+    @publish.setter
+    def edition(self, value):
+        self._get_package().update({"publish": value})
+
     def save(self):
         utils.write_toml_file(self.path, self.data)
 
