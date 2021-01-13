@@ -1,15 +1,17 @@
 from typing import Any, List
+
 from Cryptodome.Hash import keccak
 
 from erdpy import cli_shared, utils
-from erdpy.contracts import SmartContract
 from erdpy.accounts import Account, Address
+from erdpy.contracts import SmartContract
 from erdpy.proxy.core import ElrondProxy
 from erdpy.transactions import do_prepare_transaction
 
 MaxNumShards = 256
 ShardIdentiferLen = 2
 InitialDNSAddress = bytes([1] * 32)
+RegistrationCost = 100000000000000000000
 
 
 def resolve(name: str, proxy: ElrondProxy) -> Address:
@@ -29,6 +31,7 @@ def register(args: Any):
     cli_shared.prepare_nonce_in_args(args)
     args.receiver = dns_address_for_name(args.name).bech32()
     args.data = dns_register_data(args.name)
+    args.value = str(int(args.value) or RegistrationCost)
 
     tx = do_prepare_transaction(args)
 

@@ -210,8 +210,8 @@ def do_prepare_transaction(args: Any) -> Transaction:
     tx.value = args.value
     tx.receiver = args.receiver
     tx.sender = account.address.bech32()
-    tx.senderUsername = args.sender_username
-    tx.receiverUsername = args.receiver_username
+    tx.senderUsername = getattr(args, "sender_username", None)
+    tx.receiverUsername = getattr(args, "receiver_username", None)
     tx.gasPrice = int(args.gas_price)
     tx.gasLimit = int(args.gas_limit)
     tx.data = args.data
