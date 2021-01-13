@@ -26,8 +26,7 @@ def setup_parser(subparsers: Any) -> Any:
     sub = cli_shared.add_command_subparser(subparsers, "tx", "get", "Get a transaction")
     sub.add_argument("--hash", required=True, help="the hash")
     sub.add_argument("--sender", required=False, help="the sender address")
-    sub.add_argument("--with-results", default=False, required=False,
-                     help="will return also the results of transaction")
+    sub.add_argument("--with-results", action="store_true", help="will also return the results of transaction")
     cli_shared.add_proxy_arg(sub)
     cli_shared.add_omit_fields_arg(sub)
     sub.set_defaults(func=get_transaction)
