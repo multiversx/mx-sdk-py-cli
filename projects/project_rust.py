@@ -154,7 +154,7 @@ class CargoFile:
         return self._get_package().get("publish")
 
     @publish.setter
-    def edition(self, value):
+    def publish(self, value):
         self._get_package().update({"publish": value})
 
     def save(self):
