@@ -120,6 +120,11 @@ def dump_out_json(data: Any, outfile: Any = None):
     outfile.write("\n")
 
 
+def prettify_json_file(filename: str):
+    data = read_json_file(filename)
+    write_json_file(filename, data)
+
+
 def get_subfolders(folder):
     return [item.name for item in os.scandir(folder) if item.is_dir() and not item.name.startswith(".")]
 

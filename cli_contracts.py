@@ -29,6 +29,7 @@ def setup_parser(subparsers: Any) -> Any:
     _add_project_arg(sub)
     sub.add_argument("--debug", action="store_true", default=False, help="set debug flag (default: %(default)s)")
     sub.add_argument("--no-optimization", action="store_true", default=False, help="bypass optimizations (for clang) (default: %(default)s)")
+    sub.add_argument("--cargo-target-dir", type=str, help="for rust projects, forward the parameter to Cargo")
     sub.set_defaults(func=build)
 
     sub = cli_shared.add_command_subparser(subparsers, "contract", "clean", "Clean a Smart Contract project.")
@@ -139,7 +140,8 @@ def build(args: Any):
     options = {
         "debug": args.debug,
         "optimized": not args.no_optimization,
-        "verbose": args.verbose
+        "verbose": args.verbose,
+        "cargo_target_dir": args.cargo_target_dir
     }
 
     projects.build_project(project, options)

@@ -4,7 +4,7 @@ import subprocess
 import traceback
 from typing import Any, List
 
-from erdpy import errors, feedback
+from erdpy import errors
 
 logger = logging.getLogger("myprocess")
 
@@ -22,37 +22,76 @@ def run_process(args: List[str], env: Any = None, dump_to_stdout: bool = True, c
         raise errors.ExternalProcessError(error.cmd, error.output)
 
 
-def run_process_async(args: List[str], env: Any = None, cwd: str = None):
+def run_process_async(args: List[str], env: Any = None, cwd: str = None, stdout_sink=None, stderr_sink=None):
     loop = asyncio.get_event_loop()
-    result = loop.run_until_complete(async_subprocess(args, env=env, sinks=None, cwd=cwd))
+    result = loop.run_until_complete(_async_subprocess(args, env, stdout_sink, stderr_sink, cwd))
     loop.close()
     asyncio.set_event_loop(asyncio.new_event_loop())
     return result
 
 
-async def async_subprocess(args, env=None, sinks=None, cwd: str = None):
+async def _async_subprocess(args, env, stdout_sink, stderr_sink, cwd: str):
     process = await asyncio.create_subprocess_exec(*args, env=env, stdout=asyncio.subprocess.PIPE,
                                                    stderr=asyncio.subprocess.PIPE, cwd=cwd)
 
     await asyncio.wait([
-        _read_stream(process.stdout, sinks),
-        _read_stream(process.stderr, sinks)
+        _read_stream(process.stdout, stdout_sink),
+        _read_stream(process.stderr, stderr_sink)
     ])
     return await process.wait()
 
 
-async def _read_stream(stream, sinks=None):
+async def _read_stream(stream, sink):
+    sink = sink or ConsoleOutputSink()
+    sink.open()
+
     while True:
         try:
             line = await stream.readline()
             if line:
                 line = line.decode("utf-8", "replace").strip()
-                if sinks is None:
-                    print(line)
-                else:
-                    for sink in sinks:
-                        feedback.get_sink(sink).write(line)
+                sink.write(line)
             else:
                 break
         except Exception:
             print(traceback.format_exc())
+
+    sink.close()
+
+
+class OutputSink:
+    def open(self):
+        pass
+
+    def write(self, line: str):
+        pass
+
+    def close(self):
+        pass
+
+
+class ConsoleOutputSink(OutputSink):
+    def write(self, line: str):
+        print(line)
+
+
+class FileOutputSink(OutputSink):
+    def __init__(self, filepath: str) -> None:
+        super().__init__()
+        self.filepath = filepath
+        self.file = None
+
+    def open(self):
+        self.file = open(self.filepath, "w")
+
+    def write(self, line: str):
+        if self.file is None:
+            return
+
+        self.file.write(line)
+
+    def close(self):
+        if self.file is None:
+            return
+
+        self.file.close()
