@@ -6,10 +6,6 @@ from erdpy.dns import name_hash, dns_address_for_name, register, resolve, regist
 from erdpy.accounts import Address
 from erdpy.proxy.core import ElrondProxy
 
-MaxNumShards = 256
-ShardIdentiferLen = 2
-InitialDNSAddress = bytes([1] * 32)
-
 
 def setup_parser(subparsers: Any) -> Any:
     parser = cli_shared.add_group_subparser(subparsers, "dns", "Operations related to the Domain Name Service")
