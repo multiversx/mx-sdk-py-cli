@@ -55,7 +55,7 @@ def _add_name_arg(sub: Any):
 
 def dns_resolve(args: Any):
     addr = resolve(args.name, ElrondProxy(args.proxy))
-    if addr != Address.zero():
+    if addr.hex() != Address.zero().hex():
         print(addr.bech32())
 
 
