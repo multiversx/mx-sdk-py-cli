@@ -174,9 +174,6 @@ class BunchOfTransactions:
         tx.value = str(value)
         tx.receiver = receiver_address
         tx.sender = sender.address.bech32()
-        tx.senderUsername = ""
-        tx.receiverUsername = ""
-
         tx.gasPrice = gas_price
         tx.gasLimit = gas_limit
         tx.data = data
