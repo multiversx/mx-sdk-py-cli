@@ -20,6 +20,7 @@ class WalletTestCase(MyTestCase):
     def setUp(self):
         super().setUp()
         self.alice = Account(pem_file=str(self.devnet_wallets.joinpath("users", "alice.pem")))
+        self.multiple_bls_keys_file = self.testdata / 'multipleValidatorsKeys.pem'
 
     def test_nacl_playground_signing(self):
         private_key_hex = "b8211b08edc8aca591bedf1b9aba47e4077e54ac7d4ceb2f1bc9e10c064d3e6c7a5679a427f6df7adf2310ddf5e570fd51e47e6b1511124d6b250b989b017588"
@@ -68,7 +69,7 @@ class WalletTestCase(MyTestCase):
         self.assertEqual("0139472eff6886771a982f3083da5d421f24c29181e63888228dc81ca60d69e1", address.hex())
 
     def test_parse_validator_pem_default_index(self):
-        pem_file = './testdata/multipleValidatorsKeys.pem'
+        pem_file = self.multiple_bls_keys_file
         seed, bls_key = pem.parse_validator_pem(pem_file)
 
         key_hex = bytes.hex(seed)
@@ -81,7 +82,7 @@ class WalletTestCase(MyTestCase):
             key_hex)
 
     def test_parse_validator_pem_n_index(self):
-        pem_file = './testdata/multipleValidatorsKeys.pem'
+        pem_file = self.multiple_bls_keys_file
         seed, bls_key = pem.parse_validator_pem(pem_file, 3)
 
         key_hex = bytes.hex(seed)
