@@ -57,7 +57,7 @@ def read_bls_keys(lines):
         if "BEGIN" in splited_line[0]:
             continue
 
-        token = splited_line[4].replace('-----\n', '')
+        token = splited_line[4].replace('-----', '')
         bls_keys.append(token)
 
     return bls_keys
@@ -76,7 +76,7 @@ def read_validators_private_keys(lines):
 
 def get_bytes_from_private_key(private_key):
     key_base64 = private_key
-    key_hex = base64.b64decode(key_base64).decode()
+    key_hex = base64.b64decode(key_base64).hex()
     key_bytes = bytes.fromhex(key_hex)
 
     return key_bytes
