@@ -7,6 +7,8 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 ## [1.0.4] - TBD
  - Add commands for the delegation manager contract.
+ - Added commands for DNS.
+ - Added `--sender-username` and `--receiver-username` parameters.
  - For Rust projects, run ABI generator upon building the WASM file.
  - For Rust projects, patch contract templates wrt. ABI module.
  - Cache templates repository (30 seconds). 
