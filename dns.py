@@ -67,6 +67,13 @@ def registration_cost(shard_id: int, proxy: ElrondProxy) -> int:
         return int("0x{}".format(result[0]))
 
 
+def version(shard_id: int, proxy: ElrondProxy) -> str:
+    dns_address = compute_dns_address_for_shard_id(shard_id)
+    contract = SmartContract(dns_address)
+    result = contract.query(proxy, "version", [])
+    return bytearray.fromhex(result[0].hex).decode()
+
+
 def dns_address_for_name(name: str) -> Address:
     hash = name_hash(name)
     shard_id = hash[31]
