@@ -79,7 +79,7 @@ def create_new(name: str, template: str):
     _guard_config_unique(data, name)
     new_config = {}
     if len(template):
-        _guard_valid_config_name(template)
+        _guard_valid_config_name(data, template)
         new_config = data["configurations"][template]
 
     data["active"] = name
