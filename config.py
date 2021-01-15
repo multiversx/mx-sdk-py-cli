@@ -64,7 +64,10 @@ def set_value(name: str, value: Any):
 
 def get_active():
     data = read_file()
-    return data["configurations"][data["active"]]
+    configs = data.get("configurations", {})
+    active_config = data.get("active", "default")
+
+    return configs.get(active_config, {})
 
 
 def set_active(name: str):
