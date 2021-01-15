@@ -69,7 +69,7 @@ def _guard_valid_name(name: str):
 
 def get_defaults() -> Dict[str, Any]:
     return {
-        "proxy": "https://testnet-api.elrond.com",
+        "proxy": "https://testnet-gateway.elrond.com",
         "chainID": "T",
         "txVersion": "1",
         "dependencies.arwentools.tag": "v0.5.4-48-gf8b5cff",

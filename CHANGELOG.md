@@ -5,9 +5,9 @@ All notable changes will be documented in this file.
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
 
-## [1.0.4] - TBD
+## [1.0.4] - 15.01.2020
  - Add commands for the delegation manager contract.
- - Added commands for DNS.
+ - Added commands for DNS. Tests for DNS CLI.
  - Added `--sender-username` and `--receiver-username` parameters.
  - For Rust projects, run ABI generator upon building the WASM file.
  - For Rust projects, patch contract templates wrt. ABI module.
