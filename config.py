@@ -51,20 +51,69 @@ def get_dependency_url(key: str, tag: str, platform: str) -> str:
 
 def get_value(name: str) -> str:
     _guard_valid_name(name)
-    data = read_file()
+    data = get_active()
     return data.get(name, get_defaults()[name])
 
 
 def set_value(name: str, value: Any):
     _guard_valid_name(name)
     data = read_file()
-    data[name] = value
+    data["configurations"][data["active"]][name] = value
+    write_file(data)
+
+
+def get_active():
+    data = read_file()
+    return data["configurations"][data["active"]]
+
+
+def set_active(name: str):
+    data = read_file()
+    _guard_valid_config_name(data, name)
+    data["active"] = name
+    write_file(data)
+
+
+def create_new(name: str, template: str):
+    data = read_file()
+    _guard_config_unique(data, name)
+    new_config = {}
+    if len(template):
+        _guard_valid_config_name(template)
+        new_config = data["configurations"][template]
+
+    data["active"] = name
+    data["configurations"][name] = new_config
+    write_file(data)
+
+
+def delete_config(name: str):
+    _guard_valid_config_deletion(name)
+    data = read_file()
+    data["configurations"].pop(name, None)
+    if data["active"] == name:
+        data["active"] = "default"
     write_file(data)
 
 
 def _guard_valid_name(name: str):
     if name not in get_defaults().keys():
         raise errors.UnknownConfigurationError(name)
+
+
+def _guard_valid_config_name(config: Any, name: str):
+    if name not in config["configurations"]:
+        raise errors.UnknownConfigurationError(name)
+
+
+def _guard_config_unique(config: Any, name: str):
+    if name in config["configurations"]:
+        raise errors.ConfigurationShouldBeUniqueError(name)
+
+
+def _guard_valid_config_deletion(name: str):
+    if name == "default":
+        raise errors.ConfigurationProtectedError(name)
 
 
 def get_defaults() -> Dict[str, Any]:

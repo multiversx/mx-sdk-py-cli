@@ -120,6 +120,16 @@ class UnknownConfigurationError(KnownError):
         super().__init__(f"Configuration entry is not known: {name}.")
 
 
+class ConfigurationShouldBeUniqueError(KnownError):
+    def __init__(self, name: str):
+        super().__init__(f"Configuration entry already exists: {name}.")
+
+
+class ConfigurationProtectedError(KnownError):
+    def __init__(self, name: str):
+        super().__init__(f"This configuration name is protected: {name}.")
+
+
 class UnknownDerivationFunction(KnownError):
     def __init__(self):
         super().__init__("Unknown key derivation function.")
