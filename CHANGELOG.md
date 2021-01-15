@@ -5,7 +5,7 @@ All notable changes will be documented in this file.
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
 
-## [1.0.4] - 15.01.2020
+## [1.0.5] - 15.01.2020
  - Add commands for the delegation manager contract.
  - Added commands for DNS. Tests for DNS CLI.
  - Added `--sender-username` and `--receiver-username` parameters.
@@ -14,7 +14,7 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
  - Cache templates repository (30 seconds). 
  - Add github workflow for erdpy.
  - Optimize running time for tests, build time (for rust projects).
- - Add PIP update prior installing dependencies #136 @tebayoso.
+ - Add PIP update prior installing dependencies #136 @tebayoso (PR from community).
  - `erdpy testnet` - enabled Phase 3 features.
  - `erdpy testnet`: Fixes for MacOS, enable log-save for Proxy.
 
