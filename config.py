@@ -58,7 +58,11 @@ def get_value(name: str) -> str:
 def set_value(name: str, value: Any):
     _guard_valid_name(name)
     data = read_file()
-    data["configurations"][data["active"]][name] = value
+    active_config = data.get("active", "default")
+    data.setdefault("configurations", {})
+    data["configurations"].setdefault(active_config, {})
+    data["configurations"][active_config][name] = value
+    data.setdefault()
     write_file(data)
 
 
