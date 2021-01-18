@@ -62,7 +62,6 @@ def set_value(name: str, value: Any):
     data.setdefault("configurations", {})
     data["configurations"].setdefault(active_config, {})
     data["configurations"][active_config][name] = value
-    data.setdefault()
     write_file(data)
 
 
