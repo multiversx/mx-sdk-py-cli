@@ -29,7 +29,7 @@ def setup_parser(subparsers: Any) -> Any:
     sub.add_argument("--template", required=False, help="template from which to create the new config")
     sub.set_defaults(func=new_config)
 
-    sub = cli_shared.add_command_subparser(subparsers, "config", "switch", "Switch to a new defined config")
+    sub = cli_shared.add_command_subparser(subparsers, "config", "switch", "Switch to a different config")
     _add_name_arg(sub)
     sub.set_defaults(func=switch_config)
 
@@ -59,7 +59,7 @@ def set_value(args: Any):
 
 
 def new_config(args: Any):
-    config.create_new(name=args.name, template=args.template)
+    config.create_new_config(name=args.name, template=args.template)
     dump(None)
 
 

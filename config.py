@@ -80,7 +80,7 @@ def set_active(name: str):
     write_file(data)
 
 
-def create_new(name: str, template: str):
+def create_new_config(name: str, template: str):
     data = read_file()
     _guard_config_unique(data, name)
     new_config = {}
