@@ -4,8 +4,10 @@ All notable changes will be documented in this file.
 
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
+## [1.0.7] - 19.01.2021
+ - Update reference to newer Arwentools (Mandos).
 
-## [1.0.6] - 15.01.2020
+## [1.0.6] - 15.01.2021
  - Add commands for the delegation manager contract.
  - Added commands for DNS. Tests for DNS CLI.
  - Added `--sender-username` and `--receiver-username` parameters.
