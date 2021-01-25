@@ -87,14 +87,15 @@ class ProjectRust(Project):
         return Path(self.directory, "abi")
 
     def _do_after_build(self):
-        name = self.cargo_file.package_name.replace("-", "_")
-        wasm_file = Path(self._get_output_folder(), f"{name}_wasm.wasm").resolve()
-        wasm_file_renamed = Path(self._get_output_folder(), f"{name}.wasm")
+        original_name = self.cargo_file.package_name
+        wasm_base_name = self.cargo_file.package_name.replace("-", "_")
+        wasm_file = Path(self._get_output_folder(), f"{wasm_base_name}_wasm.wasm").resolve()
+        wasm_file_renamed = Path(self._get_output_folder(), f"{original_name}.wasm")
         shutil.move(wasm_file, wasm_file_renamed)
 
         if self._has_abi():
             abi_file = self._get_abi_filepath()
-            abi_file_renamed = Path(self._get_output_folder(), f"{name}.abi.json")
+            abi_file_renamed = Path(self._get_output_folder(), f"{original_name}.abi.json")
             shutil.move(abi_file, abi_file_renamed)
 
     def get_dependencies(self):
