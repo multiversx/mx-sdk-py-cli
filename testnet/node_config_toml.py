@@ -18,7 +18,7 @@ def patch(data: Any, testnet_config: TestnetConfiguration):
     data['GeneralSettings']['GasPriceModifierEnableEpoch'] = 0
 
     # Make epochs shorter
-    data['EpochStartConfig']['RoundsPerEpoch'] = 50
+    data['EpochStartConfig']['RoundsPerEpoch'] = 100
 
 
 def patch_api(data: Any, testnet_config: TestnetConfiguration):
