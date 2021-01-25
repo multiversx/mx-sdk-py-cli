@@ -17,6 +17,9 @@ def patch(data: Any, testnet_config: TestnetConfiguration):
     data['GeneralSettings']['AheadOfTimeGasUsageEnableEpoch'] = 0
     data['GeneralSettings']['GasPriceModifierEnableEpoch'] = 0
 
+    # Make epochs shorter
+    data['EpochStartConfig']['RoundsPerEpoch'] = 50
+
 
 def patch_api(data: Any, testnet_config: TestnetConfiguration):
     routes = data['APIPackages']['transaction']['Routes']
