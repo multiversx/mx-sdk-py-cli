@@ -2,7 +2,7 @@ from typing import Any
 from prettytable import PrettyTable
 
 from erdpy import cli_shared
-from erdpy.dns import name_hash, dns_address_for_name, register, resolve, registration_cost, compute_dns_address_for_shard_id
+from erdpy.dns import name_hash, dns_address_for_name, register, resolve, registration_cost, validate_name, version, compute_dns_address_for_shard_id
 from erdpy.accounts import Address
 from erdpy.proxy.core import ElrondProxy
 
@@ -25,6 +25,12 @@ def setup_parser(subparsers: Any) -> Any:
     cli_shared.add_proxy_arg(sub)
     sub.set_defaults(func=dns_resolve)
 
+    sub = cli_shared.add_command_subparser(subparsers, "dns", "validate-name", "Asks one of the DNS contracts to validate a name. Can be useful before registering it.")
+    _add_name_arg(sub)
+    sub.add_argument("--shard_id", default=0, help="shard id of the contract to call (default: %(default)s)")
+    cli_shared.add_proxy_arg(sub)
+    sub.set_defaults(func=dns_validate_name)
+
     sub = cli_shared.add_command_subparser(subparsers, "dns", "name-hash", "The hash of a name, as computed by a DNS smart contract")
     _add_name_arg(sub)
     sub.set_defaults(func=get_name_hash)
@@ -33,6 +39,11 @@ def setup_parser(subparsers: Any) -> Any:
     sub.add_argument("--shard_id", default=0, help="shard id of the contract to call (default: %(default)s)")
     cli_shared.add_proxy_arg(sub)
     sub.set_defaults(func=get_registration_cost)
+
+    sub = cli_shared.add_command_subparser(subparsers, "dns", "version", "Asks the contract for its version")
+    sub.add_argument("--shard_id", default=0, help="shard id of the contract to call (default: %(default)s)")
+    cli_shared.add_proxy_arg(sub)
+    sub.set_defaults(func=get_version)
 
     sub = cli_shared.add_command_subparser(subparsers, "dns", "dns-addresses", "Lists all 256 DNS contract addresses")
     sub.set_defaults(func=print_dns_addresses_table)
@@ -55,8 +66,12 @@ def _add_name_arg(sub: Any):
 
 def dns_resolve(args: Any):
     addr = resolve(args.name, ElrondProxy(args.proxy))
-    if addr != Address.zero():
+    if addr.hex() != Address.zero().hex():
         print(addr.bech32())
+
+
+def dns_validate_name(args: Any):
+    validate_name(args.name, args.shard_id, ElrondProxy(args.proxy))
 
 
 def get_name_hash(args: Any):
@@ -77,6 +92,10 @@ def get_dns_address_for_name_hex(args: Any):
 
 def get_registration_cost(args: Any):
     print(registration_cost(args.shard_id, ElrondProxy(args.proxy)))
+
+
+def get_version(args: Any):
+    print(version(args.shard_id, ElrondProxy(args.proxy)))
 
 
 def print_dns_addresses_table(args: Any):

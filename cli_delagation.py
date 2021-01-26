@@ -2,7 +2,7 @@ import binascii
 import sys
 from typing import Any
 
-from erdpy import cli_shared, utils, errors
+from erdpy import cli_shared, errors, utils
 from erdpy.accounts import Address
 from erdpy.delegation import staking_provider
 from erdpy.proxy import ElrondProxy
@@ -10,9 +10,7 @@ from erdpy.transactions import do_prepare_transaction
 
 
 def setup_parser(subparsers: Any) -> Any:
-    parser = cli_shared.add_group_subparser(subparsers, "staking-provider", "Create New Delegation Contract "
-                                                                            "and some more staking-provider related "
-                                                                            "options")
+    parser = cli_shared.add_group_subparser(subparsers, "staking-provider", "Staking provider omnitool")
     subparsers = parser.add_subparsers()
 
     # create new delegation contract
@@ -271,6 +269,6 @@ def _get_sc_address_from_tx(data: Any):
         sc_address = binascii.unhexlify(data_field_split[2])
         address = Address(sc_address)
         print("Contract address: ", address)
-    except:
+    except Exception:
         raise errors.ProgrammingError(
             "cannot get the smart contract address from transaction results, please try again")

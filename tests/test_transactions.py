@@ -46,6 +46,26 @@ class TransactionsTestCase(MyTestCase):
         serialized = transaction.serialize().decode()
         self.assertEqual("""{"nonce":0,"value":"0","receiver":"erd188nydpkagtpwvfklkl2tn0w6g40zdxkwfgwpjqc2a2m2n7ne9g8q2t22sr","sender":"erd1l453hd0gt5gzdp7czpuall8ggt2dcv5zwmfdf3sd3lguxseux2fsmsgldz","gasPrice":200000000000000,"gasLimit":500000000,"data":"Zm9v","chainID":"BoN","version":1}""", serialized)
 
+    def test_serialize_transaction_with_usernames(self):
+        transaction = Transaction()
+        transaction.nonce = 89
+        transaction.value = "0"
+        transaction.sender = "erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th"
+        transaction.receiver = "erd1spyavw0956vq68xj8y4tenjpq2wd5a9p2c6j8gsz7ztyrnpxrruqzu66jx"
+        transaction.senderUsername = "alice"
+        transaction.receiverUsername = "bob"
+        transaction.gasPrice = 1000000000
+        transaction.gasLimit = 50000
+        transaction.data = ""
+        transaction.chainID = "local-testnet"
+        transaction.version = 1
+
+        serialized = transaction.serialize().decode()
+        self.assertEqual("""{"nonce":89,"value":"0","receiver":"erd1spyavw0956vq68xj8y4tenjpq2wd5a9p2c6j8gsz7ztyrnpxrruqzu66jx","sender":"erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th","senderUsername":"YWxpY2U=","receiverUsername":"Ym9i","gasPrice":1000000000,"gasLimit":50000,"chainID":"local-testnet","version":1}""", serialized)
+        
+        transaction.sign(self.alice)
+        self.assertEqual("1bed82c3f91c9d24f3a163e7b93a47453d70e8743201fe7d3656c0214569566a76503ef0968279ac942ca43b9c930bd26638dfb075a220ce80b058ab7bca140a", transaction.signature)    
+
     def test_serialize_transaction_as_inner(self):
         transaction = Transaction()
         transaction.nonce = 0

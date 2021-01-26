@@ -124,10 +124,8 @@ class WalletTestCase(MyTestCase):
         transaction.chainID = "chainID"
         transaction.version = 1
         transaction.sign(self.alice)
-
-        self.assertEqual(
-            "83efd1bc35790ecc220b0ed6ddd1fcb44af6653dd74e37b3a49dcc1f002a1b98b6f79779192cca68bdfefd037bc81f4fa606628b751023122191f8c062362805",
-            transaction.signature)
+        
+        self.assertEqual("83efd1bc35790ecc220b0ed6ddd1fcb44af6653dd74e37b3a49dcc1f002a1b98b6f79779192cca68bdfefd037bc81f4fa606628b751023122191f8c062362805", transaction.signature)
 
     def test_generate_pair_pem(self):
         seed, pubkey = generate_pair()
