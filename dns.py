@@ -23,6 +23,13 @@ def resolve(name: str, proxy: ElrondProxy) -> Address:
     return Address(result[0].hex)
 
 
+def validate_name(name: str, shard_id: int, proxy: ElrondProxy):
+    name_arg = "0x{}".format(str.encode(name).hex())
+    dns_address = compute_dns_address_for_shard_id(shard_id)
+    contract = SmartContract(dns_address)
+    contract.query(proxy, "validateName", [name_arg])
+
+
 def register(args: Any):
     args = utils.as_object(args)
 
