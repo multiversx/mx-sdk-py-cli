@@ -24,6 +24,18 @@ def setup_parser(subparsers: Any) -> Any:
     sub.add_argument("value", help="the new value")
     sub.set_defaults(func=set_value)
 
+    sub = cli_shared.add_command_subparser(subparsers, "config", "new", "Creates a new configuration.")
+    _add_name_arg(sub)
+    sub.add_argument("--template", required=False, help="template from which to create the new config")
+    sub.set_defaults(func=new_config)
+
+    sub = cli_shared.add_command_subparser(subparsers, "config", "switch", "Switch to a different config")
+    _add_name_arg(sub)
+    sub.set_defaults(func=switch_config)
+
+    sub = cli_shared.add_command_subparser(subparsers, "config", "list", "List available configs")
+    sub.set_defaults(func=list_configs)
+
     parser.epilog = cli_shared.build_group_epilog(subparsers)
     return subparsers
 
@@ -33,7 +45,7 @@ def _add_name_arg(sub: Any):
 
 
 def dump(args: Any):
-    data = config.read_file()
+    data = config.get_active()
     utils.dump_out_json(data, sys.stdout)
 
 
@@ -44,3 +56,24 @@ def get_value(args: Any):
 
 def set_value(args: Any):
     config.set_value(args.name, args.value)
+
+
+def new_config(args: Any):
+    config.create_new_config(name=args.name, template=args.template)
+    dump(None)
+
+
+def switch_config(args: Any):
+    config.set_active(args.name)
+    dump(None)
+
+
+def list_configs(args: Any):
+    data = config.read_file()
+    item_str = ""
+    for cfg, _ in data["configurations"].items():
+        item_str += cfg
+        if cfg == data["active"]:
+            item_str += "*"
+        item_str += "\n"
+    print(item_str)
