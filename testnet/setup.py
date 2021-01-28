@@ -215,7 +215,6 @@ def patch_source_code(testnet_config: TestnetConfiguration):
 
     file = path.join(folder, "core/constants.go")
     content = utils.read_file(file)
-    content = content.replace("const MaxNumShards = 256", "const MaxNumShards = 4")
     utils.write_file(file, content)
 
     file = path.join(folder, "cmd/node/main.go")

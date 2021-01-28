@@ -17,8 +17,10 @@ class Transaction(ITransaction):
         self.hash = ""
         self.nonce = 0
         self.value = "0"
-        self.sender = ""
         self.receiver = ""
+        self.sender = ""
+        self.senderUsername = ""
+        self.receiverUsername = ""
         self.gasPrice = 0
         self.gasLimit = 0
         self.data = ""
@@ -28,13 +30,31 @@ class Transaction(ITransaction):
 
     # The data field is base64-encoded. erdpy only supports utf-8 "data" at this moment.
     def data_encoded(self) -> str:
-        data_bytes = self.data.encode("utf-8")
-        data_base64 = base64.b64encode(data_bytes).decode()
-        return data_base64
+        return self._field_encoded("data")
 
     # Useful when loading a tx from a file (when data is already encoded in base64)
     def data_decoded(self) -> str:
-        return base64.b64decode(self.data).decode()
+        return self._field_decoded("data")
+
+    def sender_username_encoded(self) -> str:
+        return self._field_encoded("senderUsername")
+
+    def sender_username_decoded(self) -> str:
+        return self._field_decoded("senderUsername")
+
+    def receiver_username_encoded(self) -> str:
+        return self._field_encoded("receiverUsername")
+
+    def receiver_username_decoded(self) -> str:
+        return self._field_decoded("receiverUsername")
+
+    def _field_encoded(self, field: str) -> str:
+        bytes = self.__dict__.get(field, None).encode("utf-8")
+        encoded = base64.b64encode(bytes).decode()
+        return encoded
+
+    def _field_decoded(self, field: str) -> str:
+        return base64.b64decode(self.__dict__.get(field, None)).decode()
 
     def sign(self, account: Account):
         self.signature = signing.sign_transaction(self, account)
@@ -61,6 +81,8 @@ class Transaction(ITransaction):
         instance = cls()
         instance.__dict__.update(fields)
         instance.data = instance.data_decoded()
+        instance.senderUsername = instance.sender_username_decoded()
+        instance.receiverUsername = instance.receiver_username_encoded()
         return instance
 
     def to_dump_dict(self, extra: Any = {}):
@@ -101,8 +123,15 @@ class Transaction(ITransaction):
         dictionary: Dict[str, Any] = OrderedDict()
         dictionary["nonce"] = self.nonce
         dictionary["value"] = self.value
+
         dictionary["receiver"] = self.receiver
         dictionary["sender"] = self.sender
+
+        if self.senderUsername:
+            dictionary["senderUsername"] = self.sender_username_encoded()
+        if self.receiverUsername:
+            dictionary["receiverUsername"] = self.receiver_username_encoded()
+
         dictionary["gasPrice"] = self.gasPrice
         dictionary["gasLimit"] = self.gasLimit
 
@@ -143,8 +172,8 @@ class BunchOfTransactions:
         tx = Transaction()
         tx.nonce = int(nonce)
         tx.value = str(value)
-        tx.sender = sender.address.bech32()
         tx.receiver = receiver_address
+        tx.sender = sender.address.bech32()
         tx.gasPrice = gas_price
         tx.gasLimit = gas_limit
         tx.data = data
@@ -154,8 +183,8 @@ class BunchOfTransactions:
         tx.sign(sender)
         self.transactions.append(tx)
 
-    def add_in_sequence(self):
-        pass
+    def add_tx(self, tx):
+        self.transactions.append(tx)
 
     def send(self, proxy: IElrondProxy):
         logger.info(f"BunchOfTransactions.send: {len(self.transactions)} transactions")
@@ -176,8 +205,10 @@ def do_prepare_transaction(args: Any) -> Transaction:
     tx = Transaction()
     tx.nonce = int(args.nonce)
     tx.value = args.value
-    tx.sender = account.address.bech32()
     tx.receiver = args.receiver
+    tx.sender = account.address.bech32()
+    tx.senderUsername = getattr(args, "sender_username", None)
+    tx.receiverUsername = getattr(args, "receiver_username", None)
     tx.gasPrice = int(args.gas_price)
     tx.gasLimit = int(args.gas_limit)
     tx.data = args.data

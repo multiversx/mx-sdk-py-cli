@@ -20,7 +20,7 @@ https://docs.elrond.com/tools/erdpy.
         
 
 COMMAND GROUPS:
-  {contract,tx,validator,account,wallet,network,cost,dispatcher,blockatlas,deps,config,hyperblock,testnet,data}
+  {contract,tx,validator,account,wallet,network,cost,dispatcher,blockatlas,deps,config,hyperblock,testnet,data,staking-provider,dns}
 
 TOP-LEVEL OPTIONS:
   -h, --help            show this help message and exit
@@ -44,6 +44,8 @@ config                         Configure elrond-sdk (default values etc.)
 hyperblock                     Get Hyperblock from the Network
 testnet                        Set up, start and control local testnets
 data                           Data manipulation omnitool
+staking-provider               Staking provider omnitool
+dns                            Operations related to the Domain Name Service
 
 ```
 ## Group **Contract**
@@ -116,12 +118,13 @@ usage: erdpy contract build [-h] ...
 Build a Smart Contract project using the appropriate buildchain.
 
 positional arguments:
-  project            🗀 the project directory (default: current directory)
+  project                              🗀 the project directory (default: current directory)
 
 optional arguments:
-  -h, --help         show this help message and exit
-  --debug            set debug flag (default: False)
-  --no-optimization  bypass optimizations (for clang) (default: False)
+  -h, --help                           show this help message and exit
+  --debug                              set debug flag (default: False)
+  --no-optimization                    bypass optimizations (for clang) (default: False)
+  --cargo-target-dir CARGO_TARGET_DIR  for rust projects, forward the parameter to Cargo
 
 ```
 ### Contract.Clean
@@ -160,7 +163,8 @@ optional arguments:
   --pem-index PEM_INDEX                  🔑 the index in the PEM file (default: 0)
   --keyfile KEYFILE                      🔑 a JSON keyfile, if PEM not provided
   --passfile PASSFILE                    🔑 a file containing keyfile's password, if keyfile provided
-  --proxy PROXY                          🖧 the URL of the proxy (default: https://testnet-api.elrond.com)
+  --sender-username SENDER_USERNAME      🖄 the username of the sender
+  --proxy PROXY                          🖧 the URL of the proxy (default: https://testnet-gateway.elrond.com)
   --nonce NONCE                          # the nonce for the transaction
   --recall-nonce                         ⭮ whether to recall the nonce when creating the transaction (default: False)
   --gas-price GAS_PRICE                  ⛽ the gas price (default: 1000000000)
@@ -172,7 +176,6 @@ optional arguments:
                                          --arguments 42 0x64 1000 0xabba
   --send                                 ✓ whether to broadcast the transaction (default: False)
   --simulate                             whether to simulate the transaction (default: False)
-  --relay                                whether to relay the transaction (default: False)
 
 ```
 ### Contract.Call
@@ -194,7 +197,8 @@ optional arguments:
   --pem-index PEM_INDEX                  🔑 the index in the PEM file (default: 0)
   --keyfile KEYFILE                      🔑 a JSON keyfile, if PEM not provided
   --passfile PASSFILE                    🔑 a file containing keyfile's password, if keyfile provided
-  --proxy PROXY                          🖧 the URL of the proxy (default: https://testnet-api.elrond.com)
+  --sender-username SENDER_USERNAME      🖄 the username of the sender
+  --proxy PROXY                          🖧 the URL of the proxy (default: https://testnet-gateway.elrond.com)
   --nonce NONCE                          # the nonce for the transaction
   --recall-nonce                         ⭮ whether to recall the nonce when creating the transaction (default: False)
   --gas-price GAS_PRICE                  ⛽ the gas price (default: 1000000000)
@@ -233,7 +237,8 @@ optional arguments:
   --pem-index PEM_INDEX                  🔑 the index in the PEM file (default: 0)
   --keyfile KEYFILE                      🔑 a JSON keyfile, if PEM not provided
   --passfile PASSFILE                    🔑 a file containing keyfile's password, if keyfile provided
-  --proxy PROXY                          🖧 the URL of the proxy (default: https://testnet-api.elrond.com)
+  --sender-username SENDER_USERNAME      🖄 the username of the sender
+  --proxy PROXY                          🖧 the URL of the proxy (default: https://testnet-gateway.elrond.com)
   --nonce NONCE                          # the nonce for the transaction
   --recall-nonce                         ⭮ whether to recall the nonce when creating the transaction (default: False)
   --gas-price GAS_PRICE                  ⛽ the gas price (default: 1000000000)
@@ -245,7 +250,6 @@ optional arguments:
                                          --arguments 42 0x64 1000 0xabba
   --send                                 ✓ whether to broadcast the transaction (default: False)
   --simulate                             whether to simulate the transaction (default: False)
-  --relay                                whether to relay the transaction (default: False)
 
 ```
 ### Contract.Query
@@ -262,7 +266,7 @@ positional arguments:
 
 optional arguments:
   -h, --help                             show this help message and exit
-  --proxy PROXY                          🖧 the URL of the proxy (default: https://testnet-api.elrond.com)
+  --proxy PROXY                          🖧 the URL of the proxy (default: https://testnet-gateway.elrond.com)
   --function FUNCTION                    the function to call
   --arguments ARGUMENTS [ARGUMENTS ...]  arguments for the contract transaction, as numbers or hex-encoded. E.g.
                                          --arguments 42 0x64 1000 0xabba
@@ -301,26 +305,28 @@ usage: erdpy tx new [-h] ...
 Create a new transaction
 
 optional arguments:
-  -h, --help             show this help message and exit
-  --pem PEM              🔑 the PEM file, if keyfile not provided
-  --pem-index PEM_INDEX  🔑 the index in the PEM file (default: 0)
-  --keyfile KEYFILE      🔑 a JSON keyfile, if PEM not provided
-  --passfile PASSFILE    🔑 a file containing keyfile's password, if keyfile provided
-  --nonce NONCE          # the nonce for the transaction
-  --recall-nonce         ⭮ whether to recall the nonce when creating the transaction (default: False)
-  --receiver RECEIVER    🖄 the address of the receiver
-  --gas-price GAS_PRICE  ⛽ the gas price (default: 1000000000)
-  --gas-limit GAS_LIMIT  ⛽ the gas limit
-  --value VALUE          the value to transfer (default: 0)
-  --data DATA            the payload, or 'memo' of the transaction (default: )
-  --chain CHAIN          the chain identifier (default: T)
-  --version VERSION      the transaction version (default: 1)
-  --data-file DATA_FILE  a file containing transaction data
-  --outfile OUTFILE      where to save the output (signed transaction, hash) (default: stdout)
-  --send                 ✓ whether to broadcast the transaction (default: False)
-  --simulate             whether to simulate the transaction (default: False)
-  --relay                whether to relay the transaction (default: False)
-  --proxy PROXY          🖧 the URL of the proxy (default: https://testnet-api.elrond.com)
+  -h, --help                             show this help message and exit
+  --pem PEM                              🔑 the PEM file, if keyfile not provided
+  --pem-index PEM_INDEX                  🔑 the index in the PEM file (default: 0)
+  --keyfile KEYFILE                      🔑 a JSON keyfile, if PEM not provided
+  --passfile PASSFILE                    🔑 a file containing keyfile's password, if keyfile provided
+  --sender-username SENDER_USERNAME      🖄 the username of the sender
+  --nonce NONCE                          # the nonce for the transaction
+  --recall-nonce                         ⭮ whether to recall the nonce when creating the transaction (default: False)
+  --receiver RECEIVER                    🖄 the address of the receiver
+  --receiver-username RECEIVER_USERNAME  🖄 the username of the receiver
+  --gas-price GAS_PRICE                  ⛽ the gas price (default: 1000000000)
+  --gas-limit GAS_LIMIT                  ⛽ the gas limit
+  --value VALUE                          the value to transfer (default: 0)
+  --data DATA                            the payload, or 'memo' of the transaction (default: )
+  --chain CHAIN                          the chain identifier (default: T)
+  --version VERSION                      the transaction version (default: 1)
+  --data-file DATA_FILE                  a file containing transaction data
+  --outfile OUTFILE                      where to save the output (signed transaction, hash) (default: stdout)
+  --send                                 ✓ whether to broadcast the transaction (default: False)
+  --simulate                             whether to simulate the transaction (default: False)
+  --relay                                whether to relay the transaction (default: False)
+  --proxy PROXY                          🖧 the URL of the proxy (default: https://testnet-gateway.elrond.com)
 
 ```
 ### Transactions.Send
@@ -336,7 +342,7 @@ optional arguments:
   -h, --help         show this help message and exit
   --infile INFILE    input file (a previously saved transaction)
   --outfile OUTFILE  where to save the output (the hash) (default: stdout)
-  --proxy PROXY      🖧 the URL of the proxy (default: https://testnet-api.elrond.com)
+  --proxy PROXY      🖧 the URL of the proxy (default: https://testnet-gateway.elrond.com)
 
 ```
 ### Transactions.Get
@@ -352,7 +358,8 @@ optional arguments:
   -h, --help                 show this help message and exit
   --hash HASH                the hash
   --sender SENDER            the sender address
-  --proxy PROXY              🖧 the URL of the proxy (default: https://testnet-api.elrond.com)
+  --with-results             will also return the results of transaction
+  --proxy PROXY              🖧 the URL of the proxy (default: https://testnet-gateway.elrond.com)
   --omit-fields OMIT_FIELDS  omit fields in the output payload (default: [])
 
 ```
@@ -383,7 +390,7 @@ Get hyperblock
 
 optional arguments:
   -h, --help     show this help message and exit
-  --proxy PROXY  🖧 the URL of the proxy (default: https://testnet-api.elrond.com)
+  --proxy PROXY  🖧 the URL of the proxy (default: https://testnet-gateway.elrond.com)
   --key KEY      the hash or the nonce of the hyperblock
 
 ```
@@ -424,11 +431,12 @@ Stake value into the Network
 
 optional arguments:
   -h, --help                         show this help message and exit
-  --proxy PROXY                      🖧 the URL of the proxy (default: https://testnet-api.elrond.com)
+  --proxy PROXY                      🖧 the URL of the proxy (default: https://testnet-gateway.elrond.com)
   --pem PEM                          🔑 the PEM file, if keyfile not provided
   --pem-index PEM_INDEX              🔑 the index in the PEM file (default: 0)
   --keyfile KEYFILE                  🔑 a JSON keyfile, if PEM not provided
   --passfile PASSFILE                🔑 a file containing keyfile's password, if keyfile provided
+  --sender-username SENDER_USERNAME  🖄 the username of the sender
   --nonce NONCE                      # the nonce for the transaction
   --recall-nonce                     ⭮ whether to recall the nonce when creating the transaction (default: False)
   --gas-price GAS_PRICE              ⛽ the gas price (default: 1000000000)
@@ -437,6 +445,8 @@ optional arguments:
   --value VALUE                      the value to transfer (default: 0)
   --chain CHAIN                      the chain identifier (default: T)
   --version VERSION                  the transaction version (default: 1)
+  --send                             ✓ whether to broadcast the transaction (default: False)
+  --simulate                         whether to simulate the transaction (default: False)
   --outfile OUTFILE                  where to save the output (signed transaction, hash) (default: stdout)
   --reward-address REWARD_ADDRESS    the reward address
   --validators-file VALIDATORS_FILE  a JSON file describing the Nodes
@@ -453,11 +463,12 @@ Unstake value
 
 optional arguments:
   -h, --help                             show this help message and exit
-  --proxy PROXY                          🖧 the URL of the proxy (default: https://testnet-api.elrond.com)
+  --proxy PROXY                          🖧 the URL of the proxy (default: https://testnet-gateway.elrond.com)
   --pem PEM                              🔑 the PEM file, if keyfile not provided
   --pem-index PEM_INDEX                  🔑 the index in the PEM file (default: 0)
   --keyfile KEYFILE                      🔑 a JSON keyfile, if PEM not provided
   --passfile PASSFILE                    🔑 a file containing keyfile's password, if keyfile provided
+  --sender-username SENDER_USERNAME      🖄 the username of the sender
   --nonce NONCE                          # the nonce for the transaction
   --recall-nonce                         ⭮ whether to recall the nonce when creating the transaction (default: False)
   --gas-price GAS_PRICE                  ⛽ the gas price (default: 1000000000)
@@ -466,6 +477,8 @@ optional arguments:
   --value VALUE                          the value to transfer (default: 0)
   --chain CHAIN                          the chain identifier (default: T)
   --version VERSION                      the transaction version (default: 1)
+  --send                                 ✓ whether to broadcast the transaction (default: False)
+  --simulate                             whether to simulate the transaction (default: False)
   --outfile OUTFILE                      where to save the output (signed transaction, hash) (default: stdout)
   --nodes-public-keys NODES_PUBLIC_KEYS  the public keys of the nodes as CSV (addrA,addrB)
 
@@ -481,11 +494,12 @@ Unjail a Validator Node
 
 optional arguments:
   -h, --help                             show this help message and exit
-  --proxy PROXY                          🖧 the URL of the proxy (default: https://testnet-api.elrond.com)
+  --proxy PROXY                          🖧 the URL of the proxy (default: https://testnet-gateway.elrond.com)
   --pem PEM                              🔑 the PEM file, if keyfile not provided
   --pem-index PEM_INDEX                  🔑 the index in the PEM file (default: 0)
   --keyfile KEYFILE                      🔑 a JSON keyfile, if PEM not provided
   --passfile PASSFILE                    🔑 a file containing keyfile's password, if keyfile provided
+  --sender-username SENDER_USERNAME      🖄 the username of the sender
   --nonce NONCE                          # the nonce for the transaction
   --recall-nonce                         ⭮ whether to recall the nonce when creating the transaction (default: False)
   --gas-price GAS_PRICE                  ⛽ the gas price (default: 1000000000)
@@ -494,6 +508,8 @@ optional arguments:
   --value VALUE                          the value to transfer (default: 0)
   --chain CHAIN                          the chain identifier (default: T)
   --version VERSION                      the transaction version (default: 1)
+  --send                                 ✓ whether to broadcast the transaction (default: False)
+  --simulate                             whether to simulate the transaction (default: False)
   --outfile OUTFILE                      where to save the output (signed transaction, hash) (default: stdout)
   --nodes-public-keys NODES_PUBLIC_KEYS  the public keys of the nodes as CSV (addrA,addrB)
 
@@ -509,11 +525,12 @@ Unbond
 
 optional arguments:
   -h, --help                             show this help message and exit
-  --proxy PROXY                          🖧 the URL of the proxy (default: https://testnet-api.elrond.com)
+  --proxy PROXY                          🖧 the URL of the proxy (default: https://testnet-gateway.elrond.com)
   --pem PEM                              🔑 the PEM file, if keyfile not provided
   --pem-index PEM_INDEX                  🔑 the index in the PEM file (default: 0)
   --keyfile KEYFILE                      🔑 a JSON keyfile, if PEM not provided
   --passfile PASSFILE                    🔑 a file containing keyfile's password, if keyfile provided
+  --sender-username SENDER_USERNAME      🖄 the username of the sender
   --nonce NONCE                          # the nonce for the transaction
   --recall-nonce                         ⭮ whether to recall the nonce when creating the transaction (default: False)
   --gas-price GAS_PRICE                  ⛽ the gas price (default: 1000000000)
@@ -522,6 +539,8 @@ optional arguments:
   --value VALUE                          the value to transfer (default: 0)
   --chain CHAIN                          the chain identifier (default: T)
   --version VERSION                      the transaction version (default: 1)
+  --send                                 ✓ whether to broadcast the transaction (default: False)
+  --simulate                             whether to simulate the transaction (default: False)
   --outfile OUTFILE                      where to save the output (signed transaction, hash) (default: stdout)
   --nodes-public-keys NODES_PUBLIC_KEYS  the public keys of the nodes as CSV (addrA,addrB)
 
@@ -536,22 +555,25 @@ usage: erdpy validator change-reward-address [-h] ...
 Change the reward address
 
 optional arguments:
-  -h, --help                       show this help message and exit
-  --proxy PROXY                    🖧 the URL of the proxy (default: https://testnet-api.elrond.com)
-  --pem PEM                        🔑 the PEM file, if keyfile not provided
-  --pem-index PEM_INDEX            🔑 the index in the PEM file (default: 0)
-  --keyfile KEYFILE                🔑 a JSON keyfile, if PEM not provided
-  --passfile PASSFILE              🔑 a file containing keyfile's password, if keyfile provided
-  --nonce NONCE                    # the nonce for the transaction
-  --recall-nonce                   ⭮ whether to recall the nonce when creating the transaction (default: False)
-  --gas-price GAS_PRICE            ⛽ the gas price (default: 1000000000)
-  --gas-limit GAS_LIMIT            ⛽ the gas limit
-  --estimate-gas                   ⛽ whether to estimate the gas limit (default: 0)
-  --value VALUE                    the value to transfer (default: 0)
-  --chain CHAIN                    the chain identifier (default: T)
-  --version VERSION                the transaction version (default: 1)
-  --outfile OUTFILE                where to save the output (signed transaction, hash) (default: stdout)
-  --reward-address REWARD_ADDRESS  the new reward address
+  -h, --help                         show this help message and exit
+  --proxy PROXY                      🖧 the URL of the proxy (default: https://testnet-gateway.elrond.com)
+  --pem PEM                          🔑 the PEM file, if keyfile not provided
+  --pem-index PEM_INDEX              🔑 the index in the PEM file (default: 0)
+  --keyfile KEYFILE                  🔑 a JSON keyfile, if PEM not provided
+  --passfile PASSFILE                🔑 a file containing keyfile's password, if keyfile provided
+  --sender-username SENDER_USERNAME  🖄 the username of the sender
+  --nonce NONCE                      # the nonce for the transaction
+  --recall-nonce                     ⭮ whether to recall the nonce when creating the transaction (default: False)
+  --gas-price GAS_PRICE              ⛽ the gas price (default: 1000000000)
+  --gas-limit GAS_LIMIT              ⛽ the gas limit
+  --estimate-gas                     ⛽ whether to estimate the gas limit (default: 0)
+  --value VALUE                      the value to transfer (default: 0)
+  --chain CHAIN                      the chain identifier (default: T)
+  --version VERSION                  the transaction version (default: 1)
+  --send                             ✓ whether to broadcast the transaction (default: False)
+  --simulate                         whether to simulate the transaction (default: False)
+  --outfile OUTFILE                  where to save the output (signed transaction, hash) (default: stdout)
+  --reward-address REWARD_ADDRESS    the new reward address
 
 ```
 ### Validator.Claim
@@ -564,21 +586,24 @@ usage: erdpy validator claim [-h] ...
 Claim rewards
 
 optional arguments:
-  -h, --help             show this help message and exit
-  --proxy PROXY          🖧 the URL of the proxy (default: https://testnet-api.elrond.com)
-  --pem PEM              🔑 the PEM file, if keyfile not provided
-  --pem-index PEM_INDEX  🔑 the index in the PEM file (default: 0)
-  --keyfile KEYFILE      🔑 a JSON keyfile, if PEM not provided
-  --passfile PASSFILE    🔑 a file containing keyfile's password, if keyfile provided
-  --nonce NONCE          # the nonce for the transaction
-  --recall-nonce         ⭮ whether to recall the nonce when creating the transaction (default: False)
-  --gas-price GAS_PRICE  ⛽ the gas price (default: 1000000000)
-  --gas-limit GAS_LIMIT  ⛽ the gas limit
-  --estimate-gas         ⛽ whether to estimate the gas limit (default: 0)
-  --value VALUE          the value to transfer (default: 0)
-  --chain CHAIN          the chain identifier (default: T)
-  --version VERSION      the transaction version (default: 1)
-  --outfile OUTFILE      where to save the output (signed transaction, hash) (default: stdout)
+  -h, --help                         show this help message and exit
+  --proxy PROXY                      🖧 the URL of the proxy (default: https://testnet-gateway.elrond.com)
+  --pem PEM                          🔑 the PEM file, if keyfile not provided
+  --pem-index PEM_INDEX              🔑 the index in the PEM file (default: 0)
+  --keyfile KEYFILE                  🔑 a JSON keyfile, if PEM not provided
+  --passfile PASSFILE                🔑 a file containing keyfile's password, if keyfile provided
+  --sender-username SENDER_USERNAME  🖄 the username of the sender
+  --nonce NONCE                      # the nonce for the transaction
+  --recall-nonce                     ⭮ whether to recall the nonce when creating the transaction (default: False)
+  --gas-price GAS_PRICE              ⛽ the gas price (default: 1000000000)
+  --gas-limit GAS_LIMIT              ⛽ the gas limit
+  --estimate-gas                     ⛽ whether to estimate the gas limit (default: 0)
+  --value VALUE                      the value to transfer (default: 0)
+  --chain CHAIN                      the chain identifier (default: T)
+  --version VERSION                  the transaction version (default: 1)
+  --send                             ✓ whether to broadcast the transaction (default: False)
+  --simulate                         whether to simulate the transaction (default: False)
+  --outfile OUTFILE                  where to save the output (signed transaction, hash) (default: stdout)
 
 ```
 ## Group **Account**
@@ -614,10 +639,11 @@ Query account details (nonce, balance etc.)
 
 optional arguments:
   -h, --help                 show this help message and exit
-  --proxy PROXY              🖧 the URL of the proxy (default: https://testnet-api.elrond.com)
+  --proxy PROXY              🖧 the URL of the proxy (default: https://testnet-gateway.elrond.com)
   --address ADDRESS          🖄 the address to query
   --balance                  whether to only fetch the balance
   --nonce                    whether to only fetch the nonce
+  --username                 whether to only fetch the username
   --omit-fields OMIT_FIELDS  omit fields in the output payload (default: [])
 
 ```
@@ -632,7 +658,7 @@ Query account transactions
 
 optional arguments:
   -h, --help         show this help message and exit
-  --proxy PROXY      🖧 the URL of the proxy (default: https://testnet-api.elrond.com)
+  --proxy PROXY      🖧 the URL of the proxy (default: https://testnet-gateway.elrond.com)
   --outfile OUTFILE  where to save the output (default: stdout)
   --address ADDRESS  🖄 the address to query
 
@@ -647,16 +673,18 @@ usage: erdpy wallet COMMAND [-h] ...
 Derive private key from mnemonic, bech32 address helpers etc.
 
 COMMANDS:
-  {derive,bech32}
+  {derive,bech32,pem-address,pem-address-hex}
 
 OPTIONS:
-  -h, --help       show this help message and exit
+  -h, --help            show this help message and exit
 
 ----------------
 COMMANDS summary
 ----------------
 derive                         Derive a PEM file from a mnemonic or generate a new PEM file (for tests only!)
 bech32                         Helper for encoding and decoding bech32 addresses
+pem-address                    Get the public address out of a PEM file as bech32
+pem-address-hex                Get the public address out of a PEM file as hex
 
 ```
 ### Wallet.Derive
@@ -801,7 +829,7 @@ Get the number of shards.
 
 optional arguments:
   -h, --help     show this help message and exit
-  --proxy PROXY  🖧 the URL of the proxy (default: https://testnet-api.elrond.com)
+  --proxy PROXY  🖧 the URL of the proxy (default: https://testnet-gateway.elrond.com)
 
 ```
 ### Network.BlockNonce
@@ -815,7 +843,7 @@ Get the latest block nonce, by shard.
 
 optional arguments:
   -h, --help     show this help message and exit
-  --proxy PROXY  🖧 the URL of the proxy (default: https://testnet-api.elrond.com)
+  --proxy PROXY  🖧 the URL of the proxy (default: https://testnet-gateway.elrond.com)
   --shard SHARD  the shard ID (use 4294967295 for metachain)
 
 ```
@@ -830,7 +858,7 @@ Get the chain identifier.
 
 optional arguments:
   -h, --help     show this help message and exit
-  --proxy PROXY  🖧 the URL of the proxy (default: https://testnet-api.elrond.com)
+  --proxy PROXY  🖧 the URL of the proxy (default: https://testnet-gateway.elrond.com)
 
 ```
 ## Group **Cost**
@@ -868,7 +896,7 @@ Query minimum gas price
 
 optional arguments:
   -h, --help     show this help message and exit
-  --proxy PROXY  🖧 the URL of the proxy (default: https://testnet-api.elrond.com)
+  --proxy PROXY  🖧 the URL of the proxy (default: https://testnet-gateway.elrond.com)
 
 ```
 ### Cost.TxTransfer
@@ -882,7 +910,7 @@ Query cost of regular transaction (transfer)
 
 optional arguments:
   -h, --help     show this help message and exit
-  --proxy PROXY  🖧 the URL of the proxy (default: https://testnet-api.elrond.com)
+  --proxy PROXY  🖧 the URL of the proxy (default: https://testnet-gateway.elrond.com)
   --data DATA    a transaction payload, required to estimate the cost
 
 ```
@@ -897,7 +925,7 @@ Query cost of Smart Contract deploy transaction
 
 optional arguments:
   -h, --help                             show this help message and exit
-  --proxy PROXY                          🖧 the URL of the proxy (default: https://testnet-api.elrond.com)
+  --proxy PROXY                          🖧 the URL of the proxy (default: https://testnet-gateway.elrond.com)
   --project PROJECT                      🗀 the project directory (default: current directory)
   --bytecode BYTECODE                    the WASM file
   --arguments ARGUMENTS [ARGUMENTS ...]  arguments for the contract transaction, as numbers or hex-encoded. E.g.
@@ -918,7 +946,7 @@ positional arguments:
 
 optional arguments:
   -h, --help                             show this help message and exit
-  --proxy PROXY                          🖧 the URL of the proxy (default: https://testnet-api.elrond.com)
+  --proxy PROXY                          🖧 the URL of the proxy (default: https://testnet-gateway.elrond.com)
   --function FUNCTION                    the function to call
   --arguments ARGUMENTS [ARGUMENTS ...]  arguments for the contract transaction, as numbers or hex-encoded. E.g.
                                          --arguments 42 0x64 1000 0xabba
@@ -958,14 +986,15 @@ usage: erdpy dispatcher enqueue [-h] ...
 Enqueue a transaction
 
 optional arguments:
-  -h, --help             show this help message and exit
-  --receiver RECEIVER    🖄 the address of the receiver
-  --gas-price GAS_PRICE  ⛽ the gas price (default: 1000000000)
-  --gas-limit GAS_LIMIT  ⛽ the gas limit
-  --value VALUE          the value to transfer (default: 0)
-  --data DATA            the payload, or 'memo' of the transaction (default: )
-  --chain CHAIN          the chain identifier (default: T)
-  --version VERSION      the transaction version (default: 1)
+  -h, --help                             show this help message and exit
+  --receiver RECEIVER                    🖄 the address of the receiver
+  --receiver-username RECEIVER_USERNAME  🖄 the username of the receiver
+  --gas-price GAS_PRICE                  ⛽ the gas price (default: 1000000000)
+  --gas-limit GAS_LIMIT                  ⛽ the gas limit
+  --value VALUE                          the value to transfer (default: 0)
+  --data DATA                            the payload, or 'memo' of the transaction (default: )
+  --chain CHAIN                          the chain identifier (default: T)
+  --version VERSION                      the transaction version (default: 1)
 
 ```
 ### Dispatcher.Dispatch
@@ -978,12 +1007,13 @@ usage: erdpy dispatcher dispatch [-h] ...
 Dispatch queued transactions
 
 optional arguments:
-  -h, --help             show this help message and exit
-  --proxy PROXY          🖧 the URL of the proxy (default: https://testnet-api.elrond.com)
-  --pem PEM              🔑 the PEM file, if keyfile not provided
-  --pem-index PEM_INDEX  🔑 the index in the PEM file (default: 0)
-  --keyfile KEYFILE      🔑 a JSON keyfile, if PEM not provided
-  --passfile PASSFILE    🔑 a file containing keyfile's password, if keyfile provided
+  -h, --help                         show this help message and exit
+  --proxy PROXY                      🖧 the URL of the proxy (default: https://testnet-gateway.elrond.com)
+  --pem PEM                          🔑 the PEM file, if keyfile not provided
+  --pem-index PEM_INDEX              🔑 the index in the PEM file (default: 0)
+  --keyfile KEYFILE                  🔑 a JSON keyfile, if PEM not provided
+  --passfile PASSFILE                🔑 a file containing keyfile's password, if keyfile provided
+  --sender-username SENDER_USERNAME  🖄 the username of the sender
 
 ```
 ### Dispatcher.DispatchContinuously
@@ -996,13 +1026,14 @@ usage: erdpy dispatcher dispatch-continuously [-h] ...
 Continuously dispatch queued transactions
 
 optional arguments:
-  -h, --help             show this help message and exit
-  --proxy PROXY          🖧 the URL of the proxy (default: https://testnet-api.elrond.com)
-  --pem PEM              🔑 the PEM file, if keyfile not provided
-  --pem-index PEM_INDEX  🔑 the index in the PEM file (default: 0)
-  --keyfile KEYFILE      🔑 a JSON keyfile, if PEM not provided
-  --passfile PASSFILE    🔑 a file containing keyfile's password, if keyfile provided
-  --interval INTERVAL    the interval to retrieve transactions from the queue, in seconds
+  -h, --help                         show this help message and exit
+  --proxy PROXY                      🖧 the URL of the proxy (default: https://testnet-gateway.elrond.com)
+  --pem PEM                          🔑 the PEM file, if keyfile not provided
+  --pem-index PEM_INDEX              🔑 the index in the PEM file (default: 0)
+  --keyfile KEYFILE                  🔑 a JSON keyfile, if PEM not provided
+  --passfile PASSFILE                🔑 a file containing keyfile's password, if keyfile provided
+  --sender-username SENDER_USERNAME  🖄 the username of the sender
+  --interval INTERVAL                the interval to retrieve transactions from the queue, in seconds
 
 ```
 ### Dispatcher.Clean

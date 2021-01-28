@@ -109,10 +109,11 @@ class TemplateRust(Template):
         logger.info("Patching cargo files...")
         self._patch_cargo()
         self._patch_cargo_wasm()
+        self._patch_cargo_abi()
 
         logger.info("Patching source code...")
         self._patch_source_code_wasm()
-        self._patch_source_code_debug()
+        self._patch_source_code_abi()
         self._patch_source_code_tests()
 
         logger.info("Patching test files...")
@@ -123,9 +124,10 @@ class TemplateRust(Template):
 
         cargo_file = CargoFile(cargo_path)
         cargo_file.package_name = self.project_name
-        cargo_file.version = "0.0.1"
+        cargo_file.version = "0.0.0"
         cargo_file.authors = ["you"]
         cargo_file.edition = "2018"
+        cargo_file.publish = False
 
         for dependency in cargo_file.get_dependencies().values():
             del dependency["path"]
@@ -139,13 +141,43 @@ class TemplateRust(Template):
 
         cargo_file = CargoFile(cargo_path)
         cargo_file.package_name = f"{self.project_name}-wasm"
-        cargo_file.version = "0.0.1"
+        cargo_file.version = "0.0.0"
         cargo_file.authors = ["you"]
         cargo_file.edition = "2018"
+        cargo_file.publish = False
 
         for dependency in cargo_file.get_dependencies().values():
             del dependency["path"]
         # Currently, the following logic is not really needed (we don't have dev-dependencies in wasm/Cargo.toml):
+        for dependency in cargo_file.get_dev_dependencies().values():
+            del dependency["path"]
+
+        # Patch the path towards the project crate (one folder above):
+        cargo_file.get_dependency(self.template_name)["path"] = ".."
+
+        cargo_file.save()
+
+        self._replace_in_files(
+            [cargo_path],
+            [
+                (f"[dependencies.{self.template_name}]", f"[dependencies.{self.project_name}]")
+            ]
+        )
+
+    def _patch_cargo_abi(self):
+        cargo_path = path.join(self.directory, "abi", TemplateRust.CARGO_TOML)
+        if not path.isfile(cargo_path):
+            return
+
+        cargo_file = CargoFile(cargo_path)
+        cargo_file.package_name = f"{self.project_name}-abi"
+        cargo_file.version = "0.0.0"
+        cargo_file.authors = ["you"]
+        cargo_file.edition = "2018"
+        cargo_file.publish = False
+
+        for dependency in cargo_file.get_dependencies().values():
+            del dependency["path"]
         for dependency in cargo_file.get_dev_dependencies().values():
             del dependency["path"]
 
@@ -171,13 +203,13 @@ class TemplateRust(Template):
             ]
         )
 
-    def _patch_source_code_debug(self):
-        debug_main_path = path.join(self.directory, "debug", "src", "main.rs")
-        if not path.exists(debug_main_path):
+    def _patch_source_code_abi(self):
+        abi_main_path = path.join(self.directory, "abi", "src", "main.rs")
+        if not path.exists(abi_main_path):
             return
 
         self._replace_in_files(
-            [debug_main_path],
+            [abi_main_path],
             [
                 # Example: replace "use simple-erc20::*" to "use my_token::*"
                 (f"use {self.template_name.replace('-', '_')}::*", f"use {self.project_name.replace('-', '_')}::*")
@@ -209,7 +241,7 @@ class TemplateRust(Template):
         self._replace_in_files(
             test_paths,
             [
-                (f"{self.template_name}.wasm", f"{self.project_name}.wasm")
+                (f"{self.template_name}.wasm", f"{self.project_name.replace('-', '_')}.wasm")
             ]
         )
 

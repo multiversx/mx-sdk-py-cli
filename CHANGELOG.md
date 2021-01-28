@@ -4,10 +4,24 @@ All notable changes will be documented in this file.
 
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
+## [1.0.8] - 25.01.2021
+ -  Fix flags for phase 3 features #162.
 
-## [1.0.4] - TBD
+## [1.0.7] - 19.01.2021
+ - Update reference to newer Arwentools (Mandos).
+
+## [1.0.6] - 15.01.2021
+ - Add commands for the delegation manager contract.
+ - Added commands for DNS. Tests for DNS CLI.
+ - Added `--sender-username` and `--receiver-username` parameters.
+ - For Rust projects, run ABI generator upon building the WASM file.
+ - For Rust projects, patch contract templates wrt. ABI module.
+ - Cache templates repository (30 seconds). 
+ - Add github workflow for erdpy.
+ - Optimize running time for tests, build time (for rust projects).
+ - Add PIP update prior installing dependencies #136 @tebayoso (PR from community).
+ - `erdpy testnet` - enabled Phase 3 features.
  - `erdpy testnet`: Fixes for MacOS, enable log-save for Proxy.
- - Add commands for the delegation manager contract
 
 ## [1.0.3] - 28.12.2020
  - `erdpy contract new`: Fix typo (`crate` / `create`).
