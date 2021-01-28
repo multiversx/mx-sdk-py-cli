@@ -241,7 +241,7 @@ class TemplateRust(Template):
         self._replace_in_files(
             test_paths,
             [
-                (f"{self.template_name}.wasm", f"{self.project_name.replace('-', '_')}.wasm")
+                (f"{self.template_name}.wasm", f"{self.project_name}.wasm")
             ]
         )
 
