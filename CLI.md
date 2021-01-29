@@ -1185,10 +1185,10 @@ usage: erdpy config COMMAND [-h] ...
 Configure elrond-sdk (default values etc.)
 
 COMMANDS:
-  {dump,get,set}
+  {dump,get,set,new,switch,list}
 
 OPTIONS:
-  -h, --help      show this help message and exit
+  -h, --help            show this help message and exit
 
 ----------------
 COMMANDS summary
@@ -1196,6 +1196,9 @@ COMMANDS summary
 dump                           Dumps configuration.
 get                            Gets a configuration value.
 set                            Sets a configuration value.
+new                            Creates a new configuration.
+switch                         Switch to a different config
+list                           List available configs
 
 ```
 ### Configuration.Dump
@@ -1239,6 +1242,52 @@ Sets a configuration value.
 positional arguments:
   name        the name of the configuration entry
   value       the new value
+
+optional arguments:
+  -h, --help  show this help message and exit
+
+```
+### Configuration.New
+
+
+```
+$ erdpy config new --help
+usage: erdpy config new [-h] ...
+
+Creates a new configuration.
+
+positional arguments:
+  name                 the name of the configuration entry
+
+optional arguments:
+  -h, --help           show this help message and exit
+  --template TEMPLATE  template from which to create the new config
+
+```
+### Configuration.Switch
+
+
+```
+$ erdpy config switch --help
+usage: erdpy config switch [-h] ...
+
+Switch to a different config
+
+positional arguments:
+  name        the name of the configuration entry
+
+optional arguments:
+  -h, --help  show this help message and exit
+
+```
+### Configuration.List
+
+
+```
+$ erdpy config list --help
+usage: erdpy config list [-h] ...
+
+List available configs
 
 optional arguments:
   -h, --help  show this help message and exit

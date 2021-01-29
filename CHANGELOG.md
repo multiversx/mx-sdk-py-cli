@@ -4,6 +4,11 @@ All notable changes will be documented in this file.
 
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
+## [1.0.9] - 29.01.2021
+ -  [Multiple config templates #152](https://github.com/ElrondNetwork/elrond-sdk/pull/152). One can now `switch` between different **configuration** profiles.
+ -  [Refactor validator.pem parser, allow lookup by index #126](https://github.com/ElrondNetwork/elrond-sdk/pull/126).
+ -  [erdpy contract build - naming fix, extra CLI options #161](https://github.com/ElrondNetwork/elrond-sdk/pull/161).
+
 ## [1.0.8] - 25.01.2021
  -  Fix flags for phase 3 features #162.
 

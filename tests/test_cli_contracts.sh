@@ -34,28 +34,28 @@ testBuildContracts() {
     mkdir -p ${TARGET_DIR}
 
     ${ERDPY} contract build ${SANDBOX}/myadder-rs --cargo-target-dir=${TARGET_DIR} || return 1
-    assertFileExists ${SANDBOX}/myadder-rs/output/myadder_rs.wasm || return 1
-    assertFileExists ${SANDBOX}/myadder-rs/output/myadder_rs.abi.json || return 1
+    assertFileExists ${SANDBOX}/myadder-rs/output/myadder-rs.wasm || return 1
+    assertFileExists ${SANDBOX}/myadder-rs/output/myadder-rs.abi.json || return 1
 
     ${ERDPY} contract build ${SANDBOX}/myfactorial-rs --cargo-target-dir=${TARGET_DIR} || return 1
-    assertFileExists ${SANDBOX}/myfactorial-rs/output/myfactorial_rs.wasm || return 1
-    assertFileExists ${SANDBOX}/myfactorial-rs/output/myfactorial_rs.abi.json || return 1
+    assertFileExists ${SANDBOX}/myfactorial-rs/output/myfactorial-rs.wasm || return 1
+    assertFileExists ${SANDBOX}/myfactorial-rs/output/myfactorial-rs.abi.json || return 1
 
     ${ERDPY} contract build ${SANDBOX}/myerc20-rs --cargo-target-dir=${TARGET_DIR} || return 1
-    assertFileExists ${SANDBOX}/myerc20-rs/output/myerc20_rs.wasm || return 1
-    assertFileExists ${SANDBOX}/myerc20-rs/output/myerc20_rs.abi.json || return 1
+    assertFileExists ${SANDBOX}/myerc20-rs/output/myerc20-rs.wasm || return 1
+    assertFileExists ${SANDBOX}/myerc20-rs/output/myerc20-rs.abi.json || return 1
     
     ${ERDPY} contract build ${SANDBOX}/mybubbles-rs --cargo-target-dir=${TARGET_DIR} || return 1
-    assertFileExists ${SANDBOX}/mybubbles-rs/output/mybubbles_rs.wasm || return 1
-    assertFileExists ${SANDBOX}/mybubbles-rs/output/mybubbles_rs.abi.json || return 1
+    assertFileExists ${SANDBOX}/mybubbles-rs/output/mybubbles-rs.wasm || return 1
+    assertFileExists ${SANDBOX}/mybubbles-rs/output/mybubbles-rs.abi.json || return 1
 
     ${ERDPY} contract build ${SANDBOX}/mylottery-rs --cargo-target-dir=${TARGET_DIR} || return 1
-    assertFileExists ${SANDBOX}/mylottery-rs/output/mylottery_rs.wasm || return 1
-    assertFileExists ${SANDBOX}/mylottery-rs/output/mylottery_rs.abi.json || return 1
+    assertFileExists ${SANDBOX}/mylottery-rs/output/mylottery-rs.wasm || return 1
+    assertFileExists ${SANDBOX}/mylottery-rs/output/mylottery-rs.abi.json || return 1
 
     ${ERDPY} contract build ${SANDBOX}/myfunding-rs --cargo-target-dir=${TARGET_DIR} || return 1
-    assertFileExists ${SANDBOX}/myfunding-rs/output/myfunding_rs.wasm || return 1
-    assertFileExists ${SANDBOX}/myfunding-rs/output/myfunding_rs.abi.json || return 1
+    assertFileExists ${SANDBOX}/myfunding-rs/output/myfunding-rs.wasm || return 1
+    assertFileExists ${SANDBOX}/myfunding-rs/output/myfunding-rs.abi.json || return 1
 }
 
 testRunMandos() {
