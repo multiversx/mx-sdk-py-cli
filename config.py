@@ -127,7 +127,7 @@ def get_defaults() -> Dict[str, Any]:
         "proxy": "https://testnet-gateway.elrond.com",
         "chainID": "T",
         "txVersion": "1",
-        "dependencies.arwentools.tag": "v1.0.7-3-g7b66c38",
+        "dependencies.arwentools.tag": "v1.1.0-6-g2f3d258",
         "dependencies.arwentools.urlTemplate.linux": "https://ide.elrond.com/travis-builds/ARWEN_{TAG}_linux_amd64.tar.gz",
         "dependencies.arwentools.urlTemplate.osx": "https://ide.elrond.com/travis-builds/ARWEN_{TAG}_darwin_amd64.tar.gz",
         "dependencies.llvm.tag": "v9-19feb",
