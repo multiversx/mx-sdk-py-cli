@@ -120,3 +120,16 @@ class ElrondProxy:
         response = do_get(url)
         response = response.get("hyperblock", {})
         return response
+
+    def send_transaction_and_wait_for_result(self, payload: Any) -> str:
+        url = f"{self.url}/transaction/send"
+        response = do_post(url, payload)
+        tx_hash = response.get("txHash")
+
+        while True:
+            last_nonce = self.get_last_block_nonce("metachain")
+            last_hyperblock = self.get_hyperblock(last_nonce)
+            finalized_transactions = last_hyperblock["transactions"]
+            for transaction in finalized_transactions:
+                if transaction["hash"] == tx_hash:
+                    return self.get_transaction(tx_hash=tx_hash, with_results=True)
