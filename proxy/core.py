@@ -1,4 +1,5 @@
 import logging
+import time
 from typing import Any, List, Tuple
 
 from erdpy.accounts import Address
@@ -126,10 +127,13 @@ class ElrondProxy:
         response = do_post(url, payload)
         tx_hash = response.get("txHash")
 
-        while True:
+        num_runs = 100
+        for _ in range(0, num_runs):
             last_nonce = self.get_last_block_nonce("metachain")
             last_hyperblock = self.get_hyperblock(last_nonce)
             finalized_transactions = last_hyperblock["transactions"]
             for transaction in finalized_transactions:
                 if transaction["hash"] == tx_hash:
                     return self.get_transaction(tx_hash=tx_hash, with_results=True)
+            time.sleep(1)
+        return ""
