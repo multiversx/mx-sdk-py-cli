@@ -122,7 +122,7 @@ class ElrondProxy:
         response = response.get("hyperblock", {})
         return response
 
-    def send_transaction_and_wait_for_result(self, payload: Any, num_seconds_timeout) -> str:
+    def send_transaction_and_wait_for_result(self, payload: Any, num_seconds_timeout=100) -> str:
         url = f"{self.url}/transaction/send"
         response = do_post(url, payload)
         tx_hash = response.get("txHash")
