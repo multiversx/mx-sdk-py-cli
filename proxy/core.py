@@ -1,4 +1,5 @@
 import logging
+import time
 from typing import Any, List, Tuple
 
 from erdpy.accounts import Address
@@ -120,3 +121,25 @@ class ElrondProxy:
         response = do_get(url)
         response = response.get("hyperblock", {})
         return response
+
+    def send_transaction_and_wait_for_result(self, payload: Any, num_seconds_timeout=100) -> str:
+        url = f"{self.url}/transaction/send"
+        response = do_post(url, payload)
+        tx_hash = response.get("txHash")
+
+        for _ in range(0, num_seconds_timeout):
+            if self.is_transaction_finalized(tx_hash):
+                return self.get_transaction(tx_hash=tx_hash, with_results=True)
+            time.sleep(1)
+        return ""
+
+    def is_transaction_finalized(self, tx_hash):
+        last_nonce = self.get_last_block_nonce("metachain")
+        last_hyperblock = self.get_hyperblock(last_nonce)
+        finalized_transactions = last_hyperblock["transactions"]
+
+        for transaction in finalized_transactions:
+            if transaction["hash"] == tx_hash:
+                return True
+
+        return False
