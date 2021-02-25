@@ -4,6 +4,9 @@ All notable changes will be documented in this file.
 
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
+## [1.0.10] - 25.02.2021
+ - [Fixed a bug in the testnet setup process when creting the config for the proxy app #213](https://github.com/ElrondNetwork/elrond-sdk/pull/213) 
+
 ## [1.0.9] - 29.01.2021
  -  [Multiple config templates #152](https://github.com/ElrondNetwork/elrond-sdk/pull/152). One can now `switch` between different **configuration** profiles.
  -  [Refactor validator.pem parser, allow lookup by index #126](https://github.com/ElrondNetwork/elrond-sdk/pull/126).
