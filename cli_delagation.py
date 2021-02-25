@@ -7,7 +7,6 @@ from erdpy.accounts import Address
 from erdpy.delegation import staking_provider
 from erdpy.proxy import ElrondProxy
 from erdpy.transactions import do_prepare_transaction
-from erdpy.contracts import SmartContract
 
 
 def setup_parser(subparsers: Any) -> Any:
@@ -118,13 +117,6 @@ def setup_parser(subparsers: Any) -> Any:
     sub.add_argument("--delegation-contract", required=True, help="address of the delegation contract")
     _add_common_arguments(sub)
     sub.set_defaults(func=set_metadata)
-
-    # get metadata
-    sub = cli_shared.add_command_subparser(subparsers, "staking-provider", "get-metadata",
-                                           "Get staking provider metadata")
-    sub.add_argument("--delegation-contract", required=True, help="address of the delegation contract")
-    _add_common_arguments(sub)
-    sub.set_defaults(func=get_metadata)
 
 
 def _add_common_arguments(sub: Any):
@@ -276,15 +268,6 @@ def set_metadata(args: Any):
         cli_shared.send_or_simulate(tx, args)
     finally:
         tx.dump_to(args.outfile)
-
-
-def get_metadata(args: Any):
-    contract_address = args.delegation_contract
-    function = "getMetaData"
-
-    contract = SmartContract(contract_address)
-    result = contract.query(ElrondProxy(args.proxy), function, [])
-    utils.dump_out_json(result)
 
 
 def _get_sc_address_from_tx(data: Any):
