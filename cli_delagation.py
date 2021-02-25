@@ -7,6 +7,7 @@ from erdpy.accounts import Address
 from erdpy.delegation import staking_provider
 from erdpy.proxy import ElrondProxy
 from erdpy.transactions import do_prepare_transaction
+from erdpy.contracts import SmartContract
 
 
 def setup_parser(subparsers: Any) -> Any:
@@ -103,10 +104,27 @@ def setup_parser(subparsers: Any) -> Any:
                      help="set automatic activation True")
     sub.add_argument("--unset", action="store_true", required=not (utils.is_arg_present("--set", sys.argv)),
                      help="set automatic activation False")
-
     sub.add_argument("--delegation-contract", required=True, help="address of the delegation contract")
     _add_common_arguments(sub)
     sub.set_defaults(func=automatic_activation)
+
+    # set metadata
+    sub = cli_shared.add_command_subparser(subparsers, "staking-provider", "set-metadata",
+                                           "Set metadata must be called by the contract owner")
+
+    sub.add_argument("--name", required=True, help="name field in staking provider metadata")
+    sub.add_argument("--website", required=True, help="website field in staking provider metadata")
+    sub.add_argument("--identifier", required=True, help="identifier field in staking provider metadata")
+    sub.add_argument("--delegation-contract", required=True, help="address of the delegation contract")
+    _add_common_arguments(sub)
+    sub.set_defaults(func=set_metadata)
+
+    # get metadata
+    sub = cli_shared.add_command_subparser(subparsers, "staking-provider", "get-metadata",
+                                           "Get staking provider metadata")
+    sub.add_argument("--delegation-contract", required=True, help="address of the delegation contract")
+    _add_common_arguments(sub)
+    sub.set_defaults(func=get_metadata)
 
 
 def _add_common_arguments(sub: Any):
@@ -246,6 +264,27 @@ def automatic_activation(args: Any):
         cli_shared.send_or_simulate(tx, args)
     finally:
         tx.dump_to(args.outfile)
+
+
+def set_metadata(args: Any):
+    cli_shared.check_broadcast_args(args)
+    cli_shared.prepare_nonce_in_args(args)
+    staking_provider.prepare_args_set_metadata(args)
+    tx = do_prepare_transaction(args)
+
+    try:
+        cli_shared.send_or_simulate(tx, args)
+    finally:
+        tx.dump_to(args.outfile)
+
+
+def get_metadata(args: Any):
+    contract_address = args.delegation_contract
+    function = "getMetaData"
+
+    contract = SmartContract(contract_address)
+    result = contract.query(ElrondProxy(args.proxy), function, [])
+    utils.dump_out_json(result)
 
 
 def _get_sc_address_from_tx(data: Any):

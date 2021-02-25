@@ -129,3 +129,15 @@ def prepare_args_automatic_activation(args: Any):
     args.receiver = args.delegation_contract
     if args.estimate_gas:
         args.gas_limit = estimate_system_sc_call(args, MetaChainSystemSCsCost.DELEGATION_OPS, 1)
+
+
+def prepare_args_set_metadata(args: Any):
+    data = 'setMetaData'
+    data += '@' + binascii.hexlify(str.encode(args.name)).decode()
+    data += '@' + binascii.hexlify(str.encode(args.website)).decode()
+    data += '@' + binascii.hexlify(str.encode(args.identifier)).decode()
+
+    args.data = data
+    args.receiver = args.delegation_contract
+    if args.estimate_gas:
+        args.gas_limit = estimate_system_sc_call(args, MetaChainSystemSCsCost.DELEGATION_OPS, 1)
