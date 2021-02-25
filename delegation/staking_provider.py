@@ -41,7 +41,7 @@ def prepare_args_for_add_nodes(args: Any):
         validator_pem = validator.get("pemFile")
         validator_pem = path.join(path.dirname(args.validators_file), validator_pem)
         seed, bls_key = parse_validator_pem(validator_pem)
-        signed_message = sign_message_with_bls_key(account.address.pubkey().hex(), seed.hex())
+        signed_message = sign_message_with_bls_key(account.address.pubkey().hex(), seed.decode('ascii'))
         add_nodes_data += f"@{bls_key}@{signed_message}"
 
     args.receiver = args.delegation_contract
