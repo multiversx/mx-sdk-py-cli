@@ -36,6 +36,7 @@ def setup_parser(subparsers: Any) -> Any:
                                            "Add new nodes must be called by the contract owner")
     sub.add_argument("--validators-file", required=True, help="a JSON file describing the Nodes")
     sub.add_argument("--delegation-contract", required=True, help="address of the delegation contract")
+    sub.add_argument("--using-delegation-manager", action="store_true", required=False, help="whether delegation contract was created using the Delegation Manager")
     _add_common_arguments(sub)
     sub.set_defaults(func=add_new_nodes)
 

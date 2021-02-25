@@ -29,7 +29,9 @@ def prepare_args_for_add_nodes(args: Any):
     validators_file = ValidatorsFile(args.validators_file)
 
     # TODO: Refactor, so that only address is received here.
-    if args.pem:
+    if args.using_delegation_manager:
+        account = Account(address=args.delegation_contract)
+    elif args.pem:
         account = Account(pem_file=args.pem)
     elif args.keyfile and args.passfile:
         account = Account(key_file=args.keyfile, pass_file=args.passfile)
