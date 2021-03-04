@@ -29,7 +29,9 @@ def prepare_args_for_add_nodes(args: Any):
     validators_file = ValidatorsFile(args.validators_file)
 
     # TODO: Refactor, so that only address is received here.
-    if args.pem:
+    if args.using_delegation_manager:
+        account = Account(address=args.delegation_contract)
+    elif args.pem:
         account = Account(pem_file=args.pem)
     elif args.keyfile and args.passfile:
         account = Account(key_file=args.keyfile, pass_file=args.passfile)
@@ -41,7 +43,7 @@ def prepare_args_for_add_nodes(args: Any):
         validator_pem = validator.get("pemFile")
         validator_pem = path.join(path.dirname(args.validators_file), validator_pem)
         seed, bls_key = parse_validator_pem(validator_pem)
-        signed_message = sign_message_with_bls_key(account.address.pubkey().hex(), seed.hex())
+        signed_message = sign_message_with_bls_key(account.address.pubkey().hex(), seed.decode('ascii'))
         add_nodes_data += f"@{bls_key}@{signed_message}"
 
     args.receiver = args.delegation_contract
@@ -124,6 +126,18 @@ def prepare_args_automatic_activation(args: Any):
 
     if args.unset:
         data += '@' + binascii.hexlify(str.encode('no')).decode()
+
+    args.data = data
+    args.receiver = args.delegation_contract
+    if args.estimate_gas:
+        args.gas_limit = estimate_system_sc_call(args, MetaChainSystemSCsCost.DELEGATION_OPS, 1)
+
+
+def prepare_args_set_metadata(args: Any):
+    data = 'setMetaData'
+    data += '@' + binascii.hexlify(str.encode(args.name)).decode()
+    data += '@' + binascii.hexlify(str.encode(args.website)).decode()
+    data += '@' + binascii.hexlify(str.encode(args.identifier)).decode()
 
     args.data = data
     args.receiver = args.delegation_contract
