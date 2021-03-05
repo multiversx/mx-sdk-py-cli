@@ -12,7 +12,7 @@ testAll() {
     ${ERDPY} --verbose validator stake --pem="${USERS}/alice.pem" --value="2500${DENOMINATION}" --validators-file=./testdata/validators.json --reward-address=${REWARD_ADDRESS} --chain=${CHAIN_ID} --proxy=${PROXY} --estimate-gas --nonce=42 --send
 
 
-    echo "Stake topUP"
+    echo "Stake with topUP"
     ${ERDPY} --verbose validator stake --top-up --pem="${USERS}/alice.pem" --value="2711${DENOMINATION}" --chain=${CHAIN_ID} --proxy=${PROXY} --estimate-gas --recall-nonce --send
 
     echo "Unstake"
