@@ -30,7 +30,7 @@ def setup_parser(subparsers: Any) -> Any:
     _add_nodes_arg(sub)
     sub.set_defaults(func=do_unjail)
 
-    sub = cli_shared.add_command_subparser(subparsers, "validator", "unbond", "Unbond")
+    sub = cli_shared.add_command_subparser(subparsers, "validator", "unbond", "Unbond tokens for a bls key")
     _add_common_arguments(sub)
     _add_nodes_arg(sub)
     sub.set_defaults(func=do_unbond)
