@@ -22,6 +22,8 @@ class MetaChainSystemSCsCost:
     UNJAIL = 5000000
     DELEGATION_MANAGER_OPS = 50000000
     DELEGATION_OPS = 1000000
+    UNSTAKE_TOKENS = 5000000
+    UNBOND_TOKENS = 5000000
 
 
 def get_proxy() -> str:

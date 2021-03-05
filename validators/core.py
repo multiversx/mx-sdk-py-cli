@@ -16,6 +16,10 @@ AUCTION_SMART_CONTRACT_ADDRESS = "erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqq
 
 
 def prepare_args_for_stake(args: Any):
+    if args.top_up:
+        prepare_args_for_top_up(args)
+        return
+
     validators_file = ValidatorsFile(args.validators_file)
 
     reward_address = args.reward_address
@@ -46,6 +50,14 @@ def prepare_args_for_stake(args: Any):
 
     if args.estimate_gas:
         args.gas_limit = estimate_system_sc_call(args, MetaChainSystemSCsCost.STAKE, num_of_nodes)
+
+
+def prepare_args_for_top_up(args: Any):
+    args.data = 'stake'
+    args.receiver = AUCTION_SMART_CONTRACT_ADDRESS
+
+    if args.estimate_gas:
+        args.gas_limit = estimate_system_sc_call(args, MetaChainSystemSCsCost.STAKE, 1)
 
 
 def prepare_args_for_unstake(args: Any):
@@ -90,6 +102,59 @@ def prepare_args_for_claim(args: Any):
 
     if args.estimate_gas:
         args.gas_limit = estimate_system_sc_call(args, MetaChainSystemSCsCost.CLAIM)
+
+
+def prepare_args_for_unstake_nodes(args: Any):
+    parsed_keys, num_keys = Converters.parse_keys(args.nodes_public_keys)
+    args.data = 'unStakeNodes' + parsed_keys
+
+    args.receiver = AUCTION_SMART_CONTRACT_ADDRESS
+    if args.estimate_gas:
+        args.gas_limit = estimate_system_sc_call(args, MetaChainSystemSCsCost.UNSTAKE, num_keys)
+
+
+def prepare_args_for_unstake_tokens(args: Any):
+    args.data = 'unStakeTokens'
+    args.data += '@' + Converters.str_int_to_hex_str(str(args.unstake_value))
+
+    args.receiver = AUCTION_SMART_CONTRACT_ADDRESS
+    if args.estimate_gas:
+        args.gas_limit = estimate_system_sc_call(args, MetaChainSystemSCsCost.UNSTAKE_TOKENS)
+
+
+def prepare_args_for_unbond_nodes(args: Any):
+    parsed_keys, num_keys = Converters.parse_keys(args.nodes_public_keys)
+    args.data = 'unBondNodes' + parsed_keys
+
+    args.receiver = AUCTION_SMART_CONTRACT_ADDRESS
+    if args.estimate_gas:
+        args.gas_limit = estimate_system_sc_call(args, MetaChainSystemSCsCost.UNBOND, num_keys)
+
+
+def prepare_args_for_unbond_tokens(args: Any):
+    args.data = 'unBondTokens'
+    args.data += '@' + Converters.str_int_to_hex_str(str(args.unbond_value))
+
+    args.receiver = AUCTION_SMART_CONTRACT_ADDRESS
+    if args.estimate_gas:
+        args.gas_limit = estimate_system_sc_call(args, MetaChainSystemSCsCost.UNBOND_TOKENS)
+
+
+def prepare_args_for_clean_registered_data(args: Any):
+    args.data = 'cleanRegisteredData'
+
+    args.receiver = AUCTION_SMART_CONTRACT_ADDRESS
+    if args.estimate_gas:
+        args.gas_limit = estimate_system_sc_call(args, MetaChainSystemSCsCost.STAKE)
+
+
+def prepare_args_for_restake_unstaked_nodes(args: Any):
+    parsed_keys, num_keys = Converters.parse_keys(args.nodes_public_keys)
+    args.data = 'reStakeUnStakedNodes' + parsed_keys
+
+    args.receiver = AUCTION_SMART_CONTRACT_ADDRESS
+    if args.estimate_gas:
+        args.gas_limit = estimate_system_sc_call(args, MetaChainSystemSCsCost.STAKE, num_keys)
 
 
 def estimate_system_sc_call(args, base_cost, factor=1):

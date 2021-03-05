@@ -1,6 +1,7 @@
+import sys
 from typing import Any
 
-from erdpy import cli_shared, validators
+from erdpy import cli_shared, validators, utils
 from erdpy.transactions import do_prepare_transaction
 
 
@@ -12,7 +13,10 @@ def setup_parser(subparsers: Any) -> Any:
     sub = cli_shared.add_command_subparser(subparsers, "validator", "stake", "Stake value into the Network")
     _add_common_arguments(sub)
     sub.add_argument("--reward-address", default="", help="the reward address")
-    sub.add_argument("--validators-file", required=True, help="a JSON file describing the Nodes")
+    sub.add_argument("--validators-file", required=not (utils.is_arg_present("--top-up", sys.argv)),
+                     help="a JSON file describing the Nodes")
+    sub.add_argument("--top-up", action="store_true", default=False,
+                     required=not (utils.is_arg_present("--validators-file", sys.argv)), help="Stake value for top up")
     sub.set_defaults(func=do_stake)
 
     sub = cli_shared.add_command_subparser(subparsers, "validator", "unstake", "Unstake value")
@@ -39,6 +43,40 @@ def setup_parser(subparsers: Any) -> Any:
     sub = cli_shared.add_command_subparser(subparsers, "validator", "claim", "Claim rewards")
     _add_common_arguments(sub)
     sub.set_defaults(func=do_claim)
+
+    sub = cli_shared.add_command_subparser(subparsers, "validator", "unstake-nodes", "It will unStake nodes")
+    _add_common_arguments(sub)
+    _add_nodes_arg(sub)
+    sub.set_defaults(func=do_unstake_nodes)
+
+    sub = cli_shared.add_command_subparser(subparsers, "validator", "unstake-tokens", "It will unStake tokens, if "
+                                                                                      "provided value is bigger that "
+                                                                                      "topUp value will unStake nodes")
+    _add_common_arguments(sub)
+    sub.add_argument("--unstake-value", default=0, help="the unstake value")
+    sub.set_defaults(func=do_unstake_tokens)
+
+    sub = cli_shared.add_command_subparser(subparsers, "validator", "unbond-nodes", "It will unBond nodes")
+    _add_common_arguments(sub)
+    _add_nodes_arg(sub)
+    sub.set_defaults(func=do_unbond_nodes)
+
+    sub = cli_shared.add_command_subparser(subparsers, "validator", "unbond-tokens", "It will unBond tokens, if "
+                                                                                     "provided value is bigger that "
+                                                                                     "topUp value will unBond nodes")
+    _add_common_arguments(sub)
+    sub.add_argument("--unbond-value", default=0, help="the unbond value")
+    sub.set_defaults(func=do_unbond_tokens)
+
+    sub = cli_shared.add_command_subparser(subparsers, "validator", "clean-registered-data", "Deletes duplicated keys "
+                                                                                             "from registered data")
+    _add_common_arguments(sub)
+    sub.set_defaults(func=do_clean_registered_data)
+
+    sub = cli_shared.add_command_subparser(subparsers, "validator", "restake-unstaked-nodes", "It will reStake UnStaked nodes")
+    _add_common_arguments(sub)
+    _add_nodes_arg(sub)
+    sub.set_defaults(func=do_restake_unstaked_nodes)
 
     parser.epilog = cli_shared.build_group_epilog(subparsers)
     return subparsers
@@ -120,6 +158,78 @@ def do_claim(args: Any):
     cli_shared.check_broadcast_args(args)
     cli_shared.prepare_nonce_in_args(args)
     validators.prepare_args_for_claim(args)
+    tx = do_prepare_transaction(args)
+
+    try:
+        cli_shared.send_or_simulate(tx, args)
+    finally:
+        tx.dump_to(args.outfile)
+
+
+def do_unstake_nodes(args: Any):
+    cli_shared.check_broadcast_args(args)
+    cli_shared.prepare_nonce_in_args(args)
+    validators.prepare_args_for_unstake_nodes(args)
+    tx = do_prepare_transaction(args)
+
+    try:
+        cli_shared.send_or_simulate(tx, args)
+    finally:
+        tx.dump_to(args.outfile)
+
+
+def do_unstake_tokens(args: Any):
+    cli_shared.check_broadcast_args(args)
+    cli_shared.prepare_nonce_in_args(args)
+    validators.prepare_args_for_unstake_tokens(args)
+    tx = do_prepare_transaction(args)
+
+    try:
+        cli_shared.send_or_simulate(tx, args)
+    finally:
+        tx.dump_to(args.outfile)
+
+
+def do_unbond_nodes(args: Any):
+    cli_shared.check_broadcast_args(args)
+    cli_shared.prepare_nonce_in_args(args)
+    validators.prepare_args_for_unbond_nodes(args)
+    tx = do_prepare_transaction(args)
+
+    try:
+        cli_shared.send_or_simulate(tx, args)
+    finally:
+        tx.dump_to(args.outfile)
+
+
+def do_unbond_tokens(args: Any):
+    cli_shared.check_broadcast_args(args)
+    cli_shared.prepare_nonce_in_args(args)
+    validators.prepare_args_for_unbond_tokens(args)
+    tx = do_prepare_transaction(args)
+
+    try:
+        cli_shared.send_or_simulate(tx, args)
+    finally:
+        tx.dump_to(args.outfile)
+
+
+def do_clean_registered_data(args: Any):
+    cli_shared.check_broadcast_args(args)
+    cli_shared.prepare_nonce_in_args(args)
+    validators.prepare_args_for_clean_registered_data(args)
+    tx = do_prepare_transaction(args)
+
+    try:
+        cli_shared.send_or_simulate(tx, args)
+    finally:
+        tx.dump_to(args.outfile)
+
+
+def do_restake_unstaked_nodes(args: Any):
+    cli_shared.check_broadcast_args(args)
+    cli_shared.prepare_nonce_in_args(args)
+    validators.prepare_args_for_restake_unstaked_nodes(args)
     tx = do_prepare_transaction(args)
 
     try:

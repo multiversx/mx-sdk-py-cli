@@ -207,9 +207,16 @@ def patch_proxy_config(testnet_config: TestnetConfiguration):
     data['GeneralSettings']['ServerPort'] = testnet_config.proxy_port()
     utils.write_toml_file(proxy_config_file, data)
 
+    api_config_file = path.join(testnet_config.proxy_config_folder(), 'apiConfig', 'v1_0.toml')
+    data = utils.read_toml_file(api_config_file)
+    routes = data['APIPackages']['transaction']['Routes']
+    for route in routes:
+        route["Open"] = True
+    utils.write_toml_file(api_config_file, data)
 
-def makefolder(path):
-    path.mkdir(parents=True, exist_ok=True)
+
+def makefolder(path_where_to_make_folder):
+    path_where_to_make_folder.mkdir(parents=True, exist_ok=True)
 
 
 def patch_source_code(testnet_config: TestnetConfiguration):
