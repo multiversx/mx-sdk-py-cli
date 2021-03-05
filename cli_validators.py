@@ -6,7 +6,8 @@ from erdpy.transactions import do_prepare_transaction
 
 
 def setup_parser(subparsers: Any) -> Any:
-    parser = cli_shared.add_group_subparser(subparsers, "validator", "Stake, Unjail and other actions useful for "
+    parser = cli_shared.add_group_subparser(subparsers, "validator", "Stake, UnStake, UnBond, Unjail and other "
+                                                                     "actions useful for "
                                                                      "Validators")
     subparsers = parser.add_subparsers()
 
