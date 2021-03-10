@@ -45,7 +45,8 @@ def setup_parser(subparsers: Any) -> Any:
     _add_common_arguments(sub)
     sub.set_defaults(func=do_claim)
 
-    sub = cli_shared.add_command_subparser(subparsers, "validator", "unstake-nodes", "It will unStake nodes")
+    sub = cli_shared.add_command_subparser(subparsers, "validator", "unstake-nodes", "Unstake-nodes will unstake "
+                                                                                     "nodes for provided bls keys")
     _add_common_arguments(sub)
     _add_nodes_arg(sub)
     sub.set_defaults(func=do_unstake_nodes)

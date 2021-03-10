@@ -1,10 +1,6 @@
 export PYTHONPATH=$(realpath ../../)
 echo "PYTHONPATH = ${PYTHONPATH}"
 
-# if you want to test with the local erdpy you can uncomment this command
-# ERDPY="python3  ../cli.py"
-
-
 ERDPY="python3 -m erdpy.cli"
 SANDBOX=testdata-out/SANDBOX
 USERS=../testnet/wallets/users
