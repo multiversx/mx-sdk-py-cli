@@ -60,9 +60,9 @@ def create_transaction(args: Any):
         args.outfile.write(tx.serialize_as_inner())
         return
 
-    send_wait_result = args.wait_result and args.send
-    send_only = args.send
-    simulate = args.simulate
+    send_wait_result = args.wait_result and args.send and not args.simulate
+    send_only = args.send and not args.wait_result and not args.simulate
+    simulate = args.simulate and not (send_only or send_wait_result)
 
     try:
         if send_wait_result:
