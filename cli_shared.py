@@ -55,6 +55,7 @@ def add_tx_args(sub: Any, with_nonce: bool = True, with_receiver: bool = True, w
 
     if with_receiver:
         sub.add_argument("--receiver", required=True, help="🖄 the address of the receiver")
+        sub.add_argument("--receiver-username", required=False, help="🖄 the username of the receiver")
 
     sub.add_argument("--gas-price", default=config.DEFAULT_GAS_PRICE, help="⛽ the gas price (default: %(default)d)")
     sub.add_argument("--gas-limit", required=not("--estimate-gas" in sys.argv), help="⛽ the gas limit")
@@ -75,6 +76,7 @@ def add_wallet_args(sub: Any):
     sub.add_argument("--pem-index", default=0, help="🔑 the index in the PEM file (default: %(default)s)")
     sub.add_argument("--keyfile", required=not (utils.is_arg_present("--pem", sys.argv)), help="🔑 a JSON keyfile, if PEM not provided")
     sub.add_argument("--passfile", required=not (utils.is_arg_present("--pem", sys.argv)), help="🔑 a file containing keyfile's password, if keyfile provided")
+    sub.add_argument("--sender-username", required=False, help="🖄 the username of the sender")
 
 
 def add_proxy_arg(sub: Any):

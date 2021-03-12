@@ -1,5 +1,8 @@
+import base64
+import codecs
 import logging
 from pathlib import Path
+from time import sleep
 from typing import Any
 
 import nacl.encoding
@@ -17,6 +20,7 @@ class WalletTestCase(MyTestCase):
     def setUp(self):
         super().setUp()
         self.alice = Account(pem_file=str(self.devnet_wallets.joinpath("users", "alice.pem")))
+        self.multiple_bls_keys_file = self.testdata / 'multipleValidatorsKeys.pem'
 
     def test_nacl_playground_signing(self):
         private_key_hex = "b8211b08edc8aca591bedf1b9aba47e4077e54ac7d4ceb2f1bc9e10c064d3e6c7a5679a427f6df7adf2310ddf5e570fd51e47e6b1511124d6b250b989b017588"
@@ -27,7 +31,9 @@ class WalletTestCase(MyTestCase):
         signature = signed.signature
         signed_bytes_hex = signature.hex()
 
-        self.assertEqual("a4918458d874ca58893a1f92dac33e7b10e3bf46048ad5de5bc260487ca84e8e07603297120fdc018242f63bd8e87b13efd108f8ffa095f536b6eda03805590c", signed_bytes_hex)
+        self.assertEqual(
+            "a4918458d874ca58893a1f92dac33e7b10e3bf46048ad5de5bc260487ca84e8e07603297120fdc018242f63bd8e87b13efd108f8ffa095f536b6eda03805590c",
+            signed_bytes_hex)
         self.assertEqual(64, len(signature))
 
     def test_pem_get_pubkey(self):
@@ -62,6 +68,32 @@ class WalletTestCase(MyTestCase):
         self.assertEqual("413f42575f7f26fad3317a778771212fdb80245850981e48b58a4f25e344e8f9", seed.hex())
         self.assertEqual("0139472eff6886771a982f3083da5d421f24c29181e63888228dc81ca60d69e1", address.hex())
 
+    def test_parse_validator_pem_default_index(self):
+        pem_file = self.multiple_bls_keys_file
+        seed, bls_key = pem.parse_validator_pem(pem_file)
+
+        key_hex = bytes.hex(seed)
+
+        self.assertEqual(
+            "f8910e47cf9464777c912e6390758bb39715fffcb861b184017920e4a807b42553f2f21e7f3914b81bcf58b66a72ab16d97013ae1cff807cefc977ef8cbf116258534b9e46d19528042d16ef8374404a89b184e0a4ee18c77c49e454d04eae8d",
+            bls_key)
+        self.assertEqual(
+            "37633139626633613063353763646431666230386534363037636562616133363437643662393236316234363933663631653936653534623231386434343261",
+            key_hex)
+
+    def test_parse_validator_pem_n_index(self):
+        pem_file = self.multiple_bls_keys_file
+        seed, bls_key = pem.parse_validator_pem(pem_file, 3)
+
+        key_hex = bytes.hex(seed)
+
+        self.assertEqual(
+            "12773304cb718250edd89770cedcbf675ccdb7fe2b30bd3185ca65ffa0d516879768ed03f92e41a6e5bc5340b78a9d02655e3b727c79730ead791fb68eaa02b84e1be92a816a9604a1ab9a6d3874b638487e2145239438a4bafac3889348d405",
+            bls_key)
+        self.assertEqual(
+            "38656265623037643239366164323532393430306234303638376137343161313335663833353766373966333966636232383934613666393730336135383136",
+            key_hex)
+
     def test_sign_transaction(self):
         # With data
         transaction = Transaction()
@@ -76,7 +108,9 @@ class WalletTestCase(MyTestCase):
         transaction.version = 1
         transaction.sign(self.alice)
 
-        self.assertEqual("0e69f27e24aba2f3b7a8842dc7e7c085a0bfb5b29112b258318eed73de9c8809889756f8afaa74c7b3c7ce20a028b68ba90466a249aaf999a1a78dcf7f4eb40c", transaction.signature)
+        self.assertEqual(
+            "0e69f27e24aba2f3b7a8842dc7e7c085a0bfb5b29112b258318eed73de9c8809889756f8afaa74c7b3c7ce20a028b68ba90466a249aaf999a1a78dcf7f4eb40c",
+            transaction.signature)
 
         # Without data
         transaction = Transaction()
@@ -90,8 +124,8 @@ class WalletTestCase(MyTestCase):
         transaction.chainID = "chainID"
         transaction.version = 1
         transaction.sign(self.alice)
-
-        self.assertEqual("83efd1bc35790ecc220b0ed6ddd1fcb44af6653dd74e37b3a49dcc1f002a1b98b6f79779192cca68bdfefd037bc81f4fa606628b751023122191f8c062362805", transaction.signature)    
+        
+        self.assertEqual("83efd1bc35790ecc220b0ed6ddd1fcb44af6653dd74e37b3a49dcc1f002a1b98b6f79779192cca68bdfefd037bc81f4fa606628b751023122191f8c062362805", transaction.signature)
 
     def test_generate_pair_pem(self):
         seed, pubkey = generate_pair()

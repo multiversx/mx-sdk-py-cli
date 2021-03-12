@@ -4,14 +4,38 @@ All notable changes will be documented in this file.
 
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
+## [1.0.11] - 12.03.2021
+ - Update commands for testnet in order to work with the development and master elrond-go branch
+ - Update the proxy config for testnet in order to have all the api routes active
+ - Added new commands for validator
+ - Fix bug with the command add-nodes for staking-provider
+ - Add --wait-result flag for erdpy tx new cli command.
 
-## [1.0.4] - TBD
+## [1.0.10] - 25.02.2021
+ - [Fixed a bug in the testnet setup process when creting the config for the proxy app #213](https://github.com/ElrondNetwork/elrond-sdk/pull/213) 
+
+## [1.0.9] - 29.01.2021
+ -  [Multiple config templates #152](https://github.com/ElrondNetwork/elrond-sdk/pull/152). One can now `switch` between different **configuration** profiles.
+ -  [Refactor validator.pem parser, allow lookup by index #126](https://github.com/ElrondNetwork/elrond-sdk/pull/126).
+ -  [erdpy contract build - naming fix, extra CLI options #161](https://github.com/ElrondNetwork/elrond-sdk/pull/161).
+
+## [1.0.8] - 25.01.2021
+ -  Fix flags for phase 3 features #162.
+
+## [1.0.7] - 19.01.2021
+ - Update reference to newer Arwentools (Mandos).
+
+## [1.0.6] - 15.01.2021
  - Add commands for the delegation manager contract.
+ - Added commands for DNS. Tests for DNS CLI.
+ - Added `--sender-username` and `--receiver-username` parameters.
  - For Rust projects, run ABI generator upon building the WASM file.
  - For Rust projects, patch contract templates wrt. ABI module.
  - Cache templates repository (30 seconds). 
  - Add github workflow for erdpy.
  - Optimize running time for tests, build time (for rust projects).
+ - Add PIP update prior installing dependencies #136 @tebayoso (PR from community).
+ - `erdpy testnet` - enabled Phase 3 features.
  - `erdpy testnet`: Fixes for MacOS, enable log-save for Proxy.
 
 ## [1.0.3] - 28.12.2020

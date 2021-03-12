@@ -15,6 +15,10 @@ def setup_parser(subparsers: Any) -> Any:
     cli_shared.add_outfile_arg(sub, what="signed transaction, hash")
     cli_shared.add_broadcast_args(sub, relay=True)
     cli_shared.add_proxy_arg(sub)
+    sub.add_argument("--wait-result", action="store_true", default=False,
+                     help="signal to wait for the transaction result - only valid if --send is set")
+    sub.add_argument("--timeout", default=100, help="max num of seconds to wait for result"
+                                                    " - only valid if --wait-result is set")
     sub.set_defaults(func=create_transaction)
 
     sub = cli_shared.add_command_subparser(subparsers, "tx", "send", "Send a previously saved transaction")
@@ -56,10 +60,18 @@ def create_transaction(args: Any):
         args.outfile.write(tx.serialize_as_inner())
         return
 
+    send_wait_result = args.wait_result and args.send and not args.simulate
+    send_only = args.send and not (args.wait_result or args.simulate)
+    simulate = args.simulate and not (send_only or send_wait_result)
+
     try:
-        if args.send:
+        if send_wait_result:
+            proxy = ElrondProxy(args.proxy)
+            response = tx.send_wait_result(proxy, args.timeout)
+            utils.dump_out_json(response)
+        elif send_only:
             tx.send(ElrondProxy(args.proxy))
-        elif args.simulate:
+        elif simulate:
             response = tx.simulate(ElrondProxy(args.proxy))
             utils.dump_out_json(response)
     finally:

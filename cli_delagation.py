@@ -2,7 +2,7 @@ import binascii
 import sys
 from typing import Any
 
-from erdpy import cli_shared, utils, errors
+from erdpy import cli_shared, errors, utils
 from erdpy.accounts import Address
 from erdpy.delegation import staking_provider
 from erdpy.proxy import ElrondProxy
@@ -10,9 +10,7 @@ from erdpy.transactions import do_prepare_transaction
 
 
 def setup_parser(subparsers: Any) -> Any:
-    parser = cli_shared.add_group_subparser(subparsers, "staking-provider", "Create New Delegation Contract "
-                                                                            "and some more staking-provider related "
-                                                                            "options")
+    parser = cli_shared.add_group_subparser(subparsers, "staking-provider", "Staking provider omnitool")
     subparsers = parser.add_subparsers()
 
     # create new delegation contract
@@ -38,6 +36,7 @@ def setup_parser(subparsers: Any) -> Any:
                                            "Add new nodes must be called by the contract owner")
     sub.add_argument("--validators-file", required=True, help="a JSON file describing the Nodes")
     sub.add_argument("--delegation-contract", required=True, help="address of the delegation contract")
+    sub.add_argument("--using-delegation-manager", action="store_true", required=False, help="whether delegation contract was created using the Delegation Manager")
     _add_common_arguments(sub)
     sub.set_defaults(func=add_new_nodes)
 
@@ -105,10 +104,20 @@ def setup_parser(subparsers: Any) -> Any:
                      help="set automatic activation True")
     sub.add_argument("--unset", action="store_true", required=not (utils.is_arg_present("--set", sys.argv)),
                      help="set automatic activation False")
-
     sub.add_argument("--delegation-contract", required=True, help="address of the delegation contract")
     _add_common_arguments(sub)
     sub.set_defaults(func=automatic_activation)
+
+    # set metadata
+    sub = cli_shared.add_command_subparser(subparsers, "staking-provider", "set-metadata",
+                                           "Set metadata must be called by the contract owner")
+
+    sub.add_argument("--name", required=True, help="name field in staking provider metadata")
+    sub.add_argument("--website", required=True, help="website field in staking provider metadata")
+    sub.add_argument("--identifier", required=True, help="identifier field in staking provider metadata")
+    sub.add_argument("--delegation-contract", required=True, help="address of the delegation contract")
+    _add_common_arguments(sub)
+    sub.set_defaults(func=set_metadata)
 
 
 def _add_common_arguments(sub: Any):
@@ -250,6 +259,18 @@ def automatic_activation(args: Any):
         tx.dump_to(args.outfile)
 
 
+def set_metadata(args: Any):
+    cli_shared.check_broadcast_args(args)
+    cli_shared.prepare_nonce_in_args(args)
+    staking_provider.prepare_args_set_metadata(args)
+    tx = do_prepare_transaction(args)
+
+    try:
+        cli_shared.send_or_simulate(tx, args)
+    finally:
+        tx.dump_to(args.outfile)
+
+
 def _get_sc_address_from_tx(data: Any):
     if not isinstance(data, dict):
         raise errors.ProgrammingError("error")
@@ -271,6 +292,6 @@ def _get_sc_address_from_tx(data: Any):
         sc_address = binascii.unhexlify(data_field_split[2])
         address = Address(sc_address)
         print("Contract address: ", address)
-    except:
+    except Exception:
         raise errors.ProgrammingError(
             "cannot get the smart contract address from transaction results, please try again")

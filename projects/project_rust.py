@@ -46,7 +46,8 @@ class ProjectRust(Project):
         ]
         self._decorate_cargo_args(args)
 
-        env["RUSTFLAGS"] = "-C link-arg=-s"
+        if not self.options.get("wasm_symbols"):
+            env["RUSTFLAGS"] = "-C link-arg=-s"
 
         cwd = path.join(self.directory, "wasm")
         return_code = myprocess.run_process_async(args, env=env, cwd=cwd)
@@ -87,14 +88,18 @@ class ProjectRust(Project):
         return Path(self.directory, "abi")
 
     def _do_after_build(self):
-        name = self.cargo_file.package_name.replace("-", "_")
-        wasm_file = Path(self._get_output_folder(), f"{name}_wasm.wasm").resolve()
-        wasm_file_renamed = Path(self._get_output_folder(), f"{name}.wasm")
-        shutil.move(wasm_file, wasm_file_renamed)
+        original_name = self.cargo_file.package_name
+        wasm_base_name = self.cargo_file.package_name.replace("-", "_")
+        wasm_file = Path(self._get_output_folder(), f"{wasm_base_name}_wasm.wasm").resolve()
+        wasm_file_renamed = self.options.get("wasm_name")
+        if not wasm_file_renamed:
+            wasm_file_renamed = f"{original_name}.wasm"
+        wasm_file_renamed_path = Path(self._get_output_folder(), wasm_file_renamed)
+        shutil.move(wasm_file, wasm_file_renamed_path)
 
         if self._has_abi():
             abi_file = self._get_abi_filepath()
-            abi_file_renamed = Path(self._get_output_folder(), f"{name}.abi.json")
+            abi_file_renamed = Path(self._get_output_folder(), f"{original_name}.abi.json")
             shutil.move(abi_file, abi_file_renamed)
 
     def get_dependencies(self):
@@ -148,6 +153,14 @@ class CargoFile:
     @edition.setter
     def edition(self, value):
         self._get_package().update({"edition": value})
+
+    @property
+    def publish(self):
+        return self._get_package().get("publish")
+
+    @publish.setter
+    def publish(self, value):
+        self._get_package().update({"publish": value})
 
     def save(self):
         utils.write_toml_file(self.path, self.data)

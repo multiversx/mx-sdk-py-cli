@@ -1,9 +1,10 @@
 from typing import Any, List
+
 from Cryptodome.Hash import keccak
 
 from erdpy import cli_shared, utils
-from erdpy.contracts import SmartContract
 from erdpy.accounts import Account, Address
+from erdpy.contracts import SmartContract
 from erdpy.proxy.core import ElrondProxy
 from erdpy.transactions import do_prepare_transaction
 
@@ -20,6 +21,13 @@ def resolve(name: str, proxy: ElrondProxy) -> Address:
     if len(result) == 0:
         return Address.zero()
     return Address(result[0].hex)
+
+
+def validate_name(name: str, shard_id: int, proxy: ElrondProxy):
+    name_arg = "0x{}".format(str.encode(name).hex())
+    dns_address = compute_dns_address_for_shard_id(shard_id)
+    contract = SmartContract(dns_address)
+    contract.query(proxy, "validateName", [name_arg])
 
 
 def register(args: Any):
@@ -65,6 +73,13 @@ def registration_cost(shard_id: int, proxy: ElrondProxy) -> int:
         return 0
     else:
         return int("0x{}".format(result[0]))
+
+
+def version(shard_id: int, proxy: ElrondProxy) -> str:
+    dns_address = compute_dns_address_for_shard_id(shard_id)
+    contract = SmartContract(dns_address)
+    result = contract.query(proxy, "version", [])
+    return bytearray.fromhex(result[0].hex).decode()
 
 
 def dns_address_for_name(name: str) -> Address:
