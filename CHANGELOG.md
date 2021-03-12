@@ -4,6 +4,13 @@ All notable changes will be documented in this file.
 
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
+## [1.0.11] - 12.03.2021
+ - Update commands for testnet in order to work with the development and master elrond-go branch
+ - Update the proxy config for testnet in order to have all the api routes active
+ - Added new commands for validator
+ - Fix bug with the command add-nodes for staking-provider
+ - Add --wait-result flag for erdpy tx new cli command.
+
 ## [1.0.10] - 25.02.2021
  - [Fixed a bug in the testnet setup process when creting the config for the proxy app #213](https://github.com/ElrondNetwork/elrond-sdk/pull/213) 
 
