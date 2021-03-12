@@ -51,9 +51,10 @@ def setup_parser(subparsers: Any) -> Any:
     _add_nodes_arg(sub)
     sub.set_defaults(func=do_unstake_nodes)
 
-    sub = cli_shared.add_command_subparser(subparsers, "validator", "unstake-tokens", "It will unStake tokens, if "
-                                                                                      "provided value is bigger that "
-                                                                                      "topUp value will unStake nodes")
+    sub = cli_shared.add_command_subparser(subparsers, "validator", "unstake-tokens", "UnStakeToken will unStakes the "
+                                                                                      "given amount (if value is "
+                                                                                      "greater than the topUp value, "
+                                                                                      "it will unStake a node)")
     _add_common_arguments(sub)
     sub.add_argument("--unstake-value", default=0, help="the unstake value")
     sub.set_defaults(func=do_unstake_tokens)
