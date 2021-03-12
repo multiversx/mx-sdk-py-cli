@@ -61,7 +61,7 @@ def create_transaction(args: Any):
         return
 
     send_wait_result = args.wait_result and args.send and not args.simulate
-    send_only = args.send and not args.wait_result and not args.simulate
+    send_only = args.send and not (args.wait_result or args.simulate)
     simulate = args.simulate and not (send_only or send_wait_result)
 
     try:
