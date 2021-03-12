@@ -120,3 +120,5 @@ class ElrondProxy:
         response = do_get(url)
         response = response.get("hyperblock", {})
         return response
+
+
