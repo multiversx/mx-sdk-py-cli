@@ -1,9 +1,14 @@
 from typing import Any
 
 from erdpy.testnet.config import TestnetConfiguration
+from erdpy.testnet.nodes_setup_json import CHAIN_ID
 
 
 def patch(data: Any, testnet_config: TestnetConfiguration):
+    # Set chain ID and transaction version
+    data['GeneralSettings']['ChainID'] = CHAIN_ID
+    data['GeneralSettings']['MinTransactionVersion'] = 1
+
     data['DbLookupExtensions']['Enabled'] = True
     data['GeneralSettings']['SCDeployEnableEpoch'] = 0
     data['GeneralSettings']['BuiltInFunctionsEnableEpoch'] = 0

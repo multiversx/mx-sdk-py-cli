@@ -11,12 +11,34 @@ testAll() {
     echo "Stake with provided nonce"
     ${ERDPY} --verbose validator stake --pem="${USERS}/alice.pem" --value="2500${DENOMINATION}" --validators-file=./testdata/validators.json --reward-address=${REWARD_ADDRESS} --chain=${CHAIN_ID} --proxy=${PROXY} --estimate-gas --nonce=42 --send
 
+
+    echo "Stake with topUP"
+    ${ERDPY} --verbose validator stake --top-up --pem="${USERS}/alice.pem" --value="2711${DENOMINATION}" --chain=${CHAIN_ID} --proxy=${PROXY} --estimate-gas --recall-nonce --send
+
     echo "Unstake"
-    ${ERDPY} --verbose validator unstake --pem="${USERS}/alice.pem" --nodes-public-keys=${BLS_KEY} --chain=${CHAIN_ID} --proxy=${PROXY} --estimate-gas --recall-nonce --send
+    ${ERDPY} --verbose validator unstake --pem="${USERS}/alice.pem" --nodes-public-keys="${BLS_KEY}" --chain=${CHAIN_ID} --proxy=${PROXY} --estimate-gas --recall-nonce --send
     echo "Unbond"
     ${ERDPY} --verbose validator unbond --pem="${USERS}/alice.pem" --nodes-public-keys=${BLS_KEY} --chain=${CHAIN_ID} --proxy=${PROXY} --estimate-gas --recall-nonce --send
     echo "Unjail"
     ${ERDPY} --verbose validator unjail --pem="${USERS}/alice.pem" --value="2500${DENOMINATION}" --nodes-public-keys=${BLS_KEY} --chain=${CHAIN_ID} --proxy=${PROXY} --estimate-gas --recall-nonce --send
     echo "Change reward address"
     ${ERDPY} --verbose validator change-reward-address --pem="${USERS}/alice.pem" --reward-address=${REWARD_ADDRESS} --chain=${CHAIN_ID} --proxy=${PROXY} --estimate-gas --recall-nonce --send
+
+    echo "UnstakeNodes"
+    ${ERDPY} --verbose validator unstake-nodes --pem="${USERS}/alice.pem" --nodes-public-keys=${BLS_KEY} --chain=${CHAIN_ID} --proxy=${PROXY} --estimate-gas --recall-nonce --send
+
+    echo "UnstakeTokens"
+    ${ERDPY} --verbose validator unstake-tokens --pem="${USERS}/alice.pem" --unstake-value="11${DENOMINATION}" --chain=${CHAIN_ID} --proxy=${PROXY} --estimate-gas --recall-nonce --send
+
+    echo "UnbondNodes"
+    ${ERDPY} --verbose validator unbond-nodes --pem="${USERS}/alice.pem" --nodes-public-keys=${BLS_KEY} --chain=${CHAIN_ID} --proxy=${PROXY} --estimate-gas --recall-nonce --send
+
+    echo "UnbondTokens"
+    ${ERDPY} --verbose validator unbond-tokens --pem="${USERS}/alice.pem" --unbond-value="20${DENOMINATION}" --chain=${CHAIN_ID} --proxy=${PROXY} --estimate-gas --recall-nonce --send
+
+    echo "CleanRegistrationData"
+    ${ERDPY} --verbose validator clean-registered-data --pem="${USERS}/alice.pem" --chain=${CHAIN_ID} --proxy=${PROXY} --estimate-gas --recall-nonce --send
+
+    echo "ReStakeUnstakedNodes"
+    ${ERDPY} --verbose validator restake-unstaked-nodes --pem="${USERS}/alice.pem" --nodes-public-keys=${BLS_KEY} --chain=${CHAIN_ID} --proxy=${PROXY} --estimate-gas --recall-nonce --send
 }
