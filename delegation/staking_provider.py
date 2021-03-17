@@ -122,10 +122,10 @@ def prepare_args_modify_delegation_cap(args: Any):
 def prepare_args_automatic_activation(args: Any):
     data = 'setAutomaticActivation'
     if args.set:
-        data += '@' + binascii.hexlify(str.encode('yes')).decode()
+        data += '@' + binascii.hexlify(str.encode('true')).decode()
 
     if args.unset:
-        data += '@' + binascii.hexlify(str.encode('no')).decode()
+        data += '@' + binascii.hexlify(str.encode('false')).decode()
 
     args.data = data
     args.receiver = args.delegation_contract
