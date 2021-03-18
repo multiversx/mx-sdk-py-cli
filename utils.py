@@ -190,7 +190,6 @@ def is_arg_present(key: str, args: List[str]) -> bool:
 
 
 # https://code.visualstudio.com/docs/python/debugging
-# https://code.visualstudio.com/docs/python/debugging
 def breakpoint():
     import debugpy
     debugpy.listen(5678)

@@ -155,9 +155,15 @@ class ArwenToolsModule(StandaloneModule):
 
     def make_binary_symlink_in_parent_folder(self, tag, binary_name, symlink_name):
         source_folder = self.binary_source_folder(tag, binary_name)
-        parent = Path(self.get_parent_directory())
-        (parent / symlink_name).symlink_to(source_folder / binary_name)
+        binary = source_folder / binary_name
 
+        parent = Path(self.get_parent_directory())
+        symlink = parent / symlink_name
+
+        if symlink.exists():
+            symlink.unlink()
+
+        symlink.symlink_to(binary)
 
     def get_env(self):
         return {

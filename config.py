@@ -86,11 +86,12 @@ def create_new_config(name: str, template: str):
     data = read_file()
     _guard_config_unique(data, name)
     new_config = {}
-    if len(template):
+    if template is not None and template != "":
         _guard_valid_config_name(data, template)
         new_config = data["configurations"][template]
 
     data["active"] = name
+    data.setdefault('configurations', {})
     data["configurations"][name] = new_config
     write_file(data)
 
@@ -110,12 +111,14 @@ def _guard_valid_name(name: str):
 
 
 def _guard_valid_config_name(config: Any, name: str):
-    if name not in config["configurations"]:
+    configurations = config.get('configurations', {})
+    if name not in configurations:
         raise errors.UnknownConfigurationError(name)
 
 
 def _guard_config_unique(config: Any, name: str):
-    if name in config["configurations"]:
+    configurations = config.get('configurations', {})
+    if name in configurations:
         raise errors.ConfigurationShouldBeUniqueError(name)
 
 
