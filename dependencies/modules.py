@@ -137,6 +137,8 @@ class ArwenToolsModule(StandaloneModule):
         self.repo_name = 'arwen-wasm-vm'
 
     def _post_install(self, tag: str):
+        dependencies.install_module('golang')
+
         self.build_binary(tag, 'arwendebug')
         self.build_binary(tag, 'test')
 
