@@ -28,7 +28,7 @@ testBuildContracts() {
 
     ${ERDPY} contract build ${SANDBOX}/myerc20-c || return 1
     assertFileExists ${SANDBOX}/myerc20-c/output/erc20.wasm || return 1
-        
+
     # Improve compilation time by reusing build artifacts for Rust projects
     export TARGET_DIR=$(pwd)/${SANDBOX}/TARGET
     mkdir -p ${TARGET_DIR}
@@ -44,7 +44,7 @@ testBuildContracts() {
     ${ERDPY} contract build ${SANDBOX}/myerc20-rs --cargo-target-dir=${TARGET_DIR} || return 1
     assertFileExists ${SANDBOX}/myerc20-rs/output/myerc20-rs.wasm || return 1
     assertFileExists ${SANDBOX}/myerc20-rs/output/myerc20-rs.abi.json || return 1
-    
+
     ${ERDPY} contract build ${SANDBOX}/mybubbles-rs --cargo-target-dir=${TARGET_DIR} || return 1
     assertFileExists ${SANDBOX}/mybubbles-rs/output/mybubbles-rs.wasm || return 1
     assertFileExists ${SANDBOX}/mybubbles-rs/output/mybubbles-rs.abi.json || return 1
@@ -60,7 +60,6 @@ testBuildContracts() {
 
 testRunMandos() {
     ${ERDPY} --verbose contract test --directory="mandos" ${SANDBOX}/myadder-rs || return 1
-    ${ERDPY} --verbose contract test --directory="mandos" ${SANDBOX}/myfactorial-rs || return 1
     ${ERDPY} --verbose contract test --directory="mandos" ${SANDBOX}/myerc20-rs || return 1
     ${ERDPY} --verbose contract test --directory="mandos" ${SANDBOX}/mybubbles-rs || return 1
     ${ERDPY} --verbose contract test --directory="mandos" ${SANDBOX}/mylottery-rs || return 1
