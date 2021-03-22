@@ -4,6 +4,10 @@ All notable changes will be documented in this file.
 
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
+## [1.0.12] - 22.03.2021
+ - Minor fixes to the configuration profiles support
+ - Dependency `arwentools` is now built locally, instead of fetching precompiled binaries
+
 ## [1.0.11] - 12.03.2021
  - Update commands for testnet in order to work with the development and master elrond-go branch
  - Update the proxy config for testnet in order to have all the api routes active
