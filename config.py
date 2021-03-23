@@ -86,11 +86,12 @@ def create_new_config(name: str, template: str):
     data = read_file()
     _guard_config_unique(data, name)
     new_config = {}
-    if len(template):
+    if template is not None and template != "":
         _guard_valid_config_name(data, template)
         new_config = data["configurations"][template]
 
     data["active"] = name
+    data.setdefault('configurations', {})
     data["configurations"][name] = new_config
     write_file(data)
 
@@ -110,12 +111,14 @@ def _guard_valid_name(name: str):
 
 
 def _guard_valid_config_name(config: Any, name: str):
-    if name not in config["configurations"]:
+    configurations = config.get('configurations', {})
+    if name not in configurations:
         raise errors.UnknownConfigurationError(name)
 
 
 def _guard_config_unique(config: Any, name: str):
-    if name in config["configurations"]:
+    configurations = config.get('configurations', {})
+    if name in configurations:
         raise errors.ConfigurationShouldBeUniqueError(name)
 
 
@@ -129,9 +132,9 @@ def get_defaults() -> Dict[str, Any]:
         "proxy": "https://testnet-gateway.elrond.com",
         "chainID": "T",
         "txVersion": "1",
-        "dependencies.arwentools.tag": "v1.1.0-6-g2f3d258",
-        "dependencies.arwentools.urlTemplate.linux": "https://ide.elrond.com/travis-builds/ARWEN_{TAG}_linux_amd64.tar.gz",
-        "dependencies.arwentools.urlTemplate.osx": "https://ide.elrond.com/travis-builds/ARWEN_{TAG}_darwin_amd64.tar.gz",
+        "dependencies.arwentools.tag": "v1.1.2",
+        "dependencies.arwentools.urlTemplate.linux": "https://github.com/ElrondNetwork/arwen-wasm-vm/archive/{TAG}.tar.gz",
+        "dependencies.arwentools.urlTemplate.osx": "https://github.com/ElrondNetwork/arwen-wasm-vm/archive/{TAG}.tar.gz",
         "dependencies.llvm.tag": "v9-19feb",
         "dependencies.llvm.urlTemplate.linux": "https://ide.elrond.com/vendor-llvm/{TAG}/linux-amd64.tar.gz?t=19feb",
         "dependencies.llvm.urlTemplate.osx": "https://ide.elrond.com/vendor-llvm/{TAG}/darwin-amd64.tar.gz?t=19feb",

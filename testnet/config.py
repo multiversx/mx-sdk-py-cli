@@ -52,7 +52,7 @@ class TestnetConfiguration:
             # If the user has not specified a custom source repository, the
             # ones provided by the SDK will be used, which are downloaded as
             # tar.gz files from GitHub. Due to how the name of the archive is
-            # built by GitHub, the folder will contain the tag in two variants:
+            # built by GitHub, the path will contain the tag in two variants:
             # with the 'v' prefix (e.g. "v1.1.0"), but also without (e.g.
             # "1.1.0"), hence the need for {NOvTAG}.
             if default_tag.startswith("v"):
