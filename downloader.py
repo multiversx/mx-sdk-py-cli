@@ -9,6 +9,7 @@ from erdpy import errors
 logger = logging.getLogger("downloader")
 
 CHUNK_SIZE = 1024 * 16
+LINECLEAR = '\r' + ' ' * 20 + '\r'
 
 
 def download(url: str, filename: str) -> None:
@@ -29,8 +30,9 @@ def download(url: str, filename: str) -> None:
                 file.write(chunk)
                 progress = _report_download_progress(progress, chunk_number, total_size)
                 chunk_number += 1
-            print("100 %", end="\r", file=sys.stderr)
-            print()
+            print(LINECLEAR, end='\r', file=sys.stderr)
+            print(f'100 %', file=sys.stderr)
+            sys.stderr.flush()
     except requests.HTTPError as err:
         raise errors.DownloadError(
             f"Could not download [{url}] to [{filename}]") from err
@@ -40,7 +42,9 @@ def download(url: str, filename: str) -> None:
 
 def _report_download_progress(progress, chunk_number, total_size):
     num_chunks = total_size / CHUNK_SIZE + 1
-    new_progress = int(chunk_number / num_chunks * 100)
+    new_progress = int((chunk_number / num_chunks) * 100)
     if new_progress % 10 == 0:
-        print(f"{progress} %", end="\r", file=sys.stderr)
+        print(LINECLEAR, end='\r', file=sys.stderr)
+        print(f'{progress} %', end='\r', file=sys.stderr)
+        sys.stderr.flush()
     return new_progress

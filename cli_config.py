@@ -70,10 +70,8 @@ def switch_config(args: Any):
 
 def list_configs(args: Any):
     data = config.read_file()
-    item_str = ""
-    for cfg, _ in data["configurations"].items():
-        item_str += cfg
-        if cfg == data["active"]:
-            item_str += "*"
-        item_str += "\n"
-    print(item_str)
+    configurations = data.get('configurations', {})
+    for config_name in configurations.keys():
+        if config_name == data.get("active", "default"):
+            config_name += "*"
+        print(config_name)
