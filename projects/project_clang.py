@@ -153,7 +153,6 @@ class ProjectClang(Project):
 
 
     def default_config(self):
-        default_main_source = self.path.name + '.c'
         config = super().default_config()
         config['language'] = 'clang'
         config['source_files'] = self.get_source_files_from_folder()
