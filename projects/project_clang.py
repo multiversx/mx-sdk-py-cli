@@ -119,8 +119,12 @@ class ProjectClang(Project):
 
 
     def get_source_files(self):
-        for filename in self.config['source_files']:
-            yield Path(filename).expanduser().resolve()
+        try:
+            source_files = self.config['source_files']
+            for filename in source_files:
+                yield Path(filename).expanduser().resolve()
+        except KeyError:
+            return self.path.rglob('*.c')
 
 
     def get_ll_files(self):
@@ -129,7 +133,8 @@ class ProjectClang(Project):
 
 
     def get_unit_file(self):
-        return next(self.get_source_files())
+        first_file = next(self.get_source_files())
+        return first_file
 
 
     def get_exported_functions(self):
