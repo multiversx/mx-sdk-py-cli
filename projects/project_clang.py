@@ -19,6 +19,8 @@ class ProjectClang(Project):
 
     def perform_build(self):
         self.config = self.load_config()
+        self.ensure_source_files()
+
         self.unit = self.get_unit_file()
         self.file_ll = self.unit.with_suffix('.ll')
         self.file_o = self.unit.with_suffix('.o')
@@ -119,13 +121,8 @@ class ProjectClang(Project):
 
 
     def get_source_files(self):
-        try:
-            source_files = self.config['source_files']
-            for filename in source_files:
-                yield Path(filename).expanduser().resolve()
-        except KeyError:
-            for filename in self.path.rglob('*.c'):
-                yield filename
+        for filename in self.config['source_files']:
+            yield (self.path / filename).expanduser().resolve()
 
 
     def get_ll_files(self):
@@ -138,6 +135,17 @@ class ProjectClang(Project):
         return first_file
 
 
+    def ensure_source_files(self):
+        try:
+            source_files = self.config['source_files']
+            if len(source_files) == 0:
+                source_files = self.get_source_files_from_folder()
+        except KeyError:
+            source_files = self.get_source_files_from_folder()
+
+        self.config['source_files'] = source_files
+
+
     def get_exported_functions(self):
         file_export = self.find_file_globally('*.export')
         lines = utils.read_lines(file_export)
@@ -148,8 +156,12 @@ class ProjectClang(Project):
         default_main_source = self.path.name + '.c'
         config = super().default_config()
         config['language'] = 'clang'
-        config['source_files'] = [default_main_source]
+        config['source_files'] = self.get_source_files_from_folder()
         return config
+
+
+    def get_source_files_from_folder(self):
+        return list(map(str, self.path.rglob('*.c')))
 
 
     def get_dependencies(self):
