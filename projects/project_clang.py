@@ -124,7 +124,8 @@ class ProjectClang(Project):
             for filename in source_files:
                 yield Path(filename).expanduser().resolve()
         except KeyError:
-            return self.path.rglob('*.c')
+            for filename in self.path.rglob('*.c'):
+                yield filename
 
 
     def get_ll_files(self):
