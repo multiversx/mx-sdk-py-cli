@@ -16,7 +16,6 @@ class ProjectClang(Project):
         super().__init__(directory)
         self.ensure_config_file()
 
-
     def perform_build(self):
         self.config = self.load_config()
         self.ensure_source_files()
@@ -34,7 +33,6 @@ class ProjectClang(Project):
             self.do_wasm()
         except subprocess.CalledProcessError as err:
             raise errors.BuildError(err.output)
-
 
     def do_clang(self):
         logger.info('do_clang')
@@ -54,7 +52,6 @@ class ProjectClang(Project):
         args.extend(map(str, self.get_source_files()))
         myprocess.run_process(args)
 
-
     def do_llvm_link(self):
         logger.info('do_llvm_link')
         tool = path.join(self._get_llvm_path(), 'llvm-link')
@@ -62,7 +59,6 @@ class ProjectClang(Project):
         args.extend(['-o', str(self.file_ll)])
         args.extend(map(str, self.get_ll_files()))
         myprocess.run_process(args)
-
 
     def do_llc(self):
         logger.info('do_llc')
@@ -79,7 +75,6 @@ class ProjectClang(Project):
 
         args.extend(['-o', str(self.file_o)])
         myprocess.run_process(args)
-
 
     def do_wasm(self):
         logger.info('do_wasm')
@@ -103,7 +98,6 @@ class ProjectClang(Project):
 
         myprocess.run_process(args)
 
-
     def _do_after_build(self):
         self._copy_to_output(self.file_output)
         self.file_output.unlink()
@@ -115,25 +109,20 @@ class ProjectClang(Project):
             except FileNotFoundError:
                 pass
 
-
     def _get_llvm_path(self):
         return dependencies.get_module_directory('llvm')
-
 
     def get_source_files(self):
         for filename in self.config['source_files']:
             yield (self.path / filename).expanduser().resolve()
 
-
     def get_ll_files(self):
         for source_file in self.get_source_files():
             yield source_file.with_suffix('.ll')
 
-
     def get_unit_file(self):
         first_file = next(self.get_source_files())
         return first_file
-
 
     def ensure_source_files(self):
         try:
@@ -145,12 +134,10 @@ class ProjectClang(Project):
 
         self.config['source_files'] = source_files
 
-
     def get_exported_functions(self):
         file_export = self.find_file_globally('*.export')
         lines = utils.read_lines(file_export)
         return lines
-
 
     def default_config(self):
         config = super().default_config()
@@ -158,10 +145,8 @@ class ProjectClang(Project):
         config['source_files'] = self.get_source_files_from_folder()
         return config
 
-
     def get_source_files_from_folder(self):
         return list(map(str, self.path.rglob('*.c')))
-
 
     def get_dependencies(self):
         return ['llvm']
