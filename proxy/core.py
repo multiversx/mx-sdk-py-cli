@@ -42,9 +42,18 @@ class ElrondProxy:
         transactions = response.get("transactions", [])
         for transaction in transactions:
             data = transaction.get("data", "")
-            data = (data[:TRUNCATE_DATA_THRESHOLD] + ' ... truncated ...') if len(data) > TRUNCATE_DATA_THRESHOLD else data
+            data = (data[:TRUNCATE_DATA_THRESHOLD] + ' ... truncated ...') if len(
+                data) > TRUNCATE_DATA_THRESHOLD else data
             transaction["data"] = data
         return transactions
+
+    def get_esdt_tokens(self, address: str) -> List:
+        response = do_get(f"{self.url}/address/{address}/esdt")
+        return response.get("tokens")
+
+    def get_esdt_balance(self, address: str, ticker: str) -> dict:
+        response = do_get(f"{self.url}/address/{address}/esdt/{ticker}")
+        return response.get("tokenData")
 
     def get_num_shards(self):
         network_config = self.get_network_config()
