@@ -88,7 +88,7 @@ class ProjectSol(Project):
 
         tool = path.join(self._get_llvm_path(), "wasm-ld")
         args = [
-            tool, 
+            tool,
             "--entry",
             "main",
             "--demangle",

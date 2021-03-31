@@ -11,9 +11,12 @@ from erdpy.dependencies.modules import StandaloneModule
 logger = logging.getLogger("Project")
 
 
+# TODO use pathlib.Path everywhere
 class Project:
+
     def __init__(self, directory):
-        self.directory = str(Path(directory).resolve())
+        self.path = Path(directory).expanduser().resolve()
+        self.directory = str(self.path)
 
     def build(self, options=None):
         self.options = options or dict()
@@ -53,7 +56,7 @@ class Project:
         if len(files) == 0:
             raise errors.KnownError(f"No file matches pattern [{pattern}].")
         if len(files) > 1:
-            logging.warning(f"More files match pattern [{pattern}]. Will pick first:\n{files}")
+            logger.warning(f"More files match pattern [{pattern}]. Will pick first:\n{files}")
 
         file = path.join(folder, files[0])
         return Path(file).resolve()
@@ -74,6 +77,23 @@ class Project:
         bytecode = utils.read_file(self.get_file_wasm(), binary=True)
         bytecode_hex = bytecode.hex()
         return bytecode_hex
+
+    def load_config(self):
+        config_file = self.get_config_file()
+        config = utils.read_json_file(str(config_file))
+        return config
+
+    def get_config_file(self):
+        return self.path / 'elrond.json'
+
+    def ensure_config_file(self):
+        config_file = self.get_config_file()
+        if not config_file.exists():
+            utils.write_json_file(str(config_file), self.default_config())
+            logger.info("created default configuration in elrond.json")
+
+    def default_config(self):
+        return dict()
 
     def run_tests(self, tests_directory: str, wildcard: str = ""):
         arwentools = cast(StandaloneModule, dependencies.get_module_by_key("arwentools"))
