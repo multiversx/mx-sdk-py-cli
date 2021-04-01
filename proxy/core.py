@@ -111,6 +111,7 @@ class ElrondProxy:
 
         response = do_get(url)
         transaction = response.get("transaction", dict())
+        transaction['hash'] = tx_hash
         return transaction
 
     def get_hyperblock(self, key) -> Any:
@@ -129,9 +130,7 @@ class ElrondProxy:
 
         for _ in range(0, num_seconds_timeout):
             if self.is_transaction_finalized(tx_hash):
-                tx = self.get_transaction(tx_hash=tx_hash, with_results=True)
-                tx['hash'] = tx_hash
-                return tx
+                return self.get_transaction(tx_hash=tx_hash, with_results=True)
             time.sleep(1)
         return ""
 
