@@ -303,7 +303,6 @@ def _send_or_simulate(tx: Transaction, args: Any):
     if send_wait_result:
         proxy = ElrondProxy(args.proxy)
         response = tx.send_wait_result(proxy, args.timeout)
-        utils.dump_out_json(response)
         return None
     elif send_only:
         tx.send(ElrondProxy(args.proxy))
