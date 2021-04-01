@@ -231,8 +231,12 @@ class Rust(DependencyModule):
         rustup_path = self._get_rustup_path()
         downloader.download("https://sh.rustup.rs", rustup_path)
         utils.mark_executable(rustup_path)
+        if tag:
+            toolchain = tag
+        else:
+            toolchain = "nightly"
 
-        args = [rustup_path, "--verbose", "--default-toolchain", "nightly", "--profile",
+        args = [rustup_path, "--verbose", "--default-toolchain", toolchain, "--profile",
                 "minimal", "--target", "wasm32-unknown-unknown", "--no-modify-path", "-y"]
         myprocess.run_process_async(args, env=self.get_env())
 
