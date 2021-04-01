@@ -129,7 +129,9 @@ class ElrondProxy:
 
         for _ in range(0, num_seconds_timeout):
             if self.is_transaction_finalized(tx_hash):
-                return self.get_transaction(tx_hash=tx_hash, with_results=True)
+                tx = self.get_transaction(tx_hash=tx_hash, with_results=True)
+                tx['hash'] = tx_hash
+                return tx
             time.sleep(1)
         return ""
 
