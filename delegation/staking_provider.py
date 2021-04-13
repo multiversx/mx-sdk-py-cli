@@ -133,6 +133,20 @@ def prepare_args_automatic_activation(args: Any):
         args.gas_limit = estimate_system_sc_call(args, MetaChainSystemSCsCost.DELEGATION_OPS, 1)
 
 
+def prepare_args_redelegate_cap(args: Any):
+    data = 'setCheckCapOnReDelegateRewards'
+    if args.set:
+        data += '@' + binascii.hexlify(str.encode('true')).decode()
+
+    if args.unset:
+        data += '@' + binascii.hexlify(str.encode('false')).decode()
+
+    args.data = data
+    args.receiver = args.delegation_contract
+    if args.estimate_gas:
+        args.gas_limit = estimate_system_sc_call(args, MetaChainSystemSCsCost.DELEGATION_OPS, 1)
+
+
 def prepare_args_set_metadata(args: Any):
     data = 'setMetaData'
     data += '@' + binascii.hexlify(str.encode(args.name)).decode()

@@ -108,6 +108,18 @@ def setup_parser(subparsers: Any) -> Any:
     _add_common_arguments(sub)
     sub.set_defaults(func=automatic_activation)
 
+    # set redelegate cap
+    sub = cli_shared.add_command_subparser(subparsers, "staking-provider", "redelegate-cap",
+                                           "Redelegate cap must be called by the contract owner")
+
+    sub.add_argument("--set", action="store_true", required=not (utils.is_arg_present("--unset", sys.argv)),
+                     help="set redelegate cap True")
+    sub.add_argument("--unset", action="store_true", required=not (utils.is_arg_present("--set", sys.argv)),
+                     help="set redelegate cap False")
+    sub.add_argument("--delegation-contract", required=True, help="address of the delegation contract")
+    _add_common_arguments(sub)
+    sub.set_defaults(func=automatic_activation)
+
     # set metadata
     sub = cli_shared.add_command_subparser(subparsers, "staking-provider", "set-metadata",
                                            "Set metadata must be called by the contract owner")
@@ -251,6 +263,18 @@ def automatic_activation(args: Any):
     cli_shared.check_broadcast_args(args)
     cli_shared.prepare_nonce_in_args(args)
     staking_provider.prepare_args_automatic_activation(args)
+    tx = do_prepare_transaction(args)
+
+    try:
+        cli_shared.send_or_simulate(tx, args)
+    finally:
+        tx.dump_to(args.outfile)
+
+
+def redelegate_cap(args: Any):
+    cli_shared.check_broadcast_args(args)
+    cli_shared.prepare_nonce_in_args(args)
+    staking_provider.prepare_args_redelegate_cap(args)
     tx = do_prepare_transaction(args)
 
     try:
