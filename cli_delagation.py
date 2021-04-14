@@ -118,7 +118,7 @@ def setup_parser(subparsers: Any) -> Any:
                      help="set redelegate cap False")
     sub.add_argument("--delegation-contract", required=True, help="address of the delegation contract")
     _add_common_arguments(sub)
-    sub.set_defaults(func=automatic_activation)
+    sub.set_defaults(func=redelegate_cap)
 
     # set metadata
     sub = cli_shared.add_command_subparser(subparsers, "staking-provider", "set-metadata",
