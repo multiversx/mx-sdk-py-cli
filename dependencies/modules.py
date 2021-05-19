@@ -1,11 +1,11 @@
-
 import logging
 import os
 import shutil
 from os import path
 from typing import Dict, List
+from pathlib import Path
 
-from erdpy import config, downloader, errors, myprocess, utils, workstation
+from erdpy import config, dependencies, downloader, errors, myprocess, utils, workstation
 
 logger = logging.getLogger("modules")
 
@@ -58,12 +58,13 @@ class DependencyModule:
 
 class StandaloneModule(DependencyModule):
 
-    def __init__(self, key: str, aliases: List[str] = None):
+    def __init__(self, key: str, aliases: List[str] = None, repo_name = None):
         if aliases is None:
             aliases = list()
 
         super().__init__(key, aliases)
         self.archive_type = "tar.gz"
+        self.repo_name = repo_name
 
     def _do_install(self, tag: str):
         self._download(tag)
@@ -96,6 +97,18 @@ class StandaloneModule(DependencyModule):
         folder = path.join(self.get_parent_directory(), tag)
         return folder
 
+    def get_source_directory(self, tag: str):
+        folder = Path(self.get_directory(tag))
+
+        # Due to how the GitHub creates archives for repository releases, the
+        # path will contain the tag in two variants: with the 'v' prefix (e.g.
+        # "v1.1.0"), but also without (e.g. "1.1.0"), hence the need to remove
+        # the initial 'v'.
+        if tag.startswith("v"):
+            tag = tag[1:]
+        source_folder = folder / (self.repo_name + '-' + tag)
+        return source_folder
+
     def get_parent_directory(self):
         tools_folder = workstation.get_tools_folder()
         return path.join(tools_folder, self.key)
@@ -121,16 +134,38 @@ class ArwenToolsModule(StandaloneModule):
             aliases = list()
 
         super().__init__(key, aliases)
+        self.repo_name = 'arwen-wasm-vm'
 
     def _post_install(self, tag: str):
-        directory = self.get_directory(tag)
+        dependencies.install_module('golang')
 
-        utils.mark_executable(path.join(directory, "arwen"))
-        utils.mark_executable(path.join(directory, "arwendebug"))
-        utils.mark_executable(path.join(directory, "test"))
+        self.build_binary(tag, 'arwendebug')
+        self.build_binary(tag, 'test')
 
-        utils.symlink(path.join(directory, "arwendebug"), os.path.join(self.get_parent_directory(), "arwendebug"))
-        utils.symlink(path.join(directory, "test"), os.path.join(self.get_parent_directory(), "mandos-test"))
+        self.make_binary_symlink_in_parent_folder(tag, 'arwendebug', 'arwendebug')
+        self.make_binary_symlink_in_parent_folder(tag, 'test', 'mandos-test')
+
+    def build_binary(self, tag, binary_name):
+        source_folder = self.binary_source_folder(tag, binary_name)
+        golang = dependencies.get_module_by_key("golang")
+        golang_env = golang.get_env()
+        myprocess.run_process(['go', 'build'], cwd=source_folder, env=golang_env)
+
+    def binary_source_folder(self, tag, binary_name):
+        directory = self.get_source_directory(tag)
+        return directory / 'cmd' / binary_name
+
+    def make_binary_symlink_in_parent_folder(self, tag, binary_name, symlink_name):
+        source_folder = self.binary_source_folder(tag, binary_name)
+        binary = source_folder / binary_name
+
+        parent = Path(self.get_parent_directory())
+        symlink = parent / symlink_name
+
+        if symlink.exists():
+            symlink.unlink()
+
+        symlink.symlink_to(binary)
 
     def get_env(self):
         return {
@@ -196,8 +231,12 @@ class Rust(DependencyModule):
         rustup_path = self._get_rustup_path()
         downloader.download("https://sh.rustup.rs", rustup_path)
         utils.mark_executable(rustup_path)
+        if tag:
+            toolchain = tag
+        else:
+            toolchain = "nightly"
 
-        args = [rustup_path, "--verbose", "--default-toolchain", "nightly", "--profile",
+        args = [rustup_path, "--verbose", "--default-toolchain", toolchain, "--profile",
                 "minimal", "--target", "wasm32-unknown-unknown", "--no-modify-path", "-y"]
         myprocess.run_process_async(args, env=self.get_env())
 

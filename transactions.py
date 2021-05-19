@@ -117,6 +117,7 @@ class Transaction(ITransaction):
             raise errors.TransactionIsNotSigned()
 
         response = proxy.send_transaction_and_wait_for_result(self.to_dictionary(), timeout)
+        self.hash = response['hash']
         return response
 
     def simulate(self, proxy: IElrondProxy):

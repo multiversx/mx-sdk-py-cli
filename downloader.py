@@ -9,6 +9,9 @@ from erdpy import errors
 logger = logging.getLogger("downloader")
 
 CHUNK_SIZE = 1024 * 16
+LINECLEAR = '\r' + ' ' * 20 + '\r'
+
+PROGRESS_RULER = 'Downloading...\n|_,_,_,_,_,,_,_,_,_,_|'
 
 
 def download(url: str, filename: str) -> None:
@@ -21,6 +24,9 @@ def download(url: str, filename: str) -> None:
     try:
         response = requests.get(url, stream=True)
         response.raise_for_status()
+        print(PROGRESS_RULER, file=sys.stderr)
+        print(' ', end='', file=sys.stderr)
+        sys.stderr.flush()
         total_size = int(response.headers.get("content-length", 0))
         chunk_number = 0
         progress = 0
@@ -29,8 +35,8 @@ def download(url: str, filename: str) -> None:
                 file.write(chunk)
                 progress = _report_download_progress(progress, chunk_number, total_size)
                 chunk_number += 1
-            print("100 %", end="\r", file=sys.stderr)
-            print()
+        print('', file=sys.stderr)
+        sys.stderr.flush()
     except requests.HTTPError as err:
         raise errors.DownloadError(
             f"Could not download [{url}] to [{filename}]") from err
@@ -39,8 +45,13 @@ def download(url: str, filename: str) -> None:
 
 
 def _report_download_progress(progress, chunk_number, total_size):
-    num_chunks = total_size / CHUNK_SIZE + 1
-    new_progress = int(chunk_number / num_chunks * 100)
-    if new_progress % 10 == 0:
-        print(f"{progress} %", end="\r", file=sys.stderr)
-    return new_progress
+    try:
+        num_chunks = int(total_size / CHUNK_SIZE)
+        new_progress = int((chunk_number / num_chunks) * 20)
+        if new_progress > progress:
+            progress_markers = '·' * (new_progress - progress)
+            print(progress_markers, end='', file=sys.stderr)
+        sys.stderr.flush()
+        return new_progress
+    except ZeroDivisionError:
+        return 0
