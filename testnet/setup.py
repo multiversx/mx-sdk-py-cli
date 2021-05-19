@@ -247,11 +247,14 @@ def build_binaries(testnet_config: TestnetConfiguration):
     node_folder = testnet_config.node_source() / "cmd" / "node"
     myprocess.run_process(['go', 'build'], cwd=node_folder, env=golang_env)
 
-    logger.info("Building arwen...")
-    node_folder_root = testnet_config.node_source()
-    env = dict(golang_env)
-    env["ARWEN_PATH"] = node_folder
-    myprocess.run_process(['make', 'arwen'], cwd=node_folder_root, env=env)
+    arwen_binary = testnet_config.arwen_binary()
+    logger.info("Arwen Binary: "+arwen_binary)
+    if arwen_binary:
+        logger.info("Building arwen...")
+        node_folder_root = testnet_config.node_source()
+        env = dict(golang_env)
+        env["ARWEN_PATH"] = node_folder
+        myprocess.run_process(['make', 'arwen'], cwd=node_folder_root, env=env)
 
     logger.info("Building proxy...")
     proxy_folder = testnet_config.proxy_source() / "cmd" / "proxy"
