@@ -64,6 +64,10 @@ def setup_parser(subparsers: Any) -> Any:
     cli_shared.add_tx_args(sub, with_receiver=False, with_data=False)
     _add_function_arg(sub)
     _add_arguments_arg(sub)
+    sub.add_argument("--wait-result", action="store_true", default=False,
+                     help="signal to wait for the transaction result - only valid if --send is set")
+    sub.add_argument("--timeout", default=100, help="max num of seconds to wait for result"
+                                                    " - only valid if --wait-result is set")
     cli_shared.add_broadcast_args(sub, relay=True)
 
     sub.set_defaults(func=call)
@@ -292,9 +296,17 @@ def query(args: Any):
 
 
 def _send_or_simulate(tx: Transaction, args: Any):
-    if args.send:
+    send_wait_result = args.wait_result and args.send and not args.simulate
+    send_only = args.send and not (args.wait_result or args.simulate)
+    simulate = args.simulate and not (send_only or send_wait_result)
+
+    if send_wait_result:
+        proxy = ElrondProxy(args.proxy)
+        response = tx.send_wait_result(proxy, args.timeout)
+        return None
+    elif send_only:
         tx.send(ElrondProxy(args.proxy))
         return None
-    elif args.simulate:
+    elif simulate:
         response = tx.simulate(ElrondProxy(args.proxy))
         return response

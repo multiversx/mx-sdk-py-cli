@@ -2,10 +2,6 @@
 loglevel = "*:INFO"
 proxy = true
 
-[folders]
-elrond_go = "{ELRONDSDK}/elrond_go/{TAG}/elrond-go-{NOvTAG}"
-elrond_proxy_go = "{ELRONDSDK}/elrond_proxy_go/{TAG}/elrond-proxy-go-{NOvTAG}"
-
 [metashard]
 consensus_size = 1
 metashardID = 4294967295
