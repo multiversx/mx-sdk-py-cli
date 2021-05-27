@@ -1,12 +1,12 @@
-include erdpy/projects/*.txt
-include erdpy/projects/*.json
+include projects/*.txt
+include projects/*.json
 
-include erdpy/testnet/wallets/users/*.pem
-include erdpy/testnet/wallets/users/*.json
-include erdpy/testnet/wallets/users/*.txt
-include erdpy/testnet/wallets/validators/*.pem
-include erdpy/testnet/wallets/validators/*.json
-include erdpy/testnet/wallets/validators/*.txt
-include erdpy/testnet/wallets/observers/*.pem
-include erdpy/testnet/wallets/observers/*.json
-include erdpy/testnet/wallets/observers/*.txt
+include testnet/wallets/users/*.pem
+include testnet/wallets/users/*.json
+include testnet/wallets/users/*.txt
+include testnet/wallets/validators/*.pem
+include testnet/wallets/validators/*.json
+include testnet/wallets/validators/*.txt
+include testnet/wallets/observers/*.pem
+include testnet/wallets/observers/*.json
+include testnet/wallets/observers/*.txt
