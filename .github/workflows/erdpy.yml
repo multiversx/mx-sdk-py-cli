@@ -31,11 +31,11 @@ jobs:
     - name: Run unit tests
       run: |
         export PYTHONPATH=.
-        python3 -m unittest discover -s erdpy/tests
-        pytest ./erdpy/tests/test_testnet.py -s
+        python3 -m unittest discover -s tests
+        pytest ./tests/test_testnet.py -s
     - name: Run CLI tests
       run: |
-        cd ./erdpy/tests
+        cd ./tests
         source ./test_cli_contracts.sh && testAll || return 1
         source ./test_cli_wallet.sh && testAll || return 1
         source ./test_cli_dns.sh && testOffline || return 1
