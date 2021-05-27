@@ -1,8 +1,8 @@
 import os
 import sys
 
-import workstation
-from testnet import config
+from erdpy import workstation
+from erdpy.testnet import config
 
 sys.path = [os.getcwd() + '/..'] + sys.path
 
