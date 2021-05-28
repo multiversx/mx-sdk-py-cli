@@ -1,0 +1,28 @@
+name: Install erdpy using erdpy-up (MacOS)
+
+on:
+  pull_request:
+    branches: [main, development]
+  workflow_dispatch:
+
+jobs:
+  install-erdpy:
+    runs-on: macos-latest
+
+    strategy:
+      matrix:
+        python-version: [3.8]
+
+    steps:
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install
+        run: |
+          wget -O erdpy-up.py https://raw.githubusercontent.com/ElrondNetwork/elrond-sdk-erdpy/development/erdpy-up.py
+          python3 erdpy-up.py <<< "2"
+      - name: Smoke test
+        run: |
+          source /Users/runner/.bash_profile
+          erdpy --version
