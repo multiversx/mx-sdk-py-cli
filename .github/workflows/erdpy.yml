@@ -1,0 +1,41 @@
+# This workflow will do a clean install of node dependencies, build the source code and run tests across different versions of node
+# For more information see: https://help.github.com/actions/language-and-framework-guides/using-nodejs-with-github-actions
+
+name: Build and Test erdpy
+
+on:
+  pull_request:
+    branches: [ main, development ]
+  workflow_dispatch:
+
+jobs:
+  build-erdpy:
+
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        python-version: [3.8]
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Install dependencies
+      run: |
+        python3 -m pip install --upgrade pip
+        pip3 install -r requirements.txt
+        pip3 install pytest
+    - name: Run unit tests
+      run: |
+        export PYTHONPATH=.
+        python3 -m unittest discover -s erdpy/tests
+        pytest ./erdpy/tests/test_testnet.py -s
+    - name: Run CLI tests
+      run: |
+        cd ./erdpy/tests
+        source ./test_cli_contracts.sh && testAll || return 1
+        source ./test_cli_wallet.sh && testAll || return 1
+        source ./test_cli_dns.sh && testOffline || return 1
