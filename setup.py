@@ -5,8 +5,11 @@ with open("README.md", "r") as fh:
 
 VERSION = "1.0.14"
 
-with open('./erdpy/_version.py', 'wt') as versionfile:
-    versionfile.write(f'__version__ = "{VERSION}"')
+try:
+    with open('./erdpy/_version.py', 'wt') as versionfile:
+        versionfile.write(f'__version__ = "{VERSION}"')
+except FileNotFoundError:
+    pass
 
 # See https://packaging.python.org/tutorials/packaging-projects/
 setuptools.setup(
