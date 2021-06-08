@@ -75,7 +75,7 @@ def read_lines(file: str):
     return lines
 
 
-def read_file(f: Any, binary=False) -> Union[str, bytes]:
+def read_file(f: Any, binary: bool=False) -> Union[str, bytes]:
     try:
         mode = "rb" if binary else "r"
         if isinstance(f, str) or isinstance(f, pathlib.PosixPath):
@@ -102,7 +102,7 @@ def write_toml_file(filename, data):
         toml.dump(data, f)
 
 
-def read_json_file(filename: str) -> Dict[str, Any]:
+def read_json_file(filename: str) -> Any:
     with open(filename) as f:
         return json.load(f)
 

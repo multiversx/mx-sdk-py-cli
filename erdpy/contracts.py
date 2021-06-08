@@ -1,34 +1,35 @@
 import base64
+from erdpy.interfaces import IElrondProxy
 import logging
-from typing import Any, List
+from typing import Any, List, Union
 
 from Cryptodome.Hash import keccak
 
 from erdpy import config, constants, errors, utils
-from erdpy.accounts import Address
+from erdpy.accounts import Account, Address
 from erdpy.transactions import Transaction
 
 logger = logging.getLogger("contracts")
 
 
 class SmartContract:
-    def __init__(self, address=None, bytecode=None, metadata=None):
+    def __init__(self, address: Union[Address, None] = None, bytecode=None, metadata=None):
         self.address = Address(address)
         self.bytecode = bytecode
         self.metadata = metadata or CodeMetadata()
 
-    def deploy(self, owner, arguments, gas_price, gas_limit, value, chain, version) -> Transaction:
+    def deploy(self, owner: Account, arguments: List[Any], gas_price: int, gas_limit: int, value: int, chain: str, version: int) -> Transaction:
         self.owner = owner
         self.compute_address()
 
         arguments = arguments or []
         gas_price = int(gas_price)
         gas_limit = int(gas_limit)
-        value = str(value or "0")
+        value = value or 0
 
         tx = Transaction()
         tx.nonce = owner.nonce
-        tx.value = value
+        tx.value = str(value)
         tx.sender = owner.address.bech32()
         tx.receiver = Address.zero().bech32()
         tx.gasPrice = gas_price
@@ -40,7 +41,7 @@ class SmartContract:
         tx.sign(owner)
         return tx
 
-    def prepare_deploy_transaction_data(self, arguments):
+    def prepare_deploy_transaction_data(self, arguments: List[Any]):
         tx_data = f"{self.bytecode}@{constants.VM_TYPE_ARWEN}@{self.metadata.to_hex()}"
 
         for arg in arguments:
@@ -59,17 +60,17 @@ class SmartContract:
         address = bytes([0] * 8) + bytes([5, 0]) + address[10:30] + owner_bytes[30:]
         self.address = Address(address)
 
-    def execute(self, caller, function, arguments, gas_price, gas_limit, value, chain, version) -> Transaction:
+    def execute(self, caller: Account, function: str, arguments: List[str], gas_price: int, gas_limit: int, value: int, chain: str, version: int) -> Transaction:
         self.caller = caller
 
         arguments = arguments or []
         gas_price = int(gas_price)
         gas_limit = int(gas_limit)
-        value = str(value or "0")
+        value = value or 0
 
         tx = Transaction()
         tx.nonce = caller.nonce
-        tx.value = value
+        tx.value = str(value)
         tx.sender = caller.address.bech32()
         tx.receiver = self.address.bech32()
         tx.gasPrice = gas_price
@@ -81,7 +82,7 @@ class SmartContract:
         tx.sign(caller)
         return tx
 
-    def prepare_execute_transaction_data(self, function, arguments):
+    def prepare_execute_transaction_data(self, function: str, arguments: List[Any]):
         tx_data = function
 
         for arg in arguments:
@@ -89,17 +90,17 @@ class SmartContract:
 
         return tx_data
 
-    def upgrade(self, owner, arguments, gas_price, gas_limit, value, chain, version) -> Transaction:
+    def upgrade(self, owner: Account, arguments: List[Any], gas_price: int, gas_limit: int, value: int, chain: str, version: int) -> Transaction:
         self.owner = owner
 
         arguments = arguments or []
         gas_price = int(gas_price or config.DEFAULT_GAS_PRICE)
         gas_limit = int(gas_limit)
-        value = str(value or "0")
+        value = value or 0
 
         tx = Transaction()
         tx.nonce = owner.nonce
-        tx.value = value
+        tx.value = str(value)
         tx.sender = owner.address.bech32()
         tx.receiver = self.address.bech32()
         tx.gasPrice = gas_price
@@ -111,7 +112,7 @@ class SmartContract:
         tx.sign(owner)
         return tx
 
-    def prepare_upgrade_transaction_data(self, arguments):
+    def prepare_upgrade_transaction_data(self, arguments: List[Any]):
         tx_data = f"upgradeContract@{self.bytecode}@{self.metadata.to_hex()}"
 
         for arg in arguments:
@@ -119,7 +120,7 @@ class SmartContract:
 
         return tx_data
 
-    def query(self, proxy, function, arguments) -> List[Any]:
+    def query(self, proxy: IElrondProxy, function: str, arguments: List[Any]) -> List[Any]:
         arguments = arguments or []
         prepared_arguments = [_prepare_argument(argument) for argument in arguments]
 
@@ -153,7 +154,7 @@ class SmartContract:
             return None
 
 
-def _prepare_argument(argument):
+def _prepare_argument(argument: Any):
     hex_prefix = "0X"
     as_string = str(argument).upper()
 
@@ -172,7 +173,7 @@ def _prepare_argument(argument):
 
 
 class CodeMetadata:
-    def __init__(self, upgradeable=True, payable=False):
+    def __init__(self, upgradeable: bool=True, payable: bool=False):
         self.upgradeable = upgradeable
         self.payable = payable
 

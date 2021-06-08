@@ -32,3 +32,14 @@ def sign_message_with_bls_key(message, seed):
         return signed_message
     except Exception:
         raise CannotSignMessageWithBLSKey()
+
+
+def sign_message(message: bytes, account: IAccount) -> str:
+    seed: bytes = account.get_seed()
+    signing_key: Any = nacl.signing.SigningKey(seed)
+
+    signed = signing_key.sign(message)
+    signature = signed.signature
+    signature_hex = signature.hex()
+
+    return signature_hex

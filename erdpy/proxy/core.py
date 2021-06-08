@@ -54,6 +54,10 @@ class ElrondProxy:
         response = do_get(f"{self.url}/address/{address}/esdt/{ticker}")
         return response.get("tokenData")
 
+    def get_all_tokens(self) -> List[str]:
+        response = do_get(f"{self.url}/network/esdts")
+        return response.get("tokens", [])
+
     def get_num_shards(self):
         network_config = self.get_network_config()
         return network_config.num_shards
