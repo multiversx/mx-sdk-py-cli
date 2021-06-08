@@ -3,10 +3,15 @@ import setuptools
 with open("README.md", "r") as fh:
     long_description = "https://github.com/ElrondNetwork/elrond-sdk-erdpy"
 
+VERSION = "1.0.14"
+
+with open('./erdpy/_version.py', 'wt') as versionfile:
+    versionfile.write(f'__version__ = "{VERSION}"')
+
 # See https://packaging.python.org/tutorials/packaging-projects/
 setuptools.setup(
     name="erdpy",
-    version="1.0.13",
+    version=VERSION,
     description="Elrond Smart Contracts Tools and Python SDK",
     long_description=long_description,
     long_description_content_type="text/markdown",
