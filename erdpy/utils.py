@@ -75,7 +75,7 @@ def read_lines(file: str):
     return lines
 
 
-def read_file(f: Any, binary: bool=False) -> Union[str, bytes]:
+def read_file(f: Any, binary: bool = False) -> Union[str, bytes]:
     try:
         mode = "rb" if binary else "r"
         if isinstance(f, str) or isinstance(f, pathlib.PosixPath):
@@ -156,7 +156,7 @@ def list_files(folder: str, suffix: str = None) -> List[str]:
     return files
 
 
-def remove_folder(folder):
+def remove_folder(folder: Union[str, Path]):
     shutil.rmtree(folder, ignore_errors=True)
 
 
