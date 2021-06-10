@@ -248,7 +248,7 @@ def build_binaries(testnet_config: TestnetConfiguration):
     myprocess.run_process(['go', 'build'], cwd=node_folder, env=golang_env)
 
     arwen_binary = testnet_config.arwen_binary()
-    logger.info("Arwen Binary: "+arwen_binary)
+    logger.info(f"Arwen Binary: {arwen_binary}")
     if arwen_binary:
         logger.info("Building arwen...")
         node_folder_root = testnet_config.node_source()

@@ -52,6 +52,10 @@ def setup_parser(subparsers: Any) -> Any:
     cli_shared.add_proxy_arg(sub)
     cli_shared.add_tx_args(sub, with_receiver=False, with_data=False)
     _add_arguments_arg(sub)
+    sub.add_argument("--wait-result", action="store_true", default=False,
+                     help="signal to wait for the transaction result - only valid if --send is set")
+    sub.add_argument("--timeout", default=100, help="max num of seconds to wait for result"
+                                                    " - only valid if --wait-result is set")
     cli_shared.add_broadcast_args(sub)
 
     sub.set_defaults(func=deploy)
@@ -81,6 +85,10 @@ def setup_parser(subparsers: Any) -> Any:
     cli_shared.add_proxy_arg(sub)
     cli_shared.add_tx_args(sub, with_receiver=False, with_data=False)
     _add_arguments_arg(sub)
+    sub.add_argument("--wait-result", action="store_true", default=False,
+                     help="signal to wait for the transaction result - only valid if --send is set")
+    sub.add_argument("--timeout", default=100, help="max num of seconds to wait for result"
+                                                    " - only valid if --wait-result is set")
     cli_shared.add_broadcast_args(sub)
 
     sub.set_defaults(func=upgrade)
