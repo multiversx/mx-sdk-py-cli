@@ -3,6 +3,7 @@ import time
 from typing import Any, List, Tuple
 
 from erdpy.accounts import Address
+from erdpy.interfaces import IAddress
 from erdpy.proxy.http_facade import do_get, do_post
 from erdpy.proxy.messages import NetworkConfig
 
@@ -16,19 +17,19 @@ class ElrondProxy:
     def __init__(self, url: str):
         self.url = url
 
-    def get_account_nonce(self, address: Address) -> int:
+    def get_account_nonce(self, address: IAddress) -> int:
         url = f"{self.url}/address/{address.bech32()}"
         response = do_get(url)
         nonce = response.get("account").get("nonce", 0)
         return int(nonce)
 
-    def get_account_balance(self, address: Address):
+    def get_account_balance(self, address: IAddress):
         url = f"{self.url}/address/{address.bech32()}/balance"
         response = do_get(url)
         balance = response.get("balance", 0)
         return int(balance)
 
-    def get_account(self, address: Address):
+    def get_account(self, address: IAddress):
         url = f"{self.url}/address/{address.bech32()}"
         response = do_get(url)
         account = response.get("account", dict())
@@ -48,7 +49,7 @@ class ElrondProxy:
 
     def get_esdt_tokens(self, address: str) -> List:
         response = do_get(f"{self.url}/address/{address}/esdt")
-        return response.get("tokens")
+        return response.get("esdts")
 
     def get_esdt_balance(self, address: str, ticker: str) -> dict:
         response = do_get(f"{self.url}/address/{address}/esdt/{ticker}")
@@ -111,7 +112,7 @@ class ElrondProxy:
         hashes = response.get("txsHashes")
         return num_sent, hashes
 
-    def query_contract(self, payload: Any):
+    def query_contract(self, payload: Any) -> Any:
         url = f"{self.url}/vm-values/query"
         response = do_post(url, payload)
         return response
@@ -135,7 +136,7 @@ class ElrondProxy:
         response = response.get("hyperblock", {})
         return response
 
-    def send_transaction_and_wait_for_result(self, payload: Any, num_seconds_timeout=100) -> str:
+    def send_transaction_and_wait_for_result(self, payload: Any, num_seconds_timeout: int = 100) -> str:
         url = f"{self.url}/transaction/send"
         response = do_post(url, payload)
         tx_hash = response.get("txHash")

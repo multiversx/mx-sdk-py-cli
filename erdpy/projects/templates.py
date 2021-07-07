@@ -2,6 +2,8 @@ import json
 import logging
 import os
 from os import path
+from pathlib import Path
+from typing import Union
 
 from erdpy import errors, utils
 from erdpy.projects import shared
@@ -33,7 +35,7 @@ class TemplateSummary():
         self.language = repository.get_language(name)
 
 
-def create_from_template(name: str, template_name: str, directory: str):
+def create_from_template(name: str, template_name: str, directory: Union[Path, str]):
     directory = path.expanduser(directory)
 
     logger.info("create_from_template.name: %s", name)

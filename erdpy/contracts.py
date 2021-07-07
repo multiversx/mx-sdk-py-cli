@@ -1,5 +1,4 @@
 import base64
-from erdpy.interfaces import IElrondProxy
 import logging
 from typing import Any, List, Union
 
@@ -7,6 +6,7 @@ from Cryptodome.Hash import keccak
 
 from erdpy import config, constants, errors, utils
 from erdpy.accounts import Account, Address
+from erdpy.interfaces import IElrondProxy
 from erdpy.transactions import Transaction
 
 logger = logging.getLogger("contracts")
@@ -120,22 +120,30 @@ class SmartContract:
 
         return tx_data
 
-    def query(self, proxy: IElrondProxy, function: str, arguments: List[Any]) -> List[Any]:
+    def query(self, proxy: IElrondProxy, function: str, arguments: List[Any], value: int = 0, caller: Union[Address, None] = None) -> List[Any]:
+        response_data = self.query_detailed(proxy, function, arguments, value, caller)
+        return_data = response_data.get("returnData", []) or response_data.get("ReturnData", [])
+        return [self._interpret_return_data(data) for data in return_data]
+
+    def query_detailed(self, proxy: IElrondProxy, function: str, arguments: List[Any], value: int = 0, caller: Union[Address, None] = None) -> Any:
         arguments = arguments or []
         prepared_arguments = [_prepare_argument(argument) for argument in arguments]
 
         payload = {
-            "ScAddress": self.address.bech32(),
-            "FuncName": function,
-            "Args": prepared_arguments
+            "scAddress": self.address.bech32(),
+            "funcName": function,
+            "args": prepared_arguments,
+            "value": str(value)
         }
+
+        if caller:
+            payload["caller"] = caller.bech32()
 
         response = proxy.query_contract(payload)
         response_data = response.get("data", {})
-        return_data = response_data.get("returnData", response_data.get("ReturnData")) or []
-        return [self._interpret_return_data(data) for data in return_data]
+        return response_data
 
-    def _interpret_return_data(self, data):
+    def _interpret_return_data(self, data: Any) -> Any:
         if not data:
             return data
 

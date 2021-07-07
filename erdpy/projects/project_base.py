@@ -3,7 +3,7 @@ import logging
 import shutil
 from os import path
 from pathlib import Path
-from typing import List, cast
+from typing import Any, Dict, List, Union, cast
 
 from erdpy import dependencies, errors, myprocess, utils
 from erdpy.dependencies.modules import StandaloneModule
@@ -14,11 +14,11 @@ logger = logging.getLogger("Project")
 # TODO use pathlib.Path everywhere
 class Project:
 
-    def __init__(self, directory):
+    def __init__(self, directory: Union[Path, str]):
         self.path = Path(directory).expanduser().resolve()
         self.directory = str(self.path)
 
-    def build(self, options=None):
+    def build(self, options: Union[Dict[str, Any], None] = None):
         self.options = options or dict()
         self.debug = self.options.get("debug", False)
         self._ensure_dependencies_installed()
