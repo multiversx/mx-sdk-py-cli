@@ -13,6 +13,7 @@ import erdpy.cli_cost
 import erdpy.cli_data
 import erdpy.cli_deps
 import erdpy.cli_dispatcher
+import erdpy.cli_ledger
 import erdpy.cli_network
 import erdpy.cli_testnet
 import erdpy.cli_transactions
@@ -85,6 +86,7 @@ https://docs.elrond.com/tools/erdpy.
     commands.append(erdpy.cli_transactions.setup_parser(subparsers))
     commands.append(erdpy.cli_validators.setup_parser(subparsers))
     commands.append(erdpy.cli_accounts.setup_parser(subparsers))
+    commands.append(erdpy.cli_ledger.setup_parser(subparsers))
     commands.append(erdpy.cli_wallet.setup_parser(subparsers))
     commands.append(erdpy.cli_network.setup_parser(subparsers))
     commands.append(erdpy.cli_cost.setup_parser(subparsers))

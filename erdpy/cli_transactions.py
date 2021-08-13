@@ -2,6 +2,7 @@ from argparse import FileType
 from typing import Any
 
 from erdpy import cli_shared, utils
+from erdpy.ledger.ledger_functions import do_get_ledger_address
 from erdpy.proxy.core import ElrondProxy
 from erdpy.transactions import Transaction, do_prepare_transaction
 
@@ -50,6 +51,9 @@ def create_transaction(args: Any):
 
     cli_shared.check_broadcast_args(args)
     cli_shared.prepare_nonce_in_args(args)
+
+    if args.ledger:
+        args.ledger_address = do_get_ledger_address(account_index=args.ledger_account_index, address_index=args.ledger_address_index)
 
     if args.data_file:
         args.data = utils.read_file(args.data_file)
