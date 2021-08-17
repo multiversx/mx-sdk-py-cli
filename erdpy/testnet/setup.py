@@ -224,10 +224,6 @@ def patch_source_code(testnet_config: TestnetConfiguration):
 
     folder = testnet_config.node_source()
 
-    file = path.join(folder, "core/constants.go")
-    content = utils.read_file(file)
-    utils.write_file(file, content)
-
     file = path.join(folder, "cmd/node/main.go")
     content = utils.read_file(file)
     content = content.replace("secondsToWaitForP2PBootstrap = 20", "secondsToWaitForP2PBootstrap = 1")
