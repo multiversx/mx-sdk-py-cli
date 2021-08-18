@@ -274,14 +274,13 @@ class TestnetConfiguration:
     def arwen_binary(self):
         return self.features.get("arwen_binary")
 
-
     @classmethod
     def default(cls):
         config = dict()
         config['features'] = {
             'loglevel': '*:DEBUG',
             'proxy': True,
-            'arwen_binary': True
+            'arwen_binary': False
         }
         config['folders'] = {
             'elrond_go':
