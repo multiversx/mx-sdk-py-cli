@@ -267,7 +267,10 @@ def build_binaries(testnet_config: TestnetConfiguration):
     for destination in testnet_config.all_nodes_folders():
         shutil.copy(node_folder / "node", destination)
         if arwen_binary:
-            shutil.copy(node_folder / "arwen", destination)
+            try:
+                shutil.copy(node_folder / "arwen", destination)
+            except:
+                logger.warn("Could not copy the arwen binary!")
 
         if workstation.get_platform() == "osx":
             shutil.copy(libwasmer_path, destination)
