@@ -224,10 +224,6 @@ def patch_source_code(testnet_config: TestnetConfiguration):
 
     folder = testnet_config.node_source()
 
-    file = path.join(folder, "core/constants.go")
-    content = utils.read_file(file)
-    utils.write_file(file, content)
-
     file = path.join(folder, "cmd/node/main.go")
     content = utils.read_file(file)
     content = content.replace("secondsToWaitForP2PBootstrap = 20", "secondsToWaitForP2PBootstrap = 1")
@@ -270,7 +266,11 @@ def build_binaries(testnet_config: TestnetConfiguration):
 
     for destination in testnet_config.all_nodes_folders():
         shutil.copy(node_folder / "node", destination)
-        shutil.copy(node_folder / "arwen", destination)
+        if arwen_binary:
+            try:
+                shutil.copy(node_folder / "arwen", destination)
+            except:
+                logger.warn("Could not copy the arwen binary!")
 
         if workstation.get_platform() == "osx":
             shutil.copy(libwasmer_path, destination)
