@@ -2,7 +2,7 @@ import base64
 import json
 import logging
 from collections import OrderedDict
-from typing import Any, Dict
+from typing import Any, Dict, List
 
 from erdpy import errors, utils
 from erdpy.accounts import Account, Address
@@ -171,7 +171,7 @@ class Transaction(ITransaction):
 
 class BunchOfTransactions:
     def __init__(self):
-        self.transactions = []
+        self.transactions: List[Transaction] = []
 
     def add_prepared(self, transaction: Transaction):
         self.transactions.append(transaction)

@@ -9,7 +9,7 @@ import sys
 import tarfile
 import zipfile
 from pathlib import Path
-from typing import Any, Dict, List, Union
+from typing import Any, List, Union, Optional
 
 import toml
 
@@ -75,7 +75,7 @@ def read_lines(file: str):
     return lines
 
 
-def read_file(f: Any, binary=False) -> Union[str, bytes]:
+def read_file(f: Any, binary: bool = False) -> Union[str, bytes]:
     try:
         mode = "rb" if binary else "r"
         if isinstance(f, str) or isinstance(f, pathlib.PosixPath):
@@ -102,7 +102,7 @@ def write_toml_file(filename, data):
         toml.dump(data, f)
 
 
-def read_json_file(filename: str) -> Dict[str, Any]:
+def read_json_file(filename: Union[str, Path]) -> Any:
     with open(filename) as f:
         return json.load(f)
 
@@ -146,7 +146,7 @@ def find_in_dictionary(dictionary, compound_path):
     return node
 
 
-def list_files(folder: str, suffix: str = None) -> List[str]:
+def list_files(folder: Union[str, Path], suffix: Optional[str] = None) -> List[str]:
     files = os.listdir(folder)
     files = [os.path.join(folder, f) for f in files]
 
@@ -156,7 +156,7 @@ def list_files(folder: str, suffix: str = None) -> List[str]:
     return files
 
 
-def remove_folder(folder):
+def remove_folder(folder: Union[str, Path]):
     shutil.rmtree(folder, ignore_errors=True)
 
 

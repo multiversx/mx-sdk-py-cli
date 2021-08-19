@@ -3,7 +3,7 @@ import itertools
 import textwrap
 from os import path
 from pathlib import Path
-from typing import Tuple, Union
+from typing import List, Tuple, Union
 
 from erdpy import guards, utils
 
@@ -29,6 +29,28 @@ def parse(pem_file: Union[str, Path], index: int = 0) -> Tuple[bytes, bytes]:
     seed = key_bytes[:32]
     pubkey = key_bytes[32:]
     return seed, pubkey
+
+
+def parse_all(pem_file: Union[str, Path]) -> List[Tuple[bytes, bytes]]:
+    pem_file = path.expanduser(pem_file)
+    guards.is_file(pem_file)
+
+    lines = utils.read_lines(pem_file)
+    keys_lines = [list(key_lines) for is_next_key, key_lines in itertools.groupby(lines, lambda line: "-----" in line)
+                  if not is_next_key]
+    keys = ["".join(key_lines) for key_lines in keys_lines]
+
+    result = []
+
+    for key_base64 in keys:
+        key_hex = base64.b64decode(key_base64).decode()
+        key_bytes = bytes.fromhex(key_hex)
+        seed = key_bytes[:32]
+        pubkey = key_bytes[32:]
+
+        result.append((seed, pubkey))
+
+    return result
 
 
 def parse_validator_pem(pem_file, index: int = 0):
