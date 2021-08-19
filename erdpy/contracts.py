@@ -1,6 +1,6 @@
 import base64
 import logging
-from typing import Any, List, Union
+from typing import Any, List, Optional
 
 from Cryptodome.Hash import keccak
 
@@ -13,7 +13,7 @@ logger = logging.getLogger("contracts")
 
 
 class SmartContract:
-    def __init__(self, address: Union[Address, None] = None, bytecode=None, metadata=None):
+    def __init__(self, address: Optional[Address] = None, bytecode=None, metadata=None):
         self.address = Address(address)
         self.bytecode = bytecode
         self.metadata = metadata or CodeMetadata()
@@ -120,12 +120,12 @@ class SmartContract:
 
         return tx_data
 
-    def query(self, proxy: IElrondProxy, function: str, arguments: List[Any], value: int = 0, caller: Union[Address, None] = None) -> List[Any]:
+    def query(self, proxy: IElrondProxy, function: str, arguments: List[Any], value: int = 0, caller: Optional[Address] = None) -> List[Any]:
         response_data = self.query_detailed(proxy, function, arguments, value, caller)
         return_data = response_data.get("returnData", []) or response_data.get("ReturnData", [])
         return [self._interpret_return_data(data) for data in return_data]
 
-    def query_detailed(self, proxy: IElrondProxy, function: str, arguments: List[Any], value: int = 0, caller: Union[Address, None] = None) -> Any:
+    def query_detailed(self, proxy: IElrondProxy, function: str, arguments: List[Any], value: int = 0, caller: Optional[Address] = None) -> Any:
         arguments = arguments or []
         prepared_arguments = [_prepare_argument(argument) for argument in arguments]
 
@@ -181,7 +181,7 @@ def _prepare_argument(argument: Any):
 
 
 class CodeMetadata:
-    def __init__(self, upgradeable: bool=True, payable: bool=False):
+    def __init__(self, upgradeable: bool = True, payable: bool = False):
         self.upgradeable = upgradeable
         self.payable = payable
 
