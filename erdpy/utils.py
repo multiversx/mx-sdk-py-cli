@@ -9,7 +9,7 @@ import sys
 import tarfile
 import zipfile
 from pathlib import Path
-from typing import Any, List, Union
+from typing import Any, List, Union, Optional
 
 import toml
 
@@ -146,7 +146,7 @@ def find_in_dictionary(dictionary, compound_path):
     return node
 
 
-def list_files(folder: Union[str, Path], suffix: Union[str, None] = None) -> List[str]:
+def list_files(folder: Union[str, Path], suffix: Optional[str] = None) -> List[str]:
     files = os.listdir(folder)
     files = [os.path.join(folder, f) for f in files]
 
