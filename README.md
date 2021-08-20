@@ -4,8 +4,6 @@ Elrond Python Command Line Tools and SDK for interacting with the Elrond Network
 ## Documentation
 [docs.elrond.com](https://docs.elrond.com/sdk-and-tools/erdpy/erdpy/)
 
-[pkg.go.dev](https://pkg.go.dev/github.com/ElrondNetwork/elrond-sdk/erdgo)
-
 ## CLI
 [CLI](CLI.md)
 

@@ -178,3 +178,8 @@ class NoWalletProvided(KnownError):
 class TestnetError(KnownError):
     def __init__(self, message: str):
         super().__init__(message)
+
+
+class LedgerError(KnownError):
+    def __init__(self, message: str):
+        super().__init__("Ledger error: " + message)
