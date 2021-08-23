@@ -10,7 +10,7 @@ from erdpy import workstation
 
 logger = logging.getLogger("testnet")
 
-ConfigurationType = Dict[str, Dict[str, Any]]
+ConfigurationDict = Dict[str, Dict[str, Any]]
 
 
 class Node:
@@ -34,20 +34,33 @@ class Node:
 
 
 class TestnetConfiguration:
+    config: ConfigurationDict
+    folders: Dict[str, Path]
+    networking: Dict[str, Any]
+    metashard: Dict[str, Any]
+    shards: Dict[str, Any]
+    features: Dict[str, Any]
+    timing: Dict[str, Any]
 
     def __init__(self, config):
         self.config = config
+        self.folders = dict()
+        self.networking = dict()
+        self.metashard = dict()
+        self.shards = dict()
+        self.features = dict()
+        self.timing = dict()
 
         sdk_folder = workstation.get_tools_folder()
 
-        for key, path in self.config['folders'].items():
-            if key == "testnet":
+        for folder_key, folder_path in self.config['folders'].items():
+            if folder_key == "testnet":
                 continue
 
-            path = path.replace('{ELRONDSDK}', str(sdk_folder))
+            folder_path = folder_path.replace('{ELRONDSDK}', str(sdk_folder))
 
-            default_tag = erdpy.config.get_dependency_tag(key)
-            path = path.replace('{TAG}', default_tag)
+            default_tag = erdpy.config.get_dependency_tag(folder_key)
+            folder_path = folder_path.replace('{TAG}', default_tag)
 
             # If the user has not specified a custom source repository, the
             # ones provided by the SDK will be used, which are downloaded as
@@ -57,14 +70,18 @@ class TestnetConfiguration:
             # "1.1.0"), hence the need for {NOvTAG}.
             if default_tag.startswith("v"):
                 default_tag = default_tag[1:]
-            path = path.replace('{NOvTAG}', default_tag)
+            folder_path = folder_path.replace('{NOvTAG}', default_tag)
 
-            self.config['folders'][key] = Path(path).expanduser()
+            self.folders[folder_key] = Path(folder_path).expanduser()
 
-        if 'testnet' not in self.config['folders']:
-            self.config['folders']['testnet'] = Path().absolute() / 'testnet'
+        if 'testnet' not in self.folders:
+            self.folders['testnet'] = Path().absolute() / 'testnet'
 
-        self.__dict__.update(self.config)
+        self.networking.update(self.config['networking'])
+        self.metashard.update(self.config['metashard'])
+        self.shards.update(self.config['shards'])
+        self.features.update(self.config['features'])
+        self.timing.update(self.config['timing'])
 
     @classmethod
     def from_file(cls, filename):
@@ -113,10 +130,12 @@ class TestnetConfiguration:
     def node_config_source(self) -> Path:
         return self.node_source() / 'cmd' / 'node' / 'config'
 
-    def node_source(self):
-        return self.folders['elrond_go']
+    def node_source(self) -> Path:
+        path = self.folders['elrond_go']
+        assert isinstance(path, Path)
+        return path
 
-    def proxy_source(self):
+    def proxy_source(self) -> Path:
         return self.folders['elrond_proxy_go']
 
     def proxy_config_source(self):
@@ -268,11 +287,11 @@ class TestnetConfiguration:
     def proxy_port(self):
         return self.networking["port_proxy"]
 
-    def loglevel(self):
+    def loglevel(self) -> str:
         return self.features.get("loglevel", "")
 
-    def arwen_binary(self):
-        return self.features.get("arwen_binary")
+    def arwen_binary(self) -> bool:
+        return self.features.get("arwen_binary", False)
 
     @classmethod
     def default(cls):
@@ -317,7 +336,7 @@ class TestnetConfiguration:
         return config
 
 
-def merge_configs(leftcfg: ConfigurationType, rightcfg: ConfigurationType) -> ConfigurationType:
+def merge_configs(leftcfg: ConfigurationDict, rightcfg: ConfigurationDict) -> ConfigurationDict:
     result = dict()
     result.update(leftcfg)
 

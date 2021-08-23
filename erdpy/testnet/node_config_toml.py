@@ -24,7 +24,7 @@ def patch_config(data: ConfigDict, testnet_config: TestnetConfiguration):
     data['EpochStartConfig'].update(epoch_start_config)
 
     # Always use the latest VM
-    virtual_machine = dict()
+    virtual_machine: Dict[str, Any] = dict()
     virtual_machine['Execution'] = dict()
     virtual_machine['Execution']['ArwenVersions'] = [{'StartEpoch': 0, 'Version': '*'}]
     virtual_machine['Querying'] = dict()
@@ -41,7 +41,7 @@ def patch_api(data: ConfigDict, testnet_config: TestnetConfiguration):
 
 
 def patch_enable_epochs(data: ConfigDict, testnet_config: TestnetConfiguration):
-    enable_epochs = dict()
+    enable_epochs: ConfigDict = dict()
     enable_epochs['SCDeployEnableEpoch'] = 0
     enable_epochs['BuiltInFunctionsEnableEpoch'] = 0
     enable_epochs['RelayedTransactionsEnableEpoch'] = 0

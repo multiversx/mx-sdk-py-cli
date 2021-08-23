@@ -2,7 +2,8 @@ import asyncio
 import logging
 import subprocess
 import traceback
-from typing import Any, List, Optional
+from pathlib import Path
+from typing import Any, List, Optional, Union
 
 from erdpy import errors
 
@@ -11,7 +12,7 @@ logger = logging.getLogger("myprocess")
 ReturnCode = int
 
 
-def run_process(args: List[str], env: Any = None, dump_to_stdout: bool = True, cwd: str = None):
+def run_process(args: List[str], env: Any = None, dump_to_stdout: bool = True, cwd: Optional[Union[str, Path]] = None):
     logger.info(f"run_process: {args}, in folder: {cwd}")
 
     try:

@@ -225,16 +225,16 @@ def makefolder(path_where_to_make_folder):
 def patch_source_code(testnet_config: TestnetConfiguration):
     logger.info("Patching the source code...")
 
-    folder = testnet_config.node_source()
+    node_source = testnet_config.node_source()
 
-    file = path.join(folder, "cmd/node/main.go")
-    content = utils.read_file(file)
+    file = node_source / 'cmd' / 'node' / 'main.go'
+    content = utils.read_text_file(file)
     content = content.replace("secondsToWaitForP2PBootstrap = 20", "secondsToWaitForP2PBootstrap = 1")
     utils.write_file(file, content)
 
 
 def build_binaries(testnet_config: TestnetConfiguration):
-    golang = dependencies.get_module_by_key("golang")
+    golang = dependencies.get_golang()
     golang_env = golang.get_env()
     myprocess.run_process(['go', 'env'], env=golang_env)
 
@@ -250,9 +250,9 @@ def build_binaries(testnet_config: TestnetConfiguration):
     logger.info(f"Arwen Binary: {arwen_binary}")
     if arwen_binary:
         logger.info("Building arwen...")
-        node_folder_root = testnet_config.node_source()
         env = dict(golang_env)
-        env["ARWEN_PATH"] = node_folder
+        env["ARWEN_PATH"] = str(node_folder)
+        node_folder_root = testnet_config.node_source()
         myprocess.run_process(['make', 'arwen'], cwd=node_folder_root, env=env)
 
     logger.info("Building proxy...")
@@ -285,7 +285,7 @@ def build_binaries(testnet_config: TestnetConfiguration):
 
 def _get_arwen_version(testnet_config: TestnetConfiguration):
     go_mod = testnet_config.node_source() / "go.mod"
-    lines = utils.read_lines(go_mod)
+    lines = utils.read_lines(str(go_mod))
     line = next(line for line in lines if "github.com/ElrondNetwork/arwen-wasm-vm" in line)
     parts = line.split()
     return parts[1]

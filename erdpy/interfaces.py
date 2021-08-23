@@ -45,8 +45,8 @@ class IElrondProxy:
     def send_transactions(self, payload: List[Any]) -> Tuple[int, List[str]]:
         return 0, []
 
-    def send_transaction_and_wait_for_result(self, payload: Any, num_seconds_timeout: int) -> str:
-        return ""
+    def send_transaction_and_wait_for_result(self, payload: Any, num_seconds_timeout: int) -> Dict[str, Any]:
+        return dict()
 
     def query_contract(self, payload: Any) -> Any:
         return dict()

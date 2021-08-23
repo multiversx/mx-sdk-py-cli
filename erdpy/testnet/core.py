@@ -124,5 +124,5 @@ def _is_interesting_logline(logline):
     return any(e in logline for e in ["started committing block", "ERROR", "WARN", "arwen", "smartcontract"])
 
 
-def _dump_interesting_log_line(pid: str, logline: str) -> str:
+def _dump_interesting_log_line(pid: str, logline: str):
     print(f"[PID={pid}]", logline)

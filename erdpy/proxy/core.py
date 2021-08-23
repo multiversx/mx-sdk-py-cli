@@ -1,6 +1,6 @@
 import logging
 import time
-from typing import Any, List, Tuple, cast
+from typing import Any, List, Tuple, cast, Dict
 
 from erdpy.accounts import Address
 from erdpy.interfaces import IAddress
@@ -99,12 +99,12 @@ class ElrondProxy:
     def send_transaction(self, payload: Any) -> str:
         url = f"{self.url}/transaction/send"
         response = do_post(url, payload)
-        tx_hash = response.get("txHash")
+        tx_hash = str(response.get("txHash"))
         return tx_hash
 
     def simulate_transaction(self, payload: Any) -> str:
         url = f"{self.url}/transaction/simulate"
-        response = do_post(url, payload)
+        response = str(do_post(url, payload))
         return response
 
     def send_transactions(self, payload: List[Any]) -> Tuple[int, List[str]]:
@@ -120,13 +120,14 @@ class ElrondProxy:
         response = do_post(url, payload)
         return response
 
-    def get_transaction(self, tx_hash: str, sender_address: str = "", with_results: bool = False) -> Any:
+    def get_transaction(self, tx_hash: str, sender_address: str = "", with_results: bool = False) -> Dict[str, Any]:
         url = f"{self.url}/transaction/{tx_hash}"
         url += f"?sender={sender_address or ''}"
         url += f"&withResults={with_results}"
 
         response = do_get(url)
-        transaction = response.get("transaction", dict())
+        transaction_response = response.get("transaction", dict())
+        transaction = cast(Dict[str, Any], transaction_response)
         transaction['hash'] = tx_hash
         return transaction
 
@@ -139,7 +140,7 @@ class ElrondProxy:
         response = response.get("hyperblock", {})
         return response
 
-    def send_transaction_and_wait_for_result(self, payload: Any, num_seconds_timeout: int = 100) -> str:
+    def send_transaction_and_wait_for_result(self, payload: Any, num_seconds_timeout: int = 100) -> Dict[str, Any]:
         url = f"{self.url}/transaction/send"
         response = do_post(url, payload)
         tx_hash = response.get("txHash")
@@ -148,7 +149,7 @@ class ElrondProxy:
             if self.is_transaction_finalized(tx_hash):
                 return self.get_transaction(tx_hash=tx_hash, with_results=True)
             time.sleep(1)
-        return ""
+        return dict()
 
     def is_transaction_finalized(self, tx_hash):
         last_nonce = self.get_last_block_nonce("metachain")

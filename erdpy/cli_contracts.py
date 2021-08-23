@@ -2,6 +2,8 @@ import logging
 import os
 from typing import Any
 
+from pathlib import Path
+
 from erdpy import cli_shared, errors, projects, utils
 from erdpy.accounts import Account, Address
 from erdpy.contracts import CodeMetadata, SmartContract
@@ -111,7 +113,7 @@ def _add_project_arg(sub: Any):
 def _add_project_or_bytecode_arg(sub: Any):
     group = sub.add_mutually_exclusive_group(required=True)
     group.add_argument("--project", default=os.getcwd(), help="🗀 the project directory (default: current directory)")
-    group.add_argument("--bytecode", help="the WASM file")
+    group.add_argument("--bytecode", help="the WASM file", type=str)
 
 
 def _add_contract_arg(sub: Any):
@@ -217,8 +219,8 @@ def dump_tx_and_result(tx: Any, result: Any, args: Any):
 
 
 def _prepare_contract(args: Any) -> SmartContract:
-    if args.bytecode:
-        bytecode = utils.read_file(args.bytecode, binary=True).hex()
+    if len(args.bytecode):
+        bytecode = utils.read_binary_file(Path(args.bytecode)).hex()
     else:
         project = load_project(args.project)
         bytecode = project.get_bytecode()

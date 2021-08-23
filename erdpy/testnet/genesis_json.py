@@ -1,4 +1,3 @@
-
 from typing import Any, List
 
 from erdpy.accounts import Account, Address

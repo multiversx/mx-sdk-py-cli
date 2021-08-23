@@ -7,6 +7,7 @@ from erdpy.accounts import Account, Address
 from erdpy.contracts import SmartContract
 from erdpy.proxy.core import ElrondProxy
 from erdpy.transactions import do_prepare_transaction
+from erdpy.interfaces import IElrondProxy, ITransaction
 
 MaxNumShards = 256
 ShardIdentiferLen = 2
@@ -75,7 +76,7 @@ def registration_cost(shard_id: int, proxy: ElrondProxy) -> int:
         return int("0x{}".format(result[0]))
 
 
-def version(shard_id: int, proxy: ElrondProxy) -> str:
+def version(shard_id: int, proxy: IElrondProxy) -> str:
     dns_address = compute_dns_address_for_shard_id(shard_id)
     contract = SmartContract(dns_address)
     result = contract.query(proxy, "version", [])

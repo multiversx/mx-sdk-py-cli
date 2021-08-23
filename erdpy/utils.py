@@ -205,6 +205,24 @@ def is_arg_present(key: str, args: List[str]) -> bool:
     return False
 
 
+def str_int_to_hex_str(number_str: str) -> str:
+    num_of_bytes = 1
+    if len(number_str) > 2:
+        num_of_bytes = int(len(number_str) / 2)
+    int_str = int(number_str)
+    int_bytes = int_str.to_bytes(num_of_bytes, byteorder="big")
+    bytes_str = int_bytes.hex()
+    return bytes_str
+
+
+def parse_keys(bls_public_keys):
+    keys = bls_public_keys.split(',')
+    parsed_keys = ''
+    for key in keys:
+        parsed_keys += '@' + key
+    return parsed_keys, len(keys)
+
+
 # https://code.visualstudio.com/docs/python/debugging
 def breakpoint():
     import debugpy
