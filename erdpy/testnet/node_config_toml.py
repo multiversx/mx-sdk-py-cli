@@ -96,9 +96,6 @@ def patch_enable_epochs(data: ConfigDict, testnet_config: TestnetConfiguration):
 
 
 def patch_system_smart_contracts(data: ConfigDict, testnet_config: TestnetConfiguration):
-    data['StakingSystemSCConfig']['StakeEnableEpoch'] = 0
-    data['StakingSystemSCConfig']['StakingV2Epoch'] = 1
-    data['StakingSystemSCConfig']['DoubleKeyProtectionEnableEpoch'] = 0
     data['StakingSystemSCConfig']['ActivateBLSPubKeyMessageVerification'] = True
     data['ESDTSystemSCConfig']['EnabledEpoch'] = 0
     data['GovernanceSystemSCConfig']['EnabledEpoch'] = 0
