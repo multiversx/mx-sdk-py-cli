@@ -9,7 +9,7 @@ import sys
 import tarfile
 import zipfile
 from pathlib import Path
-from typing import Any, List, Union, Optional
+from typing import Any, List, Union, Optional, cast, IO, Dict
 
 import toml
 
@@ -75,15 +75,33 @@ def read_lines(file: str):
     return lines
 
 
+# TODO delete this function, it is too generic
+# TODO find usages in legolas
 def read_file(f: Any, binary: bool = False) -> Union[str, bytes]:
     try:
-        mode = "rb" if binary else "r"
         if isinstance(f, str) or isinstance(f, pathlib.PosixPath):
-            with open(f, mode) as f:
-                return f.read()
-        return f.read()
+            path = Path(f)
+            if binary:
+                return read_binary_file(path)
+            return read_text_file(path)
+
+        file = cast(IO, f)
+        result = file.read()
+        assert isinstance(result, str) or isinstance(result, bytes)
+        return result
+
     except Exception as err:
         raise errors.BadFile(f, err)
+
+
+def read_binary_file(path: Path) -> bytes:
+    with open(path, 'rb') as binary_file:
+        return binary_file.read()
+
+
+def read_text_file(path: Path) -> str:
+    with open(path, 'r') as text_file:
+        return text_file.read()
 
 
 def write_file(f: Any, text: str):
@@ -102,9 +120,11 @@ def write_toml_file(filename, data):
         toml.dump(data, f)
 
 
-def read_json_file(filename: Union[str, Path]) -> Any:
+def read_json_file(filename: Union[str, Path]) -> Dict[str, Any]:
+    data: Dict[str, Any]
     with open(filename) as f:
-        return json.load(f)
+        data = json.load(f)
+    return data
 
 
 def write_json_file(filename: str, data: Any):
@@ -166,17 +186,13 @@ def symlink(real: str, link: str) -> None:
     os.symlink(real, link)
 
 
-def str_to_bool(input: str) -> bool:
-    return str(input).lower() in ["true", "1", "t", "y", "yes"]
-
-
-def as_object(input: Any) -> Object:
-    if isinstance(input, dict):
+def as_object(data: Object) -> Object:
+    if isinstance(data, dict):
         result = Object()
-        result.__dict__.update(input)
+        result.__dict__.update(data)
         return result
 
-    return input
+    return data
 
 
 def is_arg_present(key: str, args: List[str]) -> bool:

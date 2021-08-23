@@ -1,6 +1,6 @@
 import logging
 import time
-from typing import Any, List, Tuple
+from typing import Any, List, Tuple, cast
 
 from erdpy.accounts import Address
 from erdpy.interfaces import IAddress
@@ -49,15 +49,18 @@ class ElrondProxy:
 
     def get_esdt_tokens(self, address: str) -> List:
         response = do_get(f"{self.url}/address/{address}/esdt")
-        return response.get("esdts")
+        esdts = response.get("esdts")
+        return cast(List, esdts)
 
     def get_esdt_balance(self, address: str, ticker: str) -> dict:
         response = do_get(f"{self.url}/address/{address}/esdt/{ticker}")
-        return response.get("tokenData")
+        token_data = response.get("tokenData")
+        return cast(dict, token_data)
 
     def get_all_tokens(self) -> List[str]:
         response = do_get(f"{self.url}/network/esdts")
-        return response.get("tokens", [])
+        tokens = response.get("tokens", [])
+        return cast(List[str], tokens)
 
     def get_num_shards(self):
         network_config = self.get_network_config()

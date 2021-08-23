@@ -110,7 +110,7 @@ class TestnetConfiguration:
         sdk_testnet_config = utils.read_toml_file(filename)
         return merge_configs(default, sdk_testnet_config)
 
-    def node_config_source(self):
+    def node_config_source(self) -> Path:
         return self.node_source() / 'cmd' / 'node' / 'config'
 
     def node_source(self):

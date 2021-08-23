@@ -2,11 +2,13 @@ import asyncio
 import logging
 import subprocess
 import traceback
-from typing import Any, List
+from typing import Any, List, Optional
 
 from erdpy import errors
 
 logger = logging.getLogger("myprocess")
+
+ReturnCode = int
 
 
 def run_process(args: List[str], env: Any = None, dump_to_stdout: bool = True, cwd: str = None):
@@ -22,7 +24,13 @@ def run_process(args: List[str], env: Any = None, dump_to_stdout: bool = True, c
         raise errors.ExternalProcessError(error.cmd, error.output)
 
 
-def run_process_async(args: List[str], env: Any = None, cwd: str = None, stdout_sink=None, stderr_sink=None):
+def run_process_async(
+    args: List[str],
+    env: Any = None,
+    cwd: Optional[str] = None,
+    stdout_sink=None,
+    stderr_sink=None
+) -> ReturnCode:
     loop = asyncio.get_event_loop()
     result = loop.run_until_complete(_async_subprocess(args, env, stdout_sink, stderr_sink, cwd))
     loop.close()
@@ -30,7 +38,7 @@ def run_process_async(args: List[str], env: Any = None, cwd: str = None, stdout_
     return result
 
 
-async def _async_subprocess(args, env, stdout_sink, stderr_sink, cwd: str):
+async def _async_subprocess(args, env, stdout_sink, stderr_sink, cwd: Optional[str]) -> ReturnCode:
     process = await asyncio.create_subprocess_exec(*args, env=env, stdout=asyncio.subprocess.PIPE,
                                                    stderr=asyncio.subprocess.PIPE, cwd=cwd)
 

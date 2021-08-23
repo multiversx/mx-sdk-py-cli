@@ -5,10 +5,10 @@ Elrond Python Command Line Tools and SDK for interacting with the Elrond Network
 [docs.elrond.com](https://docs.elrond.com/sdk-and-tools/erdpy/erdpy/)
 
 ## CLI
-[CLI](CLI.md)
+[CLI](erdpy/CLI.md)
 
 ## Distribution
 [erdpy-up](https://docs.elrond.com/sdk-and-tools/erdpy/installing-erdpy/) and [PyPi](https://pypi.org/project/erdpy/#history)
 
 ## CHANGELOG
-[CHANGELOG](CHANGELOG.md)
+[CHANGELOG](erdpy/CHANGELOG.md)

@@ -2,7 +2,7 @@ import logging
 import os
 from binascii import unhexlify
 from os import path
-from typing import Any, Union
+from typing import Any, Optional
 
 from erdpy import constants, errors, utils
 from erdpy.errors import LedgerError
@@ -45,7 +45,7 @@ class AccountsRepository:
 
 
 class Account(IAccount):
-    def __init__(self, address: Any = None, pem_file: Union[str, None] = None, pem_index: int = 0, key_file: str = "", pass_file: str = "",
+    def __init__(self, address: Any = None, pem_file: Optional[str] = None, pem_index: int = 0, key_file: str = "", pass_file: str = "",
                  ledger: bool = False):
         self.address = Address(address)
         self.pem_file = pem_file
@@ -53,7 +53,7 @@ class Account(IAccount):
         self.nonce: int = 0
         self.ledger = ledger
 
-        if pem_file:
+        if self.pem_file:
             seed, pubkey = pem.parse(self.pem_file, self.pem_index)
             self.private_key_seed = seed.hex()
             self.address = Address(pubkey)
@@ -79,9 +79,10 @@ class Address(IAddress):
     PUBKEY_LENGTH = 32
     PUBKEY_STRING_LENGTH = PUBKEY_LENGTH * 2    # hex-encoded
     BECH32_LENGTH = 62
+    _value_hex: str
 
     def __init__(self, value):
-        self._value_hex = None
+        self._value_hex = ''
 
         if not value:
             return
@@ -107,7 +108,9 @@ class Address(IAddress):
     def bech32(self) -> str:
         self._assert_validity()
         pubkey = self.pubkey()
-        return bech32.bech32_encode(self.HRP, bech32.convertbits(pubkey, 8, 5))
+        b32 = bech32.bech32_encode(self.HRP, bech32.convertbits(pubkey, 8, 5))
+        assert isinstance(b32, str)
+        return b32
 
     def pubkey(self):
         self._assert_validity()

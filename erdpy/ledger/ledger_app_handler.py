@@ -29,15 +29,19 @@ class ElrondLedgerApp:
         if err != '':
             raise LedgerError(err)
 
-    def get_address(self, account_index=0, address_index=0):
+    def get_address(self, account_index=0, address_index=0) -> str:
         data = account_index.to_bytes(4, byteorder='big') + address_index.to_bytes(4, byteorder='big')
+
         self.transport.send(cla=0xed, ins=0x03, p1=0x00, p2=0x00, cdata=data)
         sw, response = self.transport.recv()
+        assert isinstance(response, bytes)
+
         err = get_error(sw)
         if err != '':
             raise LedgerError(err)
 
-        address = response[1:].decode("utf-8")
+        response_body = response[1:]
+        address = response_body.decode("utf-8")
         return address
 
     def get_app_configuration(self) -> ElrondLedgerAppConfiguration:
@@ -48,11 +52,11 @@ class ElrondLedgerApp:
             raise LedgerError(err)
         return load_ledger_config_from_response(response)
 
-    def get_version(self):
+    def get_version(self) -> str:
         config = self.get_app_configuration()
         return config.version
 
-    def sign_transaction(self, marshaled_tx: bytes, should_use_hash_signing: bool):
+    def sign_transaction(self, marshaled_tx: bytes, should_use_hash_signing: bool) -> str:
         total_size = len(marshaled_tx)
         max_chunk_size = 150
 
@@ -89,9 +93,9 @@ class ElrondLedgerApp:
 
         return self.get_signature_from_apdus(apdus)
 
-    def get_signature_from_apdus(self, apdus):
-        sw = []
-        response = []
+    def get_signature_from_apdus(self, apdus) -> str:
+        sw: int
+        response: bytes
         for apdu in apdus:
             self.transport.send(
                 cla=apdu.cla,
@@ -101,6 +105,7 @@ class ElrondLedgerApp:
                 cdata=apdu.data)
             sw, response = self.transport.recv()
 
+        assert isinstance(response, bytes)
         if len(response) != 65 or response[0] != 64 or get_error(sw) != '':
             err_message = "signature failed"
             err = get_error(sw)
@@ -108,7 +113,8 @@ class ElrondLedgerApp:
                 err_message += ': ' + err
             raise LedgerError(err_message)
 
-        signature = response[1:len(response)].hex()
+        response_body = response[1:]
+        signature = response_body.hex()
         return signature
 
 

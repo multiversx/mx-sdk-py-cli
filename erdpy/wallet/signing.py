@@ -19,6 +19,7 @@ def sign_transaction(transaction: ITransaction, account: IAccount) -> str:
     signed = signing_key.sign(data_json)
     signature = signed.signature
     signature_hex = signature.hex()
+    assert isinstance(signature_hex, str)
 
     return signature_hex
 
@@ -41,5 +42,6 @@ def sign_message(message: bytes, account: IAccount) -> str:
     signed = signing_key.sign(message)
     signature = signed.signature
     signature_hex = signature.hex()
+    assert isinstance(signature_hex, str)
 
     return signature_hex

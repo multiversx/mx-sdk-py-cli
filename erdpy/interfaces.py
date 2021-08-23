@@ -22,6 +22,9 @@ class ITransaction:
     def serialize(self) -> bytes:
         return bytes()
 
+    def serialize_as_inner(self) -> str:
+        return ''
+
     def to_dictionary(self) -> Dict[str, Any]:
         return {}
 
@@ -34,6 +37,9 @@ class IElrondProxy:
         return 0
 
     def send_transaction(self, payload: Any) -> str:
+        return ""
+
+    def simulate_transaction(self, payload: Any) -> str:
         return ""
 
     def send_transactions(self, payload: List[Any]) -> Tuple[int, List[str]]:

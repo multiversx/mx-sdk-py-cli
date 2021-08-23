@@ -54,7 +54,9 @@ def get_dependency_url(key: str, tag: str, platform: str) -> str:
 def get_value(name: str) -> str:
     _guard_valid_name(name)
     data = get_active()
-    return data.get(name, get_defaults()[name])
+    value = data.get(name, get_defaults()[name])
+    assert isinstance(value, str)
+    return value
 
 
 def set_value(name: str, value: Any):
