@@ -17,9 +17,11 @@ def patch_config(data: ConfigDict, testnet_config: TestnetConfiguration):
     data['GeneralSettings'].update(general_settings)
 
     # Make epochs shorter - never below 100 rounds
-    epoch_start_config = dict()
+    epoch_start_config: ConfigDict = dict()
     epoch_start_config['RoundsPerEpoch'] = 100
     epoch_start_config['MinRoundsBetweenEpochs'] = 20
+    epoch_start_config['MinShuffledOutRestartThreshold'] = 0.1
+    epoch_start_config['MaxShuffledOutRestartThreshold'] = 0.5
 
     data['EpochStartConfig'].update(epoch_start_config)
 
