@@ -54,7 +54,7 @@ class TestnetConfiguration:
         sdk_folder = workstation.get_tools_folder()
 
         for folder_key, folder_path in self.config['folders'].items():
-            if folder_key == "testnet":
+            if folder_key == 'testnet':
                 continue
 
             folder_path = folder_path.replace('{ELRONDSDK}', str(sdk_folder))
@@ -68,20 +68,22 @@ class TestnetConfiguration:
             # built by GitHub, the path will contain the tag in two variants:
             # with the 'v' prefix (e.g. "v1.1.0"), but also without (e.g.
             # "1.1.0"), hence the need for {NOvTAG}.
-            if default_tag.startswith("v"):
+            if default_tag.startswith('v'):
                 default_tag = default_tag[1:]
             folder_path = folder_path.replace('{NOvTAG}', default_tag)
 
             self.folders[folder_key] = Path(folder_path).expanduser()
 
-        if 'testnet' not in self.folders:
+        try:
+            self.folders['testnet'] = Path(self.config['folders']['testnet']).expanduser()
+        except KeyError:
             self.folders['testnet'] = Path().absolute() / 'testnet'
 
-        self.networking.update(self.config['networking'])
-        self.metashard.update(self.config['metashard'])
-        self.shards.update(self.config['shards'])
-        self.features.update(self.config['features'])
-        self.timing.update(self.config['timing'])
+        self.networking.update(self.config.get('networking', dict()))
+        self.metashard.update(self.config.get('metashard', dict()))
+        self.shards.update(self.config.get('shards', dict()))
+        self.features.update(self.config.get('features', dict()))
+        self.timing.update(self.config.get('timing', dict()))
 
     @classmethod
     def from_file(cls, filename):
