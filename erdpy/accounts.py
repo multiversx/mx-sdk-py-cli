@@ -121,7 +121,7 @@ class Address(IAddress):
         return self.hex().startswith(constants.SC_HEX_PUBKEY_PREFIX)
 
     def _assert_validity(self):
-        if self._value_hex is None:
+        if self._value_hex == '':
             raise errors.EmptyAddressError()
 
     def __repr__(self):
