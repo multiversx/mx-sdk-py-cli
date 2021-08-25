@@ -13,7 +13,7 @@ testCreateContracts() {
 
     ${ERDPY} contract new --template adder --directory ${SANDBOX} myadder-rs || return 1
     ${ERDPY} contract new --template factorial --directory ${SANDBOX} myfactorial-rs || return 1
-    ${ERDPY} contract new --template erc20 --directory ${SANDBOX} myerc20-rs || return 1
+    ${ERDPY} contract new --template simple-erc20 --directory ${SANDBOX} myerc20-rs || return 1
     ${ERDPY} contract new --template crypto-bubbles --directory ${SANDBOX} mybubbles-rs || return 1
     ${ERDPY} contract new --template lottery-esdt --directory ${SANDBOX} mylottery-rs || return 1
     ${ERDPY} contract new --template crowdfunding-esdt --directory ${SANDBOX} myfunding-rs || return 1
