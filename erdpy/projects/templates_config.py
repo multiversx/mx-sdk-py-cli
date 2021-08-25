@@ -7,7 +7,7 @@ from erdpy.projects.templates_repository import TemplatesRepository
 def get_templates_repositories():
     timestamp = int(time.time())
     examples_rs_tag = config.get_dependency_tag('elrond_wasm_rs')
-    examples_rs_tag_no_v = examples_rs_tag[1:]
+    examples_rs_tag_no_v = remove_initial_v_from_version(examples_rs_tag)
 
     return [
         TemplatesRepository(
@@ -24,3 +24,16 @@ def get_templates_repositories():
             relative_path=f"elrond-wasm-rs-{examples_rs_tag_no_v}/contracts/examples"
         )
     ]
+
+
+def remove_initial_v_from_version(version: str) -> str:
+    """Remove the initial 'v' from semver strings 'vX.XX.XX', but leave branch
+    names or non-semver tags unchanged"""
+    if version[0] != 'v':
+        return version
+
+    version_no_v = version[1:]
+    if not version_no_v[0].isnumeric():
+        return version
+
+    return version_no_v

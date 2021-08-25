@@ -79,10 +79,10 @@ class ProjectRust(Project):
         utils.prettify_json_file(self._get_abi_filepath())
 
     def _has_abi(self):
-        return Path(self._get_abi_folder(), "Cargo.toml").is_file()
+        return (self._get_abi_folder() / "Cargo.toml").exists()
 
     def _get_abi_filepath(self):
-        return Path(self._get_abi_folder(), "abi.json")
+        return self._get_abi_folder() / "abi.json"
 
     def _get_abi_folder(self):
         return Path(self.directory, "abi")

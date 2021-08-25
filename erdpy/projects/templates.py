@@ -35,10 +35,10 @@ class TemplateSummary():
         self.language = repository.get_language(name)
 
 
-def create_from_template(name: str, template_name: str, directory: Union[Path, str]):
+def create_from_template(project_name: str, template_name: str, directory: Union[Path, str]):
     directory = path.expanduser(directory)
 
-    logger.info("create_from_template.name: %s", name)
+    logger.info("create_from_template.project_name: %s", project_name)
     logger.info("create_from_template.template_name: %s", template_name)
     logger.info("create_from_template.directory: %s", directory)
 
@@ -46,7 +46,7 @@ def create_from_template(name: str, template_name: str, directory: Union[Path, s
         logger.info("Using current directory")
         directory = os.getcwd()
 
-    project_directory = path.join(directory, name)
+    project_directory = path.join(directory, project_name)
     if path.exists(project_directory):
         raise errors.BadDirectory(project_directory)
 
@@ -54,7 +54,7 @@ def create_from_template(name: str, template_name: str, directory: Union[Path, s
     _copy_template(template_name, project_directory)
 
     template = _load_as_template(project_directory)
-    template.apply(template_name, name)
+    template.apply(template_name, project_name)
 
     logger.info("Project created, template applied.")
 
@@ -210,11 +210,15 @@ class TemplateRust(Template):
         if not path.exists(abi_main_path):
             return
 
+        template_name = self.template_name.replace('-', '_')
+        project_name = self.project_name.replace('-', '_')
+
         self._replace_in_files(
             [abi_main_path],
             [
                 # Example: replace "use simple-erc20::*" to "use my_token::*"
-                (f"use {self.template_name.replace('-', '_')}::*", f"use {self.project_name.replace('-', '_')}::*")
+                (f"use {template_name}::*", f"use {project_name}::*"),
+                (f"<{template_name}::AbiProvider>()", f"<{project_name}::AbiProvider>()")
             ]
         )
 
