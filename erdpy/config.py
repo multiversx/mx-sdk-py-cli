@@ -135,7 +135,7 @@ def get_defaults() -> Dict[str, Any]:
         "chainID": "T",
         "txVersion": "1",
         "dependencies.arwentools.tag": "v1.3.27",
-        "dependencies.elrond_wasm_rs.tag": "v0.17.2",
+        "dependencies.elrond_wasm_rs.tag": "v0.18.2",
         "dependencies.arwentools.urlTemplate.linux": "https://github.com/ElrondNetwork/arwen-wasm-vm/archive/{TAG}.tar.gz",
         "dependencies.arwentools.urlTemplate.osx": "https://github.com/ElrondNetwork/arwen-wasm-vm/archive/{TAG}.tar.gz",
         "dependencies.llvm.tag": "v9-19feb",
