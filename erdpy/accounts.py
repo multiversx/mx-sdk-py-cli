@@ -45,7 +45,12 @@ class AccountsRepository:
 
 
 class Account(IAccount):
-    def __init__(self, address: Any = None, pem_file: Optional[str] = None, pem_index: int = 0, key_file: str = "", pass_file: str = "",
+    def __init__(self,
+                 address: Any = None,
+                 pem_file: Optional[str] = None,
+                 pem_index: int = 0,
+                 key_file: str = "",
+                 pass_file: str = "",
                  ledger: bool = False):
         self.address = Address(address)
         self.pem_file = pem_file

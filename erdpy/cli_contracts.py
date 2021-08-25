@@ -112,8 +112,10 @@ def _add_project_arg(sub: Any):
 
 def _add_project_or_bytecode_arg(sub: Any):
     group = sub.add_mutually_exclusive_group(required=True)
-    group.add_argument("--project", default=os.getcwd(), help="🗀 the project directory (default: current directory)")
-    group.add_argument("--bytecode", help="the WASM file", type=str)
+    group.add_argument("--project", default=os.getcwd(),
+                       help="🗀 the project directory (default: current directory)")
+    group.add_argument("--bytecode", type=str,
+                      help="the file containing the WASM bytecode")
 
 
 def _add_contract_arg(sub: Any):
