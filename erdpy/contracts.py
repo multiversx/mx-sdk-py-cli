@@ -4,12 +4,21 @@ from typing import Any, List, Optional
 
 from Cryptodome.Hash import keccak
 
-from erdpy import config, constants, errors, utils
+from erdpy import config, constants, errors
 from erdpy.accounts import Account, Address
 from erdpy.interfaces import IElrondProxy
 from erdpy.transactions import Transaction
 
 logger = logging.getLogger("contracts")
+
+HEX_PREFIX = "0X"
+
+
+class QueryResult:
+    def __init__(self, as_base64: str, as_hex: str, as_number: int):
+        self.base64 = as_base64
+        self.hex = as_hex
+        self.number = as_number
 
 
 class SmartContract:
@@ -120,7 +129,14 @@ class SmartContract:
 
         return tx_data
 
-    def query(self, proxy: IElrondProxy, function: str, arguments: List[Any], value: int = 0, caller: Optional[Address] = None) -> List[Any]:
+    def query(
+        self,
+        proxy: IElrondProxy,
+        function: str,
+        arguments: List[Any],
+        value: int = 0,
+        caller: Optional[Address] = None
+    ) -> List[Any]:
         response_data = self.query_detailed(proxy, function, arguments, value, caller)
         return_data = response_data.get("returnData", []) or response_data.get("ReturnData", [])
         return [self._interpret_return_data(data) for data in return_data]
@@ -143,7 +159,7 @@ class SmartContract:
         response_data = response.get("data", {})
         return response_data
 
-    def _interpret_return_data(self, data: Any) -> Any:
+    def _interpret_return_data(self, data: str) -> Any:
         if not data:
             return data
 
@@ -152,10 +168,7 @@ class SmartContract:
             as_hex = as_bytes.hex()
             as_number = int(as_hex, 16)
 
-            result = utils.Object()
-            result.base64 = data
-            result.hex = as_hex
-            result.number = as_number
+            result = QueryResult(data, as_hex, as_number)
             return result
         except Exception:
             logger.warn(f"Cannot interpret return data: {data}")
@@ -163,21 +176,38 @@ class SmartContract:
 
 
 def _prepare_argument(argument: Any):
-    hex_prefix = "0X"
     as_string = str(argument).upper()
 
-    if as_string.startswith(hex_prefix):
-        return as_string[len(hex_prefix):]
+    if as_string.startswith(HEX_PREFIX):
+        return _prepare_hexadecimal(as_string)
 
-    if not as_string.isnumeric():
-        raise errors.UnknownArgumentFormat(as_string)
+    return _prepare_decimal(as_string)
 
-    as_number = int(as_string)
-    as_hexstring = hex(as_number)[len(hex_prefix):]
-    if len(as_hexstring) % 2 == 1:
-        as_hexstring = "0" + as_hexstring
 
+def _prepare_hexadecimal(argument: str) -> str:
+    argument = argument[len(HEX_PREFIX):]
+    argument = ensure_even_length(argument)
+    try:
+        _ = int(argument, 16)
+    except ValueError:
+        raise errors.UnknownArgumentFormat(argument)
+    return argument
+
+
+def _prepare_decimal(argument: str) -> str:
+    if not argument.isnumeric():
+        raise errors.UnknownArgumentFormat(argument)
+
+    as_number = int(argument)
+    as_hexstring = hex(as_number)[len(HEX_PREFIX):]
+    as_hexstring = ensure_even_length(as_hexstring)
     return as_hexstring
+
+
+def ensure_even_length(string: str) -> str:
+    if len(string) % 2 == 1:
+        return '0' + string
+    return string
 
 
 class CodeMetadata:

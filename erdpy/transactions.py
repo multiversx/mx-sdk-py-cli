@@ -2,7 +2,7 @@ import base64
 import json
 import logging
 from collections import OrderedDict
-from typing import Any, Dict, List
+from typing import Any, Dict, List, TextIO
 
 from erdpy import errors, utils
 from erdpy.accounts import Account, Address
@@ -69,19 +69,19 @@ class Transaction(ITransaction):
         serialized = self._dict_to_json(dictionary)
         return serialized
 
-    def _dict_to_json(self, dictionary: Dict[str, Any]):
+    def _dict_to_json(self, dictionary: Dict[str, Any]) -> bytes:
         serialized = json.dumps(dictionary, separators=(',', ':')).encode("utf8")
         return serialized
 
-    def serialize_as_inner(self):
+    def serialize_as_inner(self) -> str:
         inner_dictionary = self.to_dictionary_as_inner()
         serialized = self._dict_to_json(inner_dictionary)
         serialized_hex = serialized.hex()
         return f"relayedTx@{serialized_hex}"
 
     @classmethod
-    def load_from_file(cls, f: Any):
-        data_json: bytes = utils.read_file(f).encode()
+    def load_from_file(cls, f: TextIO):
+        data_json: bytes = f.read().encode()
         fields = json.loads(data_json).get("tx")
         instance = cls()
         instance.__dict__.update(fields)

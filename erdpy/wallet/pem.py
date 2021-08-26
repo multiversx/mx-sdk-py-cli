@@ -116,8 +116,8 @@ def write(pem_file: Union[str, Path], seed: bytes, pubkey: bytes, name: str = ""
     seed_hex = seed.hex()
     pubkey_hex = pubkey.hex()
     combined = seed_hex + pubkey_hex
-    combined = combined.encode()
-    key_base64 = base64.b64encode(combined).decode()
+    combined_bytes = combined.encode()
+    key_base64 = base64.b64encode(combined_bytes).decode()
 
     payload_lines = textwrap.wrap(key_base64, 64)
     payload = "\n".join(payload_lines)

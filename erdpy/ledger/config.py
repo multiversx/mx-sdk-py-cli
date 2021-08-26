@@ -1,7 +1,11 @@
-import string
+class ElrondLedgerAppConfiguration:
+    data_activated: bool
+    account_index: int
+    address_index: int
+    version: str
 
 
-def load_ledger_config_from_response(response: bytes):
+def load_ledger_config_from_response(response: bytes) -> ElrondLedgerAppConfiguration:
     config = ElrondLedgerAppConfiguration()
 
     config.data_activated = False
@@ -17,7 +21,7 @@ def load_ledger_config_from_response(response: bytes):
     return config
 
 
-def compare_versions(version1: string, version2: string) -> int:
+def compare_versions(version1: str, version2: str) -> int:
     version1_tuple = version_tuple(version1)
     version2_tuple = version_tuple(version2)
     if version1_tuple == version2_tuple:
@@ -32,10 +36,3 @@ def version_tuple(v):
     for point in v.split("."):
         filled.append(point.zfill(8))
     return tuple(filled)
-
-
-class ElrondLedgerAppConfiguration:
-    data_activated: bool
-    account_index: int
-    address_index: int
-    version: string

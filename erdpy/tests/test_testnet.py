@@ -1,6 +1,8 @@
 import os
 import sys
 
+from pathlib import Path
+
 from erdpy import workstation
 from erdpy.testnet import config
 
@@ -59,6 +61,6 @@ def test_init():
     }
 
     testnet_config = config.TestnetConfiguration(data)
-    assert testnet_config.config["folders"]["elrond_go"] == workstation.get_tools_folder() / "bar"
-    assert testnet_config.config["folders"]["elrond_proxy_go"] == workstation.get_tools_folder() / "foobar"
-    assert testnet_config.config["folders"]["testnet"] == "/some/where/mytestnet"
+    assert testnet_config.folders["elrond_go"] == workstation.get_tools_folder() / "bar"
+    assert testnet_config.folders["elrond_proxy_go"] == workstation.get_tools_folder() / "foobar"
+    assert testnet_config.folders["testnet"] == Path("/some/where/mytestnet")

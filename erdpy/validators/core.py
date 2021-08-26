@@ -4,7 +4,7 @@ from os import path
 from typing import Any
 
 from erdpy.validators.validators_file import ValidatorsFile
-from erdpy.conv.conv import Converters
+from erdpy import utils
 from erdpy.accounts import Account, Address
 from erdpy.config import MetaChainSystemSCsCost, MIN_GAS_LIMIT, GAS_PER_DATA_BYTE
 from erdpy.wallet.pem import parse_validator_pem
@@ -61,7 +61,7 @@ def prepare_args_for_top_up(args: Any):
 
 
 def prepare_args_for_unstake(args: Any):
-    parsed_keys, num_keys = Converters.parse_keys(args.nodes_public_keys)
+    parsed_keys, num_keys = utils.parse_keys(args.nodes_public_keys)
     args.data = 'unStake' + parsed_keys
     args.receiver = VALIDATORS_SMART_CONTRACT_ADDRESS
 
@@ -70,7 +70,7 @@ def prepare_args_for_unstake(args: Any):
 
 
 def prepare_args_for_unbond(args: Any):
-    parsed_keys, num_keys = Converters.parse_keys(args.nodes_public_keys)
+    parsed_keys, num_keys = utils.parse_keys(args.nodes_public_keys)
     args.data = 'unBond' + parsed_keys
     args.receiver = VALIDATORS_SMART_CONTRACT_ADDRESS
 
@@ -79,7 +79,7 @@ def prepare_args_for_unbond(args: Any):
 
 
 def prepare_args_for_unjail(args: Any):
-    parsed_keys, num_keys = Converters.parse_keys(args.nodes_public_keys)
+    parsed_keys, num_keys = utils.parse_keys(args.nodes_public_keys)
     args.data = 'unJail' + parsed_keys
     args.receiver = VALIDATORS_SMART_CONTRACT_ADDRESS
 
@@ -105,7 +105,7 @@ def prepare_args_for_claim(args: Any):
 
 
 def prepare_args_for_unstake_nodes(args: Any):
-    parsed_keys, num_keys = Converters.parse_keys(args.nodes_public_keys)
+    parsed_keys, num_keys = utils.parse_keys(args.nodes_public_keys)
     args.data = 'unStakeNodes' + parsed_keys
 
     args.receiver = VALIDATORS_SMART_CONTRACT_ADDRESS
@@ -115,7 +115,7 @@ def prepare_args_for_unstake_nodes(args: Any):
 
 def prepare_args_for_unstake_tokens(args: Any):
     args.data = 'unStakeTokens'
-    args.data += '@' + Converters.str_int_to_hex_str(str(args.unstake_value))
+    args.data += '@' + utils.str_int_to_hex_str(str(args.unstake_value))
 
     args.receiver = VALIDATORS_SMART_CONTRACT_ADDRESS
     if args.estimate_gas:
@@ -123,7 +123,7 @@ def prepare_args_for_unstake_tokens(args: Any):
 
 
 def prepare_args_for_unbond_nodes(args: Any):
-    parsed_keys, num_keys = Converters.parse_keys(args.nodes_public_keys)
+    parsed_keys, num_keys = utils.parse_keys(args.nodes_public_keys)
     args.data = 'unBondNodes' + parsed_keys
 
     args.receiver = VALIDATORS_SMART_CONTRACT_ADDRESS
@@ -133,7 +133,7 @@ def prepare_args_for_unbond_nodes(args: Any):
 
 def prepare_args_for_unbond_tokens(args: Any):
     args.data = 'unBondTokens'
-    args.data += '@' + Converters.str_int_to_hex_str(str(args.unbond_value))
+    args.data += '@' + utils.str_int_to_hex_str(str(args.unbond_value))
 
     args.receiver = VALIDATORS_SMART_CONTRACT_ADDRESS
     if args.estimate_gas:
@@ -149,7 +149,7 @@ def prepare_args_for_clean_registered_data(args: Any):
 
 
 def prepare_args_for_restake_unstaked_nodes(args: Any):
-    parsed_keys, num_keys = Converters.parse_keys(args.nodes_public_keys)
+    parsed_keys, num_keys = utils.parse_keys(args.nodes_public_keys)
     args.data = 'reStakeUnStakedNodes' + parsed_keys
 
     args.receiver = VALIDATORS_SMART_CONTRACT_ADDRESS
