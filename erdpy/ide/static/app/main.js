@@ -1,6 +1,6 @@
 _.templateSettings = {
-    interpolate: /\[\[=(.+?)\]\]/g,
-    evaluate: /\[\[(.+?)\]\]/g,
+    interpolate: /\[\[=(.+?)]]/g,
+    evaluate: /\[\[(.+?)]]/g,
 };
 
 var app = {};
