@@ -1,23 +1,19 @@
-import unittest
-
-from erdpy.conv.conv import Converters
+from erdpy import utils
 
 
-class ConvertersTestCase(unittest.TestCase):
-    def test_str_to_hex_str(self):
-        my_str = "1000000"
-        hex_str = Converters.str_int_to_hex_str(my_str)
-        self.assertEqual("0f4240", hex_str)
+def test_str_to_hex_str():
+    my_str = "1000000"
+    hex_str = utils.str_int_to_hex_str(my_str)
+    assert hex_str == "0f4240"
 
-        my_str = "100000000000000000"
-        hex_str = Converters.str_int_to_hex_str(my_str)
-        self.assertEqual("00016345785d8a0000", hex_str)
-
-    def test_parse_keys(self):
-        keys = "myKey,newKey,anotherKey"
-        parsed_keys, num_keys = Converters.parse_keys(keys)
-
-        self.assertEqual(3, num_keys)
-        self.assertEqual("@myKey@newKey@anotherKey", parsed_keys)
+    my_str = "100000000000000000"
+    hex_str = utils.str_int_to_hex_str(my_str)
+    assert hex_str == "00016345785d8a0000"
 
 
+def test_parse_keys():
+    keys = "myKey,newKey,anotherKey"
+    parsed_keys, num_keys = utils.parse_keys(keys)
+
+    assert num_keys == 3
+    assert parsed_keys == "@myKey@newKey@anotherKey"

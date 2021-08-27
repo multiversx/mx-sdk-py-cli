@@ -3,7 +3,7 @@ import shutil
 import subprocess
 from os import path
 from pathlib import Path
-from typing import Any, MutableMapping
+from typing import Any, Dict, cast
 
 from erdpy import dependencies, errors, myprocess, utils
 from erdpy.projects.project_base import Project
@@ -79,10 +79,10 @@ class ProjectRust(Project):
         utils.prettify_json_file(self._get_abi_filepath())
 
     def _has_abi(self):
-        return Path(self._get_abi_folder(), "Cargo.toml").is_file()
+        return (self._get_abi_folder() / "Cargo.toml").exists()
 
     def _get_abi_filepath(self):
-        return Path(self._get_abi_folder(), "abi.json")
+        return self._get_abi_folder() / "abi.json"
 
     def _get_abi_folder(self):
         return Path(self.directory, "abi")
@@ -110,6 +110,8 @@ class ProjectRust(Project):
 
 
 class CargoFile:
+    data: Dict[str, Any]
+
     def __init__(self, path):
         self.data = {}
         self.path = path
@@ -165,31 +167,34 @@ class CargoFile:
     def save(self):
         utils.write_toml_file(self.path, self.data)
 
-    def _get_package(self) -> MutableMapping[str, Any]:
+    def _get_package(self) -> Dict[str, Any]:
         if "package" not in self.data:
             self.data["package"] = {}
-        return self.data["package"]
+        package = cast(Dict[str, Any], self.data['package'])
+        return package
 
-    def get_dependencies(self) -> MutableMapping[str, Any]:
+    def get_dependencies(self) -> Dict[str, Any]:
         if "dependencies" not in self.data:
             self.data["dependencies"] = {}
-        return self.data["dependencies"]
+        dependencies = cast(Dict[str, Any], self.data['dependencies'])
+        return dependencies
 
-    def get_dev_dependencies(self) -> MutableMapping[str, Any]:
+    def get_dev_dependencies(self) -> Dict[str, Any]:
         if "dev-dependencies" not in self.data:
             self.data["dev-dependencies"] = {}
-        return self.data["dev-dependencies"]
+        dev_dependencies = cast(Dict[str, Any], self.data['dev-dependencies'])
+        return dev_dependencies
 
-    def get_dependency(self, name) -> MutableMapping[str, Any]:
+    def get_dependency(self, name) -> Dict[str, Any]:
         dependencies = self.get_dependencies()
-        dependency = dependencies.get(name)
+        dependency = cast(Dict[str, Any], dependencies.get(name))
         if dependency is None:
             raise errors.BuildError(f"Can't get cargo dependency: {name}")
         return dependency
 
-    def get_dev_dependency(self, name) -> MutableMapping[str, Any]:
+    def get_dev_dependency(self, name) -> Dict[str, Any]:
         dependencies = self.get_dev_dependencies()
-        dependency = dependencies.get(name)
+        dependency = cast(Dict[str, Any], dependencies.get(name))
         if dependency is None:
             raise errors.BuildError(f"Can't get cargo dev-dependency: {name}")
         return dependency

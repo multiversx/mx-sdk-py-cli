@@ -49,3 +49,9 @@ def get_all_deps() -> List[DependencyModule]:
         GolangModule(key="golang"),
         MclSignerModule(key="mcl_signer")
     ]
+
+
+def get_golang() -> GolangModule:
+    golang = get_module_by_key('golang')
+    assert isinstance(golang, GolangModule)
+    return golang

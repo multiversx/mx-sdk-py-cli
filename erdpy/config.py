@@ -54,7 +54,9 @@ def get_dependency_url(key: str, tag: str, platform: str) -> str:
 def get_value(name: str) -> str:
     _guard_valid_name(name)
     data = get_active()
-    return data.get(name, get_defaults()[name])
+    value = data.get(name, get_defaults()[name])
+    assert isinstance(value, str)
+    return value
 
 
 def set_value(name: str, value: Any):
@@ -133,6 +135,7 @@ def get_defaults() -> Dict[str, Any]:
         "chainID": "T",
         "txVersion": "1",
         "dependencies.arwentools.tag": "v1.1.2",
+        "dependencies.elrond_wasm_rs.tag": "v0.12.0",
         "dependencies.arwentools.urlTemplate.linux": "https://github.com/ElrondNetwork/arwen-wasm-vm/archive/{TAG}.tar.gz",
         "dependencies.arwentools.urlTemplate.osx": "https://github.com/ElrondNetwork/arwen-wasm-vm/archive/{TAG}.tar.gz",
         "dependencies.llvm.tag": "v9-19feb",
@@ -155,7 +158,6 @@ def get_defaults() -> Dict[str, Any]:
         "dependencies.mcl_signer.tag": "v1.0.0",
         "dependencies.mcl_signer.urlTemplate.linux": "https://github.com/ElrondNetwork/elrond-sdk-go-tools/releases/download/{TAG}/mcl_signer_{TAG}_ubuntu-latest.tar.gz",
         "dependencies.mcl_signer.urlTemplate.osx": "https://github.com/ElrondNetwork/elrond-sdk-go-tools/releases/download/{TAG}/mcl_signer_{TAG}_macos-latest.tar.gz",
-        "dependencies.elrond_wasm_rs.tag": "v0.10.2",
     }
 
 

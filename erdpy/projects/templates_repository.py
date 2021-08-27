@@ -34,7 +34,6 @@ class TemplatesRepository:
 
         downloader.download(self.url, archive)
 
-
     def _get_archive_path(self):
         tools_folder = workstation.get_tools_folder()
         archive = path.join(tools_folder, f"{self.key}.zip")

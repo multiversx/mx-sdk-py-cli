@@ -19,6 +19,7 @@ def sign_transaction(transaction: ITransaction, account: IAccount) -> str:
     signed = signing_key.sign(data_json)
     signature = signed.signature
     signature_hex = signature.hex()
+    assert isinstance(signature_hex, str)
 
     return signature_hex
 
@@ -32,3 +33,15 @@ def sign_message_with_bls_key(message, seed):
         return signed_message
     except Exception:
         raise CannotSignMessageWithBLSKey()
+
+
+def sign_message(message: bytes, account: IAccount) -> str:
+    seed: bytes = account.get_seed()
+    signing_key: Any = nacl.signing.SigningKey(seed)
+
+    signed = signing_key.sign(message)
+    signature = signed.signature
+    signature_hex = signature.hex()
+    assert isinstance(signature_hex, str)
+
+    return signature_hex

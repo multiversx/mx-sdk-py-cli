@@ -9,7 +9,7 @@ import sys
 import tarfile
 import zipfile
 from pathlib import Path
-from typing import Any, Dict, List, Union
+from typing import Any, List, Union, Optional, cast, IO, Dict
 
 import toml
 
@@ -75,15 +75,33 @@ def read_lines(file: str):
     return lines
 
 
-def read_file(f: Any, binary=False) -> Union[str, bytes]:
+# TODO delete this function, it is too generic
+# TODO find usages in legolas
+def read_file(f: Any, binary: bool = False) -> Union[str, bytes]:
     try:
-        mode = "rb" if binary else "r"
         if isinstance(f, str) or isinstance(f, pathlib.PosixPath):
-            with open(f, mode) as f:
-                return f.read()
-        return f.read()
+            path = Path(f)
+            if binary:
+                return read_binary_file(path)
+            return read_text_file(path)
+
+        file = cast(IO, f)
+        result = file.read()
+        assert isinstance(result, str) or isinstance(result, bytes)
+        return result
+
     except Exception as err:
         raise errors.BadFile(f, err)
+
+
+def read_binary_file(path: Path) -> bytes:
+    with open(path, 'rb') as binary_file:
+        return binary_file.read()
+
+
+def read_text_file(path: Path) -> str:
+    with open(path, 'r') as text_file:
+        return text_file.read()
 
 
 def write_file(f: Any, text: str):
@@ -102,9 +120,11 @@ def write_toml_file(filename, data):
         toml.dump(data, f)
 
 
-def read_json_file(filename: str) -> Dict[str, Any]:
+def read_json_file(filename: Union[str, Path]) -> Dict[str, Any]:
+    data: Dict[str, Any]
     with open(filename) as f:
-        return json.load(f)
+        data = json.load(f)
+    return data
 
 
 def write_json_file(filename: str, data: Any):
@@ -146,7 +166,7 @@ def find_in_dictionary(dictionary, compound_path):
     return node
 
 
-def list_files(folder: str, suffix: str = None) -> List[str]:
+def list_files(folder: Union[str, Path], suffix: Optional[str] = None) -> List[str]:
     files = os.listdir(folder)
     files = [os.path.join(folder, f) for f in files]
 
@@ -156,7 +176,7 @@ def list_files(folder: str, suffix: str = None) -> List[str]:
     return files
 
 
-def remove_folder(folder):
+def remove_folder(folder: Union[str, Path]):
     shutil.rmtree(folder, ignore_errors=True)
 
 
@@ -166,17 +186,13 @@ def symlink(real: str, link: str) -> None:
     os.symlink(real, link)
 
 
-def str_to_bool(input: str) -> bool:
-    return str(input).lower() in ["true", "1", "t", "y", "yes"]
-
-
-def as_object(input: Any) -> Object:
-    if isinstance(input, dict):
+def as_object(data: Object) -> Object:
+    if isinstance(data, dict):
         result = Object()
-        result.__dict__.update(input)
+        result.__dict__.update(data)
         return result
 
-    return input
+    return data
 
 
 def is_arg_present(key: str, args: List[str]) -> bool:
@@ -187,6 +203,24 @@ def is_arg_present(key: str, args: List[str]) -> bool:
             return True
 
     return False
+
+
+def str_int_to_hex_str(number_str: str) -> str:
+    num_of_bytes = 1
+    if len(number_str) > 2:
+        num_of_bytes = int(len(number_str) / 2)
+    int_str = int(number_str)
+    int_bytes = int_str.to_bytes(num_of_bytes, byteorder="big")
+    bytes_str = int_bytes.hex()
+    return bytes_str
+
+
+def parse_keys(bls_public_keys):
+    keys = bls_public_keys.split(',')
+    parsed_keys = ''
+    for key in keys:
+        parsed_keys += '@' + key
+    return parsed_keys, len(keys)
 
 
 # https://code.visualstudio.com/docs/python/debugging

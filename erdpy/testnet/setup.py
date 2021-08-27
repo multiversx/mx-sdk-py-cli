@@ -97,9 +97,7 @@ def create_folders(testnet_config: TestnetConfiguration):
 def copy_config_to_nodes(testnet_config: TestnetConfiguration):
     config_source = testnet_config.node_config_source()
     for node_config in testnet_config.all_nodes_config_folders():
-        shutil.copytree(
-            config_source,
-            node_config)
+        shutil.copytree(config_source, node_config)
 
 
 def copy_validator_keys(testnet_config: TestnetConfiguration):
@@ -113,20 +111,25 @@ def copy_validator_keys(testnet_config: TestnetConfiguration):
 
 def patch_node_config(testnet_config: TestnetConfiguration):
     for node_config in testnet_config.all_nodes_config_folders():
-        config_file = node_config / 'config.toml'
-        data = utils.read_toml_file(config_file)
-        node_config_toml.patch(data, testnet_config)
-        utils.write_toml_file(config_file, data)
+        node_config_file = node_config / 'config.toml'
+        data = utils.read_toml_file(node_config_file)
+        node_config_toml.patch_config(data, testnet_config)
+        utils.write_toml_file(node_config_file, data)
 
-        config_file = node_config / 'api.toml'
-        data = utils.read_toml_file(config_file)
+        api_config_file = node_config / 'api.toml'
+        data = utils.read_toml_file(api_config_file)
         node_config_toml.patch_api(data, testnet_config)
-        utils.write_toml_file(config_file, data)
+        utils.write_toml_file(api_config_file, data)
 
-        config_file = node_config / 'systemSmartContractsConfig.toml'
-        data = utils.read_toml_file(config_file)
+        system_sc_config_file = node_config / 'systemSmartContractsConfig.toml'
+        data = utils.read_toml_file(system_sc_config_file)
         node_config_toml.patch_system_smart_contracts(data, testnet_config)
-        utils.write_toml_file(config_file, data)
+        utils.write_toml_file(system_sc_config_file, data)
+
+        enable_epochs_config_file = node_config / 'enableEpochs.toml'
+        data = utils.read_toml_file(enable_epochs_config_file)
+        node_config_toml.patch_enable_epochs(data, testnet_config)
+        utils.write_toml_file(enable_epochs_config_file, data)
 
         genesis_smart_contracts_file = node_config / 'genesisSmartContracts.json'
         data = utils.read_json_file(genesis_smart_contracts_file)
@@ -222,20 +225,16 @@ def makefolder(path_where_to_make_folder):
 def patch_source_code(testnet_config: TestnetConfiguration):
     logger.info("Patching the source code...")
 
-    folder = testnet_config.node_source()
+    node_source = testnet_config.node_source()
 
-    file = path.join(folder, "core/constants.go")
-    content = utils.read_file(file)
-    utils.write_file(file, content)
-
-    file = path.join(folder, "cmd/node/main.go")
-    content = utils.read_file(file)
+    file = node_source / 'cmd' / 'node' / 'main.go'
+    content = utils.read_text_file(file)
     content = content.replace("secondsToWaitForP2PBootstrap = 20", "secondsToWaitForP2PBootstrap = 1")
     utils.write_file(file, content)
 
 
 def build_binaries(testnet_config: TestnetConfiguration):
-    golang = dependencies.get_module_by_key("golang")
+    golang = dependencies.get_golang()
     golang_env = golang.get_env()
     myprocess.run_process(['go', 'env'], env=golang_env)
 
@@ -251,9 +250,9 @@ def build_binaries(testnet_config: TestnetConfiguration):
     logger.info(f"Arwen Binary: {arwen_binary}")
     if arwen_binary:
         logger.info("Building arwen...")
-        node_folder_root = testnet_config.node_source()
         env = dict(golang_env)
-        env["ARWEN_PATH"] = node_folder
+        env["ARWEN_PATH"] = str(node_folder)
+        node_folder_root = testnet_config.node_source()
         myprocess.run_process(['make', 'arwen'], cwd=node_folder_root, env=env)
 
     logger.info("Building proxy...")
@@ -270,7 +269,11 @@ def build_binaries(testnet_config: TestnetConfiguration):
 
     for destination in testnet_config.all_nodes_folders():
         shutil.copy(node_folder / "node", destination)
-        shutil.copy(node_folder / "arwen", destination)
+        if arwen_binary:
+            try:
+                shutil.copy(node_folder / "arwen", destination)
+            except FileNotFoundError:
+                logger.warn("Could not copy the arwen binary!")
 
         if workstation.get_platform() == "osx":
             shutil.copy(libwasmer_path, destination)
@@ -282,7 +285,7 @@ def build_binaries(testnet_config: TestnetConfiguration):
 
 def _get_arwen_version(testnet_config: TestnetConfiguration):
     go_mod = testnet_config.node_source() / "go.mod"
-    lines = utils.read_lines(go_mod)
+    lines = utils.read_lines(str(go_mod))
     line = next(line for line in lines if "github.com/ElrondNetwork/arwen-wasm-vm" in line)
     parts = line.split()
     return parts[1]

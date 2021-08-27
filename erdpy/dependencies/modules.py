@@ -57,8 +57,7 @@ class DependencyModule:
 
 
 class StandaloneModule(DependencyModule):
-
-    def __init__(self, key: str, aliases: List[str] = None, repo_name = None):
+    def __init__(self, key: str, aliases: List[str] = None, repo_name=None):
         if aliases is None:
             aliases = list()
 
@@ -162,9 +161,7 @@ class ArwenToolsModule(StandaloneModule):
         parent = Path(self.get_parent_directory())
         symlink = parent / symlink_name
 
-        if symlink.exists():
-            symlink.unlink()
-
+        symlink.unlink(missing_ok=True)
         symlink.symlink_to(binary)
 
     def get_env(self):

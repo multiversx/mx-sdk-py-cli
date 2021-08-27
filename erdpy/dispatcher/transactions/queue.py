@@ -137,7 +137,9 @@ class TransactionQueue:
                 tx.get("value"),
                 tx.get("data"),
                 tx.get("gasPrice"),
-                tx.get("gasLimit")
+                tx.get("gasLimit"),
+                tx.get("chain"),
+                tx.get("version")
             )
             # increment nonce
             nonce += 1

@@ -50,7 +50,7 @@ def get_validators(num_validators: int) -> Dict[str, Tuple[str, Account]]:
         pem_file = get_validator_wallet_file(i)
         nickname = "validator{:02}".format(i)
         account = Account(pem_file=pem_file)
-        result[nickname] = [pubkey, account]
+        result[nickname] = (pubkey, account)
 
     return result
 

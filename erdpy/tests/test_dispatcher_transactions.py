@@ -31,7 +31,7 @@ def write_in_queue():
 
 class DispatcherTestCase(unittest.TestCase):
     # this a manual test needs proxy and pem file with funds
-    @unittest.skip
+    @unittest.skip('manual run only')
     def test_multi_thread(self):
         _thread.start_new_thread(write_in_queue, ())
 
@@ -44,12 +44,12 @@ class DispatcherTestCase(unittest.TestCase):
 
         self.assertFalse(False)
 
-    @unittest.skip
+    @unittest.skip('manual run only')
     def test_enqueue_tx(self):
         write_in_queue()
         self.assertFalse(False)
 
-    @unittest.skip
+    @unittest.skip('manual run only')
     def test_dispatcher_txs(self):
         args = TestArgs()
         args.proxy = "http://localhost:7950"
@@ -58,7 +58,7 @@ class DispatcherTestCase(unittest.TestCase):
         queue.dispatch_transactions(args)
         self.assertFalse(False)
 
-    @unittest.skip
+    @unittest.skip('manual run only')
     def test_clean(self):
         queue = TransactionQueue()
         queue.clean_transactions_queue()
