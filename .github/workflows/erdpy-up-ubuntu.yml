@@ -20,6 +20,7 @@ jobs:
           python-version: ${{ matrix.python-version }}
       - name: Install
         run: |
+          pip3 install --user ledgercomm
           wget -O erdpy-up.py https://raw.githubusercontent.com/ElrondNetwork/elrond-sdk-erdpy/development/erdpy-up.py
           python3 erdpy-up.py
       - name: Smoke test
