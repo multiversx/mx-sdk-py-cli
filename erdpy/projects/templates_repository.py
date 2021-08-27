@@ -1,3 +1,4 @@
+from pathlib import Path
 import shutil
 import time
 from os import path
@@ -44,7 +45,7 @@ class TemplatesRepository:
         folder = path.join(tools_folder, "templates", self.key)
         return folder
 
-    def has_template(self, template):
+    def has_template(self, template: str) -> bool:
         folder = self.get_template_folder(template)
         has = path.isdir(folder)
         return has
@@ -65,7 +66,7 @@ class TemplatesRepository:
     def get_metadata_file(self, template_folder):
         return path.join(self.get_folder(), self.relative_path, template_folder, "elrond.json")
 
-    def copy_template(self, template, destination_path):
+    def copy_template(self, template: str, destination_path: Path):
         if not self.has_template(template):
             raise errors.TemplateMissingError(template)
 

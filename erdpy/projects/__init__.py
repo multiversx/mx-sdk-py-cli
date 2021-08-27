@@ -6,7 +6,8 @@ from erdpy.projects.project_clang import ProjectClang
 from erdpy.projects.project_cpp import ProjectCpp
 from erdpy.projects.project_rust import ProjectRust
 from erdpy.projects.project_sol import ProjectSol
-from erdpy.projects.templates import (create_from_template,
+from erdpy.projects.templates import (create_project_from_template_name,
+                                      apply_template_into_directory,
                                       list_project_templates)
 
-__all__ = ["build_project", "clean_project", "run_tests", "get_projects_in_workspace", "load_project", "Project", "ProjectClang", "ProjectCpp", "ProjectRust", "ProjectSol", "create_from_template", "list_project_templates"]
+__all__ = ["build_project", "clean_project", "run_tests", "get_projects_in_workspace", "load_project", "Project", "ProjectClang", "ProjectCpp", "ProjectRust", "ProjectSol", "create_project_from_template_name", "apply_template_into_directory", "list_project_templates"]

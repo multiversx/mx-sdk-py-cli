@@ -1,6 +1,5 @@
 import json
 import logging
-import os
 from os import path
 from pathlib import Path
 from typing import Union
@@ -35,30 +34,28 @@ class TemplateSummary():
         self.language = repository.get_language(name)
 
 
-def create_from_template(project_name: str, template_name: str, directory: Union[Path, str]):
-    directory = path.expanduser(directory)
+def create_project_from_template_name(project_name: str, template_name: str, directory: Union[Path, str]):
+    logger.info("create_project_from_template_name.project_name: %s", project_name)
+    logger.info("create_project_from_template_name.template_name: %s", template_name)
+    logger.info("create_project_from_template_name.directory: %s", directory)
 
-    logger.info("create_from_template.project_name: %s", project_name)
-    logger.info("create_from_template.template_name: %s", template_name)
-    logger.info("create_from_template.directory: %s", directory)
+    directory_path: Path = Path(directory).expanduser() if directory else Path.cwd()
+    project_directory = directory_path / project_name
 
-    if not directory:
-        logger.info("Using current directory")
-        directory = os.getcwd()
-
-    project_directory = path.join(directory, project_name)
-    if path.exists(project_directory):
-        raise errors.BadDirectory(project_directory)
+    if project_directory.exists():
+        raise errors.BadDirectory(str(project_directory))
 
     _download_templates_repositories()
-    _copy_template(template_name, project_directory)
+    logger.info("Done downloading templates repositories")
 
-    template = _load_as_template(project_directory)
-    template.apply(template_name, project_name)
+    _copy_template_by_name(template_name, project_directory)
+    logger.info("Project created (template not yet applied).")
 
-    logger.info("Project created, template applied.")
+    apply_template_into_directory(template_name, project_name, project_directory)
+    logger.info("Template applied.")
 
     wallets.copy_all_to(path.join(project_directory, "wallets"))
+    logger.info("Added test wallets into project directory")
 
     logger.info("Test wallets have been copied into the project.")
 
@@ -68,29 +65,40 @@ def _download_templates_repositories():
         repo.download()
 
 
-def _copy_template(template, destination_path):
+def _copy_template_by_name(template_name: str, destination_path: Path):
+    """
+    Search for a given template in all (downloaded) repositories.
+    When found, copy it's folder to the destination path.
+    """
     for repo in get_templates_repositories():
-        if repo.has_template(template):
-            repo.copy_template(template, destination_path)
+        if repo.has_template(template_name):
+            repo.copy_template(template_name, destination_path)
             return
 
-    raise errors.TemplateMissingError(template)
+    raise errors.TemplateMissingError(template_name)
 
 
-def _load_as_template(directory):
+def apply_template_into_directory(template_name: str, project_name: str, project_directory: Path):
+    template: Template = _create_template(project_directory)
+    template.apply(template_name, project_name)
+
+
+def _create_template(directory: Path):
     if shared.is_source_clang(directory):
         return TemplateClang(directory)
     if shared.is_source_sol(directory):
         return TemplateSol(directory)
     if shared.is_source_rust(directory):
         return TemplateRust(directory)
+    
+    raise errors.NotSupportedProject(str(directory))
 
 
 class Template:
     def __init__(self, directory):
         self.directory = directory
 
-    def apply(self, template_name, project_name):
+    def apply(self, template_name: str, project_name: str):
         self.template_name = template_name
         self.project_name = project_name
         self._patch()

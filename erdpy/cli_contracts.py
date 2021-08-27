@@ -1,8 +1,7 @@
 import logging
 import os
-from typing import Any
-
 from pathlib import Path
+from typing import Any
 
 from erdpy import cli_shared, errors, projects, utils
 from erdpy.accounts import Account, Address
@@ -145,7 +144,7 @@ def create(args: Any):
     template = args.template
     directory = args.directory
 
-    projects.create_from_template(name, template, directory)
+    projects.create_project_from_template_name(name, template, directory)
 
 
 def clean(args: Any):
