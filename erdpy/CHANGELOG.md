@@ -4,6 +4,12 @@ All notable changes will be documented in this file.
 
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
+## [1.0.16] - 27.08.2021
+ - Merge branch `legolas-addons`
+ - Fix `erdpy testnet` to work with recent changes in `elrond-go`
+ - Add more type hints for `mypy`
+ - Many small improvements
+
 ## [1.0.12] - 22.03.2021
  - Minor fixes to the configuration profiles support
  - Dependency `arwentools` is now built locally, instead of fetching precompiled binaries

@@ -3,7 +3,7 @@ import setuptools
 with open("README.md", "r") as fh:
     long_description = "https://github.com/ElrondNetwork/elrond-sdk-erdpy"
 
-VERSION = "1.0.15"
+VERSION = "1.0.17"
 
 try:
     with open('./erdpy/_version.py', 'wt') as versionfile:
@@ -26,7 +26,14 @@ setuptools.setup(
     include_package_data=True,
     setup_requires=["wheel"],
     install_requires=[
-        "toml>=0.10.2", "bottle", "requests", "pynacl", "pycryptodomex", "cryptography>=3.2", "prettytable"
+        "toml>=0.10.2",
+        "bottle",
+        "requests",
+        "pynacl",
+        "pycryptodomex",
+        "cryptography>=3.2",
+        "prettytable",
+        "ledgercomm"
     ],
     zip_safe=False,
     keywords=["Elrond"],
