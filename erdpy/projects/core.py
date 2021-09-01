@@ -1,3 +1,4 @@
+import os
 from erdpy import dependencies
 import logging
 from os import path
@@ -36,8 +37,10 @@ def build_project(directory: str, options: Dict[str, Any]):
 
     guards.is_directory(directory)
     project = load_project(directory)
-    project.build(options)
+    output_wasm_file = project.build(options)
     logger.info("Build ran.")
+    relative_wasm_path = os.path.join(".", output_wasm_file.relative_to(os.getcwd()))
+    logger.info(f"WASM file generated: {relative_wasm_path}")
 
 
 def clean_project(directory: str):
