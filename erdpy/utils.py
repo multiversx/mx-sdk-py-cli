@@ -230,3 +230,23 @@ def breakpoint():
     print("Waiting for debugger attach")
     debugpy.wait_for_client()
     debugpy.breakpoint()
+
+
+def log_explorer(chain, name, path, details):
+    networks = {
+        "1": ("Elrond Mainnet Explorer", "https://explorer.elrond.com"),
+        "T": ("Elrond Testnet Explorer", "https://testnet-explorer.elrond.com"),
+        "D": ("Elrond Devnet Explorer", "https://devnet-explorer.elrond.com"),
+    }
+    if chain not in networks:
+        return
+    explorer_name, explorer_url = networks[chain]
+    logger.info(f"View this {name} in the {explorer_name}: {explorer_url}/{path}/{details}")
+
+
+def log_explorer_contract_address(chain, address):
+    log_explorer(chain, "contract address", "accounts", address)
+
+
+def log_explorer_transaction(chain, transaction_hash):
+    log_explorer(chain, "transaction", "transactions", transaction_hash)
