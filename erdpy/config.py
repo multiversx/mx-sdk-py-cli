@@ -199,5 +199,14 @@ def add_config_args(argv):
             continue
         extra_args.append(str(value))
 
-    print(f"Added extra args from erdpy.json: {argv + extra_args}")
-    return argv + extra_args
+    # the verbose flag is an exception since it has to go before the command and subcommand
+    # eg. erdpy --verbose contract deploy
+    verbose_flag = '--verbose'
+    pre_args = []
+    if verbose_flag in extra_args:
+        extra_args.remove(verbose_flag)
+        pre_args = [verbose_flag]
+
+    final_args = pre_args + argv + extra_args
+    print(f"Added extra args from erdpy.json: {final_args}")
+    return final_args
