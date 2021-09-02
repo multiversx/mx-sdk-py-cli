@@ -9,6 +9,4 @@ jobs:
       - uses: tsuyoshicho/action-mypy@v3
         with:
           github_token: ${{ secrets.github_token }}
-          reporter: github-pr-review
-          level: error
-          workdir: .
+          filter_mode: nofilter
