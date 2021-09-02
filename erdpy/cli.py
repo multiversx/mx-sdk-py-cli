@@ -21,7 +21,7 @@ import erdpy.cli_validators
 import erdpy.cli_wallet
 import erdpy.cli_delagation
 import erdpy.cli_dns
-from erdpy import errors, scope
+from erdpy import config, errors, scope
 from erdpy._version import __version__
 
 logger = logging.getLogger("cli")
@@ -43,7 +43,8 @@ def _do_main():
     scope.initialize()
 
     parser = setup_parser()
-    args = parser.parse_args()
+    argv_with_config_args = config.add_config_args(sys.argv[1:])
+    args = parser.parse_args(argv_with_config_args)
 
     if args.verbose:
         logging.basicConfig(level=logging.DEBUG)

@@ -1,3 +1,5 @@
+from itertools import chain
+from logging import Logger
 import os.path
 from typing import Any, Dict
 
@@ -175,3 +177,27 @@ def write_file(data: Dict[str, Any]):
         utils.write_json_file(LOCAL_CONFIG_PATH, data)
     else:
         utils.write_json_file(CONFIG_PATH, data)
+
+
+def add_config_args(argv):
+    if len(argv) < 2:
+        return argv
+
+    func, subcommand, *_ = argv
+    config = read_file()
+    if func not in config:
+        return argv
+
+    extra_func = config[func]
+    if subcommand not in extra_func:
+        return argv
+
+    extra_args = []
+    for key, value in extra_func[subcommand].items():
+        extra_args.append(f'--{key}')
+        if value is True:
+            continue
+        extra_args.append(str(value))
+
+    print(f"Added extra args from erdpy.json: {argv + extra_args}")
+    return argv + extra_args
