@@ -1,7 +1,7 @@
 from itertools import chain
 from logging import Logger
 import os.path
-from typing import Any, Dict
+from typing import Any, Dict, List
 
 from erdpy import errors, utils
 
@@ -197,7 +197,11 @@ def add_config_args(argv):
         extra_args.append(f'--{key}')
         if value is True:
             continue
-        extra_args.append(str(value))
+        if isinstance(value, List):
+            for item in value:
+                extra_args.append(str(item))
+        else:
+            extra_args.append(str(value))
 
     # the verbose flag is an exception since it has to go before the command and subcommand
     # eg. erdpy --verbose contract deploy
