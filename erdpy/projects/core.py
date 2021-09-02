@@ -1,4 +1,5 @@
 import os
+import pathlib
 from erdpy import dependencies
 import logging
 from os import path
@@ -39,7 +40,7 @@ def build_project(directory: str, options: Dict[str, Any]):
     project = load_project(directory)
     output_wasm_file = project.build(options)
     logger.info("Build ran.")
-    relative_wasm_path = os.path.join(".", output_wasm_file.relative_to(os.getcwd()))
+    relative_wasm_path = pathlib.Path(".").joinpath(output_wasm_file.relative_to(pathlib.Path.cwd()))
     logger.info(f"WASM file generated: {relative_wasm_path}")
 
 
