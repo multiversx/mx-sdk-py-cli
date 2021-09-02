@@ -180,20 +180,20 @@ def write_file(data: Dict[str, Any]):
 
 
 def add_config_args(argv):
-    if len(argv) < 2:
+    try:
+        func, subcommand, *_ = argv
+    except ValueError:
         return argv
 
-    func, subcommand, *_ = argv
     config = read_file()
-    if func not in config:
-        return argv
 
-    extra_func = config[func]
-    if subcommand not in extra_func:
+    try:
+        config_args = config[func][subcommand]
+    except KeyError:
         return argv
 
     extra_args = []
-    for key, value in extra_func[subcommand].items():
+    for key, value in config_args.items():
         extra_args.append(f'--{key}')
         if value is True:
             continue
