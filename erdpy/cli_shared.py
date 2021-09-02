@@ -71,7 +71,7 @@ def add_tx_args(sub: Any, with_nonce: bool = True, with_receiver: bool = True, w
 
     sub.add_argument("--chain", default=scope.get_chain_id(), help="the chain identifier (default: %(default)s)")
     sub.add_argument("--version", type=int, default=scope.get_tx_version(), help="the transaction version (default: %(default)s)")
-    sub.add_argument("--options", type=int, default=0,  help="the transaction options (default: 0)")
+    sub.add_argument("--options", type=int, default=0, help="the transaction options (default: 0)")
 
 
 def add_wallet_args(sub: Any):
@@ -106,6 +106,7 @@ def add_omit_fields_arg(sub: Any):
 def parse_omit_fields_arg(args: Any) -> List[str]:
     literal = args.omit_fields
     parsed = ast.literal_eval(literal)
+    assert isinstance(parsed, List)
     return parsed
 
 
@@ -149,7 +150,7 @@ def send_or_simulate(tx: Transaction, args: Any):
         utils.dump_out_json(response)
 
 
-def check_if_sign_method_required(checked_method: string) -> bool:
+def check_if_sign_method_required(checked_method: str) -> bool:
     methods = ["--pem", "--keyfile", "--ledger"]
     rest_of_methods = []
     for method in methods:

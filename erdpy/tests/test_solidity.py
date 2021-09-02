@@ -12,7 +12,7 @@ class ProjectSolidityTestCase(utils.ProjectTestCase):
     def setUp(self):
         super().setUp()
 
-    @unittest.skip
+    @unittest.skip('manual run only')
     def test_solidity_hello(self):
         _, contract = self.build("solidity_hello")
 
@@ -23,7 +23,7 @@ class ProjectSolidityTestCase(utils.ProjectTestCase):
 
         self.environment.run_flow(myflow)
 
-    @unittest.skip
+    @unittest.skip('manual run only')
     def test_solidity_soll_001(self):
         _, contract = self.build("solidity_soll_001")
 
@@ -38,7 +38,7 @@ class ProjectSolidityTestCase(utils.ProjectTestCase):
 
         self.environment.run_flow(myflow)
 
-    @unittest.skip
+    @unittest.skip('manual run only')
     def test_solidity_soll_003(self):
         _, contract = self.build("solidity_soll_003")
 
