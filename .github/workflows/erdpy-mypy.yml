@@ -1,0 +1,14 @@
+name: mypy reviewdog check
+on: [pull_request]
+jobs:
+  mypy:
+    name: runner / mypy
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: tsuyoshicho/action-mypy@v3
+        with:
+          github_token: ${{ secrets.github_token }}
+          reporter: github-pr-review
+          level: error
+          workdir: .
