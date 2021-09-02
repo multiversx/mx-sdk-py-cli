@@ -194,7 +194,11 @@ def add_config_args(argv):
 
     extra_args = []
     for key, value in config_args.items():
-        extra_args.append(f'--{key}')
+        key_arg = f'--{key}'
+        # arguments from the command line override the config
+        if key_arg in argv:
+            continue
+        extra_args.append(key_arg)
         if value is True:
             continue
         if isinstance(value, List):
@@ -212,5 +216,5 @@ def add_config_args(argv):
         pre_args = [verbose_flag]
 
     final_args = pre_args + argv + extra_args
-    print(f"Added extra args from erdpy.json: {final_args}")
+    print(f"Found extra arguments in erdpy.json. Final arguments: {final_args}")
     return final_args
