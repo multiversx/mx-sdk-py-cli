@@ -49,9 +49,9 @@ def add_command_subparser(subparsers: Any, group: str, command: str, description
     )
 
 
-def add_tx_args(sub: Any, with_nonce: bool = True, with_receiver: bool = True, with_data: bool = True, with_estimate_gas: bool = False):
+def add_tx_args(args: List[str], sub: Any, with_nonce: bool = True, with_receiver: bool = True, with_data: bool = True, with_estimate_gas: bool = False):
     if with_nonce:
-        sub.add_argument("--nonce", type=int, required=not("--recall-nonce" in sys.argv), help="# the nonce for the transaction")
+        sub.add_argument("--nonce", type=int, required=not("--recall-nonce" in args), help="# the nonce for the transaction")
         sub.add_argument("--recall-nonce", action="store_true", default=False, help="⭮ whether to recall the nonce when creating the transaction (default: %(default)s)")
 
     if with_receiver:
@@ -59,7 +59,7 @@ def add_tx_args(sub: Any, with_nonce: bool = True, with_receiver: bool = True, w
         sub.add_argument("--receiver-username", required=False, help="🖄 the username of the receiver")
 
     sub.add_argument("--gas-price", default=config.DEFAULT_GAS_PRICE, help="⛽ the gas price (default: %(default)d)")
-    sub.add_argument("--gas-limit", required=not("--estimate-gas" in sys.argv), help="⛽ the gas limit")
+    sub.add_argument("--gas-limit", required=not("--estimate-gas" in args), help="⛽ the gas limit")
     if with_estimate_gas:
         sub.add_argument("--estimate-gas", action="store_true", default=False, help="⛽ whether to estimate the gas limit (default: %(default)d)")
 
@@ -73,12 +73,12 @@ def add_tx_args(sub: Any, with_nonce: bool = True, with_receiver: bool = True, w
     sub.add_argument("--options", type=int, default=0, help="the transaction options (default: 0)")
 
 
-def add_wallet_args(sub: Any):
-    sub.add_argument("--pem", required=check_if_sign_method_required("--pem"), help="🔑 the PEM file, if keyfile not provided")
+def add_wallet_args(args: List[str], sub: Any):
+    sub.add_argument("--pem", required=check_if_sign_method_required(args, "--pem"), help="🔑 the PEM file, if keyfile not provided")
     sub.add_argument("--pem-index", default=0, help="🔑 the index in the PEM file (default: %(default)s)")
-    sub.add_argument("--keyfile", required=check_if_sign_method_required("--keyfile"), help="🔑 a JSON keyfile, if PEM not provided")
-    sub.add_argument("--passfile", required=(utils.is_arg_present("--keyfile", sys.argv)), help="🔑 a file containing keyfile's password, if keyfile provided")
-    sub.add_argument("--ledger", action="store_true", required=check_if_sign_method_required("--ledger"), default=False, help="🔐 bool flag for signing transaction using ledger")
+    sub.add_argument("--keyfile", required=check_if_sign_method_required(args, "--keyfile"), help="🔑 a JSON keyfile, if PEM not provided")
+    sub.add_argument("--passfile", required=(utils.is_arg_present(args, "--keyfile")), help="🔑 a file containing keyfile's password, if keyfile provided")
+    sub.add_argument("--ledger", action="store_true", required=check_if_sign_method_required(args, "--ledger"), default=False, help="🔐 bool flag for signing transaction using ledger")
     sub.add_argument("--ledger-account-index", type=int, default=0, help="🔐 the index of the account when using Ledger")
     sub.add_argument("--ledger-address-index", type=int, default=0, help="🔐 the index of the address when using Ledger")
     sub.add_argument("--sender-username", required=False, help="🖄 the username of the sender")
@@ -148,7 +148,7 @@ def send_or_simulate(tx: Transaction, args: Any):
         utils.dump_out_json(response)
 
 
-def check_if_sign_method_required(checked_method: str) -> bool:
+def check_if_sign_method_required(args: List[str], checked_method: str) -> bool:
     methods = ["--pem", "--keyfile", "--ledger"]
     rest_of_methods = []
     for method in methods:
@@ -156,7 +156,7 @@ def check_if_sign_method_required(checked_method: str) -> bool:
             rest_of_methods.append(method)
 
     for method in rest_of_methods:
-        if utils.is_arg_present(method, sys.argv):
+        if utils.is_arg_present(args, method):
             return False
 
     return True

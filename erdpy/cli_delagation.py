@@ -1,6 +1,6 @@
 import binascii
 import sys
-from typing import Any
+from typing import Any, List
 
 from erdpy import cli_shared, errors, utils
 from erdpy.accounts import Address
@@ -9,7 +9,7 @@ from erdpy.proxy import ElrondProxy
 from erdpy.transactions import do_prepare_transaction
 
 
-def setup_parser(subparsers: Any) -> Any:
+def setup_parser(args: List[str], subparsers: Any) -> Any:
     parser = cli_shared.add_group_subparser(subparsers, "staking-provider", "Staking provider omnitool")
     subparsers = parser.add_subparsers()
 
@@ -17,7 +17,7 @@ def setup_parser(subparsers: Any) -> Any:
     sub = cli_shared.add_command_subparser(subparsers, "staking-provider", "create-new-delegation-contract",
                                            "Create a new delegation system smart contract, transferred value must be"
                                            "greater than baseIssuingCost + min deposit value")
-    _add_common_arguments(sub)
+    _add_common_arguments(args, sub)
     sub.add_argument("--total-delegation-cap", required=True, help="the total delegation contract capacity")
     sub.add_argument("--service-fee", required=True, help="the delegation contract service fee")
     sub.set_defaults(func=do_create_delegation_contract)
@@ -37,7 +37,7 @@ def setup_parser(subparsers: Any) -> Any:
     sub.add_argument("--validators-file", required=True, help="a JSON file describing the Nodes")
     sub.add_argument("--delegation-contract", required=True, help="address of the delegation contract")
     sub.add_argument("--using-delegation-manager", action="store_true", required=False, help="whether delegation contract was created using the Delegation Manager")
-    _add_common_arguments(sub)
+    _add_common_arguments(args, sub)
     sub.set_defaults(func=add_new_nodes)
 
     # remove nodes
@@ -45,7 +45,7 @@ def setup_parser(subparsers: Any) -> Any:
                                            "Remove nodes must be called by the contract owner")
     sub.add_argument("--bls-keys", required=True, help="a list with the bls keys of the nodes")
     sub.add_argument("--delegation-contract", required=True, help="address of the delegation contract")
-    _add_common_arguments(sub)
+    _add_common_arguments(args, sub)
     sub.set_defaults(func=remove_nodes)
 
     # stake nodes
@@ -53,7 +53,7 @@ def setup_parser(subparsers: Any) -> Any:
                                            "Stake nodes must be called by the contract owner")
     sub.add_argument("--bls-keys", required=True, help="a list with the bls keys of the nodes")
     sub.add_argument("--delegation-contract", required=True, help="address of the delegation contract")
-    _add_common_arguments(sub)
+    _add_common_arguments(args, sub)
     sub.set_defaults(func=stake_nodes)
 
     # unbond nodes
@@ -61,7 +61,7 @@ def setup_parser(subparsers: Any) -> Any:
                                            "Unbond nodes must be called by the contract owner")
     sub.add_argument("--bls-keys", required=True, help="a list with the bls keys of the nodes")
     sub.add_argument("--delegation-contract", required=True, help="address of the delegation contract")
-    _add_common_arguments(sub)
+    _add_common_arguments(args, sub)
     sub.set_defaults(func=unbond_nodes)
 
     # unstake nodes
@@ -69,7 +69,7 @@ def setup_parser(subparsers: Any) -> Any:
                                            "Unstake nodes must be called by the contract owner")
     sub.add_argument("--bls-keys", required=True, help="a list with the bls keys of the nodes")
     sub.add_argument("--delegation-contract", required=True, help="address of the delegation contract")
-    _add_common_arguments(sub)
+    _add_common_arguments(args, sub)
     sub.set_defaults(func=unstake_nodes)
 
     # unjail nodes
@@ -77,7 +77,7 @@ def setup_parser(subparsers: Any) -> Any:
                                            "Unjail nodes must be called by the contract owner")
     sub.add_argument("--bls-keys", required=True, help="a list with the bls keys of the nodes")
     sub.add_argument("--delegation-contract", required=True, help="address of the delegation contract")
-    _add_common_arguments(sub)
+    _add_common_arguments(args, sub)
     sub.set_defaults(func=unjail_nodes)
 
     # change service fee
@@ -85,7 +85,7 @@ def setup_parser(subparsers: Any) -> Any:
                                            "Change service fee must be called by the contract owner")
     sub.add_argument("--service-fee", required=True, help="new service fee value")
     sub.add_argument("--delegation-contract", required=True, help="address of the delegation contract")
-    _add_common_arguments(sub)
+    _add_common_arguments(args, sub)
     sub.set_defaults(func=change_service_fee)
 
     # modify total delegation cap
@@ -93,31 +93,31 @@ def setup_parser(subparsers: Any) -> Any:
                                            "Modify delegation cap must be called by the contract owner")
     sub.add_argument("--delegation-cap", required=True, help="new delegation contract capacity")
     sub.add_argument("--delegation-contract", required=True, help="address of the delegation contract")
-    _add_common_arguments(sub)
+    _add_common_arguments(args, sub)
     sub.set_defaults(func=modify_delegation_cap)
 
     # set automatic activation
     sub = cli_shared.add_command_subparser(subparsers, "staking-provider", "automatic-activation",
                                            "Automatic activation must be called by the contract owner")
 
-    sub.add_argument("--set", action="store_true", required=not (utils.is_arg_present("--unset", sys.argv)),
+    sub.add_argument("--set", action="store_true", required=not (utils.is_arg_present(args, "--unset")),
                      help="set automatic activation True")
-    sub.add_argument("--unset", action="store_true", required=not (utils.is_arg_present("--set", sys.argv)),
+    sub.add_argument("--unset", action="store_true", required=not (utils.is_arg_present(args, "--set")),
                      help="set automatic activation False")
     sub.add_argument("--delegation-contract", required=True, help="address of the delegation contract")
-    _add_common_arguments(sub)
+    _add_common_arguments(args, sub)
     sub.set_defaults(func=automatic_activation)
 
     # set redelegate cap
     sub = cli_shared.add_command_subparser(subparsers, "staking-provider", "redelegate-cap",
                                            "Redelegate cap must be called by the contract owner")
 
-    sub.add_argument("--set", action="store_true", required=not (utils.is_arg_present("--unset", sys.argv)),
+    sub.add_argument("--set", action="store_true", required=not (utils.is_arg_present(args, "--unset")),
                      help="set redelegate cap True")
-    sub.add_argument("--unset", action="store_true", required=not (utils.is_arg_present("--set", sys.argv)),
+    sub.add_argument("--unset", action="store_true", required=not (utils.is_arg_present(args, "--set")),
                      help="set redelegate cap False")
     sub.add_argument("--delegation-contract", required=True, help="address of the delegation contract")
-    _add_common_arguments(sub)
+    _add_common_arguments(args, sub)
     sub.set_defaults(func=redelegate_cap)
 
     # set metadata
@@ -128,14 +128,14 @@ def setup_parser(subparsers: Any) -> Any:
     sub.add_argument("--website", required=True, help="website field in staking provider metadata")
     sub.add_argument("--identifier", required=True, help="identifier field in staking provider metadata")
     sub.add_argument("--delegation-contract", required=True, help="address of the delegation contract")
-    _add_common_arguments(sub)
+    _add_common_arguments(args, sub)
     sub.set_defaults(func=set_metadata)
 
 
-def _add_common_arguments(sub: Any):
+def _add_common_arguments(args: List[str], sub: Any):
     cli_shared.add_proxy_arg(sub)
-    cli_shared.add_wallet_args(sub)
-    cli_shared.add_tx_args(sub, with_receiver=False, with_data=False, with_estimate_gas=True)
+    cli_shared.add_wallet_args(args, sub)
+    cli_shared.add_tx_args(args, sub, with_receiver=False, with_data=False, with_estimate_gas=True)
     cli_shared.add_broadcast_args(sub, relay=False)
     cli_shared.add_outfile_arg(sub, what="signed transaction, hash")
 

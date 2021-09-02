@@ -1,12 +1,12 @@
 import logging
-from typing import Any
+from typing import Any, List
 
 from erdpy import cli_shared, testnet
 
 logger = logging.getLogger("cli.testnet")
 
 
-def setup_parser(subparsers: Any) -> Any:
+def setup_parser(args: List[str], subparsers: Any) -> Any:
     parser = cli_shared.add_group_subparser(
         subparsers,
         "testnet",

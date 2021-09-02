@@ -42,8 +42,8 @@ def _do_main():
     logging.basicConfig(level=logging.INFO)
     scope.initialize()
 
-    parser = setup_parser()
     argv_with_config_args = config.add_config_args(sys.argv[1:])
+    parser = setup_parser(argv_with_config_args)
     args = parser.parse_args(argv_with_config_args)
 
     if args.verbose:
@@ -57,7 +57,7 @@ def _do_main():
         args.func(args)
 
 
-def setup_parser():
+def setup_parser(args: List[str] = sys.argv[1:]):
     parser = ArgumentParser(
         prog="erdpy",
         usage="erdpy [-h] [-v] [--verbose] COMMAND-GROUP [-h] COMMAND ...",
@@ -83,23 +83,23 @@ https://docs.elrond.com/tools/erdpy.
     subparsers = parser.add_subparsers()
     commands: List[Any] = []
 
-    commands.append(erdpy.cli_contracts.setup_parser(subparsers))
-    commands.append(erdpy.cli_transactions.setup_parser(subparsers))
-    commands.append(erdpy.cli_validators.setup_parser(subparsers))
+    commands.append(erdpy.cli_contracts.setup_parser(args, subparsers))
+    commands.append(erdpy.cli_transactions.setup_parser(args, subparsers))
+    commands.append(erdpy.cli_validators.setup_parser(args, subparsers))
     commands.append(erdpy.cli_accounts.setup_parser(subparsers))
     commands.append(erdpy.cli_ledger.setup_parser(subparsers))
-    commands.append(erdpy.cli_wallet.setup_parser(subparsers))
+    commands.append(erdpy.cli_wallet.setup_parser(args, subparsers))
     commands.append(erdpy.cli_network.setup_parser(subparsers))
     commands.append(erdpy.cli_cost.setup_parser(subparsers))
-    commands.append(erdpy.cli_dispatcher.setup_parser(subparsers))
+    commands.append(erdpy.cli_dispatcher.setup_parser(args, subparsers))
     commands.append(erdpy.cli_blockatlas.setup_parser(subparsers))
     commands.append(erdpy.cli_deps.setup_parser(subparsers))
     commands.append(erdpy.cli_config.setup_parser(subparsers))
     commands.append(erdpy.cli_block.setup_parser(subparsers))
-    commands.append(erdpy.cli_testnet.setup_parser(subparsers))
+    commands.append(erdpy.cli_testnet.setup_parser(args, subparsers))
     commands.append(erdpy.cli_data.setup_parser(subparsers))
-    commands.append(erdpy.cli_delagation.setup_parser(subparsers))
-    commands.append(erdpy.cli_dns.setup_parser(subparsers))
+    commands.append(erdpy.cli_delagation.setup_parser(args, subparsers))
+    commands.append(erdpy.cli_dns.setup_parser(args, subparsers))
 
     parser.epilog = """
 ----------------------
