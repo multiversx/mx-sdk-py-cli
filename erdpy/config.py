@@ -4,6 +4,7 @@ from typing import Any, Dict
 from erdpy import errors, utils
 
 ROOT_FOLDER_NAME = "elrondsdk"
+LOCAL_CONFIG_PATH = os.path.join(os.getcwd(), "erdpy.json")
 CONFIG_PATH = os.path.expanduser("~/elrondsdk/erdpy.json")
 
 DEFAULT_GAS_PRICE = 1000000000
@@ -162,10 +163,15 @@ def get_defaults() -> Dict[str, Any]:
 
 
 def read_file() -> Dict[str, Any]:
-    if not os.path.isfile(CONFIG_PATH):
-        return dict()
-    return utils.read_json_file(CONFIG_PATH)
+    if os.path.isfile(LOCAL_CONFIG_PATH):
+        return utils.read_json_file(LOCAL_CONFIG_PATH)
+    if os.path.isfile(CONFIG_PATH):
+        return utils.read_json_file(CONFIG_PATH)
+    return dict()
 
 
 def write_file(data: Dict[str, Any]):
-    utils.write_json_file(CONFIG_PATH, data)
+    if os.path.isfile(LOCAL_CONFIG_PATH):
+        utils.write_json_file(LOCAL_CONFIG_PATH, data)
+    else:
+        utils.write_json_file(CONFIG_PATH, data)
