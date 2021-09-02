@@ -238,10 +238,11 @@ def log_explorer(chain, name, path, details):
         "T": ("Elrond Testnet Explorer", "https://testnet-explorer.elrond.com"),
         "D": ("Elrond Devnet Explorer", "https://devnet-explorer.elrond.com"),
     }
-    if chain not in networks:
+    try:
+        explorer_name, explorer_url = networks[chain]
+        logger.info(f"View this {name} in the {explorer_name}: {explorer_url}/{path}/{details}")
+    except KeyError:
         return
-    explorer_name, explorer_url = networks[chain]
-    logger.info(f"View this {name} in the {explorer_name}: {explorer_url}/{path}/{details}")
 
 
 def log_explorer_contract_address(chain, address):
