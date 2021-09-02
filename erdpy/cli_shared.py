@@ -1,9 +1,8 @@
 import argparse
 import ast
-import string
 import sys
 from argparse import FileType
-from typing import Any, List, Text
+from typing import Any, List, Text, cast
 
 from erdpy import config, errors, scope, utils
 from erdpy.accounts import Account
@@ -106,8 +105,7 @@ def add_omit_fields_arg(sub: Any):
 def parse_omit_fields_arg(args: Any) -> List[str]:
     literal = args.omit_fields
     parsed = ast.literal_eval(literal)
-    assert isinstance(parsed, List)
-    return parsed
+    return cast(List[str], parsed)
 
 
 def prepare_nonce_in_args(args: Any):
