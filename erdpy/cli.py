@@ -32,10 +32,11 @@ def main():
         _do_main()
     except errors.KnownError as err:
         logger.critical(err.get_pretty())
-        sys.exit(1)
+        return 1
     except KeyboardInterrupt:
         print("erdpy process killed by user.")
-        sys.exit(1)
+        return 1
+    return 0
 
 
 def _do_main():
@@ -113,4 +114,5 @@ COMMAND GROUPS summary
 
 
 if __name__ == "__main__":
-    main()
+    ret = main()
+    sys.exit(ret)
