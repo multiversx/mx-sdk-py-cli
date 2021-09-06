@@ -15,10 +15,10 @@ class Environment:
     def run_flow(self):
         raise NotImplementedError()
 
-    def deploy_contract(self, contract, owner, arguments, gas_price, gas_limit, chain, version):
+    def deploy_contract(self, contract: SmartContract, owner, arguments, gas_price, gas_limit, value, chain, version):
         raise NotImplementedError()
 
-    def execute_contract(self, contract, caller, function, arguments, gas_price, gas_limit, chain, version):
+    def execute_contract(self, contract: SmartContract, caller, function, arguments, gas_price, gas_limit, value, chain, version):
         raise NotImplementedError()
 
     def query_contract(self, contract, function, arguments=None):
