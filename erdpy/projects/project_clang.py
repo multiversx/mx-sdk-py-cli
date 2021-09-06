@@ -98,8 +98,8 @@ class ProjectClang(Project):
 
         myprocess.run_process(args)
 
-    def _do_after_build(self):
-        self._copy_to_output(self.file_output)
+    def _do_after_build(self) -> Path:
+        output_wasm_file = self._copy_to_output(self.file_output)
         self.file_output.unlink()
         self.file_ll.unlink()
         self.file_o.unlink()
@@ -108,6 +108,7 @@ class ProjectClang(Project):
                 ll_file.unlink()
             except FileNotFoundError:
                 pass
+        return output_wasm_file
 
     def _get_llvm_path(self):
         return dependencies.get_module_directory('llvm')

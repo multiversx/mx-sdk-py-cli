@@ -115,7 +115,7 @@ def _add_project_or_bytecode_arg(sub: Any):
     group.add_argument("--project", default=os.getcwd(),
                        help="🗀 the project directory (default: current directory)")
     group.add_argument("--bytecode", type=str,
-                      help="the file containing the WASM bytecode")
+                       help="the file containing the WASM bytecode")
 
 
 def _add_contract_arg(sub: Any):
@@ -187,6 +187,7 @@ def deploy(args: Any):
 
     tx = contract.deploy(sender, arguments, gas_price, gas_limit, value, chain, version)
     logger.info("Contract address: %s", contract.address)
+    utils.log_explorer_contract_address(chain, contract.address)
 
     result = None
     try:
