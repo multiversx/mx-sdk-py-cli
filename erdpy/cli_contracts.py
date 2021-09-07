@@ -221,7 +221,7 @@ def dump_tx_and_result(tx: Any, result: Any, args: Any):
 
 
 def _prepare_contract(args: Any) -> SmartContract:
-    if len(args.bytecode):
+    if args.bytecode and len(args.bytecode):
         bytecode = utils.read_binary_file(Path(args.bytecode)).hex()
     else:
         project = load_project(args.project)
