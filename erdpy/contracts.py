@@ -8,13 +8,14 @@ from erdpy import config, constants, errors
 from erdpy.accounts import Account, Address
 from erdpy.interfaces import IElrondProxy
 from erdpy.transactions import Transaction
+from erdpy.utils import Object
 
 logger = logging.getLogger("contracts")
 
 HEX_PREFIX = "0X"
 
 
-class QueryResult:
+class QueryResult(Object):
     def __init__(self, as_base64: str, as_hex: str, as_number: int):
         self.base64 = as_base64
         self.hex = as_hex
