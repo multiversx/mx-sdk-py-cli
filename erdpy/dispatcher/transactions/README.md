@@ -33,4 +33,4 @@ erdpy dispatcher clean
 ## Roadmap
 
 - Use a database as the queue backend
-- Implement a mechanism to check which transactions was executed successfully (we need to use api route `transaction/:hash` and `transaction/:hash/status` )
+- Implement a mechanism to check which transactions were executed successfully (we need to use API route `transaction/:hash` and `transaction/:hash/status` )
