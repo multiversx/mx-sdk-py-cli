@@ -22,7 +22,7 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
  - Add --wait-result flag for erdpy tx new cli command.
 
 ## [1.0.10] - 25.02.2021
- - [Fixed a bug in the testnet setup process when creting the config for the proxy app #213](https://github.com/ElrondNetwork/elrond-sdk/pull/213) 
+ - [Fixed a bug in the testnet setup process when creating the config for the proxy app #213](https://github.com/ElrondNetwork/elrond-sdk/pull/213) 
 
 ## [1.0.9] - 29.01.2021
  -  [Multiple config templates #152](https://github.com/ElrondNetwork/elrond-sdk/pull/152). One can now `switch` between different **configuration** profiles.
@@ -149,7 +149,7 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
  - Refactoring and design improvements
 
 
-**Note that below, the change log is in chronological order. Will be soon updated to be in inverse chronological order (how it should have been in the first place).**
+**Note that below, the changelog is in chronological order. It will be soon updated to be in inverse chronological order (how it should have been in the first place).**
 
 ## [0.0.4]
 
@@ -498,7 +498,7 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
  - Removed .py SC interaction samples, moved to `sc-examples` `sc-examples-rs` repositories, so that they become available in Elrond IDE.
  - Removed some deprecated code.
  - `mypy`-related refactoring.
- - Fix accounts CLI. Trucate data for "account get-transactions"
+ - Fix accounts CLI. Truncate data for "account get-transactions".
 
 ## [0.7.1] - 13.07.2020
 
