@@ -182,7 +182,7 @@ def write_file(data: Dict[str, Any]):
     utils.write_json_file(config_path, data)
 
 
-def add_config_args(argv):
+def add_config_args(argv: List[str]) -> List[str]:
     try:
         command, subcommand, *_ = argv
     except ValueError:
@@ -200,12 +200,14 @@ def add_config_args(argv):
     return final_args
 
 
-def determine_final_args(argv, config_args):
+def determine_final_args(argv: List[str], config_args: Dict[str, Any]) -> List[str]:
     extra_args = []
     for key, value in config_args.items():
         key_arg = f'--{key}'
         # arguments from the command line override the config
         if key_arg in argv:
+            continue
+        if any(arg.startswith(f"{key_arg}=") for arg in argv):
             continue
         extra_args.append(key_arg)
         if value is True:
