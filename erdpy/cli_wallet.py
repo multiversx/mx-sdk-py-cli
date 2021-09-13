@@ -26,14 +26,12 @@ def setup_parser(args: List[str], subparsers: Any) -> Any:
         "new",
         "Create a new wallet"
     )
-    sub.add_argument("--output-path",
-                     help="the output path and base file name for the generated wallet files (default: %(default)s)", type=str, default="./wallet")
     sub.add_argument("--with-json",
                      help="whether to create a json key file", action="store_true", default=False)
     sub.add_argument("--with-pem",
-                     help="whether to create a json key file", action="store_true", default=False)
-    sub.add_argument("--index",
-                     help="the account index", type=int, default=0)
+                     help="whether to create a pem key file", action="store_true", default=False)
+    sub.add_argument("--output-path",
+                     help="the output path and base file name for the generated wallet files (default: %(default)s)", type=str, default="./wallet")
     sub.set_defaults(func=new_wallet)
 
     sub = cli_shared.add_command_subparser(
@@ -92,7 +90,7 @@ def setup_parser(args: List[str], subparsers: Any) -> Any:
 def new_wallet(args: Any):
     mnemonic = generate_mnemonic()
     print(f"Mnemonic: {mnemonic}")
-    seed, pubkey = wallet.derive_keys(mnemonic, account_index=args.index)
+    seed, pubkey = wallet.derive_keys(mnemonic)
     if args.with_pem:
         pem_file = prepare_file(args.output_path, ".pem")
         address = Address(pubkey)
