@@ -184,14 +184,14 @@ def write_file(data: Dict[str, Any]):
 
 def add_config_args(argv):
     try:
-        func, subcommand, *_ = argv
+        command, subcommand, *_ = argv
     except ValueError:
         return argv
 
     config = read_file()
 
     try:
-        config_args = config[func][subcommand]
+        config_args = config[command][subcommand]
     except KeyError:
         return argv
 
