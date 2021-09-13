@@ -108,7 +108,8 @@ def new_wallet(args: Any):
 def prepare_file(output_path: str, suffix: str) -> Path:
     base_path = Path(output_path)
     utils.ensure_folder(base_path.parent)
-    return base_path.with_suffix(suffix)
+    file_path = base_path.with_suffix(suffix)
+    return utils.uniquify(file_path)
 
 
 def generate_pem(args: Any):
