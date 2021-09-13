@@ -1,6 +1,8 @@
 import hashlib
 import hmac
+import secrets
 import struct
+from importlib.resources import open_text
 
 import nacl.signing
 
@@ -9,6 +11,8 @@ BIP39_PBKDF2_ROUNDS = 2048
 BIP32_SEED_MODIFIER = b'ed25519 seed'
 ELROND_DERIVATION_PATH = [44, 508, 0, 0]
 HARDENED_OFFSET = 0x80000000
+BIP39_WORD_COUNT = 2048
+BIP39_MNEMONIC_WORD_LENGTH = 24
 
 
 def derive_keys(mnemonic, account_index=0):
@@ -27,6 +31,17 @@ def mnemonic_to_bip39seed(mnemonic, passphrase=""):
     passphrase = passphrase.encode("utf-8")
     stretched = hashlib.pbkdf2_hmac("sha512", mnemonic, passphrase, BIP39_PBKDF2_ROUNDS)
     return stretched[:64]
+
+
+# Word list from:
+# https://raw.githubusercontent.com/bitcoin/bips/master/bip-0039/english.txt
+def generate_mnemonic() -> str:
+    with open_text("erdpy.wallet", "words.txt") as words_file:
+        words = words_file.read().splitlines()
+        assert len(words) == BIP39_WORD_COUNT
+    mnemonic_words = [secrets.choice(words) for _ in range(BIP39_MNEMONIC_WORD_LENGTH)]
+    mnemonic = " ".join(mnemonic_words)
+    return mnemonic
 
 
 # References:

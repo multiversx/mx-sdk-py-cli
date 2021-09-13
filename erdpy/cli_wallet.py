@@ -1,4 +1,8 @@
+from erdpy.wallet.keyfile import save_to_key_file
+from erdpy.wallet.core import generate_mnemonic
 import logging
+import getpass
+from pathlib import Path
 from typing import Any, List
 
 from erdpy import cli_shared, wallet
@@ -15,6 +19,22 @@ def setup_parser(args: List[str], subparsers: Any) -> Any:
         "Derive private key from mnemonic, bech32 address helpers etc."
     )
     subparsers = parser.add_subparsers()
+
+    sub = cli_shared.add_command_subparser(
+        subparsers,
+        "wallet",
+        "new",
+        "Create a new wallet"
+    )
+    sub.add_argument("--output-path",
+                     help="the output path and file name for the generated wallet files", type=str, default="wallet")
+    sub.add_argument("--with-json",
+                     help="whether to create a json key file", action="store_true", default=False)
+    sub.add_argument("--with-pem",
+                     help="whether to create a json key file", action="store_true", default=False)
+    sub.add_argument("--index",
+                     help="the account index", type=int, default=0)
+    sub.set_defaults(func=new_wallet)
 
     sub = cli_shared.add_command_subparser(
         subparsers,
@@ -67,6 +87,21 @@ def setup_parser(args: List[str], subparsers: Any) -> Any:
 
     parser.epilog = cli_shared.build_group_epilog(subparsers)
     return subparsers
+
+
+def new_wallet(args: Any):
+    mnemonic = generate_mnemonic()
+    print(f"Mnemonic: {mnemonic}")
+    seed, pubkey = wallet.derive_keys(mnemonic, account_index=args.index)
+    base_path = Path(args.output_path)
+    if args.with_pem:
+        pem_file = base_path.with_suffix(".pem")
+        address = Address(pubkey)
+        pem.write(pem_file, seed, pubkey, name=address.bech32())
+    if args.with_json:
+        json_file = base_path.with_suffix(".json")
+        password = getpass.getpass("Enter a new password:")
+        save_to_key_file(json_file, seed, pubkey, password)
 
 
 def generate_pem(args: Any):
