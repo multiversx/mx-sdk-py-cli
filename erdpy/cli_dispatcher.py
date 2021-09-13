@@ -1,28 +1,28 @@
 from erdpy.dispatcher.transactions.queue import TransactionQueue
 import logging
-from typing import Any
+from typing import Any, List
 
 from erdpy import cli_shared
 
 logger = logging.getLogger("cli.dispatcher")
 
 
-def setup_parser(subparsers: Any) -> Any:
+def setup_parser(args: List[str], subparsers: Any) -> Any:
     parser = cli_shared.add_group_subparser(subparsers, "dispatcher", "Enqueue transactions, then bulk dispatch them")
     subparsers = parser.add_subparsers()
 
     sub = cli_shared.add_command_subparser(subparsers, "dispatcher", "enqueue", "Enqueue a transaction")
-    cli_shared.add_tx_args(sub, with_nonce=False)
+    cli_shared.add_tx_args(args, sub, with_nonce=False)
     sub.set_defaults(func=enqueue_transaction)
 
     sub = cli_shared.add_command_subparser(subparsers, "dispatcher", "dispatch", "Dispatch queued transactions")
     cli_shared.add_proxy_arg(sub)
-    cli_shared.add_wallet_args(sub)
+    cli_shared.add_wallet_args(args, sub)
     sub.set_defaults(func=dispatch_transactions)
 
     sub = cli_shared.add_command_subparser(subparsers, "dispatcher", "dispatch-continuously", "Continuously dispatch queued transactions")
     cli_shared.add_proxy_arg(sub)
-    cli_shared.add_wallet_args(sub)
+    cli_shared.add_wallet_args(args, sub)
     sub.add_argument("--interval", required=True, help="the interval to retrieve transactions from the queue, in seconds")
     sub.set_defaults(func=dispatch_transactions_continuously)
 
