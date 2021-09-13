@@ -5,7 +5,7 @@ import getpass
 from pathlib import Path
 from typing import Any, List
 
-from erdpy import cli_shared, wallet
+from erdpy import cli_shared, wallet, utils
 from erdpy.accounts import Account, Address
 from erdpy.wallet import pem
 
@@ -27,7 +27,7 @@ def setup_parser(args: List[str], subparsers: Any) -> Any:
         "Create a new wallet"
     )
     sub.add_argument("--output-path",
-                     help="the output path and file name for the generated wallet files", type=str, default="wallet")
+                     help="the output path and base file name for the generated wallet files (default: %(default)s)", type=str, default="./wallet")
     sub.add_argument("--with-json",
                      help="whether to create a json key file", action="store_true", default=False)
     sub.add_argument("--with-pem",
@@ -93,15 +93,22 @@ def new_wallet(args: Any):
     mnemonic = generate_mnemonic()
     print(f"Mnemonic: {mnemonic}")
     seed, pubkey = wallet.derive_keys(mnemonic, account_index=args.index)
-    base_path = Path(args.output_path)
     if args.with_pem:
-        pem_file = base_path.with_suffix(".pem")
+        pem_file = prepare_file(args.output_path, ".pem")
         address = Address(pubkey)
         pem.write(pem_file, seed, pubkey, name=address.bech32())
+        logger.info(f"Pem wallet generated: {pem_file}")
     if args.with_json:
-        json_file = base_path.with_suffix(".json")
+        json_file = prepare_file(args.output_path, ".json")
         password = getpass.getpass("Enter a new password:")
         save_to_key_file(json_file, seed, pubkey, password)
+        logger.info(f"Json wallet generated: {json_file}")
+
+
+def prepare_file(output_path: str, suffix: str) -> Path:
+    base_path = Path(output_path)
+    utils.ensure_folder(base_path.parent)
+    return base_path.with_suffix(suffix)
 
 
 def generate_pem(args: Any):
