@@ -3,6 +3,7 @@ import hmac
 import secrets
 import struct
 from importlib.resources import open_text
+from typing import List
 
 import nacl.signing
 
@@ -11,7 +12,13 @@ BIP39_PBKDF2_ROUNDS = 2048
 BIP32_SEED_MODIFIER = b'ed25519 seed'
 ELROND_DERIVATION_PATH = [44, 508, 0, 0]
 HARDENED_OFFSET = 0x80000000
+BITS_PER_BYTE = 8
 BIP39_WORD_COUNT = 2048
+BIP39_ENTROPY_BITS = 256
+BIP39_ENTROPY_BYTES = BIP39_ENTROPY_BITS // 8
+BIP39_CHECKSUM_BITS = BIP39_ENTROPY_BITS // 32
+BIP39_TOTAL_INDICES_BITS = BIP39_ENTROPY_BITS + BIP39_CHECKSUM_BITS
+BIP39_WORD_BITS = 11
 BIP39_MNEMONIC_WORD_LENGTH = 24
 
 
@@ -33,13 +40,39 @@ def mnemonic_to_bip39seed(mnemonic, passphrase=""):
     return stretched[:64]
 
 
+def bytes_to_binary_string(bytes: bytes, number_of_bits: int = None) -> str:
+    if number_of_bits is None:
+        number_of_bits = len(bytes) * BITS_PER_BYTE
+    bytes_int = int.from_bytes(bytes, "big")
+    return f"{bytes_int:0{number_of_bits}b}"
+
+
+def split_to_fixed_size_slices(bits: str, chunk_size: int) -> List[str]:
+    return [bits[i:i + chunk_size] for i in range(0, len(bits), chunk_size)]
+
+
 # Word list from:
 # https://raw.githubusercontent.com/bitcoin/bips/master/bip-0039/english.txt
 def generate_mnemonic() -> str:
     with open_text("erdpy.wallet", "words.txt") as words_file:
         words = words_file.read().splitlines()
         assert len(words) == BIP39_WORD_COUNT
-    mnemonic_words = [secrets.choice(words) for _ in range(BIP39_MNEMONIC_WORD_LENGTH)]
+
+    entropy_bytes = secrets.token_bytes(BIP39_ENTROPY_BYTES)
+
+    checksum_bytes = hashlib.sha256(entropy_bytes).digest()
+    checksum_bits = bytes_to_binary_string(checksum_bytes)
+
+    entropy_str_binary = bytes_to_binary_string(entropy_bytes, BIP39_ENTROPY_BITS)
+    indices_bits = entropy_str_binary + checksum_bits[:BIP39_CHECKSUM_BITS]
+    assert len(indices_bits) == BIP39_TOTAL_INDICES_BITS
+    assert BIP39_MNEMONIC_WORD_LENGTH * BIP39_WORD_BITS == BIP39_TOTAL_INDICES_BITS
+
+    indices_bits = split_to_fixed_size_slices(indices_bits, BIP39_WORD_BITS)
+    indices_ints = [int(index_bits, base=2) for index_bits in indices_bits]
+    assert len(indices_ints) == BIP39_MNEMONIC_WORD_LENGTH
+
+    mnemonic_words = [words[word_index] for word_index in indices_ints]
     mnemonic = " ".join(mnemonic_words)
     return mnemonic
 
