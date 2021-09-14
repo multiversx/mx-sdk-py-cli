@@ -1,10 +1,13 @@
+from itertools import chain
+from logging import Logger
 import os.path
-from typing import Any, Dict
+from typing import Any, Dict, List
 
 from erdpy import errors, utils
 
 ROOT_FOLDER_NAME = "elrondsdk"
-CONFIG_PATH = os.path.expanduser("~/elrondsdk/erdpy.json")
+LOCAL_CONFIG_PATH = os.path.join(os.getcwd(), "erdpy.json")
+GLOBAL_CONFIG_PATH = os.path.expanduser("~/elrondsdk/erdpy.json")
 
 DEFAULT_GAS_PRICE = 1000000000
 GAS_PER_DATA_BYTE = 1500
@@ -161,11 +164,66 @@ def get_defaults() -> Dict[str, Any]:
     }
 
 
+def resolve_config_path() -> str:
+    if os.path.isfile(LOCAL_CONFIG_PATH):
+        return LOCAL_CONFIG_PATH
+    return GLOBAL_CONFIG_PATH
+
+
 def read_file() -> Dict[str, Any]:
-    if not os.path.isfile(CONFIG_PATH):
-        return dict()
-    return utils.read_json_file(CONFIG_PATH)
+    config_path = resolve_config_path()
+    if os.path.isfile(config_path):
+        return utils.read_json_file(config_path)
+    return dict()
 
 
 def write_file(data: Dict[str, Any]):
-    utils.write_json_file(CONFIG_PATH, data)
+    config_path = resolve_config_path()
+    utils.write_json_file(config_path, data)
+
+
+def add_config_args(argv: List[str]) -> List[str]:
+    try:
+        command, subcommand, *_ = argv
+    except ValueError:
+        return argv
+
+    config = read_file()
+
+    try:
+        config_args = config[command][subcommand]
+    except KeyError:
+        return argv
+
+    final_args = determine_final_args(argv, config_args)
+    print(f"Found extra arguments in erdpy.json. Final arguments: {final_args}")
+    return final_args
+
+
+def determine_final_args(argv: List[str], config_args: Dict[str, Any]) -> List[str]:
+    extra_args = []
+    for key, value in config_args.items():
+        key_arg = f'--{key}'
+        # arguments from the command line override the config
+        if key_arg in argv:
+            continue
+        if any(arg.startswith(f"{key_arg}=") for arg in argv):
+            continue
+        extra_args.append(key_arg)
+        if value is True:
+            continue
+        if isinstance(value, List):
+            for item in value:
+                extra_args.append(str(item))
+        else:
+            extra_args.append(str(value))
+
+    # the verbose flag is an exception since it has to go before the command and subcommand
+    # eg. erdpy --verbose contract deploy
+    verbose_flag = '--verbose'
+    pre_args = []
+    if verbose_flag in extra_args:
+        extra_args.remove(verbose_flag)
+        pre_args = [verbose_flag]
+
+    return pre_args + argv + extra_args

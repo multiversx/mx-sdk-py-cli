@@ -115,6 +115,7 @@ class Transaction(ITransaction):
         dictionary = self.to_dictionary()
         self.hash = proxy.send_transaction(dictionary)
         logger.info(f"Hash: {self.hash}")
+        utils.log_explorer_transaction(self.chainID, self.hash)
         return self.hash
 
     def send_wait_result(self, proxy, timeout):

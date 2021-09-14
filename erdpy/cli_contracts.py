@@ -1,6 +1,6 @@
 import logging
 import os
-from typing import Any
+from typing import Any, List
 
 from pathlib import Path
 
@@ -14,7 +14,7 @@ from erdpy.transactions import Transaction
 logger = logging.getLogger("cli.contracts")
 
 
-def setup_parser(subparsers: Any) -> Any:
+def setup_parser(args: List[str], subparsers: Any) -> Any:
     parser = cli_shared.add_group_subparser(subparsers, "contract", "Build, deploy and interact with Smart Contracts")
     subparsers = parser.add_subparsers()
 
@@ -50,9 +50,9 @@ def setup_parser(subparsers: Any) -> Any:
     _add_project_or_bytecode_arg(sub)
     _add_metadata_arg(sub)
     cli_shared.add_outfile_arg(sub)
-    cli_shared.add_wallet_args(sub)
+    cli_shared.add_wallet_args(args, sub)
     cli_shared.add_proxy_arg(sub)
-    cli_shared.add_tx_args(sub, with_receiver=False, with_data=False)
+    cli_shared.add_tx_args(args, sub, with_receiver=False, with_data=False)
     _add_arguments_arg(sub)
     sub.add_argument("--wait-result", action="store_true", default=False,
                      help="signal to wait for the transaction result - only valid if --send is set")
@@ -65,9 +65,9 @@ def setup_parser(subparsers: Any) -> Any:
     sub = cli_shared.add_command_subparser(subparsers, "contract", "call", "Interact with a Smart Contract (execute function).")
     _add_contract_arg(sub)
     cli_shared.add_outfile_arg(sub)
-    cli_shared.add_wallet_args(sub)
+    cli_shared.add_wallet_args(args, sub)
     cli_shared.add_proxy_arg(sub)
-    cli_shared.add_tx_args(sub, with_receiver=False, with_data=False)
+    cli_shared.add_tx_args(args, sub, with_receiver=False, with_data=False)
     _add_function_arg(sub)
     _add_arguments_arg(sub)
     sub.add_argument("--wait-result", action="store_true", default=False,
@@ -83,9 +83,9 @@ def setup_parser(subparsers: Any) -> Any:
     cli_shared.add_outfile_arg(sub)
     _add_project_or_bytecode_arg(sub)
     _add_metadata_arg(sub)
-    cli_shared.add_wallet_args(sub)
+    cli_shared.add_wallet_args(args, sub)
     cli_shared.add_proxy_arg(sub)
-    cli_shared.add_tx_args(sub, with_receiver=False, with_data=False)
+    cli_shared.add_tx_args(args, sub, with_receiver=False, with_data=False)
     _add_arguments_arg(sub)
     sub.add_argument("--wait-result", action="store_true", default=False,
                      help="signal to wait for the transaction result - only valid if --send is set")
@@ -115,7 +115,7 @@ def _add_project_or_bytecode_arg(sub: Any):
     group.add_argument("--project", default=os.getcwd(),
                        help="🗀 the project directory (default: current directory)")
     group.add_argument("--bytecode", type=str,
-                      help="the file containing the WASM bytecode")
+                       help="the file containing the WASM bytecode")
 
 
 def _add_contract_arg(sub: Any):
@@ -187,6 +187,7 @@ def deploy(args: Any):
 
     tx = contract.deploy(sender, arguments, gas_price, gas_limit, value, chain, version)
     logger.info("Contract address: %s", contract.address)
+    utils.log_explorer_contract_address(chain, contract.address)
 
     result = None
     try:
@@ -221,7 +222,7 @@ def dump_tx_and_result(tx: Any, result: Any, args: Any):
 
 
 def _prepare_contract(args: Any) -> SmartContract:
-    if len(args.bytecode):
+    if args.bytecode and len(args.bytecode):
         bytecode = utils.read_binary_file(Path(args.bytecode)).hex()
     else:
         project = load_project(args.project)

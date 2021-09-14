@@ -133,7 +133,7 @@ class Address(IAddress):
         return self.bech32()
 
     @classmethod
-    def zero(cls):
+    def zero(cls) -> 'Address':
         return Address("0" * 64)
 
 

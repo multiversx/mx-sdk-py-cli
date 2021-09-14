@@ -62,7 +62,7 @@ def compute_all_dns_addresses() -> List[Address]:
     return addresses
 
 
-def name_hash(name: str) -> Address:
+def name_hash(name: str) -> bytes:
     return keccak.new(digest_bits=256).update(str.encode(name)).digest()
 
 

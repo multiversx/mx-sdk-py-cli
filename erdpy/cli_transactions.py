@@ -1,5 +1,5 @@
 from argparse import FileType
-from typing import Any
+from typing import Any, List
 
 from erdpy import cli_shared, utils
 from erdpy.ledger.ledger_functions import do_get_ledger_address
@@ -7,12 +7,12 @@ from erdpy.proxy.core import ElrondProxy
 from erdpy.transactions import Transaction, do_prepare_transaction
 
 
-def setup_parser(subparsers: Any) -> Any:
+def setup_parser(args: List[str], subparsers: Any) -> Any:
     parser = cli_shared.add_group_subparser(subparsers, "tx", "Create and broadcast Transactions")
     subparsers = parser.add_subparsers()
 
     sub = cli_shared.add_command_subparser(subparsers, "tx", "new", "Create a new transaction")
-    _add_common_arguments(sub)
+    _add_common_arguments(args, sub)
     cli_shared.add_outfile_arg(sub, what="signed transaction, hash")
     cli_shared.add_broadcast_args(sub, relay=True)
     cli_shared.add_proxy_arg(sub)
@@ -40,9 +40,9 @@ def setup_parser(subparsers: Any) -> Any:
     return subparsers
 
 
-def _add_common_arguments(sub: Any):
-    cli_shared.add_wallet_args(sub)
-    cli_shared.add_tx_args(sub)
+def _add_common_arguments(args: List[str], sub: Any):
+    cli_shared.add_wallet_args(args, sub)
+    cli_shared.add_tx_args(args, sub)
     sub.add_argument("--data-file", type=FileType("r"), default=None, help="a file containing transaction data")
 
 

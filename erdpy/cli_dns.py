@@ -1,4 +1,4 @@
-from typing import Any
+from typing import Any, List
 from prettytable import PrettyTable
 
 from erdpy import cli_shared
@@ -7,16 +7,16 @@ from erdpy.accounts import Address
 from erdpy.proxy.core import ElrondProxy
 
 
-def setup_parser(subparsers: Any) -> Any:
+def setup_parser(args: List[str], subparsers: Any) -> Any:
     parser = cli_shared.add_group_subparser(subparsers, "dns", "Operations related to the Domain Name Service")
     subparsers = parser.add_subparsers()
 
     sub = cli_shared.add_command_subparser(subparsers, "dns", "register", "Send a register transaction to the appropriate DNS contract from given user and with given name")
     cli_shared.add_outfile_arg(sub)
     cli_shared.add_broadcast_args(sub, relay=True)
-    cli_shared.add_wallet_args(sub)
+    cli_shared.add_wallet_args(args, sub)
     cli_shared.add_proxy_arg(sub)
-    cli_shared.add_tx_args(sub, with_receiver=False, with_data=False)
+    cli_shared.add_tx_args(args, sub, with_receiver=False, with_data=False)
     sub.add_argument("--name", help="the name to register")
     sub.set_defaults(func=register)
 

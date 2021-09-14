@@ -18,12 +18,12 @@ class Project:
         self.path = Path(directory).expanduser().resolve()
         self.directory = str(self.path)
 
-    def build(self, options: Union[Dict[str, Any], None] = None):
+    def build(self, options: Union[Dict[str, Any], None] = None) -> Path:
         self.options = options or dict()
         self.debug = self.options.get("debug", False)
         self._ensure_dependencies_installed()
         self.perform_build()
-        self._do_after_build()
+        return self._do_after_build()
 
     def clean(self):
         utils.remove_folder(self._get_output_folder())
@@ -61,14 +61,15 @@ class Project:
         file = path.join(folder, files[0])
         return Path(file).resolve()
 
-    def _do_after_build(self) -> None:
+    def _do_after_build(self) -> Path:
         raise NotImplementedError()
 
-    def _copy_to_output(self, source: str, destination: str = None):
+    def _copy_to_output(self, source: str, destination: str = None) -> Path:
         output_folder = self._get_output_folder()
         utils.ensure_folder(output_folder)
         destination = path.join(output_folder, destination) if destination else output_folder
-        shutil.copy(source, destination)
+        output_wasm_file = shutil.copy(source, destination)
+        return Path(output_wasm_file)
 
     def _get_output_folder(self):
         return path.join(self.directory, "output")

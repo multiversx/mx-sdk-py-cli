@@ -4,7 +4,7 @@ import requests
 
 
 class TestPlaygroundElrondProxy(unittest.TestCase):
-    @unittest.skip
+    @unittest.skip('manual run only')
     def test_do_request(self):
         # use a valid proxy address
         url = "http://localhost:8001"
@@ -15,7 +15,7 @@ class TestPlaygroundElrondProxy(unittest.TestCase):
         print(response.json())
         self.assertTrue(self, response is not None)
 
-    @unittest.skip
+    @unittest.skip('manual run only')
     def test_do_request_node_status(self):
         # use a valid proxy address
         url = "http://localhost:8001"

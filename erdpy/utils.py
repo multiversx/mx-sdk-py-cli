@@ -9,7 +9,7 @@ import sys
 import tarfile
 import zipfile
 from pathlib import Path
-from typing import Any, List, Union, Optional, cast, IO, Dict
+from typing import Any, AnyStr, List, Union, Optional, cast, IO, Dict
 
 import toml
 
@@ -78,30 +78,32 @@ def read_lines(file: str):
 # TODO delete this function, it is too generic
 # TODO find usages in legolas
 def read_file(f: Any, binary: bool = False) -> Union[str, bytes]:
-    try:
-        if isinstance(f, str) or isinstance(f, pathlib.PosixPath):
-            path = Path(f)
-            if binary:
-                return read_binary_file(path)
-            return read_text_file(path)
+    if isinstance(f, str) or isinstance(f, pathlib.PosixPath):
+        path = Path(f)
+        if binary:
+            return read_binary_file(path)
+        return read_text_file(path)
 
-        file = cast(IO, f)
-        result = file.read()
-        assert isinstance(result, str) or isinstance(result, bytes)
-        return result
-
-    except Exception as err:
-        raise errors.BadFile(f, err)
+    file = cast(IO, f)
+    result = file.read()
+    assert isinstance(result, str) or isinstance(result, bytes)
+    return result
 
 
 def read_binary_file(path: Path) -> bytes:
-    with open(path, 'rb') as binary_file:
-        return binary_file.read()
+    try:
+        with open(path, 'rb') as binary_file:
+            return binary_file.read()
+    except Exception as err:
+        raise errors.BadFile(str(path), err) from None
 
 
 def read_text_file(path: Path) -> str:
-    with open(path, 'r') as text_file:
-        return text_file.read()
+    try:
+        with open(path, 'r') as text_file:
+            return text_file.read()
+    except Exception as err:
+        raise errors.BadFile(str(path), err) from None
 
 
 def write_file(f: Any, text: str):
@@ -195,7 +197,7 @@ def as_object(data: Object) -> Object:
     return data
 
 
-def is_arg_present(key: str, args: List[str]) -> bool:
+def is_arg_present(args: List[str], key: str) -> bool:
     for arg in args:
         if arg.find("--data") != -1:
             continue
@@ -230,3 +232,24 @@ def breakpoint():
     print("Waiting for debugger attach")
     debugpy.wait_for_client()
     debugpy.breakpoint()
+
+
+def log_explorer(chain, name, path, details):
+    networks = {
+        "1": ("Elrond Mainnet Explorer", "https://explorer.elrond.com"),
+        "T": ("Elrond Testnet Explorer", "https://testnet-explorer.elrond.com"),
+        "D": ("Elrond Devnet Explorer", "https://devnet-explorer.elrond.com"),
+    }
+    try:
+        explorer_name, explorer_url = networks[chain]
+        logger.info(f"View this {name} in the {explorer_name}: {explorer_url}/{path}/{details}")
+    except KeyError:
+        return
+
+
+def log_explorer_contract_address(chain, address):
+    log_explorer(chain, "contract address", "accounts", address)
+
+
+def log_explorer_transaction(chain, transaction_hash):
+    log_explorer(chain, "transaction", "transactions", transaction_hash)

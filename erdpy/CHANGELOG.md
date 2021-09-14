@@ -4,6 +4,15 @@ All notable changes will be documented in this file.
 
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
+## [1.0.18] - 14.09.2021
+ - Load a local `erdpy.json` file when running `erdpy` commands, containing default values for CLI options per project
+ - Bugfix by [MWFIAE](https://github.com/MWFIAE): correctly verify the value of the `--bytecode` argument
+ - Bugfix by [MWFIAE](https://github.com/MWFIAE): `QueryResult` objects are now properly JSON-serializable
+ - Add more output information after building and deploying contracts
+ - Improve error reporting to standard output
+ - Enable `mypy` checking as a GitHub action
+ - Add and fix more type hints for `mypy`
+
 ## [1.0.16] - 27.08.2021
  - Merge branch `legolas-addons`
  - Fix `erdpy testnet` to work with recent changes in `elrond-go`
@@ -22,7 +31,7 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
  - Add --wait-result flag for erdpy tx new cli command.
 
 ## [1.0.10] - 25.02.2021
- - [Fixed a bug in the testnet setup process when creting the config for the proxy app #213](https://github.com/ElrondNetwork/elrond-sdk/pull/213) 
+ - [Fixed a bug in the testnet setup process when creating the config for the proxy app #213](https://github.com/ElrondNetwork/elrond-sdk/pull/213) 
 
 ## [1.0.9] - 29.01.2021
  -  [Multiple config templates #152](https://github.com/ElrondNetwork/elrond-sdk/pull/152). One can now `switch` between different **configuration** profiles.
@@ -149,7 +158,7 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
  - Refactoring and design improvements
 
 
-**Note that below, the change log is in chronological order. Will be soon updated to be in inverse chronological order (how it should have been in the first place).**
+**Note that below, the changelog is in chronological order. It will be soon updated to be in inverse chronological order (how it should have been in the first place).**
 
 ## [0.0.4]
 
@@ -498,7 +507,7 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
  - Removed .py SC interaction samples, moved to `sc-examples` `sc-examples-rs` repositories, so that they become available in Elrond IDE.
  - Removed some deprecated code.
  - `mypy`-related refactoring.
- - Fix accounts CLI. Trucate data for "account get-transactions"
+ - Fix accounts CLI. Truncate data for "account get-transactions".
 
 ## [0.7.1] - 13.07.2020
 
