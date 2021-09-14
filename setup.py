@@ -3,11 +3,11 @@ import setuptools
 with open("README.md", "r") as fh:
     long_description = "https://github.com/ElrondNetwork/elrond-sdk-erdpy"
 
-VERSION = "1.0.17"
+VERSION = "1.0.18"
 
 try:
     with open('./erdpy/_version.py', 'wt') as versionfile:
-        versionfile.write(f'__version__ = "{VERSION}"')
+        versionfile.write(f'__version__ = "{VERSION}"\n')
 except FileNotFoundError:
     pass
 
@@ -38,9 +38,8 @@ setuptools.setup(
     zip_safe=False,
     keywords=["Elrond"],
     classifiers=[
-        "Programming Language :: Python :: 3.6",
-        "Programming Language :: Python :: 3.7",
         "Programming Language :: Python :: 3.8",
+        "Programming Language :: Python :: 3.9",
         "License :: OSI Approved :: GNU General Public License (GPL)",
         "Operating System :: POSIX :: Linux",
         "Intended Audience :: Developers",
@@ -51,5 +50,5 @@ setuptools.setup(
             "erdpy=erdpy.cli:main",
         ],
     },
-    python_requires=">=3.6"
+    python_requires=">=3.8"
 )

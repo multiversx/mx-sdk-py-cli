@@ -4,6 +4,15 @@ All notable changes will be documented in this file.
 
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
+## [1.0.18] - 14.09.2021
+ - Load a local `erdpy.json` file when running `erdpy` commands, containing default values for CLI options per project
+ - Bugfix by [MWFIAE](https://github.com/MWFIAE): correctly verify the value of the `--bytecode` argument
+ - Bugfix by [MWFIAE](https://github.com/MWFIAE): `QueryResult` objects are now properly JSON-serializable
+ - Add more output information after building and deploying contracts
+ - Improve error reporting to standard output
+ - Enable `mypy` checking as a GitHub action
+ - Add and fix more type hints for `mypy`
+
 ## [1.0.16] - 27.08.2021
  - Merge branch `legolas-addons`
  - Fix `erdpy testnet` to work with recent changes in `elrond-go`
