@@ -64,11 +64,11 @@ def generate_mnemonic() -> str:
     checksum_bits = bytes_to_binary_string(checksum_bytes)
 
     entropy_str_binary = bytes_to_binary_string(entropy_bytes, BIP39_ENTROPY_BITS)
-    indices_bits = entropy_str_binary + checksum_bits[:BIP39_CHECKSUM_BITS]
-    assert len(indices_bits) == BIP39_TOTAL_INDICES_BITS
+    bits_of_indices = entropy_str_binary + checksum_bits[:BIP39_CHECKSUM_BITS]
+    assert len(bits_of_indices) == BIP39_TOTAL_INDICES_BITS
     assert BIP39_MNEMONIC_WORD_LENGTH * BIP39_WORD_BITS == BIP39_TOTAL_INDICES_BITS
 
-    indices_bits = split_to_fixed_size_slices(indices_bits, BIP39_WORD_BITS)
+    indices_bits = split_to_fixed_size_slices(bits_of_indices, BIP39_WORD_BITS)
     indices_ints = [int(index_bits, base=2) for index_bits in indices_bits]
     assert len(indices_ints) == BIP39_MNEMONIC_WORD_LENGTH
 
