@@ -40,9 +40,8 @@ def mnemonic_to_bip39seed(mnemonic, passphrase=""):
     return stretched[:64]
 
 
-def bytes_to_binary_string(bytes: bytes, number_of_bits: Optional[int] = None) -> str:
-    if number_of_bits is None:
-        number_of_bits = len(bytes) * BITS_PER_BYTE
+def bytes_to_binary_string(bytes: bytes) -> str:
+    number_of_bits = len(bytes) * BITS_PER_BYTE
     bytes_int = int.from_bytes(bytes, "big")
     return f"{bytes_int:0{number_of_bits}b}"
 

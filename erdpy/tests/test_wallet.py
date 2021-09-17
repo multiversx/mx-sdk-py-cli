@@ -12,6 +12,7 @@ from erdpy.tests.utils import MyTestCase
 from erdpy.transactions import Transaction
 from erdpy.wallet import (bip39seed_to_private_key, generate_pair,
                           mnemonic_to_bip39seed, pem)
+from erdpy.wallet.core import bytes_to_binary_string, split_to_fixed_size_slices
 
 logging.basicConfig(level=logging.INFO)
 
@@ -124,7 +125,7 @@ class WalletTestCase(MyTestCase):
         transaction.chainID = "chainID"
         transaction.version = 1
         transaction.sign(self.alice)
-        
+
         self.assertEqual("83efd1bc35790ecc220b0ed6ddd1fcb44af6653dd74e37b3a49dcc1f002a1b98b6f79779192cca68bdfefd037bc81f4fa606628b751023122191f8c062362805", transaction.signature)
 
     def test_generate_pair_pem(self):
@@ -170,3 +171,11 @@ class WalletTestCase(MyTestCase):
         self.assertEqual(mnemonic_seed, actual_mnemonic_seed.hex())
         self.assertEqual(private_key, actual_private_key.hex())
         self.assertEqual(public_key, actual_public_key.hex())
+
+    def test_bytes_to_binary_string(self):
+        self.assertEqual(bytes_to_binary_string(b"\xA7"), '10100111')
+        self.assertEqual(bytes_to_binary_string(b"\x0F"), '00001111')
+        self.assertEqual(bytes_to_binary_string(b"\x12\x34\x56\x78\x9a\xbc\xde\xff"), '0001001000110100010101100111100010011010101111001101111011111111')
+
+    def test_split_to_fixed_size_slices(self):
+        self.assertEqual(split_to_fixed_size_slices('1234567890abcdef', 4), ['1234', '5678', '90ab', 'cdef'])
