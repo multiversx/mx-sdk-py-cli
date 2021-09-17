@@ -70,7 +70,7 @@ def generate_mnemonic() -> str:
     entropy_with_checksum_bits = entropy_bits + init_checksum_bits
     assert len(entropy_with_checksum_bits) == BIP39_TOTAL_INDICES_BITS
 
-    indices_bits = split_to_fixed_size_slices(bits_of_indices, BIP39_WORD_BITS)
+    indices_bits = split_to_fixed_size_slices(entropy_with_checksum_bits, BIP39_WORD_BITS)
     indices_ints = [int(index_bits, base=2) for index_bits in indices_bits]
     assert len(indices_ints) == BIP39_MNEMONIC_WORD_COUNT
 
