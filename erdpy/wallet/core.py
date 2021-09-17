@@ -72,7 +72,7 @@ def generate_mnemonic() -> str:
 
     indices_bits = split_to_fixed_size_slices(bits_of_indices, BIP39_WORD_BITS)
     indices_ints = [int(index_bits, base=2) for index_bits in indices_bits]
-    assert len(indices_ints) == BIP39_MNEMONIC_WORD_LENGTH
+    assert len(indices_ints) == BIP39_MNEMONIC_WORD_COUNT
 
     mnemonic_words = [words[word_index] for word_index in indices_ints]
     mnemonic = " ".join(mnemonic_words)
