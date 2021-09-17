@@ -3,7 +3,7 @@ import hmac
 import secrets
 import struct
 from importlib.resources import open_text
-from typing import List
+from typing import List, Optional
 
 import nacl.signing
 
@@ -40,7 +40,7 @@ def mnemonic_to_bip39seed(mnemonic, passphrase=""):
     return stretched[:64]
 
 
-def bytes_to_binary_string(bytes: bytes, number_of_bits: int = None) -> str:
+def bytes_to_binary_string(bytes: bytes, number_of_bits: Optional[int] = None) -> str:
     if number_of_bits is None:
         number_of_bits = len(bytes) * BITS_PER_BYTE
     bytes_int = int.from_bytes(bytes, "big")
@@ -62,7 +62,7 @@ def generate_mnemonic() -> str:
 
     entropy_bytes = secrets.token_bytes(BIP39_ENTROPY_BYTES)
     entropy_bits = bytes_to_binary_string(entropy_bytes)
-    
+
     checksum_bytes = hashlib.sha256(entropy_bytes).digest()
     checksum_bits = bytes_to_binary_string(checksum_bytes)
     init_checksum_bits = checksum_bits[:BIP39_CHECKSUM_BITS]
