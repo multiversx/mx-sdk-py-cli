@@ -81,6 +81,8 @@ def patch_enable_epochs(data: ConfigDict, testnet_config: TestnetConfiguration):
     enable_epochs['ESDTTransferRoleEnableEpoch'] = 0
     enable_epochs['BuiltInFunctionOnMetaEnableEpoch'] = 0
     enable_epochs['ComputeRewardCheckpointEnableEpoch'] = 5
+    enable_epochs['BackwardCompSaveKeyValueEnableEpoch'] = 5
+    enable_epochs['SCRSizeInvariantCheckEnableEpoch'] = 5
 
     enable_epochs['MaxNodesChangeEnableEpoch'] = [
         {'EpochEnable': 0, 'MaxNumNodes': 36, 'NodesToShufflePerShard': 4},
