@@ -1,5 +1,3 @@
-from itertools import chain
-from logging import Logger
 import os.path
 from typing import Any, Dict, List
 
@@ -57,7 +55,8 @@ def get_dependency_url(key: str, tag: str, platform: str) -> str:
 def get_value(name: str) -> str:
     _guard_valid_name(name)
     data = get_active()
-    value = data.get(name, get_defaults()[name])
+    default_value = get_defaults()[name]
+    value = data.get(name, default_value)
     assert isinstance(value, str)
     return value
 
@@ -69,6 +68,16 @@ def set_value(name: str, value: Any):
     data.setdefault("configurations", {})
     data["configurations"].setdefault(active_config, {})
     data["configurations"][active_config][name] = value
+    write_file(data)
+
+
+def delete_value(name: str):
+    _guard_valid_config_deletion(name)
+    data = read_file()
+    active_config = data.get("active", "default")
+    data.setdefault("configurations", {})
+    data["configurations"].setdefault(active_config, {})
+    del data["configurations"][active_config][name]
     write_file(data)
 
 
