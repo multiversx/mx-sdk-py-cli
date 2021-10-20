@@ -6,10 +6,11 @@ import pathlib
 import shutil
 import stat
 import sys
+import requests
 import tarfile
 import zipfile
 from pathlib import Path
-from typing import Any, AnyStr, List, Union, Optional, cast, IO, Dict
+from typing import Any, List, Union, Optional, cast, IO, Dict
 
 import toml
 
@@ -223,6 +224,18 @@ def parse_keys(bls_public_keys):
     for key in keys:
         parsed_keys += '@' + key
     return parsed_keys, len(keys)
+
+
+def query_latest_release_tag(repo: str) -> str:
+    """
+    Queries the Github API to retrieve the latest released tag of the specified
+    repository. The repository must be of the form 'organisation/project'.
+    """
+    url = f'https://api.github.com/repos/{repo}/releases/latest'
+    response = requests.get(url)
+    response.raise_for_status()
+    latest_release_tag = str(response.json()['tag_name'])
+    return latest_release_tag
 
 
 # https://code.visualstudio.com/docs/python/debugging

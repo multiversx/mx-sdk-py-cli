@@ -2,11 +2,16 @@ import time
 
 from erdpy import config
 from erdpy.projects.templates_repository import TemplatesRepository
+from erdpy.utils import query_latest_release_tag
 
 
 def get_templates_repositories():
     timestamp = int(time.time())
     examples_rs_tag = config.get_dependency_tag('elrond_wasm_rs')
+
+    if examples_rs_tag == 'latest':
+        examples_rs_tag = query_latest_release_tag('ElrondNetwork/elrond-wasm-rs')
+
     examples_rs_tag_no_v = remove_initial_v_from_version(examples_rs_tag)
 
     return [

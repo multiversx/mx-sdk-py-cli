@@ -2,7 +2,7 @@ import logging
 import os
 import shutil
 from os import path
-from typing import Dict, List
+from typing import Dict, List, Optional
 from pathlib import Path
 
 from erdpy import config, dependencies, downloader, errors, myprocess, utils, workstation
@@ -22,6 +22,9 @@ class DependencyModule:
         # Fallback to default tag if not provided
         tag = tag or config.get_dependency_tag(self.key)
 
+        if tag == 'latest':
+            tag = self.get_latest_release()
+
         logger.debug(f"install: key={self.key}, tag={tag}")
 
         if self._should_skip(tag, overwrite):
@@ -31,8 +34,6 @@ class DependencyModule:
         self.uninstall(tag)
         self._do_install(tag)
 
-        # Upon installation we update the default tag
-        config.set_dependency_tag(self.key, tag)
         self._post_install(tag)
 
     def _do_install(self, tag: str) -> None:
@@ -55,15 +56,23 @@ class DependencyModule:
     def get_env(self) -> Dict[str, str]:
         raise NotImplementedError()
 
+    def get_latest_release(self) -> str:
+        raise NotImplementedError()
+
 
 class StandaloneModule(DependencyModule):
-    def __init__(self, key: str, aliases: List[str] = None, repo_name=None):
+    def __init__(self,
+                 key: str,
+                 aliases: List[str] = None,
+                 repo_name: Optional[str] = None,
+                 organisation: Optional[str] = None):
         if aliases is None:
             aliases = list()
 
         super().__init__(key, aliases)
         self.archive_type = "tar.gz"
         self.repo_name = repo_name
+        self.organisation = organisation
 
     def _do_install(self, tag: str):
         self._download(tag)
@@ -73,7 +82,7 @@ class StandaloneModule(DependencyModule):
         if os.path.isdir(self.get_directory(tag)):
             shutil.rmtree(self.get_directory(tag))
 
-    def is_installed(self, tag: str):
+    def is_installed(self, tag: str) -> bool:
         return path.isdir(self.get_directory(tag))
 
     def _download(self, tag: str):
@@ -105,6 +114,7 @@ class StandaloneModule(DependencyModule):
         # the initial 'v'.
         if tag.startswith("v"):
             tag = tag[1:]
+        assert isinstance(self.repo_name, str)
         source_folder = folder / (self.repo_name + '-' + tag)
         return source_folder
 
@@ -114,12 +124,21 @@ class StandaloneModule(DependencyModule):
 
     def _get_download_url(self, tag: str) -> str:
         platform = workstation.get_platform()
+
         url = config.get_dependency_url(self.key, tag, platform)
         if url is None:
             raise errors.PlatformNotSupported(self.key, platform)
 
         url = url.replace("{TAG}", tag)
         return url
+
+    def get_latest_release(self) -> str:
+        if self.repo_name is None or self.organisation is None:
+            raise ValueError(f'{self.key}: repo_name or organisation not specified')
+
+        org_repo = f'{self.organisation}/{self.repo_name}'
+        tag = utils.query_latest_release_tag(org_repo)
+        return tag
 
     def _get_archive_path(self, tag: str) -> str:
         tools_folder = workstation.get_tools_folder()
@@ -134,6 +153,7 @@ class ArwenToolsModule(StandaloneModule):
 
         super().__init__(key, aliases)
         self.repo_name = 'arwen-wasm-vm'
+        self.organisation = 'ElrondNetwork'
 
     def _post_install(self, tag: str):
         dependencies.install_module('golang')
@@ -195,6 +215,9 @@ class GolangModule(StandaloneModule):
     def get_gopath(self):
         return path.join(self.get_parent_directory(), "GOPATH")
 
+    def get_latest_release(self) -> str:
+        raise errors.UnsupportedConfigurationValue("Golang tag must always be explicit, not latest")
+
 
 class NodejsModule(StandaloneModule):
     def __init__(self, key: str, aliases: List[str]):
@@ -215,6 +238,9 @@ class NodejsModule(StandaloneModule):
         return {
             "PATH": f"{bin_folder}:{os.environ['PATH']}",
         }
+
+    def get_latest_release(self) -> str:
+        raise errors.UnsupportedConfigurationValue("Nodejs tag must always be explicit, not latest")
 
 
 class Rust(DependencyModule):
@@ -242,7 +268,7 @@ class Rust(DependencyModule):
         if os.path.isdir(directory):
             shutil.rmtree(directory)
 
-    def is_installed(self, tag: str):
+    def is_installed(self, tag: str) -> bool:
         try:
             myprocess.run_process(["rustc", "--version"], env=self.get_env())
             return True
@@ -266,6 +292,9 @@ class Rust(DependencyModule):
             "CARGO_HOME": directory
         }
 
+    def get_latest_release(self) -> str:
+        raise errors.UnsupportedConfigurationValue("Rust tag must either be explicit, empty or 'nightly'")
+
 
 class MclSignerModule(StandaloneModule):
     def __init__(self, key: str, aliases: List[str] = None):
@@ -273,6 +302,8 @@ class MclSignerModule(StandaloneModule):
             aliases = list()
 
         super().__init__(key, aliases)
+        self.organisation = 'ElrondNetwork'
+        self.repo_name = 'elrond-sdk-go-tools'
 
     def _post_install(self, tag: str):
         directory = self.get_directory(tag)
