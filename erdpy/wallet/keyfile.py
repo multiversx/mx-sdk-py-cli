@@ -72,9 +72,6 @@ def load_from_key_file(key_file_json, password):
 
 def save_to_key_file(json_path: Path, secret_key: str, pubkey: str, password: str) -> None:
     address = accounts.Address(pubkey)
-    address_hex = address.hex()
-
-    address_bech32 = address.bech32()
 
     backend = default_backend()
 
@@ -99,18 +96,18 @@ def save_to_key_file(json_path: Path, secret_key: str, pubkey: str, password: st
 
     uid = str(uuid4())
 
-    json = format_key_json(uid, address_hex, address_bech32, iv, ciphertext, salt, mac)
+    json = format_key_json(uid, address, iv, ciphertext, salt, mac)
 
     with open(json_path, 'w') as json_file:
         dump(json, json_file, indent=4)
 
 
-def format_key_json(uid: str, address_hex: str, address_bech32: str, iv: bytes, ciphertext: bytes, salt: bytes, mac: bytes) -> Any:
+def format_key_json(uid: str, address: accounts.Address, iv: bytes, ciphertext: bytes, salt: bytes, mac: bytes) -> Any:
     return {
         'version': 4,
         'id': uid,
-        'address': address_hex,
-        'bech32': address_bech32,
+        'address': address.hex(),
+        'bech32': address.bech32(),
         'crypto': {
             'cipher': 'aes-128-ctr',
             'cipherparams': {
