@@ -84,6 +84,7 @@ def read_bls_keys(lines):
     return bls_keys
 
 
+# TODO rewrite using generators or simplify the list comprehension within
 def read_validators_secret_keys(lines):
     secret_keys = []
 
