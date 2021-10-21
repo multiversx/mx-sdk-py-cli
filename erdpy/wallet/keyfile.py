@@ -71,23 +71,16 @@ def load_from_key_file(key_file_json, password):
 
 
 def save_to_key_file(json_path: Path, secret_key: str, pubkey: str, password: str) -> None:
-    address = accounts.Address(pubkey)
-
     backend = default_backend()
 
     # derive the encryption key
-
     salt = os.urandom(32)
     kdf = Scrypt(salt=salt, length=32, n=4096, r=8, p=1, backend=backend)
     key = kdf.derive(bytes(password.encode()))
 
     # encrypt the secret key with half of the encryption key
-
     iv = os.urandom(16)
-    encryption_key = key[0:16]
-    cipher = Cipher(algorithms.AES(encryption_key), modes.CTR(iv), backend=backend)
-    encryptor = cipher.encryptor()
-    ciphertext = encryptor.update(secret_key) + encryptor.finalize()
+    ciphertext = make_cyphertext(backend, key, iv, secret_key)
 
     hmac_key = key[16:32]
     h = hmac.HMAC(hmac_key, hashes.SHA256(), backend=default_backend())
@@ -96,13 +89,22 @@ def save_to_key_file(json_path: Path, secret_key: str, pubkey: str, password: st
 
     uid = str(uuid4())
 
-    json = format_key_json(uid, address, iv, ciphertext, salt, mac)
+    json = format_key_json(uid, pubkey, iv, ciphertext, salt, mac)
 
     with open(json_path, 'w') as json_file:
         dump(json, json_file, indent=4)
 
 
-def format_key_json(uid: str, address: accounts.Address, iv: bytes, ciphertext: bytes, salt: bytes, mac: bytes) -> Any:
+def make_cyphertext(backend: Any, key: bytes, iv: bytes, secret_key: str):
+    encryption_key = key[0:16]
+    cipher = Cipher(algorithms.AES(encryption_key), modes.CTR(iv), backend=backend)
+    encryptor = cipher.encryptor()
+    return encryptor.update(secret_key) + encryptor.finalize()
+
+
+def format_key_json(uid: str, pubkey: str, iv: bytes, ciphertext: bytes, salt: bytes, mac: bytes) -> Any:
+    address = accounts.Address(pubkey)
+
     return {
         'version': 4,
         'id': uid,
