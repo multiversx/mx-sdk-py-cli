@@ -2,6 +2,7 @@ import base64
 import os
 from binascii import b2a_base64, hexlify, unhexlify
 from pathlib import Path
+from typing import Any
 import erdpy.accounts as accounts
 from json import load, dump
 from uuid import uuid4
@@ -98,7 +99,14 @@ def save_to_key_file(json_path: Path, secret_key: str, pubkey: str, password: st
 
     uid = str(uuid4())
 
-    json = {
+    json = format_key_json(uid, address_hex, address_bech32, iv, ciphertext, salt, mac)
+
+    with open(json_path, 'w') as json_file:
+        dump(json, json_file, indent=4)
+
+
+def format_key_json(uid: str, address_hex: str, address_bech32: str, iv: bytes, ciphertext: bytes, salt: bytes, mac: bytes) -> Any:
+    return {
         'version': 4,
         'id': uid,
         'address': address_hex,
@@ -120,9 +128,6 @@ def save_to_key_file(json_path: Path, secret_key: str, pubkey: str, password: st
             'mac': hexlify(mac).decode(),
         }
     }
-
-    with open(json_path, 'w') as json_file:
-        dump(json, json_file, indent=4)
 
 
 def get_password(pass_file):
