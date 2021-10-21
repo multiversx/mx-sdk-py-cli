@@ -75,8 +75,6 @@ def save_to_key_file(json_path: Path, secret_key: str, pubkey: str, password: st
 
     address_bech32 = address.bech32()
 
-    pvt_key = secret_key + pubkey
-
     backend = default_backend()
 
     # derive the encryption key
@@ -91,7 +89,7 @@ def save_to_key_file(json_path: Path, secret_key: str, pubkey: str, password: st
     encryption_key = key[0:16]
     cipher = Cipher(algorithms.AES(encryption_key), modes.CTR(iv), backend=backend)
     encryptor = cipher.encryptor()
-    ciphertext = encryptor.update(pvt_key) + encryptor.finalize()
+    ciphertext = encryptor.update(secret_key) + encryptor.finalize()
 
     hmac_key = key[16:32]
     h = hmac.HMAC(hmac_key, hashes.SHA256(), backend=default_backend())
