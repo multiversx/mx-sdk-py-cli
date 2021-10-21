@@ -23,10 +23,10 @@ BIP39_MNEMONIC_WORD_COUNT = 24
 
 
 def derive_keys(mnemonic, account_index=0):
-    seed = mnemonic_to_bip39seed(mnemonic)
-    private_key = bip39seed_to_private_key(seed, account_index)
-    public_key = bytes(nacl.signing.SigningKey(private_key).verify_key)
-    return private_key, public_key
+    bip39seed = mnemonic_to_bip39seed(mnemonic)
+    secret_key = bip39seed_to_secret_key(bip39seed, account_index)
+    public_key = bytes(nacl.signing.SigningKey(secret_key).verify_key)
+    return secret_key, public_key
 
 
 # References:
@@ -88,7 +88,7 @@ def bip39seed_to_master_key(seed):
 
 
 # Reference: https://github.com/alepop/ed25519-hd-key
-def bip39seed_to_private_key(seed, account_index=0):
+def bip39seed_to_secret_key(seed, account_index=0):
     key, chain_code = bip39seed_to_master_key(seed)
 
     for segment in ELROND_DERIVATION_PATH + [account_index]:

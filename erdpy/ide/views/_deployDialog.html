@@ -9,8 +9,8 @@
             <form>
                 [[ if (onTestnet) { ]]
                 <div class="form-group">
-                    <label class="">Private key:</label>
-                    <input class="form-control" type="file" name="PrivateKeyFile" accept=".pem" />
+                    <label class="">Secret key:</label>
+                    <input class="form-control" type="file" name="SecretKeyFile" accept=".pem" />
                 </div>
                 [[ } else { ]]
                 <div class="form-group">
@@ -53,7 +53,8 @@
             [[ if (contract.PropertiesOnTestnet.Address) { ]]
             <div class="form-group">
                 <label class="">Deployed at address:</label>
-                <input class="form-control" name="" type="text" value="[[= contract.PropertiesOnTestnet.Address ]]" readonly />
+                <input class="form-control" name="" type="text" value="[[= contract.PropertiesOnTestnet.Address ]]"
+                    readonly />
             </div>
             [[ } ]]
             [[ } else { ]]

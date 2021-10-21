@@ -34,7 +34,7 @@ contract                       Build, deploy and interact with Smart Contracts
 tx                             Create and broadcast Transactions
 validator                      Stake, Unjail and other actions useful for Validators
 account                        Get Account data (nonce, balance) from the Network
-wallet                         Derive private key from mnemonic, bech32 address helpers etc.
+wallet                         Derive secret key from mnemonic, bech32 address helpers etc.
 network                        Get Network parameters, such as number of shards, chain identifier etc.
 cost                           Estimate cost of Transactions
 dispatcher                     Enqueue transactions, then bulk dispatch them
@@ -701,7 +701,7 @@ optional arguments:
 $ erdpy wallet --help
 usage: erdpy wallet COMMAND [-h] ...
 
-Derive private key from mnemonic, bech32 address helpers etc.
+Derive secret key from mnemonic, bech32 address helpers etc.
 
 COMMANDS:
   {derive,bech32,pem-address,pem-address-hex}

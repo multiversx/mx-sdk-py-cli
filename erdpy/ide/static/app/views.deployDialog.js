@@ -6,7 +6,7 @@ var DeployDialog = Backbone.View.extend({
         "shown.bs.modal": "onBootstrapModalShown",
         "hidden.bs.modal": "onBootstrapModalHidden",
         "click .btn-submit": "onClickSubmit",
-        "change input[name='PrivateKeyFile']": "onChangePrivateKey"
+        "change input[name='SecretKeyFile']": "onChangeSecretKey"
     },
 
     initialize: function (options) {
@@ -49,13 +49,13 @@ var DeployDialog = Backbone.View.extend({
         this.remove();
     },
 
-    onChangePrivateKey: function (event) {
+    onChangeSecretKey: function (event) {
         var self = this;
         var file = event.currentTarget.files[0];
         var reader = new FileReader();
 
         reader.onload = function (onloadEvent) {
-            self.privateKey = onloadEvent.target.result;
+            self.secretKey = onloadEvent.target.result;
         };
 
         reader.readAsText(file);
@@ -69,7 +69,7 @@ var DeployDialog = Backbone.View.extend({
         var gasPrice = this.getGasPrice();
 
         var deployOptions = new SmartContractDeployOptions({
-            privateKey: this.privateKey,
+            secretKey: this.secretKey,
             senderAddress: senderAddress,
             initArgs: initArgs,
             value: value,
