@@ -15,7 +15,7 @@ class DependencyModule:
         self.key = key
         self.aliases = aliases
 
-    def get_directory(self, tag: str) -> str:
+    def get_directory(self, tag: str) -> Path:
         raise NotImplementedError()
 
     def install(self, tag: str, overwrite: bool) -> None:
@@ -88,7 +88,7 @@ class StandaloneModule(DependencyModule):
     def _download(self, tag: str):
         url = self._get_download_url(tag)
         archive_path = self._get_archive_path(tag)
-        downloader.download(url, archive_path)
+        downloader.download(url, str(archive_path))
 
     def _extract(self, tag: str):
         archive_path = self._get_archive_path(tag)
@@ -101,13 +101,10 @@ class StandaloneModule(DependencyModule):
         else:
             raise errors.UnknownArchiveType(self.archive_type)
 
-    def get_directory(self, tag: str):
-        folder = path.join(self.get_parent_directory(), tag)
-        return folder
+    def get_directory(self, tag: str) -> Path:
+        return config.get_dependency_directory(self.key, tag)
 
     def get_source_directory(self, tag: str):
-        folder = Path(self.get_directory(tag))
-
         # Due to how the GitHub creates archives for repository releases, the
         # path will contain the tag in two variants: with the 'v' prefix (e.g.
         # "v1.1.0"), but also without (e.g. "1.1.0"), hence the need to remove
@@ -115,12 +112,11 @@ class StandaloneModule(DependencyModule):
         if tag.startswith("v"):
             tag = tag[1:]
         assert isinstance(self.repo_name, str)
-        source_folder = folder / (self.repo_name + '-' + tag)
+        source_folder = self.get_directory(tag) / (self.repo_name + '-' + tag)
         return source_folder
 
-    def get_parent_directory(self):
-        tools_folder = workstation.get_tools_folder()
-        return path.join(tools_folder, self.key)
+    def get_parent_directory(self) -> Path:
+        return config.get_dependency_parent_directory(self.key)
 
     def _get_download_url(self, tag: str) -> str:
         platform = workstation.get_platform()
@@ -140,9 +136,9 @@ class StandaloneModule(DependencyModule):
         tag = utils.query_latest_release_tag(org_repo)
         return tag
 
-    def _get_archive_path(self, tag: str) -> str:
-        tools_folder = workstation.get_tools_folder()
-        archive = path.join(tools_folder, f"{self.key}.{tag}.{self.archive_type}")
+    def _get_archive_path(self, tag: str) -> Path:
+        tools_folder = Path(workstation.get_tools_folder())
+        archive = tools_folder / f"{self.key}.{tag}.{self.archive_type}"
         return archive
 
 

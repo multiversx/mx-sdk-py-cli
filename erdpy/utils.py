@@ -43,23 +43,23 @@ def omit_fields(data: Any, fields: List[str] = []):
     raise errors.ProgrammingError("omit_fields: only dictionaries are supported.")
 
 
-def untar(archive_path: str, destination_folder: str) -> None:
+def untar(archive_path: Path, destination_folder: Path) -> None:
     logger.debug(f"untar [{archive_path}] to [{destination_folder}].")
 
     ensure_folder(destination_folder)
-    tar = tarfile.open(archive_path)
-    tar.extractall(path=destination_folder)
+    tar = tarfile.open(str(archive_path))
+    tar.extractall(path=str(destination_folder))
     tar.close()
 
     logger.debug("untar done.")
 
 
-def unzip(archive_path, destination_folder):
+def unzip(archive_path: Path, destination_folder: Path):
     logger.debug(f"unzip [{archive_path}] to [{destination_folder}].")
 
     ensure_folder(destination_folder)
-    with zipfile.ZipFile(archive_path, "r") as my_zip:
-        my_zip.extractall(destination_folder)
+    with zipfile.ZipFile(str(archive_path), "r") as my_zip:
+        my_zip.extractall(str(destination_folder))
 
     logger.debug("unzip done.")
 

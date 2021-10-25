@@ -33,7 +33,8 @@ setuptools.setup(
         "pycryptodomex",
         "cryptography>=3.2",
         "prettytable",
-        "ledgercomm"
+        "ledgercomm",
+        "semver"
     ],
     zip_safe=False,
     keywords=["Elrond"],

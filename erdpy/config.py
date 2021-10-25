@@ -1,7 +1,9 @@
 import os.path
+import semver
 from typing import Any, Dict, List
+from pathlib import Path
 
-from erdpy import errors, utils
+from erdpy import errors, utils, workstation
 
 ROOT_FOLDER_NAME = "elrondsdk"
 LOCAL_CONFIG_PATH = os.path.join(os.getcwd(), "erdpy.json")
@@ -236,3 +238,43 @@ def determine_final_args(argv: List[str], config_args: Dict[str, Any]) -> List[s
         pre_args = [verbose_flag]
 
     return pre_args + argv + extra_args
+
+
+def get_dependency_directory(key: str, tag: str) -> Path:
+    parent_directory = get_dependency_parent_directory(key)
+    if tag == 'latest':
+        tag = get_latest_semver_from_directory(parent_directory)
+
+    return parent_directory / tag
+
+
+def get_dependency_parent_directory(key: str) -> Path:
+    tools_folder = Path(workstation.get_tools_folder())
+    return tools_folder / key
+
+
+def get_latest_semver_from_directory(directory: Path) -> str:
+    subdirs = [subdir.name for subdir in directory.iterdir()]
+    versions = parse_strings_to_semver(subdirs)
+    if len(versions) == 0:
+        raise Exception(f'no versions found in {directory}')
+
+    if len(versions) == 1:
+        latest_version = versions[0]
+    else:
+        latest_version = sorted(versions).pop()
+    return 'v' + str(latest_version)
+
+
+def parse_strings_to_semver(version_strings: List[str]) -> List[semver.VersionInfo]:
+    versions = []
+    for version_string in version_strings:
+        try:
+            version_string = version_string[1:]
+            version = semver.VersionInfo.parse(version_string)
+        except ValueError:
+            continue
+
+        versions.append(version)
+
+    return versions
