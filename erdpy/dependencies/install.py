@@ -44,8 +44,8 @@ def get_all_deps() -> List[DependencyModule]:
         ArwenToolsModule(key="arwentools"),
         Rust(key="rust"),
         NodejsModule(key="nodejs", aliases=[]),
-        StandaloneModule(key="elrond_go"),
-        StandaloneModule(key="elrond_proxy_go"),
+        StandaloneModule(key="elrond_go", repo_name="elrond-go", organisation="ElrondNetwork"),
+        StandaloneModule(key="elrond_proxy_go", repo_name="elrond-proxy-go", organisation="ElrondNetwork"),
         GolangModule(key="golang"),
         MclSignerModule(key="mcl_signer")
     ]

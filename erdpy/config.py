@@ -1,5 +1,3 @@
-from itertools import chain
-from logging import Logger
 import os.path
 from typing import Any, Dict, List
 
@@ -57,7 +55,8 @@ def get_dependency_url(key: str, tag: str, platform: str) -> str:
 def get_value(name: str) -> str:
     _guard_valid_name(name)
     data = get_active()
-    value = data.get(name, get_defaults()[name])
+    default_value = get_defaults()[name]
+    value = data.get(name, default_value)
     assert isinstance(value, str)
     return value
 
@@ -69,6 +68,16 @@ def set_value(name: str, value: Any):
     data.setdefault("configurations", {})
     data["configurations"].setdefault(active_config, {})
     data["configurations"][active_config][name] = value
+    write_file(data)
+
+
+def delete_value(name: str):
+    _guard_valid_config_deletion(name)
+    data = read_file()
+    active_config = data.get("active", "default")
+    data.setdefault("configurations", {})
+    data["configurations"].setdefault(active_config, {})
+    del data["configurations"][active_config][name]
     write_file(data)
 
 
@@ -137,28 +146,28 @@ def get_defaults() -> Dict[str, Any]:
         "proxy": "https://testnet-gateway.elrond.com",
         "chainID": "T",
         "txVersion": "1",
-        "dependencies.arwentools.tag": "v1.1.2",
-        "dependencies.elrond_wasm_rs.tag": "v0.12.0",
+        "dependencies.arwentools.tag": "latest",
+        "dependencies.elrond_wasm_rs.tag": "latest",
         "dependencies.arwentools.urlTemplate.linux": "https://github.com/ElrondNetwork/arwen-wasm-vm/archive/{TAG}.tar.gz",
         "dependencies.arwentools.urlTemplate.osx": "https://github.com/ElrondNetwork/arwen-wasm-vm/archive/{TAG}.tar.gz",
         "dependencies.llvm.tag": "v9-19feb",
         "dependencies.llvm.urlTemplate.linux": "https://ide.elrond.com/vendor-llvm/{TAG}/linux-amd64.tar.gz?t=19feb",
         "dependencies.llvm.urlTemplate.osx": "https://ide.elrond.com/vendor-llvm/{TAG}/darwin-amd64.tar.gz?t=19feb",
-        "dependencies.rust.tag": "",
+        "dependencies.rust.tag": "nightly",
         "dependencies.nodejs.tag": "v12.18.3",
         "dependencies.nodejs.urlTemplate.linux": "https://nodejs.org/dist/{TAG}/node-{TAG}-linux-x64.tar.gz",
         "dependencies.nodejs.urlTemplate.osx": "https://nodejs.org/dist/{TAG}/node-{TAG}-darwin-x64.tar.gz",
-        "dependencies.elrond_go.tag": "master",
+        "dependencies.elrond_go.tag": "latest",
         "dependencies.elrond_go.urlTemplate.linux": "https://github.com/ElrondNetwork/elrond-go/archive/{TAG}.tar.gz",
         "dependencies.elrond_go.urlTemplate.osx": "https://github.com/ElrondNetwork/elrond-go/archive/{TAG}.tar.gz",
         "dependencies.elrond_go.url": "https://github.com/ElrondNetwork/elrond-go/archive/{TAG}.tar.gz",
-        "dependencies.elrond_proxy_go.tag": "master",
+        "dependencies.elrond_proxy_go.tag": "latest",
         "dependencies.elrond_proxy_go.urlTemplate.linux": "https://github.com/ElrondNetwork/elrond-proxy-go/archive/{TAG}.tar.gz",
         "dependencies.elrond_proxy_go.urlTemplate.osx": "https://github.com/ElrondNetwork/elrond-proxy-go/archive/{TAG}.tar.gz",
         "dependencies.golang.tag": "go1.15.2",
         "dependencies.golang.urlTemplate.linux": "https://golang.org/dl/{TAG}.linux-amd64.tar.gz",
         "dependencies.golang.urlTemplate.osx": "https://golang.org/dl/{TAG}.darwin-amd64.tar.gz",
-        "dependencies.mcl_signer.tag": "v1.0.0",
+        "dependencies.mcl_signer.tag": "latest",
         "dependencies.mcl_signer.urlTemplate.linux": "https://github.com/ElrondNetwork/elrond-sdk-go-tools/releases/download/{TAG}/mcl_signer_{TAG}_ubuntu-latest.tar.gz",
         "dependencies.mcl_signer.urlTemplate.osx": "https://github.com/ElrondNetwork/elrond-sdk-go-tools/releases/download/{TAG}/mcl_signer_{TAG}_macos-latest.tar.gz",
     }
