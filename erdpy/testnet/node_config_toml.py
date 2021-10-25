@@ -1,5 +1,7 @@
 from typing import Dict, Any
 
+import erdpy.config
+
 from erdpy.testnet.config import TestnetConfiguration
 from erdpy.testnet.nodes_setup_json import CHAIN_ID
 
@@ -99,14 +101,19 @@ def patch_enable_epochs(data: ConfigDict, testnet_config: TestnetConfiguration):
         {'EpochEnable': 1, 'MaxNumNodes': 56, 'NodesToShufflePerShard': 2}
     ]
 
-    validate_expected_keys(data['EnableEpochs'], enable_epochs)
+    validate = erdpy.config.get_value('testnet.validate_expected_keys') == 'true'
+
+    if validate:
+        validate_expected_keys(data['EnableEpochs'], enable_epochs)
     data['EnableEpochs'].update(enable_epochs)
 
     gas_schedule = dict()
     gas_schedule['GasScheduleByEpochs'] = [
         {'StartEpoch': 0, 'FileName': 'gasScheduleV3.toml'}
     ]
-    validate_expected_keys(data['GasSchedule'], gas_schedule)
+
+    if validate:
+        validate_expected_keys(data['GasSchedule'], gas_schedule)
     data['GasSchedule'].update(gas_schedule)
 
 
