@@ -109,10 +109,11 @@ class StandaloneModule(DependencyModule):
         # path will contain the tag in two variants: with the 'v' prefix (e.g.
         # "v1.1.0"), but also without (e.g. "1.1.0"), hence the need to remove
         # the initial 'v'.
-        if tag.startswith("v"):
-            tag = tag[1:]
+        tag_no_v = tag
+        if tag_no_v.startswith("v"):
+            tag_no_v = tag_no_v[1:]
         assert isinstance(self.repo_name, str)
-        source_folder = self.get_directory(tag) / (self.repo_name + '-' + tag)
+        source_folder = self.get_directory(tag) / (self.repo_name + '-' + tag_no_v)
         return source_folder
 
     def get_parent_directory(self) -> Path:
@@ -159,6 +160,7 @@ class ArwenToolsModule(StandaloneModule):
 
         self.make_binary_symlink_in_parent_folder(tag, 'arwendebug', 'arwendebug')
         self.make_binary_symlink_in_parent_folder(tag, 'test', 'mandos-test')
+        self.copy_libwasmer_in_parent_directory(tag)
 
     def build_binary(self, tag, binary_name):
         source_folder = self.binary_source_folder(tag, binary_name)
@@ -174,11 +176,18 @@ class ArwenToolsModule(StandaloneModule):
         source_folder = self.binary_source_folder(tag, binary_name)
         binary = source_folder / binary_name
 
-        parent = Path(self.get_parent_directory())
+        parent = self.get_parent_directory()
         symlink = parent / symlink_name
 
         symlink.unlink(missing_ok=True)
         symlink.symlink_to(binary)
+
+    def copy_libwasmer_in_parent_directory(self, tag):
+        libwasmer_directory = self.get_source_directory(tag) / 'wasmer'
+        parent_directory = self.get_parent_directory()
+        for f in libwasmer_directory.iterdir():
+            if f.suffix in ['.dylib', '.so', '.dll']:
+                shutil.copy(f, parent_directory)
 
     def get_env(self):
         return {

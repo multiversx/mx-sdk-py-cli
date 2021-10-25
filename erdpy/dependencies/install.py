@@ -11,8 +11,12 @@ logger = logging.getLogger("install")
 
 
 def install_module(key: str, tag: str = "", overwrite: bool = False):
-    module = get_module_by_key(key)
-    module.install(tag, overwrite)
+    if key == 'all':
+        modules = get_all_deps()
+    else:
+        modules = [get_module_by_key(key)]
+    for module in modules:
+        module.install(tag, overwrite)
 
 
 def get_module_directory(key: str) -> Path:
