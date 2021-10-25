@@ -233,9 +233,15 @@ def query_latest_release_tag(repo: str) -> str:
     repository. The repository must be of the form 'organisation/project'.
     """
     url = f'https://api.github.com/repos/{repo}/releases/latest'
+
     github_api_token = erdpy.config.get_value('github_api_token')
-    response = requests.get(url, auth=github_api_token)
+    headers = dict()
+    if github_api_token != '':
+        headers['Authorization'] = f'token {github_api_token}'
+
+    response = requests.get(url, headers=headers)
     response.raise_for_status()
+
     latest_release_tag = str(response.json()['tag_name'])
     return latest_release_tag
 
