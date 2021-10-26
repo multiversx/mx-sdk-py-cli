@@ -15,6 +15,7 @@ def install_module(key: str, tag: str = "", overwrite: bool = False):
         modules = get_all_deps()
     else:
         modules = [get_module_by_key(key)]
+
     for module in modules:
         module.install(tag, overwrite)
 

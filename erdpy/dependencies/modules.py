@@ -113,7 +113,7 @@ class StandaloneModule(DependencyModule):
         if tag_no_v.startswith("v"):
             tag_no_v = tag_no_v[1:]
         assert isinstance(self.repo_name, str)
-        source_folder = self.get_directory(tag) / (self.repo_name + '-' + tag_no_v)
+        source_folder = self.get_directory(tag) / f'{self.repo_name}-{tag_no_v}'
         return source_folder
 
     def get_parent_directory(self) -> Path:

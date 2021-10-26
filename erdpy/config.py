@@ -272,6 +272,7 @@ def parse_strings_to_semver(version_strings: List[str]) -> List[semver.VersionIn
     versions = []
     for version_string in version_strings:
         try:
+            # Omit the 'v' prefix of the version string
             version_string = version_string[1:]
             version = semver.VersionInfo.parse(version_string)
         except ValueError:
