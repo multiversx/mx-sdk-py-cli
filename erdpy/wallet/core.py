@@ -55,7 +55,7 @@ def split_to_fixed_size_slices(bits: str, chunk_size: int) -> List[str]:
 # BIP39 algorithm steps from:
 # https://medium.com/coinmonks/mnemonic-generation-bip39-simply-explained-e9ac18db9477
 def generate_mnemonic() -> str:
-    with open_text("erdpy.wallet", "words.txt") as words_file:
+    with open_text("erdpy.wallet", "bip39words.txt") as words_file:
         words = words_file.read().splitlines()
         assert len(words) == BIP39_WORD_COUNT
 
