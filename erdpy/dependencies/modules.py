@@ -2,7 +2,7 @@ import logging
 import os
 import shutil
 from os import path
-from typing import Dict, List
+from typing import Dict, List, Optional
 from pathlib import Path
 
 from erdpy import config, dependencies, downloader, errors, myprocess, utils, workstation
@@ -15,12 +15,15 @@ class DependencyModule:
         self.key = key
         self.aliases = aliases
 
-    def get_directory(self, tag: str) -> str:
+    def get_directory(self, tag: str) -> Path:
         raise NotImplementedError()
 
     def install(self, tag: str, overwrite: bool) -> None:
         # Fallback to default tag if not provided
         tag = tag or config.get_dependency_tag(self.key)
+
+        if tag == 'latest':
+            tag = self.get_latest_release()
 
         logger.debug(f"install: key={self.key}, tag={tag}")
 
@@ -31,8 +34,6 @@ class DependencyModule:
         self.uninstall(tag)
         self._do_install(tag)
 
-        # Upon installation we update the default tag
-        config.set_dependency_tag(self.key, tag)
         self._post_install(tag)
 
     def _do_install(self, tag: str) -> None:
@@ -55,15 +56,23 @@ class DependencyModule:
     def get_env(self) -> Dict[str, str]:
         raise NotImplementedError()
 
+    def get_latest_release(self) -> str:
+        raise NotImplementedError()
+
 
 class StandaloneModule(DependencyModule):
-    def __init__(self, key: str, aliases: List[str] = None, repo_name=None):
+    def __init__(self,
+                 key: str,
+                 aliases: List[str] = None,
+                 repo_name: Optional[str] = None,
+                 organisation: Optional[str] = None):
         if aliases is None:
             aliases = list()
 
         super().__init__(key, aliases)
         self.archive_type = "tar.gz"
         self.repo_name = repo_name
+        self.organisation = organisation
 
     def _do_install(self, tag: str):
         self._download(tag)
@@ -73,13 +82,13 @@ class StandaloneModule(DependencyModule):
         if os.path.isdir(self.get_directory(tag)):
             shutil.rmtree(self.get_directory(tag))
 
-    def is_installed(self, tag: str):
+    def is_installed(self, tag: str) -> bool:
         return path.isdir(self.get_directory(tag))
 
     def _download(self, tag: str):
         url = self._get_download_url(tag)
         archive_path = self._get_archive_path(tag)
-        downloader.download(url, archive_path)
+        downloader.download(url, str(archive_path))
 
     def _extract(self, tag: str):
         archive_path = self._get_archive_path(tag)
@@ -92,28 +101,27 @@ class StandaloneModule(DependencyModule):
         else:
             raise errors.UnknownArchiveType(self.archive_type)
 
-    def get_directory(self, tag: str):
-        folder = path.join(self.get_parent_directory(), tag)
-        return folder
+    def get_directory(self, tag: str) -> Path:
+        return config.get_dependency_directory(self.key, tag)
 
     def get_source_directory(self, tag: str):
-        folder = Path(self.get_directory(tag))
-
         # Due to how the GitHub creates archives for repository releases, the
         # path will contain the tag in two variants: with the 'v' prefix (e.g.
         # "v1.1.0"), but also without (e.g. "1.1.0"), hence the need to remove
         # the initial 'v'.
-        if tag.startswith("v"):
-            tag = tag[1:]
-        source_folder = folder / (self.repo_name + '-' + tag)
+        tag_no_v = tag
+        if tag_no_v.startswith("v"):
+            tag_no_v = tag_no_v[1:]
+        assert isinstance(self.repo_name, str)
+        source_folder = self.get_directory(tag) / f'{self.repo_name}-{tag_no_v}'
         return source_folder
 
-    def get_parent_directory(self):
-        tools_folder = workstation.get_tools_folder()
-        return path.join(tools_folder, self.key)
+    def get_parent_directory(self) -> Path:
+        return config.get_dependency_parent_directory(self.key)
 
     def _get_download_url(self, tag: str) -> str:
         platform = workstation.get_platform()
+
         url = config.get_dependency_url(self.key, tag, platform)
         if url is None:
             raise errors.PlatformNotSupported(self.key, platform)
@@ -121,9 +129,17 @@ class StandaloneModule(DependencyModule):
         url = url.replace("{TAG}", tag)
         return url
 
-    def _get_archive_path(self, tag: str) -> str:
-        tools_folder = workstation.get_tools_folder()
-        archive = path.join(tools_folder, f"{self.key}.{tag}.{self.archive_type}")
+    def get_latest_release(self) -> str:
+        if self.repo_name is None or self.organisation is None:
+            raise ValueError(f'{self.key}: repo_name or organisation not specified')
+
+        org_repo = f'{self.organisation}/{self.repo_name}'
+        tag = utils.query_latest_release_tag(org_repo)
+        return tag
+
+    def _get_archive_path(self, tag: str) -> Path:
+        tools_folder = Path(workstation.get_tools_folder())
+        archive = tools_folder / f"{self.key}.{tag}.{self.archive_type}"
         return archive
 
 
@@ -134,6 +150,7 @@ class ArwenToolsModule(StandaloneModule):
 
         super().__init__(key, aliases)
         self.repo_name = 'arwen-wasm-vm'
+        self.organisation = 'ElrondNetwork'
 
     def _post_install(self, tag: str):
         dependencies.install_module('golang')
@@ -143,6 +160,7 @@ class ArwenToolsModule(StandaloneModule):
 
         self.make_binary_symlink_in_parent_folder(tag, 'arwendebug', 'arwendebug')
         self.make_binary_symlink_in_parent_folder(tag, 'test', 'mandos-test')
+        self.copy_libwasmer_in_parent_directory(tag)
 
     def build_binary(self, tag, binary_name):
         source_folder = self.binary_source_folder(tag, binary_name)
@@ -158,11 +176,18 @@ class ArwenToolsModule(StandaloneModule):
         source_folder = self.binary_source_folder(tag, binary_name)
         binary = source_folder / binary_name
 
-        parent = Path(self.get_parent_directory())
+        parent = self.get_parent_directory()
         symlink = parent / symlink_name
 
         symlink.unlink(missing_ok=True)
         symlink.symlink_to(binary)
+
+    def copy_libwasmer_in_parent_directory(self, tag):
+        libwasmer_directory = self.get_source_directory(tag) / 'wasmer'
+        parent_directory = self.get_parent_directory()
+        for f in libwasmer_directory.iterdir():
+            if f.suffix in ['.dylib', '.so', '.dll']:
+                shutil.copy(f, parent_directory)
 
     def get_env(self):
         return {
@@ -195,6 +220,9 @@ class GolangModule(StandaloneModule):
     def get_gopath(self):
         return path.join(self.get_parent_directory(), "GOPATH")
 
+    def get_latest_release(self) -> str:
+        raise errors.UnsupportedConfigurationValue("Golang tag must always be explicit, not latest")
+
 
 class NodejsModule(StandaloneModule):
     def __init__(self, key: str, aliases: List[str]):
@@ -215,6 +243,9 @@ class NodejsModule(StandaloneModule):
         return {
             "PATH": f"{bin_folder}:{os.environ['PATH']}",
         }
+
+    def get_latest_release(self) -> str:
+        raise errors.UnsupportedConfigurationValue("Nodejs tag must always be explicit, not latest")
 
 
 class Rust(DependencyModule):
@@ -242,7 +273,7 @@ class Rust(DependencyModule):
         if os.path.isdir(directory):
             shutil.rmtree(directory)
 
-    def is_installed(self, tag: str):
+    def is_installed(self, tag: str) -> bool:
         try:
             myprocess.run_process(["rustc", "--version"], env=self.get_env())
             return True
@@ -266,6 +297,9 @@ class Rust(DependencyModule):
             "CARGO_HOME": directory
         }
 
+    def get_latest_release(self) -> str:
+        raise errors.UnsupportedConfigurationValue("Rust tag must either be explicit, empty or 'nightly'")
+
 
 class MclSignerModule(StandaloneModule):
     def __init__(self, key: str, aliases: List[str] = None):
@@ -273,6 +307,8 @@ class MclSignerModule(StandaloneModule):
             aliases = list()
 
         super().__init__(key, aliases)
+        self.organisation = 'ElrondNetwork'
+        self.repo_name = 'elrond-sdk-go-tools'
 
     def _post_install(self, tag: str):
         directory = self.get_directory(tag)

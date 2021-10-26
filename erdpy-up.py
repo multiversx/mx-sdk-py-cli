@@ -182,7 +182,7 @@ def run_in_venv(args):
         del os.environ["PYTHONHOME"]
 
     process = subprocess.Popen(args, env={
-        "PATH": os.path.join(get_erdpy_path(), "bin"),
+        "PATH": os.path.join(get_erdpy_path(), "bin") + ":" + os.environ["PATH"],
         "VIRTUAL_ENV": get_erdpy_path()
     })
 

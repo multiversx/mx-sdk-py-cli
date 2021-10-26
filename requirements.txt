@@ -9,6 +9,7 @@ cryptography>=3.2
 prettytable
 types-prettytable
 ledgercomm
+semver
 
 pytest
 

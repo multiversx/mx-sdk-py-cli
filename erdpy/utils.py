@@ -6,13 +6,15 @@ import pathlib
 import shutil
 import stat
 import sys
+import requests
 import tarfile
 import zipfile
 from pathlib import Path
-from typing import Any, AnyStr, List, Union, Optional, cast, IO, Dict
+from typing import Any, List, Union, Optional, cast, IO, Dict
 
 import toml
 
+import erdpy.config
 from erdpy import errors
 
 logger = logging.getLogger("utils")
@@ -42,23 +44,23 @@ def omit_fields(data: Any, fields: List[str] = []):
     raise errors.ProgrammingError("omit_fields: only dictionaries are supported.")
 
 
-def untar(archive_path: str, destination_folder: str) -> None:
+def untar(archive_path: Path, destination_folder: Path) -> None:
     logger.debug(f"untar [{archive_path}] to [{destination_folder}].")
 
     ensure_folder(destination_folder)
-    tar = tarfile.open(archive_path)
-    tar.extractall(path=destination_folder)
+    tar = tarfile.open(str(archive_path))
+    tar.extractall(path=str(destination_folder))
     tar.close()
 
     logger.debug("untar done.")
 
 
-def unzip(archive_path, destination_folder):
+def unzip(archive_path: Path, destination_folder: Path):
     logger.debug(f"unzip [{archive_path}] to [{destination_folder}].")
 
     ensure_folder(destination_folder)
-    with zipfile.ZipFile(archive_path, "r") as my_zip:
-        my_zip.extractall(destination_folder)
+    with zipfile.ZipFile(str(archive_path), "r") as my_zip:
+        my_zip.extractall(str(destination_folder))
 
     logger.debug("unzip done.")
 
@@ -223,6 +225,25 @@ def parse_keys(bls_public_keys):
     for key in keys:
         parsed_keys += '@' + key
     return parsed_keys, len(keys)
+
+
+def query_latest_release_tag(repo: str) -> str:
+    """
+    Queries the Github API to retrieve the latest released tag of the specified
+    repository. The repository must be of the form 'organisation/project'.
+    """
+    url = f'https://api.github.com/repos/{repo}/releases/latest'
+
+    github_api_token = erdpy.config.get_value('github_api_token')
+    headers = dict()
+    if github_api_token != '':
+        headers['Authorization'] = f'token {github_api_token}'
+
+    response = requests.get(url, headers=headers)
+    response.raise_for_status()
+
+    latest_release_tag = str(response.json()['tag_name'])
+    return latest_release_tag
 
 
 # https://code.visualstudio.com/docs/python/debugging

@@ -1,9 +1,9 @@
-from itertools import chain
-from logging import Logger
 import os.path
+import semver
 from typing import Any, Dict, List
+from pathlib import Path
 
-from erdpy import errors, utils
+from erdpy import errors, utils, workstation
 
 ROOT_FOLDER_NAME = "elrondsdk"
 LOCAL_CONFIG_PATH = os.path.join(os.getcwd(), "erdpy.json")
@@ -57,7 +57,8 @@ def get_dependency_url(key: str, tag: str, platform: str) -> str:
 def get_value(name: str) -> str:
     _guard_valid_name(name)
     data = get_active()
-    value = data.get(name, get_defaults()[name])
+    default_value = get_defaults()[name]
+    value = data.get(name, default_value)
     assert isinstance(value, str)
     return value
 
@@ -69,6 +70,16 @@ def set_value(name: str, value: Any):
     data.setdefault("configurations", {})
     data["configurations"].setdefault(active_config, {})
     data["configurations"][active_config][name] = value
+    write_file(data)
+
+
+def delete_value(name: str):
+    _guard_valid_config_deletion(name)
+    data = read_file()
+    active_config = data.get("active", "default")
+    data.setdefault("configurations", {})
+    data["configurations"].setdefault(active_config, {})
+    del data["configurations"][active_config][name]
     write_file(data)
 
 
@@ -137,30 +148,32 @@ def get_defaults() -> Dict[str, Any]:
         "proxy": "https://testnet-gateway.elrond.com",
         "chainID": "T",
         "txVersion": "1",
-        "dependencies.arwentools.tag": "v1.1.2",
-        "dependencies.elrond_wasm_rs.tag": "v0.12.0",
+        "dependencies.arwentools.tag": "latest",
+        "dependencies.elrond_wasm_rs.tag": "latest",
         "dependencies.arwentools.urlTemplate.linux": "https://github.com/ElrondNetwork/arwen-wasm-vm/archive/{TAG}.tar.gz",
         "dependencies.arwentools.urlTemplate.osx": "https://github.com/ElrondNetwork/arwen-wasm-vm/archive/{TAG}.tar.gz",
         "dependencies.llvm.tag": "v9-19feb",
         "dependencies.llvm.urlTemplate.linux": "https://ide.elrond.com/vendor-llvm/{TAG}/linux-amd64.tar.gz?t=19feb",
         "dependencies.llvm.urlTemplate.osx": "https://ide.elrond.com/vendor-llvm/{TAG}/darwin-amd64.tar.gz?t=19feb",
-        "dependencies.rust.tag": "",
+        "dependencies.rust.tag": "nightly",
         "dependencies.nodejs.tag": "v12.18.3",
         "dependencies.nodejs.urlTemplate.linux": "https://nodejs.org/dist/{TAG}/node-{TAG}-linux-x64.tar.gz",
         "dependencies.nodejs.urlTemplate.osx": "https://nodejs.org/dist/{TAG}/node-{TAG}-darwin-x64.tar.gz",
-        "dependencies.elrond_go.tag": "master",
+        "dependencies.elrond_go.tag": "latest",
         "dependencies.elrond_go.urlTemplate.linux": "https://github.com/ElrondNetwork/elrond-go/archive/{TAG}.tar.gz",
         "dependencies.elrond_go.urlTemplate.osx": "https://github.com/ElrondNetwork/elrond-go/archive/{TAG}.tar.gz",
         "dependencies.elrond_go.url": "https://github.com/ElrondNetwork/elrond-go/archive/{TAG}.tar.gz",
-        "dependencies.elrond_proxy_go.tag": "master",
+        "dependencies.elrond_proxy_go.tag": "latest",
         "dependencies.elrond_proxy_go.urlTemplate.linux": "https://github.com/ElrondNetwork/elrond-proxy-go/archive/{TAG}.tar.gz",
         "dependencies.elrond_proxy_go.urlTemplate.osx": "https://github.com/ElrondNetwork/elrond-proxy-go/archive/{TAG}.tar.gz",
         "dependencies.golang.tag": "go1.15.2",
         "dependencies.golang.urlTemplate.linux": "https://golang.org/dl/{TAG}.linux-amd64.tar.gz",
         "dependencies.golang.urlTemplate.osx": "https://golang.org/dl/{TAG}.darwin-amd64.tar.gz",
-        "dependencies.mcl_signer.tag": "v1.0.0",
+        "dependencies.mcl_signer.tag": "latest",
         "dependencies.mcl_signer.urlTemplate.linux": "https://github.com/ElrondNetwork/elrond-sdk-go-tools/releases/download/{TAG}/mcl_signer_{TAG}_ubuntu-latest.tar.gz",
         "dependencies.mcl_signer.urlTemplate.osx": "https://github.com/ElrondNetwork/elrond-sdk-go-tools/releases/download/{TAG}/mcl_signer_{TAG}_macos-latest.tar.gz",
+        "testnet.validate_expected_keys": "false",
+        "github_api_token": "",
     }
 
 
@@ -227,3 +240,44 @@ def determine_final_args(argv: List[str], config_args: Dict[str, Any]) -> List[s
         pre_args = [verbose_flag]
 
     return pre_args + argv + extra_args
+
+
+def get_dependency_directory(key: str, tag: str) -> Path:
+    parent_directory = get_dependency_parent_directory(key)
+    if tag == 'latest':
+        tag = get_latest_semver_from_directory(parent_directory)
+
+    return parent_directory / tag
+
+
+def get_dependency_parent_directory(key: str) -> Path:
+    tools_folder = Path(workstation.get_tools_folder())
+    return tools_folder / key
+
+
+def get_latest_semver_from_directory(directory: Path) -> str:
+    subdirs = [subdir.name for subdir in directory.iterdir()]
+    versions = parse_strings_to_semver(subdirs)
+    if len(versions) == 0:
+        raise Exception(f'no versions found in {directory}')
+
+    if len(versions) == 1:
+        latest_version = versions[0]
+    else:
+        latest_version = sorted(versions).pop()
+    return 'v' + str(latest_version)
+
+
+def parse_strings_to_semver(version_strings: List[str]) -> List[semver.VersionInfo]:
+    versions = []
+    for version_string in version_strings:
+        try:
+            # Omit the 'v' prefix of the version string
+            version_string = version_string[1:]
+            version = semver.VersionInfo.parse(version_string)
+        except ValueError:
+            continue
+
+        versions.append(version)
+
+    return versions

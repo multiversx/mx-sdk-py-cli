@@ -1,4 +1,5 @@
 import logging
+from pathlib import Path
 from typing import Dict, List
 
 from erdpy import config, errors
@@ -10,11 +11,16 @@ logger = logging.getLogger("install")
 
 
 def install_module(key: str, tag: str = "", overwrite: bool = False):
-    module = get_module_by_key(key)
-    module.install(tag, overwrite)
+    if key == 'all':
+        modules = get_all_deps()
+    else:
+        modules = [get_module_by_key(key)]
+
+    for module in modules:
+        module.install(tag, overwrite)
 
 
-def get_module_directory(key: str) -> str:
+def get_module_directory(key: str) -> Path:
     module = get_module_by_key(key)
     default_tag = config.get_dependency_tag(key)
     directory = module.get_directory(default_tag)
@@ -44,8 +50,8 @@ def get_all_deps() -> List[DependencyModule]:
         ArwenToolsModule(key="arwentools"),
         Rust(key="rust"),
         NodejsModule(key="nodejs", aliases=[]),
-        StandaloneModule(key="elrond_go"),
-        StandaloneModule(key="elrond_proxy_go"),
+        StandaloneModule(key="elrond_go", repo_name="elrond-go", organisation="ElrondNetwork"),
+        StandaloneModule(key="elrond_proxy_go", repo_name="elrond-proxy-go", organisation="ElrondNetwork"),
         GolangModule(key="golang"),
         MclSignerModule(key="mcl_signer")
     ]

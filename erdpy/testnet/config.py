@@ -60,6 +60,10 @@ class TestnetConfiguration:
             folder_path = folder_path.replace('{ELRONDSDK}', str(sdk_folder))
 
             default_tag = erdpy.config.get_dependency_tag(folder_key)
+            if default_tag == 'latest':
+                parent_folder = erdpy.config.get_dependency_parent_directory(folder_key)
+                default_tag = erdpy.config.get_latest_semver_from_directory(parent_folder)
+
             folder_path = folder_path.replace('{TAG}', default_tag)
 
             # If the user has not specified a custom source repository, the

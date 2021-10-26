@@ -130,6 +130,10 @@ class ConfigurationProtectedError(KnownError):
         super().__init__(f"This configuration name is protected: {name}.")
 
 
+class UnsupportedConfigurationValue(KnownError):
+    pass
+
+
 class UnknownDerivationFunction(KnownError):
     def __init__(self):
         super().__init__("Unknown key derivation function.")
