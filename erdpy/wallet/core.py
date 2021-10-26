@@ -50,16 +50,24 @@ def split_to_fixed_size_slices(bits: str, chunk_size: int) -> List[str]:
     return [bits[i:i + chunk_size] for i in range(0, len(bits), chunk_size)]
 
 
+def generate_mnemonic() -> str:
+    entropy_bytes = secrets.token_bytes(BIP39_ENTROPY_BYTES)
+    return generate_mnemonic_from_entropy(entropy_bytes)
+
+
 # Word list from:
 # https://raw.githubusercontent.com/bitcoin/bips/master/bip-0039/english.txt
 # BIP39 algorithm steps from:
 # https://medium.com/coinmonks/mnemonic-generation-bip39-simply-explained-e9ac18db9477
-def generate_mnemonic() -> str:
+# Javascript implementations:
+# https://github.com/ElrondNetwork/elrond-sdk-erdjs/blob/main/src/walletcore/mnemonic.ts
+# https://github.com/bitcoinjs/bip39/blob/5faee2c17b2195f30b03cb125df68c20d7dd584b/src/index.js#L108
+def generate_mnemonic_from_entropy(entropy_bytes: bytes) -> str:
     with open_text("erdpy.wallet", "bip39words.txt") as words_file:
         words = words_file.read().splitlines()
         assert len(words) == BIP39_WORD_COUNT
 
-    entropy_bytes = secrets.token_bytes(BIP39_ENTROPY_BYTES)
+    assert len(entropy_bytes) == BIP39_ENTROPY_BYTES
     entropy_bits = bytes_to_binary_string(entropy_bytes)
 
     checksum_bytes = hashlib.sha256(entropy_bytes).digest()

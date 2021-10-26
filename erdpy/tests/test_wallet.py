@@ -12,7 +12,7 @@ from erdpy.tests.utils import MyTestCase
 from erdpy.transactions import Transaction
 from erdpy.wallet import (bip39seed_to_secret_key, generate_pair,
                           mnemonic_to_bip39seed, pem)
-from erdpy.wallet.core import bytes_to_binary_string, split_to_fixed_size_slices
+from erdpy.wallet.core import bytes_to_binary_string, generate_mnemonic_from_entropy, split_to_fixed_size_slices
 
 logging.basicConfig(level=logging.INFO)
 
@@ -179,3 +179,17 @@ class WalletTestCase(MyTestCase):
 
     def test_split_to_fixed_size_slices(self):
         self.assertEqual(split_to_fixed_size_slices('1234567890abcdef', 4), ['1234', '5678', '90ab', 'cdef'])
+
+    def test_generate_mnemonic_from_entropy(self):
+        self.assertEqual(
+            generate_mnemonic_from_entropy(bytes.fromhex('e4708a379dd31b94aff5e64b17fb10d43956a5ae8764602d8e1f2e4ebc4b9296')),
+            'tongue lounge mistake desert coyote ski save rubber enrich save service position nice fan ring uncle gasp hockey march frame type chair engage stove'
+        )
+        self.assertEqual(
+            generate_mnemonic_from_entropy(bytes.fromhex('a2c450adc68a627bfe9a822361433dee844b344a8d8502ca602ff0f006b1feab')),
+            'people card clock minimum plate digital whip expect casino anxiety sorry tackle dwarf olive clay radar actress fantasy armor tiger about flight wide ladder'
+        )
+        self.assertEqual(
+            generate_mnemonic_from_entropy(bytes.fromhex('8b1897060e4b24bb7c07491159c6c234238be0412973af4e39effc57756cb490')),
+            'mention seven screen broken rather frozen useless truck bacon soda rack hair december usual again common quantum impact know weather jar rent spoil angry'
+        )
