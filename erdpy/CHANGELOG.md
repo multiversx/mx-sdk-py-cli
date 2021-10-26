@@ -4,6 +4,14 @@ All notable changes will be documented in this file.
 
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
+## [1.0.20] - 26.10.2021
+ - Bugfix by [phanletrunghieu](https://github.com/phanletrunghieu): use $PATH in `erdpy-up`
+ - Bugfix by [x2ocoder](https://github.com/x2ocoder): add missing `enable_epochs` configurations
+ - Dependency tags now accept `latest`
+ - New optional configuration value `github_api_token` for querying latest versions from Github
+ - The command `erdpy deps install` now accepts `all` as an argument
+ - More fixes for `erdpy testnet`
+
 ## [1.0.19] - 05.10.2021
  - Bugfix by [MWFIAE](https://github.com/MWFIAE): add missing `enable_epochs` configurations
 
