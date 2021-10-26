@@ -15,7 +15,7 @@ class DependencyModule:
         self.key = key
         self.aliases = aliases
 
-    def get_directory(self, tag: str) -> str:
+    def get_directory(self, tag: str) -> Path:
         raise NotImplementedError()
 
     def install(self, tag: str, overwrite: bool) -> None:
@@ -88,7 +88,7 @@ class StandaloneModule(DependencyModule):
     def _download(self, tag: str):
         url = self._get_download_url(tag)
         archive_path = self._get_archive_path(tag)
-        downloader.download(url, archive_path)
+        downloader.download(url, str(archive_path))
 
     def _extract(self, tag: str):
         archive_path = self._get_archive_path(tag)
@@ -101,26 +101,23 @@ class StandaloneModule(DependencyModule):
         else:
             raise errors.UnknownArchiveType(self.archive_type)
 
-    def get_directory(self, tag: str):
-        folder = path.join(self.get_parent_directory(), tag)
-        return folder
+    def get_directory(self, tag: str) -> Path:
+        return config.get_dependency_directory(self.key, tag)
 
     def get_source_directory(self, tag: str):
-        folder = Path(self.get_directory(tag))
-
         # Due to how the GitHub creates archives for repository releases, the
         # path will contain the tag in two variants: with the 'v' prefix (e.g.
         # "v1.1.0"), but also without (e.g. "1.1.0"), hence the need to remove
         # the initial 'v'.
-        if tag.startswith("v"):
-            tag = tag[1:]
+        tag_no_v = tag
+        if tag_no_v.startswith("v"):
+            tag_no_v = tag_no_v[1:]
         assert isinstance(self.repo_name, str)
-        source_folder = folder / (self.repo_name + '-' + tag)
+        source_folder = self.get_directory(tag) / f'{self.repo_name}-{tag_no_v}'
         return source_folder
 
-    def get_parent_directory(self):
-        tools_folder = workstation.get_tools_folder()
-        return path.join(tools_folder, self.key)
+    def get_parent_directory(self) -> Path:
+        return config.get_dependency_parent_directory(self.key)
 
     def _get_download_url(self, tag: str) -> str:
         platform = workstation.get_platform()
@@ -140,9 +137,9 @@ class StandaloneModule(DependencyModule):
         tag = utils.query_latest_release_tag(org_repo)
         return tag
 
-    def _get_archive_path(self, tag: str) -> str:
-        tools_folder = workstation.get_tools_folder()
-        archive = path.join(tools_folder, f"{self.key}.{tag}.{self.archive_type}")
+    def _get_archive_path(self, tag: str) -> Path:
+        tools_folder = Path(workstation.get_tools_folder())
+        archive = tools_folder / f"{self.key}.{tag}.{self.archive_type}"
         return archive
 
 
@@ -163,6 +160,7 @@ class ArwenToolsModule(StandaloneModule):
 
         self.make_binary_symlink_in_parent_folder(tag, 'arwendebug', 'arwendebug')
         self.make_binary_symlink_in_parent_folder(tag, 'test', 'mandos-test')
+        self.copy_libwasmer_in_parent_directory(tag)
 
     def build_binary(self, tag, binary_name):
         source_folder = self.binary_source_folder(tag, binary_name)
@@ -178,11 +176,18 @@ class ArwenToolsModule(StandaloneModule):
         source_folder = self.binary_source_folder(tag, binary_name)
         binary = source_folder / binary_name
 
-        parent = Path(self.get_parent_directory())
+        parent = self.get_parent_directory()
         symlink = parent / symlink_name
 
         symlink.unlink(missing_ok=True)
         symlink.symlink_to(binary)
+
+    def copy_libwasmer_in_parent_directory(self, tag):
+        libwasmer_directory = self.get_source_directory(tag) / 'wasmer'
+        parent_directory = self.get_parent_directory()
+        for f in libwasmer_directory.iterdir():
+            if f.suffix in ['.dylib', '.so', '.dll']:
+                shutil.copy(f, parent_directory)
 
     def get_env(self):
         return {
