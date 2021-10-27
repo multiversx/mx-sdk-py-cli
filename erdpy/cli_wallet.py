@@ -26,9 +26,9 @@ def setup_parser(args: List[str], subparsers: Any) -> Any:
         "new",
         "Create a new wallet"
     )
-    sub.add_argument("--with-json",
+    sub.add_argument("--json",
                      help="whether to create a json key file", action="store_true", default=False)
-    sub.add_argument("--with-pem",
+    sub.add_argument("--pem",
                      help="whether to create a pem key file", action="store_true", default=False)
     sub.add_argument("--output-path",
                      help="the output path and base file name for the generated wallet files (default: %(default)s)", type=str, default="./wallet")
@@ -91,12 +91,12 @@ def new_wallet(args: Any):
     mnemonic = generate_mnemonic()
     print(f"Mnemonic: {mnemonic}")
     secret_key, pubkey = wallet.derive_keys(mnemonic)
-    if args.with_pem:
+    if args.pem:
         pem_file = prepare_file(args.output_path, ".pem")
         address = Address(pubkey)
         pem.write(pem_file, secret_key, pubkey, name=address.bech32())
         logger.info(f"Pem wallet generated: {pem_file}")
-    if args.with_json:
+    if args.json:
         json_file = prepare_file(args.output_path, ".json")
         password = getpass.getpass("Enter a new password:")
         save_to_key_file(json_file, secret_key, pubkey, password)
