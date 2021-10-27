@@ -102,6 +102,8 @@ def make_cyphertext(backend: Any, key: bytes, iv: bytes, secret_key: str):
     return encryptor.update(secret_key) + encryptor.finalize()
 
 
+# erdjs implementation:
+# https://github.com/ElrondNetwork/elrond-sdk-erdjs/blob/main/src/walletcore/userWallet.ts
 def format_key_json(uid: str, pubkey: str, iv: bytes, ciphertext: bytes, salt: bytes, mac: bytes) -> Any:
     address = accounts.Address(pubkey)
 
