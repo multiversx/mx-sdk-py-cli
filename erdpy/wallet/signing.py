@@ -12,8 +12,8 @@ logger = logging.getLogger("wallet")
 
 
 def sign_transaction(transaction: ITransaction, account: IAccount) -> str:
-    seed: bytes = account.get_seed()
-    signing_key: Any = nacl.signing.SigningKey(seed)
+    secret_key: bytes = account.get_secret_key()
+    signing_key: Any = nacl.signing.SigningKey(secret_key)
 
     data_json = transaction.serialize()
     signed = signing_key.sign(data_json)
@@ -36,8 +36,8 @@ def sign_message_with_bls_key(message, seed):
 
 
 def sign_message(message: bytes, account: IAccount) -> str:
-    seed: bytes = account.get_seed()
-    signing_key: Any = nacl.signing.SigningKey(seed)
+    secret_key: bytes = account.get_secret_key()
+    signing_key: Any = nacl.signing.SigningKey(secret_key)
 
     signed = signing_key.sign(message)
     signature = signed.signature

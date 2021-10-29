@@ -15,6 +15,6 @@ def generate_pairs():
 
 def generate_pair():
     signing_key = nacl.signing.SigningKey.generate()
-    seed_bytes = bytes(signing_key)
+    secret_key = bytes(signing_key)
     pubkey_bytes = bytes(signing_key.verify_key)
-    return seed_bytes, pubkey_bytes
+    return secret_key, pubkey_bytes

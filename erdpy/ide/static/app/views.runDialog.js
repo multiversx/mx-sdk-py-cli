@@ -6,7 +6,7 @@ var RunDialog = Backbone.View.extend({
         "shown.bs.modal": "onBootstrapModalShown",
         "hidden.bs.modal": "onBootstrapModalHidden",
         "click .btn-submit": "onClickSubmit",
-        "change input[name='PrivateKeyFile']": "onChangePrivateKey"
+        "change input[name='SecretKeyFile']": "onChangeSecretKey"
     },
 
     initialize: function (options) {
@@ -49,13 +49,13 @@ var RunDialog = Backbone.View.extend({
         this.remove();
     },
 
-    onChangePrivateKey: function (event) {
+    onChangeSecretKey: function (event) {
         var self = this;
         var file = event.currentTarget.files[0];
         var reader = new FileReader();
 
         reader.onload = function (onloadEvent) {
-            self.privateKey = onloadEvent.target.result;
+            self.secretKey = onloadEvent.target.result;
         };
 
         reader.readAsText(file);
@@ -70,7 +70,7 @@ var RunDialog = Backbone.View.extend({
         var gasPrice = this.getGasPrice();
 
         var runOptions = new SmartContractRunOptions({
-            privateKey: this.privateKey,
+            secretKey: this.secretKey,
             senderAddress: senderAddress,
             functionName: functionName,
             functionArgs: functionArgs,
@@ -90,11 +90,11 @@ var RunDialog = Backbone.View.extend({
         }
     },
 
-    clearValidationErrors: function() {
+    clearValidationErrors: function () {
         this.$el.find(".validation-errors-container").addClass("d-none").empty();
     },
 
-    displayValidationErrors: function(validationError) {
+    displayValidationErrors: function (validationError) {
         this.$el.find(".validation-errors-container").removeClass("d-none").text(validationError);
     },
 
