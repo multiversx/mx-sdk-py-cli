@@ -52,7 +52,7 @@ class SmartContract:
         return tx
 
     def prepare_deploy_transaction_data(self, arguments: List[Any]):
-        tx_data = f"{self.bytecode}@{constants.VM_TYPE_ARWEN}@{self.metadata.to_hex()}"
+        tx_data = f"{self.bytecode}@{constants.VM_TYPE_WASM_VM}@{self.metadata.to_hex()}"
 
         for arg in arguments:
             tx_data += f"@{_prepare_argument(arg)}"

@@ -97,9 +97,9 @@ class Project:
         return dict()
 
     def run_tests(self, tests_directory: str, wildcard: str = ""):
-        arwentools = cast(StandaloneModule, dependencies.get_module_by_key("arwentools"))
-        tool_env = arwentools.get_env()
-        tool = path.join(arwentools.get_parent_directory(), "mandos-test")
+        vmtools = cast(StandaloneModule, dependencies.get_module_by_key("vmtools"))
+        tool_env = vmtools.get_env()
+        tool = path.join(vmtools.get_parent_directory(), "mandos-test")
         test_folder = path.join(self.directory, tests_directory)
 
         if not wildcard:

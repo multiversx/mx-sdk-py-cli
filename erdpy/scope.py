@@ -25,7 +25,7 @@ def initialize():
             testnet_config = TestnetConfiguration.from_file(testnet_toml)
             proxy = f"http://localhost:{testnet_config.proxy_port()}"
         except FileNotFoundError:
-            logger.warn("components of the testnet may be missing")
+            pass
 
 
 def get_chain_id():

@@ -3,7 +3,7 @@ from pathlib import Path
 from typing import Dict, List
 
 from erdpy import config, errors
-from erdpy.dependencies.modules import (ArwenToolsModule, DependencyModule,
+from erdpy.dependencies.modules import (VMToolsModule, DependencyModule,
                                         GolangModule, MclSignerModule,
                                         NodejsModule, Rust, StandaloneModule)
 
@@ -47,7 +47,7 @@ def get_deps_dict() -> Dict[str, DependencyModule]:
 def get_all_deps() -> List[DependencyModule]:
     return [
         StandaloneModule(key="llvm", aliases=["clang", "cpp"]),
-        ArwenToolsModule(key="arwentools"),
+        VMToolsModule(key="vmtools"),
         Rust(key="rust"),
         NodejsModule(key="nodejs", aliases=[]),
         StandaloneModule(key="elrond_go", repo_name="elrond-go", organisation="ElrondNetwork"),

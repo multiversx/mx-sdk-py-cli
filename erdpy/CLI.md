@@ -1185,7 +1185,7 @@ usage: erdpy deps install [-h] ...
 Install dependencies or elrond-sdk modules.
 
 positional arguments:
-  {llvm,clang,cpp,arwentools,rust,nodejs,elrond_go,elrond_proxy_go,golang,mcl_signer}
+  {llvm,clang,cpp,vmtools,rust,nodejs,elrond_go,elrond_proxy_go,golang,mcl_signer}
                                                   the dependency to install
 
 optional arguments:
@@ -1204,7 +1204,7 @@ usage: erdpy deps check [-h] ...
 Check whether a dependency is installed.
 
 positional arguments:
-  {llvm,clang,cpp,arwentools,rust,nodejs,elrond_go,elrond_proxy_go,golang,mcl_signer}
+  {llvm,clang,cpp,vmtools,rust,nodejs,elrond_go,elrond_proxy_go,golang,mcl_signer}
                                                   the dependency to check
 
 optional arguments:

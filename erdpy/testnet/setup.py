@@ -246,22 +246,17 @@ def build_binaries(testnet_config: TestnetConfiguration):
     node_folder = testnet_config.node_source() / "cmd" / "node"
     myprocess.run_process(['go', 'build'], cwd=node_folder, env=golang_env)
 
-    arwen_binary = testnet_config.arwen_binary()
-    logger.info(f"Arwen Binary: {arwen_binary}")
-    if arwen_binary:
-        logger.info("Building arwen...")
-        env = dict(golang_env)
-        env["ARWEN_PATH"] = str(node_folder)
-        node_folder_root = testnet_config.node_source()
-        myprocess.run_process(['make', 'arwen'], cwd=node_folder_root, env=env)
+    wasm_vm_binary = testnet_config.wasm_vm_binary()
+    if wasm_vm_binary:
+        logger.warn("WASM VM does not require building anymore. Skipping...")
 
     logger.info("Building proxy...")
     proxy_folder = testnet_config.proxy_source() / "cmd" / "proxy"
     myprocess.run_process(['go', 'build'], cwd=proxy_folder, env=golang_env)
 
     # Now copy the binaries to the testnet folder
-    arwen_version = _get_arwen_version(testnet_config)
-    libwasmer_path = path.join(golang.get_gopath(), f"pkg/mod/github.com/!elrond!network/arwen-wasm-vm@{arwen_version}/wasmer/libwasmer_darwin_amd64.dylib")
+    wasm_vm_version = _get_wasm_vm_version(testnet_config)
+    libwasmer_path = path.join(golang.get_gopath(), f"pkg/mod/github.com/!elrond!network/arwen-wasm-vm@{wasm_vm_version}/wasmer/libwasmer_darwin_amd64.dylib")
 
     shutil.copy(seednode_folder / "seednode", testnet_config.seednode_folder())
     if workstation.get_platform() == "osx":
@@ -269,11 +264,6 @@ def build_binaries(testnet_config: TestnetConfiguration):
 
     for destination in testnet_config.all_nodes_folders():
         shutil.copy(node_folder / "node", destination)
-        if arwen_binary:
-            try:
-                shutil.copy(node_folder / "arwen", destination)
-            except FileNotFoundError:
-                logger.warn("Could not copy the arwen binary!")
 
         if workstation.get_platform() == "osx":
             shutil.copy(libwasmer_path, destination)
@@ -283,7 +273,7 @@ def build_binaries(testnet_config: TestnetConfiguration):
         shutil.copy(libwasmer_path, testnet_config.proxy_folder())
 
 
-def _get_arwen_version(testnet_config: TestnetConfiguration):
+def _get_wasm_vm_version(testnet_config: TestnetConfiguration):
     go_mod = testnet_config.node_source() / "go.mod"
     lines = utils.read_lines(str(go_mod))
     line = next(line for line in lines if "github.com/ElrondNetwork/arwen-wasm-vm" in line)
