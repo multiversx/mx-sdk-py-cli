@@ -149,7 +149,7 @@ class ArwenToolsModule(StandaloneModule):
             aliases = list()
 
         super().__init__(key, aliases)
-        self.repo_name = 'arwen-wasm-vm'
+        self.repo_name = 'wasm-vm'
         self.organisation = 'ElrondNetwork'
 
     def _post_install(self, tag: str):
