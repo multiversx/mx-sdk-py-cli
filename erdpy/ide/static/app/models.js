@@ -3,7 +3,7 @@ var SmartContract = Backbone.Model.extend({
 
     initialize: function () {
     },
-    
+
     deploy: function (options) {
         var payload = options.toJSON();
         payload.id = this.id;
@@ -22,7 +22,7 @@ var SmartContract = Backbone.Model.extend({
         app.talkToHead("queryWatchedVariables", payload);
     },
 
-    addWatchedVariable: function(options) {
+    addWatchedVariable: function (options) {
         this.getWatchedVariables(options.onTestnet).push({
             Name: "alice's balance",
             FunctionName: "do_balance",
@@ -32,7 +32,7 @@ var SmartContract = Backbone.Model.extend({
         this.setWatchedVariables(options);
     },
 
-    updateWatchedVariable: function(options) {
+    updateWatchedVariable: function (options) {
         var index = options.index;
         var variable = this.getWatchedVariables(options.onTestnet)[index];
         variable.Name = options.name;
@@ -42,20 +42,20 @@ var SmartContract = Backbone.Model.extend({
         this.setWatchedVariables(options);
     },
 
-    deleteWatchedVariable: function(options) {
+    deleteWatchedVariable: function (options) {
         var variables = this.getWatchedVariables(options.onTestnet);
         variables.splice(options.index, 1);
 
         this.setWatchedVariables(options);
     },
 
-    getWatchedVariables: function(onTestnet) {
+    getWatchedVariables: function (onTestnet) {
         var properties = onTestnet ? this.get("PropertiesOnTestnet") : this.get("PropertiesOnNodeDebug");
         var variables = properties.WatchedVariables;
         return variables;
     },
 
-    setWatchedVariables: function(options) {
+    setWatchedVariables: function (options) {
         var payload = options;
         payload.id = this.id;
         payload.variables = this.getWatchedVariables(options.onTestnet);
@@ -68,8 +68,8 @@ var SmartContract = Backbone.Model.extend({
 var SmartContractDeployOptions = Backbone.Model.extend({
     validate: function (attrs, options) {
         if (attrs.onTestnet) {
-            if (!attrs.privateKey) {
-                return "When deploying on testnet, the private key is required.";
+            if (!attrs.secretKey) {
+                return "When deploying on testnet, the secret key is required.";
             }
         }
         else {
@@ -87,8 +87,8 @@ var SmartContractRunOptions = Backbone.Model.extend({
         }
 
         if (attrs.onTestnet) {
-            if (!attrs.privateKey) {
-                return "When running on testnet, the private key is required.";
+            if (!attrs.secretKey) {
+                return "When running on testnet, the secret key is required.";
             }
         }
         else {

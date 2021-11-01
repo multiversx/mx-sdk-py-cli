@@ -67,8 +67,9 @@ generate() {
     group "Account" "account"
     command "Account.Get" "account get"
     command "Account.GetTransactions" "account get-transactions"
-    
+
     group "Wallet" "wallet"
+    command "Wallet.New" "wallet new"
     command "Wallet.Derive" "wallet derive"
     command "Wallet.Bech32" "wallet bech32"
 
@@ -117,3 +118,5 @@ generate() {
     command "Data.Store" "data store"
     command "Data.Load" "data load"
 }
+
+generate

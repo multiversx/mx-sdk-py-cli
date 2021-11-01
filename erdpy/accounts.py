@@ -27,12 +27,12 @@ class AccountsRepository:
             self.generate_account(i)
 
     def generate_account(self, name):
-        seed, pubkey = generate_pair()
+        secret_key, pubkey = generate_pair()
         address = Address(pubkey).bech32()
 
         pem_file = f"{name}_{address}.pem"
         pem_file = path.join(self.folder, pem_file)
-        pem.write(pem_file, seed, pubkey, name=f"{name}:{address}")
+        pem.write(pem_file, secret_key, pubkey, name=f"{name}:{address}")
 
     def get_all(self):
         accounts = []
@@ -59,13 +59,13 @@ class Account(IAccount):
         self.ledger = ledger
 
         if self.pem_file:
-            seed, pubkey = pem.parse(self.pem_file, self.pem_index)
-            self.private_key_seed = seed.hex()
+            secret_key, pubkey = pem.parse(self.pem_file, self.pem_index)
+            self.secret_key = secret_key.hex()
             self.address = Address(pubkey)
         elif key_file and pass_file:
             password = get_password(pass_file)
-            address_from_key_file, seed = load_from_key_file(key_file, password)
-            self.private_key_seed = seed.hex()
+            address_from_key_file, secret_key = load_from_key_file(key_file, password)
+            self.secret_key = secret_key.hex()
             self.address = Address(address_from_key_file)
 
     def sync_nonce(self, proxy: Any):
@@ -73,10 +73,10 @@ class Account(IAccount):
         self.nonce = proxy.get_account_nonce(self.address)
         logger.info(f"Account.sync_nonce() done: {self.nonce}")
 
-    def get_seed(self) -> bytes:
+    def get_secret_key(self) -> bytes:
         if self.ledger:
             raise LedgerError("cannot get seed from a Ledger account")
-        return unhexlify(self.private_key_seed)
+        return unhexlify(self.secret_key)
 
 
 class Address(IAddress):

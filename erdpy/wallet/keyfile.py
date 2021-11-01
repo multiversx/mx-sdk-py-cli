@@ -1,6 +1,11 @@
 import base64
+import os
 from binascii import b2a_base64, hexlify, unhexlify
-from json import load
+from pathlib import Path
+from typing import Any
+import erdpy.accounts as accounts
+from json import load, dump
+from uuid import uuid4
 
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import hashes, hmac
@@ -32,7 +37,7 @@ def load_from_key_file(key_file_json, password):
     kdf = Scrypt(salt=salt, length=dklen, n=n, r=r, p=p, backend=backend)
     key = kdf.derive(bytes(password.encode()))
 
-    # decrypt the private key with half of the decryption key
+    # decrypt the secret key with half of the decryption key
     cipher_name = keystore['crypto']['cipher']
     if cipher_name != 'aes-128-ctr':
         raise errors.UnknownCipher(name=cipher_name)
@@ -44,7 +49,7 @@ def load_from_key_file(key_file_json, password):
     cipher = Cipher(algorithms.AES(decryption_key), modes.CTR(iv), backend=backend)
     decryptor = cipher.decryptor()
     plaintext = decryptor.update(ciphertext) + decryptor.finalize()
-    pemified_private_key = b2a_base64(hexlify(plaintext))
+    pemified_secret_key = b2a_base64(hexlify(plaintext))
 
     hmac_key = key[16:32]
     h = hmac.HMAC(hmac_key, hashes.SHA256(), backend=backend)
@@ -55,14 +60,75 @@ def load_from_key_file(key_file_json, password):
         raise errors.InvalidKeystoreFilePassword()
 
     address_bech32 = keystore['bech32']
-    private_key = ''.join([pemified_private_key[i:i + 64].decode() for i in range(0, len(pemified_private_key), 64)])
+    secret_key = ''.join([pemified_secret_key[i:i + 64].decode() for i in range(0, len(pemified_secret_key), 64)])
 
-    key_hex = base64.b64decode(private_key).decode()
+    key_hex = base64.b64decode(secret_key).decode()
     key_bytes = bytes.fromhex(key_hex)
 
-    seed = key_bytes[:32]
+    secret_key = key_bytes[:32]
 
-    return address_bech32, seed
+    return address_bech32, secret_key
+
+
+def save_to_key_file(json_path: Path, secret_key: str, pubkey: str, password: str) -> None:
+    backend = default_backend()
+
+    # derive the encryption key
+    salt = os.urandom(32)
+    kdf = Scrypt(salt=salt, length=32, n=4096, r=8, p=1, backend=backend)
+    key = kdf.derive(bytes(password.encode()))
+
+    # encrypt the secret key with half of the encryption key
+    iv = os.urandom(16)
+    ciphertext = make_cyphertext(backend, key, iv, secret_key)
+
+    hmac_key = key[16:32]
+    h = hmac.HMAC(hmac_key, hashes.SHA256(), backend=default_backend())
+    h.update(ciphertext)
+    mac = h.finalize()
+
+    uid = str(uuid4())
+
+    json = format_key_json(uid, pubkey, iv, ciphertext, salt, mac)
+
+    with open(json_path, 'w') as json_file:
+        dump(json, json_file, indent=4)
+
+
+def make_cyphertext(backend: Any, key: bytes, iv: bytes, secret_key: str):
+    encryption_key = key[0:16]
+    cipher = Cipher(algorithms.AES(encryption_key), modes.CTR(iv), backend=backend)
+    encryptor = cipher.encryptor()
+    return encryptor.update(secret_key) + encryptor.finalize()
+
+
+# erdjs implementation:
+# https://github.com/ElrondNetwork/elrond-sdk-erdjs/blob/main/src/walletcore/userWallet.ts
+def format_key_json(uid: str, pubkey: str, iv: bytes, ciphertext: bytes, salt: bytes, mac: bytes) -> Any:
+    address = accounts.Address(pubkey)
+
+    return {
+        'version': 4,
+        'id': uid,
+        'address': address.hex(),
+        'bech32': address.bech32(),
+        'crypto': {
+            'cipher': 'aes-128-ctr',
+            'cipherparams': {
+                'iv': hexlify(iv).decode()
+            },
+            'ciphertext': hexlify(ciphertext).decode(),
+            'kdf': 'scrypt',
+            'kdfparams': {
+                'dklen': 32,
+                'n': 4096,
+                'p': 1,
+                'r': 8,
+                'salt': hexlify(salt).decode(),
+            },
+            'mac': hexlify(mac).decode(),
+        }
+    }
 
 
 def get_password(pass_file):

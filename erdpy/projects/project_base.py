@@ -26,7 +26,7 @@ class Project:
         return self._do_after_build()
 
     def clean(self):
-        utils.remove_folder(self._get_output_folder())
+        utils.remove_folder(self.get_output_folder())
 
     def _ensure_dependencies_installed(self):
         module_keys = self.get_dependencies()
@@ -42,36 +42,35 @@ class Project:
     def get_file_wasm(self):
         return self.find_file_in_output("*.wasm")
 
-    def find_file_globally(self, pattern):
-        folder = self.directory
+    def find_file_globally(self, pattern: str) -> Path:
+        return self.find_file_in_folder(self.path, pattern)
+
+    def find_file_in_output(self, pattern: str) -> Path:
+        folder = self.path / 'output'
         return self.find_file_in_folder(folder, pattern)
 
-    def find_file_in_output(self, pattern):
-        folder = path.join(self.directory, "output")
-        return self.find_file_in_folder(folder, pattern)
-
-    def find_file_in_folder(self, folder, pattern):
-        files = list(Path(folder).rglob(pattern))
+    def find_file_in_folder(self, folder: Path, pattern: str) -> Path:
+        files = list(folder.rglob(pattern))
 
         if len(files) == 0:
             raise errors.KnownError(f"No file matches pattern [{pattern}].")
         if len(files) > 1:
             logger.warning(f"More files match pattern [{pattern}]. Will pick first:\n{files}")
 
-        file = path.join(folder, files[0])
+        file = folder / files[0]
         return Path(file).resolve()
 
     def _do_after_build(self) -> Path:
         raise NotImplementedError()
 
-    def _copy_to_output(self, source: str, destination: str = None) -> Path:
-        output_folder = self._get_output_folder()
+    def _copy_to_output(self, source: Path, destination: str = None) -> Path:
+        output_folder = self.get_output_folder()
         utils.ensure_folder(output_folder)
         destination = path.join(output_folder, destination) if destination else output_folder
-        output_wasm_file = shutil.copy(source, destination)
+        output_wasm_file = shutil.copy(str(source), destination)
         return Path(output_wasm_file)
 
-    def _get_output_folder(self):
+    def get_output_folder(self):
         return path.join(self.directory, "output")
 
     def get_bytecode(self):
@@ -97,9 +96,9 @@ class Project:
         return dict()
 
     def run_tests(self, tests_directory: str, wildcard: str = ""):
-        arwentools = cast(StandaloneModule, dependencies.get_module_by_key("arwentools"))
-        tool_env = arwentools.get_env()
-        tool = path.join(arwentools.get_parent_directory(), "mandos-test")
+        vmtools = cast(StandaloneModule, dependencies.get_module_by_key("vmtools"))
+        tool_env = vmtools.get_env()
+        tool = path.join(vmtools.get_parent_directory(), "mandos-test")
         test_folder = path.join(self.directory, tests_directory)
 
         if not wildcard:

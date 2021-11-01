@@ -14,7 +14,7 @@ class IAddress:
 
 
 class IAccount:
-    def get_seed(self) -> bytes:
+    def get_secret_key(self) -> bytes:
         return bytes()
 
 
