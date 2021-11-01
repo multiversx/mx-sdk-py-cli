@@ -103,7 +103,7 @@ class ProjectRust(Project):
         utils.prettify_json_file(self.get_abi_filepath())
 
     def has_meta(self):
-        return self.get_meta_folder().exists()
+        return (self.get_meta_folder() / "Cargo.toml").exists()
 
     def has_abi(self):
         return (self.get_abi_folder() / "Cargo.toml").exists()
