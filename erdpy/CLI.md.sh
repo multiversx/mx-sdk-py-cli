@@ -118,3 +118,5 @@ generate() {
     command "Data.Store" "data store"
     command "Data.Load" "data load"
 }
+
+generate
