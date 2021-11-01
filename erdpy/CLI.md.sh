@@ -69,6 +69,7 @@ generate() {
     command "Account.GetTransactions" "account get-transactions"
 
     group "Wallet" "wallet"
+    command "Wallet.New" "wallet new"
     command "Wallet.Derive" "wallet derive"
     command "Wallet.Bech32" "wallet bech32"
 
