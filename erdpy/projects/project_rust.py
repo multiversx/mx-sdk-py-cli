@@ -14,25 +14,34 @@ logger = logging.getLogger("ProjectRust")
 class ProjectRust(Project):
     def __init__(self, directory):
         super().__init__(directory)
-        self.cargo_file = self._get_cargo_file()
+        self.cargo_file = self.get_cargo_file()
 
     def clean(self):
         super().clean()
         utils.remove_folder(path.join(self.directory, "wasm", "target"))
 
-    def _get_cargo_file(self):
-        cargo_path = path.join(self.directory, "Cargo.toml")
+    def get_cargo_file(self):
+        cargo_path = self.path / 'Cargo.toml'
         return CargoFile(cargo_path)
 
+    def get_meta_folder(self):
+        return self.path / 'meta'
+
     def perform_build(self):
+        meta = self.has_meta()
         try:
+            if meta:
+                self.run_meta()
             self.run_cargo()
-            self._generate_abi()
+
+            # ABI generated separately for backwards compatibility
+            if not meta:
+                self.generate_abi()
         except subprocess.CalledProcessError as err:
             raise errors.BuildError(err.output)
 
     def run_cargo(self):
-        env = self._get_env()
+        env = self.get_env()
 
         args = [
             "cargo",
@@ -40,66 +49,82 @@ class ProjectRust(Project):
             "--target=wasm32-unknown-unknown",
             "--release",
             "--out-dir",
-            self._get_output_folder(),
+            self.get_output_folder(),
             "-Z"
             "unstable-options"
         ]
-        self._decorate_cargo_args(args)
+        self.decorate_cargo_args(args)
 
         if not self.options.get("wasm_symbols"):
             env["RUSTFLAGS"] = "-C link-arg=-s"
 
-        cwd = path.join(self.directory, "wasm")
-        return_code = myprocess.run_process_async(args, env=env, cwd=cwd)
+        cwd = self.path / 'wasm'
+        return_code = myprocess.run_process_async(args, env=env, cwd=str(cwd))
         if return_code != 0:
             raise errors.BuildError(f"error code = {return_code}, see output")
 
-    def _decorate_cargo_args(self, args):
+    def run_meta(self):
+        cwd = self.get_meta_folder()
+        env = self.get_env()
+
+        args = [
+            "cargo",
+            "build",
+        ]
+
+        return_code = myprocess.run_process_async(args, env=env, cwd=str(cwd))
+        if return_code != 0:
+            raise errors.BuildError(f"error code = {return_code}, see output")
+
+    def decorate_cargo_args(self, args):
         target_dir = self.options.get("cargo_target_dir")
         if target_dir:
             args.extend(["--target-dir", target_dir])
 
-    def _generate_abi(self):
-        if not self._has_abi():
+    def generate_abi(self):
+        if not self.has_abi():
             return
 
         args = [
             "cargo",
             "run"
         ]
-        self._decorate_cargo_args(args)
+        self.decorate_cargo_args(args)
 
-        env = self._get_env()
+        env = self.get_env()
         cwd = path.join(self.directory, "abi")
-        sink = myprocess.FileOutputSink(self._get_abi_filepath())
+        sink = myprocess.FileOutputSink(self.get_abi_filepath())
         return_code = myprocess.run_process_async(args, env=env, cwd=cwd, stdout_sink=sink)
         if return_code != 0:
             raise errors.BuildError(f"error code = {return_code}, see output")
 
-        utils.prettify_json_file(self._get_abi_filepath())
+        utils.prettify_json_file(self.get_abi_filepath())
 
-    def _has_abi(self):
-        return (self._get_abi_folder() / "Cargo.toml").exists()
+    def has_meta(self):
+        return self.get_meta_folder().exists()
 
-    def _get_abi_filepath(self):
-        return self._get_abi_folder() / "abi.json"
+    def has_abi(self):
+        return (self.get_abi_folder() / "Cargo.toml").exists()
 
-    def _get_abi_folder(self):
+    def get_abi_filepath(self):
+        return self.get_abi_folder() / "abi.json"
+
+    def get_abi_folder(self):
         return Path(self.directory, "abi")
 
     def _do_after_build(self) -> Path:
         original_name = self.cargo_file.package_name
         wasm_base_name = self.cargo_file.package_name.replace("-", "_")
-        wasm_file = Path(self._get_output_folder(), f"{wasm_base_name}_wasm.wasm").resolve()
+        wasm_file = Path(self.get_output_folder(), f"{wasm_base_name}_wasm.wasm").resolve()
         wasm_file_renamed = self.options.get("wasm_name")
         if not wasm_file_renamed:
             wasm_file_renamed = f"{original_name}.wasm"
-        wasm_file_renamed_path = Path(self._get_output_folder(), wasm_file_renamed)
+        wasm_file_renamed_path = Path(self.get_output_folder(), wasm_file_renamed)
         shutil.move(wasm_file, wasm_file_renamed_path)
 
-        if self._has_abi():
-            abi_file = self._get_abi_filepath()
-            abi_file_renamed = Path(self._get_output_folder(), f"{original_name}.abi.json")
+        if self.has_abi():
+            abi_file = self.get_abi_filepath()
+            abi_file_renamed = Path(self.get_output_folder(), f"{original_name}.abi.json")
             shutil.move(abi_file, abi_file_renamed)
 
         return wasm_file_renamed_path
@@ -107,14 +132,14 @@ class ProjectRust(Project):
     def get_dependencies(self):
         return ["rust"]
 
-    def _get_env(self):
+    def get_env(self):
         return dependencies.get_module_by_key("rust").get_env()
 
 
 class CargoFile:
     data: Dict[str, Any]
 
-    def __init__(self, path):
+    def __init__(self, path: Path):
         self.data = {}
         self.path = path
 
