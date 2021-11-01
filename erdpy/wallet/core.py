@@ -3,7 +3,7 @@ import hmac
 import secrets
 import struct
 from importlib.resources import open_text
-from typing import List, Optional
+from typing import List
 
 import nacl.signing
 

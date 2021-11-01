@@ -16,7 +16,7 @@ def setup_parser(args: List[str], subparsers: Any) -> Any:
     parser = cli_shared.add_group_subparser(
         subparsers,
         "wallet",
-        "Derive secret key from mnemonic, bech32 address helpers etc."
+        "Create wallet, derive secret key from mnemonic, bech32 address helpers etc."
     )
     subparsers = parser.add_subparsers()
 
@@ -24,7 +24,7 @@ def setup_parser(args: List[str], subparsers: Any) -> Any:
         subparsers,
         "wallet",
         "new",
-        "Create a new wallet"
+        "Create a new wallet and print its mnemonic; optionally save as password-protected JSON (recommended) or PEM (not recommended)"
     )
     sub.add_argument("--json",
                      help="whether to create a json key file", action="store_true", default=False)

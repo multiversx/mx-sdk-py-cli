@@ -4,6 +4,13 @@ All notable changes will be documented in this file.
 
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
+## [1.0.21] - 01.11.2021
+ - New command `erdpy wallet new`, which generates a new wallet mnemonic and optionally saves it to JSON or PEM
+ - Add support for Rust contract `meta` crates
+ - Update reference to the renamed VM repository (VM dependency is now named `vmtools`)
+ - Change `erdpy deps install all` to avoid installing / overwriting non-repository dependencies, e.g. Rust, LLVM, Go
+ - Update help strings and `CLI.md`
+
 ## [1.0.20] - 26.10.2021
  - Bugfix by [phanletrunghieu](https://github.com/phanletrunghieu): use $PATH in `erdpy-up`
  - Bugfix by [x2ocoder](https://github.com/x2ocoder): add missing `enable_epochs` configurations

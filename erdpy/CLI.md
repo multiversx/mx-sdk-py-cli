@@ -35,7 +35,7 @@ tx                             Create and broadcast Transactions
 validator                      Stake, UnStake, UnBond, Unjail and other actions useful for Validators
 account                        Get Account data (nonce, balance) from the Network
 ledger                         Get Ledger App addresses and version
-wallet                         Derive secret key from mnemonic, bech32 address helpers etc.
+wallet                         Create wallet, derive secret key from mnemonic, bech32 address helpers etc.
 network                        Get Network parameters, such as number of shards, chain identifier etc.
 cost                           Estimate cost of Transactions
 dispatcher                     Enqueue transactions, then bulk dispatch them
@@ -744,7 +744,7 @@ optional arguments:
 $ erdpy wallet --help
 usage: erdpy wallet COMMAND [-h] ...
 
-Derive secret key from mnemonic, bech32 address helpers etc.
+Create wallet, derive secret key from mnemonic, bech32 address helpers etc.
 
 COMMANDS:
   {new,derive,bech32,pem-address,pem-address-hex}
@@ -755,7 +755,7 @@ OPTIONS:
 ----------------
 COMMANDS summary
 ----------------
-new                            Create a new wallet
+new                            Create a new wallet and print its mnemonic; optionally save as password-protected JSON (recommended) or PEM (not recommended)
 derive                         Derive a PEM file from a mnemonic or generate a new PEM file (for tests only!)
 bech32                         Helper for encoding and decoding bech32 addresses
 pem-address                    Get the public address out of a PEM file as bech32
@@ -769,7 +769,8 @@ pem-address-hex                Get the public address out of a PEM file as hex
 $ erdpy wallet new --help
 usage: erdpy wallet new [-h] ...
 
-Create a new wallet
+Create a new wallet and print its mnemonic; optionally save as password-protected JSON (recommended) or PEM (not
+recommended)
 
 optional arguments:
   -h, --help                 show this help message and exit
