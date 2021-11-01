@@ -1,8 +1,9 @@
 import logging
-import os
 import subprocess
 from os import path
 from pathlib import Path
+
+from typing import List
 
 from erdpy import dependencies, errors, myprocess, utils
 from erdpy.projects.project_base import Project
@@ -135,9 +136,9 @@ class ProjectClang(Project):
 
         self.config['source_files'] = source_files
 
-    def get_exported_functions(self):
+    def get_exported_functions(self) -> List[str]:
         file_export = self.find_file_globally('*.export')
-        lines = utils.read_lines(file_export)
+        lines = utils.read_lines(str(file_export))
         return lines
 
     def default_config(self):

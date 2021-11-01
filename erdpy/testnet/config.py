@@ -296,8 +296,8 @@ class TestnetConfiguration:
     def loglevel(self) -> str:
         return self.features.get("loglevel", "")
 
-    def arwen_binary(self) -> bool:
-        return self.features.get("arwen_binary", False)
+    def wasm_vm_binary(self) -> bool:
+        return self.features.get("wasm_vm_binary", False)
 
     @classmethod
     def default(cls):
@@ -305,7 +305,7 @@ class TestnetConfiguration:
         config['features'] = {
             'loglevel': '*:DEBUG',
             'proxy': True,
-            'arwen_binary': False
+            'wasm_vm_binary': False
         }
         config['folders'] = {
             'elrond_go':

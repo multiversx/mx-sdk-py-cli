@@ -79,7 +79,7 @@ def uniquify(path: Path) -> Path:
     return path
 
 
-def read_lines(file: str):
+def read_lines(file: str) -> List[str]:
     with open(file) as f:
         lines = f.readlines()
     lines = [line.strip() for line in lines]

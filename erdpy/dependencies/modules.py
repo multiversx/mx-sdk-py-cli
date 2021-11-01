@@ -143,22 +143,19 @@ class StandaloneModule(DependencyModule):
         return archive
 
 
-class ArwenToolsModule(StandaloneModule):
+class VMToolsModule(StandaloneModule):
     def __init__(self, key: str, aliases: List[str] = None):
         if aliases is None:
             aliases = list()
 
         super().__init__(key, aliases)
-        self.repo_name = 'arwen-wasm-vm'
+        self.repo_name = 'wasm-vm'
         self.organisation = 'ElrondNetwork'
 
     def _post_install(self, tag: str):
         dependencies.install_module('golang')
 
-        self.build_binary(tag, 'arwendebug')
         self.build_binary(tag, 'test')
-
-        self.make_binary_symlink_in_parent_folder(tag, 'arwendebug', 'arwendebug')
         self.make_binary_symlink_in_parent_folder(tag, 'test', 'mandos-test')
         self.copy_libwasmer_in_parent_directory(tag)
 

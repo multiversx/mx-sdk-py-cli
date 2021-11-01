@@ -58,7 +58,7 @@ def run_tests(args: Any):
 
     logger.info("run_tests.project: %s", project)
 
-    dependencies.install_module("arwentools")
+    dependencies.install_module("vmtools")
 
     guards.is_directory(project)
     project = load_project(project)
