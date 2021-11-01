@@ -71,7 +71,7 @@ class ProjectRust(Project):
 
         args = [
             "cargo",
-            "build",
+            "run",
         ]
 
         return_code = myprocess.run_process_async(args, env=env, cwd=str(cwd))
