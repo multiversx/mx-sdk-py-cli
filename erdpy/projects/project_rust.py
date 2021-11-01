@@ -31,6 +31,8 @@ class ProjectRust(Project):
         meta = self.has_meta()
         try:
             if meta:
+                # The meta crate allows contract developers to add extra
+                # preparation steps before building.
                 self.run_meta()
             self.run_cargo()
 
