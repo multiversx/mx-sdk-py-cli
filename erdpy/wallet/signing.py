@@ -4,9 +4,11 @@ from typing import Any
 
 import nacl.encoding
 import nacl.signing
-from erdpy import dependencies, myprocess
+from erdpy import config, dependencies, myprocess
+from erdpy import errors
 from erdpy.errors import CannotSignMessageWithBLSKey
 from erdpy.interfaces import IAccount, ITransaction
+from erdpy.transactions import Transaction
 
 logger = logging.getLogger("wallet")
 
@@ -22,6 +24,11 @@ def sign_transaction(transaction: ITransaction, account: IAccount) -> str:
     assert isinstance(signature_hex, str)
 
     return signature_hex
+
+
+def validate_transaction(transaction: Transaction) -> None:
+    if transaction.gasLimit > config.MAX_GAS_LIMIT:
+        raise errors.GasLimitTooLarge(transaction.gasLimit, config.MAX_GAS_LIMIT)
 
 
 def sign_message_with_bls_key(message, seed):

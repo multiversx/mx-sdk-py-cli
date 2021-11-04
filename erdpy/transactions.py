@@ -62,6 +62,7 @@ class Transaction(ITransaction):
         return base64.b64decode(self.__dict__.get(field, None)).decode()
 
     def sign(self, account: Account):
+        signing.validate_transaction(self)
         self.signature = signing.sign_transaction(self, account)
 
     def serialize(self) -> bytes:
