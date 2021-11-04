@@ -110,12 +110,16 @@ class TemplateRust(Template):
     def _patch(self):
         logger.info("Patching cargo files...")
         self._patch_cargo()
-        self._patch_cargo_wasm()
-        self._patch_cargo_abi()
+        self._patch_sub_crate("wasm")
+        self._patch_sub_crate("abi")
+        self._patch_sub_crate("meta")
 
         logger.info("Patching source code...")
-        self._patch_source_code_wasm()
-        self._patch_source_code_abi()
+        self._patch_source_code_files([
+            path.join(self.directory, "abi", "src", "main.rs"),
+            path.join(self.directory, "wasm", "src", "lib.rs"),
+            path.join(self.directory, "meta", "src", "main.rs"),
+        ], ignore_missing=True)
         self._patch_source_code_tests()
 
         logger.info("Patching test files...")
@@ -138,41 +142,13 @@ class TemplateRust(Template):
 
         cargo_file.save()
 
-    def _patch_cargo_wasm(self):
-        cargo_path = path.join(self.directory, "wasm", TemplateRust.CARGO_TOML)
-
-        cargo_file = CargoFile(cargo_path)
-        cargo_file.package_name = f"{self.project_name}-wasm"
-        cargo_file.version = "0.0.0"
-        cargo_file.authors = ["you"]
-        cargo_file.edition = "2018"
-        cargo_file.publish = False
-
-        for dependency in cargo_file.get_dependencies().values():
-            del dependency["path"]
-        # Currently, the following logic is not really needed (we don't have dev-dependencies in wasm/Cargo.toml):
-        for dependency in cargo_file.get_dev_dependencies().values():
-            del dependency["path"]
-
-        # Patch the path towards the project crate (one folder above):
-        cargo_file.get_dependency(self.template_name)["path"] = ".."
-
-        cargo_file.save()
-
-        self._replace_in_files(
-            [cargo_path],
-            [
-                (f"[dependencies.{self.template_name}]", f"[dependencies.{self.project_name}]")
-            ]
-        )
-
-    def _patch_cargo_abi(self):
-        cargo_path = path.join(self.directory, "abi", TemplateRust.CARGO_TOML)
+    def _patch_sub_crate(self, sub_name: str) -> None:
+        cargo_path = path.join(self.directory, sub_name, TemplateRust.CARGO_TOML)
         if not path.isfile(cargo_path):
             return
 
         cargo_file = CargoFile(cargo_path)
-        cargo_file.package_name = f"{self.project_name}-abi"
+        cargo_file.package_name = f"{self.project_name}-{sub_name}"
         cargo_file.version = "0.0.0"
         cargo_file.authors = ["you"]
         cargo_file.edition = "2018"
@@ -192,34 +168,28 @@ class TemplateRust(Template):
             [cargo_path],
             [
                 (f"[dependencies.{self.template_name}]", f"[dependencies.{self.project_name}]")
-            ]
+            ],
+            ignore_missing=False
         )
 
-    def _patch_source_code_wasm(self):
-        lib_path = path.join(self.directory, "wasm", "src", "lib.rs")
+    def _with_underscores(self, name: str) -> str:
+        return name.replace('-', '_')
+
+    def _patch_source_code_files(self, source_paths, ignore_missing: bool) -> None:
+        template_name = self._with_underscores(self.template_name)
+        project_name = self._with_underscores(self.project_name)
 
         self._replace_in_files(
-            [lib_path],
+            source_paths,
             [
-                (f"use {self.template_name.replace('-', '_')}::*", f"use {self.project_name.replace('-', '_')}::*")
-            ]
-        )
-
-    def _patch_source_code_abi(self):
-        abi_main_path = path.join(self.directory, "abi", "src", "main.rs")
-        if not path.exists(abi_main_path):
-            return
-
-        template_name = self.template_name.replace('-', '_')
-        project_name = self.project_name.replace('-', '_')
-
-        self._replace_in_files(
-            [abi_main_path],
-            [
-                # Example: replace "use simple-erc20::*" to "use my_token::*"
+                # Example: replace "use simple_erc20::*" to "use my_token::*"
                 (f"use {template_name}::*", f"use {project_name}::*"),
-                (f"<{template_name}::AbiProvider>()", f"<{project_name}::AbiProvider>()")
-            ]
+                # Example: replace "<simple_erc20::AbiProvider>()" to "<my_token::AbiProvider>()"
+                (f"<{template_name}::AbiProvider>()", f"<{project_name}::AbiProvider>()"),
+                # Example: replace "extern crate adder;" to "extern crate myadder;"
+                (f"extern crate {template_name};", f"extern crate {project_name};"),
+            ],
+            ignore_missing
         )
 
     def _patch_source_code_tests(self):
@@ -228,15 +198,7 @@ class TemplateRust(Template):
             return
 
         test_paths = utils.list_files(test_dir_path)
-        self._replace_in_files(
-            test_paths,
-            [
-                # Example: replace "use simple-erc20::*" to "use my_token::*"
-                (f"use {self.template_name.replace('-', '_')}::*", f"use {self.project_name.replace('-', '_')}::*"),
-                # Example: replace "extern crate adder;" to "extern crate myadder"
-                (f"extern crate {self.template_name.replace('-', '_')};", f"extern crate {self.project_name.replace('-', '_')};")
-            ]
-        )
+        self._patch_source_code_files(test_paths, ignore_missing=False)
 
     def _patch_mandos_tests(self):
         test_dir_path = path.join(self.directory, "mandos")
@@ -248,7 +210,8 @@ class TemplateRust(Template):
             test_paths,
             [
                 (f"{self.template_name}.wasm", f"{self.project_name}.wasm")
-            ]
+            ],
+            ignore_missing=False
         )
 
         for file in test_paths:
@@ -257,8 +220,10 @@ class TemplateRust(Template):
             data["name"] = data.get("name", "").replace(self.template_name, self.project_name)
             utils.write_json_file(file, data)
 
-    def _replace_in_files(self, files, replacements):
+    def _replace_in_files(self, files, replacements, ignore_missing: bool) -> None:
         for file in files:
+            if ignore_missing and not path.exists(file):
+                continue
             content = utils.read_file(file)
 
             for to_replace, replacement in replacements:
