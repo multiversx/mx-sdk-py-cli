@@ -145,7 +145,7 @@ def create(args: Any):
     template = args.template
     directory = args.directory
 
-    projects.create_from_template(name, template, directory)
+    projects.create_from_template(name, template, Path(directory))
 
 
 def clean(args: Any):
@@ -164,7 +164,7 @@ def build(args: Any):
         "wasm_name": args.wasm_name
     }
 
-    projects.build_project(project, options)
+    projects.build_project(Path(project), options)
 
 
 def run_tests(args: Any):

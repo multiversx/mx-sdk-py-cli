@@ -275,7 +275,7 @@ def build_binaries(testnet_config: TestnetConfiguration):
 
 def _get_wasm_vm_version(testnet_config: TestnetConfiguration):
     go_mod = testnet_config.node_source() / "go.mod"
-    lines = utils.read_lines(str(go_mod))
+    lines = utils.read_lines(go_mod)
     line = next(line for line in lines if "github.com/ElrondNetwork/arwen-wasm-vm" in line)
     parts = line.split()
     return parts[1]

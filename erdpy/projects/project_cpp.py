@@ -96,7 +96,7 @@ class ProjectCpp(Project):
 
 
 class CppBuildConfiguration:
-    def __init__(self, project, debug):
+    def __init__(self, project: Project, debug):
         self.project = project
         self.debug = debug
         self.exports = self._get_exports()

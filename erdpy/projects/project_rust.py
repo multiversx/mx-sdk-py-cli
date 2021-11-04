@@ -122,7 +122,7 @@ class ProjectRust(Project):
         if not wasm_file_renamed:
             wasm_file_renamed = f"{original_name}.wasm"
         wasm_file_renamed_path = Path(self.get_output_folder(), wasm_file_renamed)
-        shutil.move(wasm_file, wasm_file_renamed_path)
+        shutil.move(str(wasm_file), wasm_file_renamed_path)
 
         if self.has_abi():
             abi_file = self.get_abi_filepath()
