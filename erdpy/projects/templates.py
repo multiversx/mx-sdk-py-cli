@@ -78,7 +78,7 @@ def _copy_template(template: str, destination_path: Path):
     raise errors.TemplateMissingError(template)
 
 
-def _load_as_template(directory):
+def _load_as_template(directory: Path):
     if shared.is_source_clang(directory):
         return TemplateClang(directory)
     if shared.is_source_sol(directory):
