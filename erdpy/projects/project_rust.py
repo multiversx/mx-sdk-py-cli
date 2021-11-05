@@ -83,7 +83,11 @@ class ProjectRust(Project):
         self.prepare_build_wasm_args(args)
 
         for (option, value) in self.options.items():
-            args.extend([f"--{option}", value])
+            if isinstance(value, bool):
+                if value:
+                    args.extend([f"--{option}"])
+            else:
+                args.extend([f"--{option}", str(value)])
 
         return_code = myprocess.run_process_async(args, env=env, cwd=str(cwd))
         if return_code != 0:
