@@ -112,11 +112,13 @@ class TemplateRust(Template):
         self._patch_cargo()
         self._patch_cargo_wasm()
         self._patch_cargo_abi()
+        self._patch_cargo_meta()
 
         logger.info("Patching source code...")
         self._patch_source_code_wasm()
         self._patch_source_code_abi()
         self._patch_source_code_tests()
+        self._patch_source_code_meta()
 
         logger.info("Patching test files...")
         self._patch_mandos_tests()
@@ -195,6 +197,35 @@ class TemplateRust(Template):
             ]
         )
 
+    def _patch_cargo_meta(self):
+        cargo_path = path.join(self.directory, "meta", TemplateRust.CARGO_TOML)
+        if not path.isfile(cargo_path):
+            return
+
+        cargo_file = CargoFile(cargo_path)
+        cargo_file.package_name = f"{self.project_name}-meta"
+        cargo_file.version = "0.0.0"
+        cargo_file.authors = ["you"]
+        cargo_file.edition = "2018"
+        cargo_file.publish = False
+
+        for dependency in cargo_file.get_dependencies().values():
+            del dependency["path"]
+        for dependency in cargo_file.get_dev_dependencies().values():
+            del dependency["path"]
+
+        # Patch the path towards the project crate (one folder above):
+        cargo_file.get_dependency(self.template_name)["path"] = ".."
+
+        cargo_file.save()
+
+        self._replace_in_files(
+            [cargo_path],
+            [
+                (f"[dependencies.{self.template_name}]", f"[dependencies.{self.project_name}]")
+            ]
+        )
+
     def _patch_source_code_wasm(self):
         lib_path = path.join(self.directory, "wasm", "src", "lib.rs")
 
@@ -215,6 +246,23 @@ class TemplateRust(Template):
 
         self._replace_in_files(
             [abi_main_path],
+            [
+                # Example: replace "use simple-erc20::*" to "use my_token::*"
+                (f"use {template_name}::*", f"use {project_name}::*"),
+                (f"<{template_name}::AbiProvider>()", f"<{project_name}::AbiProvider>()")
+            ]
+        )
+
+    def _patch_source_code_meta(self):
+        meta_main_path = path.join(self.directory, "meta", "src", "main.rs")
+        if not path.exists(abi_main_path):
+            return
+
+        template_name = self.template_name.replace('-', '_')
+        project_name = self.project_name.replace('-', '_')
+
+        self._replace_in_files(
+            [meta_main_path],
             [
                 # Example: replace "use simple-erc20::*" to "use my_token::*"
                 (f"use {template_name}::*", f"use {project_name}::*"),
