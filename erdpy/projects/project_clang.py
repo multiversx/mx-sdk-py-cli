@@ -138,7 +138,7 @@ class ProjectClang(Project):
 
     def get_exported_functions(self) -> List[str]:
         file_export = self.find_file_globally('*.export')
-        lines = utils.read_lines(str(file_export))
+        lines = utils.read_lines(file_export)
         return lines
 
     def default_config(self):

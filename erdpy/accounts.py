@@ -1,7 +1,6 @@
 import logging
-import os
 from binascii import unhexlify
-from os import path
+from pathlib import Path
 from typing import Any, Optional
 
 from erdpy import constants, errors, utils
@@ -14,13 +13,13 @@ logger = logging.getLogger("accounts")
 
 
 class AccountsRepository:
-    def __init__(self, folder):
+    def __init__(self, folder: Path):
         utils.ensure_folder(folder)
         self.folder = folder
 
     def get_account(self, name):
-        pem_file = path.join(self.folder, f"{name}.pem")
-        return Account(pem_file=pem_file)
+        pem_file = self.folder / f"{name}.pem"
+        return Account(pem_file=str(pem_file))
 
     def generate_accounts(self, count):
         for i in range(count):
@@ -30,14 +29,13 @@ class AccountsRepository:
         secret_key, pubkey = generate_pair()
         address = Address(pubkey).bech32()
 
-        pem_file = f"{name}_{address}.pem"
-        pem_file = path.join(self.folder, pem_file)
+        pem_file = self.folder / f"{name}_{address}.pem"
         pem.write(pem_file, secret_key, pubkey, name=f"{name}:{address}")
 
     def get_all(self):
         accounts = []
-        for pem_file in os.listdir(self.folder):
-            pem_file = path.join(self.folder, pem_file)
+        for pem_file in self.folder.iterdir():
+            pem_file = self.folder / pem_file
             account = Account(pem_file=pem_file)
             accounts.append(account)
 
@@ -59,7 +57,7 @@ class Account(IAccount):
         self.ledger = ledger
 
         if self.pem_file:
-            secret_key, pubkey = pem.parse(self.pem_file, self.pem_index)
+            secret_key, pubkey = pem.parse(Path(self.pem_file), self.pem_index)
             self.secret_key = secret_key.hex()
             self.address = Address(pubkey)
         elif key_file and pass_file:

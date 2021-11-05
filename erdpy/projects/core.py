@@ -14,7 +14,7 @@ from erdpy.projects.project_sol import ProjectSol
 logger = logging.getLogger("projects.core")
 
 
-def load_project(directory):
+def load_project(directory: Path):
     guards.is_directory(directory)
 
     if shared.is_source_clang(directory):
@@ -26,11 +26,11 @@ def load_project(directory):
     if shared.is_source_rust(directory):
         return ProjectRust(directory)
     else:
-        raise errors.NotSupportedProject(directory)
+        raise errors.NotSupportedProject(str(directory))
 
 
-def build_project(directory: str, options: Dict[str, Any]):
-    directory = path.expanduser(directory)
+def build_project(directory: Path, options: Dict[str, Any]):
+    directory = directory.expanduser()
 
     logger.info("build_project.directory: %s", directory)
     logger.info("build_project.debug: %s", options['debug'])
@@ -43,8 +43,8 @@ def build_project(directory: str, options: Dict[str, Any]):
     logger.info(f"WASM file generated: {relative_wasm_path}")
 
 
-def clean_project(directory: str):
-    directory = path.expanduser(directory)
+def clean_project(directory: Path):
+    directory = directory.expanduser()
     guards.is_directory(directory)
     project = load_project(directory)
     project.clean()
@@ -52,26 +52,26 @@ def clean_project(directory: str):
 
 
 def run_tests(args: Any):
-    project = args.project
-    directory = args.directory
+    project_path = Path(args.project)
+    directory = Path(args.directory)
     wildcard = args.wildcard
 
-    logger.info("run_tests.project: %s", project)
+    logger.info("run_tests.project: %s", project_path)
 
     dependencies.install_module("vmtools")
 
-    guards.is_directory(project)
-    project = load_project(project)
+    guards.is_directory(project_path)
+    project = load_project(project_path)
     project.run_tests(directory, wildcard)
 
 
-def get_projects_in_workspace(workspace):
+def get_projects_in_workspace(workspace: Path):
     guards.is_directory(workspace)
     subfolders = utils.get_subfolders(workspace)
     projects = []
 
     for folder in subfolders:
-        project_directory = path.join(workspace, folder)
+        project_directory = workspace / folder
 
         try:
             project = load_project(project_directory)

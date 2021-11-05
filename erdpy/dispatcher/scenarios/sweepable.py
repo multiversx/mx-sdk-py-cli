@@ -1,6 +1,7 @@
 # This is an scenario example used to test a particular scenario within our system tests
 
 import logging
+from pathlib import Path
 import sys
 from argparse import ArgumentParser
 
@@ -25,7 +26,8 @@ def main():
 
     proxy = ElrondProxy(args.proxy)
     bunch = BunchOfTransactions()
-    senders_repository = AccountsRepository(args.senders_folder)
+    senders_folder = Path(args.senders_folder)
+    senders_repository = AccountsRepository(senders_folder)
 
     for sender in senders_repository.get_all():
         sender.sync_nonce(proxy)

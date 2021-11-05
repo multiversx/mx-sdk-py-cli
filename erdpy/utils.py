@@ -1,7 +1,6 @@
 import json
 import logging
 import os
-import os.path
 import pathlib
 import shutil
 import stat
@@ -79,7 +78,7 @@ def uniquify(path: Path) -> Path:
     return path
 
 
-def read_lines(file: str) -> List[str]:
+def read_lines(file: Path) -> List[str]:
     with open(file) as f:
         lines = f.readlines()
     lines = [line.strip() for line in lines]
@@ -118,11 +117,9 @@ def read_text_file(path: Path) -> str:
         raise errors.BadFile(str(path), err) from None
 
 
-def write_file(f: Any, text: str):
-    if isinstance(f, str) or isinstance(f, pathlib.PosixPath):
-        with open(f, "w") as f:
-            return f.write(text)
-    return f.write(text)
+def write_file(file_path: Path, text: str):
+    with open(file_path, "w") as file:
+        return file.write(text)
 
 
 def read_toml_file(filename):
@@ -159,7 +156,7 @@ def prettify_json_file(filename: str):
     write_json_file(filename, data)
 
 
-def get_subfolders(folder):
+def get_subfolders(folder: Path) -> List[str]:
     return [item.name for item in os.scandir(folder) if item.is_dir() and not item.name.startswith(".")]
 
 
