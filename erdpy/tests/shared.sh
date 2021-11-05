@@ -23,3 +23,13 @@ assertFileExists() {
 
     return 0
 }
+
+assertFileDoesNotExist() {
+    if [ -f "$1" ]
+    then
+        echo "Error: expected file [$1] to be missing, but it exists!" 1>&2
+        return 1
+    fi
+
+    return 0
+}

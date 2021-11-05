@@ -11,11 +11,10 @@ from erdpy.dependencies.modules import StandaloneModule
 logger = logging.getLogger("Project")
 
 
-# TODO use pathlib.Path everywhere
 class Project:
 
-    def __init__(self, directory: Union[Path, str]):
-        self.path = Path(directory).expanduser().resolve()
+    def __init__(self, directory: Path):
+        self.path = directory.expanduser().resolve()
         self.directory = str(self.path)
 
     def build(self, options: Union[Dict[str, Any], None] = None) -> Path:
@@ -95,18 +94,18 @@ class Project:
     def default_config(self):
         return dict()
 
-    def run_tests(self, tests_directory: str, wildcard: str = ""):
+    def run_tests(self, tests_directory: Path, wildcard: str = ""):
         vmtools = cast(StandaloneModule, dependencies.get_module_by_key("vmtools"))
         tool_env = vmtools.get_env()
         tool = path.join(vmtools.get_parent_directory(), "mandos-test")
-        test_folder = path.join(self.directory, tests_directory)
+        test_folder = self.directory / tests_directory
 
         if not wildcard:
-            args = [tool, test_folder]
+            args = [tool, str(test_folder)]
             myprocess.run_process(args, env=tool_env)
         else:
-            pattern = path.join(test_folder, wildcard)
-            test_files = glob.glob(pattern)
+            pattern = test_folder / wildcard
+            test_files = glob.glob(str(pattern))
 
             for test_file in test_files:
                 print("Run test for:", test_file)

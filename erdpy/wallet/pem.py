@@ -1,20 +1,19 @@
 import base64
 import itertools
 import textwrap
-from os import path
 from pathlib import Path
 from typing import List, Tuple, Union
 
 from erdpy import guards, utils
 
 
-def get_pubkey(pem_file: Union[str, Path]):
+def get_pubkey(pem_file: Path):
     _, pubkey = parse(pem_file)
     return pubkey
 
 
-def parse(pem_file: Union[str, Path], index: int = 0) -> Tuple[bytes, bytes]:
-    pem_file = path.expanduser(pem_file)
+def parse(pem_file: Path, index: int = 0) -> Tuple[bytes, bytes]:
+    pem_file = pem_file.expanduser()
     guards.is_file(pem_file)
 
     lines = utils.read_lines(pem_file)
@@ -31,8 +30,8 @@ def parse(pem_file: Union[str, Path], index: int = 0) -> Tuple[bytes, bytes]:
     return secret_key, pubkey
 
 
-def parse_all(pem_file: Union[str, Path]) -> List[Tuple[bytes, bytes]]:
-    pem_file = path.expanduser(pem_file)
+def parse_all(pem_file: Path) -> List[Tuple[bytes, bytes]]:
+    pem_file = pem_file.expanduser()
     guards.is_file(pem_file)
 
     lines = utils.read_lines(pem_file)
@@ -53,8 +52,8 @@ def parse_all(pem_file: Union[str, Path]) -> List[Tuple[bytes, bytes]]:
     return result
 
 
-def parse_validator_pem(pem_file, index: int = 0):
-    pem_file = path.expanduser(pem_file)
+def parse_validator_pem(pem_file: Path, index: int = 0):
+    pem_file = pem_file.expanduser()
     guards.is_file(pem_file)
 
     lines = utils.read_lines(pem_file)
@@ -104,8 +103,8 @@ def get_bytes_from_secret_key(secret_key):
     return key_bytes
 
 
-def write(pem_file: Union[str, Path], secret_key: bytes, pubkey: bytes, name: str = ""):
-    pem_file = path.expanduser(pem_file)
+def write(pem_file: Path, secret_key: bytes, pubkey: bytes, name: str = ""):
+    pem_file = pem_file.expanduser()
 
     if not name:
         name = pubkey.hex()
