@@ -87,7 +87,7 @@ testCleanContracts() {
 
     assertFileExists ${SANDBOX}/myfactorial-rs/output/myfactorial-rs.wasm || return 1
     assertFileExists ${SANDBOX}/myfactorial-rs/output/myfactorial-rs.abi.json || return 1
-    ${ERDPY} contract build ${SANDBOX}/myfactorial-rs || return 1
+    ${ERDPY} contract clean ${SANDBOX}/myfactorial-rs || return 1
     assertFileDoesNotExist ${SANDBOX}/myfactorial-rs/output/myfactorial-rs.wasm || return 1
     assertFileDoesNotExist ${SANDBOX}/myfactorial-rs/output/myfactorial-rs.abi.json || return 1
 
