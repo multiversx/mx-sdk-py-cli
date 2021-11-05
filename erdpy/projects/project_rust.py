@@ -131,18 +131,20 @@ class ProjectRust(Project):
 
     def _do_after_build(self) -> Path:
         original_name = self.cargo_file.package_name
-        wasm_base_name = self.cargo_file.package_name.replace("-", "_")
-        wasm_file = Path(self.get_output_folder(), f"{wasm_base_name}_wasm.wasm").resolve()
         wasm_file_renamed = self.options.get("wasm_name")
         if not wasm_file_renamed:
             wasm_file_renamed = f"{original_name}.wasm"
         wasm_file_renamed_path = Path(self.get_output_folder(), wasm_file_renamed)
-        shutil.move(str(wasm_file), wasm_file_renamed_path)
 
-        if self.has_abi():
-            abi_file = self.get_abi_filepath()
-            abi_file_renamed = Path(self.get_output_folder(), f"{original_name}.abi.json")
-            shutil.move(abi_file, abi_file_renamed)
+        if not self.has_meta():
+            wasm_base_name = self.cargo_file.package_name.replace("-", "_")
+            wasm_file = Path(self.get_output_folder(), f"{wasm_base_name}_wasm.wasm").resolve()
+            shutil.move(str(wasm_file), wasm_file_renamed_path)
+
+            if self.has_abi():
+                abi_file = self.get_abi_filepath()
+                abi_file_renamed = Path(self.get_output_folder(), f"{original_name}.abi.json")
+                shutil.move(abi_file, abi_file_renamed)
 
         return wasm_file_renamed_path
 
