@@ -255,7 +255,7 @@ class TemplateRust(Template):
 
     def _patch_source_code_meta(self):
         meta_main_path = path.join(self.directory, "meta", "src", "main.rs")
-        if not path.exists(abi_main_path):
+        if not path.exists(meta_main_path):
             return
 
         template_name = self.template_name.replace('-', '_')
