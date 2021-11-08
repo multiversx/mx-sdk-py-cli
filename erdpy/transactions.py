@@ -4,7 +4,7 @@ import logging
 from collections import OrderedDict
 from typing import Any, Dict, List, TextIO
 
-from erdpy import errors, utils
+from erdpy import config, errors, utils
 from erdpy.accounts import Account, Address
 from erdpy.interfaces import IElrondProxy, ITransaction
 from erdpy.ledger.config import compare_versions
@@ -62,7 +62,12 @@ class Transaction(ITransaction):
         return base64.b64decode(self.__dict__.get(field, None)).decode()
 
     def sign(self, account: Account):
+        self.validate()
         self.signature = signing.sign_transaction(self, account)
+
+    def validate(self) -> None:
+        if self.gasLimit > config.MAX_GAS_LIMIT:
+            raise errors.GasLimitTooLarge(self.gasLimit, config.MAX_GAS_LIMIT)
 
     def serialize(self) -> bytes:
         dictionary = self.to_dictionary()

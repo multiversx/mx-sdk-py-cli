@@ -8,6 +8,7 @@ from typing import Any
 import nacl.encoding
 import nacl.signing
 from erdpy.accounts import Account, Address
+from erdpy.errors import GasLimitTooLarge
 from erdpy.tests.utils import MyTestCase
 from erdpy.transactions import Transaction
 from erdpy.wallet import (bip39seed_to_secret_key, generate_pair,
@@ -127,6 +128,21 @@ class WalletTestCase(MyTestCase):
         transaction.sign(self.alice)
 
         self.assertEqual("83efd1bc35790ecc220b0ed6ddd1fcb44af6653dd74e37b3a49dcc1f002a1b98b6f79779192cca68bdfefd037bc81f4fa606628b751023122191f8c062362805", transaction.signature)
+
+    def test_gas_limit_too_large(self):
+        # With data
+        transaction = Transaction()
+        transaction.nonce = 0
+        transaction.value = "0"
+        transaction.sender = "erd1l453hd0gt5gzdp7czpuall8ggt2dcv5zwmfdf3sd3lguxseux2fsmsgldz"
+        transaction.receiver = "erd188nydpkagtpwvfklkl2tn0w6g40zdxkwfgwpjqc2a2m2n7ne9g8q2t22sr"
+        transaction.gasPrice = 200000000000000
+        transaction.gasLimit = 1500000000
+        transaction.data = "foo"
+        transaction.chainID = "chainID"
+        transaction.version = 1
+
+        self.assertRaises(GasLimitTooLarge, lambda: transaction.sign(self.alice))
 
     def test_generate_pair_pem(self):
         secret_key, pubkey = generate_pair()
