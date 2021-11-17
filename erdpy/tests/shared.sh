@@ -1,4 +1,10 @@
-export PYTHONPATH=$(realpath ../../)
+# compatibility with MacOS ( https://stackoverflow.com/a/9484017 )
+function absolute_path() {
+  DIR="${1%/*}"
+  (cd "$DIR" && echo "$(pwd -P)")
+}
+
+export PYTHONPATH=$(absolute_path ../../)
 echo "PYTHONPATH = ${PYTHONPATH}"
 
 ERDPY="python3 -m erdpy.cli"
