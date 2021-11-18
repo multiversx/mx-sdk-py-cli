@@ -28,9 +28,12 @@ class Project:
         utils.remove_folder(self.get_output_folder())
 
     def print_wasm_size(self) -> None:
-        wasm_file = self.get_file_wasm()
-        name = str(wasm_file)
-        size = wasm_file.stat().st_size
+        name = self.path.name
+        try:
+            wasm_file = self.get_file_wasm()
+            size = str(wasm_file.stat().st_size)
+        except errors.KnownError:
+            size = '-'
         print(f"{name} {size}")
 
     def _ensure_dependencies_installed(self):
