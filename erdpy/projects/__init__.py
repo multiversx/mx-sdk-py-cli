@@ -1,4 +1,4 @@
-from erdpy.projects.core import (build_project, clean_project,
+from erdpy.projects.core import (build_project, clean_project, print_wasm_size,
                                  get_projects_in_workspace, load_project,
                                  run_tests)
 from erdpy.projects.project_base import Project
@@ -9,4 +9,4 @@ from erdpy.projects.project_sol import ProjectSol
 from erdpy.projects.templates import (create_from_template,
                                       list_project_templates)
 
-__all__ = ["build_project", "clean_project", "run_tests", "get_projects_in_workspace", "load_project", "Project", "ProjectClang", "ProjectCpp", "ProjectRust", "ProjectSol", "create_from_template", "list_project_templates"]
+__all__ = ["build_project", "clean_project", "print_wasm_size", "run_tests", "get_projects_in_workspace", "load_project", "Project", "ProjectClang", "ProjectCpp", "ProjectRust", "ProjectSol", "create_from_template", "list_project_templates"]

@@ -8,6 +8,7 @@ from erdpy import cli_shared, errors, projects, utils
 from erdpy.accounts import Account, Address
 from erdpy.contracts import CodeMetadata, SmartContract
 from erdpy.projects import load_project
+from erdpy.projects.core import get_project_paths_recursively
 from erdpy.proxy.core import ElrondProxy
 from erdpy.transactions import Transaction
 
@@ -29,6 +30,7 @@ def setup_parser(args: List[str], subparsers: Any) -> Any:
 
     sub = cli_shared.add_command_subparser(subparsers, "contract", "build", "Build a Smart Contract project using the appropriate buildchain.")
     _add_project_arg(sub)
+    _add_recursive_arg(sub)
     sub.add_argument("--debug", action="store_true", default=False, help="set debug flag (default: %(default)s)")
     sub.add_argument("--no-optimization", action="store_true", default=False, help="bypass optimizations (for clang) (default: %(default)s)")
     sub.add_argument("--cargo-target-dir", type=str, help="for rust projects, forward the parameter to Cargo")
@@ -38,7 +40,13 @@ def setup_parser(args: List[str], subparsers: Any) -> Any:
 
     sub = cli_shared.add_command_subparser(subparsers, "contract", "clean", "Clean a Smart Contract project.")
     _add_project_arg(sub)
+    _add_recursive_arg(sub)
     sub.set_defaults(func=clean)
+
+    sub = cli_shared.add_command_subparser(subparsers, "contract", "size", "Print the Smart Contract's WASM file size.")
+    _add_project_arg(sub)
+    _add_recursive_arg(sub)
+    sub.set_defaults(func=size)
 
     sub = cli_shared.add_command_subparser(subparsers, "contract", "test", "Run Mandos tests.")
     _add_project_arg(sub)
@@ -110,6 +118,10 @@ def _add_project_arg(sub: Any):
     sub.add_argument("project", nargs='?', default=os.getcwd(), help="🗀 the project directory (default: current directory)")
 
 
+def _add_recursive_arg(sub: Any):
+    sub.add_argument("-r", "--recursive", dest="recursive", action="store_true", help="locate projects recursively")
+
+
 def _add_project_or_bytecode_arg(sub: Any):
     group = sub.add_mutually_exclusive_group(required=True)
     group.add_argument("--project", default=os.getcwd(),
@@ -148,13 +160,32 @@ def create(args: Any):
     projects.create_from_template(name, template, directory)
 
 
+def get_project_paths(base_path: Path, recursive: bool) -> List[Path]:
+    if not recursive:
+        return [base_path]
+    return get_project_paths_recursively(base_path)
+
+
+def parse_project_paths(args: Any) -> List[Path]:
+    base_path = Path(args.project)
+    recursive = bool(args.recursive)
+    return get_project_paths(base_path, recursive)
+
+
 def clean(args: Any):
-    project = Path(args.project)
-    projects.clean_project(project)
+    project_paths = parse_project_paths(args)
+    for project in project_paths:
+        projects.clean_project(project)
+
+
+def size(args: Any):
+    project_paths = parse_project_paths(args)
+    for project in project_paths:
+        projects.print_wasm_size(project)
 
 
 def build(args: Any):
-    project = Path(args.project)
+    project_paths = parse_project_paths(args)
     options = {
         "debug": args.debug,
         "optimized": not args.no_optimization,
@@ -164,7 +195,8 @@ def build(args: Any):
         "wasm_name": args.wasm_name
     }
 
-    projects.build_project(project, options)
+    for project in project_paths:
+        projects.build_project(project, options)
 
 
 def run_tests(args: Any):

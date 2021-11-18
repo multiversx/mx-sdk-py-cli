@@ -1,11 +1,11 @@
 from erdpy import dependencies
 import logging
-from os import path
-from typing import Any, Dict
+from typing import Any, Dict, List
 from pathlib import Path
 
 from erdpy import errors, utils, guards
 from erdpy.projects import shared
+from erdpy.projects.project_base import Project
 from erdpy.projects.project_clang import ProjectClang
 from erdpy.projects.project_cpp import ProjectCpp
 from erdpy.projects.project_rust import ProjectRust
@@ -14,7 +14,7 @@ from erdpy.projects.project_sol import ProjectSol
 logger = logging.getLogger("projects.core")
 
 
-def load_project(directory: Path):
+def load_project(directory: Path) -> Project:
     guards.is_directory(directory)
 
     if shared.is_source_clang(directory):
@@ -51,6 +51,13 @@ def clean_project(directory: Path):
     logger.info("Project cleaned.")
 
 
+def print_wasm_size(directory: Path) -> None:
+    directory = directory.expanduser()
+    guards.is_directory(directory)
+    project = load_project(directory)
+    project.print_wasm_size()
+
+
 def run_tests(args: Any):
     project_path = Path(args.project)
     directory = Path(args.directory)
@@ -65,7 +72,7 @@ def run_tests(args: Any):
     project.run_tests(directory, wildcard)
 
 
-def get_projects_in_workspace(workspace: Path):
+def get_projects_in_workspace(workspace: Path) -> List[Project]:
     guards.is_directory(workspace)
     subfolders = utils.get_subfolders(workspace)
     projects = []
@@ -80,3 +87,8 @@ def get_projects_in_workspace(workspace: Path):
             pass
 
     return projects
+
+
+def get_project_paths_recursively(base_path: Path) -> List[Path]:
+    guards.is_directory(base_path)
+    return [elrond_json.parent for elrond_json in base_path.glob("**/elrond.json")]
