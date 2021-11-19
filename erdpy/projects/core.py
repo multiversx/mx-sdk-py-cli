@@ -1,6 +1,6 @@
 from erdpy import dependencies
 import logging
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Tuple
 from pathlib import Path
 
 from erdpy import errors, utils, guards
@@ -51,11 +51,11 @@ def clean_project(directory: Path):
     logger.info("Project cleaned.")
 
 
-def print_wasm_size(directory: Path) -> None:
+def get_wasm_size(directory: Path) -> Tuple[Path, str, str]:
     directory = directory.expanduser()
     guards.is_directory(directory)
     project = load_project(directory)
-    project.print_wasm_size()
+    return project.get_wasm_size()
 
 
 def run_tests(args: Any):

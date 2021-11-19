@@ -3,7 +3,7 @@ import logging
 import shutil
 from os import path
 from pathlib import Path
-from typing import Any, Dict, List, Union, cast
+from typing import Any, Dict, List, Tuple, Union, cast
 
 from erdpy import dependencies, errors, myprocess, utils
 from erdpy.dependencies.modules import StandaloneModule
@@ -27,14 +27,13 @@ class Project:
     def clean(self):
         utils.remove_folder(self.get_output_folder())
 
-    def print_wasm_size(self) -> None:
-        name = self.path.name
+    def get_wasm_size(self) -> Tuple[Path, str, str]:
         try:
             wasm_file = self.get_file_wasm()
             size = str(wasm_file.stat().st_size)
         except errors.KnownError:
             size = '-'
-        print(f"{name} {size}")
+        return (self.path.parent, self.path.name, size)
 
     def _ensure_dependencies_installed(self):
         module_keys = self.get_dependencies()

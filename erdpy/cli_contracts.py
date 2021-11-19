@@ -3,6 +3,8 @@ import os
 from typing import Any, List
 
 from pathlib import Path
+import itertools
+import operator
 
 from erdpy import cli_shared, errors, projects, utils
 from erdpy.accounts import Account, Address
@@ -180,8 +182,17 @@ def clean(args: Any):
 
 def size(args: Any):
     project_paths = parse_project_paths(args)
-    for project in project_paths:
-        projects.print_wasm_size(project)
+    command_base_path = Path(args.project)
+    wasm_sizes = [projects.get_wasm_size(project) for project in project_paths]
+    base_path_getter = operator.itemgetter(0)
+    wasm_sizes.sort(key=base_path_getter)
+    for base_path, subiter in itertools.groupby(wasm_sizes, base_path_getter):
+        relative_path = base_path.relative_to(command_base_path)
+        print(f"{relative_path}:")
+        for _, name, size in subiter:
+            print(f"{name} {size}")
+        print()
+
 
 
 def build(args: Any):
