@@ -182,7 +182,7 @@ def clean(args: Any):
 
 def size(args: Any):
     project_paths = parse_project_paths(args)
-    command_base_path = Path(args.project)
+    command_base_path = Path(args.project).resolve()
     wasm_sizes = [projects.get_wasm_size(project) for project in project_paths]
     base_path_getter = operator.itemgetter(0)
     wasm_sizes.sort(key=base_path_getter)
