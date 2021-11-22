@@ -16,23 +16,27 @@ MIN_REQUIRED_PYTHON_MINOR_VERSION_MACOS = 8
 
 elrondsdk_path = None
 exact_version = None
+from_branch = None
 
 
 def main():
     global elrondsdk_path
     global exact_version
+    global from_branch
 
     parser = ArgumentParser()
     parser.add_argument("--modify-path", dest="modify_path", action="store_true", help="whether to modify $PATH (in profile file)")
     parser.add_argument("--no-modify-path", dest="modify_path", action="store_false", help="whether to modify $PATH (in profile file)")
     parser.add_argument("--elrondsdk-path", default=get_elrond_sdk_path_default(), help="where to install elrond-sdk")
     parser.add_argument("--exact-version", help="the exact version of erdpy to install")
+    parser.add_argument("--from-branch", help="use a branch of ElrondNetwork/elrond-sdk-erdpy")
     parser.set_defaults(modify_path=True)
     args = parser.parse_args()
 
     elrondsdk_path = os.path.expanduser(args.elrondsdk_path)
     modify_path = args.modify_path
     exact_version = args.exact_version
+    from_branch = args.from_branch
 
     logging.basicConfig(level=logging.DEBUG)
 
@@ -155,11 +159,15 @@ def ensure_folder(folder):
 
 def install_erdpy():
     logger.info("Installing erdpy in virtual environment...")
-    erpy_versioned = "erdpy" if not exact_version else f"erdpy=={exact_version}"
+    if from_branch:
+        erdpy_to_install = f"https://github.com/ElrondNetwork/elrond-sdk-erdpy/archive/refs/heads/{from_branch}.zip"
+    else:
+        erdpy_to_install = "erdpy" if not exact_version else f"erdpy=={exact_version}"
+
     return_code = run_in_venv(["python3", "-m", "pip", "install", "--upgrade", "pip"])
     if return_code != 0:
         raise InstallError("Could not upgrade pip.")
-    return_code = run_in_venv(["pip3", "install", "--no-cache-dir", erpy_versioned])
+    return_code = run_in_venv(["pip3", "install", "--no-cache-dir", erdpy_to_install])
     if return_code != 0:
         raise InstallError("Could not install erdpy.")
     return_code = run_in_venv(["erdpy", "--version"])
