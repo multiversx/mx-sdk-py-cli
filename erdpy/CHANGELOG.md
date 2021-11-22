@@ -4,6 +4,13 @@ All notable changes will be documented in this file.
 
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
+## [1.0.22] - 22.11.2021
+ - Fix the patching of the `meta` subproject
+ - Add a check when signing transactions so that the gas limit is below the maximum allowed
+ - Add `--from-branch` option for `erdpy-up.py`
+ - Add github actions check for MacOS
+ - Update help strings and `CLI.md`
+
 ## [1.0.21] - 01.11.2021
  - New command `erdpy wallet new`, which generates a new wallet mnemonic and optionally saves it to JSON or PEM
  - Add support for Rust contract `meta` crates
