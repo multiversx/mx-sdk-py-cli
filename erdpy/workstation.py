@@ -4,7 +4,7 @@ from pathlib import Path
 from erdpy import config, utils
 
 
-def get_tools_folder():
+def get_tools_folder() -> Path:
     folder = Path.home() / config.ROOT_FOLDER_NAME
     utils.ensure_folder(folder)
     return folder

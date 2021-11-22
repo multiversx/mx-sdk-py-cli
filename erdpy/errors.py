@@ -144,6 +144,11 @@ class UnknownCipher(KnownError):
         super().__init__(f"Unknown cipher: {name}.")
 
 
+class GasLimitTooLarge(KnownError):
+    def __init__(self, current: int, limit: int):
+        super().__init__(f"The gas limit provided ({current}) exceeds the max gas limit of allowed for a transaction ({limit})")
+
+
 class InvalidKeystoreFilePassword(KnownError):
     def __init__(self):
         super().__init__("Provided keystore file password is invalid.")

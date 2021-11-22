@@ -17,7 +17,7 @@ def index():
 
 @app.route("/workspace/contracts")
 def workspace_contracts():
-    projects = get_projects_in_workspace(global_workspace)
+    projects = get_projects_in_workspace(Path(global_workspace))
     models = [SmartContractViewModel(project).__dict__ for project in projects]
     return dict(data=models)
 

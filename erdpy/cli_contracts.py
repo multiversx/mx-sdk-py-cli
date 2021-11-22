@@ -143,18 +143,18 @@ def list_templates(args: Any):
 def create(args: Any):
     name = args.name
     template = args.template
-    directory = args.directory
+    directory = Path(args.directory)
 
     projects.create_from_template(name, template, directory)
 
 
 def clean(args: Any):
-    project = args.project
+    project = Path(args.project)
     projects.clean_project(project)
 
 
 def build(args: Any):
-    project = args.project
+    project = Path(args.project)
     options = {
         "debug": args.debug,
         "optimized": not args.no_optimization,
@@ -225,7 +225,8 @@ def _prepare_contract(args: Any) -> SmartContract:
     if args.bytecode and len(args.bytecode):
         bytecode = utils.read_binary_file(Path(args.bytecode)).hex()
     else:
-        project = load_project(args.project)
+        project_path = Path(args.project)
+        project = load_project(project_path)
         bytecode = project.get_bytecode()
 
     metadata = CodeMetadata(args.metadata_upgradeable, args.metadata_payable)

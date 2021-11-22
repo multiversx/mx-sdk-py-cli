@@ -111,7 +111,7 @@ def prepare_file(output_path: str, suffix: str) -> Path:
 
 
 def generate_pem(args: Any):
-    pem_file = args.pem
+    pem_file = Path(args.pem)
     mnemonic = args.mnemonic
     index = args.index
 

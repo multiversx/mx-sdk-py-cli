@@ -1,4 +1,5 @@
 import logging
+from pathlib import Path
 import sys
 from argparse import ArgumentParser
 
@@ -19,7 +20,8 @@ def main():
     logging.basicConfig(level=logging.DEBUG)
 
     proxy = ElrondProxy(args.proxy)
-    accounts_repository = AccountsRepository(args.pem_folder)
+    pem_folder = Path(args.pem_folder)
+    accounts_repository = AccountsRepository(pem_folder)
     bob = accounts_repository.get_account("bob")
     bob.sync_nonce(proxy)
 

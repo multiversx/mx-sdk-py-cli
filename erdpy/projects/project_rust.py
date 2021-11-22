@@ -3,7 +3,7 @@ import shutil
 import subprocess
 from os import path
 from pathlib import Path
-from typing import Any, Dict, cast
+from typing import Any, Dict, List, cast
 
 from erdpy import dependencies, errors, myprocess, utils
 from erdpy.projects.project_base import Project
@@ -31,16 +31,26 @@ class ProjectRust(Project):
         meta = self.has_meta()
         try:
             if meta:
-                # The meta crate allows contract developers to add extra
+                # The meta crate handles the build process, ABI generation and
+                # allows contract developers to add extra
                 # preparation steps before building.
                 self.run_meta()
-            self.run_cargo()
-
-            # ABI generated separately for backwards compatibility
-            if not meta:
+            else:
+                # For backwards compatibility - build the wasm and generate the ABI
+                self.run_cargo()
                 self.generate_abi()
         except subprocess.CalledProcessError as err:
             raise errors.BuildError(err.output)
+
+    def prepare_build_wasm_args(self, args: List[str]):
+        args.extend([
+            "--target=wasm32-unknown-unknown",
+            "--release",
+            "--out-dir",
+            self.get_output_folder(),
+            "-Z"
+            "unstable-options"
+        ])
 
     def run_cargo(self):
         env = self.get_env()
@@ -48,13 +58,8 @@ class ProjectRust(Project):
         args = [
             "cargo",
             "build",
-            "--target=wasm32-unknown-unknown",
-            "--release",
-            "--out-dir",
-            self.get_output_folder(),
-            "-Z"
-            "unstable-options"
         ]
+        self.prepare_build_wasm_args(args)
         self.decorate_cargo_args(args)
 
         if not self.options.get("wasm_symbols"):
@@ -69,10 +74,20 @@ class ProjectRust(Project):
         cwd = self.get_meta_folder()
         env = self.get_env()
 
+        # run the meta executable with the arguments `build --target=...`
         args = [
             "cargo",
             "run",
+            "build",
         ]
+        self.prepare_build_wasm_args(args)
+
+        for (option, value) in self.options.items():
+            if isinstance(value, bool):
+                if value:
+                    args.extend([f"--{option}"])
+            else:
+                args.extend([f"--{option}", str(value)])
 
         return_code = myprocess.run_process_async(args, env=env, cwd=str(cwd))
         if return_code != 0:
@@ -116,18 +131,20 @@ class ProjectRust(Project):
 
     def _do_after_build(self) -> Path:
         original_name = self.cargo_file.package_name
-        wasm_base_name = self.cargo_file.package_name.replace("-", "_")
-        wasm_file = Path(self.get_output_folder(), f"{wasm_base_name}_wasm.wasm").resolve()
         wasm_file_renamed = self.options.get("wasm_name")
         if not wasm_file_renamed:
             wasm_file_renamed = f"{original_name}.wasm"
         wasm_file_renamed_path = Path(self.get_output_folder(), wasm_file_renamed)
-        shutil.move(wasm_file, wasm_file_renamed_path)
 
-        if self.has_abi():
-            abi_file = self.get_abi_filepath()
-            abi_file_renamed = Path(self.get_output_folder(), f"{original_name}.abi.json")
-            shutil.move(abi_file, abi_file_renamed)
+        if not self.has_meta():
+            wasm_base_name = self.cargo_file.package_name.replace("-", "_")
+            wasm_file = Path(self.get_output_folder(), f"{wasm_base_name}_wasm.wasm").resolve()
+            shutil.move(str(wasm_file), wasm_file_renamed_path)
+
+            if self.has_abi():
+                abi_file = self.get_abi_filepath()
+                abi_file_renamed = Path(self.get_output_folder(), f"{original_name}.abi.json")
+                shutil.move(abi_file, abi_file_renamed)
 
         return wasm_file_renamed_path
 
