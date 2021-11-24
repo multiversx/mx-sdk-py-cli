@@ -1,9 +1,10 @@
+from io import StringIO
 import logging
 import shutil
 import subprocess
 from os import path
 from pathlib import Path
-from typing import Any, Dict, List, cast
+from typing import Any, Dict, List, Optional, cast
 
 from erdpy import dependencies, errors, myprocess, utils
 from erdpy.projects.project_base import Project
@@ -67,8 +68,7 @@ class ProjectRust(Project):
 
         cwd = self.path / 'wasm'
         return_code = myprocess.run_process_async(args, env=env, cwd=str(cwd))
-        if return_code != 0:
-            raise errors.BuildError(f"error code = {return_code}, see output")
+        myprocess.check_return_code(return_code)
 
     def run_meta(self):
         cwd = self.get_meta_folder()
@@ -90,8 +90,7 @@ class ProjectRust(Project):
                 args.extend([f"--{option}", str(value)])
 
         return_code = myprocess.run_process_async(args, env=env, cwd=str(cwd))
-        if return_code != 0:
-            raise errors.BuildError(f"error code = {return_code}, see output")
+        myprocess.check_return_code(return_code)
 
     def decorate_cargo_args(self, args):
         target_dir = self.options.get("cargo_target_dir")
@@ -112,8 +111,7 @@ class ProjectRust(Project):
         cwd = path.join(self.directory, "abi")
         sink = myprocess.FileOutputSink(self.get_abi_filepath())
         return_code = myprocess.run_process_async(args, env=env, cwd=cwd, stdout_sink=sink)
-        if return_code != 0:
-            raise errors.BuildError(f"error code = {return_code}, see output")
+        myprocess.check_return_code(return_code)
 
         utils.prettify_json_file(self.get_abi_filepath())
 
@@ -149,10 +147,32 @@ class ProjectRust(Project):
         return wasm_file_renamed_path
 
     def get_dependencies(self):
-        return ["rust"]
+        return ["rust", "twiggy"]
 
     def get_env(self):
         return dependencies.get_module_by_key("rust").get_env()
+
+    def check_allocator(self) -> Optional[bool]:
+        meta_folder = self.get_meta_folder()
+        env = self.get_env()
+
+        output_filename = f"{self.path.name}-dbg.wasm"
+        build_debug_args = [
+            "cargo",
+            "run",
+            "build",
+            "--wasm-symbols",
+            "--wasm-name",
+            output_filename
+        ]
+        return_code = myprocess.run_process_async(build_debug_args, env=env, cwd=str(meta_folder))
+        myprocess.check_return_code(return_code)
+
+        twiggy_paths_args = ["twiggy", "paths", output_filename]
+        output_string_io = StringIO()
+        return_code = myprocess.run_process_async(twiggy_paths_args, env=env, cwd=str(meta_folder), stdout_sink=myprocess.StringOutput(output_string_io))
+        myprocess.check_return_code(return_code)
+        return "wee_alloc::" in str(output_string_io)
 
 
 class CargoFile:

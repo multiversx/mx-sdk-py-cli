@@ -1,3 +1,4 @@
+from io import StringIO
 import logging
 import os
 import shutil
@@ -296,6 +297,21 @@ class Rust(DependencyModule):
 
     def get_latest_release(self) -> str:
         raise errors.UnsupportedConfigurationValue("Rust tag must either be explicit, empty or 'nightly'")
+
+
+class CargoModule(DependencyModule):
+    def __init__(self, key: str, aliases: List[str] = None):
+        if aliases is None:
+            aliases = list()
+
+        super().__init__(key, aliases)
+
+    def install(self, tag: str, overwrite: bool) -> None:
+        myprocess.run_process(["cargo", "install", self.key])
+
+    def is_installed(self, tag: str) -> bool:
+        output = myprocess.run_process(["cargo", "install", "--list"])
+        return self.key in output
 
 
 class MclSignerModule(StandaloneModule):

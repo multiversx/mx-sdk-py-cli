@@ -1,4 +1,5 @@
 import asyncio
+from io import StringIO
 import logging
 import subprocess
 import traceback
@@ -37,6 +38,11 @@ def run_process_async(
     loop.close()
     asyncio.set_event_loop(asyncio.new_event_loop())
     return result
+
+
+def check_return_code(return_code: ReturnCode) -> None:
+    if return_code != 0:
+        raise errors.BuildError(f"error code = {return_code}, see output")
 
 
 async def _async_subprocess(args, env, stdout_sink, stderr_sink, cwd: Optional[str]) -> ReturnCode:
@@ -104,3 +110,12 @@ class FileOutputSink(OutputSink):
             return
 
         self.file.close()
+
+
+class StringOutput(OutputSink):
+    def __init__(self, string_io: StringIO) -> None:
+        super().__init__()
+        self.string_io = string_io
+
+    def write(self, line: str):
+        self.string_io.write(line)

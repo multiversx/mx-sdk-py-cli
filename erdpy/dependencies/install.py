@@ -3,7 +3,7 @@ from pathlib import Path
 from typing import Dict, List
 
 from erdpy import config, errors
-from erdpy.dependencies.modules import (VMToolsModule, DependencyModule,
+from erdpy.dependencies.modules import (VMToolsModule, CargoModule, DependencyModule,
                                         GolangModule, MclSignerModule,
                                         NodejsModule, Rust, StandaloneModule)
 
@@ -45,15 +45,16 @@ def get_deps_dict() -> Dict[str, DependencyModule]:
 
 
 def get_all_deps() -> List[DependencyModule]:
+    return get_all_implicit_deps() + get_all_deps_installable_via_cli()
+
+
+def get_all_implicit_deps() -> List[DependencyModule]:
     return [
         StandaloneModule(key="llvm", aliases=["clang", "cpp"]),
-        VMToolsModule(key="vmtools"),
         Rust(key="rust"),
         NodejsModule(key="nodejs", aliases=[]),
-        StandaloneModule(key="elrond_go", repo_name="elrond-go", organisation="ElrondNetwork"),
-        StandaloneModule(key="elrond_proxy_go", repo_name="elrond-proxy-go", organisation="ElrondNetwork"),
         GolangModule(key="golang"),
-        MclSignerModule(key="mcl_signer")
+        CargoModule(key="twiggy")
     ]
 
 
@@ -64,7 +65,6 @@ def get_all_deps_installable_via_cli() -> List[DependencyModule]:
         StandaloneModule(key="elrond_proxy_go", repo_name="elrond-proxy-go", organisation="ElrondNetwork"),
         MclSignerModule(key="mcl_signer")
     ]
-
 
 
 def get_golang() -> GolangModule:

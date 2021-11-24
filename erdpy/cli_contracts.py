@@ -45,10 +45,13 @@ def setup_parser(args: List[str], subparsers: Any) -> Any:
     _add_recursive_arg(sub)
     sub.set_defaults(func=clean)
 
-    sub = cli_shared.add_command_subparser(subparsers, "contract", "size", "Print the Smart Contract's WASM file size.")
+    sub = cli_shared.add_command_subparser(subparsers, "contract", "report", "Print a report about various details regarding the Smart Contract.")
     _add_project_arg(sub)
     _add_recursive_arg(sub)
-    sub.set_defaults(func=size)
+    _add_flag("--all", help="prints all reports")
+    _add_flag("--size", help="report WASM file size")
+    _add_flag("--has-allocator", help="checks if wee_alloc is present")
+    sub.set_defaults(func=report)
 
     sub = cli_shared.add_command_subparser(subparsers, "contract", "test", "Run Mandos tests.")
     _add_project_arg(sub)
@@ -124,6 +127,10 @@ def _add_recursive_arg(sub: Any):
     sub.add_argument("-r", "--recursive", dest="recursive", action="store_true", help="locate projects recursively")
 
 
+def _add_flag(sub: Any, flag: str, help: str):
+    sub.add_argument(flag, action="store_true", default=False, help=help)
+
+
 def _add_project_or_bytecode_arg(sub: Any):
     group = sub.add_mutually_exclusive_group(required=True)
     group.add_argument("--project", default=os.getcwd(),
@@ -180,19 +187,11 @@ def clean(args: Any):
         projects.clean_project(project)
 
 
-def size(args: Any):
+def report(args: Any):
     project_paths = parse_project_paths(args)
-    command_base_path = Path(args.project).resolve()
-    wasm_sizes = [projects.get_wasm_size(project) for project in project_paths]
-    base_path_getter = operator.itemgetter(0)
-    wasm_sizes.sort(key=base_path_getter)
-    for base_path, subiter in itertools.groupby(wasm_sizes, base_path_getter):
-        relative_path = base_path.relative_to(command_base_path)
-        print(f"{relative_path}:")
-        for _, name, size in subiter:
-            print(f"{name} {size}")
-        print()
-
+    base_path = Path(args.project)
+    options = projects.build_report_options(args.all, args.size, args.has_allocator)
+    projects.print_report(base_path, project_paths, options)
 
 
 def build(args: Any):

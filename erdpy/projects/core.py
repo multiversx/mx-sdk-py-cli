@@ -1,6 +1,8 @@
+import itertools
+import operator
 from erdpy import dependencies
 import logging
-from typing import Any, Dict, List, Tuple
+from typing import Any, Callable, Dict, Iterable, Iterator, List, Optional, Tuple
 from pathlib import Path
 
 from erdpy import errors, utils, guards
@@ -51,11 +53,69 @@ def clean_project(directory: Path):
     logger.info("Project cleaned.")
 
 
-def get_wasm_size(directory: Path) -> Tuple[Path, str, str]:
-    directory = directory.expanduser()
-    guards.is_directory(directory)
-    project = load_project(directory)
-    return project.get_wasm_size()
+def group_projects_by_folder(project_paths: List[Path]) -> itertools.groupby[Path, Tuple[Path, Path]]:
+    path_pairs = [(path.parent, path) for path in project_paths]
+    path_pairs.sort()
+    return itertools.groupby(path_pairs, operator.itemgetter(0))
+
+
+def report_name(project: Project) -> str:
+    return project.path.name
+
+
+def str_or_default(field: Optional[Any], default: str = '-') -> str:
+    if field is None:
+        return default
+    return str(field)
+
+
+def report_size(project: Project) -> str:
+    size = project.get_wasm_size()
+    return str_or_default(size)
+
+
+def report_has_allocator(project: Project) -> str:
+    has_allocator = project.check_allocator()
+    return str_or_default(has_allocator)
+
+
+def print_strings(strings: List[str]) -> None:
+    joined_strings = " ".join(strings)
+    print(joined_strings)
+
+
+class ReportOption:
+    def __init__(self, name: str, call: Callable[[Project], str]) -> None:
+        self.name = name
+        self.call = call
+
+
+def build_report_options(all: bool, size: bool, has_allocator: bool) -> List[ReportOption]:
+    options = [ReportOption("name", report_name)]
+    if size or all:
+        options.append(ReportOption("size", report_size))
+    if has_allocator or all:
+        options.append(ReportOption("has_allocator", report_has_allocator))
+    return options
+
+
+def print_report(base_path: Path, project_paths: List[Path], options: List[ReportOption]) -> None:
+    base_path = base_path.resolve()
+
+    option_names = [option.name for option in options]
+    print_strings(option_names)
+
+    for parent_folder, iter in group_projects_by_folder(project_paths):
+        print(f"{parent_folder.relative_to(base_path)}:")
+
+        for _, project_path in iter:
+            project_path = project_path.expanduser()
+            project = load_project(project_path)
+
+            outputs = [option.call(project) for option in options]
+            print_strings(outputs)
+
+        print()
 
 
 def run_tests(args: Any):
