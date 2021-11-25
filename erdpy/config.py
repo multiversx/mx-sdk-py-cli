@@ -258,14 +258,15 @@ def get_dependency_parent_directory(key: str) -> Path:
 
 def get_latest_semver_from_directory(directory: Path) -> str:
     subdirs = [subdir.name for subdir in directory.iterdir()]
-    versions = parse_strings_to_semver(subdirs)
-    if len(versions) == 0:
+    try:
+        return get_latest_semver(subdirs)
+    except IndexError:
         raise Exception(f'no versions found in {directory}')
 
-    if len(versions) == 1:
-        latest_version = versions[0]
-    else:
-        latest_version = sorted(versions).pop()
+
+def get_latest_semver(versions: List[str]) -> str:
+    semantic_versions = parse_strings_to_semver(versions)
+    latest_version = sorted(semantic_versions).pop()
     return 'v' + str(latest_version)
 
 

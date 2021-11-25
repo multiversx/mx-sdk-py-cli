@@ -172,7 +172,7 @@ optional arguments:
   --ledger-account-index LEDGER_ACCOUNT_INDEX  🔐 the index of the account when using Ledger
   --ledger-address-index LEDGER_ADDRESS_INDEX  🔐 the index of the address when using Ledger
   --sender-username SENDER_USERNAME            🖄 the username of the sender
-  --proxy PROXY                                🔗 the URL of the proxy (default: https://testnet-api.elrond.com)
+  --proxy PROXY                                🔗 the URL of the proxy (default: https://testnet-gateway.elrond.com)
   --nonce NONCE                                # the nonce for the transaction
   --recall-nonce                               ⭮ whether to recall the nonce when creating the transaction (default:
                                                False)
@@ -214,7 +214,7 @@ optional arguments:
   --ledger-account-index LEDGER_ACCOUNT_INDEX  🔐 the index of the account when using Ledger
   --ledger-address-index LEDGER_ADDRESS_INDEX  🔐 the index of the address when using Ledger
   --sender-username SENDER_USERNAME            🖄 the username of the sender
-  --proxy PROXY                                🔗 the URL of the proxy (default: https://testnet-api.elrond.com)
+  --proxy PROXY                                🔗 the URL of the proxy (default: https://testnet-gateway.elrond.com)
   --nonce NONCE                                # the nonce for the transaction
   --recall-nonce                               ⭮ whether to recall the nonce when creating the transaction (default:
                                                False)
@@ -262,7 +262,7 @@ optional arguments:
   --ledger-account-index LEDGER_ACCOUNT_INDEX  🔐 the index of the account when using Ledger
   --ledger-address-index LEDGER_ADDRESS_INDEX  🔐 the index of the address when using Ledger
   --sender-username SENDER_USERNAME            🖄 the username of the sender
-  --proxy PROXY                                🔗 the URL of the proxy (default: https://testnet-api.elrond.com)
+  --proxy PROXY                                🔗 the URL of the proxy (default: https://testnet-gateway.elrond.com)
   --nonce NONCE                                # the nonce for the transaction
   --recall-nonce                               ⭮ whether to recall the nonce when creating the transaction (default:
                                                False)
@@ -295,7 +295,7 @@ positional arguments:
 
 optional arguments:
   -h, --help                             show this help message and exit
-  --proxy PROXY                          🔗 the URL of the proxy (default: https://testnet-api.elrond.com)
+  --proxy PROXY                          🔗 the URL of the proxy (default: https://testnet-gateway.elrond.com)
   --function FUNCTION                    the function to call
   --arguments ARGUMENTS [ARGUMENTS ...]  arguments for the contract transaction, as numbers or hex-encoded. E.g.
                                          --arguments 42 0x64 1000 0xabba
@@ -360,7 +360,7 @@ optional arguments:
   --send                                       ✓ whether to broadcast the transaction (default: False)
   --simulate                                   whether to simulate the transaction (default: False)
   --relay                                      whether to relay the transaction (default: False)
-  --proxy PROXY                                🔗 the URL of the proxy (default: https://testnet-api.elrond.com)
+  --proxy PROXY                                🔗 the URL of the proxy (default: https://testnet-gateway.elrond.com)
   --wait-result                                signal to wait for the transaction result - only valid if --send is set
   --timeout TIMEOUT                            max num of seconds to wait for result - only valid if --wait-result is
                                                set
@@ -379,7 +379,7 @@ optional arguments:
   -h, --help         show this help message and exit
   --infile INFILE    input file (a previously saved transaction)
   --outfile OUTFILE  where to save the output (the hash) (default: stdout)
-  --proxy PROXY      🔗 the URL of the proxy (default: https://testnet-api.elrond.com)
+  --proxy PROXY      🔗 the URL of the proxy (default: https://testnet-gateway.elrond.com)
 
 ```
 ### Transactions.Get
@@ -396,7 +396,7 @@ optional arguments:
   --hash HASH                the hash
   --sender SENDER            the sender address
   --with-results             will also return the results of transaction
-  --proxy PROXY              🔗 the URL of the proxy (default: https://testnet-api.elrond.com)
+  --proxy PROXY              🔗 the URL of the proxy (default: https://testnet-gateway.elrond.com)
   --omit-fields OMIT_FIELDS  omit fields in the output payload (default: [])
 
 ```
@@ -427,7 +427,7 @@ Get hyperblock
 
 optional arguments:
   -h, --help     show this help message and exit
-  --proxy PROXY  🔗 the URL of the proxy (default: https://testnet-api.elrond.com)
+  --proxy PROXY  🔗 the URL of the proxy (default: https://testnet-gateway.elrond.com)
   --key KEY      the hash or the nonce of the hyperblock
 
 ```
@@ -474,7 +474,7 @@ Stake value into the Network
 
 optional arguments:
   -h, --help                                   show this help message and exit
-  --proxy PROXY                                🔗 the URL of the proxy (default: https://testnet-api.elrond.com)
+  --proxy PROXY                                🔗 the URL of the proxy (default: https://testnet-gateway.elrond.com)
   --pem PEM                                    🔑 the PEM file, if keyfile not provided
   --pem-index PEM_INDEX                        🔑 the index in the PEM file (default: 0)
   --keyfile KEYFILE                            🔑 a JSON keyfile, if PEM not provided
@@ -512,7 +512,7 @@ Unstake value
 
 optional arguments:
   -h, --help                                   show this help message and exit
-  --proxy PROXY                                🔗 the URL of the proxy (default: https://testnet-api.elrond.com)
+  --proxy PROXY                                🔗 the URL of the proxy (default: https://testnet-gateway.elrond.com)
   --pem PEM                                    🔑 the PEM file, if keyfile not provided
   --pem-index PEM_INDEX                        🔑 the index in the PEM file (default: 0)
   --keyfile KEYFILE                            🔑 a JSON keyfile, if PEM not provided
@@ -548,7 +548,7 @@ Unjail a Validator Node
 
 optional arguments:
   -h, --help                                   show this help message and exit
-  --proxy PROXY                                🔗 the URL of the proxy (default: https://testnet-api.elrond.com)
+  --proxy PROXY                                🔗 the URL of the proxy (default: https://testnet-gateway.elrond.com)
   --pem PEM                                    🔑 the PEM file, if keyfile not provided
   --pem-index PEM_INDEX                        🔑 the index in the PEM file (default: 0)
   --keyfile KEYFILE                            🔑 a JSON keyfile, if PEM not provided
@@ -584,7 +584,7 @@ Unbond tokens for a bls key
 
 optional arguments:
   -h, --help                                   show this help message and exit
-  --proxy PROXY                                🔗 the URL of the proxy (default: https://testnet-api.elrond.com)
+  --proxy PROXY                                🔗 the URL of the proxy (default: https://testnet-gateway.elrond.com)
   --pem PEM                                    🔑 the PEM file, if keyfile not provided
   --pem-index PEM_INDEX                        🔑 the index in the PEM file (default: 0)
   --keyfile KEYFILE                            🔑 a JSON keyfile, if PEM not provided
@@ -620,7 +620,7 @@ Change the reward address
 
 optional arguments:
   -h, --help                                   show this help message and exit
-  --proxy PROXY                                🔗 the URL of the proxy (default: https://testnet-api.elrond.com)
+  --proxy PROXY                                🔗 the URL of the proxy (default: https://testnet-gateway.elrond.com)
   --pem PEM                                    🔑 the PEM file, if keyfile not provided
   --pem-index PEM_INDEX                        🔑 the index in the PEM file (default: 0)
   --keyfile KEYFILE                            🔑 a JSON keyfile, if PEM not provided
@@ -656,7 +656,7 @@ Claim rewards
 
 optional arguments:
   -h, --help                                   show this help message and exit
-  --proxy PROXY                                🔗 the URL of the proxy (default: https://testnet-api.elrond.com)
+  --proxy PROXY                                🔗 the URL of the proxy (default: https://testnet-gateway.elrond.com)
   --pem PEM                                    🔑 the PEM file, if keyfile not provided
   --pem-index PEM_INDEX                        🔑 the index in the PEM file (default: 0)
   --keyfile KEYFILE                            🔑 a JSON keyfile, if PEM not provided
@@ -713,7 +713,7 @@ Query account details (nonce, balance etc.)
 
 optional arguments:
   -h, --help                 show this help message and exit
-  --proxy PROXY              🔗 the URL of the proxy (default: https://testnet-api.elrond.com)
+  --proxy PROXY              🔗 the URL of the proxy (default: https://testnet-gateway.elrond.com)
   --address ADDRESS          🖄 the address to query
   --balance                  whether to only fetch the balance
   --nonce                    whether to only fetch the nonce
@@ -732,7 +732,7 @@ Query account transactions
 
 optional arguments:
   -h, --help         show this help message and exit
-  --proxy PROXY      🔗 the URL of the proxy (default: https://testnet-api.elrond.com)
+  --proxy PROXY      🔗 the URL of the proxy (default: https://testnet-gateway.elrond.com)
   --outfile OUTFILE  where to save the output (default: stdout)
   --address ADDRESS  🖄 the address to query
 
@@ -921,7 +921,7 @@ Get the number of shards.
 
 optional arguments:
   -h, --help     show this help message and exit
-  --proxy PROXY  🔗 the URL of the proxy (default: https://testnet-api.elrond.com)
+  --proxy PROXY  🔗 the URL of the proxy (default: https://testnet-gateway.elrond.com)
 
 ```
 ### Network.BlockNonce
@@ -935,7 +935,7 @@ Get the latest block nonce, by shard.
 
 optional arguments:
   -h, --help     show this help message and exit
-  --proxy PROXY  🔗 the URL of the proxy (default: https://testnet-api.elrond.com)
+  --proxy PROXY  🔗 the URL of the proxy (default: https://testnet-gateway.elrond.com)
   --shard SHARD  the shard ID (use 4294967295 for metachain)
 
 ```
@@ -950,7 +950,7 @@ Get the chain identifier.
 
 optional arguments:
   -h, --help     show this help message and exit
-  --proxy PROXY  🔗 the URL of the proxy (default: https://testnet-api.elrond.com)
+  --proxy PROXY  🔗 the URL of the proxy (default: https://testnet-gateway.elrond.com)
 
 ```
 ## Group **Cost**
@@ -988,7 +988,7 @@ Query minimum gas price
 
 optional arguments:
   -h, --help     show this help message and exit
-  --proxy PROXY  🔗 the URL of the proxy (default: https://testnet-api.elrond.com)
+  --proxy PROXY  🔗 the URL of the proxy (default: https://testnet-gateway.elrond.com)
 
 ```
 ### Cost.TxTransfer
@@ -1002,7 +1002,7 @@ Query cost of regular transaction (transfer)
 
 optional arguments:
   -h, --help     show this help message and exit
-  --proxy PROXY  🔗 the URL of the proxy (default: https://testnet-api.elrond.com)
+  --proxy PROXY  🔗 the URL of the proxy (default: https://testnet-gateway.elrond.com)
   --data DATA    a transaction payload, required to estimate the cost
 
 ```
@@ -1017,7 +1017,7 @@ Query cost of Smart Contract deploy transaction
 
 optional arguments:
   -h, --help                             show this help message and exit
-  --proxy PROXY                          🔗 the URL of the proxy (default: https://testnet-api.elrond.com)
+  --proxy PROXY                          🔗 the URL of the proxy (default: https://testnet-gateway.elrond.com)
   --project PROJECT                      🗀 the project directory (default: current directory)
   --bytecode BYTECODE                    the file containing the WASM bytecode
   --arguments ARGUMENTS [ARGUMENTS ...]  arguments for the contract transaction, as numbers or hex-encoded. E.g.
@@ -1038,7 +1038,7 @@ positional arguments:
 
 optional arguments:
   -h, --help                             show this help message and exit
-  --proxy PROXY                          🔗 the URL of the proxy (default: https://testnet-api.elrond.com)
+  --proxy PROXY                          🔗 the URL of the proxy (default: https://testnet-gateway.elrond.com)
   --function FUNCTION                    the function to call
   --arguments ARGUMENTS [ARGUMENTS ...]  arguments for the contract transaction, as numbers or hex-encoded. E.g.
                                          --arguments 42 0x64 1000 0xabba
@@ -1101,7 +1101,7 @@ Dispatch queued transactions
 
 optional arguments:
   -h, --help                                   show this help message and exit
-  --proxy PROXY                                🔗 the URL of the proxy (default: https://testnet-api.elrond.com)
+  --proxy PROXY                                🔗 the URL of the proxy (default: https://testnet-gateway.elrond.com)
   --pem PEM                                    🔑 the PEM file, if keyfile not provided
   --pem-index PEM_INDEX                        🔑 the index in the PEM file (default: 0)
   --keyfile KEYFILE                            🔑 a JSON keyfile, if PEM not provided
@@ -1123,7 +1123,7 @@ Continuously dispatch queued transactions
 
 optional arguments:
   -h, --help                                   show this help message and exit
-  --proxy PROXY                                🔗 the URL of the proxy (default: https://testnet-api.elrond.com)
+  --proxy PROXY                                🔗 the URL of the proxy (default: https://testnet-gateway.elrond.com)
   --pem PEM                                    🔑 the PEM file, if keyfile not provided
   --pem-index PEM_INDEX                        🔑 the index in the PEM file (default: 0)
   --keyfile KEYFILE                            🔑 a JSON keyfile, if PEM not provided
