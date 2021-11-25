@@ -1,5 +1,6 @@
 import semver
-from erdpy.dependencies.modules import StandaloneModule
+import pytest
+from erdpy.config import get_latest_semver
 
 
 def test_semver_parsing():
@@ -12,6 +13,12 @@ def test_semver_parsing():
 
 
 def test_semver_sorting():
-    folders = ['master', 'development', 'v1.2.3', 'v1.3.19', 'v0.1.1-beta.2']
-    latest = StandaloneModule.get_latest_semver_from_folder_list(folders)
+    versions = ['master', 'development', 'v1.2.3', 'v1.3.19', 'v0.1.1-beta.2']
+    latest = get_latest_semver(versions)
     assert latest == 'v1.3.19'
+
+
+def test_latest_semver_raises_for_empty_list():
+    versions = []
+    with pytest.raises(IndexError):
+        get_latest_semver(versions)
