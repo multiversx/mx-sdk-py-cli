@@ -30,7 +30,7 @@ class Project:
     def get_wasm_size(self) -> Optional[int]:
         try:
             wasm_file = self.get_file_wasm()
-            return wasm_file.stat().st_size
+            return int(wasm_file.stat().st_size)
         except errors.KnownError:
             return None
 

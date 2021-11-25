@@ -48,9 +48,9 @@ def setup_parser(args: List[str], subparsers: Any) -> Any:
     sub = cli_shared.add_command_subparser(subparsers, "contract", "report", "Print a report about various details regarding the Smart Contract.")
     _add_project_arg(sub)
     _add_recursive_arg(sub)
-    _add_flag("--all", help="prints all reports")
-    _add_flag("--size", help="report WASM file size")
-    _add_flag("--has-allocator", help="checks if wee_alloc is present")
+    _add_flag(sub, "--all", help="prints all reports")
+    _add_flag(sub, "--size", help="report WASM file size")
+    _add_flag(sub, "--has-allocator", help="checks if wee_alloc is present")
     sub.set_defaults(func=report)
 
     sub = cli_shared.add_command_subparser(subparsers, "contract", "test", "Run Mandos tests.")

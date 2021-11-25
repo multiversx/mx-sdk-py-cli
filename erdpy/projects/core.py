@@ -53,7 +53,7 @@ def clean_project(directory: Path):
     logger.info("Project cleaned.")
 
 
-def group_projects_by_folder(project_paths: List[Path]) -> itertools.groupby[Path, Tuple[Path, Path]]:
+def group_projects_by_folder(project_paths: List[Path]) -> Iterable[Tuple[Path, Iterable[Tuple[Path, Path]]]]:
     path_pairs = [(path.parent, path) for path in project_paths]
     path_pairs.sort()
     return itertools.groupby(path_pairs, operator.itemgetter(0))
