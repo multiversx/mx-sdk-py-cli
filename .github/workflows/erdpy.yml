@@ -34,7 +34,7 @@ jobs:
       run: |
         export PYTHONPATH=.
         python3 -m unittest discover -s erdpy/tests
-        pytest ./erdpy/tests/test_testnet.py -s
+        pytest .
     - name: Run CLI tests
       run: |
         cd ./erdpy/tests
