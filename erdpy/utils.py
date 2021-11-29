@@ -239,7 +239,7 @@ def query_latest_release_tag(repo: str) -> str:
     Queries the Github API to retrieve the latest released tag of the specified
     repository. The repository must be of the form 'organisation/project'.
     """
-    url = f'https://api.github.com/repos/{repo}/releases/latest'
+    url = f'https://api.github.com/repos/{repo}/releases'
 
     github_api_token = erdpy.config.get_value('github_api_token')
     headers = dict()
@@ -249,8 +249,12 @@ def query_latest_release_tag(repo: str) -> str:
     response = requests.get(url, headers=headers)
     response.raise_for_status()
 
-    latest_release_tag = str(response.json()['tag_name'])
-    return latest_release_tag
+    release_tags = [str(release['tag_name']) for release in response.json()]
+    try:
+        latest_release_tag = erdpy.config.get_latest_semver(release_tags)
+        return latest_release_tag
+    except IndexError:
+        raise Exception(f"no releases in {repo}")
 
 
 # https://code.visualstudio.com/docs/python/debugging

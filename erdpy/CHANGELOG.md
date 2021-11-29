@@ -4,6 +4,10 @@ All notable changes will be documented in this file.
 
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
+## [1.0.23] - 29.11.2021
+ - Fix - when specifying `latest` for a dependency, get the highest semantic version instead of the most recent release
+ - Fix github actions to run `pytest` tests as well
+
 ## [1.0.22] - 22.11.2021
  - Fix the patching of the `meta` subproject
  - Add a check when signing transactions so that the gas limit is below the maximum allowed
