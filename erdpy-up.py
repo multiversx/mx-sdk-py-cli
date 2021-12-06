@@ -11,8 +11,7 @@ from argparse import ArgumentParser
 logger = logging.getLogger("installer")
 
 MIN_REQUIRED_PYTHON_MAJOR_VERSION = 3
-MIN_REQUIRED_PYTHON_MINOR_VERSION = 6
-MIN_REQUIRED_PYTHON_MINOR_VERSION_MACOS = 8
+MIN_REQUIRED_PYTHON_MINOR_VERSION = 8
 
 elrondsdk_path = None
 exact_version = None
@@ -51,9 +50,7 @@ def main():
     logger.info("Checking Python version.")
     logger.info(f"Python version: {sys.version_info}")
     if python_major_version < MIN_REQUIRED_PYTHON_MAJOR_VERSION or (python_major_version >= MIN_REQUIRED_PYTHON_MAJOR_VERSION and python_minor_version < MIN_REQUIRED_PYTHON_MINOR_VERSION):
-        raise InstallError("You need Python 3.6 or later.")
-    if operating_system == "osx" and python_minor_version < MIN_REQUIRED_PYTHON_MINOR_VERSION_MACOS:
-        raise InstallError("On MacOS, you need Python 3.8 or later.")
+        raise InstallError(f"You need Python 3.8 or later.")
 
     logger.info("Checking operating system.")
     logger.info(f"Operating system: {operating_system}")
