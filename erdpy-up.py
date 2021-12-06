@@ -7,11 +7,11 @@ import subprocess
 import sys
 import json
 from argparse import ArgumentParser
+from packaging import version
 
 logger = logging.getLogger("installer")
 
-MIN_REQUIRED_PYTHON_MAJOR_VERSION = 3
-MIN_REQUIRED_PYTHON_MINOR_VERSION = 8
+MIN_REQUIRED_PYTHON_VERSION = '3.8'
 
 elrondsdk_path = None
 exact_version = None
@@ -40,17 +40,17 @@ def main():
     logging.basicConfig(level=logging.DEBUG)
 
     operating_system = get_operating_system()
-    python_major_version = sys.version_info.major
-    python_minor_version = sys.version_info.minor
+    python_version = version.parse(f"{sys.version_info.major}.{sys.version_info.minor}.{sys.version_info.micro}")
 
     logger.info("Checking user.")
     if os.getuid() == 0:
         raise InstallError("You should not install erdpy as root.")
 
     logger.info("Checking Python version.")
-    logger.info(f"Python version: {sys.version_info}")
-    if python_major_version < MIN_REQUIRED_PYTHON_MAJOR_VERSION or (python_major_version >= MIN_REQUIRED_PYTHON_MAJOR_VERSION and python_minor_version < MIN_REQUIRED_PYTHON_MINOR_VERSION):
-        raise InstallError(f"You need Python 3.8 or later.")
+    logger.info(f"Python version: {python_version}")
+    minimum_required_python_version = version.parse(MIN_REQUIRED_PYTHON_VERSION)
+    if python_version < minimum_required_python_version:
+        raise InstallError(f"You need Python {minimum_required_python_version} or later.")
 
     logger.info("Checking operating system.")
     logger.info(f"Operating system: {operating_system}")
@@ -132,10 +132,11 @@ def require_venv():
     except ModuleNotFoundError:
         if operating_system == "linux":
             logger.info("Package [venv] or [ensurepip] not found, will be installed.")
-            logger.info("Running [$ sudo apt-get install python3.8-venv]:")
-            return_code = os.system("sudo apt-get install python3.8-venv")
+            python_venv = f"python{sys.version_info.major}.{sys.version_info.minor}-venv"
+            logger.info(f"Running [$ sudo apt-get install {python_venv}]:")
+            return_code = os.system(f"sudo apt-get install {python_venv}")
             if return_code == 0:
-                logger.info("Done installing [python3.8-venv].")
+                logger.info(f"Done installing [{python_venv}].")
             else:
                 raise InstallError("Packages [venv] or [ensurepip] not installed correctly.")
         else:
