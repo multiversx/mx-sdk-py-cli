@@ -135,10 +135,10 @@ def require_venv():
     except ModuleNotFoundError:
         if operating_system == "linux":
             logger.info("Package [venv] or [ensurepip] not found, will be installed.")
-            logger.info("Running [$ sudo apt-get install python3-venv]:")
-            return_code = os.system("sudo apt-get install python3-venv")
+            logger.info("Running [$ sudo apt-get install python3.8-venv]:")
+            return_code = os.system("sudo apt-get install python3.8-venv")
             if return_code == 0:
-                logger.info("Done installing [python3-venv].")
+                logger.info("Done installing [python3.8-venv].")
             else:
                 raise InstallError("Packages [venv] or [ensurepip] not installed correctly.")
         else:
