@@ -131,14 +131,8 @@ def require_venv():
         logger.info(f"Packages found: {ensurepip}, {venv}.")
     except ModuleNotFoundError:
         if operating_system == "linux":
-            logger.info("Package [venv] or [ensurepip] not found, will be installed.")
             python_venv = f"python{sys.version_info.major}.{sys.version_info.minor}-venv"
-            logger.info(f"Running [$ sudo apt-get install {python_venv}]:")
-            return_code = os.system(f"sudo apt-get install {python_venv}")
-            if return_code == 0:
-                logger.info(f"Done installing [{python_venv}].")
-            else:
-                raise InstallError("Packages [venv] or [ensurepip] not installed correctly.")
+            raise InstallError(f'Packages [venv] or [ensurepip] not found. Try installing them by running: "sudo apt-get install {python_venv}"')
         else:
             raise InstallError("Packages [venv] or [ensurepip] not found, please install them first. See https://docs.python.org/3/tutorial/venv.html.")
 
