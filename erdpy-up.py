@@ -132,7 +132,7 @@ def require_venv():
     except ModuleNotFoundError:
         if operating_system == "linux":
             python_venv = f"python{sys.version_info.major}.{sys.version_info.minor}-venv"
-            raise InstallError(f'Packages [venv] or [ensurepip] not found. Please run "sudo apt-get install {python_venv}" and then run erdpy-up again.')
+            raise InstallError(f'Packages [venv] or [ensurepip] not found. Please run "sudo apt install {python_venv}" and then run erdpy-up again.')
         else:
             raise InstallError("Packages [venv] or [ensurepip] not found, please install them first. See https://docs.python.org/3/tutorial/venv.html.")
 
