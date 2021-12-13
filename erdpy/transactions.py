@@ -2,7 +2,7 @@ import base64
 import json
 import logging
 from collections import OrderedDict
-from typing import Any, Dict, List, TextIO
+from typing import Any, Dict, List, TextIO, Union
 
 from erdpy import config, errors, utils
 from erdpy.accounts import Account, Address, LedgerAccount
@@ -49,8 +49,8 @@ class Transaction(ITransaction):
         return self._field_decoded("receiverUsername")
 
     def _field_encoded(self, field: str) -> str:
-        bytes = self.__dict__.get(field, None).encode("utf-8")
-        encoded = base64.b64encode(bytes).decode()
+        field_bytes = self.__dict__.get(field, None).encode("utf-8")
+        encoded = base64.b64encode(field_bytes).decode()
         return encoded
 
     def _field_decoded(self, field: str) -> str:
@@ -179,6 +179,12 @@ class Transaction(ITransaction):
     def wrap_inner(self, inner: ITransaction) -> None:
         self.data = inner.serialize_as_inner()
 
+    def set_version(self, version: int):
+        self.version = version
+
+    def set_options(self, options: int):
+        self.options = options
+
 
 class BunchOfTransactions:
     def __init__(self):
@@ -217,7 +223,7 @@ class BunchOfTransactions:
 
 
 def do_prepare_transaction(args: Any) -> Transaction:
-    account = Account()
+    account: Union[Account, LedgerAccount] = Account()
     if args.ledger:
         account = LedgerAccount(account_index=args.ledger_account_index, address_index=args.ledger_address_index)
     if args.pem:

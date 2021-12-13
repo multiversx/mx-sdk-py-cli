@@ -25,11 +25,14 @@ class ITransaction:
     def to_dictionary_as_inner(self) -> Dict[str, Any]:
         return {}
 
+    def set_version(self, version: int):
+        return
+
+    def set_options(self, options: int):
+        return
+
 
 class IAccount:
-    def get_secret_key(self) -> bytes:
-        return bytes()
-
     def sign_transaction(self, transaction: ITransaction) -> str:
         return ""
 

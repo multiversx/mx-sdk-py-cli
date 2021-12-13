@@ -1,19 +1,17 @@
 import logging
-from binascii import unhexlify
 from pathlib import Path
 from typing import Any, Optional
 
 import nacl.signing
 
 from erdpy import constants, errors, utils
-from erdpy.errors import LedgerError
 from erdpy.interfaces import IAccount, IAddress, ITransaction
 from erdpy.ledger.config import compare_versions
 from erdpy.ledger.ledger_app_handler import SIGN_USING_HASH_VERSION
-from erdpy.wallet import bech32, generate_pair, pem
-from erdpy.wallet.keyfile import get_password, load_from_key_file
 from erdpy.ledger.ledger_functions import do_get_ledger_address, do_sign_transaction_with_ledger, do_get_ledger_version, \
     TX_HASH_SIGN_VERSION, TX_HASH_SIGN_OPTIONS
+from erdpy.wallet import bech32, generate_pair, pem
+from erdpy.wallet.keyfile import get_password, load_from_key_file
 
 logger = logging.getLogger("accounts")
 
@@ -77,41 +75,31 @@ class Account(IAccount):
         self.nonce = proxy.get_account_nonce(self.address)
         logger.info(f"Account.sync_nonce() done: {self.nonce}")
 
-    def get_secret_key(self) -> bytes:
-        if self.ledger:
-            raise LedgerError("cannot get seed from a Ledger account")
-        return unhexlify(self.secret_key)
-
     def sign_transaction(self, transaction: ITransaction) -> str:
-        secret_key = self.get_secret_key()
+        secret_key = bytes.fromhex(self.secret_key)
         signing_key: Any = nacl.signing.SigningKey(secret_key)
 
         data_json = transaction.serialize()
         signed = signing_key.sign(data_json)
         signature = signed.signature
-        signature_hex = signature.hex()
-        assert isinstance(signature_hex, str)
+        assert isinstance(signature, bytes)
 
-        return signature_hex
+        return signature.hex()
 
 
-class LedgerAccount(IAccount):
-    def __init__(self,
-                 account_index: int = 0,
-                 address_index: int = 0,
-                 ):
+class LedgerAccount(Account):
+    def __init__(self, account_index: int = 0, address_index: int = 0):
+        super().__init__()
         self.account_index = account_index
         self.address_index = address_index
-        self.nonce: int = 0
         self.address = Address(do_get_ledger_address(account_index=account_index, address_index=address_index))
 
     def sign_transaction(self, transaction: ITransaction) -> str:
         ledger_version = do_get_ledger_version()
         should_use_hash_signing = compare_versions(ledger_version, SIGN_USING_HASH_VERSION) >= 0
         if should_use_hash_signing:
-            transaction.version = TX_HASH_SIGN_VERSION
-            transaction.options = TX_HASH_SIGN_OPTIONS
-        transaction.signature = ""
+            transaction.set_version(TX_HASH_SIGN_VERSION)
+            transaction.set_options(TX_HASH_SIGN_OPTIONS)
 
         signature = do_sign_transaction_with_ledger(transaction.serialize(),
                                                     account_index=self.account_index,
@@ -120,11 +108,6 @@ class LedgerAccount(IAccount):
         assert isinstance(signature, str)
 
         return signature
-
-    def sync_nonce(self, proxy: Any):
-        logger.info("Account.sync_nonce()")
-        self.nonce = proxy.get_account_nonce(self.address)
-        logger.info(f"Account.sync_nonce() done: {self.nonce}")
 
 
 class Address(IAddress):
