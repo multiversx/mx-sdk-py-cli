@@ -1,4 +1,3 @@
-
 from typing import Any, Dict, List, Tuple
 
 
@@ -10,11 +9,6 @@ class IAddress:
         return ""
 
     def pubkey(self) -> bytes:
-        return bytes()
-
-
-class IAccount:
-    def get_secret_key(self) -> bytes:
         return bytes()
 
 
@@ -30,6 +24,14 @@ class ITransaction:
 
     def to_dictionary_as_inner(self) -> Dict[str, Any]:
         return {}
+
+
+class IAccount:
+    def get_secret_key(self) -> bytes:
+        return bytes()
+
+    def sign_transaction(self, transaction: ITransaction) -> str:
+        return ""
 
 
 class IElrondProxy:
