@@ -6,7 +6,7 @@ from typing import Any, Dict, List, TextIO
 
 from erdpy import config, errors, utils
 from erdpy.accounts import Account, Address, LedgerAccount
-from erdpy.interfaces import IElrondProxy, ITransaction
+from erdpy.interfaces import IElrondProxy, ITransaction, IAccount
 
 logger = logging.getLogger("transactions")
 
@@ -217,7 +217,7 @@ class BunchOfTransactions:
 
 
 def do_prepare_transaction(args: Any) -> Transaction:
-    account = Account()
+    account = IAccount()
     if args.ledger:
         account = LedgerAccount(account_index=args.ledger_account_index, address_index=args.ledger_address_index)
     if args.pem:

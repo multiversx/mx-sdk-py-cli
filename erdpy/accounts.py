@@ -4,6 +4,7 @@ from pathlib import Path
 from typing import Any, Optional
 
 import nacl.signing
+from erdpy.transactions import Transaction
 
 from erdpy import constants, errors, utils
 from erdpy.errors import LedgerError
@@ -105,7 +106,7 @@ class LedgerAccount(IAccount):
         self.nonce: int = 0
         self.address = Address(do_get_ledger_address(account_index=account_index, address_index=address_index))
 
-    def sign_transaction(self, transaction: ITransaction) -> str:
+    def sign_transaction(self, transaction: Transaction) -> str:
         ledger_version = do_get_ledger_version()
         should_use_hash_signing = compare_versions(ledger_version, SIGN_USING_HASH_VERSION) >= 0
         if should_use_hash_signing:

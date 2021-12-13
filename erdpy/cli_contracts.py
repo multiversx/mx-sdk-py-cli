@@ -4,6 +4,8 @@ from typing import Any, List
 
 from pathlib import Path
 
+from erdpy.interfaces import IAccount
+
 from erdpy import cli_shared, errors, projects, utils
 from erdpy.accounts import Account, Address, LedgerAccount
 from erdpy.contracts import CodeMetadata, SmartContract
@@ -234,7 +236,7 @@ def _prepare_contract(args: Any) -> SmartContract:
     return contract
 
 
-def _prepare_sender(args: Any) -> Account:
+def _prepare_sender(args: Any) -> IAccount:
     if args.ledger:
         sender = LedgerAccount(account_index=args.ledger_account_index, address_index=args.ledger_address_index)
     elif args.pem:
