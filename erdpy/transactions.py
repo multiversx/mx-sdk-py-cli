@@ -223,7 +223,7 @@ class BunchOfTransactions:
 
 
 def do_prepare_transaction(args: Any) -> Transaction:
-    account: Union[Account, LedgerAccount] = Account()
+    account = Account()
     if args.ledger:
         account = LedgerAccount(account_index=args.ledger_account_index, address_index=args.ledger_address_index)
     if args.pem:

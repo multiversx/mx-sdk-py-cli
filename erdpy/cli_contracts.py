@@ -250,7 +250,7 @@ def _prepare_contract(args: Any) -> SmartContract:
 
 
 def _prepare_sender(args: Any) -> Account:
-    sender: Union[Account, LedgerAccount]
+    sender: Account
     if args.ledger:
         sender = LedgerAccount(account_index=args.ledger_account_index, address_index=args.ledger_address_index)
     elif args.pem:
