@@ -13,7 +13,6 @@ testCreateContracts() {
 
     ${ERDPY} contract new --template adder --directory ${SANDBOX} myadder-rs || return 1
     ${ERDPY} contract new --template factorial --directory ${SANDBOX} myfactorial-rs || return 1
-    ${ERDPY} contract new --template erc20 --directory ${SANDBOX} myerc20-rs || return 1
     ${ERDPY} contract new --template crypto-bubbles --directory ${SANDBOX} mybubbles-rs || return 1
     ${ERDPY} contract new --template lottery-esdt --directory ${SANDBOX} mylottery-rs || return 1
     ${ERDPY} contract new --template crowdfunding-esdt --directory ${SANDBOX} myfunding-rs || return 1
@@ -41,10 +40,6 @@ testBuildContracts() {
     assertFileExists ${SANDBOX}/myfactorial-rs/output/myfactorial-rs.wasm || return 1
     assertFileExists ${SANDBOX}/myfactorial-rs/output/myfactorial-rs.abi.json || return 1
 
-    ${ERDPY} contract build ${SANDBOX}/myerc20-rs --cargo-target-dir=${TARGET_DIR} || return 1
-    assertFileExists ${SANDBOX}/myerc20-rs/output/myerc20-rs.wasm || return 1
-    assertFileExists ${SANDBOX}/myerc20-rs/output/myerc20-rs.abi.json || return 1
-
     ${ERDPY} contract build ${SANDBOX}/mybubbles-rs --cargo-target-dir=${TARGET_DIR} || return 1
     assertFileExists ${SANDBOX}/mybubbles-rs/output/mybubbles-rs.wasm || return 1
     assertFileExists ${SANDBOX}/mybubbles-rs/output/mybubbles-rs.abi.json || return 1
@@ -60,7 +55,6 @@ testBuildContracts() {
 
 testRunMandos() {
     ${ERDPY} --verbose contract test --directory="mandos" ${SANDBOX}/myadder-rs || return 1
-    ${ERDPY} --verbose contract test --directory="mandos" ${SANDBOX}/myerc20-rs || return 1
     ${ERDPY} --verbose contract test --directory="mandos" ${SANDBOX}/mybubbles-rs || return 1
     ${ERDPY} --verbose contract test --directory="mandos" ${SANDBOX}/mylottery-rs || return 1
     ${ERDPY} --verbose contract test --directory="mandos" ${SANDBOX}/myfunding-rs || return 1
@@ -75,10 +69,6 @@ testCleanContracts() {
     ${ERDPY} contract clean ${SANDBOX}/mycounter-c || return 1
     assertFileDoesNotExist ${SANDBOX}/mycounter-c/output/counter.wasm || return 1
 
-    assertFileExists ${SANDBOX}/myerc20-c/output/erc20.wasm || return 1
-    ${ERDPY} contract clean ${SANDBOX}/myerc20-c || return 1
-    assertFileDoesNotExist ${SANDBOX}/myerc20-c/output/erc20.wasm || return 1
-
     assertFileExists ${SANDBOX}/myadder-rs/output/myadder-rs.wasm || return 1
     assertFileExists ${SANDBOX}/myadder-rs/output/myadder-rs.abi.json || return 1
     ${ERDPY} contract clean ${SANDBOX}/myadder-rs || return 1
@@ -90,12 +80,6 @@ testCleanContracts() {
     ${ERDPY} contract clean ${SANDBOX}/myfactorial-rs || return 1
     assertFileDoesNotExist ${SANDBOX}/myfactorial-rs/output/myfactorial-rs.wasm || return 1
     assertFileDoesNotExist ${SANDBOX}/myfactorial-rs/output/myfactorial-rs.abi.json || return 1
-
-    assertFileExists ${SANDBOX}/myerc20-rs/output/myerc20-rs.wasm || return 1
-    assertFileExists ${SANDBOX}/myerc20-rs/output/myerc20-rs.abi.json || return 1
-    ${ERDPY} contract clean ${SANDBOX}/myerc20-rs || return 1
-    assertFileDoesNotExist ${SANDBOX}/myerc20-rs/output/myerc20-rs.wasm || return 1
-    assertFileDoesNotExist ${SANDBOX}/myerc20-rs/output/myerc20-rs.abi.json || return 1
 
     assertFileExists ${SANDBOX}/mybubbles-rs/output/mybubbles-rs.wasm || return 1
     assertFileExists ${SANDBOX}/mybubbles-rs/output/mybubbles-rs.abi.json || return 1
