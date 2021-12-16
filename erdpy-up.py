@@ -7,11 +7,11 @@ import subprocess
 import sys
 import json
 from argparse import ArgumentParser
-from packaging import version
+from typing import Tuple
 
 logger = logging.getLogger("installer")
 
-MIN_REQUIRED_PYTHON_VERSION = '3.8'
+MIN_REQUIRED_PYTHON_VERSION = (3, 8, 0)
 
 elrondsdk_path = None
 exact_version = None
@@ -40,17 +40,16 @@ def main():
     logging.basicConfig(level=logging.DEBUG)
 
     operating_system = get_operating_system()
-    python_version = version.parse(f"{sys.version_info.major}.{sys.version_info.minor}.{sys.version_info.micro}")
+    python_version = (sys.version_info.major, sys.version_info.minor, sys.version_info.micro)
 
     logger.info("Checking user.")
     if os.getuid() == 0:
         raise InstallError("You should not install erdpy as root.")
 
     logger.info("Checking Python version.")
-    logger.info(f"Python version: {python_version}")
-    minimum_required_python_version = version.parse(MIN_REQUIRED_PYTHON_VERSION)
-    if python_version < minimum_required_python_version:
-        raise InstallError(f"You need Python {minimum_required_python_version} or later.")
+    logger.info(f"Python version: {format_version(python_version)}")
+    if python_version < MIN_REQUIRED_PYTHON_VERSION:
+        raise InstallError(f"You need Python {format_version(MIN_REQUIRED_PYTHON_VERSION)} or later.")
 
     logger.info("Checking operating system.")
     logger.info(f"Operating system: {operating_system}")
@@ -68,6 +67,11 @@ Upon restarting the user session, [$ erdpy] command should be available in your 
 Furthermore, after restarting the user session, you can use [$ source erdpy-activate] to activate the Python virtual environment containing erdpy.
 ###############################################################################
 """)
+
+
+def format_version(version: Tuple[int, int, int]) -> str:
+    major, minor, patch = version
+    return f"{major}.{minor}.{patch}"
 
 
 def get_operating_system():
