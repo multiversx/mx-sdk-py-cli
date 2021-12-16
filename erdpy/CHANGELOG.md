@@ -4,6 +4,10 @@ All notable changes will be documented in this file.
 
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
+## [1.0.24] - 16.12.2021
+ - Refactor and fix Ledger signing
+ - Remove tests for ERC20 contracts, they have been deprecated
+
 ## [1.0.23] - 29.11.2021
  - Fix - when specifying `latest` for a dependency, get the highest semantic version instead of the most recent release
  - Fix github actions to run `pytest` tests as well
