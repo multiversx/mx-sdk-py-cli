@@ -4,6 +4,7 @@ from erdpy.errors import LedgerError
 from erdpy.ledger.config import load_ledger_config_from_response, ElrondLedgerAppConfiguration
 
 SIGN_USING_HASH_VERSION = "1.0.11"
+CONNECTION_ERROR_MSG = "check if device is plugged in, unlocked and on Elrond app"
 
 
 class Apdu:
@@ -16,7 +17,10 @@ class Apdu:
 
 class ElrondLedgerApp:
     def __init__(self):
-        self.transport = Transport(interface="hid", debug=False)  # Nano S/X using HID interface
+        try:
+            self.transport = Transport(interface="hid", debug=False)  # Nano S/X using HID interface
+        except:
+            raise LedgerError(CONNECTION_ERROR_MSG)
 
     def close(self):
         self.transport.close()
@@ -38,7 +42,7 @@ class ElrondLedgerApp:
 
         err = get_error(sw)
         if err != '':
-            raise LedgerError(err)
+            raise LedgerError(CONNECTION_ERROR_MSG + " (" + err + ")")
 
         response_body = response[1:]
         address = response_body.decode("utf-8")
@@ -49,7 +53,7 @@ class ElrondLedgerApp:
         sw, response = self.transport.recv()
         err = get_error(sw)
         if err != '':
-            raise LedgerError(err)
+            raise LedgerError(CONNECTION_ERROR_MSG + " (" + err + ")")
         return load_ledger_config_from_response(response)
 
     def get_version(self) -> str:

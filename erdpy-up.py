@@ -7,12 +7,11 @@ import subprocess
 import sys
 import json
 from argparse import ArgumentParser
+from typing import Tuple
 
 logger = logging.getLogger("installer")
 
-MIN_REQUIRED_PYTHON_MAJOR_VERSION = 3
-MIN_REQUIRED_PYTHON_MINOR_VERSION = 6
-MIN_REQUIRED_PYTHON_MINOR_VERSION_MACOS = 8
+MIN_REQUIRED_PYTHON_VERSION = (3, 8, 0)
 
 elrondsdk_path = None
 exact_version = None
@@ -41,19 +40,16 @@ def main():
     logging.basicConfig(level=logging.DEBUG)
 
     operating_system = get_operating_system()
-    python_major_version = sys.version_info.major
-    python_minor_version = sys.version_info.minor
+    python_version = (sys.version_info.major, sys.version_info.minor, sys.version_info.micro)
 
     logger.info("Checking user.")
     if os.getuid() == 0:
         raise InstallError("You should not install erdpy as root.")
 
     logger.info("Checking Python version.")
-    logger.info(f"Python version: {sys.version_info}")
-    if python_major_version < MIN_REQUIRED_PYTHON_MAJOR_VERSION or (python_major_version >= MIN_REQUIRED_PYTHON_MAJOR_VERSION and python_minor_version < MIN_REQUIRED_PYTHON_MINOR_VERSION):
-        raise InstallError("You need Python 3.6 or later.")
-    if operating_system == "osx" and python_minor_version < MIN_REQUIRED_PYTHON_MINOR_VERSION_MACOS:
-        raise InstallError("On MacOS, you need Python 3.8 or later.")
+    logger.info(f"Python version: {format_version(python_version)}")
+    if python_version < MIN_REQUIRED_PYTHON_VERSION:
+        raise InstallError(f"You need Python {format_version(MIN_REQUIRED_PYTHON_VERSION)} or later.")
 
     logger.info("Checking operating system.")
     logger.info(f"Operating system: {operating_system}")
@@ -71,6 +67,11 @@ Upon restarting the user session, [$ erdpy] command should be available in your 
 Furthermore, after restarting the user session, you can use [$ source erdpy-activate] to activate the Python virtual environment containing erdpy.
 ###############################################################################
 """)
+
+
+def format_version(version: Tuple[int, int, int]) -> str:
+    major, minor, patch = version
+    return f"{major}.{minor}.{patch}"
 
 
 def get_operating_system():
@@ -134,13 +135,8 @@ def require_venv():
         logger.info(f"Packages found: {ensurepip}, {venv}.")
     except ModuleNotFoundError:
         if operating_system == "linux":
-            logger.info("Package [venv] or [ensurepip] not found, will be installed.")
-            logger.info("Running [$ sudo apt-get install python3-venv]:")
-            return_code = os.system("sudo apt-get install python3-venv")
-            if return_code == 0:
-                logger.info("Done installing [python3-venv].")
-            else:
-                raise InstallError("Packages [venv] or [ensurepip] not installed correctly.")
+            python_venv = f"python{sys.version_info.major}.{sys.version_info.minor}-venv"
+            raise InstallError(f'Packages [venv] or [ensurepip] not found. Please run "sudo apt install {python_venv}" and then run erdpy-up again.')
         else:
             raise InstallError("Packages [venv] or [ensurepip] not found, please install them first. See https://docs.python.org/3/tutorial/venv.html.")
 
