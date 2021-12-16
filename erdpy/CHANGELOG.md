@@ -6,6 +6,7 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 ## [1.0.24] - 16.12.2021
  - Refactor and fix Ledger signing
+ - Fix erdpy-up `venv` installation on Ubuntu
  - Remove tests for ERC20 contracts, they have been deprecated
 
 ## [1.0.23] - 29.11.2021
