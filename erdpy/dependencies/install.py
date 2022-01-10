@@ -62,7 +62,8 @@ def get_all_deps_installable_via_cli() -> List[DependencyModule]:
         VMToolsModule(key="vmtools"),
         StandaloneModule(key="elrond_go", repo_name="elrond-go", organisation="ElrondNetwork"),
         StandaloneModule(key="elrond_proxy_go", repo_name="elrond-proxy-go", organisation="ElrondNetwork"),
-        MclSignerModule(key="mcl_signer")
+        MclSignerModule(key="mcl_signer"),
+        NpmModule(key="wasm-opt")
     ]
 
 

@@ -245,6 +245,15 @@ class NodejsModule(StandaloneModule):
         raise errors.UnsupportedConfigurationValue("Nodejs tag must always be explicit, not latest")
 
 
+class NpmModule(DependencyModule):
+    def __init__(self, key: str, aliases: List[str] = []):
+        super().__init__(key, aliases)
+
+    def _do_install(self, tag: str) -> None:
+        args = ["npm", "install", f"{self.key}@{tag}", "-g"]
+        myprocess.run_process_async(args, env=self.get_env())
+
+
 class Rust(DependencyModule):
     def __init__(self, key: str, aliases: List[str] = None):
         if aliases is None:
