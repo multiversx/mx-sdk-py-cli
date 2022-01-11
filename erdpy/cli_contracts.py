@@ -146,8 +146,12 @@ def _add_arguments_arg(sub: Any):
 def _add_metadata_arg(sub: Any):
     sub.add_argument("--metadata-not-upgradeable", dest="metadata_upgradeable", action="store_false",
                      help="‼ mark the contract as NOT upgradeable (default: upgradeable)")
+    sub.add_argument("--metadata-not-readable", dest="metadata_readable", action="store_false",
+                     help="‼ mark the contract as NOT readable (default: readable)")
     sub.add_argument("--metadata-payable", dest="metadata_payable", action="store_true",
                      help="‼ mark the contract as payable (default: not payable)")
+    sub.add_argument("--metadata-payable-by-sc", dest="metadata_payable_by_sc", action="store_true",
+                     help="‼ mark the contract as payable by SC (default: not payable by SC)")
     sub.set_defaults(metadata_upgradeable=True, metadata_payable=False)
 
 
@@ -244,7 +248,8 @@ def _prepare_contract(args: Any) -> SmartContract:
         project = load_project(project_path)
         bytecode = project.get_bytecode()
 
-    metadata = CodeMetadata(args.metadata_upgradeable, args.metadata_payable)
+    metadata = CodeMetadata(upgradeable=args.metadata_upgradeable, readable=args.metadata_readable,
+        payable=args.metadata_payable, payable_by_sc=args.metadata_payable_by_sc)
     contract = SmartContract(bytecode=bytecode, metadata=metadata)
     return contract
 

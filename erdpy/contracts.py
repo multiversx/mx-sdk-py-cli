@@ -1,6 +1,6 @@
 import base64
 import logging
-from typing import Any, List, Optional
+from typing import Any, List, Optional, Tuple
 
 from Cryptodome.Hash import keccak
 
@@ -211,10 +211,27 @@ def ensure_even_length(string: str) -> str:
     return string
 
 
+def sum_flag_values(flag_value_pairs: List[Tuple[int, bool]]) -> int:
+    value_sum = 0
+    for value, flag in flag_value_pairs:
+        if flag:
+            value_sum += value
+    return value_sum
+
+
 class CodeMetadata:
-    def __init__(self, upgradeable: bool = True, payable: bool = False):
+    def __init__(self, upgradeable: bool = True, readable: bool = True, payable: bool = False, payable_by_sc: bool = False):
         self.upgradeable = upgradeable
+        self.readable = readable
         self.payable = payable
+        self.payable_by_sc = payable_by_sc
 
     def to_hex(self):
-        return ("01" if self.upgradeable else "00") + ("02" if self.payable else "00")
+        flag_value_pairs = [
+            (0x01_00, self.upgradeable),
+            (0x04_00, self.readable),
+            (0x00_02, self.payable),
+            (0x00_04, self.payable_by_sc)
+        ]
+        metadata_value = sum_flag_values(flag_value_pairs)
+        return f"{metadata_value:04X}"
