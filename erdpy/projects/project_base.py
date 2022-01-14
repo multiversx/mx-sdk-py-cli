@@ -6,6 +6,7 @@ from pathlib import Path
 from typing import Any, Dict, List, Union, cast
 
 from erdpy import dependencies, errors, myprocess, utils
+from erdpy.dependencies.install import get_module_by_key
 from erdpy.dependencies.modules import StandaloneModule
 
 logger = logging.getLogger("Project")
@@ -177,6 +178,18 @@ def optimize_contracts(paths: List[Path]) -> None:
         optimize_contract(path)
 
 def optimize_contract(contract_path: Path) -> None:
+    wasm_opt = get_module_by_key("wasm-opt")
+    if not wasm_opt.is_installed(""):
+        logger.warn("""
+    Skipping optimization because wasm-opt is not installed.
+
+    To install it run:
+        erdpy deps install nodejs
+        erdpy deps install wasm-opt
+
+    Alternatively, pass the "--no-wasm-opt" argument in order to skip the optimization step.
+        """)
+        return
     args = [
         "wasm-opt",
         "-O4",
@@ -184,5 +197,5 @@ def optimize_contract(contract_path: Path) -> None:
         "--output",
         str(contract_path)
     ]
-    myprocess.run_process(args)
+    myprocess.run_process(args, env=wasm_opt.get_env())
     logger.info(f"Optimized contract.")

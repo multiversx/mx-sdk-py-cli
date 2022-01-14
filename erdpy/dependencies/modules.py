@@ -249,9 +249,26 @@ class NpmModule(DependencyModule):
     def __init__(self, key: str, aliases: List[str] = []):
         super().__init__(key, aliases)
 
+    def get_nodejs(self) -> DependencyModule:
+        return dependencies.get_module_by_key("nodejs")
+    
+    def get_nodejs_env(self) -> Dict[str, str]:
+        return self.get_nodejs().get_env()
+
     def _do_install(self, tag: str) -> None:
         args = ["npm", "install", f"{self.key}@{tag}", "-g"]
-        myprocess.run_process(args, env=self.get_env())
+        myprocess.run_process(args, env=self.get_nodejs_env())
+
+    def uninstall(self, tag: str) -> None:
+        args = ["npm", "uninstall", self.key, "-g"]
+        myprocess.run_process(args, env=self.get_nodejs_env())
+
+    def get_env(self):
+        bin_folder = config.get_dependency_parent_directory("nodejs") / "latest" / "lib" / "node_modules" / self.key / "bin"
+
+        return {
+            "PATH": f"{bin_folder}:{os.environ['PATH']}",
+        }
 
     def is_installed(self, tag: str) -> bool:
         try:
