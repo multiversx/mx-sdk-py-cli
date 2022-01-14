@@ -2,7 +2,7 @@
 
 export PYTHONPATH=../
 
-ERDPY="python3 -m erdpy.cli"
+ERDPY="python3.8 -m erdpy.cli"
 
 code() {
     printf "\n\`\`\`\n" >> CLI.md

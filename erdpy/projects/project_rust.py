@@ -27,6 +27,9 @@ class ProjectRust(Project):
     def get_meta_folder(self):
         return self.path / 'meta'
 
+    def get_wasm_view_folder(self):
+        return self.path / 'wasm-view'
+
     def perform_build(self):
         meta = self.has_meta()
         try:
@@ -120,6 +123,9 @@ class ProjectRust(Project):
     def has_meta(self):
         return (self.get_meta_folder() / "Cargo.toml").exists()
 
+    def has_wasm_view(self):
+        return (self.get_wasm_view_folder() / "Cargo.toml").exists()
+
     def has_abi(self):
         return (self.get_abi_folder() / "Cargo.toml").exists()
 
@@ -129,24 +135,25 @@ class ProjectRust(Project):
     def get_abi_folder(self):
         return Path(self.directory, "abi")
 
-    def _do_after_build(self) -> Path:
-        original_name = self.cargo_file.package_name
-        wasm_file_renamed = self.options.get("wasm_name")
-        if not wasm_file_renamed:
-            wasm_file_renamed = f"{original_name}.wasm"
-        wasm_file_renamed_path = Path(self.get_output_folder(), wasm_file_renamed)
+    def get_wasm_default_name(self, suffix: str = "") -> str:
+        return f"{self.cargo_file.package_name}{suffix}.wasm"
 
+    def _do_after_build(self) -> List[Path]:
         if not self.has_meta():
-            wasm_base_name = self.cargo_file.package_name.replace("-", "_")
-            wasm_file = Path(self.get_output_folder(), f"{wasm_base_name}_wasm.wasm").resolve()
-            shutil.move(str(wasm_file), wasm_file_renamed_path)
+            base_name = str(self.cargo_file.package_name)
+            temporary_wasm_base_name = base_name.replace("-", "_")
+            wasm_file = self.get_wasm_path(f"{temporary_wasm_base_name}_wasm.wasm")
+            wasm_file.rename(self.get_wasm_default_path())
 
             if self.has_abi():
                 abi_file = self.get_abi_filepath()
-                abi_file_renamed = Path(self.get_output_folder(), f"{original_name}.abi.json")
-                shutil.move(abi_file, abi_file_renamed)
-
-        return wasm_file_renamed_path
+                abi_file_renamed = Path(self.get_output_folder(), f"{base_name}.abi.json")
+                abi_file.rename(abi_file_renamed)
+        
+        outputs = [self.get_wasm_default_path()]
+        if self.has_wasm_view():
+            outputs.append(self.get_wasm_view_default_path())
+        return outputs
 
     def get_dependencies(self):
         return ["rust"]

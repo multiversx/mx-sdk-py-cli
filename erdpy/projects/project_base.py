@@ -17,12 +17,16 @@ class Project:
         self.path = directory.expanduser().resolve()
         self.directory = str(self.path)
 
-    def build(self, options: Union[Dict[str, Any], None] = None) -> Path:
+    def build(self, options: Union[Dict[str, Any], None] = None) -> List[Path]:
         self.options = options or dict()
         self.debug = self.options.get("debug", False)
         self._ensure_dependencies_installed()
         self.perform_build()
-        return self._do_after_build()
+        contract_paths = self._do_after_build()
+        contract_paths = rename_contracts(contract_paths, self.options.get("wasm_name"))
+        if self.options.get("wasm_opt"):
+            optimize_contracts(contract_paths)
+        return contract_paths
 
     def clean(self):
         utils.remove_folder(self.get_output_folder())
@@ -45,8 +49,8 @@ class Project:
         return self.find_file_in_folder(self.path, pattern)
 
     def find_file_in_output(self, pattern: str) -> Path:
-        folder = self.path / 'output'
-        return self.find_file_in_folder(folder, pattern)
+        folder = self.get_output_folder()
+        return self.find_file_in_folder(Path(folder), pattern)
 
     def find_file_in_folder(self, folder: Path, pattern: str) -> Path:
         files = list(folder.rglob(pattern))
@@ -59,7 +63,7 @@ class Project:
         file = folder / files[0]
         return Path(file).resolve()
 
-    def _do_after_build(self) -> Path:
+    def _do_after_build(self) -> List[Path]:
         raise NotImplementedError()
 
     def _copy_to_output(self, source: Path, destination: str = None) -> Path:
@@ -71,6 +75,18 @@ class Project:
 
     def get_output_folder(self):
         return path.join(self.directory, "output")
+    
+    def get_wasm_default_name(self, suffix: str = "") -> str:
+        return f"{self.path.name}{suffix}.wasm"
+    
+    def get_wasm_path(self, wasm_name: str) -> Path:
+        return Path(self.get_output_folder(), wasm_name).resolve()
+
+    def get_wasm_default_path(self) -> Path:
+        return self.get_wasm_path(self.get_wasm_default_name())
+
+    def get_wasm_view_default_path(self) -> Path:
+        return self.get_wasm_path(self.get_wasm_default_name("-view"))
 
     def get_bytecode(self):
         bytecode = utils.read_file(self.get_file_wasm(), binary=True)
@@ -111,3 +127,62 @@ class Project:
                 print("Run test for:", test_file)
                 args = [tool, test_file]
                 myprocess.run_process(args, env=tool_env)
+
+def glob_files(folder: Path, pattern: str) -> List[Path]:
+    files = folder.rglob(pattern)
+    return [Path(folder / file).resolve() for file in files]
+
+def exclude_files(files: List[Path], to_exclude: List[Path]) -> List[Path]:
+    return list(set(files).difference(to_exclude))
+
+def rename_contracts(paths: List[Path], name: Union[str, None]) -> List[Path]:
+    if name is None:
+        return paths
+    new_paths = [compute_contract_new_path(path, name) for path in paths]
+    for old_path, new_path in zip(paths, new_paths):
+        old_path.rename(new_path)
+    return new_paths
+
+def get_contract_suffix(name: str) -> str:
+    for suffix in ["-view.wasm", ".wasm"]:
+        if name.endswith(suffix):
+            return suffix
+    return ""
+
+def remove_suffix(name: str, suffix: str) -> str:
+    if not name.endswith(suffix) or len(suffix) == 0:
+        return name
+    return name[:-len(suffix)]
+
+def compute_contract_new_path(path: Path, name_hint: str) -> Path:
+    """
+    Computes the contract's new path by using a name hint
+
+    >>> compute_contract_new_path(Path("test/my-contract.wasm"), "hello.wasm")
+    PosixPath('test/hello.wasm')
+    >>> compute_contract_new_path(Path("test/my-contract-view.wasm"), "hello.wasm")
+    PosixPath('test/hello-view.wasm')
+    >>> compute_contract_new_path(Path("test/my-contract-view.wasm"), "hello")
+    PosixPath('test/hello-view.wasm')
+    >>> compute_contract_new_path(Path("test/my-contract.wasm"), "world-view.wasm")
+    PosixPath('test/world-view.wasm')
+    >>> compute_contract_new_path(Path("test/my-contract-view.wasm"), "world-view.wasm")
+    PosixPath('test/world-view-view.wasm')
+    """
+    new_name = remove_suffix(name_hint, ".wasm") + get_contract_suffix(path.name)
+    return path.with_name(new_name)
+
+def optimize_contracts(paths: List[Path]) -> None:
+    for path in paths:
+        optimize_contract(path)
+
+def optimize_contract(contract_path: Path) -> None:
+    args = [
+        "wasm-opt",
+        "-O4",
+        str(contract_path),
+        "--output",
+        str(contract_path)
+    ]
+    myprocess.run_process(args)
+    logger.info(f"Optimized contract.")

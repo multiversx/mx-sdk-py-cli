@@ -251,8 +251,17 @@ class NpmModule(DependencyModule):
 
     def _do_install(self, tag: str) -> None:
         args = ["npm", "install", f"{self.key}@{tag}", "-g"]
-        myprocess.run_process_async(args, env=self.get_env())
+        myprocess.run_process(args, env=self.get_env())
 
+    def is_installed(self, tag: str) -> bool:
+        try:
+            myprocess.run_process(["wasm-opt", "--version"], env=self.get_env())
+            return True
+        except Exception:
+            return False
+    
+    def get_latest_release(self) -> str:
+        return "latest"
 
 class Rust(DependencyModule):
     def __init__(self, key: str, aliases: List[str] = None):
@@ -272,7 +281,7 @@ class Rust(DependencyModule):
 
         args = [rustup_path, "--verbose", "--default-toolchain", toolchain, "--profile",
                 "minimal", "--target", "wasm32-unknown-unknown", "--no-modify-path", "-y"]
-        myprocess.run_process_async(args, env=self.get_env())
+        myprocess.run_process(args, env=self.get_env())
 
     def uninstall(self, tag: str):
         directory = self.get_directory("")

@@ -16,6 +16,7 @@ testCreateContracts() {
     ${ERDPY} contract new --template crypto-bubbles --directory ${SANDBOX} mybubbles-rs || return 1
     ${ERDPY} contract new --template lottery-esdt --directory ${SANDBOX} mylottery-rs || return 1
     ${ERDPY} contract new --template crowdfunding-esdt --directory ${SANDBOX} myfunding-rs || return 1
+    ${ERDPY} contract new --template multisig --directory ${SANDBOX} multisig-rs || return 1
 }
 
 testBuildContracts() {
@@ -58,6 +59,19 @@ testRunMandos() {
     ${ERDPY} --verbose contract test --directory="mandos" ${SANDBOX}/mybubbles-rs || return 1
     ${ERDPY} --verbose contract test --directory="mandos" ${SANDBOX}/mylottery-rs || return 1
     ${ERDPY} --verbose contract test --directory="mandos" ${SANDBOX}/myfunding-rs || return 1
+}
+
+testWasmName() {
+    ${ERDPY} contract clean ${SANDBOX}/myanswer-c || return 1
+    assertFileDoesNotExist ${SANDBOX}/myanswer-c/output/answer-2.wasm || return 1
+    ${ERDPY} contract build ${SANDBOX}/myanswer-c --wasm-name answer-2 || return 1
+    assertFileExists ${SANDBOX}/myanswer-c/output/answer-2.wasm || return 1
+
+    ${ERDPY} contract clean ${SANDBOX}/myadder-rs
+    assertFileDoesNotExist ${SANDBOX}/myadder-rs/output/myadder-2-rs.wasm || return 1
+    ${ERDPY} contract build ${SANDBOX}/myadder-rs --cargo-target-dir=${TARGET_DIR} --wasm-name myadder-2-rs || return 1
+    assertFileExists ${SANDBOX}/myadder-rs/output/myadder-2-rs.wasm || return 1
+    assertFileExists ${SANDBOX}/myadder-rs/output/myadder-rs.abi.json || return 1
 }
 
 testCleanContracts() {
@@ -107,4 +121,5 @@ testAll() {
     testBuildContracts || return 1
     testRunMandos || return 1
     testCleanContracts || return 1
+    testWasmName || return 1
 }

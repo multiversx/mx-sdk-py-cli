@@ -36,6 +36,8 @@ def setup_parser(args: List[str], subparsers: Any) -> Any:
     sub.add_argument("--debug", action="store_true", default=False, help="set debug flag (default: %(default)s)")
     sub.add_argument("--no-optimization", action="store_true", default=False,
                      help="bypass optimizations (for clang) (default: %(default)s)")
+    sub.add_argument("--no-wasm-opt", action="store_true", default=False,
+                     help="do not optimize wasm files after the build (default: %(default)s)")
     sub.add_argument("--cargo-target-dir", type=str, help="for rust projects, forward the parameter to Cargo")
     sub.add_argument("--wasm-symbols", action="store_true", default=False,
                      help="for rust projects, does not strip the symbols from the wasm output. Useful for analysing the bytecode. Creates larger wasm files. Avoid in production (default: %(default)s)")
@@ -173,6 +175,7 @@ def build(args: Any):
     options = {
         "debug": args.debug,
         "optimized": not args.no_optimization,
+        "wasm_opt": not args.no_wasm_opt,
         "verbose": args.verbose,
         "cargo_target_dir": args.cargo_target_dir,
         "wasm_symbols": args.wasm_symbols,
