@@ -30,7 +30,7 @@ TOP-LEVEL OPTIONS:
 ----------------------
 COMMAND GROUPS summary
 ----------------------
-contract                       Build, deploy and interact with Smart Contracts
+contract                       Build, deploy, upgrade and interact with Smart Contracts
 tx                             Create and broadcast Transactions
 validator                      Stake, UnStake, UnBond, Unjail and other actions useful for Validators
 account                        Get Account data (nonce, balance) from the Network
