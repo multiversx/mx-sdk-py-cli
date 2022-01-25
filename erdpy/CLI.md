@@ -163,7 +163,9 @@ optional arguments:
   --project PROJECT                            🗀 the project directory (default: current directory)
   --bytecode BYTECODE                          the file containing the WASM bytecode
   --metadata-not-upgradeable                   ‼ mark the contract as NOT upgradeable (default: upgradeable)
+  --metadata-not-readable                      ‼ mark the contract as NOT readable (default: readable)
   --metadata-payable                           ‼ mark the contract as payable (default: not payable)
+  --metadata-payable-by-sc                     ‼ mark the contract as payable by SC (default: not payable by SC)
   --outfile OUTFILE                            where to save the output (default: stdout)
   --pem PEM                                    🔑 the PEM file, if keyfile not provided
   --pem-index PEM_INDEX                        🔑 the index in the PEM file (default: 0)
@@ -254,7 +256,9 @@ optional arguments:
   --project PROJECT                            🗀 the project directory (default: current directory)
   --bytecode BYTECODE                          the file containing the WASM bytecode
   --metadata-not-upgradeable                   ‼ mark the contract as NOT upgradeable (default: upgradeable)
+  --metadata-not-readable                      ‼ mark the contract as NOT readable (default: readable)
   --metadata-payable                           ‼ mark the contract as payable (default: not payable)
+  --metadata-payable-by-sc                     ‼ mark the contract as payable by SC (default: not payable by SC)
   --pem PEM                                    🔑 the PEM file, if keyfile not provided
   --pem-index PEM_INDEX                        🔑 the index in the PEM file (default: 0)
   --keyfile KEYFILE                            🔑 a JSON keyfile, if PEM not provided
