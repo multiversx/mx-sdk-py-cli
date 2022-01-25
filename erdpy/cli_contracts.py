@@ -175,7 +175,7 @@ def build(args: Any):
     options = {
         "debug": args.debug,
         "optimized": not args.no_optimization,
-        "wasm_opt": not args.no_wasm_opt,
+        "no_wasm_opt": args.no_wasm_opt,
         "verbose": args.verbose,
         "cargo_target_dir": args.cargo_target_dir,
         "wasm_symbols": args.wasm_symbols,

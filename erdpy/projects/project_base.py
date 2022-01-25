@@ -22,11 +22,11 @@ class Project:
         self.options = options or dict()
         self.debug = self.options.get("debug", False)
         self._ensure_dependencies_installed()
+        if not self.options.get("no_wasm_opt"):
+            check_wasm_opt_installed()
         self.perform_build()
         contract_paths = self._do_after_build()
         contract_paths = rename_contracts(contract_paths, self.options.get("wasm_name"))
-        if self.options.get("wasm_opt"):
-            optimize_contracts(contract_paths)
         return contract_paths
 
     def clean(self):
@@ -173,11 +173,8 @@ def compute_contract_new_path(path: Path, name_hint: str) -> Path:
     new_name = remove_suffix(name_hint, ".wasm") + get_contract_suffix(path.name)
     return path.with_name(new_name)
 
-def optimize_contracts(paths: List[Path]) -> None:
-    for path in paths:
-        optimize_contract(path)
 
-def optimize_contract(contract_path: Path) -> None:
+def check_wasm_opt_installed() -> None:
     wasm_opt = get_module_by_key("wasm-opt")
     if not wasm_opt.is_installed(""):
         logger.warn("""
@@ -189,13 +186,3 @@ def optimize_contract(contract_path: Path) -> None:
 
     Alternatively, pass the "--no-wasm-opt" argument in order to skip the optimization step.
         """)
-        return
-    args = [
-        "wasm-opt",
-        "-O4",
-        str(contract_path),
-        "--output",
-        str(contract_path)
-    ]
-    myprocess.run_process(args, env=wasm_opt.get_env())
-    logger.info(f"Optimized contract.")
