@@ -34,7 +34,8 @@ setuptools.setup(
         "cryptography>=3.2",
         "prettytable",
         "ledgercomm",
-        "semver"
+        "semver",
+        "requests-cache"
     ],
     zip_safe=False,
     keywords=["Elrond"],
