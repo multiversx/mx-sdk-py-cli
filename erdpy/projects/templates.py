@@ -4,7 +4,7 @@ import os
 from os import path
 from pathlib import Path
 import pathlib
-from typing import List, Tuple, Union
+from typing import Any, Dict, List, Tuple, Union
 
 from erdpy import errors, utils
 from erdpy.projects import shared
@@ -136,10 +136,7 @@ class TemplateRust(Template):
         cargo_file.edition = "2018"
         cargo_file.publish = False
 
-        for dependency in cargo_file.get_dependencies().values():
-            del dependency["path"]
-        for dependency in cargo_file.get_dev_dependencies().values():
-            del dependency["path"]
+        remove_path_from_dependencies(cargo_file)
 
         cargo_file.save()
 
@@ -155,10 +152,7 @@ class TemplateRust(Template):
         cargo_file.edition = "2018"
         cargo_file.publish = False
 
-        for dependency in cargo_file.get_dependencies().values():
-            del dependency["path"]
-        for dependency in cargo_file.get_dev_dependencies().values():
-            del dependency["path"]
+        remove_path_from_dependencies(cargo_file)
 
         # Patch the path towards the project crate (one folder above):
         cargo_file.get_dependency(self.template_name)["path"] = ".."
@@ -236,3 +230,17 @@ class TemplateRust(Template):
 
 class TemplateSol(Template):
     pass
+
+
+def remove_path(dependency: Any) -> None:
+    try:
+        del dependency["path"]
+    except TypeError:
+        pass
+
+
+def remove_path_from_dependencies(cargo_file: CargoFile) -> None:
+    for dependency in cargo_file.get_dependencies().values():
+        remove_path(dependency)
+    for dependency in cargo_file.get_dev_dependencies().values():
+        remove_path(dependency)
