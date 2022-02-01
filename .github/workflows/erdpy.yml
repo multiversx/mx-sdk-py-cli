@@ -32,8 +32,9 @@ jobs:
         pip3 install pytest
     - name: Set github_api_token
       run: |
-        mkdir ~/elrondsdk && touch ~/elrondsdk/erdpy.json
+        mkdir ~/elrondsdk
         export PYTHONPATH=.
+        python3 -m erdpy.cli config new test
         python3 -m erdpy.cli config set github_api_token ${{ secrets.GITHUB_TOKEN }}
     - name: Run unit tests
       run: |
