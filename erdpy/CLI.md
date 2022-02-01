@@ -16,7 +16,7 @@ erdpy is part of the elrond-sdk and consists of Command Line Tools and Python SD
 for interacting with the Blockchain (in general) and with Smart Contracts (in particular).
 
 erdpy targets a broad audience of users and developers.
-https://docs.elrond.com/tools/erdpy.
+https://docs.elrond.com/sdk-and-tools/erdpy/erdpy.
         
 
 COMMAND GROUPS:
