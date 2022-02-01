@@ -31,6 +31,9 @@ class ProjectRust(Project):
         return self.path / 'wasm-view'
 
     def perform_build(self):
+        with_wasm_opt = not self.options.get("no_wasm_opt")
+        if with_wasm_opt:
+            check_wasm_opt_installed()
         meta = self.has_meta()
         try:
             if meta:
@@ -251,3 +254,16 @@ class CargoFile:
         if dependency is None:
             raise errors.BuildError(f"Can't get cargo dev-dependency: {name}")
         return dependency
+
+def check_wasm_opt_installed() -> None:
+    wasm_opt = dependencies.get_module_by_key("wasm-opt")
+    if not wasm_opt.is_installed(""):
+        logger.warn("""
+    Skipping optimization because wasm-opt is not installed.
+
+    To install it run:
+        erdpy deps install nodejs
+        erdpy deps install wasm-opt
+
+    Alternatively, pass the "--no-wasm-opt" argument in order to skip the optimization step.
+        """)

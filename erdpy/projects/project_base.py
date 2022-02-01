@@ -6,7 +6,6 @@ from pathlib import Path
 from typing import Any, Dict, List, Union, cast
 
 from erdpy import dependencies, errors, myprocess, utils
-from erdpy.dependencies.install import get_module_by_key
 from erdpy.dependencies.modules import StandaloneModule
 
 logger = logging.getLogger("Project")
@@ -22,11 +21,9 @@ class Project:
         self.options = options or dict()
         self.debug = self.options.get("debug", False)
         self._ensure_dependencies_installed()
-        if not self.options.get("no_wasm_opt"):
-            check_wasm_opt_installed()
         self.perform_build()
         contract_paths = self._do_after_build()
-        contract_paths = rename_contracts(contract_paths, self.options.get("wasm_name"))
+        contract_paths = rename_wasm_files(contract_paths, self.options.get("wasm_name"))
         return contract_paths
 
     def clean(self):
@@ -136,10 +133,10 @@ def glob_files(folder: Path, pattern: str) -> List[Path]:
 def exclude_files(files: List[Path], to_exclude: List[Path]) -> List[Path]:
     return list(set(files).difference(to_exclude))
 
-def rename_contracts(paths: List[Path], name: Union[str, None]) -> List[Path]:
+def rename_wasm_files(paths: List[Path], name: Union[str, None]) -> List[Path]:
     if name is None:
         return paths
-    new_paths = [compute_contract_new_path(path, name) for path in paths]
+    new_paths = [adjust_wasm_filename(path, name) for path in paths]
     for old_path, new_path in zip(paths, new_paths):
         old_path.rename(new_path)
     return new_paths
@@ -155,34 +152,20 @@ def remove_suffix(name: str, suffix: str) -> str:
         return name
     return name[:-len(suffix)]
 
-def compute_contract_new_path(path: Path, name_hint: str) -> Path:
+def adjust_wasm_filename(path: Path, name_hint: str) -> Path:
     """
-    Computes the contract's new path by using a name hint
+    Adjusts the wasm's filename by using a name hint
 
-    >>> compute_contract_new_path(Path("test/my-contract.wasm"), "hello.wasm")
+    >>> adjust_wasm_filename(Path("test/my-contract.wasm"), "hello.wasm")
     PosixPath('test/hello.wasm')
-    >>> compute_contract_new_path(Path("test/my-contract-view.wasm"), "hello.wasm")
+    >>> adjust_wasm_filename(Path("test/my-contract-view.wasm"), "hello.wasm")
     PosixPath('test/hello-view.wasm')
-    >>> compute_contract_new_path(Path("test/my-contract-view.wasm"), "hello")
+    >>> adjust_wasm_filename(Path("test/my-contract-view.wasm"), "hello")
     PosixPath('test/hello-view.wasm')
-    >>> compute_contract_new_path(Path("test/my-contract.wasm"), "world-view.wasm")
+    >>> adjust_wasm_filename(Path("test/my-contract.wasm"), "world-view.wasm")
     PosixPath('test/world-view.wasm')
-    >>> compute_contract_new_path(Path("test/my-contract-view.wasm"), "world-view.wasm")
+    >>> adjust_wasm_filename(Path("test/my-contract-view.wasm"), "world-view.wasm")
     PosixPath('test/world-view-view.wasm')
     """
     new_name = remove_suffix(name_hint, ".wasm") + get_contract_suffix(path.name)
     return path.with_name(new_name)
-
-
-def check_wasm_opt_installed() -> None:
-    wasm_opt = get_module_by_key("wasm-opt")
-    if not wasm_opt.is_installed(""):
-        logger.warn("""
-    Skipping optimization because wasm-opt is not installed.
-
-    To install it run:
-        erdpy deps install nodejs
-        erdpy deps install wasm-opt
-
-    Alternatively, pass the "--no-wasm-opt" argument in order to skip the optimization step.
-        """)

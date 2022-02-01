@@ -274,7 +274,7 @@ class NpmModule(DependencyModule):
         try:
             myprocess.run_process(["wasm-opt", "--version"], env=self.get_env())
             return True
-        except Exception:
+        except errors.ExternalProcessError:
             return False
     
     def get_latest_release(self) -> str:
