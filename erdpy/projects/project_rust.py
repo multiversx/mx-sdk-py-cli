@@ -19,6 +19,7 @@ class ProjectRust(Project):
     def clean(self):
         super().clean()
         utils.remove_folder(path.join(self.directory, "wasm", "target"))
+        utils.remove_folder(path.join(self.directory, "meta", "target"))
 
     def get_cargo_file(self):
         cargo_path = self.path / 'Cargo.toml'
