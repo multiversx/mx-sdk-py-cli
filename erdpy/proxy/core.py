@@ -42,7 +42,7 @@ class ElrondProxy(IElrondProxy):
         response = do_get(url)
         transactions = response.get("transactions", [])
         for transaction in transactions:
-            data = transaction.get("data", "")
+            data = transaction.get("data") or ""
             data = (data[:TRUNCATE_DATA_THRESHOLD] + ' ... truncated ...') if len(data) > TRUNCATE_DATA_THRESHOLD else data
             transaction["data"] = data
         return transactions
