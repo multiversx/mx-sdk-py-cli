@@ -84,12 +84,14 @@ def delete_value(name: str):
     write_file(data)
 
 
-def get_active():
+def get_active() -> Dict[str, Any]:
     data = read_file()
     configs = data.get("configurations", {})
-    active_config = data.get("active", "default")
+    active_config_name: str = data.get("active", "default")
+    empty_config: Dict[str, Any] = dict()
+    result: Dict[str, Any] = configs.get(active_config_name, empty_config)
 
-    return configs.get(active_config, {})
+    return result;
 
 
 def set_active(name: str):

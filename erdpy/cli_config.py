@@ -51,11 +51,17 @@ def _add_name_arg(sub: Any):
 
 def dump(args: Any):
     if args.defaults:
-        data = config.get_defaults()
+        _dump_defaults()
     else:
-        data = config.get_active()
+        _dump_active()
 
-    utils.dump_out_json(data, sys.stdout)
+
+def _dump_defaults():
+    utils.dump_out_json(config.get_defaults(), sys.stdout)
+
+
+def _dump_active():
+    utils.dump_out_json(config.get_active(), sys.stdout)
 
 
 def get_value(args: Any):
@@ -73,12 +79,12 @@ def delete_value(args: Any):
 
 def new_config(args: Any):
     config.create_new_config(name=args.name, template=args.template)
-    dump(None)
+    _dump_active()
 
 
 def switch_config(args: Any):
     config.set_active(args.name)
-    dump(None)
+    _dump_active()
 
 
 def list_configs(args: Any):
