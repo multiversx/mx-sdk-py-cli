@@ -1,9 +1,8 @@
 import logging
-import shutil
 import subprocess
 from os import path
 from pathlib import Path
-from typing import Any, Dict, List, cast
+from typing import Any, Dict, List, Set, cast
 
 from erdpy import dependencies, errors, myprocess, utils
 from erdpy.projects.project_base import Project
@@ -31,9 +30,6 @@ class ProjectRust(Project):
         return self.path / 'wasm-view'
 
     def perform_build(self):
-        with_wasm_opt = not self.options.get("no_wasm_opt")
-        if with_wasm_opt:
-            check_wasm_opt_installed()
         meta = self.has_meta()
         try:
             if meta:
@@ -79,6 +75,12 @@ class ProjectRust(Project):
     def run_meta(self):
         cwd = self.get_meta_folder()
         env = self.get_env()
+
+        with_wasm_opt = not self.options.get("no-wasm-opt")
+        if with_wasm_opt:
+            check_wasm_opt_installed()
+            wasm_opt = dependencies.get_module_by_key("wasm-opt")
+            env = merge_env(env, wasm_opt.get_env())
 
         # run the meta executable with the arguments `build --target=...`
         args = [
@@ -254,6 +256,27 @@ class CargoFile:
         if dependency is None:
             raise errors.BuildError(f"Can't get cargo dev-dependency: {name}")
         return dependency
+
+
+def paths_of(env: Dict[str, str], key: str) -> Set[str]:
+    try:
+        return set(env[key].split(":"))
+    except KeyError:
+        return set()
+
+
+def merge_env(first: Dict[str, str], second: Dict[str, str]):
+    """
+>>> merge_env({'PATH':'first:common', 'CARGO_PATH': 'cargo_path'}, {'PATH':'second:common', 'EXAMPLE': 'other'})
+{'CARGO_PATH': 'cargo_path', 'EXAMPLE': 'other', 'PATH': 'common:first:second'}
+    """
+    keys = set(first.keys()).union(second.keys())
+    merged = dict()
+    for key in sorted(keys):
+        values = paths_of(first, key).union(paths_of(second, key))
+        merged[key] = ":".join(sorted(values))
+    return merged
+
 
 def check_wasm_opt_installed() -> None:
     wasm_opt = dependencies.get_module_by_key("wasm-opt")
