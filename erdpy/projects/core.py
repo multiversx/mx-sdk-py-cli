@@ -1,11 +1,11 @@
 from erdpy import dependencies
 import logging
-from os import path
-from typing import Any, Dict
+from typing import Any, Dict, List
 from pathlib import Path
 
 from erdpy import errors, utils, guards
 from erdpy.projects import shared
+from erdpy.projects.project_base import Project
 from erdpy.projects.project_clang import ProjectClang
 from erdpy.projects.project_cpp import ProjectCpp
 from erdpy.projects.project_rust import ProjectRust
@@ -14,7 +14,7 @@ from erdpy.projects.project_sol import ProjectSol
 logger = logging.getLogger("projects.core")
 
 
-def load_project(directory: Path):
+def load_project(directory: Path) -> Project:
     guards.is_directory(directory)
 
     if shared.is_source_clang(directory):
@@ -37,10 +37,11 @@ def build_project(directory: Path, options: Dict[str, Any]):
 
     guards.is_directory(directory)
     project = load_project(directory)
-    output_wasm_file = project.build(options)
+    outputs = project.build(options)
     logger.info("Build ran.")
-    relative_wasm_path = output_wasm_file.relative_to(Path.cwd())
-    logger.info(f"WASM file generated: {relative_wasm_path}")
+    for output_wasm_file in outputs:
+        relative_wasm_path = output_wasm_file.relative_to(Path.cwd())
+        logger.info(f"WASM file generated: {relative_wasm_path}")
 
 
 def clean_project(directory: Path):
@@ -65,7 +66,7 @@ def run_tests(args: Any):
     project.run_tests(directory, wildcard)
 
 
-def get_projects_in_workspace(workspace: Path):
+def get_projects_in_workspace(workspace: Path) -> List[Project]:
     guards.is_directory(workspace)
     subfolders = utils.get_subfolders(workspace)
     projects = []
@@ -80,3 +81,9 @@ def get_projects_in_workspace(workspace: Path):
             pass
 
     return projects
+
+
+def get_project_paths_recursively(base_path: Path) -> List[Path]:
+    guards.is_directory(base_path)
+    path_list = [elrond_json.parent for elrond_json in base_path.glob("**/elrond.json")]
+    return sorted(path_list)

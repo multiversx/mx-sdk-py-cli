@@ -3,6 +3,7 @@ import os
 from pathlib import Path
 import subprocess
 from os import path
+from typing import List
 
 from erdpy import dependencies, errors, myprocess, utils
 from erdpy.projects.project_base import Project
@@ -80,13 +81,13 @@ class ProjectCpp(Project):
 
         myprocess.run_process(args)
 
-    def _do_after_build(self) -> Path:
+    def _do_after_build(self) -> List[Path]:
         source_file = self.find_file_globally("*.cpp")
         output_wasm_file = self._copy_to_output(source_file.with_suffix(".wasm"))
         os.remove(source_file.with_suffix(".wasm"))
         os.remove(source_file.with_suffix(".ll"))
         os.remove(source_file.with_suffix(".o"))
-        return output_wasm_file
+        return [output_wasm_file]
 
     def _get_llvm_path(self):
         return dependencies.get_module_directory("llvm")

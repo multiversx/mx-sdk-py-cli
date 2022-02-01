@@ -125,6 +125,7 @@ optional arguments:
   -h, --help                           show this help message and exit
   --debug                              set debug flag (default: False)
   --no-optimization                    bypass optimizations (for clang) (default: False)
+  --no-wasm-opt                        do not optimize wasm files after the build (default: False)
   --cargo-target-dir CARGO_TARGET_DIR  for rust projects, forward the parameter to Cargo
   --wasm-symbols                       for rust projects, does not strip the symbols from the wasm output. Useful for
                                        analysing the bytecode. Creates larger wasm files. Avoid in production (default:
@@ -1251,7 +1252,7 @@ usage: erdpy deps install [-h] ...
 Install dependencies or elrond-sdk modules.
 
 positional arguments:
-  {all,llvm,clang,cpp,vmtools,rust,nodejs,elrond_go,elrond_proxy_go,golang,mcl_signer}
+  {all,llvm,clang,cpp,rust,nodejs,golang,vmtools,elrond_go,elrond_proxy_go,mcl_signer,wasm-opt}
                                                   the dependency to install
 
 optional arguments:
@@ -1270,7 +1271,7 @@ usage: erdpy deps check [-h] ...
 Check whether a dependency is installed.
 
 positional arguments:
-  {all,llvm,clang,cpp,vmtools,rust,nodejs,elrond_go,elrond_proxy_go,golang,mcl_signer}
+  {all,llvm,clang,cpp,rust,nodejs,golang,vmtools,elrond_go,elrond_proxy_go,mcl_signer,wasm-opt}
                                                   the dependency to check
 
 optional arguments:
