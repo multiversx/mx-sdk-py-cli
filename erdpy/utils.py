@@ -5,7 +5,7 @@ import pathlib
 import shutil
 import stat
 import sys
-import requests
+import requests_cache
 import tarfile
 import zipfile
 from pathlib import Path
@@ -246,7 +246,8 @@ def query_latest_release_tag(repo: str) -> str:
     if github_api_token != '':
         headers['Authorization'] = f'token {github_api_token}'
 
-    response = requests.get(url, headers=headers)
+    session = requests_cache.CachedSession('erdpy_requests_cache', use_cache_dir=True, cache_control=True)
+    response = session.get(url, headers=headers)
     response.raise_for_status()
 
     release_tags = [str(release['tag_name']) for release in response.json()]

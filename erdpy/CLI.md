@@ -16,7 +16,7 @@ erdpy is part of the elrond-sdk and consists of Command Line Tools and Python SD
 for interacting with the Blockchain (in general) and with Smart Contracts (in particular).
 
 erdpy targets a broad audience of users and developers.
-https://docs.elrond.com/tools/erdpy.
+https://docs.elrond.com/sdk-and-tools/erdpy/erdpy.
         
 
 COMMAND GROUPS:
@@ -125,6 +125,7 @@ optional arguments:
   -h, --help                           show this help message and exit
   --debug                              set debug flag (default: False)
   --no-optimization                    bypass optimizations (for clang) (default: False)
+  --no-wasm-opt                        do not optimize wasm files after the build (default: False)
   --cargo-target-dir CARGO_TARGET_DIR  for rust projects, forward the parameter to Cargo
   --wasm-symbols                       for rust projects, does not strip the symbols from the wasm output. Useful for
                                        analysing the bytecode. Creates larger wasm files. Avoid in production (default:
@@ -162,7 +163,9 @@ optional arguments:
   --project PROJECT                            🗀 the project directory (default: current directory)
   --bytecode BYTECODE                          the file containing the WASM bytecode
   --metadata-not-upgradeable                   ‼ mark the contract as NOT upgradeable (default: upgradeable)
+  --metadata-not-readable                      ‼ mark the contract as NOT readable (default: readable)
   --metadata-payable                           ‼ mark the contract as payable (default: not payable)
+  --metadata-payable-by-sc                     ‼ mark the contract as payable by SC (default: not payable by SC)
   --outfile OUTFILE                            where to save the output (default: stdout)
   --pem PEM                                    🔑 the PEM file, if keyfile not provided
   --pem-index PEM_INDEX                        🔑 the index in the PEM file (default: 0)
@@ -253,7 +256,9 @@ optional arguments:
   --project PROJECT                            🗀 the project directory (default: current directory)
   --bytecode BYTECODE                          the file containing the WASM bytecode
   --metadata-not-upgradeable                   ‼ mark the contract as NOT upgradeable (default: upgradeable)
+  --metadata-not-readable                      ‼ mark the contract as NOT readable (default: readable)
   --metadata-payable                           ‼ mark the contract as payable (default: not payable)
+  --metadata-payable-by-sc                     ‼ mark the contract as payable by SC (default: not payable by SC)
   --pem PEM                                    🔑 the PEM file, if keyfile not provided
   --pem-index PEM_INDEX                        🔑 the index in the PEM file (default: 0)
   --keyfile KEYFILE                            🔑 a JSON keyfile, if PEM not provided
@@ -1247,7 +1252,7 @@ usage: erdpy deps install [-h] ...
 Install dependencies or elrond-sdk modules.
 
 positional arguments:
-  {all,llvm,clang,cpp,vmtools,rust,nodejs,elrond_go,elrond_proxy_go,golang,mcl_signer}
+  {all,llvm,clang,cpp,rust,nodejs,golang,vmtools,elrond_go,elrond_proxy_go,mcl_signer,wasm-opt}
                                                   the dependency to install
 
 optional arguments:
@@ -1266,7 +1271,7 @@ usage: erdpy deps check [-h] ...
 Check whether a dependency is installed.
 
 positional arguments:
-  {all,llvm,clang,cpp,vmtools,rust,nodejs,elrond_go,elrond_proxy_go,golang,mcl_signer}
+  {all,llvm,clang,cpp,rust,nodejs,golang,vmtools,elrond_go,elrond_proxy_go,mcl_signer,wasm-opt}
                                                   the dependency to check
 
 optional arguments:

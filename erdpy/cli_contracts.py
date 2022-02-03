@@ -36,6 +36,8 @@ def setup_parser(args: List[str], subparsers: Any) -> Any:
     sub.add_argument("--debug", action="store_true", default=False, help="set debug flag (default: %(default)s)")
     sub.add_argument("--no-optimization", action="store_true", default=False,
                      help="bypass optimizations (for clang) (default: %(default)s)")
+    sub.add_argument("--no-wasm-opt", action="store_true", default=False,
+                     help="do not optimize wasm files after the build (default: %(default)s)")
     sub.add_argument("--cargo-target-dir", type=str, help="for rust projects, forward the parameter to Cargo")
     sub.add_argument("--wasm-symbols", action="store_true", default=False,
                      help="for rust projects, does not strip the symbols from the wasm output. Useful for analysing the bytecode. Creates larger wasm files. Avoid in production (default: %(default)s)")
@@ -146,8 +148,12 @@ def _add_arguments_arg(sub: Any):
 def _add_metadata_arg(sub: Any):
     sub.add_argument("--metadata-not-upgradeable", dest="metadata_upgradeable", action="store_false",
                      help="‼ mark the contract as NOT upgradeable (default: upgradeable)")
+    sub.add_argument("--metadata-not-readable", dest="metadata_readable", action="store_false",
+                     help="‼ mark the contract as NOT readable (default: readable)")
     sub.add_argument("--metadata-payable", dest="metadata_payable", action="store_true",
                      help="‼ mark the contract as payable (default: not payable)")
+    sub.add_argument("--metadata-payable-by-sc", dest="metadata_payable_by_sc", action="store_true",
+                     help="‼ mark the contract as payable by SC (default: not payable by SC)")
     sub.set_defaults(metadata_upgradeable=True, metadata_payable=False)
 
 
@@ -173,6 +179,7 @@ def build(args: Any):
     options = {
         "debug": args.debug,
         "optimized": not args.no_optimization,
+        "no-wasm-opt": args.no_wasm_opt,
         "verbose": args.verbose,
         "cargo_target_dir": args.cargo_target_dir,
         "wasm_symbols": args.wasm_symbols,
@@ -244,7 +251,8 @@ def _prepare_contract(args: Any) -> SmartContract:
         project = load_project(project_path)
         bytecode = project.get_bytecode()
 
-    metadata = CodeMetadata(args.metadata_upgradeable, args.metadata_payable)
+    metadata = CodeMetadata(upgradeable=args.metadata_upgradeable, readable=args.metadata_readable,
+        payable=args.metadata_payable, payable_by_sc=args.metadata_payable_by_sc)
     contract = SmartContract(bytecode=bytecode, metadata=metadata)
     return contract
 

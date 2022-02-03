@@ -4,6 +4,16 @@ All notable changes will be documented in this file.
 
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
+## [1.0.25] - 02.02.2022
+ - Remove old & deprecated, experimental code related to the Elrond IDE
+ - Fix `erdpy account get-transactions` (handle transactions with no data field)
+ - Fix link in documentation
+ - Fix build (test) issues on Github Actions by setting erdpy's `github_api_token`
+ - Added caching for the github releases URL when creating projects from templates in order to avoid rate limit errors
+ - Fix issue with project creation when using the `crowdfunding-esdt` template due to dependencies
+ - Add `readable` and `payable_by_sc` code metadata flags
+ - `erdpy contract clean` fix - the `meta/target` folder is removed
+
 ## [1.0.24] - 16.12.2021
  - Refactor and fix Ledger signing
  - Fix erdpy-up `venv` installation on Ubuntu
