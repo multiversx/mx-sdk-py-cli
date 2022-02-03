@@ -1,12 +1,15 @@
 import logging
-import os
-from binascii import unhexlify
-from os import path
+from pathlib import Path
 from typing import Any, Optional
 
+import nacl.signing
+
 from erdpy import constants, errors, utils
-from erdpy.errors import LedgerError
-from erdpy.interfaces import IAccount, IAddress
+from erdpy.interfaces import IAccount, IAddress, ITransaction
+from erdpy.ledger.config import compare_versions
+from erdpy.ledger.ledger_app_handler import SIGN_USING_HASH_VERSION
+from erdpy.ledger.ledger_functions import do_get_ledger_address, do_sign_transaction_with_ledger, do_get_ledger_version, \
+    TX_HASH_SIGN_VERSION, TX_HASH_SIGN_OPTIONS
 from erdpy.wallet import bech32, generate_pair, pem
 from erdpy.wallet.keyfile import get_password, load_from_key_file
 
@@ -14,30 +17,29 @@ logger = logging.getLogger("accounts")
 
 
 class AccountsRepository:
-    def __init__(self, folder):
+    def __init__(self, folder: Path):
         utils.ensure_folder(folder)
         self.folder = folder
 
     def get_account(self, name):
-        pem_file = path.join(self.folder, f"{name}.pem")
-        return Account(pem_file=pem_file)
+        pem_file = self.folder / f"{name}.pem"
+        return Account(pem_file=str(pem_file))
 
     def generate_accounts(self, count):
         for i in range(count):
             self.generate_account(i)
 
     def generate_account(self, name):
-        seed, pubkey = generate_pair()
+        secret_key, pubkey = generate_pair()
         address = Address(pubkey).bech32()
 
-        pem_file = f"{name}_{address}.pem"
-        pem_file = path.join(self.folder, pem_file)
-        pem.write(pem_file, seed, pubkey, name=f"{name}:{address}")
+        pem_file = self.folder / f"{name}_{address}.pem"
+        pem.write(pem_file, secret_key, pubkey, name=f"{name}:{address}")
 
     def get_all(self):
         accounts = []
-        for pem_file in os.listdir(self.folder):
-            pem_file = path.join(self.folder, pem_file)
+        for pem_file in self.folder.iterdir():
+            pem_file = self.folder / pem_file
             account = Account(pem_file=pem_file)
             accounts.append(account)
 
@@ -59,13 +61,13 @@ class Account(IAccount):
         self.ledger = ledger
 
         if self.pem_file:
-            seed, pubkey = pem.parse(self.pem_file, self.pem_index)
-            self.private_key_seed = seed.hex()
+            secret_key, pubkey = pem.parse(Path(self.pem_file), self.pem_index)
+            self.secret_key = secret_key.hex()
             self.address = Address(pubkey)
         elif key_file and pass_file:
             password = get_password(pass_file)
-            address_from_key_file, seed = load_from_key_file(key_file, password)
-            self.private_key_seed = seed.hex()
+            address_from_key_file, secret_key = load_from_key_file(key_file, password)
+            self.secret_key = secret_key.hex()
             self.address = Address(address_from_key_file)
 
     def sync_nonce(self, proxy: Any):
@@ -73,16 +75,45 @@ class Account(IAccount):
         self.nonce = proxy.get_account_nonce(self.address)
         logger.info(f"Account.sync_nonce() done: {self.nonce}")
 
-    def get_seed(self) -> bytes:
-        if self.ledger:
-            raise LedgerError("cannot get seed from a Ledger account")
-        return unhexlify(self.private_key_seed)
+    def sign_transaction(self, transaction: ITransaction) -> str:
+        secret_key = bytes.fromhex(self.secret_key)
+        signing_key: Any = nacl.signing.SigningKey(secret_key)
+
+        data_json = transaction.serialize()
+        signed = signing_key.sign(data_json)
+        signature = signed.signature
+        assert isinstance(signature, bytes)
+
+        return signature.hex()
+
+
+class LedgerAccount(Account):
+    def __init__(self, account_index: int = 0, address_index: int = 0):
+        super().__init__()
+        self.account_index = account_index
+        self.address_index = address_index
+        self.address = Address(do_get_ledger_address(account_index=account_index, address_index=address_index))
+
+    def sign_transaction(self, transaction: ITransaction) -> str:
+        ledger_version = do_get_ledger_version()
+        should_use_hash_signing = compare_versions(ledger_version, SIGN_USING_HASH_VERSION) >= 0
+        if should_use_hash_signing:
+            transaction.set_version(TX_HASH_SIGN_VERSION)
+            transaction.set_options(TX_HASH_SIGN_OPTIONS)
+
+        signature = do_sign_transaction_with_ledger(transaction.serialize(),
+                                                    account_index=self.account_index,
+                                                    address_index=self.address_index,
+                                                    sign_using_hash=should_use_hash_signing)
+        assert isinstance(signature, str)
+
+        return signature
 
 
 class Address(IAddress):
     HRP = "erd"
     PUBKEY_LENGTH = 32
-    PUBKEY_STRING_LENGTH = PUBKEY_LENGTH * 2    # hex-encoded
+    PUBKEY_STRING_LENGTH = PUBKEY_LENGTH * 2  # hex-encoded
     BECH32_LENGTH = 62
     _value_hex: str
 
@@ -133,7 +164,7 @@ class Address(IAddress):
         return self.bech32()
 
     @classmethod
-    def zero(cls):
+    def zero(cls) -> 'Address':
         return Address("0" * 64)
 
 

@@ -1,10 +1,17 @@
 toml>=0.10.2
+types-toml
 bottle~=0.12.18
 requests~=2.24.0
+types-requests
 pynacl
 pycryptodomex
 cryptography>=3.2
 prettytable
+types-prettytable
 ledgercomm
+semver
+requests-cache
+
+pytest
 
 setuptools

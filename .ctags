@@ -6,4 +6,3 @@
 --exclude=README*
 --exclude=erdpy/tests/testdata/*
 --exclude=__pycache__
---exclude=erdpy/ide/static/*

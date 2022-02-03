@@ -1,10 +1,12 @@
 import logging
 import os
+from typing import Any, List, Union
+
 from pathlib import Path
 from typing import Any
 
 from erdpy import cli_shared, errors, projects, utils
-from erdpy.accounts import Account, Address
+from erdpy.accounts import Account, Address, LedgerAccount
 from erdpy.contracts import CodeMetadata, SmartContract
 from erdpy.projects import load_project
 from erdpy.proxy.core import ElrondProxy
@@ -13,26 +15,35 @@ from erdpy.transactions import Transaction
 logger = logging.getLogger("cli.contracts")
 
 
-def setup_parser(subparsers: Any) -> Any:
+def setup_parser(args: List[str], subparsers: Any) -> Any:
     parser = cli_shared.add_group_subparser(subparsers, "contract", "Build, deploy and interact with Smart Contracts")
     subparsers = parser.add_subparsers()
 
-    sub = cli_shared.add_command_subparser(subparsers, "contract", "new", "Create a new Smart Contract project based on a template.")
+    sub = cli_shared.add_command_subparser(subparsers, "contract", "new",
+                                           "Create a new Smart Contract project based on a template.")
     sub.add_argument("name")
     sub.add_argument("--template", required=True, help="the template to use")
-    sub.add_argument("--directory", type=str, default=os.getcwd(), help="🗀 the parent directory of the project (default: current directory)")
+    sub.add_argument("--directory", type=str, default=os.getcwd(),
+                     help="🗀 the parent directory of the project (default: current directory)")
     sub.set_defaults(func=create)
 
-    sub = cli_shared.add_command_subparser(subparsers, "contract", "templates", "List the available Smart Contract templates.")
+    sub = cli_shared.add_command_subparser(subparsers, "contract", "templates",
+                                           "List the available Smart Contract templates.")
     sub.set_defaults(func=list_templates)
 
-    sub = cli_shared.add_command_subparser(subparsers, "contract", "build", "Build a Smart Contract project using the appropriate buildchain.")
+    sub = cli_shared.add_command_subparser(subparsers, "contract", "build",
+                                           "Build a Smart Contract project using the appropriate buildchain.")
     _add_project_arg(sub)
     sub.add_argument("--debug", action="store_true", default=False, help="set debug flag (default: %(default)s)")
-    sub.add_argument("--no-optimization", action="store_true", default=False, help="bypass optimizations (for clang) (default: %(default)s)")
+    sub.add_argument("--no-optimization", action="store_true", default=False,
+                     help="bypass optimizations (for clang) (default: %(default)s)")
+    sub.add_argument("--no-wasm-opt", action="store_true", default=False,
+                     help="do not optimize wasm files after the build (default: %(default)s)")
     sub.add_argument("--cargo-target-dir", type=str, help="for rust projects, forward the parameter to Cargo")
-    sub.add_argument("--wasm-symbols", action="store_true", default=False, help="for rust projects, does not strip the symbols from the wasm output. Useful for analysing the bytecode. Creates larger wasm files. Avoid in production (default: %(default)s)")
-    sub.add_argument("--wasm-name", type=str, help="for rust projects, optionally specify the name of the wasm bytecode output file")
+    sub.add_argument("--wasm-symbols", action="store_true", default=False,
+                     help="for rust projects, does not strip the symbols from the wasm output. Useful for analysing the bytecode. Creates larger wasm files. Avoid in production (default: %(default)s)")
+    sub.add_argument("--wasm-name", type=str,
+                     help="for rust projects, optionally specify the name of the wasm bytecode output file")
     sub.set_defaults(func=build)
 
     sub = cli_shared.add_command_subparser(subparsers, "contract", "clean", "Clean a Smart Contract project.")
@@ -41,7 +52,8 @@ def setup_parser(subparsers: Any) -> Any:
 
     sub = cli_shared.add_command_subparser(subparsers, "contract", "test", "Run Mandos tests.")
     _add_project_arg(sub)
-    sub.add_argument("--directory", default="mandos", help="🗀 the directory containing the tests (default: %(default)s)")
+    sub.add_argument("--directory", default="mandos",
+                     help="🗀 the directory containing the tests (default: %(default)s)")
     sub.add_argument("--wildcard", required=False, help="wildcard to match only specific test files")
     sub.set_defaults(func=run_tests)
 
@@ -49,9 +61,9 @@ def setup_parser(subparsers: Any) -> Any:
     _add_project_or_bytecode_arg(sub)
     _add_metadata_arg(sub)
     cli_shared.add_outfile_arg(sub)
-    cli_shared.add_wallet_args(sub)
+    cli_shared.add_wallet_args(args, sub)
     cli_shared.add_proxy_arg(sub)
-    cli_shared.add_tx_args(sub, with_receiver=False, with_data=False)
+    cli_shared.add_tx_args(args, sub, with_receiver=False, with_data=False)
     _add_arguments_arg(sub)
     sub.add_argument("--wait-result", action="store_true", default=False,
                      help="signal to wait for the transaction result - only valid if --send is set")
@@ -61,12 +73,13 @@ def setup_parser(subparsers: Any) -> Any:
 
     sub.set_defaults(func=deploy)
 
-    sub = cli_shared.add_command_subparser(subparsers, "contract", "call", "Interact with a Smart Contract (execute function).")
+    sub = cli_shared.add_command_subparser(subparsers, "contract", "call",
+                                           "Interact with a Smart Contract (execute function).")
     _add_contract_arg(sub)
     cli_shared.add_outfile_arg(sub)
-    cli_shared.add_wallet_args(sub)
+    cli_shared.add_wallet_args(args, sub)
     cli_shared.add_proxy_arg(sub)
-    cli_shared.add_tx_args(sub, with_receiver=False, with_data=False)
+    cli_shared.add_tx_args(args, sub, with_receiver=False, with_data=False)
     _add_function_arg(sub)
     _add_arguments_arg(sub)
     sub.add_argument("--wait-result", action="store_true", default=False,
@@ -77,14 +90,15 @@ def setup_parser(subparsers: Any) -> Any:
 
     sub.set_defaults(func=call)
 
-    sub = cli_shared.add_command_subparser(subparsers, "contract", "upgrade", "Upgrade a previously-deployed Smart Contract")
+    sub = cli_shared.add_command_subparser(subparsers, "contract", "upgrade",
+                                           "Upgrade a previously-deployed Smart Contract")
     _add_contract_arg(sub)
     cli_shared.add_outfile_arg(sub)
     _add_project_or_bytecode_arg(sub)
     _add_metadata_arg(sub)
-    cli_shared.add_wallet_args(sub)
+    cli_shared.add_wallet_args(args, sub)
     cli_shared.add_proxy_arg(sub)
-    cli_shared.add_tx_args(sub, with_receiver=False, with_data=False)
+    cli_shared.add_tx_args(args, sub, with_receiver=False, with_data=False)
     _add_arguments_arg(sub)
     sub.add_argument("--wait-result", action="store_true", default=False,
                      help="signal to wait for the transaction result - only valid if --send is set")
@@ -94,7 +108,8 @@ def setup_parser(subparsers: Any) -> Any:
 
     sub.set_defaults(func=upgrade)
 
-    sub = cli_shared.add_command_subparser(subparsers, "contract", "query", "Query a Smart Contract (call a pure function)")
+    sub = cli_shared.add_command_subparser(subparsers, "contract", "query",
+                                           "Query a Smart Contract (call a pure function)")
     _add_contract_arg(sub)
     cli_shared.add_proxy_arg(sub)
     _add_function_arg(sub)
@@ -106,7 +121,8 @@ def setup_parser(subparsers: Any) -> Any:
 
 
 def _add_project_arg(sub: Any):
-    sub.add_argument("project", nargs='?', default=os.getcwd(), help="🗀 the project directory (default: current directory)")
+    sub.add_argument("project", nargs='?', default=os.getcwd(),
+                     help="🗀 the project directory (default: current directory)")
 
 
 def _add_project_or_bytecode_arg(sub: Any):
@@ -114,7 +130,7 @@ def _add_project_or_bytecode_arg(sub: Any):
     group.add_argument("--project", default=os.getcwd(),
                        help="🗀 the project directory (default: current directory)")
     group.add_argument("--bytecode", type=str,
-                      help="the file containing the WASM bytecode")
+                       help="the file containing the WASM bytecode")
 
 
 def _add_contract_arg(sub: Any):
@@ -126,12 +142,19 @@ def _add_function_arg(sub: Any):
 
 
 def _add_arguments_arg(sub: Any):
-    sub.add_argument("--arguments", nargs='+', help="arguments for the contract transaction, as numbers or hex-encoded. E.g. --arguments 42 0x64 1000 0xabba")
+    sub.add_argument("--arguments", nargs='+',
+                     help="arguments for the contract transaction, as numbers or hex-encoded. E.g. --arguments 42 0x64 1000 0xabba")
 
 
 def _add_metadata_arg(sub: Any):
-    sub.add_argument("--metadata-not-upgradeable", dest="metadata_upgradeable", action="store_false", help="‼ mark the contract as NOT upgradeable (default: upgradeable)")
-    sub.add_argument("--metadata-payable", dest="metadata_payable", action="store_true", help="‼ mark the contract as payable (default: not payable)")
+    sub.add_argument("--metadata-not-upgradeable", dest="metadata_upgradeable", action="store_false",
+                     help="‼ mark the contract as NOT upgradeable (default: upgradeable)")
+    sub.add_argument("--metadata-not-readable", dest="metadata_readable", action="store_false",
+                     help="‼ mark the contract as NOT readable (default: readable)")
+    sub.add_argument("--metadata-payable", dest="metadata_payable", action="store_true",
+                     help="‼ mark the contract as payable (default: not payable)")
+    sub.add_argument("--metadata-payable-by-sc", dest="metadata_payable_by_sc", action="store_true",
+                     help="‼ mark the contract as payable by SC (default: not payable by SC)")
     sub.set_defaults(metadata_upgradeable=True, metadata_payable=False)
 
 
@@ -142,21 +165,22 @@ def list_templates(args: Any):
 def create(args: Any):
     name = args.name
     template = args.template
-    directory = args.directory
+    directory = Path(args.directory)
 
     projects.create_project_from_template_name(name, template, directory)
 
 
 def clean(args: Any):
-    project = args.project
+    project = Path(args.project)
     projects.clean_project(project)
 
 
 def build(args: Any):
-    project = args.project
+    project = Path(args.project)
     options = {
         "debug": args.debug,
         "optimized": not args.no_optimization,
+        "no-wasm-opt": args.no_wasm_opt,
         "verbose": args.verbose,
         "cargo_target_dir": args.cargo_target_dir,
         "wasm_symbols": args.wasm_symbols,
@@ -186,6 +210,7 @@ def deploy(args: Any):
 
     tx = contract.deploy(sender, arguments, gas_price, gas_limit, value, chain, version)
     logger.info("Contract address: %s", contract.address)
+    utils.log_explorer_contract_address(chain, contract.address)
 
     result = None
     try:
@@ -220,19 +245,24 @@ def dump_tx_and_result(tx: Any, result: Any, args: Any):
 
 
 def _prepare_contract(args: Any) -> SmartContract:
-    if len(args.bytecode):
+    if args.bytecode and len(args.bytecode):
         bytecode = utils.read_binary_file(Path(args.bytecode)).hex()
     else:
-        project = load_project(args.project)
+        project_path = Path(args.project)
+        project = load_project(project_path)
         bytecode = project.get_bytecode()
 
-    metadata = CodeMetadata(args.metadata_upgradeable, args.metadata_payable)
+    metadata = CodeMetadata(upgradeable=args.metadata_upgradeable, readable=args.metadata_readable,
+        payable=args.metadata_payable, payable_by_sc=args.metadata_payable_by_sc)
     contract = SmartContract(bytecode=bytecode, metadata=metadata)
     return contract
 
 
 def _prepare_sender(args: Any) -> Account:
-    if args.pem:
+    sender: Account
+    if args.ledger:
+        sender = LedgerAccount(account_index=args.ledger_account_index, address_index=args.ledger_address_index)
+    elif args.pem:
         sender = Account(pem_file=args.pem, pem_index=args.pem_index)
     elif args.keyfile and args.passfile:
         sender = Account(key_file=args.keyfile, pass_file=args.passfile)

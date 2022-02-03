@@ -1,6 +1,6 @@
 import base64
 import logging
-from typing import Any, List, Optional
+from typing import Any, List, Optional, Tuple
 
 from Cryptodome.Hash import keccak
 
@@ -8,13 +8,14 @@ from erdpy import config, constants, errors
 from erdpy.accounts import Account, Address
 from erdpy.interfaces import IElrondProxy
 from erdpy.transactions import Transaction
+from erdpy.utils import Object
 
 logger = logging.getLogger("contracts")
 
 HEX_PREFIX = "0X"
 
 
-class QueryResult:
+class QueryResult(Object):
     def __init__(self, as_base64: str, as_hex: str, as_number: int):
         self.base64 = as_base64
         self.hex = as_hex
@@ -51,7 +52,7 @@ class SmartContract:
         return tx
 
     def prepare_deploy_transaction_data(self, arguments: List[Any]):
-        tx_data = f"{self.bytecode}@{constants.VM_TYPE_ARWEN}@{self.metadata.to_hex()}"
+        tx_data = f"{self.bytecode}@{constants.VM_TYPE_WASM_VM}@{self.metadata.to_hex()}"
 
         for arg in arguments:
             tx_data += f"@{_prepare_argument(arg)}"
@@ -210,10 +211,27 @@ def ensure_even_length(string: str) -> str:
     return string
 
 
+def sum_flag_values(flag_value_pairs: List[Tuple[int, bool]]) -> int:
+    value_sum = 0
+    for value, flag in flag_value_pairs:
+        if flag:
+            value_sum += value
+    return value_sum
+
+
 class CodeMetadata:
-    def __init__(self, upgradeable: bool = True, payable: bool = False):
+    def __init__(self, upgradeable: bool = True, readable: bool = True, payable: bool = False, payable_by_sc: bool = False):
         self.upgradeable = upgradeable
+        self.readable = readable
         self.payable = payable
+        self.payable_by_sc = payable_by_sc
 
     def to_hex(self):
-        return ("01" if self.upgradeable else "00") + ("02" if self.payable else "00")
+        flag_value_pairs = [
+            (0x01_00, self.upgradeable),
+            (0x04_00, self.readable),
+            (0x00_02, self.payable),
+            (0x00_04, self.payable_by_sc)
+        ]
+        metadata_value = sum_flag_values(flag_value_pairs)
+        return f"{metadata_value:04X}"

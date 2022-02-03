@@ -1,8 +1,9 @@
 import logging
+from pathlib import Path
 from typing import Dict, List
 
 from erdpy import config, errors
-from erdpy.dependencies.modules import (ArwenToolsModule, DependencyModule,
+from erdpy.dependencies.modules import (NpmModule, VMToolsModule, DependencyModule,
                                         GolangModule, MclSignerModule,
                                         NodejsModule, Rust, StandaloneModule)
 
@@ -10,11 +11,16 @@ logger = logging.getLogger("install")
 
 
 def install_module(key: str, tag: str = "", overwrite: bool = False):
-    module = get_module_by_key(key)
-    module.install(tag, overwrite)
+    if key == 'all':
+        modules = get_all_deps_installable_via_cli()
+    else:
+        modules = [get_module_by_key(key)]
+
+    for module in modules:
+        module.install(tag, overwrite)
 
 
-def get_module_directory(key: str) -> str:
+def get_module_directory(key: str) -> Path:
     module = get_module_by_key(key)
     default_tag = config.get_dependency_tag(key)
     directory = module.get_directory(default_tag)
@@ -39,16 +45,27 @@ def get_deps_dict() -> Dict[str, DependencyModule]:
 
 
 def get_all_deps() -> List[DependencyModule]:
+    return get_all_implicit_deps() + get_all_deps_installable_via_cli()
+
+
+def get_all_implicit_deps() -> List[DependencyModule]:
     return [
         StandaloneModule(key="llvm", aliases=["clang", "cpp"]),
-        ArwenToolsModule(key="arwentools"),
         Rust(key="rust"),
         NodejsModule(key="nodejs", aliases=[]),
-        StandaloneModule(key="elrond_go"),
-        StandaloneModule(key="elrond_proxy_go"),
         GolangModule(key="golang"),
-        MclSignerModule(key="mcl_signer")
     ]
+
+
+def get_all_deps_installable_via_cli() -> List[DependencyModule]:
+    return [
+        VMToolsModule(key="vmtools"),
+        StandaloneModule(key="elrond_go", repo_name="elrond-go", organisation="ElrondNetwork"),
+        StandaloneModule(key="elrond_proxy_go", repo_name="elrond-proxy-go", organisation="ElrondNetwork"),
+        MclSignerModule(key="mcl_signer"),
+        NpmModule(key="wasm-opt")
+    ]
+
 
 
 def get_golang() -> GolangModule:

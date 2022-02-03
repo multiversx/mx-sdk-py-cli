@@ -16,11 +16,11 @@ erdpy is part of the elrond-sdk and consists of Command Line Tools and Python SD
 for interacting with the Blockchain (in general) and with Smart Contracts (in particular).
 
 erdpy targets a broad audience of users and developers.
-https://docs.elrond.com/tools/erdpy.
+https://docs.elrond.com/sdk-and-tools/erdpy/erdpy.
         
 
 COMMAND GROUPS:
-  {contract,tx,validator,account,wallet,network,cost,dispatcher,blockatlas,deps,config,hyperblock,testnet,data,staking-provider,dns}
+  {contract,tx,validator,account,ledger,wallet,network,cost,dispatcher,blockatlas,deps,config,hyperblock,testnet,data,staking-provider,dns}
 
 TOP-LEVEL OPTIONS:
   -h, --help            show this help message and exit
@@ -32,9 +32,10 @@ COMMAND GROUPS summary
 ----------------------
 contract                       Build, deploy and interact with Smart Contracts
 tx                             Create and broadcast Transactions
-validator                      Stake, Unjail and other actions useful for Validators
+validator                      Stake, UnStake, UnBond, Unjail and other actions useful for Validators
 account                        Get Account data (nonce, balance) from the Network
-wallet                         Derive private key from mnemonic, bech32 address helpers etc.
+ledger                         Get Ledger App addresses and version
+wallet                         Create wallet, derive secret key from mnemonic, bech32 address helpers etc.
 network                        Get Network parameters, such as number of shards, chain identifier etc.
 cost                           Estimate cost of Transactions
 dispatcher                     Enqueue transactions, then bulk dispatch them
@@ -46,7 +47,6 @@ testnet                        Set up, start and control local testnets
 data                           Data manipulation omnitool
 staking-provider               Staking provider omnitool
 dns                            Operations related to the Domain Name Service
-ledger                         Get Ledger App address and version
 
 ```
 ## Group **Contract**
@@ -125,7 +125,12 @@ optional arguments:
   -h, --help                           show this help message and exit
   --debug                              set debug flag (default: False)
   --no-optimization                    bypass optimizations (for clang) (default: False)
+  --no-wasm-opt                        do not optimize wasm files after the build (default: False)
   --cargo-target-dir CARGO_TARGET_DIR  for rust projects, forward the parameter to Cargo
+  --wasm-symbols                       for rust projects, does not strip the symbols from the wasm output. Useful for
+                                       analysing the bytecode. Creates larger wasm files. Avoid in production (default:
+                                       False)
+  --wasm-name WASM_NAME                for rust projects, optionally specify the name of the wasm bytecode output file
 
 ```
 ### Contract.Clean
@@ -154,32 +159,39 @@ usage: erdpy contract deploy [-h] ...
 Deploy a Smart Contract.
 
 optional arguments:
-  -h, --help                             show this help message and exit
-  --project PROJECT                      🗀 the project directory (default: current directory)
-  --bytecode BYTECODE                    the WASM file
-  --metadata-not-upgradeable             ‼ mark the contract as NOT upgradeable (default: upgradeable)
-  --metadata-payable                     ‼ mark the contract as payable (default: not payable)
-  --outfile OUTFILE                      where to save the output (default: stdout)
-  --pem PEM                              🔑 the PEM file, if keyfile or ledger are not provided
-  --pem-index PEM_INDEX                  🔑 the index in the PEM file (default: 0)
-  --keyfile KEYFILE                      🔑 a JSON keyfile, if PEM of ledger not provided
-  --passfile PASSFILE                    🔑 a file containing keyfile's password, if keyfile provided
-  --ledger                               🔐 bool flag for signing transaction using ledger
-  --ledger-account-index                 🔐 the index of the account (only applicable if --ledger is set)
-  --ledger-address-index                 🔐 the index of the address (only applicable if --ledger is set)
-  --sender-username SENDER_USERNAME      🖄 the username of the sender
-  --proxy PROXY                          🖧 the URL of the proxy (default: https://testnet-gateway.elrond.com)
-  --nonce NONCE                          # the nonce for the transaction
-  --recall-nonce                         ⭮ whether to recall the nonce when creating the transaction (default: False)
-  --gas-price GAS_PRICE                  ⛽ the gas price (default: 1000000000)
-  --gas-limit GAS_LIMIT                  ⛽ the gas limit
-  --value VALUE                          the value to transfer (default: 0)
-  --chain CHAIN                          the chain identifier (default: T)
-  --version VERSION                      the transaction version (default: 1)
-  --arguments ARGUMENTS [ARGUMENTS ...]  arguments for the contract transaction, as numbers or hex-encoded. E.g.
-                                         --arguments 42 0x64 1000 0xabba
-  --send                                 ✓ whether to broadcast the transaction (default: False)
-  --simulate                             whether to simulate the transaction (default: False)
+  -h, --help                                   show this help message and exit
+  --project PROJECT                            🗀 the project directory (default: current directory)
+  --bytecode BYTECODE                          the file containing the WASM bytecode
+  --metadata-not-upgradeable                   ‼ mark the contract as NOT upgradeable (default: upgradeable)
+  --metadata-not-readable                      ‼ mark the contract as NOT readable (default: readable)
+  --metadata-payable                           ‼ mark the contract as payable (default: not payable)
+  --metadata-payable-by-sc                     ‼ mark the contract as payable by SC (default: not payable by SC)
+  --outfile OUTFILE                            where to save the output (default: stdout)
+  --pem PEM                                    🔑 the PEM file, if keyfile not provided
+  --pem-index PEM_INDEX                        🔑 the index in the PEM file (default: 0)
+  --keyfile KEYFILE                            🔑 a JSON keyfile, if PEM not provided
+  --passfile PASSFILE                          🔑 a file containing keyfile's password, if keyfile provided
+  --ledger                                     🔐 bool flag for signing transaction using ledger
+  --ledger-account-index LEDGER_ACCOUNT_INDEX  🔐 the index of the account when using Ledger
+  --ledger-address-index LEDGER_ADDRESS_INDEX  🔐 the index of the address when using Ledger
+  --sender-username SENDER_USERNAME            🖄 the username of the sender
+  --proxy PROXY                                🔗 the URL of the proxy (default: https://testnet-gateway.elrond.com)
+  --nonce NONCE                                # the nonce for the transaction
+  --recall-nonce                               ⭮ whether to recall the nonce when creating the transaction (default:
+                                               False)
+  --gas-price GAS_PRICE                        ⛽ the gas price (default: 1000000000)
+  --gas-limit GAS_LIMIT                        ⛽ the gas limit
+  --value VALUE                                the value to transfer (default: 0)
+  --chain CHAIN                                the chain identifier (default: T)
+  --version VERSION                            the transaction version (default: 1)
+  --options OPTIONS                            the transaction options (default: 0)
+  --arguments ARGUMENTS [ARGUMENTS ...]        arguments for the contract transaction, as numbers or hex-encoded. E.g.
+                                               --arguments 42 0x64 1000 0xabba
+  --wait-result                                signal to wait for the transaction result - only valid if --send is set
+  --timeout TIMEOUT                            max num of seconds to wait for result - only valid if --wait-result is
+                                               set
+  --send                                       ✓ whether to broadcast the transaction (default: False)
+  --simulate                                   whether to simulate the transaction (default: False)
 
 ```
 ### Contract.Call
@@ -192,33 +204,38 @@ usage: erdpy contract call [-h] ...
 Interact with a Smart Contract (execute function).
 
 positional arguments:
-  contract                               🖄 the address of the Smart Contract
+  contract                                     🖄 the address of the Smart Contract
 
 optional arguments:
-  -h, --help                             show this help message and exit
-  --outfile OUTFILE                      where to save the output (default: stdout)
-  --pem PEM                              🔑 the PEM file, if keyfile or ledger are not provided
-  --pem-index PEM_INDEX                  🔑 the index in the PEM file (default: 0)
-  --keyfile KEYFILE                      🔑 a JSON keyfile, if PEM of ledger not provided
-  --passfile PASSFILE                    🔑 a file containing keyfile's password, if keyfile provided
-  --ledger                               🔐 bool flag for signing transaction using ledger
-  --ledger-account-index                 🔐 the index of the account (only applicable if --ledger is set)
-  --ledger-address-index                 🔐 the index of the address (only applicable if --ledger is set)
-  --sender-username SENDER_USERNAME      🖄 the username of the sender
-  --proxy PROXY                          🖧 the URL of the proxy (default: https://testnet-gateway.elrond.com)
-  --nonce NONCE                          # the nonce for the transaction
-  --recall-nonce                         ⭮ whether to recall the nonce when creating the transaction (default: False)
-  --gas-price GAS_PRICE                  ⛽ the gas price (default: 1000000000)
-  --gas-limit GAS_LIMIT                  ⛽ the gas limit
-  --value VALUE                          the value to transfer (default: 0)
-  --chain CHAIN                          the chain identifier (default: T)
-  --version VERSION                      the transaction version (default: 1)
-  --function FUNCTION                    the function to call
-  --arguments ARGUMENTS [ARGUMENTS ...]  arguments for the contract transaction, as numbers or hex-encoded. E.g.
-                                         --arguments 42 0x64 1000 0xabba
-  --send                                 ✓ whether to broadcast the transaction (default: False)
-  --simulate                             whether to simulate the transaction (default: False)
-  --relay                                whether to relay the transaction (default: False)
+  -h, --help                                   show this help message and exit
+  --outfile OUTFILE                            where to save the output (default: stdout)
+  --pem PEM                                    🔑 the PEM file, if keyfile not provided
+  --pem-index PEM_INDEX                        🔑 the index in the PEM file (default: 0)
+  --keyfile KEYFILE                            🔑 a JSON keyfile, if PEM not provided
+  --passfile PASSFILE                          🔑 a file containing keyfile's password, if keyfile provided
+  --ledger                                     🔐 bool flag for signing transaction using ledger
+  --ledger-account-index LEDGER_ACCOUNT_INDEX  🔐 the index of the account when using Ledger
+  --ledger-address-index LEDGER_ADDRESS_INDEX  🔐 the index of the address when using Ledger
+  --sender-username SENDER_USERNAME            🖄 the username of the sender
+  --proxy PROXY                                🔗 the URL of the proxy (default: https://testnet-gateway.elrond.com)
+  --nonce NONCE                                # the nonce for the transaction
+  --recall-nonce                               ⭮ whether to recall the nonce when creating the transaction (default:
+                                               False)
+  --gas-price GAS_PRICE                        ⛽ the gas price (default: 1000000000)
+  --gas-limit GAS_LIMIT                        ⛽ the gas limit
+  --value VALUE                                the value to transfer (default: 0)
+  --chain CHAIN                                the chain identifier (default: T)
+  --version VERSION                            the transaction version (default: 1)
+  --options OPTIONS                            the transaction options (default: 0)
+  --function FUNCTION                          the function to call
+  --arguments ARGUMENTS [ARGUMENTS ...]        arguments for the contract transaction, as numbers or hex-encoded. E.g.
+                                               --arguments 42 0x64 1000 0xabba
+  --wait-result                                signal to wait for the transaction result - only valid if --send is set
+  --timeout TIMEOUT                            max num of seconds to wait for result - only valid if --wait-result is
+                                               set
+  --send                                       ✓ whether to broadcast the transaction (default: False)
+  --simulate                                   whether to simulate the transaction (default: False)
+  --relay                                      whether to relay the transaction (default: False)
 
 ```
 ### Contract.Upgrade
@@ -231,35 +248,42 @@ usage: erdpy contract upgrade [-h] ...
 Upgrade a previously-deployed Smart Contract
 
 positional arguments:
-  contract                               🖄 the address of the Smart Contract
+  contract                                     🖄 the address of the Smart Contract
 
 optional arguments:
-  -h, --help                             show this help message and exit
-  --outfile OUTFILE                      where to save the output (default: stdout)
-  --project PROJECT                      🗀 the project directory (default: current directory)
-  --bytecode BYTECODE                    the WASM file
-  --metadata-not-upgradeable             ‼ mark the contract as NOT upgradeable (default: upgradeable)
-  --metadata-payable                     ‼ mark the contract as payable (default: not payable)
-  --pem PEM                              🔑 the PEM file, if keyfile or ledger are not provided
-  --pem-index PEM_INDEX                  🔑 the index in the PEM file (default: 0)
-  --keyfile KEYFILE                      🔑 a JSON keyfile, if PEM of ledger not provided
-  --passfile PASSFILE                    🔑 a file containing keyfile's password, if keyfile provided
-  --ledger                               🔐 bool flag for signing transaction using ledger
-  --ledger-account-index                 🔐 the index of the account (only applicable if --ledger is set)
-  --ledger-address-index                 🔐 the index of the address (only applicable if --ledger is set)
-  --sender-username SENDER_USERNAME      🖄 the username of the sender
-  --proxy PROXY                          🖧 the URL of the proxy (default: https://testnet-gateway.elrond.com)
-  --nonce NONCE                          # the nonce for the transaction
-  --recall-nonce                         ⭮ whether to recall the nonce when creating the transaction (default: False)
-  --gas-price GAS_PRICE                  ⛽ the gas price (default: 1000000000)
-  --gas-limit GAS_LIMIT                  ⛽ the gas limit
-  --value VALUE                          the value to transfer (default: 0)
-  --chain CHAIN                          the chain identifier (default: T)
-  --version VERSION                      the transaction version (default: 1)
-  --arguments ARGUMENTS [ARGUMENTS ...]  arguments for the contract transaction, as numbers or hex-encoded. E.g.
-                                         --arguments 42 0x64 1000 0xabba
-  --send                                 ✓ whether to broadcast the transaction (default: False)
-  --simulate                             whether to simulate the transaction (default: False)
+  -h, --help                                   show this help message and exit
+  --outfile OUTFILE                            where to save the output (default: stdout)
+  --project PROJECT                            🗀 the project directory (default: current directory)
+  --bytecode BYTECODE                          the file containing the WASM bytecode
+  --metadata-not-upgradeable                   ‼ mark the contract as NOT upgradeable (default: upgradeable)
+  --metadata-not-readable                      ‼ mark the contract as NOT readable (default: readable)
+  --metadata-payable                           ‼ mark the contract as payable (default: not payable)
+  --metadata-payable-by-sc                     ‼ mark the contract as payable by SC (default: not payable by SC)
+  --pem PEM                                    🔑 the PEM file, if keyfile not provided
+  --pem-index PEM_INDEX                        🔑 the index in the PEM file (default: 0)
+  --keyfile KEYFILE                            🔑 a JSON keyfile, if PEM not provided
+  --passfile PASSFILE                          🔑 a file containing keyfile's password, if keyfile provided
+  --ledger                                     🔐 bool flag for signing transaction using ledger
+  --ledger-account-index LEDGER_ACCOUNT_INDEX  🔐 the index of the account when using Ledger
+  --ledger-address-index LEDGER_ADDRESS_INDEX  🔐 the index of the address when using Ledger
+  --sender-username SENDER_USERNAME            🖄 the username of the sender
+  --proxy PROXY                                🔗 the URL of the proxy (default: https://testnet-gateway.elrond.com)
+  --nonce NONCE                                # the nonce for the transaction
+  --recall-nonce                               ⭮ whether to recall the nonce when creating the transaction (default:
+                                               False)
+  --gas-price GAS_PRICE                        ⛽ the gas price (default: 1000000000)
+  --gas-limit GAS_LIMIT                        ⛽ the gas limit
+  --value VALUE                                the value to transfer (default: 0)
+  --chain CHAIN                                the chain identifier (default: T)
+  --version VERSION                            the transaction version (default: 1)
+  --options OPTIONS                            the transaction options (default: 0)
+  --arguments ARGUMENTS [ARGUMENTS ...]        arguments for the contract transaction, as numbers or hex-encoded. E.g.
+                                               --arguments 42 0x64 1000 0xabba
+  --wait-result                                signal to wait for the transaction result - only valid if --send is set
+  --timeout TIMEOUT                            max num of seconds to wait for result - only valid if --wait-result is
+                                               set
+  --send                                       ✓ whether to broadcast the transaction (default: False)
+  --simulate                                   whether to simulate the transaction (default: False)
 
 ```
 ### Contract.Query
@@ -276,7 +300,7 @@ positional arguments:
 
 optional arguments:
   -h, --help                             show this help message and exit
-  --proxy PROXY                          🖧 the URL of the proxy (default: https://testnet-gateway.elrond.com)
+  --proxy PROXY                          🔗 the URL of the proxy (default: https://testnet-gateway.elrond.com)
   --function FUNCTION                    the function to call
   --arguments ARGUMENTS [ARGUMENTS ...]  arguments for the contract transaction, as numbers or hex-encoded. E.g.
                                          --arguments 42 0x64 1000 0xabba
@@ -315,31 +339,36 @@ usage: erdpy tx new [-h] ...
 Create a new transaction
 
 optional arguments:
-  -h, --help                             show this help message and exit
-  --pem PEM                              🔑 the PEM file, if keyfile or ledger are not provided
-  --pem-index PEM_INDEX                  🔑 the index in the PEM file (default: 0)
-  --keyfile KEYFILE                      🔑 a JSON keyfile, if PEM of ledger not provided
-  --passfile PASSFILE                    🔑 a file containing keyfile's password, if keyfile provided
-  --ledger                               🔐 bool flag for signing transaction using ledger
-  --ledger-account-index                 🔐 the index of the account (only applicable if --ledger is set)
-  --ledger-address-index                 🔐 the index of the address (only applicable if --ledger is set)
-  --sender-username SENDER_USERNAME      🖄 the username of the sender
-  --nonce NONCE                          # the nonce for the transaction
-  --recall-nonce                         ⭮ whether to recall the nonce when creating the transaction (default: False)
-  --receiver RECEIVER                    🖄 the address of the receiver
-  --receiver-username RECEIVER_USERNAME  🖄 the username of the receiver
-  --gas-price GAS_PRICE                  ⛽ the gas price (default: 1000000000)
-  --gas-limit GAS_LIMIT                  ⛽ the gas limit
-  --value VALUE                          the value to transfer (default: 0)
-  --data DATA                            the payload, or 'memo' of the transaction (default: )
-  --chain CHAIN                          the chain identifier (default: T)
-  --version VERSION                      the transaction version (default: 1)
-  --data-file DATA_FILE                  a file containing transaction data
-  --outfile OUTFILE                      where to save the output (signed transaction, hash) (default: stdout)
-  --send                                 ✓ whether to broadcast the transaction (default: False)
-  --simulate                             whether to simulate the transaction (default: False)
-  --relay                                whether to relay the transaction (default: False)
-  --proxy PROXY                          🖧 the URL of the proxy (default: https://testnet-gateway.elrond.com)
+  -h, --help                                   show this help message and exit
+  --pem PEM                                    🔑 the PEM file, if keyfile not provided
+  --pem-index PEM_INDEX                        🔑 the index in the PEM file (default: 0)
+  --keyfile KEYFILE                            🔑 a JSON keyfile, if PEM not provided
+  --passfile PASSFILE                          🔑 a file containing keyfile's password, if keyfile provided
+  --ledger                                     🔐 bool flag for signing transaction using ledger
+  --ledger-account-index LEDGER_ACCOUNT_INDEX  🔐 the index of the account when using Ledger
+  --ledger-address-index LEDGER_ADDRESS_INDEX  🔐 the index of the address when using Ledger
+  --sender-username SENDER_USERNAME            🖄 the username of the sender
+  --nonce NONCE                                # the nonce for the transaction
+  --recall-nonce                               ⭮ whether to recall the nonce when creating the transaction (default:
+                                               False)
+  --receiver RECEIVER                          🖄 the address of the receiver
+  --receiver-username RECEIVER_USERNAME        🖄 the username of the receiver
+  --gas-price GAS_PRICE                        ⛽ the gas price (default: 1000000000)
+  --gas-limit GAS_LIMIT                        ⛽ the gas limit
+  --value VALUE                                the value to transfer (default: 0)
+  --data DATA                                  the payload, or 'memo' of the transaction (default: )
+  --chain CHAIN                                the chain identifier (default: T)
+  --version VERSION                            the transaction version (default: 1)
+  --options OPTIONS                            the transaction options (default: 0)
+  --data-file DATA_FILE                        a file containing transaction data
+  --outfile OUTFILE                            where to save the output (signed transaction, hash) (default: stdout)
+  --send                                       ✓ whether to broadcast the transaction (default: False)
+  --simulate                                   whether to simulate the transaction (default: False)
+  --relay                                      whether to relay the transaction (default: False)
+  --proxy PROXY                                🔗 the URL of the proxy (default: https://testnet-gateway.elrond.com)
+  --wait-result                                signal to wait for the transaction result - only valid if --send is set
+  --timeout TIMEOUT                            max num of seconds to wait for result - only valid if --wait-result is
+                                               set
 
 ```
 ### Transactions.Send
@@ -355,7 +384,7 @@ optional arguments:
   -h, --help         show this help message and exit
   --infile INFILE    input file (a previously saved transaction)
   --outfile OUTFILE  where to save the output (the hash) (default: stdout)
-  --proxy PROXY      🖧 the URL of the proxy (default: https://testnet-gateway.elrond.com)
+  --proxy PROXY      🔗 the URL of the proxy (default: https://testnet-gateway.elrond.com)
 
 ```
 ### Transactions.Get
@@ -372,7 +401,7 @@ optional arguments:
   --hash HASH                the hash
   --sender SENDER            the sender address
   --with-results             will also return the results of transaction
-  --proxy PROXY              🖧 the URL of the proxy (default: https://testnet-gateway.elrond.com)
+  --proxy PROXY              🔗 the URL of the proxy (default: https://testnet-gateway.elrond.com)
   --omit-fields OMIT_FIELDS  omit fields in the output payload (default: [])
 
 ```
@@ -403,7 +432,7 @@ Get hyperblock
 
 optional arguments:
   -h, --help     show this help message and exit
-  --proxy PROXY  🖧 the URL of the proxy (default: https://testnet-gateway.elrond.com)
+  --proxy PROXY  🔗 the URL of the proxy (default: https://testnet-gateway.elrond.com)
   --key KEY      the hash or the nonce of the hyperblock
 
 ```
@@ -414,10 +443,10 @@ optional arguments:
 $ erdpy validator --help
 usage: erdpy validator COMMAND [-h] ...
 
-Stake, Unjail and other actions useful for Validators
+Stake, UnStake, UnBond, Unjail and other actions useful for Validators
 
 COMMANDS:
-  {stake,unstake,unjail,unbond,change-reward-address,claim}
+  {stake,unstake,unjail,unbond,change-reward-address,claim,unstake-nodes,unstake-tokens,unbond-nodes,unbond-tokens,clean-registered-data,restake-unstaked-nodes}
 
 OPTIONS:
   -h, --help            show this help message and exit
@@ -428,9 +457,15 @@ COMMANDS summary
 stake                          Stake value into the Network
 unstake                        Unstake value
 unjail                         Unjail a Validator Node
-unbond                         Unbond
+unbond                         Unbond tokens for a bls key
 change-reward-address          Change the reward address
 claim                          Claim rewards
+unstake-nodes                  Unstake-nodes will unstake nodes for provided bls keys
+unstake-tokens                 This command will un-stake the given amount (if value is greater than the existing topUp value, it will unStake one or several nodes)
+unbond-nodes                   It will unBond nodes
+unbond-tokens                  It will unBond tokens, if provided value is bigger that topUp value will unBond nodes
+clean-registered-data          Deletes duplicated keys from registered data
+restake-unstaked-nodes         It will reStake UnStaked nodes
 
 ```
 ### Validator.Stake
@@ -443,29 +478,32 @@ usage: erdpy validator stake [-h] ...
 Stake value into the Network
 
 optional arguments:
-  -h, --help                         show this help message and exit
-  --proxy PROXY                      🖧 the URL of the proxy (default: https://testnet-gateway.elrond.com)
-  --pem PEM                          🔑 the PEM file, if keyfile or ledger are not provided
-  --pem-index PEM_INDEX              🔑 the index in the PEM file (default: 0)
-  --keyfile KEYFILE                  🔑 a JSON keyfile, if PEM of ledger not provided
-  --passfile PASSFILE                🔑 a file containing keyfile's password, if keyfile provided
-  --ledger                           🔐 bool flag for signing transaction using ledger
-  --ledger-account-index             🔐 the index of the account (only applicable if --ledger is set)
-  --ledger-address-index             🔐 the index of the address (only applicable if --ledger is set)
-  --sender-username SENDER_USERNAME  🖄 the username of the sender
-  --nonce NONCE                      # the nonce for the transaction
-  --recall-nonce                     ⭮ whether to recall the nonce when creating the transaction (default: False)
-  --gas-price GAS_PRICE              ⛽ the gas price (default: 1000000000)
-  --gas-limit GAS_LIMIT              ⛽ the gas limit
-  --estimate-gas                     ⛽ whether to estimate the gas limit (default: 0)
-  --value VALUE                      the value to transfer (default: 0)
-  --chain CHAIN                      the chain identifier (default: T)
-  --version VERSION                  the transaction version (default: 1)
-  --send                             ✓ whether to broadcast the transaction (default: False)
-  --simulate                         whether to simulate the transaction (default: False)
-  --outfile OUTFILE                  where to save the output (signed transaction, hash) (default: stdout)
-  --reward-address REWARD_ADDRESS    the reward address
-  --validators-file VALIDATORS_FILE  a JSON file describing the Nodes
+  -h, --help                                   show this help message and exit
+  --proxy PROXY                                🔗 the URL of the proxy (default: https://testnet-gateway.elrond.com)
+  --pem PEM                                    🔑 the PEM file, if keyfile not provided
+  --pem-index PEM_INDEX                        🔑 the index in the PEM file (default: 0)
+  --keyfile KEYFILE                            🔑 a JSON keyfile, if PEM not provided
+  --passfile PASSFILE                          🔑 a file containing keyfile's password, if keyfile provided
+  --ledger                                     🔐 bool flag for signing transaction using ledger
+  --ledger-account-index LEDGER_ACCOUNT_INDEX  🔐 the index of the account when using Ledger
+  --ledger-address-index LEDGER_ADDRESS_INDEX  🔐 the index of the address when using Ledger
+  --sender-username SENDER_USERNAME            🖄 the username of the sender
+  --nonce NONCE                                # the nonce for the transaction
+  --recall-nonce                               ⭮ whether to recall the nonce when creating the transaction (default:
+                                               False)
+  --gas-price GAS_PRICE                        ⛽ the gas price (default: 1000000000)
+  --gas-limit GAS_LIMIT                        ⛽ the gas limit
+  --estimate-gas                               ⛽ whether to estimate the gas limit (default: 0)
+  --value VALUE                                the value to transfer (default: 0)
+  --chain CHAIN                                the chain identifier (default: T)
+  --version VERSION                            the transaction version (default: 1)
+  --options OPTIONS                            the transaction options (default: 0)
+  --send                                       ✓ whether to broadcast the transaction (default: False)
+  --simulate                                   whether to simulate the transaction (default: False)
+  --outfile OUTFILE                            where to save the output (signed transaction, hash) (default: stdout)
+  --reward-address REWARD_ADDRESS              the reward address
+  --validators-file VALIDATORS_FILE            a JSON file describing the Nodes
+  --top-up                                     Stake value for top up
 
 ```
 ### Validator.Unstake
@@ -478,28 +516,30 @@ usage: erdpy validator unstake [-h] ...
 Unstake value
 
 optional arguments:
-  -h, --help                             show this help message and exit
-  --proxy PROXY                          🖧 the URL of the proxy (default: https://testnet-gateway.elrond.com)
-  --pem PEM                              🔑 the PEM file, if keyfile or ledger are not provided
-  --pem-index PEM_INDEX                  🔑 the index in the PEM file (default: 0)
-  --keyfile KEYFILE                      🔑 a JSON keyfile, if PEM of ledger not provided
-  --passfile PASSFILE                    🔑 a file containing keyfile's password, if keyfile provided
-  --ledger                               🔐 bool flag for signing transaction using ledger
-  --ledger-account-index                 🔐 the index of the account (only applicable if --ledger is set)
-  --ledger-address-index                 🔐 the index of the address (only applicable if --ledger is set)
-  --sender-username SENDER_USERNAME      🖄 the username of the sender
-  --nonce NONCE                          # the nonce for the transaction
-  --recall-nonce                         ⭮ whether to recall the nonce when creating the transaction (default: False)
-  --gas-price GAS_PRICE                  ⛽ the gas price (default: 1000000000)
-  --gas-limit GAS_LIMIT                  ⛽ the gas limit
-  --estimate-gas                         ⛽ whether to estimate the gas limit (default: 0)
-  --value VALUE                          the value to transfer (default: 0)
-  --chain CHAIN                          the chain identifier (default: T)
-  --version VERSION                      the transaction version (default: 1)
-  --send                                 ✓ whether to broadcast the transaction (default: False)
-  --simulate                             whether to simulate the transaction (default: False)
-  --outfile OUTFILE                      where to save the output (signed transaction, hash) (default: stdout)
-  --nodes-public-keys NODES_PUBLIC_KEYS  the public keys of the nodes as CSV (addrA,addrB)
+  -h, --help                                   show this help message and exit
+  --proxy PROXY                                🔗 the URL of the proxy (default: https://testnet-gateway.elrond.com)
+  --pem PEM                                    🔑 the PEM file, if keyfile not provided
+  --pem-index PEM_INDEX                        🔑 the index in the PEM file (default: 0)
+  --keyfile KEYFILE                            🔑 a JSON keyfile, if PEM not provided
+  --passfile PASSFILE                          🔑 a file containing keyfile's password, if keyfile provided
+  --ledger                                     🔐 bool flag for signing transaction using ledger
+  --ledger-account-index LEDGER_ACCOUNT_INDEX  🔐 the index of the account when using Ledger
+  --ledger-address-index LEDGER_ADDRESS_INDEX  🔐 the index of the address when using Ledger
+  --sender-username SENDER_USERNAME            🖄 the username of the sender
+  --nonce NONCE                                # the nonce for the transaction
+  --recall-nonce                               ⭮ whether to recall the nonce when creating the transaction (default:
+                                               False)
+  --gas-price GAS_PRICE                        ⛽ the gas price (default: 1000000000)
+  --gas-limit GAS_LIMIT                        ⛽ the gas limit
+  --estimate-gas                               ⛽ whether to estimate the gas limit (default: 0)
+  --value VALUE                                the value to transfer (default: 0)
+  --chain CHAIN                                the chain identifier (default: T)
+  --version VERSION                            the transaction version (default: 1)
+  --options OPTIONS                            the transaction options (default: 0)
+  --send                                       ✓ whether to broadcast the transaction (default: False)
+  --simulate                                   whether to simulate the transaction (default: False)
+  --outfile OUTFILE                            where to save the output (signed transaction, hash) (default: stdout)
+  --nodes-public-keys NODES_PUBLIC_KEYS        the public keys of the nodes as CSV (addrA,addrB)
 
 ```
 ### Validator.Unjail
@@ -512,28 +552,30 @@ usage: erdpy validator unjail [-h] ...
 Unjail a Validator Node
 
 optional arguments:
-  -h, --help                             show this help message and exit
-  --proxy PROXY                          🖧 the URL of the proxy (default: https://testnet-gateway.elrond.com)
-  --pem PEM                              🔑 the PEM file, if keyfile or ledger are not provided
-  --pem-index PEM_INDEX                  🔑 the index in the PEM file (default: 0)
-  --keyfile KEYFILE                      🔑 a JSON keyfile, if PEM of ledger not provided
-  --passfile PASSFILE                    🔑 a file containing keyfile's password, if keyfile provided
-  --ledger                               🔐 bool flag for signing transaction using ledger
-  --ledger-account-index                 🔐 the index of the account (only applicable if --ledger is set)
-  --ledger-address-index                 🔐 the index of the address (only applicable if --ledger is set)
-  --sender-username SENDER_USERNAME      🖄 the username of the sender
-  --nonce NONCE                          # the nonce for the transaction
-  --recall-nonce                         ⭮ whether to recall the nonce when creating the transaction (default: False)
-  --gas-price GAS_PRICE                  ⛽ the gas price (default: 1000000000)
-  --gas-limit GAS_LIMIT                  ⛽ the gas limit
-  --estimate-gas                         ⛽ whether to estimate the gas limit (default: 0)
-  --value VALUE                          the value to transfer (default: 0)
-  --chain CHAIN                          the chain identifier (default: T)
-  --version VERSION                      the transaction version (default: 1)
-  --send                                 ✓ whether to broadcast the transaction (default: False)
-  --simulate                             whether to simulate the transaction (default: False)
-  --outfile OUTFILE                      where to save the output (signed transaction, hash) (default: stdout)
-  --nodes-public-keys NODES_PUBLIC_KEYS  the public keys of the nodes as CSV (addrA,addrB)
+  -h, --help                                   show this help message and exit
+  --proxy PROXY                                🔗 the URL of the proxy (default: https://testnet-gateway.elrond.com)
+  --pem PEM                                    🔑 the PEM file, if keyfile not provided
+  --pem-index PEM_INDEX                        🔑 the index in the PEM file (default: 0)
+  --keyfile KEYFILE                            🔑 a JSON keyfile, if PEM not provided
+  --passfile PASSFILE                          🔑 a file containing keyfile's password, if keyfile provided
+  --ledger                                     🔐 bool flag for signing transaction using ledger
+  --ledger-account-index LEDGER_ACCOUNT_INDEX  🔐 the index of the account when using Ledger
+  --ledger-address-index LEDGER_ADDRESS_INDEX  🔐 the index of the address when using Ledger
+  --sender-username SENDER_USERNAME            🖄 the username of the sender
+  --nonce NONCE                                # the nonce for the transaction
+  --recall-nonce                               ⭮ whether to recall the nonce when creating the transaction (default:
+                                               False)
+  --gas-price GAS_PRICE                        ⛽ the gas price (default: 1000000000)
+  --gas-limit GAS_LIMIT                        ⛽ the gas limit
+  --estimate-gas                               ⛽ whether to estimate the gas limit (default: 0)
+  --value VALUE                                the value to transfer (default: 0)
+  --chain CHAIN                                the chain identifier (default: T)
+  --version VERSION                            the transaction version (default: 1)
+  --options OPTIONS                            the transaction options (default: 0)
+  --send                                       ✓ whether to broadcast the transaction (default: False)
+  --simulate                                   whether to simulate the transaction (default: False)
+  --outfile OUTFILE                            where to save the output (signed transaction, hash) (default: stdout)
+  --nodes-public-keys NODES_PUBLIC_KEYS        the public keys of the nodes as CSV (addrA,addrB)
 
 ```
 ### Validator.Unbond
@@ -543,31 +585,33 @@ optional arguments:
 $ erdpy validator unbond --help
 usage: erdpy validator unbond [-h] ...
 
-Unbond
+Unbond tokens for a bls key
 
 optional arguments:
-  -h, --help                             show this help message and exit
-  --proxy PROXY                          🖧 the URL of the proxy (default: https://testnet-gateway.elrond.com)
-  --pem PEM                              🔑 the PEM file, if keyfile or ledger are not provided
-  --pem-index PEM_INDEX                  🔑 the index in the PEM file (default: 0)
-  --keyfile KEYFILE                      🔑 a JSON keyfile, if PEM of ledger not provided
-  --passfile PASSFILE                    🔑 a file containing keyfile's password, if keyfile provided
-  --ledger                               🔐 bool flag for signing transaction using ledger
-  --ledger-account-index                 🔐 the index of the account (only applicable if --ledger is set)
-  --ledger-address-index                 🔐 the index of the address (only applicable if --ledger is set)
-  --sender-username SENDER_USERNAME      🖄 the username of the sender
-  --nonce NONCE                          # the nonce for the transaction
-  --recall-nonce                         ⭮ whether to recall the nonce when creating the transaction (default: False)
-  --gas-price GAS_PRICE                  ⛽ the gas price (default: 1000000000)
-  --gas-limit GAS_LIMIT                  ⛽ the gas limit
-  --estimate-gas                         ⛽ whether to estimate the gas limit (default: 0)
-  --value VALUE                          the value to transfer (default: 0)
-  --chain CHAIN                          the chain identifier (default: T)
-  --version VERSION                      the transaction version (default: 1)
-  --send                                 ✓ whether to broadcast the transaction (default: False)
-  --simulate                             whether to simulate the transaction (default: False)
-  --outfile OUTFILE                      where to save the output (signed transaction, hash) (default: stdout)
-  --nodes-public-keys NODES_PUBLIC_KEYS  the public keys of the nodes as CSV (addrA,addrB)
+  -h, --help                                   show this help message and exit
+  --proxy PROXY                                🔗 the URL of the proxy (default: https://testnet-gateway.elrond.com)
+  --pem PEM                                    🔑 the PEM file, if keyfile not provided
+  --pem-index PEM_INDEX                        🔑 the index in the PEM file (default: 0)
+  --keyfile KEYFILE                            🔑 a JSON keyfile, if PEM not provided
+  --passfile PASSFILE                          🔑 a file containing keyfile's password, if keyfile provided
+  --ledger                                     🔐 bool flag for signing transaction using ledger
+  --ledger-account-index LEDGER_ACCOUNT_INDEX  🔐 the index of the account when using Ledger
+  --ledger-address-index LEDGER_ADDRESS_INDEX  🔐 the index of the address when using Ledger
+  --sender-username SENDER_USERNAME            🖄 the username of the sender
+  --nonce NONCE                                # the nonce for the transaction
+  --recall-nonce                               ⭮ whether to recall the nonce when creating the transaction (default:
+                                               False)
+  --gas-price GAS_PRICE                        ⛽ the gas price (default: 1000000000)
+  --gas-limit GAS_LIMIT                        ⛽ the gas limit
+  --estimate-gas                               ⛽ whether to estimate the gas limit (default: 0)
+  --value VALUE                                the value to transfer (default: 0)
+  --chain CHAIN                                the chain identifier (default: T)
+  --version VERSION                            the transaction version (default: 1)
+  --options OPTIONS                            the transaction options (default: 0)
+  --send                                       ✓ whether to broadcast the transaction (default: False)
+  --simulate                                   whether to simulate the transaction (default: False)
+  --outfile OUTFILE                            where to save the output (signed transaction, hash) (default: stdout)
+  --nodes-public-keys NODES_PUBLIC_KEYS        the public keys of the nodes as CSV (addrA,addrB)
 
 ```
 ### Validator.ChangeRewardAddress
@@ -580,28 +624,30 @@ usage: erdpy validator change-reward-address [-h] ...
 Change the reward address
 
 optional arguments:
-  -h, --help                         show this help message and exit
-  --proxy PROXY                      🖧 the URL of the proxy (default: https://testnet-gateway.elrond.com)
-  --pem PEM                          🔑 the PEM file, if keyfile or ledger are not provided
-  --pem-index PEM_INDEX              🔑 the index in the PEM file (default: 0)
-  --keyfile KEYFILE                  🔑 a JSON keyfile, if PEM of ledger not provided
-  --passfile PASSFILE                🔑 a file containing keyfile's password, if keyfile provided
-  --ledger                           🔐 bool flag for signing transaction using ledger
-  --ledger-account-index             🔐 the index of the account (only applicable if --ledger is set)
-  --ledger-address-index             🔐 the index of the address (only applicable if --ledger is set)
-  --sender-username SENDER_USERNAME  🖄 the username of the sender
-  --nonce NONCE                      # the nonce for the transaction
-  --recall-nonce                     ⭮ whether to recall the nonce when creating the transaction (default: False)
-  --gas-price GAS_PRICE              ⛽ the gas price (default: 1000000000)
-  --gas-limit GAS_LIMIT              ⛽ the gas limit
-  --estimate-gas                     ⛽ whether to estimate the gas limit (default: 0)
-  --value VALUE                      the value to transfer (default: 0)
-  --chain CHAIN                      the chain identifier (default: T)
-  --version VERSION                  the transaction version (default: 1)
-  --send                             ✓ whether to broadcast the transaction (default: False)
-  --simulate                         whether to simulate the transaction (default: False)
-  --outfile OUTFILE                  where to save the output (signed transaction, hash) (default: stdout)
-  --reward-address REWARD_ADDRESS    the new reward address
+  -h, --help                                   show this help message and exit
+  --proxy PROXY                                🔗 the URL of the proxy (default: https://testnet-gateway.elrond.com)
+  --pem PEM                                    🔑 the PEM file, if keyfile not provided
+  --pem-index PEM_INDEX                        🔑 the index in the PEM file (default: 0)
+  --keyfile KEYFILE                            🔑 a JSON keyfile, if PEM not provided
+  --passfile PASSFILE                          🔑 a file containing keyfile's password, if keyfile provided
+  --ledger                                     🔐 bool flag for signing transaction using ledger
+  --ledger-account-index LEDGER_ACCOUNT_INDEX  🔐 the index of the account when using Ledger
+  --ledger-address-index LEDGER_ADDRESS_INDEX  🔐 the index of the address when using Ledger
+  --sender-username SENDER_USERNAME            🖄 the username of the sender
+  --nonce NONCE                                # the nonce for the transaction
+  --recall-nonce                               ⭮ whether to recall the nonce when creating the transaction (default:
+                                               False)
+  --gas-price GAS_PRICE                        ⛽ the gas price (default: 1000000000)
+  --gas-limit GAS_LIMIT                        ⛽ the gas limit
+  --estimate-gas                               ⛽ whether to estimate the gas limit (default: 0)
+  --value VALUE                                the value to transfer (default: 0)
+  --chain CHAIN                                the chain identifier (default: T)
+  --version VERSION                            the transaction version (default: 1)
+  --options OPTIONS                            the transaction options (default: 0)
+  --send                                       ✓ whether to broadcast the transaction (default: False)
+  --simulate                                   whether to simulate the transaction (default: False)
+  --outfile OUTFILE                            where to save the output (signed transaction, hash) (default: stdout)
+  --reward-address REWARD_ADDRESS              the new reward address
 
 ```
 ### Validator.Claim
@@ -614,27 +660,29 @@ usage: erdpy validator claim [-h] ...
 Claim rewards
 
 optional arguments:
-  -h, --help                         show this help message and exit
-  --proxy PROXY                      🖧 the URL of the proxy (default: https://testnet-gateway.elrond.com)
-  --pem PEM                          🔑 the PEM file, if keyfile or ledger are not provided
-  --pem-index PEM_INDEX              🔑 the index in the PEM file (default: 0)
-  --keyfile KEYFILE                  🔑 a JSON keyfile, if PEM of ledger not provided
-  --passfile PASSFILE                🔑 a file containing keyfile's password, if keyfile provided
-  --ledger                           🔐 bool flag for signing transaction using ledger
-  --ledger-account-index             🔐 the index of the account (only applicable if --ledger is set)
-  --ledger-address-index             🔐 the index of the address (only applicable if --ledger is set)
-  --sender-username SENDER_USERNAME  🖄 the username of the sender
-  --nonce NONCE                      # the nonce for the transaction
-  --recall-nonce                     ⭮ whether to recall the nonce when creating the transaction (default: False)
-  --gas-price GAS_PRICE              ⛽ the gas price (default: 1000000000)
-  --gas-limit GAS_LIMIT              ⛽ the gas limit
-  --estimate-gas                     ⛽ whether to estimate the gas limit (default: 0)
-  --value VALUE                      the value to transfer (default: 0)
-  --chain CHAIN                      the chain identifier (default: T)
-  --version VERSION                  the transaction version (default: 1)
-  --send                             ✓ whether to broadcast the transaction (default: False)
-  --simulate                         whether to simulate the transaction (default: False)
-  --outfile OUTFILE                  where to save the output (signed transaction, hash) (default: stdout)
+  -h, --help                                   show this help message and exit
+  --proxy PROXY                                🔗 the URL of the proxy (default: https://testnet-gateway.elrond.com)
+  --pem PEM                                    🔑 the PEM file, if keyfile not provided
+  --pem-index PEM_INDEX                        🔑 the index in the PEM file (default: 0)
+  --keyfile KEYFILE                            🔑 a JSON keyfile, if PEM not provided
+  --passfile PASSFILE                          🔑 a file containing keyfile's password, if keyfile provided
+  --ledger                                     🔐 bool flag for signing transaction using ledger
+  --ledger-account-index LEDGER_ACCOUNT_INDEX  🔐 the index of the account when using Ledger
+  --ledger-address-index LEDGER_ADDRESS_INDEX  🔐 the index of the address when using Ledger
+  --sender-username SENDER_USERNAME            🖄 the username of the sender
+  --nonce NONCE                                # the nonce for the transaction
+  --recall-nonce                               ⭮ whether to recall the nonce when creating the transaction (default:
+                                               False)
+  --gas-price GAS_PRICE                        ⛽ the gas price (default: 1000000000)
+  --gas-limit GAS_LIMIT                        ⛽ the gas limit
+  --estimate-gas                               ⛽ whether to estimate the gas limit (default: 0)
+  --value VALUE                                the value to transfer (default: 0)
+  --chain CHAIN                                the chain identifier (default: T)
+  --version VERSION                            the transaction version (default: 1)
+  --options OPTIONS                            the transaction options (default: 0)
+  --send                                       ✓ whether to broadcast the transaction (default: False)
+  --simulate                                   whether to simulate the transaction (default: False)
+  --outfile OUTFILE                            where to save the output (signed transaction, hash) (default: stdout)
 
 ```
 ## Group **Account**
@@ -670,7 +718,7 @@ Query account details (nonce, balance etc.)
 
 optional arguments:
   -h, --help                 show this help message and exit
-  --proxy PROXY              🖧 the URL of the proxy (default: https://testnet-gateway.elrond.com)
+  --proxy PROXY              🔗 the URL of the proxy (default: https://testnet-gateway.elrond.com)
   --address ADDRESS          🖄 the address to query
   --balance                  whether to only fetch the balance
   --nonce                    whether to only fetch the nonce
@@ -689,7 +737,7 @@ Query account transactions
 
 optional arguments:
   -h, --help         show this help message and exit
-  --proxy PROXY      🖧 the URL of the proxy (default: https://testnet-gateway.elrond.com)
+  --proxy PROXY      🔗 the URL of the proxy (default: https://testnet-gateway.elrond.com)
   --outfile OUTFILE  where to save the output (default: stdout)
   --address ADDRESS  🖄 the address to query
 
@@ -701,10 +749,10 @@ optional arguments:
 $ erdpy wallet --help
 usage: erdpy wallet COMMAND [-h] ...
 
-Derive private key from mnemonic, bech32 address helpers etc.
+Create wallet, derive secret key from mnemonic, bech32 address helpers etc.
 
 COMMANDS:
-  {derive,bech32,pem-address,pem-address-hex}
+  {new,derive,bech32,pem-address,pem-address-hex}
 
 OPTIONS:
   -h, --help            show this help message and exit
@@ -712,10 +760,28 @@ OPTIONS:
 ----------------
 COMMANDS summary
 ----------------
+new                            Create a new wallet and print its mnemonic; optionally save as password-protected JSON (recommended) or PEM (not recommended)
 derive                         Derive a PEM file from a mnemonic or generate a new PEM file (for tests only!)
 bech32                         Helper for encoding and decoding bech32 addresses
 pem-address                    Get the public address out of a PEM file as bech32
 pem-address-hex                Get the public address out of a PEM file as hex
+
+```
+### Wallet.New
+
+
+```
+$ erdpy wallet new --help
+usage: erdpy wallet new [-h] ...
+
+Create a new wallet and print its mnemonic; optionally save as password-protected JSON (recommended) or PEM (not
+recommended)
+
+optional arguments:
+  -h, --help                 show this help message and exit
+  --json                     whether to create a json key file
+  --pem                      whether to create a pem key file
+  --output-path OUTPUT_PATH  the output path and base file name for the generated wallet files (default: ./wallet)
 
 ```
 ### Wallet.Derive
@@ -860,7 +926,7 @@ Get the number of shards.
 
 optional arguments:
   -h, --help     show this help message and exit
-  --proxy PROXY  🖧 the URL of the proxy (default: https://testnet-gateway.elrond.com)
+  --proxy PROXY  🔗 the URL of the proxy (default: https://testnet-gateway.elrond.com)
 
 ```
 ### Network.BlockNonce
@@ -874,7 +940,7 @@ Get the latest block nonce, by shard.
 
 optional arguments:
   -h, --help     show this help message and exit
-  --proxy PROXY  🖧 the URL of the proxy (default: https://testnet-gateway.elrond.com)
+  --proxy PROXY  🔗 the URL of the proxy (default: https://testnet-gateway.elrond.com)
   --shard SHARD  the shard ID (use 4294967295 for metachain)
 
 ```
@@ -889,7 +955,7 @@ Get the chain identifier.
 
 optional arguments:
   -h, --help     show this help message and exit
-  --proxy PROXY  🖧 the URL of the proxy (default: https://testnet-gateway.elrond.com)
+  --proxy PROXY  🔗 the URL of the proxy (default: https://testnet-gateway.elrond.com)
 
 ```
 ## Group **Cost**
@@ -927,7 +993,7 @@ Query minimum gas price
 
 optional arguments:
   -h, --help     show this help message and exit
-  --proxy PROXY  🖧 the URL of the proxy (default: https://testnet-gateway.elrond.com)
+  --proxy PROXY  🔗 the URL of the proxy (default: https://testnet-gateway.elrond.com)
 
 ```
 ### Cost.TxTransfer
@@ -941,7 +1007,7 @@ Query cost of regular transaction (transfer)
 
 optional arguments:
   -h, --help     show this help message and exit
-  --proxy PROXY  🖧 the URL of the proxy (default: https://testnet-gateway.elrond.com)
+  --proxy PROXY  🔗 the URL of the proxy (default: https://testnet-gateway.elrond.com)
   --data DATA    a transaction payload, required to estimate the cost
 
 ```
@@ -956,9 +1022,9 @@ Query cost of Smart Contract deploy transaction
 
 optional arguments:
   -h, --help                             show this help message and exit
-  --proxy PROXY                          🖧 the URL of the proxy (default: https://testnet-gateway.elrond.com)
+  --proxy PROXY                          🔗 the URL of the proxy (default: https://testnet-gateway.elrond.com)
   --project PROJECT                      🗀 the project directory (default: current directory)
-  --bytecode BYTECODE                    the WASM file
+  --bytecode BYTECODE                    the file containing the WASM bytecode
   --arguments ARGUMENTS [ARGUMENTS ...]  arguments for the contract transaction, as numbers or hex-encoded. E.g.
                                          --arguments 42 0x64 1000 0xabba
 
@@ -977,7 +1043,7 @@ positional arguments:
 
 optional arguments:
   -h, --help                             show this help message and exit
-  --proxy PROXY                          🖧 the URL of the proxy (default: https://testnet-gateway.elrond.com)
+  --proxy PROXY                          🔗 the URL of the proxy (default: https://testnet-gateway.elrond.com)
   --function FUNCTION                    the function to call
   --arguments ARGUMENTS [ARGUMENTS ...]  arguments for the contract transaction, as numbers or hex-encoded. E.g.
                                          --arguments 42 0x64 1000 0xabba
@@ -1026,6 +1092,7 @@ optional arguments:
   --data DATA                            the payload, or 'memo' of the transaction (default: )
   --chain CHAIN                          the chain identifier (default: T)
   --version VERSION                      the transaction version (default: 1)
+  --options OPTIONS                      the transaction options (default: 0)
 
 ```
 ### Dispatcher.Dispatch
@@ -1038,16 +1105,16 @@ usage: erdpy dispatcher dispatch [-h] ...
 Dispatch queued transactions
 
 optional arguments:
-  -h, --help                         show this help message and exit
-  --proxy PROXY                      🖧 the URL of the proxy (default: https://testnet-gateway.elrond.com)
-  --pem PEM                          🔑 the PEM file, if keyfile or ledger are not provided
-  --pem-index PEM_INDEX              🔑 the index in the PEM file (default: 0)
-  --keyfile KEYFILE                  🔑 a JSON keyfile, if PEM of ledger not provided
-  --passfile PASSFILE                🔑 a file containing keyfile's password, if keyfile provided
-  --ledger                           🔐 bool flag for signing transaction using ledger
-  --ledger-account-index             🔐 the index of the account (only applicable if --ledger is set)
-  --ledger-address-index             🔐 the index of the address (only applicable if --ledger is set)
-  --sender-username SENDER_USERNAME  🖄 the username of the sender
+  -h, --help                                   show this help message and exit
+  --proxy PROXY                                🔗 the URL of the proxy (default: https://testnet-gateway.elrond.com)
+  --pem PEM                                    🔑 the PEM file, if keyfile not provided
+  --pem-index PEM_INDEX                        🔑 the index in the PEM file (default: 0)
+  --keyfile KEYFILE                            🔑 a JSON keyfile, if PEM not provided
+  --passfile PASSFILE                          🔑 a file containing keyfile's password, if keyfile provided
+  --ledger                                     🔐 bool flag for signing transaction using ledger
+  --ledger-account-index LEDGER_ACCOUNT_INDEX  🔐 the index of the account when using Ledger
+  --ledger-address-index LEDGER_ADDRESS_INDEX  🔐 the index of the address when using Ledger
+  --sender-username SENDER_USERNAME            🖄 the username of the sender
 
 ```
 ### Dispatcher.DispatchContinuously
@@ -1060,17 +1127,17 @@ usage: erdpy dispatcher dispatch-continuously [-h] ...
 Continuously dispatch queued transactions
 
 optional arguments:
-  -h, --help                         show this help message and exit
-  --proxy PROXY                      🖧 the URL of the proxy (default: https://testnet-gateway.elrond.com)
-  --pem PEM                          🔑 the PEM file, if keyfile or ledger are not provided
-  --pem-index PEM_INDEX              🔑 the index in the PEM file (default: 0)
-  --keyfile KEYFILE                  🔑 a JSON keyfile, if PEM of ledger not provided
-  --passfile PASSFILE                🔑 a file containing keyfile's password, if keyfile provided
-  --ledger                           🔐 bool flag for signing transaction using ledger
-  --ledger-account-index             🔐 the index of the account (only applicable if --ledger is set)
-  --ledger-address-index             🔐 the index of the address (only applicable if --ledger is set)
-  --sender-username SENDER_USERNAME  🖄 the username of the sender
-  --interval INTERVAL                the interval to retrieve transactions from the queue, in seconds
+  -h, --help                                   show this help message and exit
+  --proxy PROXY                                🔗 the URL of the proxy (default: https://testnet-gateway.elrond.com)
+  --pem PEM                                    🔑 the PEM file, if keyfile not provided
+  --pem-index PEM_INDEX                        🔑 the index in the PEM file (default: 0)
+  --keyfile KEYFILE                            🔑 a JSON keyfile, if PEM not provided
+  --passfile PASSFILE                          🔑 a file containing keyfile's password, if keyfile provided
+  --ledger                                     🔐 bool flag for signing transaction using ledger
+  --ledger-account-index LEDGER_ACCOUNT_INDEX  🔐 the index of the account when using Ledger
+  --ledger-address-index LEDGER_ADDRESS_INDEX  🔐 the index of the address when using Ledger
+  --sender-username SENDER_USERNAME            🖄 the username of the sender
+  --interval INTERVAL                          the interval to retrieve transactions from the queue, in seconds
 
 ```
 ### Dispatcher.Clean
@@ -1185,7 +1252,7 @@ usage: erdpy deps install [-h] ...
 Install dependencies or elrond-sdk modules.
 
 positional arguments:
-  {llvm,clang,cpp,arwentools,rust,nodejs,elrond_go,elrond_proxy_go,golang,mcl_signer}
+  {all,llvm,clang,cpp,rust,nodejs,golang,vmtools,elrond_go,elrond_proxy_go,mcl_signer,wasm-opt}
                                                   the dependency to install
 
 optional arguments:
@@ -1204,7 +1271,7 @@ usage: erdpy deps check [-h] ...
 Check whether a dependency is installed.
 
 positional arguments:
-  {llvm,clang,cpp,arwentools,rust,nodejs,elrond_go,elrond_proxy_go,golang,mcl_signer}
+  {all,llvm,clang,cpp,rust,nodejs,golang,vmtools,elrond_go,elrond_proxy_go,mcl_signer,wasm-opt}
                                                   the dependency to check
 
 optional arguments:
@@ -1222,7 +1289,7 @@ usage: erdpy config COMMAND [-h] ...
 Configure elrond-sdk (default values etc.)
 
 COMMANDS:
-  {dump,get,set,new,switch,list}
+  {dump,get,set,delete,new,switch,list}
 
 OPTIONS:
   -h, --help            show this help message and exit
@@ -1233,6 +1300,7 @@ COMMANDS summary
 dump                           Dumps configuration.
 get                            Gets a configuration value.
 set                            Sets a configuration value.
+delete                         Deletes a configuration value.
 new                            Creates a new configuration.
 switch                         Switch to a different config
 list                           List available configs
@@ -1249,6 +1317,7 @@ Dumps configuration.
 
 optional arguments:
   -h, --help  show this help message and exit
+  --defaults  dump defaults instead of local config
 
 ```
 ### Configuration.Get
@@ -1400,47 +1469,4 @@ optional arguments:
   --partition PARTITION  the storage partition (default: *)
   --use-global           use the global storage (default: False)
 
-```
-
-## Group **Ledger**
-
-
-
-```
-usage: erdpy ledger COMMAND [-h] ...
-
-Get Ledger App addresses and version
-
-COMMANDS:
-  {addresses,version}
-
-OPTIONS:
-  -h, --help           show this help message and exit
-
-----------------
-COMMANDS summary
-----------------
-addresses                      Print multiple addresses for the Ledger device
-version                        Print the Elrond App version
-```
-
-### Ledger.addresses
-```
-usage: erdpy ledger addresses [-h] ...
-
-Get the addresses within Ledger
-
-optional arguments:
-  -h, --help                     show this help message and exit
-  --num-addresses NUM_ADDRESSES  The number of addresses to fetch
-```
-
-### Ledger.version
-```
-usage: erdpy ledger version [-h] ...
-
-Get the version of the Elrond App for Ledger
-
-optional arguments:
-  -h, --help  show this help message and exit
 ```

@@ -1,4 +1,5 @@
 import logging
+from pathlib import Path
 import sys
 from argparse import ArgumentParser
 
@@ -28,7 +29,8 @@ def main():
     proxy = ElrondProxy(args.proxy)
     bunch = BunchOfTransactions()
     minter = Account(pem_file=args.minter)
-    minted_repository = AccountsRepository(args.minted_folder)
+    minted_folder = Path(args.minted_folder)
+    minted_repository = AccountsRepository(minted_folder)
 
     if args.minted_count:
         minted_repository.generate_accounts(args.minted_count)

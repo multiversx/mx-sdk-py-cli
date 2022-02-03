@@ -1,10 +1,11 @@
 from erdpy import dependencies
 import logging
-from os import path
-from typing import Any, Dict
+from typing import Any, Dict, List
+from pathlib import Path
 
 from erdpy import errors, utils, guards
 from erdpy.projects import shared
+from erdpy.projects.project_base import Project
 from erdpy.projects.project_clang import ProjectClang
 from erdpy.projects.project_cpp import ProjectCpp
 from erdpy.projects.project_rust import ProjectRust
@@ -13,7 +14,7 @@ from erdpy.projects.project_sol import ProjectSol
 logger = logging.getLogger("projects.core")
 
 
-def load_project(directory):
+def load_project(directory: Path) -> Project:
     guards.is_directory(directory)
 
     if shared.is_source_clang(directory):
@@ -25,23 +26,26 @@ def load_project(directory):
     if shared.is_source_rust(directory):
         return ProjectRust(directory)
     else:
-        raise errors.NotSupportedProject(directory)
+        raise errors.NotSupportedProject(str(directory))
 
 
-def build_project(directory: str, options: Dict[str, Any]):
-    directory = path.expanduser(directory)
+def build_project(directory: Path, options: Dict[str, Any]):
+    directory = directory.expanduser()
 
     logger.info("build_project.directory: %s", directory)
     logger.info("build_project.debug: %s", options['debug'])
 
     guards.is_directory(directory)
     project = load_project(directory)
-    project.build(options)
+    outputs = project.build(options)
     logger.info("Build ran.")
+    for output_wasm_file in outputs:
+        relative_wasm_path = output_wasm_file.relative_to(Path.cwd())
+        logger.info(f"WASM file generated: {relative_wasm_path}")
 
 
-def clean_project(directory: str):
-    directory = path.expanduser(directory)
+def clean_project(directory: Path):
+    directory = directory.expanduser()
     guards.is_directory(directory)
     project = load_project(directory)
     project.clean()
@@ -49,26 +53,26 @@ def clean_project(directory: str):
 
 
 def run_tests(args: Any):
-    project = args.project
-    directory = args.directory
+    project_path = Path(args.project)
+    directory = Path(args.directory)
     wildcard = args.wildcard
 
-    logger.info("run_tests.project: %s", project)
+    logger.info("run_tests.project: %s", project_path)
 
-    dependencies.install_module("arwentools")
+    dependencies.install_module("vmtools")
 
-    guards.is_directory(project)
-    project = load_project(project)
+    guards.is_directory(project_path)
+    project = load_project(project_path)
     project.run_tests(directory, wildcard)
 
 
-def get_projects_in_workspace(workspace):
+def get_projects_in_workspace(workspace: Path) -> List[Project]:
     guards.is_directory(workspace)
     subfolders = utils.get_subfolders(workspace)
     projects = []
 
     for folder in subfolders:
-        project_directory = path.join(workspace, folder)
+        project_directory = workspace / folder
 
         try:
             project = load_project(project_directory)
@@ -77,3 +81,9 @@ def get_projects_in_workspace(workspace):
             pass
 
     return projects
+
+
+def get_project_paths_recursively(base_path: Path) -> List[Path]:
+    guards.is_directory(base_path)
+    path_list = [elrond_json.parent for elrond_json in base_path.glob("**/elrond.json")]
+    return sorted(path_list)

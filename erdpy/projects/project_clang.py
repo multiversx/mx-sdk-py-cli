@@ -1,8 +1,9 @@
 import logging
-import os
 import subprocess
 from os import path
 from pathlib import Path
+
+from typing import List
 
 from erdpy import dependencies, errors, myprocess, utils
 from erdpy.projects.project_base import Project
@@ -83,7 +84,7 @@ class ProjectClang(Project):
             tool,
             '--no-entry',
             str(self.file_o),
-            '-o', self.file_output,
+            '-o', str(self.file_output),
             '--strip-all',
             '-allow-undefined'
         ]
@@ -98,8 +99,8 @@ class ProjectClang(Project):
 
         myprocess.run_process(args)
 
-    def _do_after_build(self):
-        self._copy_to_output(self.file_output)
+    def _do_after_build(self) -> List[Path]:
+        output_wasm_file = self._copy_to_output(self.file_output)
         self.file_output.unlink()
         self.file_ll.unlink()
         self.file_o.unlink()
@@ -108,6 +109,7 @@ class ProjectClang(Project):
                 ll_file.unlink()
             except FileNotFoundError:
                 pass
+        return [output_wasm_file]
 
     def _get_llvm_path(self):
         return dependencies.get_module_directory('llvm')
@@ -134,7 +136,7 @@ class ProjectClang(Project):
 
         self.config['source_files'] = source_files
 
-    def get_exported_functions(self):
+    def get_exported_functions(self) -> List[str]:
         file_export = self.find_file_globally('*.export')
         lines = utils.read_lines(file_export)
         return lines

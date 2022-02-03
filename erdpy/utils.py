@@ -1,11 +1,11 @@
 import json
 import logging
 import os
-import os.path
 import pathlib
 import shutil
 import stat
 import sys
+import requests_cache
 import tarfile
 import zipfile
 from pathlib import Path
@@ -13,6 +13,7 @@ from typing import Any, List, Union, Optional, cast, IO, Dict
 
 import toml
 
+import erdpy.config
 from erdpy import errors
 
 logger = logging.getLogger("utils")
@@ -42,23 +43,23 @@ def omit_fields(data: Any, fields: List[str] = []):
     raise errors.ProgrammingError("omit_fields: only dictionaries are supported.")
 
 
-def untar(archive_path: str, destination_folder: str) -> None:
+def untar(archive_path: Path, destination_folder: Path) -> None:
     logger.debug(f"untar [{archive_path}] to [{destination_folder}].")
 
     ensure_folder(destination_folder)
-    tar = tarfile.open(archive_path)
-    tar.extractall(path=destination_folder)
+    tar = tarfile.open(str(archive_path))
+    tar.extractall(path=str(destination_folder))
     tar.close()
 
     logger.debug("untar done.")
 
 
-def unzip(archive_path, destination_folder):
+def unzip(archive_path: Path, destination_folder: Path):
     logger.debug(f"unzip [{archive_path}] to [{destination_folder}].")
 
     ensure_folder(destination_folder)
-    with zipfile.ZipFile(archive_path, "r") as my_zip:
-        my_zip.extractall(destination_folder)
+    with zipfile.ZipFile(str(archive_path), "r") as my_zip:
+        my_zip.extractall(str(destination_folder))
 
     logger.debug("unzip done.")
 
@@ -67,7 +68,17 @@ def ensure_folder(folder: Union[str, Path]):
     pathlib.Path(folder).mkdir(parents=True, exist_ok=True)
 
 
-def read_lines(file: str):
+def uniquify(path: Path) -> Path:
+    '''Generates the next available non-already-existing filename, by adding a _1, _2, _3, etc. suffix before the extension if necessary'''
+    i = 1
+    stem = path.stem
+    while path.exists():
+        path = path.with_name(f"{stem}_{i}").with_suffix(path.suffix)
+        i += 1
+    return path
+
+
+def read_lines(file: Path) -> List[str]:
     with open(file) as f:
         lines = f.readlines()
     lines = [line.strip() for line in lines]
@@ -78,37 +89,37 @@ def read_lines(file: str):
 # TODO delete this function, it is too generic
 # TODO find usages in legolas
 def read_file(f: Any, binary: bool = False) -> Union[str, bytes]:
-    try:
-        if isinstance(f, str) or isinstance(f, pathlib.PosixPath):
-            path = Path(f)
-            if binary:
-                return read_binary_file(path)
-            return read_text_file(path)
+    if isinstance(f, str) or isinstance(f, pathlib.PosixPath):
+        path = Path(f)
+        if binary:
+            return read_binary_file(path)
+        return read_text_file(path)
 
-        file = cast(IO, f)
-        result = file.read()
-        assert isinstance(result, str) or isinstance(result, bytes)
-        return result
-
-    except Exception as err:
-        raise errors.BadFile(f, err)
+    file = cast(IO, f)
+    result = file.read()
+    assert isinstance(result, str) or isinstance(result, bytes)
+    return result
 
 
 def read_binary_file(path: Path) -> bytes:
-    with open(path, 'rb') as binary_file:
-        return binary_file.read()
+    try:
+        with open(path, 'rb') as binary_file:
+            return binary_file.read()
+    except Exception as err:
+        raise errors.BadFile(str(path), err) from None
 
 
 def read_text_file(path: Path) -> str:
-    with open(path, 'r') as text_file:
-        return text_file.read()
+    try:
+        with open(path, 'r') as text_file:
+            return text_file.read()
+    except Exception as err:
+        raise errors.BadFile(str(path), err) from None
 
 
-def write_file(f: Any, text: str):
-    if isinstance(f, str) or isinstance(f, pathlib.PosixPath):
-        with open(f, "w") as f:
-            return f.write(text)
-    return f.write(text)
+def write_file(file_path: Path, text: str):
+    with open(file_path, "w") as file:
+        return file.write(text)
 
 
 def read_toml_file(filename):
@@ -145,7 +156,7 @@ def prettify_json_file(filename: str):
     write_json_file(filename, data)
 
 
-def get_subfolders(folder):
+def get_subfolders(folder: Path) -> List[str]:
     return [item.name for item in os.scandir(folder) if item.is_dir() and not item.name.startswith(".")]
 
 
@@ -195,7 +206,7 @@ def as_object(data: Object) -> Object:
     return data
 
 
-def is_arg_present(key: str, args: List[str]) -> bool:
+def is_arg_present(args: List[str], key: str) -> bool:
     for arg in args:
         if arg.find("--data") != -1:
             continue
@@ -223,6 +234,30 @@ def parse_keys(bls_public_keys):
     return parsed_keys, len(keys)
 
 
+def query_latest_release_tag(repo: str) -> str:
+    """
+    Queries the Github API to retrieve the latest released tag of the specified
+    repository. The repository must be of the form 'organisation/project'.
+    """
+    url = f'https://api.github.com/repos/{repo}/releases'
+
+    github_api_token = erdpy.config.get_value('github_api_token')
+    headers = dict()
+    if github_api_token != '':
+        headers['Authorization'] = f'token {github_api_token}'
+
+    session = requests_cache.CachedSession('erdpy_requests_cache', use_cache_dir=True, cache_control=True)
+    response = session.get(url, headers=headers)
+    response.raise_for_status()
+
+    release_tags = [str(release['tag_name']) for release in response.json()]
+    try:
+        latest_release_tag = erdpy.config.get_latest_semver(release_tags)
+        return latest_release_tag
+    except IndexError:
+        raise Exception(f"no releases in {repo}")
+
+
 # https://code.visualstudio.com/docs/python/debugging
 def breakpoint():
     import debugpy
@@ -230,3 +265,24 @@ def breakpoint():
     print("Waiting for debugger attach")
     debugpy.wait_for_client()
     debugpy.breakpoint()
+
+
+def log_explorer(chain, name, path, details):
+    networks = {
+        "1": ("Elrond Mainnet Explorer", "https://explorer.elrond.com"),
+        "T": ("Elrond Testnet Explorer", "https://testnet-explorer.elrond.com"),
+        "D": ("Elrond Devnet Explorer", "https://devnet-explorer.elrond.com"),
+    }
+    try:
+        explorer_name, explorer_url = networks[chain]
+        logger.info(f"View this {name} in the {explorer_name}: {explorer_url}/{path}/{details}")
+    except KeyError:
+        return
+
+
+def log_explorer_contract_address(chain, address):
+    log_explorer(chain, "contract address", "accounts", address)
+
+
+def log_explorer_transaction(chain, transaction_hash):
+    log_explorer(chain, "transaction", "transactions", transaction_hash)

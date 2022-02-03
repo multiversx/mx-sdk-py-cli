@@ -2,16 +2,11 @@ import base64
 import json
 import logging
 from collections import OrderedDict
-from typing import Any, Dict, List, TextIO
+from typing import Any, Dict, List, TextIO, Union
 
-from erdpy import errors, utils
-from erdpy.accounts import Account, Address
+from erdpy import config, errors, utils
+from erdpy.accounts import Account, Address, LedgerAccount
 from erdpy.interfaces import IElrondProxy, ITransaction
-from erdpy.ledger.config import compare_versions
-from erdpy.ledger.ledger_app_handler import SIGN_USING_HASH_VERSION
-from erdpy.ledger.ledger_functions import do_get_ledger_version, TX_HASH_SIGN_VERSION, TX_HASH_SIGN_OPTIONS, \
-    do_sign_transaction_with_ledger
-from erdpy.wallet import signing
 
 logger = logging.getLogger("transactions")
 
@@ -54,15 +49,20 @@ class Transaction(ITransaction):
         return self._field_decoded("receiverUsername")
 
     def _field_encoded(self, field: str) -> str:
-        bytes = self.__dict__.get(field, None).encode("utf-8")
-        encoded = base64.b64encode(bytes).decode()
+        field_bytes = self.__dict__.get(field, None).encode("utf-8")
+        encoded = base64.b64encode(field_bytes).decode()
         return encoded
 
     def _field_decoded(self, field: str) -> str:
         return base64.b64decode(self.__dict__.get(field, None)).decode()
 
     def sign(self, account: Account):
-        self.signature = signing.sign_transaction(self, account)
+        self.validate()
+        self.signature = account.sign_transaction(self)
+
+    def validate(self) -> None:
+        if self.gasLimit > config.MAX_GAS_LIMIT:
+            raise errors.GasLimitTooLarge(self.gasLimit, config.MAX_GAS_LIMIT)
 
     def serialize(self) -> bytes:
         dictionary = self.to_dictionary()
@@ -115,6 +115,7 @@ class Transaction(ITransaction):
         dictionary = self.to_dictionary()
         self.hash = proxy.send_transaction(dictionary)
         logger.info(f"Hash: {self.hash}")
+        utils.log_explorer_transaction(self.chainID, self.hash)
         return self.hash
 
     def send_wait_result(self, proxy, timeout):
@@ -178,6 +179,12 @@ class Transaction(ITransaction):
     def wrap_inner(self, inner: ITransaction) -> None:
         self.data = inner.serialize_as_inner()
 
+    def set_version(self, version: int):
+        self.version = version
+
+    def set_options(self, options: int):
+        self.options = options
+
 
 class BunchOfTransactions:
     def __init__(self):
@@ -218,7 +225,7 @@ class BunchOfTransactions:
 def do_prepare_transaction(args: Any) -> Transaction:
     account = Account()
     if args.ledger:
-        return do_prepare_transaction_ledger(args)
+        account = LedgerAccount(account_index=args.ledger_account_index, address_index=args.ledger_address_index)
     if args.pem:
         account = Account(pem_file=args.pem, pem_index=args.pem_index)
     elif args.keyfile and args.passfile:
@@ -239,44 +246,4 @@ def do_prepare_transaction(args: Any) -> Transaction:
     tx.options = int(args.options)
 
     tx.sign(account)
-    return tx
-
-
-def do_prepare_transaction_ledger(args: Any) -> Transaction:
-    account_index = 0
-    address_index = 0
-    if args.ledger_account_index:
-        account_index = args.ledger_account_index
-    if args.ledger_address_index:
-        address_index = args.ledger_address_index
-
-    tx = Transaction()
-    tx.nonce = int(args.nonce)
-    tx.value = args.value
-    tx.receiver = args.receiver
-    tx.sender = args.ledger_address
-    tx.senderUsername = getattr(args, "sender_username", None)
-    tx.receiverUsername = getattr(args, "receiver_username", None)
-    tx.gasPrice = int(args.gas_price)
-    tx.gasLimit = int(args.gas_limit)
-    tx.data = args.data
-    tx.chainID = args.chain
-
-    ledger_version = do_get_ledger_version()
-    should_use_hash_signing = compare_versions(ledger_version, SIGN_USING_HASH_VERSION) >= 0
-    if should_use_hash_signing:
-        tx.version = TX_HASH_SIGN_VERSION
-        tx.options = TX_HASH_SIGN_OPTIONS
-
-    tx.signature = ""
-
-    signature = do_sign_transaction_with_ledger(
-        tx_payload=tx.serialize(),
-        account_index=account_index,
-        address_index=address_index,
-        sign_using_hash=should_use_hash_signing,
-    )
-
-    tx.signature = signature
-
     return tx

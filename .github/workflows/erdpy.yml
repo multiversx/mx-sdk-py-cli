@@ -1,20 +1,41 @@
 # This workflow will do a clean install of node dependencies, build the source code and run tests across different versions of node
 # For more information see: https://help.github.com/actions/language-and-framework-guides/using-nodejs-with-github-actions
 
-name: Build and Test erdpy
+name: erdpy-build
 
 on:
   pull_request:
     branches: [ main, development ]
   workflow_dispatch:
 
+# At the start of each workflow run, GitHub automatically creates a unique GITHUB_TOKEN secret (we will pass it below to erdpy config).
+# The token's permissions are limited to the repository that contains your workflow.
+# https://docs.github.com/en/actions/security-guides/automatic-token-authentication#about-the-github_token-secret
+# https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#permissions
+permissions:
+  actions: none
+  checks: none
+  contents: none
+  deployments: none
+  id-token: none
+  issues: none
+  discussions: none
+  packages: none
+  pages: none
+  pull-requests: none
+  repository-projects: none
+  security-events: none
+  statuses: none
+
 jobs:
   build-erdpy:
-
-    runs-on: ubuntu-latest
+    name: Build and Test erdpy for ${{ matrix.os }}, python ${{ matrix.python-version }}
+    
+    runs-on: ${{ matrix.os }}
 
     strategy:
       matrix:
+        os: [ubuntu-18.04, ubuntu-latest, macos-latest]
         python-version: [3.8]
 
     steps:
@@ -28,11 +49,17 @@ jobs:
         python3 -m pip install --upgrade pip
         pip3 install -r requirements.txt
         pip3 install pytest
+    - name: Set github_api_token
+      run: |
+        mkdir ~/elrondsdk
+        export PYTHONPATH=.
+        python3 -m erdpy.cli config new test
+        python3 -m erdpy.cli config set github_api_token ${{ secrets.GITHUB_TOKEN }}
     - name: Run unit tests
       run: |
         export PYTHONPATH=.
         python3 -m unittest discover -s erdpy/tests
-        pytest ./erdpy/tests/test_testnet.py -s
+        pytest .
     - name: Run CLI tests
       run: |
         cd ./erdpy/tests

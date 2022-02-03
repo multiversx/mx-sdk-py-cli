@@ -7,49 +7,49 @@ import subprocess
 import sys
 import json
 from argparse import ArgumentParser
+from typing import Tuple
 
 logger = logging.getLogger("installer")
 
-MIN_REQUIRED_PYTHON_MAJOR_VERSION = 3
-MIN_REQUIRED_PYTHON_MINOR_VERSION = 6
-MIN_REQUIRED_PYTHON_MINOR_VERSION_MACOS = 8
+MIN_REQUIRED_PYTHON_VERSION = (3, 8, 0)
 
 elrondsdk_path = None
 exact_version = None
+from_branch = None
 
 
 def main():
     global elrondsdk_path
     global exact_version
+    global from_branch
 
     parser = ArgumentParser()
     parser.add_argument("--modify-path", dest="modify_path", action="store_true", help="whether to modify $PATH (in profile file)")
     parser.add_argument("--no-modify-path", dest="modify_path", action="store_false", help="whether to modify $PATH (in profile file)")
     parser.add_argument("--elrondsdk-path", default=get_elrond_sdk_path_default(), help="where to install elrond-sdk")
     parser.add_argument("--exact-version", help="the exact version of erdpy to install")
+    parser.add_argument("--from-branch", help="use a branch of ElrondNetwork/elrond-sdk-erdpy")
     parser.set_defaults(modify_path=True)
     args = parser.parse_args()
 
     elrondsdk_path = os.path.expanduser(args.elrondsdk_path)
     modify_path = args.modify_path
     exact_version = args.exact_version
+    from_branch = args.from_branch
 
     logging.basicConfig(level=logging.DEBUG)
 
     operating_system = get_operating_system()
-    python_major_version = sys.version_info.major
-    python_minor_version = sys.version_info.minor
+    python_version = (sys.version_info.major, sys.version_info.minor, sys.version_info.micro)
 
     logger.info("Checking user.")
     if os.getuid() == 0:
         raise InstallError("You should not install erdpy as root.")
 
     logger.info("Checking Python version.")
-    logger.info(f"Python version: {sys.version_info}")
-    if python_major_version < MIN_REQUIRED_PYTHON_MAJOR_VERSION or (python_major_version >= MIN_REQUIRED_PYTHON_MAJOR_VERSION and python_minor_version < MIN_REQUIRED_PYTHON_MINOR_VERSION):
-        raise InstallError("You need Python 3.6 or later.")
-    if operating_system == "osx" and python_minor_version < MIN_REQUIRED_PYTHON_MINOR_VERSION_MACOS:
-        raise InstallError("On MacOS, you need Python 3.8 or later.")
+    logger.info(f"Python version: {format_version(python_version)}")
+    if python_version < MIN_REQUIRED_PYTHON_VERSION:
+        raise InstallError(f"You need Python {format_version(MIN_REQUIRED_PYTHON_VERSION)} or later.")
 
     logger.info("Checking operating system.")
     logger.info(f"Operating system: {operating_system}")
@@ -67,6 +67,11 @@ Upon restarting the user session, [$ erdpy] command should be available in your 
 Furthermore, after restarting the user session, you can use [$ source erdpy-activate] to activate the Python virtual environment containing erdpy.
 ###############################################################################
 """)
+
+
+def format_version(version: Tuple[int, int, int]) -> str:
+    major, minor, patch = version
+    return f"{major}.{minor}.{patch}"
 
 
 def get_operating_system():
@@ -130,13 +135,8 @@ def require_venv():
         logger.info(f"Packages found: {ensurepip}, {venv}.")
     except ModuleNotFoundError:
         if operating_system == "linux":
-            logger.info("Package [venv] or [ensurepip] not found, will be installed.")
-            logger.info("Running [$ sudo apt-get install python3-venv]:")
-            return_code = os.system("sudo apt-get install python3-venv")
-            if return_code == 0:
-                logger.info("Done installing [python3-venv].")
-            else:
-                raise InstallError("Packages [venv] or [ensurepip] not installed correctly.")
+            python_venv = f"python{sys.version_info.major}.{sys.version_info.minor}-venv"
+            raise InstallError(f'Packages [venv] or [ensurepip] not found. Please run "sudo apt install {python_venv}" and then run erdpy-up again.')
         else:
             raise InstallError("Packages [venv] or [ensurepip] not found, please install them first. See https://docs.python.org/3/tutorial/venv.html.")
 
@@ -155,11 +155,15 @@ def ensure_folder(folder):
 
 def install_erdpy():
     logger.info("Installing erdpy in virtual environment...")
-    erpy_versioned = "erdpy" if not exact_version else f"erdpy=={exact_version}"
+    if from_branch:
+        erdpy_to_install = f"https://github.com/ElrondNetwork/elrond-sdk-erdpy/archive/refs/heads/{from_branch}.zip"
+    else:
+        erdpy_to_install = "erdpy" if not exact_version else f"erdpy=={exact_version}"
+
     return_code = run_in_venv(["python3", "-m", "pip", "install", "--upgrade", "pip"])
     if return_code != 0:
         raise InstallError("Could not upgrade pip.")
-    return_code = run_in_venv(["pip3", "install", "--no-cache-dir", erpy_versioned])
+    return_code = run_in_venv(["pip3", "install", "--no-cache-dir", erdpy_to_install])
     if return_code != 0:
         raise InstallError("Could not install erdpy.")
     return_code = run_in_venv(["erdpy", "--version"])
@@ -182,7 +186,7 @@ def run_in_venv(args):
         del os.environ["PYTHONHOME"]
 
     process = subprocess.Popen(args, env={
-        "PATH": os.path.join(get_erdpy_path(), "bin"),
+        "PATH": os.path.join(get_erdpy_path(), "bin") + ":" + os.environ["PATH"],
         "VIRTUAL_ENV": get_erdpy_path()
     })
 

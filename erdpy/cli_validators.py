@@ -1,53 +1,53 @@
 import sys
-from typing import Any
+from typing import Any, List
 
 from erdpy import cli_shared, validators, utils
 from erdpy.transactions import do_prepare_transaction
 
 
-def setup_parser(subparsers: Any) -> Any:
+def setup_parser(args: List[str], subparsers: Any) -> Any:
     parser = cli_shared.add_group_subparser(subparsers, "validator", "Stake, UnStake, UnBond, Unjail and other "
                                                                      "actions useful for "
                                                                      "Validators")
     subparsers = parser.add_subparsers()
 
     sub = cli_shared.add_command_subparser(subparsers, "validator", "stake", "Stake value into the Network")
-    _add_common_arguments(sub)
+    _add_common_arguments(args, sub)
     sub.add_argument("--reward-address", default="", help="the reward address")
-    sub.add_argument("--validators-file", required=not (utils.is_arg_present("--top-up", sys.argv)),
+    sub.add_argument("--validators-file", required=not (utils.is_arg_present(args, "--top-up")),
                      help="a JSON file describing the Nodes")
     sub.add_argument("--top-up", action="store_true", default=False,
-                     required=not (utils.is_arg_present("--validators-file", sys.argv)), help="Stake value for top up")
+                     required=not (utils.is_arg_present(args, "--validators-file")), help="Stake value for top up")
     sub.set_defaults(func=do_stake)
 
     sub = cli_shared.add_command_subparser(subparsers, "validator", "unstake", "Unstake value")
-    _add_common_arguments(sub)
+    _add_common_arguments(args, sub)
     _add_nodes_arg(sub)
     sub.set_defaults(func=do_unstake)
 
     sub = cli_shared.add_command_subparser(subparsers, "validator", "unjail", "Unjail a Validator Node")
-    _add_common_arguments(sub)
+    _add_common_arguments(args, sub)
     _add_nodes_arg(sub)
     sub.set_defaults(func=do_unjail)
 
     sub = cli_shared.add_command_subparser(subparsers, "validator", "unbond", "Unbond tokens for a bls key")
-    _add_common_arguments(sub)
+    _add_common_arguments(args, sub)
     _add_nodes_arg(sub)
     sub.set_defaults(func=do_unbond)
 
     sub = cli_shared.add_command_subparser(subparsers, "validator", "change-reward-address",
                                            "Change the reward address")
-    _add_common_arguments(sub)
+    _add_common_arguments(args, sub)
     sub.add_argument("--reward-address", required=True, help="the new reward address")
     sub.set_defaults(func=change_reward_address)
 
     sub = cli_shared.add_command_subparser(subparsers, "validator", "claim", "Claim rewards")
-    _add_common_arguments(sub)
+    _add_common_arguments(args, sub)
     sub.set_defaults(func=do_claim)
 
     sub = cli_shared.add_command_subparser(subparsers, "validator", "unstake-nodes", "Unstake-nodes will unstake "
                                                                                      "nodes for provided bls keys")
-    _add_common_arguments(sub)
+    _add_common_arguments(args, sub)
     _add_nodes_arg(sub)
     sub.set_defaults(func=do_unstake_nodes)
 
@@ -56,29 +56,29 @@ def setup_parser(subparsers: Any) -> Any:
                                                                                       "greater than the existing "
                                                                                       "topUp value, it will unStake "
                                                                                       "one or several nodes)")
-    _add_common_arguments(sub)
+    _add_common_arguments(args, sub)
     sub.add_argument("--unstake-value", default=0, help="the unstake value")
     sub.set_defaults(func=do_unstake_tokens)
 
     sub = cli_shared.add_command_subparser(subparsers, "validator", "unbond-nodes", "It will unBond nodes")
-    _add_common_arguments(sub)
+    _add_common_arguments(args, sub)
     _add_nodes_arg(sub)
     sub.set_defaults(func=do_unbond_nodes)
 
     sub = cli_shared.add_command_subparser(subparsers, "validator", "unbond-tokens", "It will unBond tokens, if "
                                                                                      "provided value is bigger that "
                                                                                      "topUp value will unBond nodes")
-    _add_common_arguments(sub)
+    _add_common_arguments(args, sub)
     sub.add_argument("--unbond-value", default=0, help="the unbond value")
     sub.set_defaults(func=do_unbond_tokens)
 
     sub = cli_shared.add_command_subparser(subparsers, "validator", "clean-registered-data", "Deletes duplicated keys "
                                                                                              "from registered data")
-    _add_common_arguments(sub)
+    _add_common_arguments(args, sub)
     sub.set_defaults(func=do_clean_registered_data)
 
     sub = cli_shared.add_command_subparser(subparsers, "validator", "restake-unstaked-nodes", "It will reStake UnStaked nodes")
-    _add_common_arguments(sub)
+    _add_common_arguments(args, sub)
     _add_nodes_arg(sub)
     sub.set_defaults(func=do_restake_unstaked_nodes)
 
@@ -86,10 +86,10 @@ def setup_parser(subparsers: Any) -> Any:
     return subparsers
 
 
-def _add_common_arguments(sub: Any):
+def _add_common_arguments(args: List[str], sub: Any):
     cli_shared.add_proxy_arg(sub)
-    cli_shared.add_wallet_args(sub)
-    cli_shared.add_tx_args(sub, with_receiver=False, with_data=False, with_estimate_gas=True)
+    cli_shared.add_wallet_args(args, sub)
+    cli_shared.add_tx_args(args, sub, with_receiver=False, with_data=False, with_estimate_gas=True)
     cli_shared.add_broadcast_args(sub, relay=False)
     cli_shared.add_outfile_arg(sub, what="signed transaction, hash")
 

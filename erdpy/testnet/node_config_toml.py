@@ -1,5 +1,7 @@
 from typing import Dict, Any
 
+import erdpy.config
+
 from erdpy.testnet.config import TestnetConfiguration
 from erdpy.testnet.nodes_setup_json import CHAIN_ID
 
@@ -80,20 +82,38 @@ def patch_enable_epochs(data: ConfigDict, testnet_config: TestnetConfiguration):
     enable_epochs['GlobalMintBurnDisableEpoch'] = 0
     enable_epochs['ESDTTransferRoleEnableEpoch'] = 0
     enable_epochs['BuiltInFunctionOnMetaEnableEpoch'] = 0
+    enable_epochs['ComputeRewardCheckpointEnableEpoch'] = 5
+    enable_epochs['BackwardCompSaveKeyValueEnableEpoch'] = 5
+    enable_epochs['SCRSizeInvariantCheckEnableEpoch'] = 5
+
+    enable_epochs['MultiESDTTransferFixOnCallBackOnEnableEpoch'] = 0
+    enable_epochs['ESDTNFTCreateOnMultiShard'] = 0
+    enable_epochs['RemoveNonUpdatedStorageEnableEpoch'] = 0
+    enable_epochs['FixOOGReturnCodeEnableEpoch'] = 0
+    enable_epochs['AddTokensToDelegationEnableEpoch'] = 0
+    enable_epochs['CorrectFirstQueuedEpoch'] = 0
+    enable_epochs['MetaESDTSetEnableEpoch'] = 0
+    enable_epochs['OptimizeGasUsedInCrossMiniBlocksEnableEpoch'] = 0
+    enable_epochs['DeleteDelegatorAfterClaimRewardsEnableEpoch'] = 0
 
     enable_epochs['MaxNodesChangeEnableEpoch'] = [
         {'EpochEnable': 0, 'MaxNumNodes': 36, 'NodesToShufflePerShard': 4},
         {'EpochEnable': 1, 'MaxNumNodes': 56, 'NodesToShufflePerShard': 2}
     ]
 
-    validate_expected_keys(data['EnableEpochs'], enable_epochs)
+    validate = erdpy.config.get_value('testnet.validate_expected_keys') == 'true'
+
+    if validate:
+        validate_expected_keys(data['EnableEpochs'], enable_epochs)
     data['EnableEpochs'].update(enable_epochs)
 
     gas_schedule = dict()
     gas_schedule['GasScheduleByEpochs'] = [
         {'StartEpoch': 0, 'FileName': 'gasScheduleV3.toml'}
     ]
-    validate_expected_keys(data['GasSchedule'], gas_schedule)
+
+    if validate:
+        validate_expected_keys(data['GasSchedule'], gas_schedule)
     data['GasSchedule'].update(gas_schedule)
 
 

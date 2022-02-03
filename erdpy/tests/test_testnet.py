@@ -3,6 +3,7 @@ import sys
 
 from pathlib import Path
 
+import erdpy.config
 from erdpy import workstation
 from erdpy.testnet import config
 
@@ -60,7 +61,14 @@ def test_init():
         'testnet': '/some/where/mytestnet',
     }
 
+    sdk_folder = workstation.get_tools_folder()
+    node_folder = erdpy.config.get_dependency_parent_directory('elrond_go')
+    (node_folder / 'v1.2.3').mkdir(parents=True, exist_ok=True)
+
+    proxy_folder = erdpy.config.get_dependency_parent_directory('elrond_proxy_go')
+    (proxy_folder / 'v2.3.4').mkdir(parents=True, exist_ok=True)
+
     testnet_config = config.TestnetConfiguration(data)
-    assert testnet_config.folders["elrond_go"] == workstation.get_tools_folder() / "bar"
-    assert testnet_config.folders["elrond_proxy_go"] == workstation.get_tools_folder() / "foobar"
+    assert testnet_config.folders["elrond_go"] == sdk_folder / "bar"
+    assert testnet_config.folders["elrond_proxy_go"] == sdk_folder / "foobar"
     assert testnet_config.folders["testnet"] == Path("/some/where/mytestnet")

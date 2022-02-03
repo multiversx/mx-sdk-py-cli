@@ -13,6 +13,7 @@ def setup_parser(subparsers: Any) -> Any:
     subparsers = parser.add_subparsers()
 
     sub = cli_shared.add_command_subparser(subparsers, "config", "dump", "Dumps configuration.")
+    sub.add_argument('--defaults', required=False, help='dump defaults instead of local config', action='store_true')
     sub.set_defaults(func=dump)
 
     sub = cli_shared.add_command_subparser(subparsers, "config", "get", "Gets a configuration value.")
@@ -23,6 +24,10 @@ def setup_parser(subparsers: Any) -> Any:
     _add_name_arg(sub)
     sub.add_argument("value", help="the new value")
     sub.set_defaults(func=set_value)
+
+    sub = cli_shared.add_command_subparser(subparsers, "config", "delete", "Deletes a configuration value.")
+    _add_name_arg(sub)
+    sub.set_defaults(func=delete_value)
 
     sub = cli_shared.add_command_subparser(subparsers, "config", "new", "Creates a new configuration.")
     _add_name_arg(sub)
@@ -45,8 +50,18 @@ def _add_name_arg(sub: Any):
 
 
 def dump(args: Any):
-    data = config.get_active()
-    utils.dump_out_json(data, sys.stdout)
+    if args.defaults:
+        _dump_defaults()
+    else:
+        _dump_active()
+
+
+def _dump_defaults():
+    utils.dump_out_json(config.get_defaults(), sys.stdout)
+
+
+def _dump_active():
+    utils.dump_out_json(config.get_active(), sys.stdout)
 
 
 def get_value(args: Any):
@@ -58,14 +73,18 @@ def set_value(args: Any):
     config.set_value(args.name, args.value)
 
 
+def delete_value(args: Any):
+    config.delete_value(args.name)
+
+
 def new_config(args: Any):
     config.create_new_config(name=args.name, template=args.template)
-    dump(None)
+    _dump_active()
 
 
 def switch_config(args: Any):
     config.set_active(args.name)
-    dump(None)
+    _dump_active()
 
 
 def list_configs(args: Any):

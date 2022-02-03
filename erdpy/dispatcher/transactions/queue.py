@@ -1,6 +1,7 @@
 import json
 import logging
 import os
+from pathlib import Path
 import time
 from collections import OrderedDict
 from os import path
@@ -51,18 +52,18 @@ class TransactionQueue:
     def __init__(self):
         tools_folder = get_tools_folder()
 
-        txs_file_dir = path.join(tools_folder, "transactions")
+        txs_file_dir = tools_folder / "transactions"
         # create transactions directory if not exits
-        if not os.path.exists(txs_file_dir):
-            os.mkdir(txs_file_dir)
+        if not txs_file_dir.exists():
+            txs_file_dir.mkdir()
 
-        self.txs_file_path = path.join(txs_file_dir, self._TXS_FILE_NAME)
-        if not os.path.exists(self.txs_file_path):
+        self.txs_file_path = txs_file_dir / self._TXS_FILE_NAME
+        if not self.txs_file_path.exists():
             # create transactions file if not exits
             utils.write_file(self.txs_file_path, '{"' + self._TXS_FIELD_NAME + '":[]}')
 
-        self.txs_info_file_path = path.join(txs_file_dir, self._TXS_INFO_FILE_NAME)
-        if not os.path.exists(self.txs_info_file_path):
+        self.txs_info_file_path = txs_file_dir / self._TXS_INFO_FILE_NAME
+        if not self.txs_info_file_path.exists():
             utils.write_file(self.txs_info_file_path, f"index:{0}")
 
     def enqueue_transaction(self, args):
@@ -86,7 +87,7 @@ class TransactionQueue:
             json.dump(data, json_file, indent=1)
 
     def _remove_all_transactions(self):
-        os.remove(self.txs_file_path)
+        self.txs_file_path.unlink()
 
     def _read_index(self):
         info = utils.read_file(self.txs_info_file_path)
@@ -157,6 +158,6 @@ class TransactionQueue:
         for key in hashes:
             print(f"tx {txs_index+int(key)}: hash => {hashes[key]}")
 
-        utils.write_file(self.txs_info_file_path, f"index:{len(txs)}")
+        utils.write_file(Path(self.txs_info_file_path), f"index:{len(txs)}")
         # wait until transactions are executed
         _wait_to_execute_txs(proxy, owner, old_nonce + num_sent)

@@ -19,9 +19,13 @@ def initialize():
     if os.path.exists(testnet_toml):
         global chain_id, proxy
 
-        testnet_config = TestnetConfiguration.from_file(testnet_toml)
         chain_id = CHAIN_ID
-        proxy = f"http://localhost:{testnet_config.proxy_port()}"
+
+        try:
+            testnet_config = TestnetConfiguration.from_file(testnet_toml)
+            proxy = f"http://localhost:{testnet_config.proxy_port()}"
+        except FileNotFoundError:
+            pass
 
 
 def get_chain_id():

@@ -1,15 +1,15 @@
-import os.path
+from pathlib import Path
 from erdpy import errors
 
 
-def is_file(input):
-    if not os.path.isfile(input):
-        raise errors.BadInputError(input, "is not a valid file")
+def is_file(input: Path):
+    if not input.is_file():
+        raise errors.BadInputError(str(input), "is not a valid file")
 
 
-def is_directory(directory: str):
-    if not os.path.isdir(directory):
-        raise errors.BadDirectory(directory)
+def is_directory(directory: Path):
+    if not directory.is_dir():
+        raise errors.BadDirectory(str(directory))
 
 
 def is_hex_address(input):

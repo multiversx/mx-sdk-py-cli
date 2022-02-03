@@ -1,0 +1,14 @@
+name: mypy reviewdog check
+on: [pull_request]
+jobs:
+  mypy:
+    name: runner / mypy
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Install Python dependencies
+        uses: py-actions/py-dependency-install@v2
+      - uses: tsuyoshicho/action-mypy@v3
+        with:
+          github_token: ${{ secrets.github_token }}
+          filter_mode: nofilter

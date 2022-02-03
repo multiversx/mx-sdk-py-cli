@@ -3,7 +3,7 @@ import time
 from typing import Any, List, Tuple, cast, Dict
 
 from erdpy.accounts import Address
-from erdpy.interfaces import IAddress
+from erdpy.interfaces import IAddress, IElrondProxy
 from erdpy.proxy.http_facade import do_get, do_post
 from erdpy.proxy.messages import NetworkConfig
 
@@ -13,7 +13,7 @@ ANY_SHARD_ID = 0
 logger = logging.getLogger("proxy")
 
 
-class ElrondProxy:
+class ElrondProxy(IElrondProxy):
     def __init__(self, url: str):
         self.url = url
 
@@ -42,7 +42,7 @@ class ElrondProxy:
         response = do_get(url)
         transactions = response.get("transactions", [])
         for transaction in transactions:
-            data = transaction.get("data", "")
+            data = transaction.get("data") or ""
             data = (data[:TRUNCATE_DATA_THRESHOLD] + ' ... truncated ...') if len(data) > TRUNCATE_DATA_THRESHOLD else data
             transaction["data"] = data
         return transactions

@@ -1,7 +1,9 @@
 import logging
 import os
+from pathlib import Path
 import subprocess
 from os import path
+from typing import List
 
 from erdpy import dependencies, errors, myprocess, utils
 from erdpy.projects.project_base import Project
@@ -79,12 +81,13 @@ class ProjectCpp(Project):
 
         myprocess.run_process(args)
 
-    def _do_after_build(self):
+    def _do_after_build(self) -> List[Path]:
         source_file = self.find_file_globally("*.cpp")
-        self._copy_to_output(source_file.with_suffix(".wasm"))
+        output_wasm_file = self._copy_to_output(source_file.with_suffix(".wasm"))
         os.remove(source_file.with_suffix(".wasm"))
         os.remove(source_file.with_suffix(".ll"))
         os.remove(source_file.with_suffix(".o"))
+        return [output_wasm_file]
 
     def _get_llvm_path(self):
         return dependencies.get_module_directory("llvm")
@@ -94,7 +97,7 @@ class ProjectCpp(Project):
 
 
 class CppBuildConfiguration:
-    def __init__(self, project, debug):
+    def __init__(self, project: Project, debug):
         self.project = project
         self.debug = debug
         self.exports = self._get_exports()

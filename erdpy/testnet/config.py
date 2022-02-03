@@ -60,6 +60,10 @@ class TestnetConfiguration:
             folder_path = folder_path.replace('{ELRONDSDK}', str(sdk_folder))
 
             default_tag = erdpy.config.get_dependency_tag(folder_key)
+            if default_tag == 'latest':
+                parent_folder = erdpy.config.get_dependency_parent_directory(folder_key)
+                default_tag = erdpy.config.get_latest_semver_from_directory(parent_folder)
+
             folder_path = folder_path.replace('{TAG}', default_tag)
 
             # If the user has not specified a custom source repository, the
@@ -292,8 +296,8 @@ class TestnetConfiguration:
     def loglevel(self) -> str:
         return self.features.get("loglevel", "")
 
-    def arwen_binary(self) -> bool:
-        return self.features.get("arwen_binary", False)
+    def wasm_vm_binary(self) -> bool:
+        return self.features.get("wasm_vm_binary", False)
 
     @classmethod
     def default(cls):
@@ -301,7 +305,7 @@ class TestnetConfiguration:
         config['features'] = {
             'loglevel': '*:DEBUG',
             'proxy': True,
-            'arwen_binary': False
+            'wasm_vm_binary': False
         }
         config['folders'] = {
             'elrond_go':
