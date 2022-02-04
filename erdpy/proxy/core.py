@@ -148,18 +148,11 @@ class ElrondProxy(IElrondProxy):
         tx_hash = response.get("txHash")
 
         for _ in range(0, num_seconds_timeout):
-            if self.is_transaction_finalized(tx_hash):
-                return self.get_transaction(tx_hash=tx_hash, with_results=True)
             time.sleep(1)
-        return dict()
 
-    def is_transaction_finalized(self, tx_hash):
-        last_nonce = self.get_last_block_nonce("metachain")
-        last_hyperblock = self.get_hyperblock(last_nonce)
-        finalized_transactions = last_hyperblock["transactions"]
+            tx = self.get_transaction(tx_hash=tx_hash, with_results=True)
+            if tx.is_done():
+                return tx
 
-        for transaction in finalized_transactions:
-            if transaction["hash"] == tx_hash:
-                return True
-
-        return False
+        return ITransactionOnNetwork()
+ 
