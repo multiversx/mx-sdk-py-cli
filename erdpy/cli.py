@@ -9,7 +9,6 @@ import erdpy.cli_block
 import erdpy.cli_blockatlas
 import erdpy.cli_config
 import erdpy.cli_contracts
-import erdpy.cli_cost
 import erdpy.cli_data
 import erdpy.cli_deps
 import erdpy.cli_dispatcher
@@ -91,7 +90,6 @@ https://docs.elrond.com/sdk-and-tools/erdpy/erdpy.
     commands.append(erdpy.cli_ledger.setup_parser(subparsers))
     commands.append(erdpy.cli_wallet.setup_parser(args, subparsers))
     commands.append(erdpy.cli_network.setup_parser(subparsers))
-    commands.append(erdpy.cli_cost.setup_parser(subparsers))
     commands.append(erdpy.cli_dispatcher.setup_parser(args, subparsers))
     commands.append(erdpy.cli_blockatlas.setup_parser(subparsers))
     commands.append(erdpy.cli_deps.setup_parser(subparsers))

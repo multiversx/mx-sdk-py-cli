@@ -20,7 +20,7 @@ https://docs.elrond.com/sdk-and-tools/erdpy/erdpy.
         
 
 COMMAND GROUPS:
-  {contract,tx,validator,account,ledger,wallet,network,cost,dispatcher,blockatlas,deps,config,hyperblock,testnet,data,staking-provider,dns}
+  {contract,tx,validator,account,ledger,wallet,network,dispatcher,blockatlas,deps,config,hyperblock,testnet,data,staking-provider,dns}
 
 TOP-LEVEL OPTIONS:
   -h, --help            show this help message and exit
@@ -37,7 +37,6 @@ account                        Get Account data (nonce, balance) from the Networ
 ledger                         Get Ledger App addresses and version
 wallet                         Create wallet, derive secret key from mnemonic, bech32 address helpers etc.
 network                        Get Network parameters, such as number of shards, chain identifier etc.
-cost                           Estimate cost of Transactions
 dispatcher                     Enqueue transactions, then bulk dispatch them
 blockatlas                     Interact with an Block Atlas instance
 deps                           Manage dependencies or elrond-sdk modules
@@ -956,97 +955,6 @@ Get the chain identifier.
 optional arguments:
   -h, --help     show this help message and exit
   --proxy PROXY  🔗 the URL of the proxy (default: https://testnet-gateway.elrond.com)
-
-```
-## Group **Cost**
-
-
-```
-$ erdpy cost --help
-usage: erdpy cost COMMAND [-h] ...
-
-Estimate cost of Transactions
-
-COMMANDS:
-  {gas-price,tx-transfer,sc-deploy,sc-call}
-
-OPTIONS:
-  -h, --help            show this help message and exit
-
-----------------
-COMMANDS summary
-----------------
-gas-price                      Query minimum gas price
-tx-transfer                    Query cost of regular transaction (transfer)
-sc-deploy                      Query cost of Smart Contract deploy transaction
-sc-call                        Query cost of Smart Contract call transaction
-
-```
-### Cost.GasPrice
-
-
-```
-$ erdpy cost gas-price --help
-usage: erdpy cost gas-price [-h] ...
-
-Query minimum gas price
-
-optional arguments:
-  -h, --help     show this help message and exit
-  --proxy PROXY  🔗 the URL of the proxy (default: https://testnet-gateway.elrond.com)
-
-```
-### Cost.TxTransfer
-
-
-```
-$ erdpy cost tx-transfer --help
-usage: erdpy cost tx-transfer [-h] ...
-
-Query cost of regular transaction (transfer)
-
-optional arguments:
-  -h, --help     show this help message and exit
-  --proxy PROXY  🔗 the URL of the proxy (default: https://testnet-gateway.elrond.com)
-  --data DATA    a transaction payload, required to estimate the cost
-
-```
-### Cost.ScDeploy
-
-
-```
-$ erdpy cost sc-deploy --help
-usage: erdpy cost sc-deploy [-h] ...
-
-Query cost of Smart Contract deploy transaction
-
-optional arguments:
-  -h, --help                             show this help message and exit
-  --proxy PROXY                          🔗 the URL of the proxy (default: https://testnet-gateway.elrond.com)
-  --project PROJECT                      🗀 the project directory (default: current directory)
-  --bytecode BYTECODE                    the file containing the WASM bytecode
-  --arguments ARGUMENTS [ARGUMENTS ...]  arguments for the contract transaction, as numbers or hex-encoded. E.g.
-                                         --arguments 42 0x64 1000 0xabba
-
-```
-### Cost.ScCall
-
-
-```
-$ erdpy cost sc-call --help
-usage: erdpy cost sc-call [-h] ...
-
-Query cost of Smart Contract call transaction
-
-positional arguments:
-  contract                               🖄 the address of the Smart Contract
-
-optional arguments:
-  -h, --help                             show this help message and exit
-  --proxy PROXY                          🔗 the URL of the proxy (default: https://testnet-gateway.elrond.com)
-  --function FUNCTION                    the function to call
-  --arguments ARGUMENTS [ARGUMENTS ...]  arguments for the contract transaction, as numbers or hex-encoded. E.g.
-                                         --arguments 42 0x64 1000 0xabba
 
 ```
 ## Group **Dispatcher**
