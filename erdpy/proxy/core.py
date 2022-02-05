@@ -153,6 +153,8 @@ class ElrondProxy(IElrondProxy):
             tx = self.get_transaction(tx_hash=tx_hash, with_results=True)
             if tx.is_done():
                 return tx
+            else:
+                logger.info("Transaction not yet done.")
 
         return ITransactionOnNetwork()
  
