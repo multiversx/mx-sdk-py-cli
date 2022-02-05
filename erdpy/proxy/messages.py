@@ -35,6 +35,9 @@ class TransactionOnNetwork(ITransactionOnNetwork):
     def is_done(self) -> bool:
         return self.raw.get("hyperblockNonce", 0) > 0
 
+    def get_hash(self) -> str:
+        return self.hash
+
     def to_dictionary(self) -> Dict[str, Any]:
         result: Dict[str, Any] = dict()
         result.update(self.raw)

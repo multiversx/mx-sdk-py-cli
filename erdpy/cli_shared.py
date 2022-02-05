@@ -8,6 +8,7 @@ from erdpy import config, errors, scope, utils
 from erdpy.accounts import Account
 from erdpy.ledger.ledger_functions import do_get_ledger_address
 from erdpy.proxy.core import ElrondProxy
+from erdpy.simulation import Simulator
 from erdpy.transactions import Transaction
 
 
@@ -124,7 +125,7 @@ def prepare_nonce_in_args(args: Any):
         args.nonce = account.nonce
 
 
-def add_broadcast_args(sub: Any, simulate=True, relay=False):
+def add_broadcast_args(sub: Any, simulate: bool = True, relay: bool = False):
     sub.add_argument("--send", action="store_true", default=False, help="✓ whether to broadcast the transaction (default: %(default)s)")
 
     if simulate:
@@ -141,11 +142,12 @@ def check_broadcast_args(args: Any):
 
 
 def send_or_simulate(tx: Transaction, args: Any):
+    proxy = ElrondProxy(args.proxy)
     if args.send:
-        tx.send(ElrondProxy(args.proxy))
+        tx.send(proxy)
     elif args.simulate:
-        response = tx.simulate(ElrondProxy(args.proxy))
-        utils.dump_out_json(response)
+        simulation = Simulator(proxy).run(tx)
+        utils.dump_out_json(simulation)
 
 
 def check_if_sign_method_required(args: List[str], checked_method: str) -> bool:

@@ -22,7 +22,7 @@ testAll() {
     ${ERDPY} --verbose tx new --pem="${USERS}/alice.pem" --receiver=${BOB} --value="1${DENOMINATION}" --nonce=44 --data-file=${SANDBOX}/txInner.txt --gas-limit=200000 --chain=${CHAIN_ID} --outfile=${SANDBOX}/txWrapper.txt || return 1
 
     echo "tx new --simulate"
-    ${ERDPY} --verbose tx new --simulate --pem="${USERS}/alice.pem" --receiver=${BOB} --value="1${DENOMINATION}" --recall-nonce --data="foo" --gas-limit=70000 --chain=${CHAIN_ID} --proxy=${PROXY} --outfile=${SANDBOX}/tx42.txt || return 1
+    ${ERDPY} --verbose tx new --simulate --pem="${USERS}/alice.pem" --receiver=${BOB} --value="1${DENOMINATION}" --recall-nonce --data="foo" --gas-limit=70000 --chain=${CHAIN_ID} --proxy=${PROXY} || return 1
 
     echo "tx new --send --wait-result"
     ${ERDPY} --verbose tx new --send --wait-result --pem="${USERS}/alice.pem" --receiver=${BOB} --value="1${DENOMINATION}" --recall-nonce --data="foo" --gas-limit=70000 --chain=${CHAIN_ID} --proxy=${PROXY} || return 1

@@ -1,6 +1,7 @@
+from collections import OrderedDict
 import logging
 import os
-from typing import Any, List, Union
+from typing import Any, Dict, List
 
 from pathlib import Path
 
@@ -9,6 +10,7 @@ from erdpy.accounts import Account, Address, LedgerAccount
 from erdpy.contracts import CodeMetadata, SmartContract
 from erdpy.projects import load_project
 from erdpy.proxy.core import ElrondProxy
+from erdpy.simulation import Simulator
 from erdpy.transactions import Transaction
 
 logger = logging.getLogger("cli.contracts")
@@ -211,36 +213,8 @@ def deploy(args: Any):
     logger.info("Contract address: %s", contract.address)
     utils.log_explorer_contract_address(chain, contract.address)
 
-    result = None
-    try:
-        result = _send_or_simulate(tx, args)
-    finally:
-        txdict = tx.to_dump_dict()
-        txdict['address'] = contract.address.bech32()
-        dump_tx_and_result(txdict, result, args)
-
-
-def dump_tx_and_result(tx: Any, result: Any, args: Any):
-    dump = dict()
-    dump['emitted_tx'] = tx
-
-    try:
-        returnCode = ''
-        returnMessage = ''
-        dump['result'] = result['result']
-        for scrHash, scr in dump['result']['scResults'].items():
-            if scr['receiver'] == tx['tx']['sender']:
-                retCode = scr['data'][1:]
-                retCode = bytes.fromhex(retCode).decode('ascii')
-                returnCode = retCode
-                returnMessage = scr['returnMessage']
-
-        dump['result']['returnCode'] = returnCode
-        dump['result']['returnMessage'] = returnMessage
-    except TypeError:
-        pass
-
-    utils.dump_out_json(dump, outfile=args.outfile)
+    output = _send_or_simulate(tx, contract, args)
+    utils.dump_out_json(output, outfile=args.outfile)
 
 
 def _prepare_contract(args: Any) -> SmartContract:
@@ -292,11 +266,8 @@ def call(args: Any):
     sender = _prepare_sender(args)
 
     tx = contract.execute(sender, function, arguments, gas_price, gas_limit, value, chain, version)
-    try:
-        result = _send_or_simulate(tx, args)
-    finally:
-        txdict = tx.to_dump_dict()
-        dump_tx_and_result(txdict, result, args)
+    output = _send_or_simulate(tx, contract, args)
+    utils.dump_out_json(output, outfile=args.outfile)
 
 
 def upgrade(args: Any):
@@ -316,11 +287,8 @@ def upgrade(args: Any):
     sender = _prepare_sender(args)
 
     tx = contract.upgrade(sender, arguments, gas_price, gas_limit, value, chain, version)
-    try:
-        result = _send_or_simulate(tx, args)
-    finally:
-        txdict = tx.to_dump_dict()
-        dump_tx_and_result(txdict, result, args)
+    output = _send_or_simulate(tx, contract, args)
+    utils.dump_out_json(output, outfile=args.outfile)
 
 
 def query(args: Any):
@@ -335,18 +303,24 @@ def query(args: Any):
     utils.dump_out_json(result)
 
 
-def _send_or_simulate(tx: Transaction, args: Any):
+def _send_or_simulate(tx: Transaction, contract: SmartContract, args: Any) -> Dict[str, Any]:
+    proxy = ElrondProxy(args.proxy)
+
     send_wait_result = args.wait_result and args.send and not args.simulate
     send_only = args.send and not (args.wait_result or args.simulate)
     simulate = args.simulate and not (send_only or send_wait_result)
 
+    output: OrderedDict[str, Any] = OrderedDict()
+
     if send_wait_result:
-        proxy = ElrondProxy(args.proxy)
-        response = tx.send_wait_result(proxy, args.timeout)
-        return None
+        output["txOnNetwork"] = tx.send_wait_result(proxy, args.timeout)
     elif send_only:
-        tx.send(ElrondProxy(args.proxy))
-        return None
+        tx.send(proxy)
     elif simulate:
-        response = tx.simulate(ElrondProxy(args.proxy))
-        return response
+        output["txSimulation"] = Simulator(proxy).run(tx)
+
+    # For backwards compatibility (a lot of interaction scripts rely on this attributes):
+    output["emitted_tx"] = tx.to_dump_dict()
+    output["emitted_tx"]["address"] = contract.address.bech32()
+
+    return output

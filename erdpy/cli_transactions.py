@@ -1,8 +1,9 @@
 from argparse import FileType
-from typing import Any, List
+from typing import Any, Dict, List
 
 from erdpy import cli_shared, utils
 from erdpy.proxy.core import ElrondProxy
+from erdpy.simulation import Simulator
 from erdpy.transactions import Transaction, do_prepare_transaction
 
 
@@ -64,18 +65,19 @@ def create_transaction(args: Any):
     send_only = args.send and not (args.wait_result or args.simulate)
     simulate = args.simulate and not (send_only or send_wait_result)
 
+    proxy = ElrondProxy(args.proxy)
+    output: Dict[str, Any] = dict()
+
     try:
         if send_wait_result:
-            proxy = ElrondProxy(args.proxy)
-            response = tx.send_wait_result(proxy, args.timeout)
-            utils.dump_out_json(response)
+            output["txOnNetwork"] = tx.send_wait_result(proxy, args.timeout)
         elif send_only:
-            tx.send(ElrondProxy(args.proxy))
+            tx.send(proxy)
         elif simulate:
-            response = tx.simulate(ElrondProxy(args.proxy))
-            utils.dump_out_json(response)
+            output["txSimulation"] = Simulator(proxy).run(tx)
     finally:
-        tx.dump_to(args.outfile)
+        output.update(tx.to_dump_dict())
+        utils.dump_out_json(output, outfile=args.outfile)
 
 
 def send_transaction(args: Any):
@@ -96,5 +98,6 @@ def get_transaction(args: Any):
     proxy = ElrondProxy(args.proxy)
 
     transaction = proxy.get_transaction(args.hash, args.sender, args.with_results)
-    utils.omit_fields(transaction, omit_fields)
-    utils.dump_out_json(transaction)
+    transaction_dictionary = transaction.to_dictionary()
+    utils.omit_fields(transaction_dictionary, omit_fields)
+    utils.dump_out_json(transaction_dictionary)

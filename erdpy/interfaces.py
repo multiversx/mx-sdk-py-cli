@@ -42,6 +42,9 @@ class ITransactionOnNetwork(ISerializable):
     def is_done(self) -> bool:
         return False
 
+    def get_hash(self) -> str:
+        return ""
+
 
 class ISimulateResponse(ISerializable):
     pass
