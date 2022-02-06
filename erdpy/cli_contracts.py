@@ -1,7 +1,6 @@
-from collections import OrderedDict
 import logging
 import os
-from typing import Any, Dict, List
+from typing import Any, List
 
 from pathlib import Path
 
@@ -10,7 +9,6 @@ from erdpy.accounts import Account, Address, LedgerAccount
 from erdpy.contracts import CodeMetadata, SmartContract
 from erdpy.projects import load_project
 from erdpy.proxy.core import ElrondProxy
-from erdpy.simulation import Simulator
 from erdpy.transactions import Transaction
 
 logger = logging.getLogger("cli.contracts")
@@ -213,8 +211,7 @@ def deploy(args: Any):
     logger.info("Contract address: %s", contract.address)
     utils.log_explorer_contract_address(chain, contract.address)
 
-    output = _send_or_simulate(tx, contract, args)
-    utils.dump_out_json(output, outfile=args.outfile)
+    _send_or_simulate(tx, contract, args)
 
 
 def _prepare_contract(args: Any) -> SmartContract:
@@ -226,7 +223,7 @@ def _prepare_contract(args: Any) -> SmartContract:
         bytecode = project.get_bytecode()
 
     metadata = CodeMetadata(upgradeable=args.metadata_upgradeable, readable=args.metadata_readable,
-        payable=args.metadata_payable, payable_by_sc=args.metadata_payable_by_sc)
+                            payable=args.metadata_payable, payable_by_sc=args.metadata_payable_by_sc)
     contract = SmartContract(bytecode=bytecode, metadata=metadata)
     return contract
 
@@ -266,8 +263,7 @@ def call(args: Any):
     sender = _prepare_sender(args)
 
     tx = contract.execute(sender, function, arguments, gas_price, gas_limit, value, chain, version)
-    output = _send_or_simulate(tx, contract, args)
-    utils.dump_out_json(output, outfile=args.outfile)
+    _send_or_simulate(tx, contract, args)
 
 
 def upgrade(args: Any):
@@ -287,8 +283,7 @@ def upgrade(args: Any):
     sender = _prepare_sender(args)
 
     tx = contract.upgrade(sender, arguments, gas_price, gas_limit, value, chain, version)
-    output = _send_or_simulate(tx, contract, args)
-    utils.dump_out_json(output, outfile=args.outfile)
+    _send_or_simulate(tx, contract, args)
 
 
 def query(args: Any):
@@ -303,24 +298,7 @@ def query(args: Any):
     utils.dump_out_json(result)
 
 
-def _send_or_simulate(tx: Transaction, contract: SmartContract, args: Any) -> Dict[str, Any]:
-    proxy = ElrondProxy(args.proxy)
-
-    send_wait_result = args.wait_result and args.send and not args.simulate
-    send_only = args.send and not (args.wait_result or args.simulate)
-    simulate = args.simulate and not (send_only or send_wait_result)
-
-    output: OrderedDict[str, Any] = OrderedDict()
-
-    if send_wait_result:
-        output["txOnNetwork"] = tx.send_wait_result(proxy, args.timeout)
-    elif send_only:
-        tx.send(proxy)
-    elif simulate:
-        output["txSimulation"] = Simulator(proxy).run(tx)
-
-    # For backwards compatibility (a lot of interaction scripts rely on this attributes):
-    output["emitted_tx"] = tx.to_dump_dict()
-    output["emitted_tx"]["address"] = contract.address.bech32()
-
-    return output
+def _send_or_simulate(tx: Transaction, contract: SmartContract, args: Any):
+    output_builder = cli_shared.send_or_simulate(tx, args, dump_output=False)
+    output_builder.set_contract_address(contract.address)
+    utils.dump_out_json(output_builder.build(), outfile=args.outfile)

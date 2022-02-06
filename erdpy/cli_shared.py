@@ -6,6 +6,7 @@ from typing import Any, List, Text, cast
 
 from erdpy import config, errors, scope, utils
 from erdpy.accounts import Account
+from erdpy.cli_output import CLIOutputBuilder
 from erdpy.ledger.ledger_functions import do_get_ledger_address
 from erdpy.proxy.core import ElrondProxy
 from erdpy.simulation import Simulator
@@ -141,13 +142,35 @@ def check_broadcast_args(args: Any):
         raise errors.BadUsage("Cannot both 'simulate' and 'send' a transaction")
 
 
-def send_or_simulate(tx: Transaction, args: Any):
+def send_or_simulate(tx: Transaction, args: Any, dump_output: bool = True) -> CLIOutputBuilder:
     proxy = ElrondProxy(args.proxy)
-    if args.send:
-        tx.send(proxy)
-    elif args.simulate:
-        simulation = Simulator(proxy).run(tx)
-        utils.dump_out_json(simulation)
+
+    is_set_wait_result = hasattr(args, "wait_result") and args.wait_result
+    is_set_send = hasattr(args, "send") and args.send
+    is_set_simulate = hasattr(args, "simulate") and args.simulate
+
+    send_wait_result = is_set_wait_result and is_set_send and not is_set_simulate
+    send_only = is_set_send and not (is_set_wait_result or is_set_simulate)
+    simulate = is_set_simulate and not (send_only or send_wait_result)
+
+    output_builder = CLIOutputBuilder()
+    output_builder.set_emitted_transaction(tx)
+    outfile = args.outfile if hasattr(args, "outfile") else None
+
+    try:
+        if send_wait_result:
+            transaction_on_network = tx.send_wait_result(proxy, args.timeout)
+            output_builder.set_transaction_on_network(transaction_on_network)
+        elif send_only:
+            tx.send(proxy)
+        elif simulate:
+            simulation = Simulator(proxy).run(tx)
+            output_builder.set_simulation_results(simulation)
+    finally:
+        if dump_output:
+            utils.dump_out_json(output_builder.build(), outfile=outfile)
+
+    return output_builder
 
 
 def check_if_sign_method_required(args: List[str], checked_method: str) -> bool:

@@ -13,7 +13,7 @@ class IAddress:
         return bytes()
 
 
-class ITransaction:
+class ITransaction(ISerializable):
     def serialize(self) -> bytes:
         return bytes()
 
@@ -31,6 +31,12 @@ class ITransaction:
 
     def set_options(self, options: int):
         return
+
+    def get_hash(self) -> str:
+        return ""
+
+    def get_data(self) -> str:
+        return ""
 
 
 class IAccount:

@@ -90,17 +90,6 @@ class Transaction(ITransaction):
         instance.receiverUsername = instance.receiver_username_encoded()
         return instance
 
-    def to_dump_dict(self):
-        dump_dict: Dict[str, Any] = dict()
-        dump_dict['tx'] = self.to_dictionary()
-        dump_dict['hash'] = self.hash or ""
-        dump_dict['data'] = self.data
-        return dump_dict
-
-    def dump_to(self, f: Any):
-        dump_dict: Any = self.to_dump_dict()
-        utils.dump_out_json(dump_dict, f)
-
     def send(self, proxy: IElrondProxy):
         if not self.signature:
             raise errors.TransactionIsNotSigned()
@@ -172,6 +161,12 @@ class Transaction(ITransaction):
 
     def set_options(self, options: int):
         self.options = options
+
+    def get_data(self) -> str:
+        return self.data
+    
+    def get_hash(self) -> str:
+        return self.hash
 
 
 class BunchOfTransactions:

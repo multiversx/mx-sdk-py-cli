@@ -6,7 +6,6 @@ from erdpy import cli_shared, utils
 from erdpy.accounts import Account, Address
 from erdpy.contracts import SmartContract
 from erdpy.proxy.core import ElrondProxy
-from erdpy.simulation import Simulator
 from erdpy.transactions import do_prepare_transaction
 from erdpy.interfaces import IElrondProxy
 
@@ -46,16 +45,7 @@ def register(args: Any):
         args.outfile.write(tx.serialize_as_inner())
         return
 
-    proxy = ElrondProxy(args.proxy)
-
-    try:
-        if args.send:
-            tx.send(proxy)
-        elif args.simulate:
-            simulation = Simulator(proxy).run(tx)
-            utils.dump_out_json(simulation)
-    finally:
-        tx.dump_to(args.outfile)
+    cli_shared.send_or_simulate(tx, args)
 
 
 def compute_all_dns_addresses() -> List[Address]:
