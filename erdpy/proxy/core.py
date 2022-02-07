@@ -9,6 +9,7 @@ from erdpy.proxy.messages import NetworkConfig, SimulateCostResponse, SimulateRe
 
 METACHAIN_ID = 4294967295
 ANY_SHARD_ID = 0
+AWAIT_TRANSACTION_PERIOD = 5
 
 logger = logging.getLogger("proxy")
 
@@ -148,7 +149,7 @@ class ElrondProxy(IElrondProxy):
         tx_hash = response.get("txHash")
 
         for _ in range(0, num_seconds_timeout):
-            time.sleep(1)
+            time.sleep(AWAIT_TRANSACTION_PERIOD)
 
             tx = self.get_transaction(tx_hash=tx_hash, with_results=True)
             if tx.is_done():
