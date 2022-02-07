@@ -28,7 +28,7 @@ def setup_parser(args: List[str], subparsers: Any) -> Any:
     cli_shared.add_proxy_arg(sub)
     sub.set_defaults(func=send_transaction)
 
-    sub = cli_shared.add_command_subparser(subparsers, "tx", "get", f"Get a transaction.{CLIOutputBuilder.describe(with_emitted=False)}")
+    sub = cli_shared.add_command_subparser(subparsers, "tx", "get", f"Get a transaction.{CLIOutputBuilder.describe(with_emitted=False, with_transaction_on_network=True)}")
     sub.add_argument("--hash", required=True, help="the hash")
     sub.add_argument("--sender", required=False, help="the sender address")
     sub.add_argument("--with-results", action="store_true", help="will also return the results of transaction")
@@ -82,5 +82,5 @@ def get_transaction(args: Any):
     proxy = ElrondProxy(args.proxy)
 
     transaction = proxy.get_transaction(args.hash, args.sender, args.with_results)
-    output = CLIOutputBuilder().set_awaited_transaction(transaction, omit_fields).build()
+    output = CLIOutputBuilder().set_transaction_on_network(transaction, omit_fields).build()
     utils.dump_out_json(output)

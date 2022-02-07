@@ -57,7 +57,7 @@ def setup_parser(args: List[str], subparsers: Any) -> Any:
     sub.add_argument("--wildcard", required=False, help="wildcard to match only specific test files")
     sub.set_defaults(func=run_tests)
 
-    output_description = CLIOutputBuilder.describe(with_contract=True, with_awaited_transaction=True, with_simulation=True)
+    output_description = CLIOutputBuilder.describe(with_contract=True, with_transaction_on_network=True, with_simulation=True)
     sub = cli_shared.add_command_subparser(subparsers, "contract", "deploy", f"Deploy a Smart Contract.{output_description}")
     _add_project_or_bytecode_arg(sub)
     _add_metadata_arg(sub)
@@ -92,7 +92,7 @@ def setup_parser(args: List[str], subparsers: Any) -> Any:
     sub.set_defaults(func=call)
 
     sub = cli_shared.add_command_subparser(subparsers, "contract", "upgrade",
-                                           "Upgrade a previously-deployed Smart Contract.{output_description}")
+                                           f"Upgrade a previously-deployed Smart Contract.{output_description}")
     _add_contract_arg(sub)
     cli_shared.add_outfile_arg(sub)
     _add_project_or_bytecode_arg(sub)

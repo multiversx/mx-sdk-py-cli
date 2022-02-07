@@ -37,7 +37,8 @@ COMMANDS summary
 ----------------
 """
     for choice, sub in subparsers.choices.items():
-        epilog += f"{choice.ljust(30)} {sub.description}\n"
+        description_first_line = sub.description.splitlines()[0]
+        epilog += f"{choice.ljust(30)} {description_first_line}\n"
 
     return epilog
 

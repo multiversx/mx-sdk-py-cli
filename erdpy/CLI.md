@@ -73,7 +73,7 @@ clean                          Clean a Smart Contract project.
 test                           Run Mandos tests.
 deploy                         Deploy a Smart Contract.
 call                           Interact with a Smart Contract (execute function).
-upgrade                        Upgrade a previously-deployed Smart Contract
+upgrade                        Upgrade a previously-deployed Smart Contract.
 query                          Query a Smart Contract (call a pure function)
 
 ```
@@ -157,6 +157,42 @@ usage: erdpy contract deploy [-h] ...
 
 Deploy a Smart Contract.
 
+Output example:
+===============
+{
+    "emittedTransaction": {
+        "nonce": 42,
+        "sender": "alice",
+        "receiver": "bob",
+        "...": "..."
+    },
+    "emittedTransactionData": "the transaction data, not encoded",
+    "emittedTransactionHash": "the transaction hash",
+    "tx": {
+        "DEPRECATED": "DEPRECATED"
+    },
+    "data": "DEPRECATED",
+    "hash": "DEPRECATED",
+    "emitted_tx": {
+        "DEPRECATED": "DEPRECATED"
+    },
+    "contractAddress": "the address of the contract",
+    "transactionOnNetwork": {
+        "nonce": 42,
+        "sender": "alice",
+        "receiver": "bob",
+        "...": "..."
+    },
+    "simulation": {
+        "execution": {
+            "...": "..."
+        },
+        "cost": {
+            "...": "..."
+        }
+    }
+}
+
 optional arguments:
   -h, --help                                   show this help message and exit
   --project PROJECT                            🗀 the project directory (default: current directory)
@@ -202,6 +238,42 @@ usage: erdpy contract call [-h] ...
 
 Interact with a Smart Contract (execute function).
 
+Output example:
+===============
+{
+    "emittedTransaction": {
+        "nonce": 42,
+        "sender": "alice",
+        "receiver": "bob",
+        "...": "..."
+    },
+    "emittedTransactionData": "the transaction data, not encoded",
+    "emittedTransactionHash": "the transaction hash",
+    "tx": {
+        "DEPRECATED": "DEPRECATED"
+    },
+    "data": "DEPRECATED",
+    "hash": "DEPRECATED",
+    "emitted_tx": {
+        "DEPRECATED": "DEPRECATED"
+    },
+    "contractAddress": "the address of the contract",
+    "transactionOnNetwork": {
+        "nonce": 42,
+        "sender": "alice",
+        "receiver": "bob",
+        "...": "..."
+    },
+    "simulation": {
+        "execution": {
+            "...": "..."
+        },
+        "cost": {
+            "...": "..."
+        }
+    }
+}
+
 positional arguments:
   contract                                     🖄 the address of the Smart Contract
 
@@ -244,7 +316,43 @@ optional arguments:
 $ erdpy contract upgrade --help
 usage: erdpy contract upgrade [-h] ...
 
-Upgrade a previously-deployed Smart Contract
+Upgrade a previously-deployed Smart Contract.
+
+Output example:
+===============
+{
+    "emittedTransaction": {
+        "nonce": 42,
+        "sender": "alice",
+        "receiver": "bob",
+        "...": "..."
+    },
+    "emittedTransactionData": "the transaction data, not encoded",
+    "emittedTransactionHash": "the transaction hash",
+    "tx": {
+        "DEPRECATED": "DEPRECATED"
+    },
+    "data": "DEPRECATED",
+    "hash": "DEPRECATED",
+    "emitted_tx": {
+        "DEPRECATED": "DEPRECATED"
+    },
+    "contractAddress": "the address of the contract",
+    "transactionOnNetwork": {
+        "nonce": 42,
+        "sender": "alice",
+        "receiver": "bob",
+        "...": "..."
+    },
+    "simulation": {
+        "execution": {
+            "...": "..."
+        },
+        "cost": {
+            "...": "..."
+        }
+    }
+}
 
 positional arguments:
   contract                                     🖄 the address of the Smart Contract
@@ -323,9 +431,9 @@ OPTIONS:
 ----------------
 COMMANDS summary
 ----------------
-new                            Create a new transaction
-send                           Send a previously saved transaction
-get                            Get a transaction
+new                            Create a new transaction.
+send                           Send a previously saved transaction.
+get                            Get a transaction.
 
 ```
 ### Transactions.New
@@ -335,7 +443,25 @@ get                            Get a transaction
 $ erdpy tx new --help
 usage: erdpy tx new [-h] ...
 
-Create a new transaction
+Create a new transaction.
+
+Output example:
+===============
+{
+    "emittedTransaction": {
+        "nonce": 42,
+        "sender": "alice",
+        "receiver": "bob",
+        "...": "..."
+    },
+    "emittedTransactionData": "the transaction data, not encoded",
+    "emittedTransactionHash": "the transaction hash",
+    "tx": {
+        "DEPRECATED": "DEPRECATED"
+    },
+    "data": "DEPRECATED",
+    "hash": "DEPRECATED"
+}
 
 optional arguments:
   -h, --help                                   show this help message and exit
@@ -377,7 +503,25 @@ optional arguments:
 $ erdpy tx send --help
 usage: erdpy tx send [-h] ...
 
-Send a previously saved transaction
+Send a previously saved transaction.
+
+Output example:
+===============
+{
+    "emittedTransaction": {
+        "nonce": 42,
+        "sender": "alice",
+        "receiver": "bob",
+        "...": "..."
+    },
+    "emittedTransactionData": "the transaction data, not encoded",
+    "emittedTransactionHash": "the transaction hash",
+    "tx": {
+        "DEPRECATED": "DEPRECATED"
+    },
+    "data": "DEPRECATED",
+    "hash": "DEPRECATED"
+}
 
 optional arguments:
   -h, --help         show this help message and exit
@@ -393,7 +537,18 @@ optional arguments:
 $ erdpy tx get --help
 usage: erdpy tx get [-h] ...
 
-Get a transaction
+Get a transaction.
+
+Output example:
+===============
+{
+    "transactionOnNetwork": {
+        "nonce": 42,
+        "sender": "alice",
+        "receiver": "bob",
+        "...": "..."
+    }
+}
 
 optional arguments:
   -h, --help                 show this help message and exit
@@ -773,8 +928,7 @@ pem-address-hex                Get the public address out of a PEM file as hex
 $ erdpy wallet new --help
 usage: erdpy wallet new [-h] ...
 
-Create a new wallet and print its mnemonic; optionally save as password-protected JSON (recommended) or PEM (not
-recommended)
+Create a new wallet and print its mnemonic; optionally save as password-protected JSON (recommended) or PEM (not recommended)
 
 optional arguments:
   -h, --help                 show this help message and exit

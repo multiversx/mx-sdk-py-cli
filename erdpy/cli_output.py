@@ -16,8 +16,8 @@ class CLIOutputBuilder:
         self.emitted_transaction: Union[ITransaction, None] = None
         self.emitted_transaction_omitted_fields: List[str] = []
         self.contract_address: Union[Address, None] = None
-        self.awaited_transaction: Union[ISerializable, None] = None
-        self.awaited_transaction_omitted_fields: List[str] = []
+        self.transaction_on_network: Union[ISerializable, None] = None
+        self.transaction_on_network_omitted_fields: List[str] = []
         self.simulation_results: Union[ISerializable, None] = None
 
     def set_emitted_transaction(self, emitted_transaction: ITransaction, omitted_fields: List[str] = []):
@@ -30,8 +30,11 @@ class CLIOutputBuilder:
         return self
 
     def set_awaited_transaction(self, awaited_transaction: ISerializable, omitted_fields: List[str] = []):
-        self.awaited_transaction = awaited_transaction
-        self.awaited_transaction_omitted_fields = omitted_fields
+        return self.set_transaction_on_network(awaited_transaction, omitted_fields)
+
+    def set_transaction_on_network(self, transaction_on_network: ISerializable, omitted_fields: List[str] = []):
+        self.transaction_on_network = transaction_on_network
+        self.transaction_on_network_omitted_fields = omitted_fields
         return self
 
     def set_simulation_results(self, simulation_results: ISerializable):
@@ -71,10 +74,10 @@ class CLIOutputBuilder:
             if "emitted_tx" in output:
                 output["emitted_tx"]["address"] = contract_address
 
-        if self.awaited_transaction:
-            awaited_transaction_dict = self.awaited_transaction.to_dictionary()
-            utils.omit_fields(awaited_transaction_dict, self.awaited_transaction_omitted_fields)
-            output["awaitedTransaction"] = awaited_transaction_dict
+        if self.transaction_on_network:
+            transaction_on_network_dict = self.transaction_on_network.to_dictionary()
+            utils.omit_fields(transaction_on_network_dict, self.transaction_on_network_omitted_fields)
+            output["transactionOnNetwork"] = transaction_on_network_dict
 
         if self.simulation_results:
             output["simulation"] = self.simulation_results
@@ -82,7 +85,7 @@ class CLIOutputBuilder:
         return output
 
     @classmethod
-    def describe(cls, with_emitted: bool = True, with_contract: bool = False, with_awaited_transaction: bool = False, with_simulation: bool = False) -> str:
+    def describe(cls, with_emitted: bool = True, with_contract: bool = False, with_transaction_on_network: bool = False, with_simulation: bool = False) -> str:
         output: Dict[str, Any] = OrderedDict()
 
         if with_emitted:
@@ -96,10 +99,10 @@ class CLIOutputBuilder:
 
         if with_contract:
             output["emitted_tx"] = {"DEPRECATED": "DEPRECATED"}
-            output["contractAddress"] = "the address of the contract (in case of deployments)"
+            output["contractAddress"] = "the address of the contract"
 
-        if with_awaited_transaction:
-            output["awaitedTransaction"] = {"nonce": 42, "sender": "alice", "receiver": "bob", "...": "..."}
+        if with_transaction_on_network:
+            output["transactionOnNetwork"] = {"nonce": 42, "sender": "alice", "receiver": "bob", "...": "..."}
 
         if with_simulation:
             output["simulation"] = {
