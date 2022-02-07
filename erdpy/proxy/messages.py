@@ -53,14 +53,36 @@ class TransactionOnNetwork(ITransactionOnNetwork):
 class SmartContractResult(ISerializable):
     def __init__(self, raw: Dict[str, Any]) -> None:
         self.raw = raw
-        self.parsed_data = decode_hex_base64(raw.get("data"))
+        self.return_message = self._parse_return_message()
+        self.arguments = self._parse_arguments()
         self.parsed_log = Log(raw.get("logs", {}))
+
+    def _parse_return_message(self) -> str:
+        try:
+            data_parts = self._parse_data_parts()
+            return_message_encoded = data_parts[0]
+            return_message = bytes.fromhex(return_message_encoded).decode("ascii")
+            return return_message
+        except:
+            return ""
+
+    def _parse_arguments(self) -> List[str]:
+        try:
+            data_parts = self._parse_data_parts()
+            arguments = data_parts[1:]
+            return arguments
+        except:
+            return []
+
+    def _parse_data_parts(self) -> List[str]:
+        return self.raw.get("data", "").split("@")
 
     def to_dictionary(self) -> Dict[str, Any]:
         result: Dict[str, Any] = dict()
         result.update(self.raw)
         result["parsed"] = {
-            "data": self.parsed_data,
+            "returnMessage": self.return_message,
+            "arguments": self.arguments,
             "log": self.parsed_log
         }
 
@@ -112,4 +134,3 @@ def decode_hex_base64(input: Union[str, None]) -> str:
 
 def decode_base64(input: Union[str, None]) -> str:
     return base64.b64decode(input).decode() if input else ""
-
