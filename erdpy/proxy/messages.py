@@ -33,7 +33,8 @@ class TransactionOnNetwork(ITransactionOnNetwork):
         self.parsed_logs = [Log(item) for item in logs]
 
     def is_done(self) -> bool:
-        return self.raw.get("hyperblockNonce", 0) > 0
+        hyperblock: int = self.raw.get("hyperblockNonce", 0)
+        return hyperblock > 0
 
     def get_hash(self) -> str:
         return self.hash
@@ -76,7 +77,8 @@ class SmartContractResult(ISerializable):
             return []
 
     def _parse_data_parts(self) -> List[str]:
-        return self.raw.get("data", "").split("@")
+        data: str = self.raw.get("data", "")
+        return data.split("@")
 
     def to_dictionary(self) -> Dict[str, Any]:
         result: Dict[str, Any] = dict()
@@ -92,7 +94,7 @@ class SmartContractResult(ISerializable):
 
 class Log(ISerializable):
     def __init__(self, raw: Dict[str, Any]) -> None:
-        self.events = []
+        self.raw = raw
 
 
 class SimulateResponse(ISimulateResponse):
@@ -122,7 +124,7 @@ class SimulateCostResponse(ISimulateCostResponse):
 
     def to_dictionary(self) -> Dict[str, Any]:
         result: Dict[str, Any] = dict()
-        result.update(self.raw)   
+        result.update(self.raw)
         result["parsed"] = dict()
 
         if self.parsed_contract_results:

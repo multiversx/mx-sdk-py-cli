@@ -13,7 +13,7 @@ logger = logging.getLogger("transactions")
 
 class Transaction(ITransaction):
     def __init__(self):
-        self.hash = ""
+        self.hash: str = ""
         self.nonce = 0
         self.value = "0"
         self.receiver = ""
@@ -22,7 +22,7 @@ class Transaction(ITransaction):
         self.receiverUsername = ""
         self.gasPrice = 0
         self.gasLimit = 0
-        self.data = ""
+        self.data: str = ""
         self.chainID = ""
         self.version = 0
         self.options = 0
