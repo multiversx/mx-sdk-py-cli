@@ -25,12 +25,11 @@ class TransactionOnNetwork(ITransactionOnNetwork):
     def __init__(self, hash: str, response: GenericProxyResponse) -> None:
         raw = response.get("transaction", dict())
         contract_results: List[Dict[str, Any]] = raw.get("smartContractResults", [])
-        logs: List[Dict[str, Any]] = raw.get("logs", [])
 
         self.raw = raw
         self.hash = hash
         self.parsed_contract_results = [SmartContractResult(item) for item in contract_results]
-        self.parsed_logs = [Log(item) for item in logs]
+        self.parsed_logs: List[Log] = []
 
     def is_done(self) -> bool:
         hyperblock: int = self.raw.get("hyperblockNonce", 0)
@@ -45,9 +44,9 @@ class TransactionOnNetwork(ITransactionOnNetwork):
         result["parsed"] = dict()
 
         if self.parsed_contract_results:
-            result["smartContractResults"] = self.parsed_contract_results
+            result["parsed"]["smartContractResults"] = self.parsed_contract_results
         if self.parsed_logs:
-            result["logs"] = self.parsed_logs
+            result["parsed"]["logs"] = self.parsed_logs
 
         return result
 
@@ -77,7 +76,7 @@ class SmartContractResult(ISerializable):
             return []
 
     def _parse_data_parts(self) -> List[str]:
-        data: str = self.raw.get("data", "")
+        data: str = self.raw.get("data", "").lstrip("@")
         return data.split("@")
 
     def to_dictionary(self) -> Dict[str, Any]:
@@ -99,7 +98,8 @@ class Log(ISerializable):
 
 class SimulateResponse(ISimulateResponse):
     def __init__(self, response: GenericProxyResponse) -> None:
-        contract_results: Dict[str, Any] = response.get("scResults") or dict()
+        result: Dict[str, Any] = response.get("result") or dict()
+        contract_results: Dict[str, Any] = result.get("scResults") or dict()
 
         self.raw = response.to_dictionary()
         self.parsed_contract_results = [SmartContractResult(item) for item in contract_results.values()]
@@ -110,7 +110,7 @@ class SimulateResponse(ISimulateResponse):
         result["parsed"] = dict()
 
         if self.parsed_contract_results:
-            result["smartContractResults"] = self.parsed_contract_results
+            result["parsed"]["smartContractResults"] = self.parsed_contract_results
 
         return result
 
@@ -128,7 +128,7 @@ class SimulateCostResponse(ISimulateCostResponse):
         result["parsed"] = dict()
 
         if self.parsed_contract_results:
-            result["smartContractResults"] = self.parsed_contract_results
+            result["parsed"]["smartContractResults"] = self.parsed_contract_results
 
         return result
 
