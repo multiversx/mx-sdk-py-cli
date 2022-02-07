@@ -11,7 +11,7 @@ def setup_parser(args: List[str], subparsers: Any) -> Any:
     parser = cli_shared.add_group_subparser(subparsers, "tx", "Create and broadcast Transactions")
     subparsers = parser.add_subparsers()
 
-    sub = cli_shared.add_command_subparser(subparsers, "tx", "new", "Create a new transaction")
+    sub = cli_shared.add_command_subparser(subparsers, "tx", "new", f"Create a new transaction.{CLIOutputBuilder.describe()}")
     _add_common_arguments(args, sub)
     cli_shared.add_outfile_arg(sub, what="signed transaction, hash")
     cli_shared.add_broadcast_args(sub, relay=True)
@@ -22,13 +22,13 @@ def setup_parser(args: List[str], subparsers: Any) -> Any:
                                                     " - only valid if --wait-result is set")
     sub.set_defaults(func=create_transaction)
 
-    sub = cli_shared.add_command_subparser(subparsers, "tx", "send", "Send a previously saved transaction")
+    sub = cli_shared.add_command_subparser(subparsers, "tx", "send", f"Send a previously saved transaction.{CLIOutputBuilder.describe()}")
     cli_shared.add_infile_arg(sub, what="a previously saved transaction")
     cli_shared.add_outfile_arg(sub, what="the hash")
     cli_shared.add_proxy_arg(sub)
     sub.set_defaults(func=send_transaction)
 
-    sub = cli_shared.add_command_subparser(subparsers, "tx", "get", "Get a transaction")
+    sub = cli_shared.add_command_subparser(subparsers, "tx", "get", f"Get a transaction.{CLIOutputBuilder.describe(with_emitted=False)}")
     sub.add_argument("--hash", required=True, help="the hash")
     sub.add_argument("--sender", required=False, help="the sender address")
     sub.add_argument("--with-results", action="store_true", help="will also return the results of transaction")
@@ -82,5 +82,5 @@ def get_transaction(args: Any):
     proxy = ElrondProxy(args.proxy)
 
     transaction = proxy.get_transaction(args.hash, args.sender, args.with_results)
-    output = CLIOutputBuilder().set_transaction_on_network(transaction, omit_fields).build()
+    output = CLIOutputBuilder().set_awaited_transaction(transaction, omit_fields).build()
     utils.dump_out_json(output)

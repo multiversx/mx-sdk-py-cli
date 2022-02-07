@@ -14,7 +14,7 @@ from erdpy.transactions import Transaction
 
 
 def wider_help_formatter(prog: Text):
-    return argparse.HelpFormatter(prog, max_help_position=50, width=120)
+    return argparse.RawDescriptionHelpFormatter(prog, max_help_position=50, width=120)
 
 
 def add_group_subparser(subparsers: Any, group: str, description: str) -> Any:
@@ -160,7 +160,7 @@ def send_or_simulate(tx: Transaction, args: Any, dump_output: bool = True) -> CL
     try:
         if send_wait_result:
             transaction_on_network = tx.send_wait_result(proxy, args.timeout)
-            output_builder.set_transaction_on_network(transaction_on_network)
+            output_builder.set_awaited_transaction(transaction_on_network)
         elif send_only:
             tx.send(proxy)
         elif simulate:

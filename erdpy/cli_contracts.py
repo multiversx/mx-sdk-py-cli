@@ -6,6 +6,7 @@ from pathlib import Path
 
 from erdpy import cli_shared, errors, projects, utils
 from erdpy.accounts import Account, Address, LedgerAccount
+from erdpy.cli_output import CLIOutputBuilder
 from erdpy.contracts import CodeMetadata, SmartContract
 from erdpy.projects import load_project
 from erdpy.proxy.core import ElrondProxy
@@ -56,7 +57,8 @@ def setup_parser(args: List[str], subparsers: Any) -> Any:
     sub.add_argument("--wildcard", required=False, help="wildcard to match only specific test files")
     sub.set_defaults(func=run_tests)
 
-    sub = cli_shared.add_command_subparser(subparsers, "contract", "deploy", "Deploy a Smart Contract.")
+    output_description = CLIOutputBuilder.describe(with_contract=True, with_awaited_transaction=True, with_simulation=True)
+    sub = cli_shared.add_command_subparser(subparsers, "contract", "deploy", f"Deploy a Smart Contract.{output_description}")
     _add_project_or_bytecode_arg(sub)
     _add_metadata_arg(sub)
     cli_shared.add_outfile_arg(sub)
@@ -73,7 +75,7 @@ def setup_parser(args: List[str], subparsers: Any) -> Any:
     sub.set_defaults(func=deploy)
 
     sub = cli_shared.add_command_subparser(subparsers, "contract", "call",
-                                           "Interact with a Smart Contract (execute function).")
+                                           f"Interact with a Smart Contract (execute function).{output_description}")
     _add_contract_arg(sub)
     cli_shared.add_outfile_arg(sub)
     cli_shared.add_wallet_args(args, sub)
@@ -90,7 +92,7 @@ def setup_parser(args: List[str], subparsers: Any) -> Any:
     sub.set_defaults(func=call)
 
     sub = cli_shared.add_command_subparser(subparsers, "contract", "upgrade",
-                                           "Upgrade a previously-deployed Smart Contract")
+                                           "Upgrade a previously-deployed Smart Contract.{output_description}")
     _add_contract_arg(sub)
     cli_shared.add_outfile_arg(sub)
     _add_project_or_bytecode_arg(sub)

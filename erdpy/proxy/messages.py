@@ -41,11 +41,12 @@ class TransactionOnNetwork(ITransactionOnNetwork):
     def to_dictionary(self) -> Dict[str, Any]:
         result: Dict[str, Any] = dict()
         result.update(self.raw)
-        result["hash"] = self.hash
-        result["parsed"] = {
-            "smartContractResults": self.parsed_contract_results,
-            "logs": self.parsed_logs
-        }
+        result["parsed"] = dict()
+
+        if self.parsed_contract_results:
+            result["smartContractResults"] = self.parsed_contract_results
+        if self.parsed_logs:
+            result["logs"] = self.parsed_logs
 
         return result
 
@@ -104,9 +105,10 @@ class SimulateResponse(ISimulateResponse):
     def to_dictionary(self) -> Dict[str, Any]:
         result: Dict[str, Any] = dict()
         result.update(self.raw)
-        result["parsed"] = {
-            "smartContractResults": self.parsed_contract_results
-        }
+        result["parsed"] = dict()
+
+        if self.parsed_contract_results:
+            result["smartContractResults"] = self.parsed_contract_results
 
         return result
 
@@ -120,10 +122,11 @@ class SimulateCostResponse(ISimulateCostResponse):
 
     def to_dictionary(self) -> Dict[str, Any]:
         result: Dict[str, Any] = dict()
-        result.update(self.raw)
-        result["parsed"] = {
-            "smartContractResults": self.parsed_contract_results
-        }
+        result.update(self.raw)   
+        result["parsed"] = dict()
+
+        if self.parsed_contract_results:
+            result["smartContractResults"] = self.parsed_contract_results
 
         return result
 
