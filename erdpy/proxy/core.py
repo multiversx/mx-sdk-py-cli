@@ -147,8 +147,9 @@ class ElrondProxy(IElrondProxy):
         url = f"{self.url}/transaction/send"
         response = do_post(url, payload)
         tx_hash = response.get("txHash")
+        num_periods_to_wait = int(num_seconds_timeout / AWAIT_TRANSACTION_PERIOD)
 
-        for _ in range(0, num_seconds_timeout):
+        for _ in range(0, num_periods_to_wait):
             time.sleep(AWAIT_TRANSACTION_PERIOD)
 
             tx = self.get_transaction(tx_hash=tx_hash, with_results=True)

@@ -109,7 +109,7 @@ def patch_enable_epochs(data: ConfigDict, testnet_config: TestnetConfiguration):
 
     gas_schedule = dict()
     gas_schedule['GasScheduleByEpochs'] = [
-        {'StartEpoch': 0, 'FileName': 'gasScheduleV3.toml'}
+        {'StartEpoch': 0, 'FileName': 'gasScheduleV5.toml'}
     ]
 
     if validate:
