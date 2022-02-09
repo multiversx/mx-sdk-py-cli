@@ -179,9 +179,9 @@ def create(args: Any):
 def get_project_paths(args: Any) -> List[Path]:
     base_path = Path(args.project)
     recursive = bool(args.recursive)
-    if not recursive:
-        return [base_path]
-    return get_project_paths_recursively(base_path)
+    if recursive:
+        return get_project_paths_recursively(base_path)
+    return [base_path]
 
 
 def clean(args: Any):
