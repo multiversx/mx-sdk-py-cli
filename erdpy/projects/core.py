@@ -45,6 +45,7 @@ def build_project(directory: Path, options: Dict[str, Any]):
 
 
 def clean_project(directory: Path):
+    logger.info("clean_project.directory: %s", directory)
     directory = directory.expanduser()
     guards.is_directory(directory)
     project = load_project(directory)
