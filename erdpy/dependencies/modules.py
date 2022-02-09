@@ -333,6 +333,36 @@ class Rust(DependencyModule):
         raise errors.UnsupportedConfigurationValue("Rust tag must either be explicit, empty or 'nightly'")
 
 
+class CargoModule(DependencyModule):
+    def __init__(self, key: str, aliases: List[str] = None):
+        if aliases is None:
+            aliases = list()
+
+        super().__init__(key, aliases)
+
+    def run_command_with_rust_env(self, args: List[str]) -> str:
+        rust = dependencies.get_module_by_key("rust")
+        return myprocess.run_process(args, rust.get_env())
+
+    def _do_install(self, tag: str) -> None:
+        self.run_command_with_rust_env(["cargo", "install", self.key])
+
+    def is_installed(self, tag: str) -> bool:
+        rust = dependencies.get_module_by_key("rust")
+        output = myprocess.run_process(["cargo", "install", "--list"], rust.get_env())
+        for line in output.splitlines():
+            if self.key == line.strip():
+                return True
+        return False
+
+    def uninstall(self, tag: str):
+        if self.is_installed(tag):
+            self.run_command_with_rust_env(["cargo", "uninstall", self.key])
+
+    def get_latest_release(self) -> str:
+        return "latest"
+
+
 class MclSignerModule(StandaloneModule):
     def __init__(self, key: str, aliases: List[str] = None):
         if aliases is None:
