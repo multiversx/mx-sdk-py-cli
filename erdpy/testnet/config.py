@@ -90,7 +90,7 @@ class TestnetConfiguration:
         self.timing.update(self.config.get('timing', dict()))
 
     @classmethod
-    def from_file(cls, filename):
+    def from_file(cls, filename: str):
         """
         If no filename is specified, try to load testnet.toml from the current
         directory, if there is any, and merge it with the SDK-level testnet
