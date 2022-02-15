@@ -167,6 +167,23 @@ class ProjectRust(Project):
     def get_env(self):
         return dependencies.get_module_by_key("rust").get_env()
 
+    def build_wasm_with_debug_symbols(self):
+        cwd = self.get_meta_folder()
+        env = self.get_env()
+
+        args = [
+            "cargo",
+            "run",
+            "build",
+            "--wasm-symbols",
+            "--wasm-suffix", "dbg",
+            "--no-wasm-opt"
+        ]
+        
+        return_code = myprocess.run_process_async(args, env=env, cwd=str(cwd))
+        if return_code != 0:
+            raise errors.BuildError(f"error code = {return_code}, see output")
+
 
 class CargoFile:
     data: Dict[str, Any]
