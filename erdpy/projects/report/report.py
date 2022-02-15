@@ -188,7 +188,7 @@ class ReportCreator:
         parent_folder = parent_folder.resolve()
         project_reports = [self.create_project_report(parent_folder, project_path) for _, project_path in iter]
 
-        root_path = parent_folder.relative_to(base_path)
+        root_path = parent_folder.relative_to(base_path.parent)
         return FolderReport(root_path, project_reports)
 
 
