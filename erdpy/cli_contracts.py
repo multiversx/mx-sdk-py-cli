@@ -142,7 +142,8 @@ def _add_function_arg(sub: Any):
 
 def _add_arguments_arg(sub: Any):
     sub.add_argument("--arguments", nargs='+',
-                     help="arguments for the contract transaction, as numbers or hex-encoded. E.g. --arguments 42 0x64 1000 0xabba")
+                     help="arguments for the contract transaction, as [number, bech32-address, ascii string, "
+                          "boolean] or hex-encoded. E.g. --arguments 42 0x64 1000 0xabba TOK-a1c2ef true erd1[..]")
 
 
 def _add_metadata_arg(sub: Any):
@@ -252,7 +253,7 @@ def _prepare_contract(args: Any) -> SmartContract:
         bytecode = project.get_bytecode()
 
     metadata = CodeMetadata(upgradeable=args.metadata_upgradeable, readable=args.metadata_readable,
-        payable=args.metadata_payable, payable_by_sc=args.metadata_payable_by_sc)
+                            payable=args.metadata_payable, payable_by_sc=args.metadata_payable_by_sc)
     contract = SmartContract(bytecode=bytecode, metadata=metadata)
     return contract
 

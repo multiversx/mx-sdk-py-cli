@@ -34,9 +34,23 @@ def test_prepare_argument():
     assert _prepare_argument('5') == '05'
     assert _prepare_argument('0x05f') == '005F'
     assert _prepare_argument('0xaaa') == '0AAA'
+    assert _prepare_argument('aaa') == '616161'
+
+    assert _prepare_argument(155) == '9B'
+    assert _prepare_argument('155') == '9B'
+
+    assert \
+        _prepare_argument('erd1qr9av6ar4ymr05xj93jzdxyezdrp6r4hz6u0scz4dtzvv7kmlldse7zktc') == \
+        '00CBD66BA3A93637D0D22C6426989913461D0EB716B8F860556AC4C67ADBFFDB'
+
+    assert _prepare_argument('TOK-123456') == '544F4B2D313233343536'
+    assert _prepare_argument('TOK-a1c2ef') == '544F4B2D613163326566'
+    assert _prepare_argument('TokenName') == '546F6B656E4E616D65'
+
+    assert _prepare_argument(True) == "01"
+    assert _prepare_argument(False) == "00"
+    assert _prepare_argument("TrUe") == "01"
+    assert _prepare_argument("fAlSe") == "00"
 
     with pytest.raises(errors.UnknownArgumentFormat):
         _ = _prepare_argument('0x05fq')
-
-    with pytest.raises(errors.UnknownArgumentFormat):
-        _ = _prepare_argument('aaa')

@@ -6,6 +6,7 @@ __pycache__
 *$py.class
 .pytest_cache/
 erdpy/tests/testdata-out
+.idea
 
 # mypy
 .mypy_cache/
