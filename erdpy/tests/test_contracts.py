@@ -34,6 +34,7 @@ def test_prepare_argument():
     assert _prepare_argument('5') == '05'
     assert _prepare_argument('0x05f') == '005F'
     assert _prepare_argument('0xaaa') == '0AAA'
+    assert _prepare_argument('str:a') == '61'
     assert _prepare_argument('str:aaa') == '616161'
 
     assert _prepare_argument(155) == '9B'

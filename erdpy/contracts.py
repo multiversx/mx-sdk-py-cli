@@ -32,8 +32,7 @@ class SmartContract:
         self.bytecode = bytecode
         self.metadata = metadata or CodeMetadata()
 
-    def deploy(self, owner: Account, arguments: List[Any], gas_price: int, gas_limit: int, value: int, chain: str,
-               version: int) -> Transaction:
+    def deploy(self, owner: Account, arguments: List[Any], gas_price: int, gas_limit: int, value: int, chain: str, version: int) -> Transaction:
         self.owner = owner
         self.compute_address()
 
@@ -75,8 +74,7 @@ class SmartContract:
         address = bytes([0] * 8) + bytes([5, 0]) + address[10:30] + owner_bytes[30:]
         self.address = Address(address)
 
-    def execute(self, caller: Account, function: str, arguments: List[str], gas_price: int, gas_limit: int, value: int,
-                chain: str, version: int) -> Transaction:
+    def execute(self, caller: Account, function: str, arguments: List[str], gas_price: int, gas_limit: int, value: int, chain: str, version: int) -> Transaction:
         self.caller = caller
 
         arguments = arguments or []
@@ -106,8 +104,7 @@ class SmartContract:
 
         return tx_data
 
-    def upgrade(self, owner: Account, arguments: List[Any], gas_price: int, gas_limit: int, value: int, chain: str,
-                version: int) -> Transaction:
+    def upgrade(self, owner: Account, arguments: List[Any], gas_price: int, gas_limit: int, value: int, chain: str, version: int) -> Transaction:
         self.owner = owner
 
         arguments = arguments or []
@@ -138,19 +135,18 @@ class SmartContract:
         return tx_data
 
     def query(
-            self,
-            proxy: IElrondProxy,
-            function: str,
-            arguments: List[Any],
-            value: int = 0,
-            caller: Optional[Address] = None
+        self,
+        proxy: IElrondProxy,
+        function: str,
+        arguments: List[Any],
+        value: int = 0,
+        caller: Optional[Address] = None
     ) -> List[Any]:
         response_data = self.query_detailed(proxy, function, arguments, value, caller)
         return_data = response_data.get("returnData", []) or response_data.get("ReturnData", [])
         return [self._interpret_return_data(data) for data in return_data]
 
-    def query_detailed(self, proxy: IElrondProxy, function: str, arguments: List[Any], value: int = 0,
-                       caller: Optional[Address] = None) -> Any:
+    def query_detailed(self, proxy: IElrondProxy, function: str, arguments: List[Any], value: int = 0, caller: Optional[Address] = None) -> Any:
         arguments = arguments or []
         prepared_arguments = [_prepare_argument(argument) for argument in arguments]
 
@@ -245,8 +241,7 @@ def sum_flag_values(flag_value_pairs: List[Tuple[int, bool]]) -> int:
 
 
 class CodeMetadata:
-    def __init__(self, upgradeable: bool = True, readable: bool = True, payable: bool = False,
-                 payable_by_sc: bool = False):
+    def __init__(self, upgradeable: bool = True, readable: bool = True, payable: bool = False, payable_by_sc: bool = False):
         self.upgradeable = upgradeable
         self.readable = readable
         self.payable = payable
