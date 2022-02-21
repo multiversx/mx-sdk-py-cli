@@ -187,7 +187,7 @@ optional arguments:
   --options OPTIONS                            the transaction options (default: 0)
   --arguments ARGUMENTS [ARGUMENTS ...]        arguments for the contract transaction, as [number, bech32-address, ascii
                                                string, boolean] or hex-encoded. E.g. --arguments 42 0x64 1000 0xabba
-                                               TOK-a1c2ef true erd1[..]
+                                               str:TOK-a1c2ef true erd1[..]
   --wait-result                                signal to wait for the transaction result - only valid if --send is set
   --timeout TIMEOUT                            max num of seconds to wait for result - only valid if --wait-result is
                                                set
@@ -231,7 +231,7 @@ optional arguments:
   --function FUNCTION                          the function to call
   --arguments ARGUMENTS [ARGUMENTS ...]        arguments for the contract transaction, as [number, bech32-address, ascii
                                                string, boolean] or hex-encoded. E.g. --arguments 42 0x64 1000 0xabba
-                                               TOK-a1c2ef true erd1[..]
+                                               str:TOK-a1c2ef true erd1[..]
   --wait-result                                signal to wait for the transaction result - only valid if --send is set
   --timeout TIMEOUT                            max num of seconds to wait for result - only valid if --wait-result is
                                                set
@@ -281,7 +281,7 @@ optional arguments:
   --options OPTIONS                            the transaction options (default: 0)
   --arguments ARGUMENTS [ARGUMENTS ...]        arguments for the contract transaction, as [number, bech32-address, ascii
                                                string, boolean] or hex-encoded. E.g. --arguments 42 0x64 1000 0xabba
-                                               TOK-a1c2ef true erd1[..]
+                                               str:TOK-a1c2ef true erd1[..]
   --wait-result                                signal to wait for the transaction result - only valid if --send is set
   --timeout TIMEOUT                            max num of seconds to wait for result - only valid if --wait-result is
                                                set
@@ -307,7 +307,7 @@ optional arguments:
   --function FUNCTION                    the function to call
   --arguments ARGUMENTS [ARGUMENTS ...]  arguments for the contract transaction, as [number, bech32-address, ascii
                                          string, boolean] or hex-encoded. E.g. --arguments 42 0x64 1000 0xabba
-                                         TOK-a1c2ef true erd1[..]
+                                         str:TOK-a1c2ef true erd1[..]
 
 ```
 ## Group **Transactions**
