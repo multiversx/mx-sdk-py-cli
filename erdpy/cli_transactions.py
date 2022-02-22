@@ -2,6 +2,7 @@ from argparse import FileType
 from typing import Any, List
 
 from erdpy import cli_shared, utils
+from erdpy.cli_output import CLIOutputBuilder
 from erdpy.proxy.core import ElrondProxy
 from erdpy.transactions import Transaction, do_prepare_transaction
 
@@ -10,7 +11,7 @@ def setup_parser(args: List[str], subparsers: Any) -> Any:
     parser = cli_shared.add_group_subparser(subparsers, "tx", "Create and broadcast Transactions")
     subparsers = parser.add_subparsers()
 
-    sub = cli_shared.add_command_subparser(subparsers, "tx", "new", "Create a new transaction")
+    sub = cli_shared.add_command_subparser(subparsers, "tx", "new", f"Create a new transaction.{CLIOutputBuilder.describe()}")
     _add_common_arguments(args, sub)
     cli_shared.add_outfile_arg(sub, what="signed transaction, hash")
     cli_shared.add_broadcast_args(sub, relay=True)
@@ -21,13 +22,13 @@ def setup_parser(args: List[str], subparsers: Any) -> Any:
                                                     " - only valid if --wait-result is set")
     sub.set_defaults(func=create_transaction)
 
-    sub = cli_shared.add_command_subparser(subparsers, "tx", "send", "Send a previously saved transaction")
+    sub = cli_shared.add_command_subparser(subparsers, "tx", "send", f"Send a previously saved transaction.{CLIOutputBuilder.describe()}")
     cli_shared.add_infile_arg(sub, what="a previously saved transaction")
     cli_shared.add_outfile_arg(sub, what="the hash")
     cli_shared.add_proxy_arg(sub)
     sub.set_defaults(func=send_transaction)
 
-    sub = cli_shared.add_command_subparser(subparsers, "tx", "get", "Get a transaction")
+    sub = cli_shared.add_command_subparser(subparsers, "tx", "get", f"Get a transaction.{CLIOutputBuilder.describe(with_emitted=False, with_transaction_on_network=True)}")
     sub.add_argument("--hash", required=True, help="the hash")
     sub.add_argument("--sender", required=False, help="the sender address")
     sub.add_argument("--with-results", action="store_true", help="will also return the results of transaction")
@@ -60,22 +61,7 @@ def create_transaction(args: Any):
         args.outfile.write(tx.serialize_as_inner())
         return
 
-    send_wait_result = args.wait_result and args.send and not args.simulate
-    send_only = args.send and not (args.wait_result or args.simulate)
-    simulate = args.simulate and not (send_only or send_wait_result)
-
-    try:
-        if send_wait_result:
-            proxy = ElrondProxy(args.proxy)
-            response = tx.send_wait_result(proxy, args.timeout)
-            utils.dump_out_json(response)
-        elif send_only:
-            tx.send(ElrondProxy(args.proxy))
-        elif simulate:
-            response = tx.simulate(ElrondProxy(args.proxy))
-            utils.dump_out_json(response)
-    finally:
-        tx.dump_to(args.outfile)
+    cli_shared.send_or_simulate(tx, args)
 
 
 def send_transaction(args: Any):
@@ -86,15 +72,15 @@ def send_transaction(args: Any):
     try:
         tx.send(ElrondProxy(args.proxy))
     finally:
-        tx.dump_to(args.outfile)
+        output = CLIOutputBuilder().set_emitted_transaction(tx).build()
+        utils.dump_out_json(output, outfile=args.outfile)
 
 
 def get_transaction(args: Any):
     args = utils.as_object(args)
     omit_fields = cli_shared.parse_omit_fields_arg(args)
-
     proxy = ElrondProxy(args.proxy)
 
     transaction = proxy.get_transaction(args.hash, args.sender, args.with_results)
-    utils.omit_fields(transaction, omit_fields)
-    utils.dump_out_json(transaction)
+    output = CLIOutputBuilder().set_transaction_on_network(transaction, omit_fields).build()
+    utils.dump_out_json(output)

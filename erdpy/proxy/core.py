@@ -1,14 +1,15 @@
 import logging
 import time
-from typing import Any, List, Tuple, cast, Dict
+from typing import Any, List, Tuple, cast
 
 from erdpy.accounts import Address
-from erdpy.interfaces import IAddress, IElrondProxy
+from erdpy.interfaces import IAddress, IElrondProxy, ISimulateCostResponse, ISimulateResponse, ITransactionOnNetwork
 from erdpy.proxy.http_facade import do_get, do_post
-from erdpy.proxy.messages import NetworkConfig
+from erdpy.proxy.messages import NetworkConfig, SimulateCostResponse, SimulateResponse, TransactionOnNetwork
 
 METACHAIN_ID = 4294967295
 ANY_SHARD_ID = 0
+AWAIT_TRANSACTION_PERIOD = 5
 
 logger = logging.getLogger("proxy")
 
@@ -102,10 +103,15 @@ class ElrondProxy(IElrondProxy):
         tx_hash = str(response.get("txHash"))
         return tx_hash
 
-    def simulate_transaction(self, payload: Any) -> str:
+    def simulate_transaction(self, payload: Any) -> ISimulateResponse:
         url = f"{self.url}/transaction/simulate"
-        response = str(do_post(url, payload))
-        return response
+        response = do_post(url, payload)
+        return SimulateResponse(response)
+
+    def simulate_transaction_cost(self, payload: Any) -> ISimulateCostResponse:
+        url = f"{self.url}/transaction/cost"
+        response = do_post(url, payload)
+        return SimulateCostResponse(response)
 
     def send_transactions(self, payload: List[Any]) -> Tuple[int, List[str]]:
         url = f"{self.url}/transaction/send-multiple"
@@ -120,16 +126,13 @@ class ElrondProxy(IElrondProxy):
         response = do_post(url, payload)
         return response
 
-    def get_transaction(self, tx_hash: str, sender_address: str = "", with_results: bool = False) -> Dict[str, Any]:
+    def get_transaction(self, tx_hash: str, sender_address: str = "", with_results: bool = False) -> ITransactionOnNetwork:
         url = f"{self.url}/transaction/{tx_hash}"
         url += f"?sender={sender_address or ''}"
         url += f"&withResults={with_results}"
 
         response = do_get(url)
-        transaction_response = response.get("transaction", dict())
-        transaction = cast(Dict[str, Any], transaction_response)
-        transaction['hash'] = tx_hash
-        return transaction
+        return TransactionOnNetwork(tx_hash, response)
 
     def get_hyperblock(self, key) -> Any:
         url = f"{self.url}/hyperblock/by-hash/{key}"
@@ -140,24 +143,20 @@ class ElrondProxy(IElrondProxy):
         response = response.get("hyperblock", {})
         return response
 
-    def send_transaction_and_wait_for_result(self, payload: Any, num_seconds_timeout: int = 100) -> Dict[str, Any]:
+    def send_transaction_and_wait_for_result(self, payload: Any, num_seconds_timeout: int = 100) -> ITransactionOnNetwork:
         url = f"{self.url}/transaction/send"
         response = do_post(url, payload)
         tx_hash = response.get("txHash")
+        num_periods_to_wait = int(num_seconds_timeout / AWAIT_TRANSACTION_PERIOD)
 
-        for _ in range(0, num_seconds_timeout):
-            if self.is_transaction_finalized(tx_hash):
-                return self.get_transaction(tx_hash=tx_hash, with_results=True)
-            time.sleep(1)
-        return dict()
+        for _ in range(0, num_periods_to_wait):
+            time.sleep(AWAIT_TRANSACTION_PERIOD)
 
-    def is_transaction_finalized(self, tx_hash):
-        last_nonce = self.get_last_block_nonce("metachain")
-        last_hyperblock = self.get_hyperblock(last_nonce)
-        finalized_transactions = last_hyperblock["transactions"]
+            tx = self.get_transaction(tx_hash=tx_hash, with_results=True)
+            if tx.is_done():
+                return tx
+            else:
+                logger.info("Transaction not yet done.")
 
-        for transaction in finalized_transactions:
-            if transaction["hash"] == tx_hash:
-                return True
-
-        return False
+        return ITransactionOnNetwork()
+ 

@@ -1,8 +1,10 @@
+from typing import Any, Dict
 import requests
 from erdpy import errors
+from erdpy.proxy.messages import GenericProxyResponse
 
 
-def do_get(url):
+def do_get(url: str) -> GenericProxyResponse:
     try:
         response = requests.get(url)
         response.raise_for_status()
@@ -17,7 +19,7 @@ def do_get(url):
         raise errors.ProxyRequestError(url, err)
 
 
-def do_post(url, payload):
+def do_post(url: str, payload: Any) -> GenericProxyResponse:
     try:
         response = requests.post(url, json=payload)
         response.raise_for_status()
@@ -32,17 +34,18 @@ def do_post(url, payload):
         raise errors.ProxyRequestError(url, err)
 
 
-def get_data(parsed, url):
+def get_data(parsed: Dict[str, Any], url: str) -> GenericProxyResponse:
     err = parsed.get("error")
     code = parsed.get("code")
 
     if not err and code == "successful":
-        return parsed.get("data", dict())
+        data: Dict[str, Any] = parsed.get("data", dict())
+        return GenericProxyResponse(data)
 
     raise errors.ProxyRequestError(url, f"code:{code}, error: {err}")
 
 
-def _extract_error_from_response(response):
+def _extract_error_from_response(response: Any):
     try:
         return response.json()
     except Exception:

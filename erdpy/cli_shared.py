@@ -6,13 +6,15 @@ from typing import Any, List, Text, cast
 
 from erdpy import config, errors, scope, utils
 from erdpy.accounts import Account
+from erdpy.cli_output import CLIOutputBuilder
 from erdpy.ledger.ledger_functions import do_get_ledger_address
 from erdpy.proxy.core import ElrondProxy
+from erdpy.simulation import Simulator
 from erdpy.transactions import Transaction
 
 
 def wider_help_formatter(prog: Text):
-    return argparse.HelpFormatter(prog, max_help_position=50, width=120)
+    return argparse.RawDescriptionHelpFormatter(prog, max_help_position=50, width=120)
 
 
 def add_group_subparser(subparsers: Any, group: str, description: str) -> Any:
@@ -35,7 +37,8 @@ COMMANDS summary
 ----------------
 """
     for choice, sub in subparsers.choices.items():
-        epilog += f"{choice.ljust(30)} {sub.description}\n"
+        description_first_line = sub.description.splitlines()[0]
+        epilog += f"{choice.ljust(30)} {description_first_line}\n"
 
     return epilog
 
@@ -124,7 +127,7 @@ def prepare_nonce_in_args(args: Any):
         args.nonce = account.nonce
 
 
-def add_broadcast_args(sub: Any, simulate=True, relay=False):
+def add_broadcast_args(sub: Any, simulate: bool = True, relay: bool = False):
     sub.add_argument("--send", action="store_true", default=False, help="✓ whether to broadcast the transaction (default: %(default)s)")
 
     if simulate:
@@ -140,12 +143,35 @@ def check_broadcast_args(args: Any):
         raise errors.BadUsage("Cannot both 'simulate' and 'send' a transaction")
 
 
-def send_or_simulate(tx: Transaction, args: Any):
-    if args.send:
-        tx.send(ElrondProxy(args.proxy))
-    elif args.simulate:
-        response = tx.simulate(ElrondProxy(args.proxy))
-        utils.dump_out_json(response)
+def send_or_simulate(tx: Transaction, args: Any, dump_output: bool = True) -> CLIOutputBuilder:
+    proxy = ElrondProxy(args.proxy)
+
+    is_set_wait_result = hasattr(args, "wait_result") and args.wait_result
+    is_set_send = hasattr(args, "send") and args.send
+    is_set_simulate = hasattr(args, "simulate") and args.simulate
+
+    send_wait_result = is_set_wait_result and is_set_send and not is_set_simulate
+    send_only = is_set_send and not (is_set_wait_result or is_set_simulate)
+    simulate = is_set_simulate and not (send_only or send_wait_result)
+
+    output_builder = CLIOutputBuilder()
+    output_builder.set_emitted_transaction(tx)
+    outfile = args.outfile if hasattr(args, "outfile") else None
+
+    try:
+        if send_wait_result:
+            transaction_on_network = tx.send_wait_result(proxy, args.timeout)
+            output_builder.set_awaited_transaction(transaction_on_network)
+        elif send_only:
+            tx.send(proxy)
+        elif simulate:
+            simulation = Simulator(proxy).run(tx)
+            output_builder.set_simulation_results(simulation)
+    finally:
+        if dump_output:
+            utils.dump_out_json(output_builder.build(), outfile=outfile)
+
+    return output_builder
 
 
 def check_if_sign_method_required(args: List[str], checked_method: str) -> bool:
