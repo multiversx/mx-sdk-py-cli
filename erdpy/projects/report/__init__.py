@@ -1,1 +1,1 @@
-from .report import report_cli
+from .report_cli import report_cli

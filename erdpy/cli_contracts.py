@@ -64,6 +64,8 @@ def setup_parser(args: List[str], subparsers: Any) -> Any:
     _add_flag(sub, "--skip-build", help="skips the step of building of the wasm contracts")
     _add_flag(sub, "--skip-twiggy", help="skips the steps of building the debug wasm files and running twiggy")
     sub.add_argument("--output-format", type=str, default="markdown", choices=["markdown", "json"], help="report output format (default: %(default)s)")
+    sub.add_argument("--output-file", type=Path, help="if specified, the output is written to a file, otherwise it's written to the standard output")
+    sub.add_argument("--compare", type=Path, nargs='+', metavar=("report-1.json", "report-2.json"), help="create a comparison from two or more reports")
     sub.set_defaults(func=projects.report_cli)
 
     sub = cli_shared.add_command_subparser(subparsers, "contract", "deploy", "Deploy a Smart Contract.")
