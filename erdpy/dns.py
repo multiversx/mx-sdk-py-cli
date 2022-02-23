@@ -7,7 +7,7 @@ from erdpy.accounts import Account, Address
 from erdpy.contracts import SmartContract
 from erdpy.proxy.core import ElrondProxy
 from erdpy.transactions import do_prepare_transaction
-from erdpy.interfaces import IElrondProxy, ITransaction
+from erdpy.interfaces import IElrondProxy
 
 MaxNumShards = 256
 ShardIdentiferLen = 2
@@ -45,14 +45,7 @@ def register(args: Any):
         args.outfile.write(tx.serialize_as_inner())
         return
 
-    try:
-        if args.send:
-            tx.send(ElrondProxy(args.proxy))
-        elif args.simulate:
-            response = tx.simulate(ElrondProxy(args.proxy))
-            utils.dump_out_json(response)
-    finally:
-        tx.dump_to(args.outfile)
+    cli_shared.send_or_simulate(tx, args)
 
 
 def compute_all_dns_addresses() -> List[Address]:

@@ -2,18 +2,18 @@ import base64
 import json
 import logging
 from collections import OrderedDict
-from typing import Any, Dict, List, TextIO, Union
+from typing import Any, Dict, List, TextIO
 
 from erdpy import config, errors, utils
 from erdpy.accounts import Account, Address, LedgerAccount
-from erdpy.interfaces import IElrondProxy, ITransaction
+from erdpy.interfaces import IElrondProxy, ITransaction, ITransactionOnNetwork
 
 logger = logging.getLogger("transactions")
 
 
 class Transaction(ITransaction):
     def __init__(self):
-        self.hash = ""
+        self.hash: str = ""
         self.nonce = 0
         self.value = "0"
         self.receiver = ""
@@ -22,7 +22,7 @@ class Transaction(ITransaction):
         self.receiverUsername = ""
         self.gasPrice = 0
         self.gasLimit = 0
-        self.data = ""
+        self.data: str = ""
         self.chainID = ""
         self.version = 0
         self.options = 0
@@ -90,22 +90,6 @@ class Transaction(ITransaction):
         instance.receiverUsername = instance.receiver_username_encoded()
         return instance
 
-    def to_dump_dict(self, extra: Any = {}):
-        dump_dict: Dict[str, Any] = dict()
-        dump_dict['tx'] = self.to_dictionary()
-        dump_dict['hash'] = self.hash or ""
-        dump_dict['data'] = self.data
-        dump_dict.update(extra)
-        return dump_dict
-
-    def dump_to(self, f: Any, extra: Any = {}):
-        dump: Any = utils.Object()
-        dump.tx = self.to_dictionary()
-        dump.hash = self.hash or ""
-        dump.data = self.data
-        dump.__dict__.update(extra)
-        f.writelines([dump.to_json(), "\n"])
-
     def send(self, proxy: IElrondProxy):
         if not self.signature:
             raise errors.TransactionIsNotSigned()
@@ -118,20 +102,13 @@ class Transaction(ITransaction):
         utils.log_explorer_transaction(self.chainID, self.hash)
         return self.hash
 
-    def send_wait_result(self, proxy, timeout):
+    def send_wait_result(self, proxy: IElrondProxy, timeout: int) -> ITransactionOnNetwork:
         if not self.signature:
             raise errors.TransactionIsNotSigned()
 
-        response = proxy.send_transaction_and_wait_for_result(self.to_dictionary(), timeout)
-        self.hash = response['hash']
-        return response
-
-    def simulate(self, proxy: IElrondProxy):
-        if not self.signature:
-            raise errors.TransactionIsNotSigned()
-
-        dictionary = self.to_dictionary()
-        return proxy.simulate_transaction(dictionary)
+        txOnNetwork = proxy.send_transaction_and_wait_for_result(self.to_dictionary(), timeout)
+        self.hash = txOnNetwork.get_hash()
+        return txOnNetwork
 
     def to_dictionary(self) -> Dict[str, Any]:
         dictionary: Dict[str, Any] = OrderedDict()
@@ -184,6 +161,12 @@ class Transaction(ITransaction):
 
     def set_options(self, options: int):
         self.options = options
+
+    def get_data(self) -> str:
+        return self.data
+    
+    def get_hash(self) -> str:
+        return self.hash
 
 
 class BunchOfTransactions:
