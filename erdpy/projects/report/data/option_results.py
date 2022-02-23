@@ -19,7 +19,11 @@ class OptionResults:
         return OptionResults(json['option_name'], json['results'])
 
     def results_to_markdown(self) -> str:
-        return ' -> '.join(self.results)
+        all_results_are_identical = all(result == self.results[0] for result in self.results)
+        if all_results_are_identical:
+            return self.results[0]
+        else:
+            return ' -> '.join(self.results)
 
 
 def merge_lists_of_option_results(first: List[OptionResults], second: List[OptionResults]) -> List[OptionResults]:
