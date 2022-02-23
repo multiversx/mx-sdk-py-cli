@@ -41,8 +41,15 @@ def get_project_report_path(project_report: ProjectReport) -> Path:
     return project_report.project_path
 
 
+def wasms_or_default(project_report: Optional[ProjectReport]) -> List[WasmReport]:
+    if project_report is None:
+        return []
+    return project_report.wasms
+
+
 def merge_two_project_reports(first: Optional[ProjectReport], second: Optional[ProjectReport]) -> ProjectReport:
-    if first is None or second is None:
-        return first_non_none(first, second)
-    merged_wasms = merge_list_of_wasms(first.wasms, second.wasms)
-    return ProjectReport(first.project_path, merged_wasms)
+    any = first_non_none(first, second)
+    first_wasms = wasms_or_default(first)
+    second_wasms = wasms_or_default(second)
+    merged_wasms = merge_list_of_wasms(first_wasms, second_wasms)
+    return ProjectReport(any.project_path, merged_wasms)

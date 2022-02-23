@@ -34,8 +34,15 @@ def get_folder_report_root_path(item: FolderReport) -> Path:
     return item.root_path
 
 
+def projects_or_default(folder_report: Optional[FolderReport]) -> List[ProjectReport]:
+    if folder_report is None:
+        return []
+    return folder_report.projects
+
+
 def merge_two_folder_reports(first: Optional[FolderReport], second: Optional[FolderReport]) -> FolderReport:
-    if first is None or second is None:
-        return first_non_none(first, second)
-    merged_projects = merge_list_of_projects(first.projects, second.projects)
-    return FolderReport(first.root_path, merged_projects)
+    any = first_non_none(first, second)
+    first_projects = projects_or_default(first)
+    second_projects = projects_or_default(second)
+    merged_projects = merge_list_of_projects(first_projects, second_projects)
+    return FolderReport(any.root_path, merged_projects)

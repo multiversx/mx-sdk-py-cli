@@ -31,8 +31,15 @@ def get_wasm_key(wasm: WasmReport) -> str:
     return wasm.wasm_name
 
 
+def get_option_results_or_default(wasm: Optional[WasmReport]) -> List[OptionResults]:
+    if wasm is None:
+        return []
+    return wasm.option_results
+
+
 def merge_two_wasms(first: Optional[WasmReport], second: Optional[WasmReport]) -> WasmReport:
-    if first is None or second is None:
-        return first_non_none(first, second)
-    merged_option_results = merge_lists_of_option_results(first.option_results, second.option_results)
-    return WasmReport(first.wasm_name, merged_option_results)
+    any = first_non_none(first, second)
+    first_option_results = get_option_results_or_default(first)
+    second_option_results = get_option_results_or_default(second)
+    merged_option_results = merge_lists_of_option_results(first_option_results, second_option_results)
+    return WasmReport(any.wasm_name, merged_option_results)
