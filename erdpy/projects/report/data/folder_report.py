@@ -3,6 +3,7 @@ from typing import Any, List, Optional
 from erdpy.projects.report.data.common import first_non_none, flatten_list_of_rows, merge_values_by_key
 
 from erdpy.projects.report.data.project_report import ProjectReport, merge_list_of_projects
+from erdpy.projects.report.format.format_options import FormatOptions
 
 
 class FolderReport:
@@ -10,19 +11,22 @@ class FolderReport:
         self.root_path = root_path
         self.projects = projects
 
+
     def to_json(self) -> Any:
         return {
             'root_path': str(self.root_path),
             'projects': self.projects
         }
 
+
     def from_json(json: Any) -> 'FolderReport':
         projects = [ProjectReport.from_json(project) for project in json['projects']]
         return FolderReport(Path(json['root_path']), projects)
-    
-    def get_rows(self) -> List[List[str]]:
+
+
+    def get_markdown_rows(self, format_options: FormatOptions) -> List[List[str]]:
         folder_row = [str(self.root_path)]
-        project_rows = flatten_list_of_rows([project.get_rows_markdown() for project in self.projects])
+        project_rows = flatten_list_of_rows([project.get_rows_markdown(format_options) for project in self.projects])
         return [folder_row] + project_rows
 
 

@@ -1,6 +1,7 @@
 from typing import Any, List, Optional
 from erdpy.projects.report.data.common import first_non_none, merge_values_by_key
 from erdpy.projects.report.data.option_results import OptionResults, merge_lists_of_option_results
+from erdpy.projects.report.format.format_options import FormatOptions
 
 
 class WasmReport:
@@ -19,8 +20,8 @@ class WasmReport:
         option_results = [OptionResults.from_json(option_result) for option_result in json['option_results']]
         return WasmReport(json['wasm_name'], option_results)
 
-    def get_option_results(self) -> List[str]:
-        return [option.results_to_markdown() for option in self.option_results]
+    def get_option_results(self, format_options: FormatOptions) -> List[str]:
+        return [option.results_to_markdown(format_options) for option in self.option_results]
 
 
 def merge_list_of_wasms(first: List[WasmReport], second: List[WasmReport]) -> List[WasmReport]:

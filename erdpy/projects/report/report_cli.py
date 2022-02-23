@@ -5,6 +5,7 @@ from erdpy import utils
 
 from erdpy.projects.core import get_project_paths_recursively
 from erdpy.projects.report.data.report import Report, merge_list_of_reports
+from erdpy.projects.report.format.format_options import FormatOptions
 from erdpy.projects.report.options.builder import get_default_report_options
 from erdpy.projects.report.report_creator import ReportCreator
 
@@ -41,9 +42,11 @@ def finalize_report(report: Report, args: Any) -> None:
 
 def get_report_output_string(report: Report, args: Any) -> str:
     output_format = args.output_format
-    if output_format == "markdown":
-        return report.to_markdown()
-    elif output_format == "json":
+    if output_format == 'github-markdown':
+        return report.to_markdown(FormatOptions(github_markdown=True))
+    if output_format == 'text-markdown':
+        return report.to_markdown(FormatOptions(github_markdown=False))
+    elif output_format == 'json':
         return report.to_json_string()
     raise Exception('Invalid output format')
 
