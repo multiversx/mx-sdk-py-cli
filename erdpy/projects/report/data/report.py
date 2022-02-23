@@ -72,10 +72,10 @@ def merge_two_reports(first: Report, other: Report) -> Report:
 
 def format_row_markdown(row: List[str]) -> str:
     row += [''] * (4 - len(row))
-    row[0] = row[0].ljust(80)
-    row[1] = row[1].rjust(15)
-    row[2] = row[2].rjust(15)
-    row[3] = row[3].rjust(15)
+    row[0] = row[0].ljust(100)
+    row[1] = row[1].rjust(20)
+    row[2] = row[2].rjust(20)
+    row[3] = row[3].rjust(20)
     merged_cells = " | ".join(row)
     return f"| {merged_cells} |"
 
