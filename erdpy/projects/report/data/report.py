@@ -63,7 +63,7 @@ class Report:
         return json.dumps(self, indent=4, default=lambda obj: obj.to_json())
 
 
-# In order to fix column widths - see:
+# Adjusts the column widths in github tables - see:
 # https://github.com/markedjs/marked/issues/266#issuecomment-616347986
 def adjust_table_headers(table_headers: List[str], format_options: FormatOptions) -> None:
     if not format_options.github_flavor:
@@ -85,6 +85,8 @@ def merge_two_reports(first: Report, other: Report) -> Report:
     return Report(option_names, folders)
 
 
+# Hack in order to keep the column alignment in a terminal
+# as unicode characters are sometimes wider or narrower
 def justify_text_string(string: str, width: int) -> str:
     if ChangeType.UNKNOWN.to_text_markdown() in string:
         width += 1
