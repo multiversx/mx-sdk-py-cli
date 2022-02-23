@@ -1,3 +1,4 @@
+from binascii import unhexlify
 import logging
 from pathlib import Path
 from typing import Any, Optional
@@ -85,6 +86,9 @@ class Account(IAccount):
         assert isinstance(signature, bytes)
 
         return signature.hex()
+
+    def get_secret_key(self) -> bytes:
+        return unhexlify(self.secret_key)
 
 
 class LedgerAccount(Account):
