@@ -5,10 +5,7 @@ from pathlib import Path
 from typing import Any, List
 from erdpy.projects.report.data.folder_report import FolderReport, merge_list_of_folder_reports
 
-from erdpy.projects.report.data.common import flatten_list_of_rows, merge_values, merge_values_by_key
-from erdpy.projects.report.data.option_results import OptionResults
-from erdpy.projects.report.data.project_report import ProjectReport
-from erdpy.projects.report.data.wasm_report import WasmReport
+from erdpy.projects.report.data.common import flatten_list_of_rows, merge_values
 
 
 class Report:

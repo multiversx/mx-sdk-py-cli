@@ -1,12 +1,9 @@
 import logging
 from pathlib import Path
+
 from erdpy import dependencies, myprocess, utils
 from erdpy.errors import BadFile
-
-from erdpy.projects.project_base import remove_suffix
-
-from .report_option import ReportOption
-
+from erdpy.projects.report.options.report_option import ReportOption
 
 logger = logging.getLogger("projects.report.options.twiggy_paths_check")
 

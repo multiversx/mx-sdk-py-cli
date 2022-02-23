@@ -4,7 +4,7 @@ from typing import Any, List
 from erdpy import utils
 
 from erdpy.projects.core import get_project_paths_recursively
-from erdpy.projects.report.data.report import Report, merge_list_of_reports, merge_two_reports
+from erdpy.projects.report.data.report import Report, merge_list_of_reports
 from erdpy.projects.report.options.builder import get_default_report_options
 from erdpy.projects.report.report_creator import ReportCreator
 
@@ -38,12 +38,15 @@ def finalize_report(report: Report, args: Any) -> None:
     output = get_report_output_string(report, args)
     store_output(output, args)
 
+
 def get_report_output_string(report: Report, args: Any) -> str:
-    if args.output_format == "markdown":
+    output_format = args.output_format
+    if output_format == "markdown":
         return report.to_markdown()
-    elif args.output_format == "json":
+    elif output_format == "json":
         return report.to_json_string()
     raise Exception('Invalid output format')
+
 
 def store_output(output: str, args: Any) -> None:
     output_file_path = args.output_file
