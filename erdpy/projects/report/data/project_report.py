@@ -1,6 +1,6 @@
 from pathlib import Path
 from typing import Any, List, Optional
-from erdpy.projects.report.data.common import first_non_none, merge_values_by_key
+from erdpy.projects.report.data.common import first_not_none, merge_values_by_key
 
 from erdpy.projects.report.data.wasm_report import WasmReport, merge_list_of_wasms
 from erdpy.projects.report.format.format_options import FormatOptions
@@ -11,19 +11,16 @@ class ProjectReport:
         self.project_path = project_path
         self.wasms = wasms
 
-
     def to_json(self) -> Any:
         return {
             "project_path": str(self.project_path),
             'wasms': self.wasms
         }
 
-
     @staticmethod
     def from_json(json: Any) -> 'ProjectReport':
         wasms = [WasmReport.from_json(wasm) for wasm in json['wasms']]
         return ProjectReport(Path(json['project_path']), wasms)
-
 
     def get_rows_markdown(self, format_options: FormatOptions) -> List[List[str]]:
         wasm_count = len(self.wasms)
@@ -52,7 +49,7 @@ def wasms_or_default(project_report: Optional[ProjectReport]) -> List[WasmReport
 
 
 def merge_two_project_reports(first: Optional[ProjectReport], second: Optional[ProjectReport]) -> ProjectReport:
-    any = first_non_none(first, second)
+    any = first_not_none(first, second)
     first_wasms = wasms_or_default(first)
     second_wasms = wasms_or_default(second)
     merged_wasms = merge_list_of_wasms(first_wasms, second_wasms)

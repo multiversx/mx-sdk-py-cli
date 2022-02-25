@@ -1,11 +1,11 @@
 from pathlib import Path
 from typing import Optional
 
-from .report_option import ReportOption, str_or_default
+from .report_option import ReportFeature, str_or_default
 
 
-class Size(ReportOption):
-    def apply(self, wasm_path: Path):
+class Size(ReportFeature):
+    def extract(self, wasm_path: Path):
         size = get_file_size(wasm_path)
         return str_or_default(size)
 

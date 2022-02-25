@@ -1,11 +1,11 @@
 from typing import Any, List, Optional
-from erdpy.projects.report.data.common import first_non_none, merge_values_by_key
-from erdpy.projects.report.data.option_results import OptionResults, merge_lists_of_option_results
+from erdpy.projects.report.data.common import first_not_none, merge_values_by_key
+from erdpy.projects.report.data.option_results import ExtractedFeature, merge_lists_of_option_results
 from erdpy.projects.report.format.format_options import FormatOptions
 
 
 class WasmReport:
-    def __init__(self, wasm_name: str, option_results: List[OptionResults]) -> None:
+    def __init__(self, wasm_name: str, option_results: List[ExtractedFeature]) -> None:
         self.wasm_name = wasm_name
         self.option_results = option_results
 
@@ -14,10 +14,10 @@ class WasmReport:
             'wasm_name': self.wasm_name,
             'option_results': self.option_results
         }
-    
+
     @staticmethod
     def from_json(json: Any) -> 'WasmReport':
-        option_results = [OptionResults.from_json(option_result) for option_result in json['option_results']]
+        option_results = [ExtractedFeature.from_json(option_result) for option_result in json['option_results']]
         return WasmReport(json['wasm_name'], option_results)
 
     def get_option_results(self, format_options: FormatOptions) -> List[str]:
@@ -32,14 +32,14 @@ def get_wasm_key(wasm: WasmReport) -> str:
     return wasm.wasm_name
 
 
-def get_option_results_or_default(wasm: Optional[WasmReport]) -> List[OptionResults]:
+def get_option_results_or_default(wasm: Optional[WasmReport]) -> List[ExtractedFeature]:
     if wasm is None:
         return []
     return wasm.option_results
 
 
 def merge_two_wasms(first: Optional[WasmReport], second: Optional[WasmReport]) -> WasmReport:
-    any = first_non_none(first, second)
+    any = first_not_none(first, second)
     first_option_results = get_option_results_or_default(first)
     second_option_results = get_option_results_or_default(second)
     merged_option_results = merge_lists_of_option_results(first_option_results, second_option_results)

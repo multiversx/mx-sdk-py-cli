@@ -14,50 +14,44 @@ class Report:
     def __init__(self, option_names: List[str], folders: List[FolderReport]) -> None:
         self.option_names = option_names
         self.folders = folders
-    
 
     def to_json(self) -> Any:
         return {
             'options': self.option_names,
             'folders': self.folders
         }
-    
 
     @staticmethod
     def from_json(json: Any) -> 'Report':
         folders = [FolderReport.from_json(folder_report) for folder_report in json['folders']]
         return Report(json['options'], folders)
-    
 
     @staticmethod
     def load_from_file(report_json_path: Path) -> 'Report':
         with open(report_json_path, 'r') as report_file:
             report_json = json.load(report_file)
             return Report.from_json(report_json)
-    
 
     def get_markdown_rows(self, format_options: FormatOptions) -> List[List[str]]:
         rows = [folder_report.get_markdown_rows(format_options) for folder_report in self.folders]
         return flatten_list_of_rows(rows)
 
-
     def to_markdown(self, format_options: FormatOptions) -> str:
-        string = StringIO()
+        text = StringIO()
 
         table_headers = ["Path"] + self.option_names
         adjust_table_headers(table_headers, format_options)
-        write_markdown_row(string, table_headers, format_options)
+        write_markdown_row(text, table_headers, format_options)
 
         ALIGN_LEFT = ":--"
         ALIGN_RIGHT = "--:"
         row_alignments = [ALIGN_LEFT] + len(self.option_names) * [ALIGN_RIGHT]
-        write_markdown_row(string, row_alignments, format_options)
+        write_markdown_row(text, row_alignments, format_options)
 
         for row in self.get_markdown_rows(format_options):
-            write_markdown_row(string, row, format_options)
+            write_markdown_row(text, row, format_options)
 
-        return string.getvalue()
-
+        return text.getvalue()
 
     def to_json_string(self) -> str:
         return json.dumps(self, indent=4, default=lambda obj: obj.to_json())

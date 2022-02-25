@@ -15,7 +15,7 @@ T = TypeVar('T')
 K = TypeVar('K')
 
 
-def first_non_none(first: Optional[T], second: Optional[T]) -> T:
+def first_not_none(first: Optional[T], second: Optional[T]) -> T:
     return next(item for item in [first, second] if item is not None)
 
 

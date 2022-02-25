@@ -251,7 +251,7 @@ class NpmModule(DependencyModule):
 
     def get_nodejs(self) -> DependencyModule:
         return dependencies.get_module_by_key("nodejs")
-    
+
     def get_nodejs_env(self) -> Dict[str, str]:
         return self.get_nodejs().get_env()
 
@@ -276,9 +276,10 @@ class NpmModule(DependencyModule):
             return True
         except FileNotFoundError:
             return False
-    
+
     def get_latest_release(self) -> str:
         return "latest"
+
 
 class Rust(DependencyModule):
     def __init__(self, key: str, aliases: List[str] = None):
