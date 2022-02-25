@@ -340,12 +340,8 @@ class CargoModule(DependencyModule):
 
         super().__init__(key, aliases)
 
-    def run_command_with_rust_env(self, args: List[str]) -> str:
-        rust = dependencies.get_module_by_key("rust")
-        return myprocess.run_process(args, rust.get_env())
-
     def _do_install(self, tag: str) -> None:
-        self.run_command_with_rust_env(["cargo", "install", self.key])
+        self._run_command_with_rust_env(["cargo", "install", self.key])
 
     def is_installed(self, tag: str) -> bool:
         rust = dependencies.get_module_by_key("rust")
@@ -357,10 +353,14 @@ class CargoModule(DependencyModule):
 
     def uninstall(self, tag: str):
         if self.is_installed(tag):
-            self.run_command_with_rust_env(["cargo", "uninstall", self.key])
+            self._run_command_with_rust_env(["cargo", "uninstall", self.key])
 
     def get_latest_release(self) -> str:
         return "latest"
+
+    def _run_command_with_rust_env(self, args: List[str]) -> str:
+        rust = dependencies.get_module_by_key("rust")
+        return myprocess.run_process(args, rust.get_env())
 
 
 class MclSignerModule(StandaloneModule):
