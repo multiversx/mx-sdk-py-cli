@@ -62,8 +62,8 @@ def setup_parser(args: List[str], subparsers: Any) -> Any:
 
     sub = cli_shared.add_command_subparser(subparsers, "contract", "report", "Print a detailed report of the smart contracts.")
     _add_project_arg(sub)
-    _add_flag(sub, "--skip-build", help="skips the step of building of the wasm contracts")
-    _add_flag(sub, "--skip-twiggy", help="skips the steps of building the debug wasm files and running twiggy")
+    sub.add_argument("--skip-build", action="store_true", default=False, help="skips the step of building of the wasm contracts")
+    sub.add_argument("--skip-twiggy", action="store_true", default=False, help="skips the steps of building the debug wasm files and running twiggy")
     sub.add_argument("--output-format", type=str, default="text-markdown", choices=["github-markdown", "text-markdown", "json"], help="report output format (default: %(default)s)")
     sub.add_argument("--output-file", type=Path, help="if specified, the output is written to a file, otherwise it's written to the standard output")
     sub.add_argument("--compare", type=Path, nargs='+', metavar=("report-1.json", "report-2.json"), help="create a comparison from two or more reports")
@@ -140,10 +140,6 @@ def _add_project_arg(sub: Any):
 
 def _add_recursive_arg(sub: Any):
     sub.add_argument("-r", "--recursive", dest="recursive", action="store_true", help="locate projects recursively")
-
-
-def _add_flag(sub: Any, flag: str, help: str):
-    sub.add_argument(flag, action="store_true", default=False, help=help)
 
 
 def _add_project_or_bytecode_arg(sub: Any):
