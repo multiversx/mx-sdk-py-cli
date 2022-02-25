@@ -60,7 +60,7 @@ def setup_parser(args: List[str], subparsers: Any) -> Any:
     sub.add_argument("--wildcard", required=False, help="wildcard to match only specific test files")
     sub.set_defaults(func=run_tests)
 
-    sub = cli_shared.add_command_subparser(subparsers, "contract", "report", "Print a detailed report the smart contracts.")
+    sub = cli_shared.add_command_subparser(subparsers, "contract", "report", "Print a detailed report of the smart contracts.")
     _add_project_arg(sub)
     _add_flag(sub, "--skip-build", help="skips the step of building of the wasm contracts")
     _add_flag(sub, "--skip-twiggy", help="skips the steps of building the debug wasm files and running twiggy")
