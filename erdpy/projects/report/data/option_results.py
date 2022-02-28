@@ -83,15 +83,15 @@ def _is_strictly_worse(items: List[Any]) -> bool:
     return sorted(items, reverse=True) == items
 
 
-def merge_lists_of_option_results(first: List[ExtractedFeature], second: List[ExtractedFeature]) -> List[ExtractedFeature]:
-    return merge_values_by_key(first, second, _get_option_result_key, _merge_two_option_results)
+def merge_lists_of_extracted_features(first: List[ExtractedFeature], second: List[ExtractedFeature]) -> List[ExtractedFeature]:
+    return merge_values_by_key(first, second, _get_extracted_feature_key, _merge_two_extracted_features)
 
 
-def _get_option_result_key(option_results: ExtractedFeature) -> str:
-    return option_results.feature_name
+def _get_extracted_feature_key(extracted_feature: ExtractedFeature) -> str:
+    return extracted_feature.feature_name
 
 
-def _merge_two_option_results(first: Optional[ExtractedFeature], second: Optional[ExtractedFeature]) -> ExtractedFeature:
+def _merge_two_extracted_features(first: Optional[ExtractedFeature], second: Optional[ExtractedFeature]) -> ExtractedFeature:
     any = first_not_none(first, second)
     merged_results = _results_or_NA(first) + _results_or_NA(second)
     return ExtractedFeature(any.feature_name, merged_results)

@@ -19,10 +19,10 @@ from erdpy.projects.report.features.twiggy_paths_check import run_twiggy_paths
 
 class ReportCreator:
     def __init__(self, options: List[ReportFeature], skip_build: bool, skip_twiggy: bool) -> None:
-        self.options = options
+        self.report_features = options
         self.skip_build = skip_build
         self.skip_twiggy = skip_twiggy
-        self.require_twiggy_paths = any(option.requires_twiggy_paths() for option in self.options)
+        self.require_twiggy_paths = any(report_feature.requires_twiggy_paths() for report_feature in self.report_features)
 
     def create_report(self, base_path: Path, project_paths: List[Path]) -> Report:
         base_path = base_path.resolve()
@@ -31,8 +31,8 @@ class ReportCreator:
         folder_groups = [self._create_folder_report(base_path, parent_folder, iter)
                          for parent_folder, iter in _group_projects_by_folder(project_paths)]
 
-        option_names = [option.name for option in self.options]
-        return Report(option_names, folder_groups)
+        feature_names = [report_feature.name for report_feature in self.report_features]
+        return Report(feature_names, folder_groups)
 
     def _create_folder_report(self, base_path: Path, parent_folder: Path, iter: Iterable[Tuple[Path, Path]]) -> FolderReport:
         parent_folder = parent_folder.resolve()
@@ -63,8 +63,8 @@ class ReportCreator:
         if twiggy_requirements_met:
             run_twiggy_paths(wasm_path)
         name = wasm_path.name
-        option_results = [_extract_feature(option, wasm_path) for option in self.options]
-        return WasmReport(name, option_results)
+        extracted_features = [_extract_feature(report_feature, wasm_path) for report_feature in self.report_features]
+        return WasmReport(name, extracted_features)
 
 
 def _extract_feature(feature: ReportFeature, wasm_path: Path) -> ExtractedFeature:

@@ -11,20 +11,20 @@ from erdpy.projects.report.format.format_options import FormatOptions
 
 
 class Report:
-    def __init__(self, option_names: List[str], folders: List[FolderReport]) -> None:
-        self.option_names = option_names
+    def __init__(self, feature_names: List[str], folders: List[FolderReport]) -> None:
+        self.feature_names = feature_names
         self.folders = folders
 
     def to_json(self) -> Any:
         return {
-            'options': self.option_names,
+            'features': self.feature_names,
             'folders': self.folders
         }
 
     @staticmethod
     def from_json(json: Any) -> 'Report':
         folders = [FolderReport.from_json(folder_report) for folder_report in json['folders']]
-        return Report(json['options'], folders)
+        return Report(json['features'], folders)
 
     @staticmethod
     def load_from_file(report_json_path: Path) -> 'Report':
@@ -39,13 +39,13 @@ class Report:
     def to_markdown(self, format_options: FormatOptions) -> str:
         text = StringIO()
 
-        table_headers = ["Path"] + self.option_names
+        table_headers = ["Path"] + self.feature_names
         _adjust_table_headers(table_headers, format_options)
         _write_markdown_row(text, table_headers, format_options)
 
         ALIGN_LEFT = ":--"
         ALIGN_RIGHT = "--:"
-        row_alignments = [ALIGN_LEFT] + len(self.option_names) * [ALIGN_RIGHT]
+        row_alignments = [ALIGN_LEFT] + len(self.feature_names) * [ALIGN_RIGHT]
         _write_markdown_row(text, row_alignments, format_options)
 
         for row in self.get_markdown_rows(format_options):
@@ -74,9 +74,9 @@ def merge_list_of_reports(reports: List[Report]) -> Report:
 
 
 def _merge_two_reports(first: Report, other: Report) -> Report:
-    option_names = merge_values(first.option_names, other.option_names)
+    feature_names = merge_values(first.feature_names, other.feature_names)
     folders = merge_list_of_folder_reports(first.folders, other.folders)
-    return Report(option_names, folders)
+    return Report(feature_names, folders)
 
 
 # Hack in order to keep the column alignment in a terminal

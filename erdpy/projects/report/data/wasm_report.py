@@ -1,27 +1,27 @@
 from typing import Any, List, Optional
 from erdpy.projects.report.data.common import first_not_none, merge_values_by_key
-from erdpy.projects.report.data.option_results import ExtractedFeature, merge_lists_of_option_results
+from erdpy.projects.report.data.option_results import ExtractedFeature, merge_lists_of_extracted_features
 from erdpy.projects.report.format.format_options import FormatOptions
 
 
 class WasmReport:
-    def __init__(self, wasm_name: str, option_results: List[ExtractedFeature]) -> None:
+    def __init__(self, wasm_name: str, extracted_features: List[ExtractedFeature]) -> None:
         self.wasm_name = wasm_name
-        self.option_results = option_results
+        self.extracted_features = extracted_features
 
     def to_json(self) -> Any:
         return {
             'wasm_name': self.wasm_name,
-            'option_results': self.option_results
+            'extracted_features': self.extracted_features
         }
 
     @staticmethod
     def from_json(json: Any) -> 'WasmReport':
-        option_results = [ExtractedFeature.from_json(option_result) for option_result in json['option_results']]
-        return WasmReport(json['wasm_name'], option_results)
+        extracted_features = [ExtractedFeature.from_json(extracted_feature) for extracted_feature in json['extracted_features']]
+        return WasmReport(json['wasm_name'], extracted_features)
 
-    def get_option_results(self, format_options: FormatOptions) -> List[str]:
-        return [option.results_to_markdown(format_options) for option in self.option_results]
+    def get_extracted_features_markdown(self, format_options: FormatOptions) -> List[str]:
+        return [extracted_feature.results_to_markdown(format_options) for extracted_feature in self.extracted_features]
 
 
 def merge_list_of_wasm_reports(first: List[WasmReport], second: List[WasmReport]) -> List[WasmReport]:
@@ -32,15 +32,15 @@ def _get_wasm_report_key(wasm_report: WasmReport) -> str:
     return wasm_report.wasm_name
 
 
-def _get_option_results_or_default(wasm: Optional[WasmReport]) -> List[ExtractedFeature]:
+def _get_extracted_features_or_default(wasm: Optional[WasmReport]) -> List[ExtractedFeature]:
     if wasm is None:
         return []
-    return wasm.option_results
+    return wasm.extracted_features
 
 
 def merge_two_wasm_reports(first: Optional[WasmReport], second: Optional[WasmReport]) -> WasmReport:
     any = first_not_none(first, second)
-    first_option_results = _get_option_results_or_default(first)
-    second_option_results = _get_option_results_or_default(second)
-    merged_option_results = merge_lists_of_option_results(first_option_results, second_option_results)
-    return WasmReport(any.wasm_name, merged_option_results)
+    first_extracted_features = _get_extracted_features_or_default(first)
+    second_extracted_features = _get_extracted_features_or_default(second)
+    merged_extracted_features = merge_lists_of_extracted_features(first_extracted_features, second_extracted_features)
+    return WasmReport(any.wasm_name, merged_extracted_features)

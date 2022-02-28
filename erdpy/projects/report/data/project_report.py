@@ -27,10 +27,10 @@ class ProjectReport:
         if wasm_count == 0:
             return [[f" - {str(self.project_path)} <no wasm present>"]]
         elif wasm_count == 1:
-            return [[f" - {str(self.project_path / self.wasm_reports[0].wasm_name)}"] + self.wasm_reports[0].get_option_results(format_options)]
+            return [[f" - {str(self.project_path / self.wasm_reports[0].wasm_name)}"] + self.wasm_reports[0].get_extracted_features_markdown(format_options)]
         else:
             project_path_row = [f" - {str(self.project_path)}"]
-            wasm_rows = [[f" - - {wasm.wasm_name}"] + wasm.get_option_results(format_options) for wasm in self.wasm_reports]
+            wasm_rows = [[f" - - {wasm.wasm_name}"] + wasm.get_extracted_features_markdown(format_options) for wasm in self.wasm_reports]
             return [project_path_row] + wasm_rows
 
 
