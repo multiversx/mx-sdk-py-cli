@@ -1,6 +1,6 @@
 from typing import Any, List, Optional
 from erdpy.projects.report.data.common import first_not_none, merge_values_by_key
-from erdpy.projects.report.data.option_results import ExtractedFeature, merge_lists_of_extracted_features
+from erdpy.projects.report.data.extracted_feature import ExtractedFeature, merge_lists_of_extracted_features
 from erdpy.projects.report.format.format_options import FormatOptions
 
 

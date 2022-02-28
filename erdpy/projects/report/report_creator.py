@@ -5,7 +5,7 @@ from pathlib import Path
 from typing import Iterable, List, Tuple
 from erdpy import guards
 from erdpy.projects.report.data.folder_report import FolderReport
-from erdpy.projects.report.data.option_results import ExtractedFeature
+from erdpy.projects.report.data.extracted_feature import ExtractedFeature
 from erdpy.projects.report.data.report import Report
 from erdpy.projects.report.data.wasm_report import WasmReport
 from erdpy.projects.report.data.project_report import ProjectReport
