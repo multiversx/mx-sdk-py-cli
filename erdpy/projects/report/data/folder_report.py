@@ -28,22 +28,22 @@ class FolderReport:
 
 
 def merge_list_of_folder_reports(first: List[FolderReport], second: List[FolderReport]) -> List[FolderReport]:
-    return merge_values_by_key(first, second, get_folder_report_root_path, merge_two_folder_reports)
+    return merge_values_by_key(first, second, _get_folder_report_root_path, _merge_two_folder_reports)
 
 
-def get_folder_report_root_path(item: FolderReport) -> Path:
+def _get_folder_report_root_path(item: FolderReport) -> Path:
     return item.root_path
 
 
-def projects_or_default(folder_report: Optional[FolderReport]) -> List[ProjectReport]:
+def _projects_or_default(folder_report: Optional[FolderReport]) -> List[ProjectReport]:
     if folder_report is None:
         return []
     return folder_report.projects
 
 
-def merge_two_folder_reports(first: Optional[FolderReport], second: Optional[FolderReport]) -> FolderReport:
+def _merge_two_folder_reports(first: Optional[FolderReport], second: Optional[FolderReport]) -> FolderReport:
     any = first_not_none(first, second)
-    first_projects = projects_or_default(first)
-    second_projects = projects_or_default(second)
+    first_projects = _projects_or_default(first)
+    second_projects = _projects_or_default(second)
     merged_projects = merge_list_of_projects(first_projects, second_projects)
     return FolderReport(any.root_path, merged_projects)

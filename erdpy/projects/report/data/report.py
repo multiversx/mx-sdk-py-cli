@@ -40,16 +40,16 @@ class Report:
         text = StringIO()
 
         table_headers = ["Path"] + self.option_names
-        adjust_table_headers(table_headers, format_options)
-        write_markdown_row(text, table_headers, format_options)
+        _adjust_table_headers(table_headers, format_options)
+        _write_markdown_row(text, table_headers, format_options)
 
         ALIGN_LEFT = ":--"
         ALIGN_RIGHT = "--:"
         row_alignments = [ALIGN_LEFT] + len(self.option_names) * [ALIGN_RIGHT]
-        write_markdown_row(text, row_alignments, format_options)
+        _write_markdown_row(text, row_alignments, format_options)
 
         for row in self.get_markdown_rows(format_options):
-            write_markdown_row(text, row, format_options)
+            _write_markdown_row(text, row, format_options)
 
         return text.getvalue()
 
@@ -59,7 +59,7 @@ class Report:
 
 # Adjusts the column widths in github tables - see:
 # https://github.com/markedjs/marked/issues/266#issuecomment-616347986
-def adjust_table_headers(table_headers: List[str], format_options: FormatOptions) -> None:
+def _adjust_table_headers(table_headers: List[str], format_options: FormatOptions) -> None:
     if not format_options.github_flavor:
         return
     NBSP = '\u00A0'
@@ -70,10 +70,10 @@ def adjust_table_headers(table_headers: List[str], format_options: FormatOptions
 
 
 def merge_list_of_reports(reports: List[Report]) -> Report:
-    return functools.reduce(merge_two_reports, reports)
+    return functools.reduce(_merge_two_reports, reports)
 
 
-def merge_two_reports(first: Report, other: Report) -> Report:
+def _merge_two_reports(first: Report, other: Report) -> Report:
     option_names = merge_values(first.option_names, other.option_names)
     folders = merge_list_of_folder_reports(first.folders, other.folders)
     return Report(option_names, folders)
@@ -81,27 +81,27 @@ def merge_two_reports(first: Report, other: Report) -> Report:
 
 # Hack in order to keep the column alignment in a terminal
 # as unicode characters are sometimes wider or narrower
-def justify_text_string(string: str, width: int) -> str:
-    if ChangeType.UNKNOWN.to_text_markdown() in string:
+def _justify_text_string(string: str, width: int) -> str:
+    if ChangeType.UNKNOWN._to_text_markdown() in string:
         width += 1
-    if ChangeType.GOOD.to_text_markdown() in string:
+    if ChangeType.GOOD._to_text_markdown() in string:
         width -= 1
-    if ChangeType.BAD.to_text_markdown() in string:
+    if ChangeType.BAD._to_text_markdown() in string:
         width -= 1
     return string.rjust(width)
 
 
-def format_row_markdown(row: List[str], format_options: FormatOptions) -> str:
+def _format_row_markdown(row: List[str], format_options: FormatOptions) -> str:
     row += [''] * (4 - len(row))
     if not format_options.github_flavor:
         row[0] = row[0].ljust(100)
-        row[1] = justify_text_string(row[1], 20)
-        row[2] = justify_text_string(row[2], 20)
-        row[3] = justify_text_string(row[3], 20)
+        row[1] = _justify_text_string(row[1], 20)
+        row[2] = _justify_text_string(row[2], 20)
+        row[3] = _justify_text_string(row[3], 20)
     merged_cells = " | ".join(row)
     return f"| {merged_cells} |"
 
 
-def write_markdown_row(string: StringIO, row: List[str], format_options: FormatOptions):
-    string.write(format_row_markdown(row, format_options))
+def _write_markdown_row(string: StringIO, row: List[str], format_options: FormatOptions):
+    string.write(_format_row_markdown(row, format_options))
     string.write('\n')

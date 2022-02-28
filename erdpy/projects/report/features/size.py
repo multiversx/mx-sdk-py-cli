@@ -6,11 +6,11 @@ from .report_option import ReportFeature, str_or_default
 
 class Size(ReportFeature):
     def extract(self, wasm_path: Path):
-        size = get_file_size(wasm_path)
+        size = _get_file_size(wasm_path)
         return str_or_default(size)
 
 
-def get_file_size(file_path: Path) -> Optional[int]:
+def _get_file_size(file_path: Path) -> Optional[int]:
     try:
         return int(file_path.stat().st_size)
     except FileNotFoundError:

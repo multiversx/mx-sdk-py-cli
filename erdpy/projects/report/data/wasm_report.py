@@ -25,14 +25,14 @@ class WasmReport:
 
 
 def merge_list_of_wasm_reports(first: List[WasmReport], second: List[WasmReport]) -> List[WasmReport]:
-    return merge_values_by_key(first, second, get_wasm_key, merge_two_wasm_reports)
+    return merge_values_by_key(first, second, _get_wasm_report_key, merge_two_wasm_reports)
 
 
-def get_wasm_key(wasm: WasmReport) -> str:
-    return wasm.wasm_name
+def _get_wasm_report_key(wasm_report: WasmReport) -> str:
+    return wasm_report.wasm_name
 
 
-def get_option_results_or_default(wasm: Optional[WasmReport]) -> List[ExtractedFeature]:
+def _get_option_results_or_default(wasm: Optional[WasmReport]) -> List[ExtractedFeature]:
     if wasm is None:
         return []
     return wasm.option_results
@@ -40,7 +40,7 @@ def get_option_results_or_default(wasm: Optional[WasmReport]) -> List[ExtractedF
 
 def merge_two_wasm_reports(first: Optional[WasmReport], second: Optional[WasmReport]) -> WasmReport:
     any = first_not_none(first, second)
-    first_option_results = get_option_results_or_default(first)
-    second_option_results = get_option_results_or_default(second)
+    first_option_results = _get_option_results_or_default(first)
+    second_option_results = _get_option_results_or_default(second)
     merged_option_results = merge_lists_of_option_results(first_option_results, second_option_results)
     return WasmReport(any.wasm_name, merged_option_results)

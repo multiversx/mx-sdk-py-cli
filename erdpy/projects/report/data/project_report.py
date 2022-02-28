@@ -35,22 +35,22 @@ class ProjectReport:
 
 
 def merge_list_of_projects(first: List[ProjectReport], second: List[ProjectReport]) -> List[ProjectReport]:
-    return merge_values_by_key(first, second, get_project_report_path, merge_two_project_reports)
+    return merge_values_by_key(first, second, _get_project_report_path, _merge_two_project_reports)
 
 
-def get_project_report_path(project_report: ProjectReport) -> Path:
+def _get_project_report_path(project_report: ProjectReport) -> Path:
     return project_report.project_path
 
 
-def wasm_reports_or_default(project_report: Optional[ProjectReport]) -> List[WasmReport]:
+def _wasm_reports_or_default(project_report: Optional[ProjectReport]) -> List[WasmReport]:
     if project_report is None:
         return []
     return project_report.wasm_reports
 
 
-def merge_two_project_reports(first: Optional[ProjectReport], second: Optional[ProjectReport]) -> ProjectReport:
+def _merge_two_project_reports(first: Optional[ProjectReport], second: Optional[ProjectReport]) -> ProjectReport:
     any = first_not_none(first, second)
-    first_wasm_reports = wasm_reports_or_default(first)
-    second_wasm_reports = wasm_reports_or_default(second)
+    first_wasm_reports = _wasm_reports_or_default(first)
+    second_wasm_reports = _wasm_reports_or_default(second)
     merged_wasm_reports = merge_list_of_wasm_reports(first_wasm_reports, second_wasm_reports)
     return ProjectReport(any.project_path, merged_wasm_reports)

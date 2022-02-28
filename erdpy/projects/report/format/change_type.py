@@ -12,11 +12,11 @@ class ChangeType(Enum):
 
     def to_markdown(self, format_options: FormatOptions) -> str:
         if format_options.github_flavor:
-            return self.to_github_markdown()
+            return self._to_github_markdown()
         else:
-            return self.to_text_markdown()
+            return self._to_text_markdown()
 
-    def to_github_markdown(self) -> str:
+    def _to_github_markdown(self) -> str:
         switch = {
             ChangeType.UNKNOWN: ':warning:',
             ChangeType.NONE: '',
@@ -25,8 +25,8 @@ class ChangeType(Enum):
             ChangeType.MIXED: ':yellow_circle:'
         }
         return switch[self]
-    
-    def to_text_markdown(self) -> str:
+
+    def _to_text_markdown(self) -> str:
         switch = {
             ChangeType.UNKNOWN: '\u26a0\ufe0f ',
             ChangeType.NONE: '',

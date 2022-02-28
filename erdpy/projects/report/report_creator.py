@@ -29,7 +29,7 @@ class ReportCreator:
         guards.is_directory(base_path)
 
         folder_groups = [self._create_folder_report(base_path, parent_folder, iter)
-                         for parent_folder, iter in group_projects_by_folder(project_paths)]
+                         for parent_folder, iter in _group_projects_by_folder(project_paths)]
 
         option_names = [option.name for option in self.options]
         return Report(option_names, folder_groups)
@@ -72,6 +72,6 @@ def _extract_feature(feature: ReportFeature, wasm_path: Path) -> ExtractedFeatur
     return ExtractedFeature(feature.name, [result])
 
 
-def group_projects_by_folder(project_paths: List[Path]) -> Iterable[Tuple[Path, Iterable[Tuple[Path, Path]]]]:
+def _group_projects_by_folder(project_paths: List[Path]) -> Iterable[Tuple[Path, Iterable[Tuple[Path, Path]]]]:
     path_pairs = sorted([(path.parent, path) for path in project_paths])
     return itertools.groupby(path_pairs, operator.itemgetter(0))
