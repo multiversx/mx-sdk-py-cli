@@ -60,6 +60,12 @@ class Project:
 
         file = folder / files[0]
         return Path(file).resolve()
+    
+    def find_wasm_files(self):
+        output_folder = Path(self.get_output_folder())
+        wasm_files = output_folder.rglob("*.wasm")
+        main_wasm_files = list(filter(lambda wasm_path: not wasm_path.name.endswith("-dbg.wasm"), wasm_files))
+        return main_wasm_files
 
     def _do_after_build(self) -> List[Path]:
         raise NotImplementedError()

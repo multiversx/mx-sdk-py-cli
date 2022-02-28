@@ -12,7 +12,7 @@ logger = logging.getLogger("myprocess")
 ReturnCode = int
 
 
-def run_process(args: List[str], env: Any = None, dump_to_stdout: bool = True, cwd: Optional[Union[str, Path]] = None):
+def run_process(args: List[str], env: Any = None, dump_to_stdout: bool = True, cwd: Optional[Union[str, Path]] = None) -> str:
     logger.info(f"run_process: {args}, in folder: {cwd}")
 
     try:
