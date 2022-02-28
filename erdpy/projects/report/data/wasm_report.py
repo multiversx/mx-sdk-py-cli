@@ -24,8 +24,8 @@ class WasmReport:
         return [option.results_to_markdown(format_options) for option in self.option_results]
 
 
-def merge_list_of_wasms(first: List[WasmReport], second: List[WasmReport]) -> List[WasmReport]:
-    return merge_values_by_key(first, second, get_wasm_key, merge_two_wasms)
+def merge_list_of_wasm_reports(first: List[WasmReport], second: List[WasmReport]) -> List[WasmReport]:
+    return merge_values_by_key(first, second, get_wasm_key, merge_two_wasm_reports)
 
 
 def get_wasm_key(wasm: WasmReport) -> str:
@@ -38,7 +38,7 @@ def get_option_results_or_default(wasm: Optional[WasmReport]) -> List[ExtractedF
     return wasm.option_results
 
 
-def merge_two_wasms(first: Optional[WasmReport], second: Optional[WasmReport]) -> WasmReport:
+def merge_two_wasm_reports(first: Optional[WasmReport], second: Optional[WasmReport]) -> WasmReport:
     any = first_not_none(first, second)
     first_option_results = get_option_results_or_default(first)
     second_option_results = get_option_results_or_default(second)
