@@ -13,15 +13,15 @@ from erdpy.projects.report.report_creator import ReportCreator
 logger = logging.getLogger("report")
 
 
-def report_cli(args: Any) -> None:
+def do_report(args: Any) -> None:
     compare_report_paths = args.compare
     if compare_report_paths is None:
-        build_report_cli(args)
+        build_report(args)
     else:
         compare_reports_cli(args, compare_report_paths)
 
 
-def build_report_cli(args: Any) -> None:
+def build_report(args: Any) -> None:
     base_path = Path(args.project)
     project_paths = get_project_paths_recursively(base_path)
     options = get_default_report_features()

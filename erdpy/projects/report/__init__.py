@@ -1,3 +1,3 @@
-from .report_cli import report_cli
+from .do_report import do_report
 
-__all__ = ["report_cli"]
+__all__ = ["do_report"]

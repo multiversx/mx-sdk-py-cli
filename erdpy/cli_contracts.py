@@ -67,7 +67,7 @@ def setup_parser(args: List[str], subparsers: Any) -> Any:
     sub.add_argument("--output-format", type=str, default="text-markdown", choices=["github-markdown", "text-markdown", "json"], help="report output format (default: %(default)s)")
     sub.add_argument("--output-file", type=Path, help="if specified, the output is written to a file, otherwise it's written to the standard output")
     sub.add_argument("--compare", type=Path, nargs='+', metavar=("report-1.json", "report-2.json"), help="create a comparison from two or more reports")
-    sub.set_defaults(func=projects.report_cli)
+    sub.set_defaults(func=projects.do_report)
 
     output_description = CLIOutputBuilder.describe(with_contract=True, with_transaction_on_network=True, with_simulation=True)
     sub = cli_shared.add_command_subparser(subparsers, "contract", "deploy", f"Deploy a Smart Contract.{output_description}")
