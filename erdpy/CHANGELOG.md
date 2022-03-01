@@ -4,6 +4,15 @@ All notable changes will be documented in this file.
 
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
+## [Unreleased]
+ - TBD 
+
+## [1.1.0] - 01.03.2022
+ - [Add reports: contract sizes and twiggy symbol checks](https://github.com/ElrondNetwork/elrond-sdk-erdpy/pull/106)
+ - [Add `--recursive` option on contract build](https://github.com/ElrondNetwork/elrond-sdk-erdpy/pull/104)
+ - [Local testnet: minor refactoring, and remove `*:TRACE` from the default log-level](https://github.com/ElrondNetwork/elrond-sdk-erdpy/pull/103)
+ - [Transaction simulation & cost simulation: fix & redesign](https://github.com/ElrondNetwork/elrond-sdk-erdpy/pull/102)
+
 ## [1.0.25] - 02.02.2022
  - Remove old & deprecated, experimental code related to the Elrond IDE
  - Fix `erdpy account get-transactions` (handle transactions with no data field)

@@ -58,7 +58,7 @@ usage: erdpy contract COMMAND [-h] ...
 Build, deploy and interact with Smart Contracts
 
 COMMANDS:
-  {new,templates,build,clean,test,deploy,call,upgrade,query}
+  {new,templates,build,clean,test,report,deploy,call,upgrade,query}
 
 OPTIONS:
   -h, --help            show this help message and exit
@@ -71,6 +71,7 @@ templates                      List the available Smart Contract templates.
 build                          Build a Smart Contract project using the appropriate buildchain.
 clean                          Clean a Smart Contract project.
 test                           Run Mandos tests.
+report                         Print a detailed report of the smart contracts.
 deploy                         Deploy a Smart Contract.
 call                           Interact with a Smart Contract (execute function).
 upgrade                        Upgrade a previously-deployed Smart Contract.
@@ -122,6 +123,7 @@ positional arguments:
 
 optional arguments:
   -h, --help                           show this help message and exit
+  -r, --recursive                      locate projects recursively
   --debug                              set debug flag (default: False)
   --no-optimization                    bypass optimizations (for clang) (default: False)
   --no-wasm-opt                        do not optimize wasm files after the build (default: False)
@@ -142,10 +144,11 @@ usage: erdpy contract clean [-h] ...
 Clean a Smart Contract project.
 
 positional arguments:
-  project     🗀 the project directory (default: current directory)
+  project          🗀 the project directory (default: current directory)
 
 optional arguments:
-  -h, --help  show this help message and exit
+  -h, --help       show this help message and exit
+  -r, --recursive  locate projects recursively
 
 ```
 ### Contract.Deploy
@@ -1314,7 +1317,7 @@ usage: erdpy deps install [-h] ...
 Install dependencies or elrond-sdk modules.
 
 positional arguments:
-  {all,llvm,clang,cpp,rust,nodejs,golang,vmtools,elrond_go,elrond_proxy_go,mcl_signer,wasm-opt}
+  {all,llvm,clang,cpp,rust,nodejs,golang,vmtools,elrond_go,elrond_proxy_go,mcl_signer,wasm-opt,twiggy}
                                                   the dependency to install
 
 optional arguments:
@@ -1333,7 +1336,7 @@ usage: erdpy deps check [-h] ...
 Check whether a dependency is installed.
 
 positional arguments:
-  {all,llvm,clang,cpp,rust,nodejs,golang,vmtools,elrond_go,elrond_proxy_go,mcl_signer,wasm-opt}
+  {all,llvm,clang,cpp,rust,nodejs,golang,vmtools,elrond_go,elrond_proxy_go,mcl_signer,wasm-opt,twiggy}
                                                   the dependency to check
 
 optional arguments:
