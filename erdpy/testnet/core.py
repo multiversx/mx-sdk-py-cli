@@ -1,7 +1,8 @@
 import asyncio
 import logging
+from pathlib import Path
 import traceback
-from typing import Any
+from typing import Any, Coroutine, List
 
 from erdpy.testnet.config import TestnetConfiguration
 
@@ -28,12 +29,13 @@ async def do_start(args: Any):
     testnet_config = TestnetConfiguration.from_file(args.configfile)
     logger.info('testnet folder is %s', testnet_config.root())
 
-    to_run = []
+    to_run: List[Coroutine[Any, Any, None]] = []
 
     # Seed node
     to_run.append(run(["./seednode", "--log-save"], cwd=testnet_config.seednode_folder()))
 
     loglevel = _patch_loglevel(testnet_config.loglevel())
+    logger.info(f"loglevel: {loglevel}")
 
     # Observers
     for observer in testnet_config.observers():
@@ -69,10 +71,10 @@ async def do_start(args: Any):
     await asyncio.gather(*to_run)
 
 
-async def run(args, env=None, cwd: str = None, delay: int = 0):
+async def run(args: List[str], cwd: Path, delay: int = 0):
     await asyncio.sleep(delay)
 
-    process = await asyncio.create_subprocess_exec(*args, env=env, stdout=asyncio.subprocess.PIPE,
+    process = await asyncio.create_subprocess_exec(*args, stdout=asyncio.subprocess.PIPE,
                                                    stderr=asyncio.subprocess.PIPE, cwd=cwd, limit=1024 * 512)
 
     pid = process.pid
@@ -87,7 +89,7 @@ async def run(args, env=None, cwd: str = None, delay: int = 0):
     print(f"Proces [{pid}] stopped. Return code: {return_code}.")
 
 
-async def _read_stream(stream, pid):
+async def _read_stream(stream: Any, pid: int):
     while True:
         try:
             line = await stream.readline()
@@ -103,26 +105,31 @@ async def _read_stream(stream, pid):
 
 def _patch_loglevel(loglevel: str) -> str:
     loglevel = loglevel or "*:DEBUG"
+
     if "arwen:" not in loglevel:
         loglevel += ",arwen:TRACE"
     if "process/smartcontract:" not in loglevel:
         loglevel += ",process/smartcontract:TRACE"
 
-    loglevel += ",*:TRACE"
-
     return loglevel
 
 
-def _is_interesting_logline(logline):
+LOGLINE_GENESIS_THRESHOLD_MARKER = "started committing block"
+LOGLINE_AFTER_GENESIS_INTERESTING_MARKERS = ["started committing block", "ERROR", "WARN", "arwen", "smartcontract"]
+# We ignore SC calls on genesis.
+LOGLINE_ON_GENESIS_INTERESTING_MARKERS = ["started committing block", "ERROR", "WARN"]
+
+
+def _is_interesting_logline(logline: str):
     global is_after_genesis
 
-    if "started committing block" in logline:
+    if LOGLINE_GENESIS_THRESHOLD_MARKER in logline:
         is_after_genesis = True
 
-    if not is_after_genesis:
-        return any(e in logline for e in ["started committing block", "ERROR", "WARN"])
-    return any(e in logline for e in ["started committing block", "ERROR", "WARN", "arwen", "smartcontract"])
+    if is_after_genesis:
+        return any(e in logline for e in LOGLINE_AFTER_GENESIS_INTERESTING_MARKERS)
+    return any(e in logline for e in LOGLINE_ON_GENESIS_INTERESTING_MARKERS)
 
 
-def _dump_interesting_log_line(pid: str, logline: str):
+def _dump_interesting_log_line(pid: int, logline: str):
     print(f"[PID={pid}]", logline)

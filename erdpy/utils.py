@@ -18,21 +18,28 @@ from erdpy import errors
 
 logger = logging.getLogger("utils")
 
+class ISerializable:
+    def to_dictionary(self) -> Dict[str, Any]:
+        return self.__dict__
 
-class Object:
+
+class Object(ISerializable):
     def __repr__(self):
         return str(self.__dict__)
+
+    def to_dictionary(self):
+        return dict(self.__dict__)
 
     def to_json(self):
         data_json = json.dumps(self.__dict__, indent=4)
         return data_json
 
 
-class ObjectEncoder(json.JSONEncoder):
-    def default(self, obj):
-        if isinstance(obj, Object):
-            return obj.__dict__
-        return json.JSONEncoder.default(self, obj)
+class BasicEncoder(json.JSONEncoder):
+    def default(self, o: Any):
+        if isinstance(o, ISerializable):
+            return o.to_dictionary()
+        return json.JSONEncoder.default(self, o)
 
 
 def omit_fields(data: Any, fields: List[str] = []):
@@ -147,7 +154,7 @@ def dump_out_json(data: Any, outfile: Any = None):
     if not outfile:
         outfile = sys.stdout
 
-    json.dump(data, outfile, indent=4, cls=ObjectEncoder)
+    json.dump(data, outfile, indent=4, cls=BasicEncoder)
     outfile.write("\n")
 
 

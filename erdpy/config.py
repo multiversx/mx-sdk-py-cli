@@ -176,6 +176,7 @@ def get_defaults() -> Dict[str, Any]:
         "dependencies.mcl_signer.urlTemplate.linux": "https://github.com/ElrondNetwork/elrond-sdk-go-tools/releases/download/{TAG}/mcl_signer_{TAG}_ubuntu-latest.tar.gz",
         "dependencies.mcl_signer.urlTemplate.osx": "https://github.com/ElrondNetwork/elrond-sdk-go-tools/releases/download/{TAG}/mcl_signer_{TAG}_macos-latest.tar.gz",
         "dependencies.wasm-opt.tag": "latest",
+        "dependencies.twiggy.tag": "latest",
         "testnet.validate_expected_keys": "false",
         "github_api_token": "",
     }

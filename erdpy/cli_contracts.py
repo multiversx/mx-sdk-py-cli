@@ -1,13 +1,15 @@
 import logging
 import os
-from typing import Any, List, Union
+from typing import Any, List
 
 from pathlib import Path
 
 from erdpy import cli_shared, errors, projects, utils
 from erdpy.accounts import Account, Address, LedgerAccount
+from erdpy.cli_output import CLIOutputBuilder
 from erdpy.contracts import CodeMetadata, SmartContract
 from erdpy.projects import load_project
+from erdpy.projects.core import get_project_paths_recursively
 from erdpy.proxy.core import ElrondProxy
 from erdpy.transactions import Transaction
 
@@ -33,6 +35,7 @@ def setup_parser(args: List[str], subparsers: Any) -> Any:
     sub = cli_shared.add_command_subparser(subparsers, "contract", "build",
                                            "Build a Smart Contract project using the appropriate buildchain.")
     _add_project_arg(sub)
+    _add_recursive_arg(sub)
     sub.add_argument("--debug", action="store_true", default=False, help="set debug flag (default: %(default)s)")
     sub.add_argument("--no-optimization", action="store_true", default=False,
                      help="bypass optimizations (for clang) (default: %(default)s)")
@@ -47,6 +50,7 @@ def setup_parser(args: List[str], subparsers: Any) -> Any:
 
     sub = cli_shared.add_command_subparser(subparsers, "contract", "clean", "Clean a Smart Contract project.")
     _add_project_arg(sub)
+    _add_recursive_arg(sub)
     sub.set_defaults(func=clean)
 
     sub = cli_shared.add_command_subparser(subparsers, "contract", "test", "Run Mandos tests.")
@@ -56,7 +60,17 @@ def setup_parser(args: List[str], subparsers: Any) -> Any:
     sub.add_argument("--wildcard", required=False, help="wildcard to match only specific test files")
     sub.set_defaults(func=run_tests)
 
-    sub = cli_shared.add_command_subparser(subparsers, "contract", "deploy", "Deploy a Smart Contract.")
+    sub = cli_shared.add_command_subparser(subparsers, "contract", "report", "Print a detailed report of the smart contracts.")
+    _add_project_arg(sub)
+    sub.add_argument("--skip-build", action="store_true", default=False, help="skips the step of building of the wasm contracts")
+    sub.add_argument("--skip-twiggy", action="store_true", default=False, help="skips the steps of building the debug wasm files and running twiggy")
+    sub.add_argument("--output-format", type=str, default="text-markdown", choices=["github-markdown", "text-markdown", "json"], help="report output format (default: %(default)s)")
+    sub.add_argument("--output-file", type=Path, help="if specified, the output is written to a file, otherwise it's written to the standard output")
+    sub.add_argument("--compare", type=Path, nargs='+', metavar=("report-1.json", "report-2.json"), help="create a comparison from two or more reports")
+    sub.set_defaults(func=projects.do_report)
+
+    output_description = CLIOutputBuilder.describe(with_contract=True, with_transaction_on_network=True, with_simulation=True)
+    sub = cli_shared.add_command_subparser(subparsers, "contract", "deploy", f"Deploy a Smart Contract.{output_description}")
     _add_project_or_bytecode_arg(sub)
     _add_metadata_arg(sub)
     cli_shared.add_outfile_arg(sub)
@@ -73,7 +87,7 @@ def setup_parser(args: List[str], subparsers: Any) -> Any:
     sub.set_defaults(func=deploy)
 
     sub = cli_shared.add_command_subparser(subparsers, "contract", "call",
-                                           "Interact with a Smart Contract (execute function).")
+                                           f"Interact with a Smart Contract (execute function).{output_description}")
     _add_contract_arg(sub)
     cli_shared.add_outfile_arg(sub)
     cli_shared.add_wallet_args(args, sub)
@@ -90,7 +104,7 @@ def setup_parser(args: List[str], subparsers: Any) -> Any:
     sub.set_defaults(func=call)
 
     sub = cli_shared.add_command_subparser(subparsers, "contract", "upgrade",
-                                           "Upgrade a previously-deployed Smart Contract")
+                                           f"Upgrade a previously-deployed Smart Contract.{output_description}")
     _add_contract_arg(sub)
     cli_shared.add_outfile_arg(sub)
     _add_project_or_bytecode_arg(sub)
@@ -122,6 +136,10 @@ def setup_parser(args: List[str], subparsers: Any) -> Any:
 def _add_project_arg(sub: Any):
     sub.add_argument("project", nargs='?', default=os.getcwd(),
                      help="🗀 the project directory (default: current directory)")
+
+
+def _add_recursive_arg(sub: Any):
+    sub.add_argument("-r", "--recursive", dest="recursive", action="store_true", help="locate projects recursively")
 
 
 def _add_project_or_bytecode_arg(sub: Any):
@@ -169,13 +187,22 @@ def create(args: Any):
     projects.create_from_template(name, template, directory)
 
 
+def get_project_paths(args: Any) -> List[Path]:
+    base_path = Path(args.project)
+    recursive = bool(args.recursive)
+    if recursive:
+        return get_project_paths_recursively(base_path)
+    return [base_path]
+
+
 def clean(args: Any):
-    project = Path(args.project)
-    projects.clean_project(project)
+    project_paths = get_project_paths(args)
+    for project in project_paths:
+        projects.clean_project(project)
 
 
 def build(args: Any):
-    project = Path(args.project)
+    project_paths = get_project_paths(args)
     options = {
         "debug": args.debug,
         "optimized": not args.no_optimization,
@@ -186,7 +213,8 @@ def build(args: Any):
         "wasm_name": args.wasm_name
     }
 
-    projects.build_project(project, options)
+    for project in project_paths:
+        projects.build_project(project, options)
 
 
 def run_tests(args: Any):
@@ -211,36 +239,7 @@ def deploy(args: Any):
     logger.info("Contract address: %s", contract.address)
     utils.log_explorer_contract_address(chain, contract.address)
 
-    result = None
-    try:
-        result = _send_or_simulate(tx, args)
-    finally:
-        txdict = tx.to_dump_dict()
-        txdict['address'] = contract.address.bech32()
-        dump_tx_and_result(txdict, result, args)
-
-
-def dump_tx_and_result(tx: Any, result: Any, args: Any):
-    dump = dict()
-    dump['emitted_tx'] = tx
-
-    try:
-        returnCode = ''
-        returnMessage = ''
-        dump['result'] = result['result']
-        for scrHash, scr in dump['result']['scResults'].items():
-            if scr['receiver'] == tx['tx']['sender']:
-                retCode = scr['data'][1:]
-                retCode = bytes.fromhex(retCode).decode('ascii')
-                returnCode = retCode
-                returnMessage = scr['returnMessage']
-
-        dump['result']['returnCode'] = returnCode
-        dump['result']['returnMessage'] = returnMessage
-    except TypeError:
-        pass
-
-    utils.dump_out_json(dump, outfile=args.outfile)
+    _send_or_simulate(tx, contract, args)
 
 
 def _prepare_contract(args: Any) -> SmartContract:
@@ -252,7 +251,7 @@ def _prepare_contract(args: Any) -> SmartContract:
         bytecode = project.get_bytecode()
 
     metadata = CodeMetadata(upgradeable=args.metadata_upgradeable, readable=args.metadata_readable,
-        payable=args.metadata_payable, payable_by_sc=args.metadata_payable_by_sc)
+                            payable=args.metadata_payable, payable_by_sc=args.metadata_payable_by_sc)
     contract = SmartContract(bytecode=bytecode, metadata=metadata)
     return contract
 
@@ -292,11 +291,7 @@ def call(args: Any):
     sender = _prepare_sender(args)
 
     tx = contract.execute(sender, function, arguments, gas_price, gas_limit, value, chain, version)
-    try:
-        result = _send_or_simulate(tx, args)
-    finally:
-        txdict = tx.to_dump_dict()
-        dump_tx_and_result(txdict, result, args)
+    _send_or_simulate(tx, contract, args)
 
 
 def upgrade(args: Any):
@@ -316,11 +311,7 @@ def upgrade(args: Any):
     sender = _prepare_sender(args)
 
     tx = contract.upgrade(sender, arguments, gas_price, gas_limit, value, chain, version)
-    try:
-        result = _send_or_simulate(tx, args)
-    finally:
-        txdict = tx.to_dump_dict()
-        dump_tx_and_result(txdict, result, args)
+    _send_or_simulate(tx, contract, args)
 
 
 def query(args: Any):
@@ -335,18 +326,7 @@ def query(args: Any):
     utils.dump_out_json(result)
 
 
-def _send_or_simulate(tx: Transaction, args: Any):
-    send_wait_result = args.wait_result and args.send and not args.simulate
-    send_only = args.send and not (args.wait_result or args.simulate)
-    simulate = args.simulate and not (send_only or send_wait_result)
-
-    if send_wait_result:
-        proxy = ElrondProxy(args.proxy)
-        response = tx.send_wait_result(proxy, args.timeout)
-        return None
-    elif send_only:
-        tx.send(ElrondProxy(args.proxy))
-        return None
-    elif simulate:
-        response = tx.simulate(ElrondProxy(args.proxy))
-        return response
+def _send_or_simulate(tx: Transaction, contract: SmartContract, args: Any):
+    output_builder = cli_shared.send_or_simulate(tx, args, dump_output=False)
+    output_builder.set_contract_address(contract.address)
+    utils.dump_out_json(output_builder.build(), outfile=args.outfile)

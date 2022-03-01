@@ -8,7 +8,7 @@ export PYTHONPATH=$(absolute_path ../../)
 echo "PYTHONPATH = ${PYTHONPATH}"
 
 ERDPY="python3.8 -m erdpy.cli"
-SANDBOX=testdata-out/SANDBOX
+SANDBOX=./testdata-out/SANDBOX
 USERS=../testnet/wallets/users
 VALIDATORS=../testnet/wallets/validators
 DENOMINATION="000000000000000000"

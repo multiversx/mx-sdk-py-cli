@@ -1,6 +1,7 @@
 import binascii
 import logging
 from os import path
+from pathlib import Path
 from typing import Any
 
 from erdpy.validators.validators_file import ValidatorsFile
@@ -37,7 +38,7 @@ def prepare_args_for_stake(args: Any):
         # get validator
         validator_pem = validator.get("pemFile")
         validator_pem = path.join(path.dirname(args.validators_file), validator_pem)
-        secret_key_bytes, bls_key = parse_validator_pem(validator_pem)
+        secret_key_bytes, bls_key = parse_validator_pem(Path(validator_pem))
         signed_message = sign_message_with_bls_key(account.address.pubkey().hex(), secret_key_bytes.decode('ascii'))
         stake_data += f"@{bls_key}@{signed_message}"
 

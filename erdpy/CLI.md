@@ -20,7 +20,7 @@ https://docs.elrond.com/sdk-and-tools/erdpy/erdpy.
         
 
 COMMAND GROUPS:
-  {contract,tx,validator,account,ledger,wallet,network,cost,dispatcher,blockatlas,deps,config,hyperblock,testnet,data,staking-provider,dns}
+  {contract,tx,validator,account,ledger,wallet,network,dispatcher,blockatlas,deps,config,hyperblock,testnet,data,staking-provider,dns}
 
 TOP-LEVEL OPTIONS:
   -h, --help            show this help message and exit
@@ -37,7 +37,6 @@ account                        Get Account data (nonce, balance) from the Networ
 ledger                         Get Ledger App addresses and version
 wallet                         Create wallet, derive secret key from mnemonic, bech32 address helpers etc.
 network                        Get Network parameters, such as number of shards, chain identifier etc.
-cost                           Estimate cost of Transactions
 dispatcher                     Enqueue transactions, then bulk dispatch them
 blockatlas                     Interact with an Block Atlas instance
 deps                           Manage dependencies or elrond-sdk modules
@@ -59,7 +58,7 @@ usage: erdpy contract COMMAND [-h] ...
 Build, deploy and interact with Smart Contracts
 
 COMMANDS:
-  {new,templates,build,clean,test,deploy,call,upgrade,query}
+  {new,templates,build,clean,test,report,deploy,call,upgrade,query}
 
 OPTIONS:
   -h, --help            show this help message and exit
@@ -72,9 +71,10 @@ templates                      List the available Smart Contract templates.
 build                          Build a Smart Contract project using the appropriate buildchain.
 clean                          Clean a Smart Contract project.
 test                           Run Mandos tests.
+report                         Print a detailed report of the smart contracts.
 deploy                         Deploy a Smart Contract.
 call                           Interact with a Smart Contract (execute function).
-upgrade                        Upgrade a previously-deployed Smart Contract
+upgrade                        Upgrade a previously-deployed Smart Contract.
 query                          Query a Smart Contract (call a pure function)
 
 ```
@@ -123,6 +123,7 @@ positional arguments:
 
 optional arguments:
   -h, --help                           show this help message and exit
+  -r, --recursive                      locate projects recursively
   --debug                              set debug flag (default: False)
   --no-optimization                    bypass optimizations (for clang) (default: False)
   --no-wasm-opt                        do not optimize wasm files after the build (default: False)
@@ -143,10 +144,11 @@ usage: erdpy contract clean [-h] ...
 Clean a Smart Contract project.
 
 positional arguments:
-  project     🗀 the project directory (default: current directory)
+  project          🗀 the project directory (default: current directory)
 
 optional arguments:
-  -h, --help  show this help message and exit
+  -h, --help       show this help message and exit
+  -r, --recursive  locate projects recursively
 
 ```
 ### Contract.Deploy
@@ -157,6 +159,42 @@ $ erdpy contract deploy --help
 usage: erdpy contract deploy [-h] ...
 
 Deploy a Smart Contract.
+
+Output example:
+===============
+{
+    "emittedTransaction": {
+        "nonce": 42,
+        "sender": "alice",
+        "receiver": "bob",
+        "...": "..."
+    },
+    "emittedTransactionData": "the transaction data, not encoded",
+    "emittedTransactionHash": "the transaction hash",
+    "tx": {
+        "DEPRECATED": "DEPRECATED"
+    },
+    "data": "DEPRECATED",
+    "hash": "DEPRECATED",
+    "emitted_tx": {
+        "DEPRECATED": "DEPRECATED"
+    },
+    "contractAddress": "the address of the contract",
+    "transactionOnNetwork": {
+        "nonce": 42,
+        "sender": "alice",
+        "receiver": "bob",
+        "...": "..."
+    },
+    "simulation": {
+        "execution": {
+            "...": "..."
+        },
+        "cost": {
+            "...": "..."
+        }
+    }
+}
 
 optional arguments:
   -h, --help                                   show this help message and exit
@@ -203,6 +241,42 @@ usage: erdpy contract call [-h] ...
 
 Interact with a Smart Contract (execute function).
 
+Output example:
+===============
+{
+    "emittedTransaction": {
+        "nonce": 42,
+        "sender": "alice",
+        "receiver": "bob",
+        "...": "..."
+    },
+    "emittedTransactionData": "the transaction data, not encoded",
+    "emittedTransactionHash": "the transaction hash",
+    "tx": {
+        "DEPRECATED": "DEPRECATED"
+    },
+    "data": "DEPRECATED",
+    "hash": "DEPRECATED",
+    "emitted_tx": {
+        "DEPRECATED": "DEPRECATED"
+    },
+    "contractAddress": "the address of the contract",
+    "transactionOnNetwork": {
+        "nonce": 42,
+        "sender": "alice",
+        "receiver": "bob",
+        "...": "..."
+    },
+    "simulation": {
+        "execution": {
+            "...": "..."
+        },
+        "cost": {
+            "...": "..."
+        }
+    }
+}
+
 positional arguments:
   contract                                     🖄 the address of the Smart Contract
 
@@ -245,7 +319,43 @@ optional arguments:
 $ erdpy contract upgrade --help
 usage: erdpy contract upgrade [-h] ...
 
-Upgrade a previously-deployed Smart Contract
+Upgrade a previously-deployed Smart Contract.
+
+Output example:
+===============
+{
+    "emittedTransaction": {
+        "nonce": 42,
+        "sender": "alice",
+        "receiver": "bob",
+        "...": "..."
+    },
+    "emittedTransactionData": "the transaction data, not encoded",
+    "emittedTransactionHash": "the transaction hash",
+    "tx": {
+        "DEPRECATED": "DEPRECATED"
+    },
+    "data": "DEPRECATED",
+    "hash": "DEPRECATED",
+    "emitted_tx": {
+        "DEPRECATED": "DEPRECATED"
+    },
+    "contractAddress": "the address of the contract",
+    "transactionOnNetwork": {
+        "nonce": 42,
+        "sender": "alice",
+        "receiver": "bob",
+        "...": "..."
+    },
+    "simulation": {
+        "execution": {
+            "...": "..."
+        },
+        "cost": {
+            "...": "..."
+        }
+    }
+}
 
 positional arguments:
   contract                                     🖄 the address of the Smart Contract
@@ -324,9 +434,9 @@ OPTIONS:
 ----------------
 COMMANDS summary
 ----------------
-new                            Create a new transaction
-send                           Send a previously saved transaction
-get                            Get a transaction
+new                            Create a new transaction.
+send                           Send a previously saved transaction.
+get                            Get a transaction.
 
 ```
 ### Transactions.New
@@ -336,7 +446,25 @@ get                            Get a transaction
 $ erdpy tx new --help
 usage: erdpy tx new [-h] ...
 
-Create a new transaction
+Create a new transaction.
+
+Output example:
+===============
+{
+    "emittedTransaction": {
+        "nonce": 42,
+        "sender": "alice",
+        "receiver": "bob",
+        "...": "..."
+    },
+    "emittedTransactionData": "the transaction data, not encoded",
+    "emittedTransactionHash": "the transaction hash",
+    "tx": {
+        "DEPRECATED": "DEPRECATED"
+    },
+    "data": "DEPRECATED",
+    "hash": "DEPRECATED"
+}
 
 optional arguments:
   -h, --help                                   show this help message and exit
@@ -378,7 +506,25 @@ optional arguments:
 $ erdpy tx send --help
 usage: erdpy tx send [-h] ...
 
-Send a previously saved transaction
+Send a previously saved transaction.
+
+Output example:
+===============
+{
+    "emittedTransaction": {
+        "nonce": 42,
+        "sender": "alice",
+        "receiver": "bob",
+        "...": "..."
+    },
+    "emittedTransactionData": "the transaction data, not encoded",
+    "emittedTransactionHash": "the transaction hash",
+    "tx": {
+        "DEPRECATED": "DEPRECATED"
+    },
+    "data": "DEPRECATED",
+    "hash": "DEPRECATED"
+}
 
 optional arguments:
   -h, --help         show this help message and exit
@@ -394,7 +540,18 @@ optional arguments:
 $ erdpy tx get --help
 usage: erdpy tx get [-h] ...
 
-Get a transaction
+Get a transaction.
+
+Output example:
+===============
+{
+    "transactionOnNetwork": {
+        "nonce": 42,
+        "sender": "alice",
+        "receiver": "bob",
+        "...": "..."
+    }
+}
 
 optional arguments:
   -h, --help                 show this help message and exit
@@ -774,8 +931,7 @@ pem-address-hex                Get the public address out of a PEM file as hex
 $ erdpy wallet new --help
 usage: erdpy wallet new [-h] ...
 
-Create a new wallet and print its mnemonic; optionally save as password-protected JSON (recommended) or PEM (not
-recommended)
+Create a new wallet and print its mnemonic; optionally save as password-protected JSON (recommended) or PEM (not recommended)
 
 optional arguments:
   -h, --help                 show this help message and exit
@@ -956,97 +1112,6 @@ Get the chain identifier.
 optional arguments:
   -h, --help     show this help message and exit
   --proxy PROXY  🔗 the URL of the proxy (default: https://testnet-gateway.elrond.com)
-
-```
-## Group **Cost**
-
-
-```
-$ erdpy cost --help
-usage: erdpy cost COMMAND [-h] ...
-
-Estimate cost of Transactions
-
-COMMANDS:
-  {gas-price,tx-transfer,sc-deploy,sc-call}
-
-OPTIONS:
-  -h, --help            show this help message and exit
-
-----------------
-COMMANDS summary
-----------------
-gas-price                      Query minimum gas price
-tx-transfer                    Query cost of regular transaction (transfer)
-sc-deploy                      Query cost of Smart Contract deploy transaction
-sc-call                        Query cost of Smart Contract call transaction
-
-```
-### Cost.GasPrice
-
-
-```
-$ erdpy cost gas-price --help
-usage: erdpy cost gas-price [-h] ...
-
-Query minimum gas price
-
-optional arguments:
-  -h, --help     show this help message and exit
-  --proxy PROXY  🔗 the URL of the proxy (default: https://testnet-gateway.elrond.com)
-
-```
-### Cost.TxTransfer
-
-
-```
-$ erdpy cost tx-transfer --help
-usage: erdpy cost tx-transfer [-h] ...
-
-Query cost of regular transaction (transfer)
-
-optional arguments:
-  -h, --help     show this help message and exit
-  --proxy PROXY  🔗 the URL of the proxy (default: https://testnet-gateway.elrond.com)
-  --data DATA    a transaction payload, required to estimate the cost
-
-```
-### Cost.ScDeploy
-
-
-```
-$ erdpy cost sc-deploy --help
-usage: erdpy cost sc-deploy [-h] ...
-
-Query cost of Smart Contract deploy transaction
-
-optional arguments:
-  -h, --help                             show this help message and exit
-  --proxy PROXY                          🔗 the URL of the proxy (default: https://testnet-gateway.elrond.com)
-  --project PROJECT                      🗀 the project directory (default: current directory)
-  --bytecode BYTECODE                    the file containing the WASM bytecode
-  --arguments ARGUMENTS [ARGUMENTS ...]  arguments for the contract transaction, as numbers or hex-encoded. E.g.
-                                         --arguments 42 0x64 1000 0xabba
-
-```
-### Cost.ScCall
-
-
-```
-$ erdpy cost sc-call --help
-usage: erdpy cost sc-call [-h] ...
-
-Query cost of Smart Contract call transaction
-
-positional arguments:
-  contract                               🖄 the address of the Smart Contract
-
-optional arguments:
-  -h, --help                             show this help message and exit
-  --proxy PROXY                          🔗 the URL of the proxy (default: https://testnet-gateway.elrond.com)
-  --function FUNCTION                    the function to call
-  --arguments ARGUMENTS [ARGUMENTS ...]  arguments for the contract transaction, as numbers or hex-encoded. E.g.
-                                         --arguments 42 0x64 1000 0xabba
 
 ```
 ## Group **Dispatcher**
@@ -1252,7 +1317,7 @@ usage: erdpy deps install [-h] ...
 Install dependencies or elrond-sdk modules.
 
 positional arguments:
-  {all,llvm,clang,cpp,rust,nodejs,golang,vmtools,elrond_go,elrond_proxy_go,mcl_signer,wasm-opt}
+  {all,llvm,clang,cpp,rust,nodejs,golang,vmtools,elrond_go,elrond_proxy_go,mcl_signer,wasm-opt,twiggy}
                                                   the dependency to install
 
 optional arguments:
@@ -1271,7 +1336,7 @@ usage: erdpy deps check [-h] ...
 Check whether a dependency is installed.
 
 positional arguments:
-  {all,llvm,clang,cpp,rust,nodejs,golang,vmtools,elrond_go,elrond_proxy_go,mcl_signer,wasm-opt}
+  {all,llvm,clang,cpp,rust,nodejs,golang,vmtools,elrond_go,elrond_proxy_go,mcl_signer,wasm-opt,twiggy}
                                                   the dependency to check
 
 optional arguments:

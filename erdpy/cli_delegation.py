@@ -1,5 +1,4 @@
 import binascii
-import sys
 from typing import Any, List
 
 from erdpy import cli_shared, errors, utils
@@ -146,10 +145,7 @@ def do_create_delegation_contract(args: Any):
     staking_provider.prepare_args_for_create_new_staking_contract(args)
     tx = do_prepare_transaction(args)
 
-    try:
-        cli_shared.send_or_simulate(tx, args)
-    finally:
-        tx.dump_to(args.outfile)
+    cli_shared.send_or_simulate(tx, args)
 
 
 def get_contract_address_by_deploy_tx_hash(args: Any):
@@ -169,10 +165,7 @@ def add_new_nodes(args: Any):
     staking_provider.prepare_args_for_add_nodes(args)
     tx = do_prepare_transaction(args)
 
-    try:
-        cli_shared.send_or_simulate(tx, args)
-    finally:
-        tx.dump_to(args.outfile)
+    cli_shared.send_or_simulate(tx, args)
 
 
 def remove_nodes(args: Any):
@@ -181,10 +174,7 @@ def remove_nodes(args: Any):
     staking_provider.prepare_args_for_remove_nodes(args)
     tx = do_prepare_transaction(args)
 
-    try:
-        cli_shared.send_or_simulate(tx, args)
-    finally:
-        tx.dump_to(args.outfile)
+    cli_shared.send_or_simulate(tx, args)
 
 
 def stake_nodes(args: Any):
@@ -193,10 +183,7 @@ def stake_nodes(args: Any):
     staking_provider.prepare_args_for_stake_nodes(args)
     tx = do_prepare_transaction(args)
 
-    try:
-        cli_shared.send_or_simulate(tx, args)
-    finally:
-        tx.dump_to(args.outfile)
+    cli_shared.send_or_simulate(tx, args)
 
 
 def unbond_nodes(args: Any):
@@ -205,10 +192,7 @@ def unbond_nodes(args: Any):
     staking_provider.prepare_args_for_unbond_nodes(args)
     tx = do_prepare_transaction(args)
 
-    try:
-        cli_shared.send_or_simulate(tx, args)
-    finally:
-        tx.dump_to(args.outfile)
+    cli_shared.send_or_simulate(tx, args)
 
 
 def unstake_nodes(args: Any):
@@ -217,10 +201,7 @@ def unstake_nodes(args: Any):
     staking_provider.prepare_args_for_unstake_nodes(args)
     tx = do_prepare_transaction(args)
 
-    try:
-        cli_shared.send_or_simulate(tx, args)
-    finally:
-        tx.dump_to(args.outfile)
+    cli_shared.send_or_simulate(tx, args)
 
 
 def unjail_nodes(args: Any):
@@ -229,10 +210,7 @@ def unjail_nodes(args: Any):
     staking_provider.prepare_args_for_unjail_nodes(args)
     tx = do_prepare_transaction(args)
 
-    try:
-        cli_shared.send_or_simulate(tx, args)
-    finally:
-        tx.dump_to(args.outfile)
+    cli_shared.send_or_simulate(tx, args)
 
 
 def change_service_fee(args: Any):
@@ -241,11 +219,7 @@ def change_service_fee(args: Any):
     staking_provider.prepare_args_change_service_fee(args)
     tx = do_prepare_transaction(args)
 
-    try:
-        cli_shared.send_or_simulate(tx, args)
-    finally:
-        tx.dump_to(args.outfile)
-
+    cli_shared.send_or_simulate(tx, args)
 
 def modify_delegation_cap(args: Any):
     cli_shared.check_broadcast_args(args)
@@ -253,10 +227,7 @@ def modify_delegation_cap(args: Any):
     staking_provider.prepare_args_modify_delegation_cap(args)
     tx = do_prepare_transaction(args)
 
-    try:
-        cli_shared.send_or_simulate(tx, args)
-    finally:
-        tx.dump_to(args.outfile)
+    cli_shared.send_or_simulate(tx, args)
 
 
 def automatic_activation(args: Any):
@@ -265,10 +236,7 @@ def automatic_activation(args: Any):
     staking_provider.prepare_args_automatic_activation(args)
     tx = do_prepare_transaction(args)
 
-    try:
-        cli_shared.send_or_simulate(tx, args)
-    finally:
-        tx.dump_to(args.outfile)
+    cli_shared.send_or_simulate(tx, args)
 
 
 def redelegate_cap(args: Any):
@@ -277,10 +245,7 @@ def redelegate_cap(args: Any):
     staking_provider.prepare_args_redelegate_cap(args)
     tx = do_prepare_transaction(args)
 
-    try:
-        cli_shared.send_or_simulate(tx, args)
-    finally:
-        tx.dump_to(args.outfile)
+    cli_shared.send_or_simulate(tx, args)
 
 
 def set_metadata(args: Any):
@@ -289,10 +254,7 @@ def set_metadata(args: Any):
     staking_provider.prepare_args_set_metadata(args)
     tx = do_prepare_transaction(args)
 
-    try:
-        cli_shared.send_or_simulate(tx, args)
-    finally:
-        tx.dump_to(args.outfile)
+    cli_shared.send_or_simulate(tx, args)
 
 
 def _get_sc_address_from_tx(data: Any):

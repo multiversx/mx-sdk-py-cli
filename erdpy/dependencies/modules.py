@@ -251,7 +251,7 @@ class NpmModule(DependencyModule):
 
     def get_nodejs(self) -> DependencyModule:
         return dependencies.get_module_by_key("nodejs")
-    
+
     def get_nodejs_env(self) -> Dict[str, str]:
         return self.get_nodejs().get_env()
 
@@ -276,9 +276,10 @@ class NpmModule(DependencyModule):
             return True
         except FileNotFoundError:
             return False
-    
+
     def get_latest_release(self) -> str:
         return "latest"
+
 
 class Rust(DependencyModule):
     def __init__(self, key: str, aliases: List[str] = None):
@@ -331,6 +332,36 @@ class Rust(DependencyModule):
 
     def get_latest_release(self) -> str:
         raise errors.UnsupportedConfigurationValue("Rust tag must either be explicit, empty or 'nightly'")
+
+
+class CargoModule(DependencyModule):
+    def __init__(self, key: str, aliases: List[str] = None):
+        if aliases is None:
+            aliases = list()
+
+        super().__init__(key, aliases)
+
+    def _do_install(self, tag: str) -> None:
+        self._run_command_with_rust_env(["cargo", "install", self.key])
+
+    def is_installed(self, tag: str) -> bool:
+        rust = dependencies.get_module_by_key("rust")
+        output = myprocess.run_process(["cargo", "install", "--list"], rust.get_env())
+        for line in output.splitlines():
+            if self.key == line.strip():
+                return True
+        return False
+
+    def uninstall(self, tag: str):
+        if self.is_installed(tag):
+            self._run_command_with_rust_env(["cargo", "uninstall", self.key])
+
+    def get_latest_release(self) -> str:
+        return "latest"
+
+    def _run_command_with_rust_env(self, args: List[str]) -> str:
+        rust = dependencies.get_module_by_key("rust")
+        return myprocess.run_process(args, rust.get_env())
 
 
 class MclSignerModule(StandaloneModule):

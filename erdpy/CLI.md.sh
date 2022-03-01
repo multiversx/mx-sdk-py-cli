@@ -84,12 +84,6 @@ generate() {
     command "Network.BlockNonce" "network block-nonce"
     command "Network.Chain" "network chain"
 
-    group "Cost" "cost"
-    command "Cost.GasPrice" "cost gas-price"
-    command "Cost.TxTransfer" "cost tx-transfer"
-    command "Cost.ScDeploy" "cost sc-deploy"
-    command "Cost.ScCall" "cost sc-call"
-
     group "Dispatcher" "dispatcher"
     command "Dispatcher.Enqueue" "dispatcher enqueue"
     command "Dispatcher.Dispatch" "dispatcher dispatch"

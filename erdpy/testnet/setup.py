@@ -180,7 +180,6 @@ def overwrite_genesis_file(testnet_config: TestnetConfiguration, nodes_config_fo
 
 def copy_config_to_proxy(testnet_config: TestnetConfiguration):
     proxy_config_source = testnet_config.proxy_config_source()
-    node_config_source = testnet_config.node_config_source()
     proxy_config = testnet_config.proxy_config_folder()
     makefolder(proxy_config)
 
@@ -197,7 +196,7 @@ def copy_config_to_proxy(testnet_config: TestnetConfiguration):
         proxy_config)
 
     shutil.copy(
-        node_config_source / 'economics.toml',
+        proxy_config_source / 'economics.toml',
         proxy_config)
 
 

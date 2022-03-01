@@ -3,7 +3,7 @@ from pathlib import Path
 from typing import Dict, List
 
 from erdpy import config, errors
-from erdpy.dependencies.modules import (NpmModule, VMToolsModule, DependencyModule,
+from erdpy.dependencies.modules import (CargoModule, NpmModule, VMToolsModule, DependencyModule,
                                         GolangModule, MclSignerModule,
                                         NodejsModule, Rust, StandaloneModule)
 
@@ -63,7 +63,8 @@ def get_all_deps_installable_via_cli() -> List[DependencyModule]:
         StandaloneModule(key="elrond_go", repo_name="elrond-go", organisation="ElrondNetwork"),
         StandaloneModule(key="elrond_proxy_go", repo_name="elrond-proxy-go", organisation="ElrondNetwork"),
         MclSignerModule(key="mcl_signer"),
-        NpmModule(key="wasm-opt")
+        NpmModule(key="wasm-opt"),
+        CargoModule(key="twiggy"),
     ]
 
 
