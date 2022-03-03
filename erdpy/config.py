@@ -177,6 +177,9 @@ def get_defaults() -> Dict[str, Any]:
         "dependencies.mcl_signer.urlTemplate.osx": "https://github.com/ElrondNetwork/elrond-sdk-go-tools/releases/download/{TAG}/mcl_signer_{TAG}_macos-latest.tar.gz",
         "dependencies.wasm-opt.tag": "latest",
         "dependencies.twiggy.tag": "latest",
+        "dependencies.wabt.tag": "1.0.27",
+        "dependencies.wabt.urlTemplate.linux": "https://github.com/WebAssembly/wabt/releases/download/1.0.27/wabt-1.0.27-ubuntu.tar.gz",
+        "dependencies.wabt.urlTemplate.osx": "https://github.com/WebAssembly/wabt/releases/download/1.0.27/wabt-1.0.27-macos.tar.gz",
         "testnet.validate_expected_keys": "false",
         "github_api_token": "",
     }
