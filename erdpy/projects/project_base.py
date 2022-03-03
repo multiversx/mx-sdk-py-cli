@@ -8,7 +8,7 @@ from typing import Any, Dict, List, Union, cast, final
 
 from erdpy import dependencies, errors, myprocess, utils
 from erdpy.dependencies.modules import StandaloneModule
-from erdpy.projects import wabt
+from erdpy.projects import eei, wabt
 from erdpy.projects.interfaces import IProject
 
 logger = logging.getLogger("Project")
@@ -78,6 +78,7 @@ class Project(IProject):
     @final
     def _do_after_build_core(self):
         wabt.generate_artifacts(self)
+        eei.analyze_compatibility(self)
 
     def _copy_to_output(self, source: Path, destination: Union[str, None] = None) -> Path:
         output_folder = self.get_output_folder()
