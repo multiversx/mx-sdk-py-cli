@@ -144,7 +144,7 @@ class ProjectRust(Project):
     def get_wasm_default_name(self, suffix: str = "") -> str:
         return f"{self.cargo_file.package_name}{suffix}.wasm"
 
-    def _do_after_build(self) -> List[Path]:
+    def _do_after_build_custom(self) -> List[Path]:
         if not self.has_meta():
             base_name = str(self.cargo_file.package_name)
             temporary_wasm_base_name = base_name.replace("-", "_")

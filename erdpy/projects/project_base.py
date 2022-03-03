@@ -1,17 +1,20 @@
+from abc import abstractmethod
 import glob
 import logging
 import shutil
 from os import path
 from pathlib import Path
-from typing import Any, Dict, List, Union, cast
+from typing import Any, Dict, List, Union, cast, final
 
 from erdpy import dependencies, errors, myprocess, utils
 from erdpy.dependencies.modules import StandaloneModule
+from erdpy.projects import wabt
+from erdpy.projects.interfaces import IProject
 
 logger = logging.getLogger("Project")
 
 
-class Project:
+class Project(IProject):
 
     def __init__(self, directory: Path):
         self.path = directory.expanduser().resolve()
@@ -22,8 +25,9 @@ class Project:
         self.debug = self.options.get("debug", False)
         self._ensure_dependencies_installed()
         self.perform_build()
-        contract_paths = self._do_after_build()
+        contract_paths = self._do_after_build_custom()
         contract_paths = rename_wasm_files(contract_paths, self.options.get("wasm_name"))
+        self._do_after_build_core()
         return contract_paths
 
     def clean(self):
@@ -40,7 +44,7 @@ class Project:
     def perform_build(self) -> None:
         raise NotImplementedError()
 
-    def get_file_wasm(self):
+    def get_file_wasm(self) -> Path:
         return self.find_file_in_output("*.wasm")
 
     def find_file_globally(self, pattern: str) -> Path:
@@ -67,10 +71,15 @@ class Project:
         main_wasm_files = list(filter(lambda wasm_path: not wasm_path.name.endswith("-dbg.wasm"), wasm_files))
         return main_wasm_files
 
-    def _do_after_build(self) -> List[Path]:
+    @abstractmethod
+    def _do_after_build_custom(self) -> List[Path]:
         raise NotImplementedError()
 
-    def _copy_to_output(self, source: Path, destination: str = None) -> Path:
+    @final
+    def _do_after_build_core(self):
+        wabt.generate_artifacts(self)
+
+    def _copy_to_output(self, source: Path, destination: Union[str, None] = None) -> Path:
         output_folder = self.get_output_folder()
         utils.ensure_folder(output_folder)
         destination = path.join(output_folder, destination) if destination else output_folder
@@ -93,7 +102,7 @@ class Project:
         return self.get_wasm_path(self.get_wasm_default_name("-view"))
 
     def get_bytecode(self):
-        bytecode = utils.read_file(self.get_file_wasm(), binary=True)
+        bytecode: bytes = cast(bytes, utils.read_file(self.get_file_wasm(), binary=True))
         bytecode_hex = bytecode.hex()
         return bytecode_hex
 
@@ -111,7 +120,7 @@ class Project:
             utils.write_json_file(str(config_file), self.default_config())
             logger.info("created default configuration in elrond.json")
 
-    def default_config(self):
+    def default_config(self) -> Dict[str, Any]:
         return dict()
 
     def run_tests(self, tests_directory: Path, wildcard: str = ""):

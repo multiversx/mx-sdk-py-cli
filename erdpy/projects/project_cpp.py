@@ -81,7 +81,7 @@ class ProjectCpp(Project):
 
         myprocess.run_process(args)
 
-    def _do_after_build(self) -> List[Path]:
+    def _do_after_build_custom(self) -> List[Path]:
         source_file = self.find_file_globally("*.cpp")
         output_wasm_file = self._copy_to_output(source_file.with_suffix(".wasm"))
         os.remove(source_file.with_suffix(".wasm"))

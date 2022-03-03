@@ -99,7 +99,7 @@ class ProjectClang(Project):
 
         myprocess.run_process(args)
 
-    def _do_after_build(self) -> List[Path]:
+    def _do_after_build_custom(self) -> List[Path]:
         output_wasm_file = self._copy_to_output(self.file_output)
         self.file_output.unlink()
         self.file_ll.unlink()
