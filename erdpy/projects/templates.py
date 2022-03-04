@@ -81,8 +81,6 @@ def _copy_template(template: str, destination_path: Path):
 def _load_as_template(directory: Path):
     if shared.is_source_clang(directory):
         return TemplateClang(directory)
-    if shared.is_source_sol(directory):
-        return TemplateSol(directory)
     if shared.is_source_rust(directory):
         return TemplateRust(directory)
 
@@ -226,10 +224,6 @@ class TemplateRust(Template):
                 content = content.replace(to_replace, replacement)
 
             utils.write_file(file, content)
-
-
-class TemplateSol(Template):
-    pass
 
 
 def remove_path(dependency: Any) -> None:
