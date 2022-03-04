@@ -12,7 +12,7 @@ logger = logging.getLogger("ProjectCpp")
 
 
 class ProjectCpp(Project):
-    def __init__(self, directory):
+    def __init__(self, directory: Path):
         super().__init__(directory)
 
     def perform_build(self):

@@ -11,7 +11,7 @@ logger = logging.getLogger("ProjectRust")
 
 
 class ProjectRust(Project):
-    def __init__(self, directory):
+    def __init__(self, directory: Path):
         super().__init__(directory)
         self.cargo_file = self.get_cargo_file()
 

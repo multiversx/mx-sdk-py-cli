@@ -1,235 +1,379 @@
-from typing import List
+import logging
+from pathlib import Path
+import sys
+import time
+import requests
+import toml
+from typing import Any, Callable, Dict, List, Union
+from erdpy import utils, workstation
+from erdpy.errors import KnownError
 from erdpy.projects.interfaces import IProject
+from erdpy.proxy.core import ElrondProxy
 
+logger = logging.getLogger("eei")
 
-class EEIVersion:
-    def __init__(self, value: str) -> None:
-        self.value = value
-
-
-_v1_4 = EEIVersion("1.4")
-_vNext = EEIVersion("vNext")
-
-
-class EEIFunction:
-    def __init__(self, name: str, available_in: List[EEIVersion], tags: List[str]) -> None:
-        self.name = name
-        self.available_in = available_in
-        self.tags = tags
-
-
-_eei_registry: List[EEIFunction] = [
-    # big int
-    EEIFunction("bigIntNew", [_v1_4, _vNext], []),
-    EEIFunction("bigIntUnsignedByteLength", [_v1_4, _vNext], []),
-    EEIFunction("bigIntSignedByteLength", [_v1_4, _vNext], []),
-    EEIFunction("bigIntGetUnsignedBytes", [_v1_4, _vNext], []),
-    EEIFunction("bigIntGetSignedBytes", [_v1_4, _vNext], []),
-    EEIFunction("bigIntSetUnsignedBytes", [_v1_4, _vNext], []),
-    EEIFunction("bigIntSetSignedBytes", [_v1_4, _vNext], []),
-    EEIFunction("bigIntIsInt64", [_v1_4, _vNext], []),
-    EEIFunction("bigIntGetInt64", [_v1_4, _vNext], []),
-    EEIFunction("bigIntSetInt64", [_v1_4, _vNext], []),
-    EEIFunction("bigIntAdd", [_v1_4, _vNext], []),
-    EEIFunction("bigIntSub", [_v1_4, _vNext], []),
-    EEIFunction("bigIntMul", [_v1_4, _vNext], []),
-    EEIFunction("bigIntTDiv", [_v1_4, _vNext], []),
-    EEIFunction("bigIntTMod", [_v1_4, _vNext], []),
-    EEIFunction("bigIntEDiv", [_v1_4, _vNext], []),
-    EEIFunction("bigIntEMod", [_v1_4, _vNext], []),
-    EEIFunction("bigIntPow", [_v1_4, _vNext], []),
-    EEIFunction("bigIntLog2", [_v1_4, _vNext], []),
-    EEIFunction("bigIntSqrt", [_v1_4, _vNext], []),
-    EEIFunction("bigIntAbs", [_v1_4, _vNext], []),
-    EEIFunction("bigIntNeg", [_v1_4, _vNext], []),
-    EEIFunction("bigIntSign", [_v1_4, _vNext], []),
-    EEIFunction("bigIntCmp", [_v1_4, _vNext], []),
-    EEIFunction("bigIntNot", [_v1_4, _vNext], []),
-    EEIFunction("bigIntAnd", [_v1_4, _vNext], []),
-    EEIFunction("bigIntOr", [_v1_4, _vNext], []),
-    EEIFunction("bigIntXor", [_v1_4, _vNext], []),
-    EEIFunction("bigIntShr", [_v1_4, _vNext], []),
-    EEIFunction("bigIntShl", [_v1_4, _vNext], []),
-    EEIFunction("bigIntFinishUnsigned", [_v1_4, _vNext], []),
-    EEIFunction("bigIntFinishSigned", [_v1_4, _vNext], []),
-    EEIFunction("bigIntStorageStoreUnsigned", [_v1_4, _vNext], []),
-    EEIFunction("bigIntStorageLoadUnsigned", [_v1_4, _vNext], []),
-    EEIFunction("bigIntGetUnsignedArgument", [_v1_4, _vNext], []),
-    EEIFunction("bigIntGetSignedArgument", [_v1_4, _vNext], []),
-    EEIFunction("bigIntGetCallValue", [_v1_4, _vNext], []),
-    EEIFunction("bigIntGetESDTCallValue", [_v1_4, _vNext], []),
-    EEIFunction("bigIntGetESDTCallValueByIndex", [_v1_4, _vNext], []),
-    EEIFunction("bigIntGetESDTExternalBalance", [_v1_4, _vNext], []),
-    EEIFunction("bigIntGetExternalBalance", [_v1_4, _vNext], []),
-
-    # small int
-    EEIFunction("smallIntGetUnsignedArgument", [_v1_4, _vNext], []),
-    EEIFunction("smallIntGetSignedArgument", [_v1_4, _vNext], []),
-    EEIFunction("smallIntFinishUnsigned", [_v1_4, _vNext], []),
-    EEIFunction("smallIntFinishSigned", [_v1_4, _vNext], []),
-    EEIFunction("smallIntStorageStoreUnsigned", [_v1_4, _vNext], []),
-    EEIFunction("smallIntStorageStoreSigned", [_v1_4, _vNext], []),
-    EEIFunction("smallIntStorageLoadUnsigned", [_v1_4, _vNext], []),
-    EEIFunction("smallIntStorageLoadSigned", [_v1_4, _vNext], []),
-    EEIFunction("int64getArgument", [_v1_4, _vNext], []),
-    EEIFunction("int64storageStore", [_v1_4, _vNext], []),
-    EEIFunction("int64storageLoad", [_v1_4, _vNext], []),
-    EEIFunction("int64finish", [_v1_4, _vNext], []),
-
-    # buffers
-    EEIFunction("mBufferNew", [_v1_4, _vNext], []),
-    EEIFunction("mBufferNewFromBytes", [_v1_4, _vNext], []),
-    EEIFunction("mBufferGetLength", [_v1_4, _vNext], []),
-    EEIFunction("mBufferGetBytes", [_v1_4, _vNext], []),
-    EEIFunction("mBufferGetByteSlice", [_v1_4, _vNext], []),
-    EEIFunction("mBufferCopyByteSlice", [_v1_4, _vNext], []),
-    EEIFunction("mBufferEq", [_v1_4, _vNext], []),
-    EEIFunction("mBufferSetBytes", [_v1_4, _vNext], []),
-    EEIFunction("mBufferSetByteSlice", [_vNext], []),
-    EEIFunction("mBufferAppend", [_v1_4, _vNext], []),
-    EEIFunction("mBufferAppendBytes", [_v1_4, _vNext], []),
-    EEIFunction("mBufferToBigIntUnsigned", [_v1_4, _vNext], []),
-    EEIFunction("mBufferToBigIntSigned", [_v1_4, _vNext], []),
-    EEIFunction("mBufferFromBigIntUnsigned", [_v1_4, _vNext], []),
-    EEIFunction("mBufferFromBigIntSigned", [_v1_4, _vNext], []),
-    EEIFunction("mBufferStorageStore", [_v1_4, _vNext], []),
-    EEIFunction("mBufferStorageLoad", [_v1_4, _vNext], []),
-    EEIFunction("mBufferStorageLoadFromAddress", [_vNext], []),
-    EEIFunction("mBufferGetArgument", [_v1_4, _vNext], []),
-    EEIFunction("mBufferFinish", [_v1_4, _vNext], []),
-    EEIFunction("mBufferSetRandom", [_v1_4, _vNext], []),
-
-    # eei core
-    EEIFunction("getSCAddress", [_v1_4, _vNext], []),
-    EEIFunction("getOwnerAddress", [_v1_4, _vNext], []),
-    EEIFunction("getShardOfAddress", [_v1_4, _vNext], []),
-    EEIFunction("isSmartContract", [_v1_4, _vNext], []),
-    EEIFunction("getExternalBalance", [_v1_4, _vNext], []),
-    EEIFunction("blockHash", [_v1_4, _vNext], []),
-    EEIFunction("transferValue", [_v1_4, _vNext], []),
-    EEIFunction("transferESDTExecute", [_v1_4, _vNext], []),
-    EEIFunction("transferESDTNFTExecute", [_v1_4, _vNext], []),
-    EEIFunction("multiTransferESDTNFTExecute", [_v1_4, _vNext], []),
-    EEIFunction("transferValueExecute", [_v1_4, _vNext], []),
-    EEIFunction("getArgumentLength", [_v1_4, _vNext], []),
-    EEIFunction("getArgument", [_v1_4, _vNext], []),
-    EEIFunction("getFunction", [_v1_4, _vNext], []),
-    EEIFunction("getNumArguments", [_v1_4, _vNext], []),
-    EEIFunction("storageStore", [_v1_4, _vNext], []),
-    EEIFunction("storageLoadLength", [_v1_4, _vNext], []),
-    EEIFunction("storageLoad", [_v1_4, _vNext], []),
-    EEIFunction("storageLoadFromAddress", [_v1_4, _vNext], []),
-    EEIFunction("getCaller", [_v1_4, _vNext], []),
-    EEIFunction("checkNoPayment", [_v1_4, _vNext], []),
-    EEIFunction("callValue", [_v1_4, _vNext], []),
-    EEIFunction("getESDTValue", [_v1_4, _vNext], []),
-    EEIFunction("getESDTTokenName", [_v1_4, _vNext], []),
-    EEIFunction("getESDTTokenNonce", [_v1_4, _vNext], []),
-    EEIFunction("getESDTTokenType", [_v1_4, _vNext], []),
-    EEIFunction("getCallValueTokenName", [_v1_4, _vNext], []),
-    EEIFunction("getESDTValueByIndex", [_v1_4, _vNext], []),
-    EEIFunction("getESDTTokenNameByIndex", [_v1_4, _vNext], []),
-    EEIFunction("getESDTTokenNonceByIndex", [_v1_4, _vNext], []),
-    EEIFunction("getESDTTokenTypeByIndex", [_v1_4, _vNext], []),
-    EEIFunction("getCallValueTokenNameByIndex", [_v1_4, _vNext], []),
-    EEIFunction("getNumESDTTransfers", [_v1_4, _vNext], []),
-    EEIFunction("getCurrentESDTNFTNonce", [_v1_4, _vNext], []),
-    EEIFunction("writeLog", [_v1_4, _vNext], ["deprecated"]),
-    EEIFunction("writeEventLog", [_v1_4, _vNext], []),
-    EEIFunction("returnData", [_v1_4, _vNext], []),
-    EEIFunction("signalError", [_v1_4, _vNext], []),
-    EEIFunction("getGasLeft", [_v1_4, _vNext], []),
-    EEIFunction("getESDTBalance", [_v1_4, _vNext], []),
-    EEIFunction("getESDTNFTNameLength", [_v1_4, _vNext], []),
-    EEIFunction("getESDTNFTAttributeLength", [_v1_4, _vNext], []),
-    EEIFunction("getESDTNFTURILength", [_v1_4, _vNext], []),
-    EEIFunction("getESDTTokenData", [_v1_4, _vNext], []),
-    EEIFunction("getESDTLocalRoles", [_vNext], []),
-    EEIFunction("validateTokenIdentifier", [_vNext], []),
-    EEIFunction("executeOnDestContext", [_v1_4, _vNext], []),
-    EEIFunction("executeOnDestContextByCaller", [_v1_4, _vNext], []),
-    EEIFunction("executeOnSameContext", [_v1_4, _vNext], []),
-    EEIFunction("executeReadOnly", [_v1_4, _vNext], []),
-    EEIFunction("createContract", [_v1_4, _vNext], []),
-    EEIFunction("deployFromSourceContract", [_v1_4, _vNext], []),
-    EEIFunction("upgradeContract", [_v1_4, _vNext], []),
-    EEIFunction("upgradeFromSourceContract", [_v1_4, _vNext], []),
-    EEIFunction("asyncCall", [_v1_4, _vNext], []),
-    EEIFunction("getNumReturnData", [_v1_4, _vNext], []),
-    EEIFunction("getReturnDataSize", [_v1_4, _vNext], []),
-    EEIFunction("getReturnData", [_v1_4, _vNext], []),
-    EEIFunction("cleanReturnData", [_vNext], []),
-    EEIFunction("deleteFromReturnData", [_vNext], []),
-    EEIFunction("setStorageLock", [_v1_4, _vNext], []),
-    EEIFunction("getStorageLock", [_v1_4, _vNext], []),
-    EEIFunction("isStorageLocked", [_v1_4, _vNext], []),
-    EEIFunction("clearStorageLock", [_v1_4, _vNext], []),
-    EEIFunction("getBlockTimestamp", [_v1_4, _vNext], []),
-    EEIFunction("getBlockNonce", [_v1_4, _vNext], []),
-    EEIFunction("getBlockRound", [_v1_4, _vNext], []),
-    EEIFunction("getBlockEpoch", [_v1_4, _vNext], []),
-    EEIFunction("getBlockRandomSeed", [_v1_4, _vNext], []),
-    EEIFunction("getStateRootHash", [_v1_4, _vNext], []),
-    EEIFunction("getPrevBlockTimestamp", [_v1_4, _vNext], []),
-    EEIFunction("getPrevBlockNonce", [_v1_4, _vNext], []),
-    EEIFunction("getPrevBlockRound", [_v1_4, _vNext], []),
-    EEIFunction("getPrevBlockEpoch", [_v1_4, _vNext], []),
-    EEIFunction("getPrevBlockRandomSeed", [_v1_4, _vNext], []),
-    EEIFunction("getOriginalTxHash", [_v1_4, _vNext], []),
-
-    # eei core (managed)
-    EEIFunction("managedSCAddress", [_v1_4, _vNext], []),
-    EEIFunction("managedOwnerAddress", [_v1_4, _vNext], []),
-    EEIFunction("managedCaller", [_v1_4, _vNext], []),
-    EEIFunction("managedSignalError", [_v1_4, _vNext], []),
-    EEIFunction("managedWriteLog", [_v1_4, _vNext], []),
-    EEIFunction("managedMultiTransferESDTNFTExecute", [_v1_4, _vNext], []),
-    EEIFunction("managedTransferValueExecute", [_v1_4, _vNext], []),
-    EEIFunction("managedExecuteOnDestContext", [_v1_4, _vNext], []),
-    EEIFunction("managedExecuteOnDestContextByCaller", [_v1_4, _vNext], []),
-    EEIFunction("managedExecuteOnSameContext", [_v1_4, _vNext], []),
-    EEIFunction("managedExecuteReadOnly", [_v1_4, _vNext], []),
-    EEIFunction("managedCreateContract", [_v1_4, _vNext], []),
-    EEIFunction("managedDeployFromSourceContract", [_v1_4, _vNext], []),
-    EEIFunction("managedUpgradeContract", [_v1_4, _vNext], []),
-    EEIFunction("managedUpgradeFromSourceContract", [_v1_4, _vNext], []),
-    EEIFunction("managedAsyncCall", [_v1_4, _vNext], []),
-    EEIFunction("managedGetMultiESDTCallValue", [_v1_4, _vNext], []),
-    EEIFunction("managedGetESDTBalance", [_v1_4, _vNext], []),
-    EEIFunction("managedGetESDTTokenData", [_v1_4, _vNext], []),
-    EEIFunction("managedGetReturnData", [_v1_4, _vNext], []),
-    EEIFunction("managedGetPrevBlockRandomSeed", [_v1_4, _vNext], []),
-    EEIFunction("managedGetBlockRandomSeed", [_v1_4, _vNext], []),
-    EEIFunction("managedGetStateRootHash", [_v1_4, _vNext], []),
-    EEIFunction("managedGetOriginalTxHash", [_v1_4, _vNext], []),
-
-    # crypto
-    EEIFunction("sha256", [_v1_4, _vNext], []),
-    EEIFunction("managedSha256", [_vNext], []),
-    EEIFunction("keccak256", [_v1_4, _vNext], []),
-    EEIFunction("managedKeccak256", [_vNext], []),
-    EEIFunction("ripemd160", [_v1_4, _vNext], []),
-    EEIFunction("verifyBLS", [_v1_4, _vNext], []),
-    EEIFunction("verifyEd25519", [_v1_4, _vNext], []),
-    EEIFunction("verifySecp256k1", [_v1_4, _vNext], []),
-    EEIFunction("verifyCustomSecp256k1", [_v1_4, _vNext], []),
-    EEIFunction("encodeSecp256k1DerSignature", [_v1_4, _vNext], []),
-    EEIFunction("addEC", [_v1_4, _vNext], []),
-    EEIFunction("doubleEC", [_v1_4, _vNext], []),
-    EEIFunction("isOnCurveEC", [_v1_4, _vNext], []),
-    EEIFunction("scalarBaseMultEC", [_v1_4, _vNext], []),
-    EEIFunction("scalarMultEC", [_v1_4, _vNext], []),
-    EEIFunction("marshalEC", [_v1_4, _vNext], []),
-    EEIFunction("unmarshalEC", [_v1_4, _vNext], []),
-    EEIFunction("marshalCompressedEC", [_v1_4, _vNext], []),
-    EEIFunction("unmarshalCompressedEC", [_v1_4, _vNext], []),
-    EEIFunction("generateKeyEC", [_v1_4, _vNext], []),
-    EEIFunction("createEC", [_v1_4, _vNext], []),
-    EEIFunction("getCurveLengthEC", [_v1_4, _vNext], []),
-    EEIFunction("getPrivKeyByteLengthEC", [_v1_4, _vNext], []),
-    EEIFunction("ellipticCurveGetValues", [_v1_4, _vNext], [])
-]
+MAINNET_PROXY_URL = "https://gateway.elrond.com"
+MAINNET_ENABLE_EPOCHS_URL = "https://raw.githubusercontent.com/ElrondNetwork/elrond-config-mainnet/master/enableEpochs.toml"
+DEVNET_PROXY_URL = "https://devnet-gateway.elrond.com"
+DEVNET_ENABLE_EPOCHS_URL = "https://raw.githubusercontent.com/ElrondNetwork/elrond-config-devnet/master/enableEpochs.toml"
 
 
 def analyze_compatibility(project: IProject):
-    pass
+    logger.info("analyze_compatibility")
+
+    wasm_file = project.get_file_wasm()
+    imports_file = wasm_file.with_suffix(".imports.json")
+    imports = utils.read_json_file(imports_file)
+
+    compatible_with_mainnet = _analyze_imports_compatibility(imports, ActivationKnowledge("mainnet", MAINNET_PROXY_URL, MAINNET_ENABLE_EPOCHS_URL))
+    compatible_with_devnet = _analyze_imports_compatibility(imports, ActivationKnowledge("devnet", DEVNET_PROXY_URL, DEVNET_ENABLE_EPOCHS_URL))
+
+    if not compatible_with_mainnet or not compatible_with_devnet:
+        raise KnownError("Contract compatibility issue")
+
+
+def _analyze_imports_compatibility(imports: List[str], activation_knowledge: 'ActivationKnowledge') -> bool:
+    registry = EEIRegistry(activation_knowledge)
+    registry.sync_flags()
+
+    not_active: List[str] = []
+    not_active_maybe: List[str] = []
+
+    for function_name in imports:
+        is_active = registry.is_function_active(function_name)
+        if is_active is False:
+            not_active.append(function_name)
+        elif is_active is None:
+            not_active_maybe.append(function_name)
+
+    if not_active:
+        logger.error(f"This contract requires functionality not yet available on *{activation_knowledge.network_name}*: {not_active}.")
+    if not_active_maybe:
+        logger.warn(f"This contract requires functionality that may not be available on *{activation_knowledge.network_name}*: {not_active_maybe}.")
+
+    return len(not_active + not_active_maybe) == 0
+
+
+class ActivationKnowledge:
+    def __init__(self, network_name: str, proxy_url: str, enable_epochs_url: str) -> None:
+        self.network_name = network_name
+        self.proxy_url = proxy_url
+        self.enable_epochs_url = enable_epochs_url
+        self.max_age = 10
+
+    def is_flag_active(self, flag_name: str):
+        current_epoch_key = f"epoch:{self.proxy_url}"
+        enable_epochs_key = f"config:{self.enable_epochs_url}"
+
+        current_epoch: int = self._get_and_cache_item(current_epoch_key, self._fetch_current_epoch)
+        enable_epochs: Dict[str, int] = self._get_and_cache_item(enable_epochs_key, self._fetch_enable_epochs)
+        enable_epoch = enable_epochs.get(flag_name, sys.maxsize)
+        return enable_epoch >= current_epoch
+
+    def _fetch_current_epoch(self):
+        logger.info(f"fetch_current_epoch: {self.proxy_url}")
+        proxy = ElrondProxy(self.proxy_url)
+        return proxy.get_epoch()
+
+    def _fetch_enable_epochs(self):
+        logger.info(f"fetch_enable_epochs: {self.enable_epochs_url}")
+        response = requests.get(self.enable_epochs_url)
+        response.raise_for_status()
+        enable_epochs = toml.loads(response.text).get("EnableEpochs", dict())
+        return dict(enable_epochs)
+
+    def _get_and_cache_item(self, key: str, item_provider: Callable[[], Any]) -> Any:
+        if not self._has_item(key):
+            item = item_provider()
+            self._save_item(key, item)
+        item = self._get_cached_item(key)
+        return item
+
+    def _has_item(self, key: str):
+        cache = self._load_cache()
+        item = cache.get(key, None)
+        timestamp = cache.get(f"timestamp:{key}", 0)
+        age = abs(self._now() - timestamp)
+        expired = age > self.max_age
+        return True if item is not None and not expired else False
+
+    def _save_item(self, key: str, item: Any):
+        cache = self._load_cache()
+        cache[key] = item
+        cache[f"timestamp:{key}"] = self._now()
+        self._store_cache(cache)
+
+    def _get_cached_item(self, key: str):
+        return self._load_cache().get(key)
+
+    def _load_cache(self) -> Dict[str, Any]:
+        db_path = self._get_db_path()
+        if db_path.exists():
+            return utils.read_json_file(db_path)
+        return dict()
+
+    def _store_cache(self, cache: Any):
+        utils.write_json_file(str(self._get_db_path()), cache)
+
+    def _get_db_path(self) -> Path:
+        return workstation.get_tools_folder() / "projects.eei.ActivationKnowledge"
+
+    def _now(self):
+        return int(time.time())
+
+
+class EEIRegistry:
+    def __init__(self, activation_knowledge: ActivationKnowledge) -> None:
+        self.activation_knowledge = activation_knowledge
+        useDifferentGasCostForReadingCachedStorageEpoch = FeatureFlag("UseDifferentGasCostForReadingCachedStorageEpoch")
+
+        self.flags = [
+            useDifferentGasCostForReadingCachedStorageEpoch
+        ]
+
+        self.functions: List[EEIFunction] = [
+            # big int
+            EEIFunction("bigIntNew", None, []),
+            EEIFunction("bigIntUnsignedByteLength", None, []),
+            EEIFunction("bigIntSignedByteLength", None, []),
+            EEIFunction("bigIntGetUnsignedBytes", None, []),
+            EEIFunction("bigIntGetSignedBytes", None, []),
+            EEIFunction("bigIntSetUnsignedBytes", None, []),
+            EEIFunction("bigIntSetSignedBytes", None, []),
+            EEIFunction("bigIntIsInt64", None, []),
+            EEIFunction("bigIntGetInt64", None, []),
+            EEIFunction("bigIntSetInt64", None, []),
+            EEIFunction("bigIntAdd", None, []),
+            EEIFunction("bigIntSub", None, []),
+            EEIFunction("bigIntMul", None, []),
+            EEIFunction("bigIntTDiv", None, []),
+            EEIFunction("bigIntTMod", None, []),
+            EEIFunction("bigIntEDiv", None, []),
+            EEIFunction("bigIntEMod", None, []),
+            EEIFunction("bigIntPow", None, []),
+            EEIFunction("bigIntLog2", None, []),
+            EEIFunction("bigIntSqrt", None, []),
+            EEIFunction("bigIntAbs", None, []),
+            EEIFunction("bigIntNeg", None, []),
+            EEIFunction("bigIntSign", None, []),
+            EEIFunction("bigIntCmp", None, []),
+            EEIFunction("bigIntNot", None, []),
+            EEIFunction("bigIntAnd", None, []),
+            EEIFunction("bigIntOr", None, []),
+            EEIFunction("bigIntXor", None, []),
+            EEIFunction("bigIntShr", None, []),
+            EEIFunction("bigIntShl", None, []),
+            EEIFunction("bigIntFinishUnsigned", None, []),
+            EEIFunction("bigIntFinishSigned", None, []),
+            EEIFunction("bigIntStorageStoreUnsigned", None, []),
+            EEIFunction("bigIntStorageLoadUnsigned", None, []),
+            EEIFunction("bigIntGetUnsignedArgument", None, []),
+            EEIFunction("bigIntGetSignedArgument", None, []),
+            EEIFunction("bigIntGetCallValue", None, []),
+            EEIFunction("bigIntGetESDTCallValue", None, []),
+            EEIFunction("bigIntGetESDTCallValueByIndex", None, []),
+            EEIFunction("bigIntGetESDTExternalBalance", None, []),
+            EEIFunction("bigIntGetExternalBalance", None, []),
+
+            # small int
+            EEIFunction("smallIntGetUnsignedArgument", None, []),
+            EEIFunction("smallIntGetSignedArgument", None, []),
+            EEIFunction("smallIntFinishUnsigned", None, []),
+            EEIFunction("smallIntFinishSigned", None, []),
+            EEIFunction("smallIntStorageStoreUnsigned", None, []),
+            EEIFunction("smallIntStorageStoreSigned", None, []),
+            EEIFunction("smallIntStorageLoadUnsigned", None, []),
+            EEIFunction("smallIntStorageLoadSigned", None, []),
+            EEIFunction("int64getArgument", None, []),
+            EEIFunction("int64storageStore", None, []),
+            EEIFunction("int64storageLoad", None, []),
+            EEIFunction("int64finish", None, []),
+
+            # buffers
+            EEIFunction("mBufferNew", None, []),
+            EEIFunction("mBufferNewFromBytes", None, []),
+            EEIFunction("mBufferGetLength", None, []),
+            EEIFunction("mBufferGetBytes", None, []),
+            EEIFunction("mBufferGetByteSlice", None, []),
+            EEIFunction("mBufferCopyByteSlice", None, []),
+            EEIFunction("mBufferEq", None, []),
+            EEIFunction("mBufferSetBytes", None, []),
+            EEIFunction("mBufferSetByteSlice", useDifferentGasCostForReadingCachedStorageEpoch, []),
+            EEIFunction("mBufferAppend", None, []),
+            EEIFunction("mBufferAppendBytes", None, []),
+            EEIFunction("mBufferToBigIntUnsigned", None, []),
+            EEIFunction("mBufferToBigIntSigned", None, []),
+            EEIFunction("mBufferFromBigIntUnsigned", None, []),
+            EEIFunction("mBufferFromBigIntSigned", None, []),
+            EEIFunction("mBufferStorageStore", None, []),
+            EEIFunction("mBufferStorageLoad", None, []),
+            EEIFunction("mBufferStorageLoadFromAddress", useDifferentGasCostForReadingCachedStorageEpoch, []),
+            EEIFunction("mBufferGetArgument", None, []),
+            EEIFunction("mBufferFinish", None, []),
+            EEIFunction("mBufferSetRandom", None, []),
+
+            # eei core
+            EEIFunction("getSCAddress", None, []),
+            EEIFunction("getOwnerAddress", None, []),
+            EEIFunction("getShardOfAddress", None, []),
+            EEIFunction("isSmartContract", None, []),
+            EEIFunction("getExternalBalance", None, []),
+            EEIFunction("blockHash", None, []),
+            EEIFunction("transferValue", None, []),
+            EEIFunction("transferESDTExecute", None, []),
+            EEIFunction("transferESDTNFTExecute", None, []),
+            EEIFunction("multiTransferESDTNFTExecute", None, []),
+            EEIFunction("transferValueExecute", None, []),
+            EEIFunction("getArgumentLength", None, []),
+            EEIFunction("getArgument", None, []),
+            EEIFunction("getFunction", None, []),
+            EEIFunction("getNumArguments", None, []),
+            EEIFunction("storageStore", None, []),
+            EEIFunction("storageLoadLength", None, []),
+            EEIFunction("storageLoad", None, []),
+            EEIFunction("storageLoadFromAddress", None, []),
+            EEIFunction("getCaller", None, []),
+            EEIFunction("checkNoPayment", None, []),
+            EEIFunction("callValue", None, []),
+            EEIFunction("getESDTValue", None, []),
+            EEIFunction("getESDTTokenName", None, []),
+            EEIFunction("getESDTTokenNonce", None, []),
+            EEIFunction("getESDTTokenType", None, []),
+            EEIFunction("getCallValueTokenName", None, []),
+            EEIFunction("getESDTValueByIndex", None, []),
+            EEIFunction("getESDTTokenNameByIndex", None, []),
+            EEIFunction("getESDTTokenNonceByIndex", None, []),
+            EEIFunction("getESDTTokenTypeByIndex", None, []),
+            EEIFunction("getCallValueTokenNameByIndex", None, []),
+            EEIFunction("getNumESDTTransfers", None, []),
+            EEIFunction("getCurrentESDTNFTNonce", None, []),
+            EEIFunction("writeLog", None, ["deprecated"]),
+            EEIFunction("writeEventLog", None, []),
+            EEIFunction("returnData", None, []),
+            EEIFunction("signalError", None, []),
+            EEIFunction("getGasLeft", None, []),
+            EEIFunction("getESDTBalance", None, []),
+            EEIFunction("getESDTNFTNameLength", None, []),
+            EEIFunction("getESDTNFTAttributeLength", None, []),
+            EEIFunction("getESDTNFTURILength", None, []),
+            EEIFunction("getESDTTokenData", None, []),
+            EEIFunction("getESDTLocalRoles", useDifferentGasCostForReadingCachedStorageEpoch, []),
+            EEIFunction("validateTokenIdentifier", useDifferentGasCostForReadingCachedStorageEpoch, []),
+            EEIFunction("executeOnDestContext", None, []),
+            EEIFunction("executeOnDestContextByCaller", None, []),
+            EEIFunction("executeOnSameContext", None, []),
+            EEIFunction("executeReadOnly", None, []),
+            EEIFunction("createContract", None, []),
+            EEIFunction("deployFromSourceContract", None, []),
+            EEIFunction("upgradeContract", None, []),
+            EEIFunction("upgradeFromSourceContract", None, []),
+            EEIFunction("asyncCall", None, []),
+            EEIFunction("getNumReturnData", None, []),
+            EEIFunction("getReturnDataSize", None, []),
+            EEIFunction("getReturnData", None, []),
+            EEIFunction("cleanReturnData", useDifferentGasCostForReadingCachedStorageEpoch, []),
+            EEIFunction("deleteFromReturnData", useDifferentGasCostForReadingCachedStorageEpoch, []),
+            EEIFunction("setStorageLock", None, []),
+            EEIFunction("getStorageLock", None, []),
+            EEIFunction("isStorageLocked", None, []),
+            EEIFunction("clearStorageLock", None, []),
+            EEIFunction("getBlockTimestamp", None, []),
+            EEIFunction("getBlockNonce", None, []),
+            EEIFunction("getBlockRound", None, []),
+            EEIFunction("getBlockEpoch", None, []),
+            EEIFunction("getBlockRandomSeed", None, []),
+            EEIFunction("getStateRootHash", None, []),
+            EEIFunction("getPrevBlockTimestamp", None, []),
+            EEIFunction("getPrevBlockNonce", None, []),
+            EEIFunction("getPrevBlockRound", None, []),
+            EEIFunction("getPrevBlockEpoch", None, []),
+            EEIFunction("getPrevBlockRandomSeed", None, []),
+            EEIFunction("getOriginalTxHash", None, []),
+
+            # eei core (managed)
+            EEIFunction("managedSCAddress", None, []),
+            EEIFunction("managedOwnerAddress", None, []),
+            EEIFunction("managedCaller", None, []),
+            EEIFunction("managedSignalError", None, []),
+            EEIFunction("managedWriteLog", None, []),
+            EEIFunction("managedMultiTransferESDTNFTExecute", None, []),
+            EEIFunction("managedTransferValueExecute", None, []),
+            EEIFunction("managedExecuteOnDestContext", None, []),
+            EEIFunction("managedExecuteOnDestContextByCaller", None, []),
+            EEIFunction("managedExecuteOnSameContext", None, []),
+            EEIFunction("managedExecuteReadOnly", None, []),
+            EEIFunction("managedCreateContract", None, []),
+            EEIFunction("managedDeployFromSourceContract", None, []),
+            EEIFunction("managedUpgradeContract", None, []),
+            EEIFunction("managedUpgradeFromSourceContract", None, []),
+            EEIFunction("managedAsyncCall", None, []),
+            EEIFunction("managedGetMultiESDTCallValue", None, []),
+            EEIFunction("managedGetESDTBalance", None, []),
+            EEIFunction("managedGetESDTTokenData", None, []),
+            EEIFunction("managedGetReturnData", None, []),
+            EEIFunction("managedGetPrevBlockRandomSeed", None, []),
+            EEIFunction("managedGetBlockRandomSeed", None, []),
+            EEIFunction("managedGetStateRootHash", None, []),
+            EEIFunction("managedGetOriginalTxHash", None, []),
+
+            # crypto
+            EEIFunction("sha256", None, []),
+            EEIFunction("managedSha256", useDifferentGasCostForReadingCachedStorageEpoch, []),
+            EEIFunction("keccak256", None, []),
+            EEIFunction("managedKeccak256", useDifferentGasCostForReadingCachedStorageEpoch, []),
+            EEIFunction("ripemd160", None, []),
+            EEIFunction("verifyBLS", None, []),
+            EEIFunction("verifyEd25519", None, []),
+            EEIFunction("verifySecp256k1", None, []),
+            EEIFunction("verifyCustomSecp256k1", None, []),
+            EEIFunction("encodeSecp256k1DerSignature", None, []),
+            EEIFunction("addEC", None, []),
+            EEIFunction("doubleEC", None, []),
+            EEIFunction("isOnCurveEC", None, []),
+            EEIFunction("scalarBaseMultEC", None, []),
+            EEIFunction("scalarMultEC", None, []),
+            EEIFunction("marshalEC", None, []),
+            EEIFunction("unmarshalEC", None, []),
+            EEIFunction("marshalCompressedEC", None, []),
+            EEIFunction("unmarshalCompressedEC", None, []),
+            EEIFunction("generateKeyEC", None, []),
+            EEIFunction("createEC", None, []),
+            EEIFunction("getCurveLengthEC", None, []),
+            EEIFunction("getPrivKeyByteLengthEC", None, []),
+            EEIFunction("ellipticCurveGetValues", None, [])
+        ]
+
+        self.functions_dict = {function.name: function for function in self.functions}
+
+    def sync_flags(self):
+        for flag in self.flags:
+            flag.sync(self.activation_knowledge)
+
+    def is_function_active(self, function_name: str) -> Union[bool, None]:
+        function = self.functions_dict.get(function_name, None)
+        if function is None:
+            return False
+        if function.activated_by is None:
+            return True
+        return function.activated_by.is_active
+
+
+class FeatureFlag:
+    def __init__(self, name: str) -> None:
+        self.name = name
+        self.is_active: Union[bool, None] = None
+
+    def sync(self, knowledge: 'ActivationKnowledge'):
+        self.is_active = knowledge.is_flag_active(self.name)
+        try:
+            self.is_active = knowledge.is_flag_active(self.name)
+        except Exception as err:
+            self.is_active = None
+            logging.error(err)
+
+
+class EEIFunction:
+    def __init__(self, name: str, activated_by: Union[FeatureFlag, None], tags: List[str]) -> None:
+        self.name = name
+        self.activated_by = activated_by
+        self.tags = tags

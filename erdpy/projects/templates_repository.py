@@ -73,7 +73,7 @@ class TemplatesRepository:
         source_path = self.get_template_folder(template)
         shutil.copytree(source_path, destination_path)
 
-    def get_language(self, template):
+    def get_language(self, template: str):
         metadata_file = self.get_metadata_file(template)
         metadata = utils.read_json_file(metadata_file)
         return metadata.get("language", "unknown")
