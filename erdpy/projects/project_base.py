@@ -37,9 +37,12 @@ class Project(IProject):
         utils.remove_folder(self.get_output_folder())
 
     def _ensure_dependencies_installed(self):
-        module_keys = self.get_dependencies()
+        module_keys = self.get_core_dependencies() + self.get_dependencies()
         for module_key in module_keys:
             dependencies.install_module(module_key)
+
+    def get_core_dependencies(self) -> List[str]:
+        return ["wabt"]
 
     def get_dependencies(self) -> List[str]:
         raise NotImplementedError()
