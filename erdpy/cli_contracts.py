@@ -17,7 +17,7 @@ logger = logging.getLogger("cli.contracts")
 
 
 def setup_parser(args: List[str], subparsers: Any) -> Any:
-    parser = cli_shared.add_group_subparser(subparsers, "contract", "Build, deploy and interact with Smart Contracts")
+    parser = cli_shared.add_group_subparser(subparsers, "contract", "Build, deploy, upgrade and interact with Smart Contracts")
     subparsers = parser.add_subparsers()
 
     sub = cli_shared.add_command_subparser(subparsers, "contract", "new",
