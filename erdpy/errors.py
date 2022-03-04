@@ -63,6 +63,11 @@ class NotSupportedProject(KnownError):
         super().__init__(f"Directory is not a supported project: {directory}")
 
 
+class NotSupportedProjectFeature(KnownError):
+    def __init__(self):
+        super().__init__(f"Project feature not yet supported.")
+
+
 class PlatformNotSupported(KnownError):
     def __init__(self, action_or_item: str, platform: str):
         super().__init__(f"[{action_or_item}] is not supported on platform [{platform}].")

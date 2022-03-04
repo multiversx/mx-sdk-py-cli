@@ -30,6 +30,9 @@ class Project(IProject):
         self._do_after_build_core()
         return contract_paths
 
+    def get_option(self, option_name: str) -> Any:
+        return self.options.get(option_name, None)
+
     def clean(self):
         utils.remove_folder(self.get_output_folder())
 
@@ -78,7 +81,7 @@ class Project(IProject):
     @final
     def _do_after_build_core(self):
         wabt.generate_artifacts(self)
-        eei.analyze_compatibility(self)
+        eei.check_compatibility(self)
 
     def _copy_to_output(self, source: Path, destination: Union[str, None] = None) -> Path:
         output_folder = self.get_output_folder()

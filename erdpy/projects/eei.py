@@ -6,7 +6,7 @@ import requests
 import toml
 from typing import Any, Callable, Dict, List, Union
 from erdpy import utils, workstation
-from erdpy.errors import KnownError
+from erdpy.errors import NotSupportedProjectFeature
 from erdpy.projects.interfaces import IProject
 from erdpy.proxy.core import ElrondProxy
 
@@ -18,21 +18,35 @@ DEVNET_PROXY_URL = "https://devnet-gateway.elrond.com"
 DEVNET_ENABLE_EPOCHS_URL = "https://raw.githubusercontent.com/ElrondNetwork/elrond-config-devnet/master/enableEpochs.toml"
 
 
-def analyze_compatibility(project: IProject):
-    logger.info("analyze_compatibility")
+def check_compatibility(project: IProject):
+    if _should_skip_checks(project):
+        return
+
+    logger.info("check_compatibility")
 
     wasm_file = project.get_file_wasm()
     imports_file = wasm_file.with_suffix(".imports.json")
     imports = utils.read_json_file(imports_file)
 
-    compatible_with_mainnet = _analyze_imports_compatibility(imports, ActivationKnowledge("mainnet", MAINNET_PROXY_URL, MAINNET_ENABLE_EPOCHS_URL))
-    compatible_with_devnet = _analyze_imports_compatibility(imports, ActivationKnowledge("devnet", DEVNET_PROXY_URL, DEVNET_ENABLE_EPOCHS_URL))
+    compatible_with_mainnet = _check_imports_compatibility(imports, ActivationKnowledge("mainnet", MAINNET_PROXY_URL, MAINNET_ENABLE_EPOCHS_URL))
+    compatible_with_devnet = _check_imports_compatibility(imports, ActivationKnowledge("devnet", DEVNET_PROXY_URL, DEVNET_ENABLE_EPOCHS_URL))
+
+    if _should_ignore_checks(project):
+        return
 
     if not compatible_with_mainnet or not compatible_with_devnet:
-        raise KnownError("Contract compatibility issue")
+        raise NotSupportedProjectFeature()
 
 
-def _analyze_imports_compatibility(imports: List[str], activation_knowledge: 'ActivationKnowledge') -> bool:
+def _should_skip_checks(project: IProject):
+    return project.get_option("eei-checks-skip") is True
+
+
+def _should_ignore_checks(project: IProject):
+    return project.get_option("eei-checks-ignore") is True
+
+
+def _check_imports_compatibility(imports: List[str], activation_knowledge: 'ActivationKnowledge') -> bool:
     registry = EEIRegistry(activation_knowledge)
     registry.sync_flags()
 
@@ -59,7 +73,8 @@ class ActivationKnowledge:
         self.network_name = network_name
         self.proxy_url = proxy_url
         self.enable_epochs_url = enable_epochs_url
-        self.max_age = 10
+        # 30 minutes
+        self.max_age = 60 * 30
 
     def is_flag_active(self, flag_name: str):
         current_epoch_key = f"epoch:{self.proxy_url}"
