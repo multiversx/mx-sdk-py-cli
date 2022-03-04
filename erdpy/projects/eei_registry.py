@@ -1,104 +1,13 @@
 import logging
-import sys
-import requests
-import toml
-from typing import Dict, List, Union
-from erdpy import utils
-from erdpy.diskcache import DiskCache
-from erdpy.errors import NotSupportedProjectFeature
-from erdpy.projects.interfaces import IProject
-from erdpy.proxy.core import ElrondProxy
+from typing import List, Union
 
-logger = logging.getLogger("eei")
-
-MAINNET_PROXY_URL = "https://gateway.elrond.com"
-MAINNET_ENABLE_EPOCHS_URL = "https://raw.githubusercontent.com/ElrondNetwork/elrond-config-mainnet/master/enableEpochs.toml"
-DEVNET_PROXY_URL = "https://devnet-gateway.elrond.com"
-DEVNET_ENABLE_EPOCHS_URL = "https://raw.githubusercontent.com/ElrondNetwork/elrond-config-devnet/master/enableEpochs.toml"
-
-
-def check_compatibility(project: IProject):
-    if _should_skip_checks(project):
-        return
-
-    logger.info("check_compatibility")
-
-    wasm_file = project.get_file_wasm()
-    imports_file = wasm_file.with_suffix(".imports.json")
-    imports = utils.read_json_file(imports_file)
-
-    compatible_with_mainnet = _check_imports_compatibility(imports, ActivationKnowledge("mainnet", MAINNET_PROXY_URL, MAINNET_ENABLE_EPOCHS_URL))
-    compatible_with_devnet = _check_imports_compatibility(imports, ActivationKnowledge("devnet", DEVNET_PROXY_URL, DEVNET_ENABLE_EPOCHS_URL))
-
-    if _should_ignore_checks(project):
-        return
-
-    if not compatible_with_mainnet or not compatible_with_devnet:
-        raise NotSupportedProjectFeature()
-
-
-def _should_skip_checks(project: IProject):
-    return project.get_option("eei-checks-skip") is True
-
-
-def _should_ignore_checks(project: IProject):
-    return project.get_option("eei-checks-ignore") is True
-
-
-def _check_imports_compatibility(imports: List[str], activation_knowledge: 'ActivationKnowledge') -> bool:
-    registry = EEIRegistry(activation_knowledge)
-    registry.sync_flags()
-
-    not_active: List[str] = []
-    not_active_maybe: List[str] = []
-
-    for function_name in imports:
-        is_active = registry.is_function_active(function_name)
-        if is_active is False:
-            not_active.append(function_name)
-        elif is_active is None:
-            not_active_maybe.append(function_name)
-
-    if not_active:
-        logger.error(f"This contract requires functionality not yet available on *{activation_knowledge.network_name}*: {not_active}.")
-    if not_active_maybe:
-        logger.warn(f"This contract requires functionality that may not be available on *{activation_knowledge.network_name}*: {not_active_maybe}.")
-
-    return len(not_active + not_active_maybe) == 0
-
-
-class ActivationKnowledge(DiskCache):
-    def __init__(self, network_name: str, proxy_url: str, enable_epochs_url: str) -> None:
-        super().__init__("projects.eei.ActivationKnowledge", 60 * 30)
-        self.network_name = network_name
-        self.proxy_url = proxy_url
-        self.enable_epochs_url = enable_epochs_url
-
-    def is_flag_active(self, flag_name: str):
-        current_epoch_key = f"epoch:{self.proxy_url}"
-        enable_epochs_key = f"config:{self.enable_epochs_url}"
-
-        current_epoch: int = self.get_and_cache_item(current_epoch_key, self._fetch_current_epoch)
-        enable_epochs: Dict[str, int] = self.get_and_cache_item(enable_epochs_key, self._fetch_enable_epochs)
-        enable_epoch = enable_epochs.get(flag_name, sys.maxsize)
-        return enable_epoch >= current_epoch
-
-    def _fetch_current_epoch(self):
-        logger.info(f"fetch_current_epoch: {self.proxy_url}")
-        proxy = ElrondProxy(self.proxy_url)
-        return proxy.get_epoch()
-
-    def _fetch_enable_epochs(self):
-        logger.info(f"fetch_enable_epochs: {self.enable_epochs_url}")
-        response = requests.get(self.enable_epochs_url)
-        response.raise_for_status()
-        enable_epochs = toml.loads(response.text).get("EnableEpochs", dict())
-        return dict(enable_epochs)
+from erdpy.projects.eei_activation import ActivationKnowledge
 
 
 class EEIRegistry:
     def __init__(self, activation_knowledge: ActivationKnowledge) -> None:
         self.activation_knowledge = activation_knowledge
+        
         useDifferentGasCostForReadingCachedStorageEpoch = FeatureFlag("UseDifferentGasCostForReadingCachedStorageEpoch")
 
         self.flags = [
@@ -337,7 +246,7 @@ class FeatureFlag:
         self.name = name
         self.is_active: Union[bool, None] = None
 
-    def sync(self, knowledge: 'ActivationKnowledge'):
+    def sync(self, knowledge: ActivationKnowledge):
         self.is_active = knowledge.is_flag_active(self.name)
         try:
             self.is_active = knowledge.is_flag_active(self.name)

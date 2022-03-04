@@ -21,9 +21,9 @@ class DiskCache:
         return item
 
     def has_item(self, key: str):
-        all_items = self.load_payload()
-        item = all_items.get(key, None)
-        timestamp = all_items.get(f"timestamp:{key}", 0)
+        payload = self.load_payload()
+        item = payload.get(key, None)
+        timestamp = payload.get(f"timestamp:{key}", 0)
         age = abs(self._now() - timestamp)
         expired = age > self.max_age
         return True if item is not None and not expired else False
