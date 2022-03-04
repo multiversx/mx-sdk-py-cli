@@ -225,8 +225,9 @@ optional arguments:
   --chain CHAIN                                the chain identifier (default: T)
   --version VERSION                            the transaction version (default: 1)
   --options OPTIONS                            the transaction options (default: 0)
-  --arguments ARGUMENTS [ARGUMENTS ...]        arguments for the contract transaction, as numbers or hex-encoded. E.g.
-                                               --arguments 42 0x64 1000 0xabba
+  --arguments ARGUMENTS [ARGUMENTS ...]        arguments for the contract transaction, as [number, bech32-address, ascii
+                                               string, boolean] or hex-encoded. E.g. --arguments 42 0x64 1000 0xabba
+                                               str:TOK-a1c2ef true erd1[..]
   --wait-result                                signal to wait for the transaction result - only valid if --send is set
   --timeout TIMEOUT                            max num of seconds to wait for result - only valid if --wait-result is
                                                set
@@ -304,8 +305,9 @@ optional arguments:
   --version VERSION                            the transaction version (default: 1)
   --options OPTIONS                            the transaction options (default: 0)
   --function FUNCTION                          the function to call
-  --arguments ARGUMENTS [ARGUMENTS ...]        arguments for the contract transaction, as numbers or hex-encoded. E.g.
-                                               --arguments 42 0x64 1000 0xabba
+  --arguments ARGUMENTS [ARGUMENTS ...]        arguments for the contract transaction, as [number, bech32-address, ascii
+                                               string, boolean] or hex-encoded. E.g. --arguments 42 0x64 1000 0xabba
+                                               str:TOK-a1c2ef true erd1[..]
   --wait-result                                signal to wait for the transaction result - only valid if --send is set
   --timeout TIMEOUT                            max num of seconds to wait for result - only valid if --wait-result is
                                                set
@@ -389,8 +391,9 @@ optional arguments:
   --chain CHAIN                                the chain identifier (default: T)
   --version VERSION                            the transaction version (default: 1)
   --options OPTIONS                            the transaction options (default: 0)
-  --arguments ARGUMENTS [ARGUMENTS ...]        arguments for the contract transaction, as numbers or hex-encoded. E.g.
-                                               --arguments 42 0x64 1000 0xabba
+  --arguments ARGUMENTS [ARGUMENTS ...]        arguments for the contract transaction, as [number, bech32-address, ascii
+                                               string, boolean] or hex-encoded. E.g. --arguments 42 0x64 1000 0xabba
+                                               str:TOK-a1c2ef true erd1[..]
   --wait-result                                signal to wait for the transaction result - only valid if --send is set
   --timeout TIMEOUT                            max num of seconds to wait for result - only valid if --wait-result is
                                                set
@@ -414,8 +417,9 @@ optional arguments:
   -h, --help                             show this help message and exit
   --proxy PROXY                          🔗 the URL of the proxy (default: https://testnet-gateway.elrond.com)
   --function FUNCTION                    the function to call
-  --arguments ARGUMENTS [ARGUMENTS ...]  arguments for the contract transaction, as numbers or hex-encoded. E.g.
-                                         --arguments 42 0x64 1000 0xabba
+  --arguments ARGUMENTS [ARGUMENTS ...]  arguments for the contract transaction, as [number, bech32-address, ascii
+                                         string, boolean] or hex-encoded. E.g. --arguments 42 0x64 1000 0xabba
+                                         str:TOK-a1c2ef true erd1[..]
 
 ```
 ## Group **Transactions**
