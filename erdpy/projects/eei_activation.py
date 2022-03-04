@@ -10,9 +10,9 @@ from erdpy.proxy.core import ElrondProxy
 logger = logging.getLogger("eei")
 
 
-class ActivationKnowledge(DiskCache):
+class ActivationEpochsInfo(DiskCache):
     def __init__(self, network_name: str, proxy_url: str, enable_epochs_url: str) -> None:
-        super().__init__(cache_name="projects.eei.ActivationKnowledge", max_age=60 * 30)
+        super().__init__(cache_name="projects.eei.ActivationEpochsInfo", max_age=60 * 30)
         self.network_name = network_name
         self.proxy_url = proxy_url
         self.enable_epochs_url = enable_epochs_url

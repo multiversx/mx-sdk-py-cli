@@ -1,6 +1,6 @@
 from pathlib import Path
 import time
-from typing import Any, Callable, Dict
+from typing import Any, Callable, Dict, cast
 
 from erdpy import utils, workstation
 
@@ -40,7 +40,8 @@ class DiskCache:
     def load_payload(self) -> Dict[str, Any]:
         path = self.get_path()
         if path.exists():
-            return utils.read_json_file(path)
+            payload = utils.read_json_file(path)
+            return cast(Dict[str, Any], payload)
         return dict()
 
     def store_payload(self, cache: Any):

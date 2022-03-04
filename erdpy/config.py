@@ -178,8 +178,8 @@ def get_defaults() -> Dict[str, Any]:
         "dependencies.wasm-opt.tag": "latest",
         "dependencies.twiggy.tag": "latest",
         "dependencies.wabt.tag": "1.0.27",
-        "dependencies.wabt.urlTemplate.linux": "https://github.com/WebAssembly/wabt/releases/download/1.0.27/wabt-1.0.27-ubuntu.tar.gz",
-        "dependencies.wabt.urlTemplate.osx": "https://github.com/WebAssembly/wabt/releases/download/1.0.27/wabt-1.0.27-macos.tar.gz",
+        "dependencies.wabt.urlTemplate.linux": "https://github.com/WebAssembly/wabt/releases/download/{TAG}/wabt-{TAG}-ubuntu.tar.gz",
+        "dependencies.wabt.urlTemplate.osx": "https://github.com/WebAssembly/wabt/releases/download/{TAG}/wabt-{TAG}-macos.tar.gz",
         "testnet.validate_expected_keys": "false",
         "github_api_token": "",
     }

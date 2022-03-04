@@ -1,12 +1,12 @@
 import logging
 from typing import List, Union
 
-from erdpy.projects.eei_activation import ActivationKnowledge
+from erdpy.projects.eei_activation import ActivationEpochsInfo
 
 
 class EEIRegistry:
-    def __init__(self, activation_knowledge: ActivationKnowledge) -> None:
-        self.activation_knowledge = activation_knowledge
+    def __init__(self, activation_info: ActivationEpochsInfo) -> None:
+        self.activation_info = activation_info
         
         useDifferentGasCostForReadingCachedStorageEpoch = FeatureFlag("UseDifferentGasCostForReadingCachedStorageEpoch")
 
@@ -230,7 +230,7 @@ class EEIRegistry:
 
     def sync_flags(self):
         for flag in self.flags:
-            flag.sync(self.activation_knowledge)
+            flag.sync(self.activation_info)
 
     def is_function_active(self, function_name: str) -> Union[bool, None]:
         function = self.functions_dict.get(function_name, None)
@@ -246,10 +246,9 @@ class FeatureFlag:
         self.name = name
         self.is_active: Union[bool, None] = None
 
-    def sync(self, knowledge: ActivationKnowledge):
-        self.is_active = knowledge.is_flag_active(self.name)
+    def sync(self, activation_info: ActivationEpochsInfo):
         try:
-            self.is_active = knowledge.is_flag_active(self.name)
+            self.is_active = activation_info.is_flag_active(self.name)
         except Exception as err:
             self.is_active = None
             logging.error(err)
