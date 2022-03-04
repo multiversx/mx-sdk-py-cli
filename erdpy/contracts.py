@@ -12,7 +12,11 @@ from erdpy.utils import Object
 
 logger = logging.getLogger("contracts")
 
-HEX_PREFIX = "0X"
+HEX_PREFIX = "0x"
+ERD_BECH32_PREFIX = "erd"
+FALSE_STR_LOWER = "false"
+TRUE_STR_LOWER = "true"
+STR_PREFIX = "str:"
 
 
 class QueryResult(Object):
@@ -177,16 +181,33 @@ class SmartContract:
 
 
 def _prepare_argument(argument: Any):
-    as_string = str(argument).upper()
+    as_str = str(argument)
+    as_hex = _to_hex(as_str)
+    return as_hex
 
-    if as_string.startswith(HEX_PREFIX):
-        return _prepare_hexadecimal(as_string)
 
-    return _prepare_decimal(as_string)
+def _to_hex(arg: str):
+    if arg.startswith(HEX_PREFIX):
+        return _prepare_hexadecimal(arg)
+
+    if arg.isnumeric():
+        return _prepare_decimal(arg)
+    elif arg.startswith(ERD_BECH32_PREFIX):
+        addr = Address(arg)
+        return _prepare_hexadecimal(f"{HEX_PREFIX}{addr.hex()}")
+    elif arg.lower() == FALSE_STR_LOWER or arg.lower() == TRUE_STR_LOWER:
+        as_str = f"{HEX_PREFIX}01" if arg.lower() == TRUE_STR_LOWER else f"{HEX_PREFIX}00"
+        return _prepare_hexadecimal(as_str)
+    elif arg.startswith(STR_PREFIX):
+        as_hex = f"{HEX_PREFIX}{arg[len(STR_PREFIX):].encode('ascii').hex()}"
+        return _prepare_hexadecimal(as_hex)
+    else:
+        raise Exception(f"could not convert {arg} to hex")
 
 
 def _prepare_hexadecimal(argument: str) -> str:
     argument = argument[len(HEX_PREFIX):]
+    argument = argument.upper()
     argument = ensure_even_length(argument)
     try:
         _ = int(argument, 16)
@@ -202,7 +223,7 @@ def _prepare_decimal(argument: str) -> str:
     as_number = int(argument)
     as_hexstring = hex(as_number)[len(HEX_PREFIX):]
     as_hexstring = ensure_even_length(as_hexstring)
-    return as_hexstring
+    return as_hexstring.upper()
 
 
 def ensure_even_length(string: str) -> str:
