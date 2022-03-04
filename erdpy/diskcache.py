@@ -21,29 +21,29 @@ class DiskCache:
         return item
 
     def has_item(self, key: str):
-        cache = self._load_all()
-        item = cache.get(key, None)
-        timestamp = cache.get(f"timestamp:{key}", 0)
+        all_items = self.load_payload()
+        item = all_items.get(key, None)
+        timestamp = all_items.get(f"timestamp:{key}", 0)
         age = abs(self._now() - timestamp)
         expired = age > self.max_age
         return True if item is not None and not expired else False
 
     def save_item(self, key: str, item: Any):
-        cache = self._load_all()
+        cache = self.load_payload()
         cache[key] = item
         cache[f"timestamp:{key}"] = self._now()
-        self._store_all(cache)
+        self.store_payload(cache)
 
     def _get_cached_item(self, key: str):
-        return self._load_all().get(key)
+        return self.load_payload().get(key)
 
-    def _load_all(self) -> Dict[str, Any]:
+    def load_payload(self) -> Dict[str, Any]:
         path = self.get_path()
         if path.exists():
             return utils.read_json_file(path)
         return dict()
 
-    def _store_all(self, cache: Any):
+    def store_payload(self, cache: Any):
         utils.write_json_file(str(self.get_path()), cache)
 
     def _now(self):
