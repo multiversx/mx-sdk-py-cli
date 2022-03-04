@@ -1,11 +1,10 @@
 import logging
-from pathlib import Path
 import sys
-import time
 import requests
 import toml
-from typing import Any, Callable, Dict, List, Union
-from erdpy import utils, workstation
+from typing import Dict, List, Union
+from erdpy import utils
+from erdpy.diskcache import DiskCache
 from erdpy.errors import NotSupportedProjectFeature
 from erdpy.projects.interfaces import IProject
 from erdpy.proxy.core import ElrondProxy
@@ -68,20 +67,19 @@ def _check_imports_compatibility(imports: List[str], activation_knowledge: 'Acti
     return len(not_active + not_active_maybe) == 0
 
 
-class ActivationKnowledge:
+class ActivationKnowledge(DiskCache):
     def __init__(self, network_name: str, proxy_url: str, enable_epochs_url: str) -> None:
+        super().__init__("projects.eei.ActivationKnowledge", 60 * 30)
         self.network_name = network_name
         self.proxy_url = proxy_url
         self.enable_epochs_url = enable_epochs_url
-        # 30 minutes
-        self.max_age = 60 * 30
 
     def is_flag_active(self, flag_name: str):
         current_epoch_key = f"epoch:{self.proxy_url}"
         enable_epochs_key = f"config:{self.enable_epochs_url}"
 
-        current_epoch: int = self._get_and_cache_item(current_epoch_key, self._fetch_current_epoch)
-        enable_epochs: Dict[str, int] = self._get_and_cache_item(enable_epochs_key, self._fetch_enable_epochs)
+        current_epoch: int = self.get_and_cache_item(current_epoch_key, self._fetch_current_epoch)
+        enable_epochs: Dict[str, int] = self.get_and_cache_item(enable_epochs_key, self._fetch_enable_epochs)
         enable_epoch = enable_epochs.get(flag_name, sys.maxsize)
         return enable_epoch >= current_epoch
 
@@ -96,45 +94,6 @@ class ActivationKnowledge:
         response.raise_for_status()
         enable_epochs = toml.loads(response.text).get("EnableEpochs", dict())
         return dict(enable_epochs)
-
-    def _get_and_cache_item(self, key: str, item_provider: Callable[[], Any]) -> Any:
-        if not self._has_item(key):
-            item = item_provider()
-            self._save_item(key, item)
-        item = self._get_cached_item(key)
-        return item
-
-    def _has_item(self, key: str):
-        cache = self._load_cache()
-        item = cache.get(key, None)
-        timestamp = cache.get(f"timestamp:{key}", 0)
-        age = abs(self._now() - timestamp)
-        expired = age > self.max_age
-        return True if item is not None and not expired else False
-
-    def _save_item(self, key: str, item: Any):
-        cache = self._load_cache()
-        cache[key] = item
-        cache[f"timestamp:{key}"] = self._now()
-        self._store_cache(cache)
-
-    def _get_cached_item(self, key: str):
-        return self._load_cache().get(key)
-
-    def _load_cache(self) -> Dict[str, Any]:
-        db_path = self._get_db_path()
-        if db_path.exists():
-            return utils.read_json_file(db_path)
-        return dict()
-
-    def _store_cache(self, cache: Any):
-        utils.write_json_file(str(self._get_db_path()), cache)
-
-    def _get_db_path(self) -> Path:
-        return workstation.get_tools_folder() / "projects.eei.ActivationKnowledge"
-
-    def _now(self):
-        return int(time.time())
 
 
 class EEIRegistry:
