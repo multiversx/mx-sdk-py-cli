@@ -78,11 +78,6 @@ class BuildError(KnownError):
         super().__init__(f"Build error: {message}.", inner)
 
 
-class BadSink(ProgrammingError):
-    def __init__(self, name: str):
-        super().__init__(f"Bad sink:\n {name}.")
-
-
 class UnknownArgumentFormat(KnownError):
     def __init__(self, argument: Any):
         super().__init__(f"Cannot handle non-hex, non-number arguments yet: {argument}.")

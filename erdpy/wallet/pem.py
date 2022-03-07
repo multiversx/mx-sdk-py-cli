@@ -67,7 +67,7 @@ def parse_validator_pem(pem_file: Path, index: int = 0):
     return secret_key_bytes, bls_key
 
 
-def read_bls_keys(lines):
+def read_bls_keys(lines) -> List[str]:
     bls_keys = []
 
     for line in lines:

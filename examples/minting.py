@@ -27,7 +27,7 @@ def main():
     parser.add_argument("--proxy", required=True)
     parser.add_argument("--accounts", required=True)
     parser.add_argument("--minter", help="minter address", required=True)
-    parser.add_argument("--value", help="value, as a number (atoms of EGLD)")
+    parser.add_argument("--value", type=int, help="value, as a number (atoms of EGLD)")
     args = parser.parse_args()
 
     proxy = ElrondProxy(args.proxy)
