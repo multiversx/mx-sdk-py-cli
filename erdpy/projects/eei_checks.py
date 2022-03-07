@@ -59,7 +59,7 @@ def _check_imports_compatibility(imports: List[str], activation_info: Activation
             not_active_maybe.append(function_name)
 
     if not_active:
-        logger.error(f"This project requires functionality not yet available on *{activation_info.network_name}*: {not_active}.")
+        logger.error(f"This project requires functionality not yet available on *{activation_info.network_name}*: {not_active}. Use --ignore-eei-checks to ignore this error.")
     if not_active_maybe:
         logger.warn(f"This project requires functionality that may not be available on *{activation_info.network_name}*: {not_active_maybe}.")
 
