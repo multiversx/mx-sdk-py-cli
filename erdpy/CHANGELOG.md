@@ -5,7 +5,7 @@ All notable changes will be documented in this file.
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
 ## [Unreleased]
- - TBD 
+ - [ Add (update) examples of using erdpy in Python scripts. Refactoring.](https://github.com/ElrondNetwork/elrond-sdk-erdpy/pull/120)
 
 ## [1.2.1] - 07.03.2022
  - [Bugfix: fix functions in EEI registry](https://github.com/ElrondNetwork/elrond-sdk-erdpy/pull/119)
