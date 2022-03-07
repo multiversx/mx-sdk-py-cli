@@ -132,7 +132,7 @@ class EEIRegistry:
             EEIFunction("getCurrentESDTNFTNonce", None, []),
             EEIFunction("writeLog", None, ["deprecated"]),
             EEIFunction("writeEventLog", None, []),
-            EEIFunction("returnData", None, []),
+            EEIFunction("finish", None, []),
             EEIFunction("signalError", None, []),
             EEIFunction("getGasLeft", None, []),
             EEIFunction("getESDTBalance", None, []),
