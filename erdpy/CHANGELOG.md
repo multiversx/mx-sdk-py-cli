@@ -8,7 +8,7 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
  - TBD 
 
 ## [1.2.1] - 07.03.2022
- - [Bugfix: include "finish()" in EEI registry](https://github.com/ElrondNetwork/elrond-sdk-erdpy/pull/119)
+ - [Bugfix: fix functions in EEI registry](https://github.com/ElrondNetwork/elrond-sdk-erdpy/pull/119)
  - [Bit of cleanup (remove deprecated files / functionality)](https://github.com/ElrondNetwork/elrond-sdk-erdpy/pull/113)
 
 ## [1.2.0] - 07.03.2022
