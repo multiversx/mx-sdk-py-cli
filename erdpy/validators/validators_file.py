@@ -6,8 +6,8 @@ from erdpy.errors import CannotReadValidatorsData
 
 
 class ValidatorsFile:
-    def __init__(self, validators_file_path: str):
-        self.validators_file_path = Path(validators_file_path)
+    def __init__(self, validators_file_path: Path):
+        self.validators_file_path = validators_file_path
         self._validators_data = self._read_json_file_validators()
 
     def get_num_of_nodes(self) -> int:

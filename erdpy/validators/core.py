@@ -29,7 +29,7 @@ def prepare_args_for_stake(args: Any):
     else:
         raise BadUsage("cannot initialize node operator")
 
-    validators_file_path = args.validators_file
+    validators_file_path = Path(args.validators_file)
     reward_address = Address(args.reward_address) if args.reward_address else None
 
     data, gas_limit = prepare_transaction_data_for_stake(node_operator.address, validators_file_path, reward_address)
@@ -40,7 +40,7 @@ def prepare_args_for_stake(args: Any):
         args.gas_limit = gas_limit
 
 
-def prepare_transaction_data_for_stake(node_operator_address: Address, validators_file_path: str, reward_address: Union[Address, None]) -> Tuple[str, int]:
+def prepare_transaction_data_for_stake(node_operator_address: Address, validators_file_path: Path, reward_address: Union[Address, None]) -> Tuple[str, int]:
     validators_file = ValidatorsFile(validators_file_path)
     num_of_nodes = validators_file.get_num_of_nodes()
     validators_list = validators_file.get_validators_list()

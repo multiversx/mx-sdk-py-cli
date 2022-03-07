@@ -1,4 +1,5 @@
 import binascii
+from pathlib import Path
 from typing import Any
 from os import path
 
@@ -26,7 +27,7 @@ def prepare_args_for_create_new_staking_contract(args: Any):
 
 
 def prepare_args_for_add_nodes(args: Any):
-    validators_file = ValidatorsFile(args.validators_file)
+    validators_file = ValidatorsFile(Path(args.validators_file))
 
     # TODO: Refactor, so that only address is received here.
     if args.using_delegation_manager:
