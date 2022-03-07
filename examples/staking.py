@@ -8,7 +8,7 @@ from erdpy.proxy.core import ElrondProxy
 from erdpy.transactions import Transaction
 from erdpy.validators.core import VALIDATORS_SMART_CONTRACT_ADDRESS, prepare_transaction_data_for_stake
 
-logger = logging.getLogger("staking")
+logger = logging.getLogger("examples")
 
 
 def main():
