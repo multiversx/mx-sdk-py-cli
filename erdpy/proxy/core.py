@@ -1,6 +1,6 @@
 import logging
 import time
-from typing import Any, List, Tuple, cast
+from typing import Any, List, Tuple, Union, cast
 
 from erdpy.accounts import Address
 from erdpy.interfaces import IAddress, IElrondProxy, ISimulateCostResponse, ISimulateResponse, ITransactionOnNetwork
@@ -67,7 +67,12 @@ class ElrondProxy(IElrondProxy):
         network_config = self.get_network_config()
         return network_config.num_shards
 
-    def get_last_block_nonce(self, shard_id):
+    def get_epoch(self):
+        status = self._get_network_status(METACHAIN_ID)
+        nonce = status.get("erd_epoch_number", 0)
+        return nonce
+
+    def get_last_block_nonce(self, shard_id: Union[str, int]):
         if shard_id == "metachain":
             metrics = self._get_network_status(METACHAIN_ID)
         else:
@@ -84,7 +89,7 @@ class ElrondProxy(IElrondProxy):
         network_config = self.get_network_config()
         return network_config.chain_id
 
-    def _get_network_status(self, shard_id):
+    def _get_network_status(self, shard_id: Union[str, int]):
         url = f"{self.url}/network/status/{shard_id}"
         response = do_get(url)
         payload = response.get("status")

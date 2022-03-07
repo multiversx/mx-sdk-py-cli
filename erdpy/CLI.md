@@ -30,7 +30,7 @@ TOP-LEVEL OPTIONS:
 ----------------------
 COMMAND GROUPS summary
 ----------------------
-contract                       Build, deploy and interact with Smart Contracts
+contract                       Build, deploy, upgrade and interact with Smart Contracts
 tx                             Create and broadcast Transactions
 validator                      Stake, UnStake, UnBond, Unjail and other actions useful for Validators
 account                        Get Account data (nonce, balance) from the Network
@@ -54,7 +54,7 @@ dns                            Operations related to the Domain Name Service
 $ erdpy contract --help
 usage: erdpy contract COMMAND [-h] ...
 
-Build, deploy and interact with Smart Contracts
+Build, deploy, upgrade and interact with Smart Contracts
 
 COMMANDS:
   {new,templates,build,clean,test,report,deploy,call,upgrade,query}
@@ -131,6 +131,8 @@ optional arguments:
                                        analysing the bytecode. Creates larger wasm files. Avoid in production (default:
                                        False)
   --wasm-name WASM_NAME                for rust projects, optionally specify the name of the wasm bytecode output file
+  --skip-eei-checks                    skip EEI compatibility checks (default: False)
+  --ignore-eei-checks                  ignore EEI compatibility errors (default: False)
 
 ```
 ### Contract.Clean
@@ -1216,7 +1218,7 @@ usage: erdpy deps install [-h] ...
 Install dependencies or elrond-sdk modules.
 
 positional arguments:
-  {all,llvm,clang,cpp,rust,nodejs,golang,vmtools,elrond_go,elrond_proxy_go,mcl_signer,wasm-opt,twiggy}
+  {all,llvm,clang,cpp,rust,nodejs,golang,wabt,vmtools,elrond_go,elrond_proxy_go,mcl_signer,wasm-opt,twiggy}
                                                   the dependency to install
 
 optional arguments:
@@ -1235,7 +1237,7 @@ usage: erdpy deps check [-h] ...
 Check whether a dependency is installed.
 
 positional arguments:
-  {all,llvm,clang,cpp,rust,nodejs,golang,vmtools,elrond_go,elrond_proxy_go,mcl_signer,wasm-opt,twiggy}
+  {all,llvm,clang,cpp,rust,nodejs,golang,wabt,vmtools,elrond_go,elrond_proxy_go,mcl_signer,wasm-opt,twiggy}
                                                   the dependency to check
 
 optional arguments:

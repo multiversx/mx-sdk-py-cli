@@ -138,11 +138,9 @@ def write_toml_file(filename, data):
         toml.dump(data, f)
 
 
-def read_json_file(filename: Union[str, Path]) -> Dict[str, Any]:
-    data: Dict[str, Any]
+def read_json_file(filename: Union[str, Path]) -> Any:
     with open(filename) as f:
-        data = json.load(f)
-    return data
+        return json.load(f)
 
 
 def write_json_file(filename: str, data: Any):
