@@ -7,6 +7,9 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 ## [Unreleased]
  - TBD 
 
+## [1.2.0] - 07.03.2022
+ - [On contract builld, reveal imported functions and check compatibility](https://github.com/ElrondNetwork/elrond-sdk-erdpy/pull/111)
+
 ## [1.1.0] - 01.03.2022
  - [Add reports: contract sizes and twiggy symbol checks](https://github.com/ElrondNetwork/elrond-sdk-erdpy/pull/106)
  - [Add `--recursive` option on contract build](https://github.com/ElrondNetwork/elrond-sdk-erdpy/pull/104)
