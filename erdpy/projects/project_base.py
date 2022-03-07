@@ -42,7 +42,7 @@ class Project(IProject):
             dependencies.install_module(module_key)
 
     def get_core_dependencies(self) -> List[str]:
-        return ["wabt", "wasm-opt"]
+        return ["wabt"]
 
     def get_dependencies(self) -> List[str]:
         raise NotImplementedError()
