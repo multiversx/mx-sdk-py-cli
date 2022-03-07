@@ -5,14 +5,14 @@ from typing import Dict, List
 from erdpy import config, errors
 from erdpy.dependencies.modules import (CargoModule, NpmModule, VMToolsModule, DependencyModule,
                                         GolangModule, MclSignerModule,
-                                        NodejsModule, Rust, StandaloneModule)
+                                        NodejsModule, Rust, StandaloneModule, WabtModule)
 
 logger = logging.getLogger("install")
 
 
 def install_module(key: str, tag: str = "", overwrite: bool = False):
     if key == 'all':
-        modules = get_all_deps_installable_via_cli()
+        modules = _get_all_deps_installable_via_cli()
     else:
         modules = [get_module_by_key(key)]
 
@@ -28,7 +28,7 @@ def get_module_directory(key: str) -> Path:
 
 
 def get_module_by_key(key: str) -> DependencyModule:
-    matches = [module for module in get_all_deps() if module.key == key or key in module.aliases]
+    matches = [module for module in _get_all_deps() if module.key == key or key in module.aliases]
     if len(matches) != 1:
         raise errors.UnknownDependency(key)
 
@@ -36,28 +36,31 @@ def get_module_by_key(key: str) -> DependencyModule:
 
 
 def get_deps_dict() -> Dict[str, DependencyModule]:
-    deps = dict()
-    for module in get_all_deps():
+    deps: Dict[str, DependencyModule] = dict()
+
+    for module in _get_all_deps():
         deps[module.key] = module
         for alias in module.aliases:
             deps[alias] = module
+
     return deps
 
 
-def get_all_deps() -> List[DependencyModule]:
-    return get_all_implicit_deps() + get_all_deps_installable_via_cli()
+def _get_all_deps() -> List[DependencyModule]:
+    return _get_all_implicit_deps() + _get_all_deps_installable_via_cli()
 
 
-def get_all_implicit_deps() -> List[DependencyModule]:
+def _get_all_implicit_deps() -> List[DependencyModule]:
     return [
         StandaloneModule(key="llvm", aliases=["clang", "cpp"]),
         Rust(key="rust"),
         NodejsModule(key="nodejs", aliases=[]),
         GolangModule(key="golang"),
+        WabtModule(key="wabt", aliases=[])
     ]
 
 
-def get_all_deps_installable_via_cli() -> List[DependencyModule]:
+def _get_all_deps_installable_via_cli() -> List[DependencyModule]:
     return [
         VMToolsModule(key="vmtools"),
         StandaloneModule(key="elrond_go", repo_name="elrond-go", organisation="ElrondNetwork"),
@@ -66,7 +69,6 @@ def get_all_deps_installable_via_cli() -> List[DependencyModule]:
         NpmModule(key="wasm-opt"),
         CargoModule(key="twiggy"),
     ]
-
 
 
 def get_golang() -> GolangModule:
