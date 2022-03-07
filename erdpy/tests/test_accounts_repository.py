@@ -4,6 +4,7 @@ from erdpy.accounts_repository import AccountsRepository
 from erdpy.interfaces import IAddress, IElrondProxy
 
 TESTNET_USERS_FOLDER = Path(__file__).parent.parent.joinpath("testnet/wallets/users")
+DUMMY_NONCE = 42
 
 
 def test_create_from_folder():
@@ -45,9 +46,9 @@ def test_sync_nonces():
     repository.sync_nonces(proxy)
 
     for account in repository.get_all():
-        assert account.nonce == 42
+        assert account.nonce == DUMMY_NONCE
 
 
 class ElrondProxyStub(IElrondProxy):
     def get_account_nonce(self, address: IAddress) -> int:
-        return 42
+        return DUMMY_NONCE
