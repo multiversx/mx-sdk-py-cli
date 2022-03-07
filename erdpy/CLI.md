@@ -20,7 +20,7 @@ https://docs.elrond.com/sdk-and-tools/erdpy/erdpy.
         
 
 COMMAND GROUPS:
-  {contract,tx,validator,account,ledger,wallet,network,dispatcher,blockatlas,deps,config,hyperblock,testnet,data,staking-provider,dns}
+  {contract,tx,validator,account,ledger,wallet,network,blockatlas,deps,config,hyperblock,testnet,data,staking-provider,dns}
 
 TOP-LEVEL OPTIONS:
   -h, --help            show this help message and exit
@@ -37,7 +37,6 @@ account                        Get Account data (nonce, balance) from the Networ
 ledger                         Get Ledger App addresses and version
 wallet                         Create wallet, derive secret key from mnemonic, bech32 address helpers etc.
 network                        Get Network parameters, such as number of shards, chain identifier etc.
-dispatcher                     Enqueue transactions, then bulk dispatch them
 blockatlas                     Interact with an Block Atlas instance
 deps                           Manage dependencies or elrond-sdk modules
 config                         Configure elrond-sdk (default values etc.)
@@ -1118,110 +1117,6 @@ Get the chain identifier.
 optional arguments:
   -h, --help     show this help message and exit
   --proxy PROXY  🔗 the URL of the proxy (default: https://testnet-gateway.elrond.com)
-
-```
-## Group **Dispatcher**
-
-
-```
-$ erdpy dispatcher --help
-usage: erdpy dispatcher COMMAND [-h] ...
-
-Enqueue transactions, then bulk dispatch them
-
-COMMANDS:
-  {enqueue,dispatch,dispatch-continuously,clean}
-
-OPTIONS:
-  -h, --help            show this help message and exit
-
-----------------
-COMMANDS summary
-----------------
-enqueue                        Enqueue a transaction
-dispatch                       Dispatch queued transactions
-dispatch-continuously          Continuously dispatch queued transactions
-clean                          Clear queue of transactions
-
-```
-### Dispatcher.Enqueue
-
-
-```
-$ erdpy dispatcher enqueue --help
-usage: erdpy dispatcher enqueue [-h] ...
-
-Enqueue a transaction
-
-optional arguments:
-  -h, --help                             show this help message and exit
-  --receiver RECEIVER                    🖄 the address of the receiver
-  --receiver-username RECEIVER_USERNAME  🖄 the username of the receiver
-  --gas-price GAS_PRICE                  ⛽ the gas price (default: 1000000000)
-  --gas-limit GAS_LIMIT                  ⛽ the gas limit
-  --value VALUE                          the value to transfer (default: 0)
-  --data DATA                            the payload, or 'memo' of the transaction (default: )
-  --chain CHAIN                          the chain identifier (default: T)
-  --version VERSION                      the transaction version (default: 1)
-  --options OPTIONS                      the transaction options (default: 0)
-
-```
-### Dispatcher.Dispatch
-
-
-```
-$ erdpy dispatcher dispatch --help
-usage: erdpy dispatcher dispatch [-h] ...
-
-Dispatch queued transactions
-
-optional arguments:
-  -h, --help                                   show this help message and exit
-  --proxy PROXY                                🔗 the URL of the proxy (default: https://testnet-gateway.elrond.com)
-  --pem PEM                                    🔑 the PEM file, if keyfile not provided
-  --pem-index PEM_INDEX                        🔑 the index in the PEM file (default: 0)
-  --keyfile KEYFILE                            🔑 a JSON keyfile, if PEM not provided
-  --passfile PASSFILE                          🔑 a file containing keyfile's password, if keyfile provided
-  --ledger                                     🔐 bool flag for signing transaction using ledger
-  --ledger-account-index LEDGER_ACCOUNT_INDEX  🔐 the index of the account when using Ledger
-  --ledger-address-index LEDGER_ADDRESS_INDEX  🔐 the index of the address when using Ledger
-  --sender-username SENDER_USERNAME            🖄 the username of the sender
-
-```
-### Dispatcher.DispatchContinuously
-
-
-```
-$ erdpy dispatcher dispatch-continuously --help
-usage: erdpy dispatcher dispatch-continuously [-h] ...
-
-Continuously dispatch queued transactions
-
-optional arguments:
-  -h, --help                                   show this help message and exit
-  --proxy PROXY                                🔗 the URL of the proxy (default: https://testnet-gateway.elrond.com)
-  --pem PEM                                    🔑 the PEM file, if keyfile not provided
-  --pem-index PEM_INDEX                        🔑 the index in the PEM file (default: 0)
-  --keyfile KEYFILE                            🔑 a JSON keyfile, if PEM not provided
-  --passfile PASSFILE                          🔑 a file containing keyfile's password, if keyfile provided
-  --ledger                                     🔐 bool flag for signing transaction using ledger
-  --ledger-account-index LEDGER_ACCOUNT_INDEX  🔐 the index of the account when using Ledger
-  --ledger-address-index LEDGER_ADDRESS_INDEX  🔐 the index of the address when using Ledger
-  --sender-username SENDER_USERNAME            🖄 the username of the sender
-  --interval INTERVAL                          the interval to retrieve transactions from the queue, in seconds
-
-```
-### Dispatcher.Clean
-
-
-```
-$ erdpy dispatcher clean --help
-usage: erdpy dispatcher clean [-h] ...
-
-Clear queue of transactions
-
-optional arguments:
-  -h, --help  show this help message and exit
 
 ```
 ## Group **BlockAtlas**
