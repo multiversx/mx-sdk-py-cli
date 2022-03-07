@@ -16,3 +16,6 @@ class ProjectSol(Project):
 
     def get_dependencies(self) -> List[str]:
         return []
+
+    def _do_after_build_custom(self) -> List[Path]:
+        raise NotImplementedError()

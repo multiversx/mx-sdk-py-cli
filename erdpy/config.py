@@ -194,7 +194,8 @@ def resolve_config_path() -> str:
 def read_file() -> Dict[str, Any]:
     config_path = resolve_config_path()
     if os.path.isfile(config_path):
-        return utils.read_json_file(config_path)
+        data: Dict[str, Any] = utils.read_json_file(config_path)
+        return data
     return dict()
 
 
