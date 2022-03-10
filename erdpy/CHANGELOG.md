@@ -9,7 +9,7 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 ## [1.2.2]
  - [ Add (update) examples of using erdpy in Python scripts. Refactoring.](https://github.com/ElrondNetwork/elrond-sdk-erdpy/pull/120)
- - [Allow "str:" and "0x" as contract arguments, as well](...)
+ - [Allow "str:" and "0x" as contract arguments, as well](https://github.com/ElrondNetwork/elrond-sdk-erdpy/pull/121)
 
 ## [1.2.1] - 07.03.2022
  - [Bugfix: fix functions in EEI registry](https://github.com/ElrondNetwork/elrond-sdk-erdpy/pull/119)
