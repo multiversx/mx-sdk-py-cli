@@ -209,6 +209,10 @@ def _prepare_hexadecimal(argument: str) -> str:
     argument = argument[len(HEX_PREFIX):]
     argument = argument.upper()
     argument = ensure_even_length(argument)
+
+    if argument == "":
+        return ""
+
     try:
         _ = int(argument, 16)
     except ValueError:
