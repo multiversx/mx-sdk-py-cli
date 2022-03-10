@@ -56,3 +56,6 @@ def test_prepare_argument():
 
     with pytest.raises(errors.UnknownArgumentFormat):
         _ = _prepare_argument('0x05fq')
+
+    assert _prepare_argument("str:") == ""
+    assert _prepare_argument("0x") == ""
