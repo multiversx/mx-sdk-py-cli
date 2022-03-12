@@ -8,10 +8,10 @@ class EEIRegistry:
     def __init__(self, activation_info: ActivationEpochsInfo) -> None:
         self.activation_info = activation_info
         
-        useDifferentGasCostForReadingCachedStorageEpoch = FeatureFlag("UseDifferentGasCostForReadingCachedStorageEpoch")
+        storageAPICostOptimizationEnableEpoch = FeatureFlag("StorageAPICostOptimizationEnableEpoch")
 
         self.flags = [
-            useDifferentGasCostForReadingCachedStorageEpoch
+            storageAPICostOptimizationEnableEpoch
         ]
 
         self.functions: List[EEIFunction] = [
@@ -81,7 +81,7 @@ class EEIRegistry:
             EEIFunction("mBufferCopyByteSlice", None, []),
             EEIFunction("mBufferEq", None, []),
             EEIFunction("mBufferSetBytes", None, []),
-            EEIFunction("mBufferSetByteSlice", useDifferentGasCostForReadingCachedStorageEpoch, []),
+            EEIFunction("mBufferSetByteSlice", storageAPICostOptimizationEnableEpoch, []),
             EEIFunction("mBufferAppend", None, []),
             EEIFunction("mBufferAppendBytes", None, []),
             EEIFunction("mBufferToBigIntUnsigned", None, []),
@@ -90,7 +90,7 @@ class EEIRegistry:
             EEIFunction("mBufferFromBigIntSigned", None, []),
             EEIFunction("mBufferStorageStore", None, []),
             EEIFunction("mBufferStorageLoad", None, []),
-            EEIFunction("mBufferStorageLoadFromAddress", useDifferentGasCostForReadingCachedStorageEpoch, []),
+            EEIFunction("mBufferStorageLoadFromAddress", storageAPICostOptimizationEnableEpoch, []),
             EEIFunction("mBufferGetArgument", None, []),
             EEIFunction("mBufferFinish", None, []),
             EEIFunction("mBufferSetRandom", None, []),
@@ -140,8 +140,8 @@ class EEIRegistry:
             EEIFunction("getESDTNFTAttributeLength", None, []),
             EEIFunction("getESDTNFTURILength", None, []),
             EEIFunction("getESDTTokenData", None, []),
-            EEIFunction("getESDTLocalRoles", useDifferentGasCostForReadingCachedStorageEpoch, []),
-            EEIFunction("validateTokenIdentifier", useDifferentGasCostForReadingCachedStorageEpoch, []),
+            EEIFunction("getESDTLocalRoles", storageAPICostOptimizationEnableEpoch, []),
+            EEIFunction("validateTokenIdentifier", storageAPICostOptimizationEnableEpoch, []),
             EEIFunction("executeOnDestContext", None, []),
             EEIFunction("executeOnDestContextByCaller", None, []),
             EEIFunction("executeOnSameContext", None, []),
@@ -154,8 +154,8 @@ class EEIRegistry:
             EEIFunction("getNumReturnData", None, []),
             EEIFunction("getReturnDataSize", None, []),
             EEIFunction("getReturnData", None, []),
-            EEIFunction("cleanReturnData", useDifferentGasCostForReadingCachedStorageEpoch, []),
-            EEIFunction("deleteFromReturnData", useDifferentGasCostForReadingCachedStorageEpoch, []),
+            EEIFunction("cleanReturnData", storageAPICostOptimizationEnableEpoch, []),
+            EEIFunction("deleteFromReturnData", storageAPICostOptimizationEnableEpoch, []),
             EEIFunction("setStorageLock", None, []),
             EEIFunction("getStorageLock", None, []),
             EEIFunction("isStorageLocked", None, []),
@@ -201,9 +201,9 @@ class EEIRegistry:
 
             # crypto
             EEIFunction("sha256", None, []),
-            EEIFunction("managedSha256", useDifferentGasCostForReadingCachedStorageEpoch, []),
+            EEIFunction("managedSha256", storageAPICostOptimizationEnableEpoch, []),
             EEIFunction("keccak256", None, []),
-            EEIFunction("managedKeccak256", useDifferentGasCostForReadingCachedStorageEpoch, []),
+            EEIFunction("managedKeccak256", storageAPICostOptimizationEnableEpoch, []),
             EEIFunction("ripemd160", None, []),
             EEIFunction("verifyBLS", None, []),
             EEIFunction("verifyEd25519", None, []),
