@@ -24,7 +24,7 @@ class ActivationEpochsInfo(DiskCache):
         current_epoch = self.get_and_cache_item(current_epoch_key, self._fetch_current_epoch)
         enable_epochs = self.get_and_cache_item(enable_epochs_key, self._fetch_enable_epochs)
         enable_epoch = enable_epochs.get(flag_name, sys.maxsize)
-        return enable_epoch >= current_epoch
+        return current_epoch >= enable_epoch
 
     def _fetch_current_epoch(self):
         logger.info(f"fetch_current_epoch: {self.proxy_url}")
