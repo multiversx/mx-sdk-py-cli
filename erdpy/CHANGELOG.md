@@ -5,7 +5,11 @@ All notable changes will be documented in this file.
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
 ## [Unreleased]
+ - TBD
+
+## [1.2.3]
  - [Fix activation flag check, fix flag name](https://github.com/ElrondNetwork/elrond-sdk-erdpy/pull/123)
+ - [Fix reference to libwasmer (referenced by mandos-test)](https://github.com/ElrondNetwork/elrond-sdk-erdpy/pull/124)
 
 ## [1.2.2]
  - [Add (update) examples of using erdpy in Python scripts. Refactoring.](https://github.com/ElrondNetwork/elrond-sdk-erdpy/pull/120)
