@@ -3,10 +3,12 @@
 source "./shared.sh"
 
 testTrivialCommands() {
+    echo "testTrivialCommands"
     ${ERDPY} contract templates
 }
 
 testCreateContracts() {
+    echo "testCreateContracts"
     ${ERDPY} contract new --template ultimate-answer --directory ${SANDBOX} myanswer-c || return 1
     ${ERDPY} contract new --template simple-counter --directory ${SANDBOX} mycounter-c || return 1
     ${ERDPY} contract new --template erc20-c --directory ${SANDBOX} myerc20-c || return 1
@@ -20,6 +22,7 @@ testCreateContracts() {
 }
 
 testBuildContracts() {
+    echo "testBuildContracts"
     ${ERDPY} contract build ${SANDBOX}/myanswer-c || return 1
     assertFileExists ${SANDBOX}/myanswer-c/output/answer.wasm || return 1
 
@@ -55,6 +58,7 @@ testBuildContracts() {
 }
 
 testRunMandos() {
+    echo "testRunMandos"
     ${ERDPY} --verbose contract test --directory="mandos" ${SANDBOX}/myadder-rs || return 1
     ${ERDPY} --verbose contract test --directory="mandos" ${SANDBOX}/mybubbles-rs || return 1
     ${ERDPY} --verbose contract test --directory="mandos" ${SANDBOX}/mylottery-rs || return 1
@@ -62,6 +66,7 @@ testRunMandos() {
 }
 
 testWasmName() {
+    echo "testWasmName"
     ${ERDPY} contract clean ${SANDBOX}/myanswer-c || return 1
     assertFileDoesNotExist ${SANDBOX}/myanswer-c/output/answer-2.wasm || return 1
     ${ERDPY} contract build ${SANDBOX}/myanswer-c --wasm-name answer-2 || return 1
@@ -75,6 +80,7 @@ testWasmName() {
 }
 
 testCleanContracts() {
+    echo "testCleanContracts"
     assertFileExists ${SANDBOX}/myanswer-c/output/answer.wasm || return 1
     ${ERDPY} contract clean ${SANDBOX}/myanswer-c || return 1
     assertFileDoesNotExist ${SANDBOX}/myanswer-c/output/answer.wasm || return 1

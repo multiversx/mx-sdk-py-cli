@@ -159,17 +159,17 @@ class VMToolsModule(StandaloneModule):
         self.make_binary_symlink_in_parent_folder(tag, 'test', 'mandos-test')
         self.copy_libwasmer_in_parent_directory(tag)
 
-    def build_binary(self, tag, binary_name):
+    def build_binary(self, tag: str, binary_name: str):
         source_folder = self.binary_source_folder(tag, binary_name)
         golang = dependencies.get_module_by_key("golang")
         golang_env = golang.get_env()
         myprocess.run_process(['go', 'build'], cwd=source_folder, env=golang_env)
 
-    def binary_source_folder(self, tag, binary_name):
+    def binary_source_folder(self, tag: str, binary_name: str):
         directory = self.get_source_directory(tag)
         return directory / 'cmd' / binary_name
 
-    def make_binary_symlink_in_parent_folder(self, tag, binary_name, symlink_name):
+    def make_binary_symlink_in_parent_folder(self, tag: str, binary_name: str, symlink_name: str):
         source_folder = self.binary_source_folder(tag, binary_name)
         binary = source_folder / binary_name
 
@@ -179,16 +179,19 @@ class VMToolsModule(StandaloneModule):
         symlink.unlink(missing_ok=True)
         symlink.symlink_to(binary)
 
-    def copy_libwasmer_in_parent_directory(self, tag):
+    def copy_libwasmer_in_parent_directory(self, tag: str):
         libwasmer_directory = self.get_source_directory(tag) / 'wasmer'
+        cmd_test_directory = self.get_source_directory(tag) / 'cmd' / 'test'
         parent_directory = self.get_parent_directory()
         for f in libwasmer_directory.iterdir():
             if f.suffix in ['.dylib', '.so', '.dll']:
+                # Copy the dynamic library near the "mandos-test" symlink
                 shutil.copy(f, parent_directory)
+                # Though, also copy the dynamic library near the target executable (seems to be necessary on MacOS)
+                shutil.copy(f, cmd_test_directory)
 
-    def get_env(self):
-        return {
-        }
+    def get_env(self) -> Dict[str, str]:
+        return dict()
 
 
 class GolangModule(StandaloneModule):
