@@ -261,7 +261,7 @@ class CargoFile:
         dev_dependencies = cast(Dict[str, Any], self.data['dev-dependencies'])
         return dev_dependencies
 
-    def get_dependency(self, name) -> Dict[str, Any]:
+    def get_dependency(self, name: str) -> Dict[str, Any]:
         dependencies = self.get_dependencies()
         dependency = cast(Dict[str, Any], dependencies.get(name))
         if dependency is None:

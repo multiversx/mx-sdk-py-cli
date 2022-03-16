@@ -20,7 +20,7 @@ class AccountsRepository:
         """
         Creates an AccountsRepository using a folder containing *.pem files.
         """
-        files = [Path(file) for file in utils.list_files(folder, suffix=".pem")]
+        files = utils.list_files(folder, suffix=".pem")
         return cls.create_from_files(files)
 
     @classmethod

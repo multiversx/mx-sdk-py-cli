@@ -74,11 +74,11 @@ def _get_observers_folder():
 
 
 def get_users() -> Dict[str, Account]:
-    result = OrderedDict()
+    result: Dict[str, Account] = OrderedDict()
 
     for pem_file in sorted(utils.list_files(_get_users_folder(), ".pem")):
         nickname = Path(pem_file).stem
-        account = Account(pem_file=pem_file)
+        account = Account(pem_file=str(pem_file))
         result[nickname] = account
 
     return result
