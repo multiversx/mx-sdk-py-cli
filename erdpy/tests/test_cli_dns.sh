@@ -109,3 +109,8 @@ testTransactionsWithUsernamesOffline() {
         --outfile=${SANDBOX}/txG.txt || return 1
     assertFileExists ${SANDBOX}/txG.txt || return 1
 }
+
+testAll() {
+    testOnline || return 1
+    testOffline || return 1
+}

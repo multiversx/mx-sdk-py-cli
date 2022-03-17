@@ -55,6 +55,9 @@ jobs:
         export PYTHONPATH=.
         python3 -m erdpy.cli config new test
         python3 -m erdpy.cli config set github_api_token ${{ secrets.GITHUB_TOKEN }}
+    - name: Setup test dependencies
+      run: |
+        python3 -m erdpy.cli deps install testwallets
     - name: Run unit tests
       run: |
         export PYTHONPATH=.

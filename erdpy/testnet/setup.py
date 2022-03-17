@@ -71,7 +71,6 @@ def configure(args: Any):
 
     patch_source_code(testnet_config)
     build_binaries(testnet_config)
-    copy_wallets(testnet_config)
 
 
 def clean(args):
@@ -276,7 +275,3 @@ def _get_wasm_vm_version(testnet_config: TestnetConfiguration):
     line = next(line for line in lines if "github.com/ElrondNetwork/arwen-wasm-vm" in line)
     parts = line.split()
     return parts[1]
-
-
-def copy_wallets(testnet_config: TestnetConfiguration):
-    wallets.copy_all_to(testnet_config.root() / "wallets")
