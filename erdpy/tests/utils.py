@@ -4,13 +4,14 @@ from pathlib import Path
 from erdpy import projects, utils
 from erdpy.accounts import Account
 from erdpy.contracts import SmartContract
+from erdpy.workstation import get_tools_folder
 
 
 class MyTestCase(unittest.TestCase):
     def setUp(self):
         self.testdata = Path(__file__).parent.joinpath("testdata")
         self.testdata_out = Path(__file__).parent.joinpath("testdata-out")
-        self.devnet_wallets = Path("~/elrondsdk/testwallets/latest").expanduser()
+        self.devnet_wallets = get_tools_folder() / "testwallets" /"latest"
 
         utils.ensure_folder(self.testdata_out)
 

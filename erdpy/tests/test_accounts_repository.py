@@ -1,9 +1,9 @@
-from pathlib import Path
 from erdpy.accounts import Address
 from erdpy.accounts_repository import AccountsRepository
 from erdpy.interfaces import IAddress, IElrondProxy
+from erdpy.workstation import get_tools_folder
 
-TESTNET_USERS_FOLDER = Path("~/elrondsdk/testwallets/latest/users").expanduser()
+TESTNET_USERS_FOLDER = get_tools_folder() / "testwallets" / "latest" / "users"
 DUMMY_NONCE = 42
 
 
