@@ -183,10 +183,11 @@ def find_in_dictionary(dictionary, compound_path):
 
 
 def list_files(folder: Path, suffix: Optional[str] = None) -> List[Path]:
-    files: List[Path] = [folder / f for f in os.listdir(folder)]
+    files: List[Path] = [folder / file for file in os.listdir(folder)]
+    files = [file for file in files if file.is_file()]
 
     if suffix:
-        files = [e for e in files if str(e).lower().endswith(suffix.lower())]
+        files = [file for file in files if str(file).lower().endswith(suffix.lower())]
 
     return files
 
