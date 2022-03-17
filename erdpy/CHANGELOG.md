@@ -5,7 +5,7 @@ All notable changes will be documented in this file.
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
 ## [Unreleased]
- - TBD
+ - [Prepare integration with erdjs-snippets (from templates)](https://github.com/ElrondNetwork/elrond-sdk-erdpy/pull/126)
 
 ## [1.2.3]
  - [Fix activation flag check, fix flag name](https://github.com/ElrondNetwork/elrond-sdk-erdpy/pull/123)

@@ -182,12 +182,11 @@ def find_in_dictionary(dictionary, compound_path):
     return node
 
 
-def list_files(folder: Union[str, Path], suffix: Optional[str] = None) -> List[str]:
-    files = os.listdir(folder)
-    files = [os.path.join(folder, f) for f in files]
+def list_files(folder: Path, suffix: Optional[str] = None) -> List[Path]:
+    files: List[Path] = [folder / f for f in os.listdir(folder)]
 
     if suffix:
-        files = [e for e in files if e.lower().endswith(suffix.lower())]
+        files = [e for e in files if str(e).lower().endswith(suffix.lower())]
 
     return files
 
