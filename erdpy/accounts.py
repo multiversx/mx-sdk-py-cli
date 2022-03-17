@@ -91,7 +91,7 @@ class Address(IAddress):
     BECH32_LENGTH = 62
     _value_hex: str
 
-    def __init__(self, value):
+    def __init__(self, value: Any):
         self._value_hex = ''
 
         if not value:
@@ -136,6 +136,14 @@ class Address(IAddress):
 
     def __repr__(self):
         return self.bech32()
+    
+    def __eq__(self, other: Any):
+        if isinstance(other, Address):
+            return self._value_hex == other._value_hex
+        return NotImplemented
+
+    def __hash__(self):
+        return hash(self._value_hex)
 
     @classmethod
     def zero(cls) -> 'Address':
