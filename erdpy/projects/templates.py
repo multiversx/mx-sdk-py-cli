@@ -14,6 +14,7 @@ from erdpy.projects.templates_repository import TemplatesRepository
 from erdpy.testnet import wallets
 
 logger = logging.getLogger("projects.templates")
+ERDJS_SNIPPETS_FOLDER_NAME = "erdjs-snippets"
 
 
 def list_project_templates():
@@ -82,11 +83,15 @@ def _copy_template(template: str, destination_path: Path, project_name: str):
 
 
 def _copy_erdjs_snippets(template: str,  templates_payload_folder: Path, destination_path: Path, project_name: str):
-    source_erdjs_snippets_folder = templates_payload_folder / "erdjs-snippets"
+    source_erdjs_snippets_folder = templates_payload_folder / ERDJS_SNIPPETS_FOLDER_NAME
     source_erdjs_snippets_subfolder = source_erdjs_snippets_folder / template
-    destination_erdjs_snippets_folder = destination_path.parent / "erdjs-snippets"
+    destination_erdjs_snippets_folder = destination_path.parent / ERDJS_SNIPPETS_FOLDER_NAME
+    no_snippets = not source_erdjs_snippets_subfolder.is_dir()
 
-    if not source_erdjs_snippets_subfolder.is_dir():
+    logger.info(f"_copy_erdjs_snippets, source_erdjs_snippets_subfolder: {source_erdjs_snippets_subfolder}")
+    logger.info(f"_copy_erdjs_snippets, destination_erdjs_snippets_folder: {destination_erdjs_snippets_folder}")
+
+    if no_snippets:
         logger.info(f"_copy_erdjs_snippets: no snippets in template {template}")
         return
 
@@ -94,16 +99,16 @@ def _copy_erdjs_snippets(template: str,  templates_payload_folder: Path, destina
 
     # Copy snippets to destination
     # First, copy the subfolder associated with the template
-    logger.info(f"_copy_erdjs_snippets, source_erdjs_snippets_subfolder: {source_erdjs_snippets_subfolder}")
-    logger.info(f"_copy_erdjs_snippets, destination_erdjs_snippets_folder: {destination_erdjs_snippets_folder}")
     shutil.copytree(source_erdjs_snippets_subfolder, destination_erdjs_snippets_folder / project_name)
 
-    # After that, copy the remaining files from the source folder (not recursively)
+    # After that, copy the remaining files from the source folder - not recursively (on purpose).
     for file in os.listdir(source_erdjs_snippets_folder):
         source_file = source_erdjs_snippets_folder / file
         destination_file = destination_erdjs_snippets_folder / file
-        if source_file.is_file() and not destination_file.exists():
-            logger.info(f"_copy_erdjs_snippets, source file: {source_file}")
+        should_copy = source_file.is_file() and not destination_file.exists()
+
+        if should_copy:
+            logger.info(f"_copy_erdjs_snippets, file: {file}")
             shutil.copy(source_file, destination_file)
 
 
