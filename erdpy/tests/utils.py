@@ -10,7 +10,7 @@ class MyTestCase(unittest.TestCase):
     def setUp(self):
         self.testdata = Path(__file__).parent.joinpath("testdata")
         self.testdata_out = Path(__file__).parent.joinpath("testdata-out")
-        self.devnet_wallets = Path(__file__).parent.parent.joinpath("testnet", "wallets")
+        self.devnet_wallets = Path("~/elrondsdk/testwallets/latest").expanduser()
 
         utils.ensure_folder(self.testdata_out)
 

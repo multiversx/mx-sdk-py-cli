@@ -3,7 +3,7 @@ from erdpy.accounts import Address
 from erdpy.accounts_repository import AccountsRepository
 from erdpy.interfaces import IAddress, IElrondProxy
 
-TESTNET_USERS_FOLDER = Path(__file__).parent.parent.joinpath("testnet/wallets/users")
+TESTNET_USERS_FOLDER = Path("~/elrondsdk/testwallets/latest/users").expanduser()
 DUMMY_NONCE = 42
 
 

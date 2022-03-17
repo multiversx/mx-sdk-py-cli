@@ -180,6 +180,9 @@ def get_defaults() -> Dict[str, Any]:
         "dependencies.wabt.tag": "1.0.27",
         "dependencies.wabt.urlTemplate.linux": "https://github.com/WebAssembly/wabt/releases/download/{TAG}/wabt-{TAG}-ubuntu.tar.gz",
         "dependencies.wabt.urlTemplate.osx": "https://github.com/WebAssembly/wabt/releases/download/{TAG}/wabt-{TAG}-macos.tar.gz",
+        "dependencies.testwallets.tag": "latest",
+        "dependencies.testwallets.urlTemplate.linux": "https://github.com/ElrondNetwork/elrond-sdk-testwallets/archive/{TAG}.tar.gz",
+        "dependencies.testwallets.urlTemplate.osx": "https://github.com/ElrondNetwork/elrond-sdk-testwallets/archive/{TAG}.tar.gz",
         "testnet.validate_expected_keys": "false",
         "github_api_token": "",
     }
