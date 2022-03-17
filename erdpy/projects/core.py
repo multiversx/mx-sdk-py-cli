@@ -40,8 +40,7 @@ def build_project(directory: Path, options: Dict[str, Any]):
     outputs = project.build(options)
     logger.info("Build ran.")
     for output_wasm_file in outputs:
-        relative_wasm_path = output_wasm_file.relative_to(Path.cwd())
-        logger.info(f"WASM file generated: {relative_wasm_path}")
+        logger.info(f"WASM file generated: {output_wasm_file}")
 
 
 def clean_project(directory: Path):
