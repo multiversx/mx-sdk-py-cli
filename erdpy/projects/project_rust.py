@@ -11,7 +11,7 @@ logger = logging.getLogger("ProjectRust")
 
 
 class ProjectRust(Project):
-    def __init__(self, directory):
+    def __init__(self, directory: Path):
         super().__init__(directory)
         self.cargo_file = self.get_cargo_file()
 
@@ -144,7 +144,7 @@ class ProjectRust(Project):
     def get_wasm_default_name(self, suffix: str = "") -> str:
         return f"{self.cargo_file.package_name}{suffix}.wasm"
 
-    def _do_after_build(self) -> List[Path]:
+    def _do_after_build_custom(self) -> List[Path]:
         if not self.has_meta():
             base_name = str(self.cargo_file.package_name)
             temporary_wasm_base_name = base_name.replace("-", "_")
@@ -166,6 +166,23 @@ class ProjectRust(Project):
 
     def get_env(self):
         return dependencies.get_module_by_key("rust").get_env()
+
+    def build_wasm_with_debug_symbols(self):
+        cwd = self.get_meta_folder()
+        env = self.get_env()
+
+        args = [
+            "cargo",
+            "run",
+            "build",
+            "--wasm-symbols",
+            "--wasm-suffix", "dbg",
+            "--no-wasm-opt"
+        ]
+        
+        return_code = myprocess.run_process_async(args, env=env, cwd=str(cwd))
+        if return_code != 0:
+            raise errors.BuildError(f"error code = {return_code}, see output")
 
 
 class CargoFile:

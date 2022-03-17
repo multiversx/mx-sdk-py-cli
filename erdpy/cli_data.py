@@ -94,13 +94,14 @@ def _read_file(use_global: bool) -> Dict[str, Any]:
 
     if not os.path.isfile(filename):
         return dict()
-    return utils.read_json_file(filename)
+    data: Dict[str, Any] = utils.read_json_file(filename)
+    return data
 
 
 def _write_file(use_global: bool, data: Dict[str, Any]):
     filename = _get_filename(use_global)
 
-    utils.write_json_file(filename, data)
+    utils.write_json_file(str(filename), data)
 
 
 def _get_filename(use_global: bool):

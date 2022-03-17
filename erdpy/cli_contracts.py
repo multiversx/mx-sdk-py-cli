@@ -17,7 +17,7 @@ logger = logging.getLogger("cli.contracts")
 
 
 def setup_parser(args: List[str], subparsers: Any) -> Any:
-    parser = cli_shared.add_group_subparser(subparsers, "contract", "Build, deploy and interact with Smart Contracts")
+    parser = cli_shared.add_group_subparser(subparsers, "contract", "Build, deploy, upgrade and interact with Smart Contracts")
     subparsers = parser.add_subparsers()
 
     sub = cli_shared.add_command_subparser(subparsers, "contract", "new",
@@ -46,6 +46,8 @@ def setup_parser(args: List[str], subparsers: Any) -> Any:
                      help="for rust projects, does not strip the symbols from the wasm output. Useful for analysing the bytecode. Creates larger wasm files. Avoid in production (default: %(default)s)")
     sub.add_argument("--wasm-name", type=str,
                      help="for rust projects, optionally specify the name of the wasm bytecode output file")
+    sub.add_argument("--skip-eei-checks", action="store_true", default=False, help="skip EEI compatibility checks (default: %(default)s)")
+    sub.add_argument("--ignore-eei-checks", action="store_true", default=False, help="ignore EEI compatibility errors (default: %(default)s)")
     sub.set_defaults(func=build)
 
     sub = cli_shared.add_command_subparser(subparsers, "contract", "clean", "Clean a Smart Contract project.")
@@ -59,6 +61,15 @@ def setup_parser(args: List[str], subparsers: Any) -> Any:
                      help="🗀 the directory containing the tests (default: %(default)s)")
     sub.add_argument("--wildcard", required=False, help="wildcard to match only specific test files")
     sub.set_defaults(func=run_tests)
+
+    sub = cli_shared.add_command_subparser(subparsers, "contract", "report", "Print a detailed report of the smart contracts.")
+    _add_project_arg(sub)
+    sub.add_argument("--skip-build", action="store_true", default=False, help="skips the step of building of the wasm contracts")
+    sub.add_argument("--skip-twiggy", action="store_true", default=False, help="skips the steps of building the debug wasm files and running twiggy")
+    sub.add_argument("--output-format", type=str, default="text-markdown", choices=["github-markdown", "text-markdown", "json"], help="report output format (default: %(default)s)")
+    sub.add_argument("--output-file", type=Path, help="if specified, the output is written to a file, otherwise it's written to the standard output")
+    sub.add_argument("--compare", type=Path, nargs='+', metavar=("report-1.json", "report-2.json"), help="create a comparison from two or more reports")
+    sub.set_defaults(func=projects.do_report)
 
     output_description = CLIOutputBuilder.describe(with_contract=True, with_transaction_on_network=True, with_simulation=True)
     sub = cli_shared.add_command_subparser(subparsers, "contract", "deploy", f"Deploy a Smart Contract.{output_description}")
@@ -151,7 +162,8 @@ def _add_function_arg(sub: Any):
 
 def _add_arguments_arg(sub: Any):
     sub.add_argument("--arguments", nargs='+',
-                     help="arguments for the contract transaction, as numbers or hex-encoded. E.g. --arguments 42 0x64 1000 0xabba")
+                     help="arguments for the contract transaction, as [number, bech32-address, ascii string, "
+                          "boolean] or hex-encoded. E.g. --arguments 42 0x64 1000 0xabba str:TOK-a1c2ef true erd1[..]")
 
 
 def _add_metadata_arg(sub: Any):
@@ -201,7 +213,9 @@ def build(args: Any):
         "verbose": args.verbose,
         "cargo_target_dir": args.cargo_target_dir,
         "wasm_symbols": args.wasm_symbols,
-        "wasm_name": args.wasm_name
+        "wasm_name": args.wasm_name,
+        "skip-eei-checks": args.skip_eei_checks,
+        "ignore-eei-checks": args.ignore_eei_checks
     }
 
     for project in project_paths:

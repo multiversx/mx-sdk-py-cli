@@ -63,6 +63,11 @@ class NotSupportedProject(KnownError):
         super().__init__(f"Directory is not a supported project: {directory}")
 
 
+class NotSupportedProjectFeature(KnownError):
+    def __init__(self):
+        super().__init__(f"Project feature not yet supported.")
+
+
 class PlatformNotSupported(KnownError):
     def __init__(self, action_or_item: str, platform: str):
         super().__init__(f"[{action_or_item}] is not supported on platform [{platform}].")
@@ -71,11 +76,6 @@ class PlatformNotSupported(KnownError):
 class BuildError(KnownError):
     def __init__(self, message, inner=None):
         super().__init__(f"Build error: {message}.", inner)
-
-
-class BadSink(ProgrammingError):
-    def __init__(self, name: str):
-        super().__init__(f"Bad sink:\n {name}.")
 
 
 class UnknownArgumentFormat(KnownError):

@@ -5,46 +5,16 @@ from typing import Any, Optional
 
 import nacl.signing
 
-from erdpy import constants, errors, utils
+from erdpy import constants, errors
 from erdpy.interfaces import IAccount, IAddress, ITransaction
 from erdpy.ledger.config import compare_versions
 from erdpy.ledger.ledger_app_handler import SIGN_USING_HASH_VERSION
 from erdpy.ledger.ledger_functions import do_get_ledger_address, do_sign_transaction_with_ledger, do_get_ledger_version, \
     TX_HASH_SIGN_VERSION, TX_HASH_SIGN_OPTIONS
-from erdpy.wallet import bech32, generate_pair, pem
+from erdpy.wallet import bech32, pem
 from erdpy.wallet.keyfile import get_password, load_from_key_file
 
 logger = logging.getLogger("accounts")
-
-
-class AccountsRepository:
-    def __init__(self, folder: Path):
-        utils.ensure_folder(folder)
-        self.folder = folder
-
-    def get_account(self, name):
-        pem_file = self.folder / f"{name}.pem"
-        return Account(pem_file=str(pem_file))
-
-    def generate_accounts(self, count):
-        for i in range(count):
-            self.generate_account(i)
-
-    def generate_account(self, name):
-        secret_key, pubkey = generate_pair()
-        address = Address(pubkey).bech32()
-
-        pem_file = self.folder / f"{name}_{address}.pem"
-        pem.write(pem_file, secret_key, pubkey, name=f"{name}:{address}")
-
-    def get_all(self):
-        accounts = []
-        for pem_file in self.folder.iterdir():
-            pem_file = self.folder / pem_file
-            account = Account(pem_file=pem_file)
-            accounts.append(account)
-
-        return accounts
 
 
 class Account(IAccount):

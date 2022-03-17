@@ -84,12 +84,6 @@ generate() {
     command "Network.BlockNonce" "network block-nonce"
     command "Network.Chain" "network chain"
 
-    group "Dispatcher" "dispatcher"
-    command "Dispatcher.Enqueue" "dispatcher enqueue"
-    command "Dispatcher.Dispatch" "dispatcher dispatch"
-    command "Dispatcher.DispatchContinuously" "dispatcher dispatch-continuously"
-    command "Dispatcher.Clean" "dispatcher clean"
-
     group "BlockAtlas" "blockatlas"
     command "BlockAtlas.CurrentBlockNumber" "blockatlas current-block-number"
     command "BlockAtlas.BlockByNumber" "blockatlas block-by-number"

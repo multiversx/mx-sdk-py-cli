@@ -4,6 +4,30 @@ All notable changes will be documented in this file.
 
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
+## [Unreleased]
+ - TBD
+
+## [1.2.3]
+ - [Fix activation flag check, fix flag name](https://github.com/ElrondNetwork/elrond-sdk-erdpy/pull/123)
+ - [Fix reference to libwasmer (referenced by mandos-test)](https://github.com/ElrondNetwork/elrond-sdk-erdpy/pull/124)
+
+## [1.2.2]
+ - [Add (update) examples of using erdpy in Python scripts. Refactoring.](https://github.com/ElrondNetwork/elrond-sdk-erdpy/pull/120)
+ - [Allow "str:" and "0x" as contract arguments, as well](https://github.com/ElrondNetwork/elrond-sdk-erdpy/pull/121)
+
+## [1.2.1] - 07.03.2022
+ - [Bugfix: fix functions in EEI registry](https://github.com/ElrondNetwork/elrond-sdk-erdpy/pull/119)
+ - [Bit of cleanup (remove deprecated files / functionality)](https://github.com/ElrondNetwork/elrond-sdk-erdpy/pull/113)
+
+## [1.2.0] - 07.03.2022
+ - [On contract builld, reveal imported functions and check compatibility](https://github.com/ElrondNetwork/elrond-sdk-erdpy/pull/111)
+
+## [1.1.0] - 01.03.2022
+ - [Add reports: contract sizes and twiggy symbol checks](https://github.com/ElrondNetwork/elrond-sdk-erdpy/pull/106)
+ - [Add `--recursive` option on contract build](https://github.com/ElrondNetwork/elrond-sdk-erdpy/pull/104)
+ - [Local testnet: minor refactoring, and remove `*:TRACE` from the default log-level](https://github.com/ElrondNetwork/elrond-sdk-erdpy/pull/103)
+ - [Transaction simulation & cost simulation: fix & redesign](https://github.com/ElrondNetwork/elrond-sdk-erdpy/pull/102)
+
 ## [1.0.25] - 02.02.2022
  - Remove old & deprecated, experimental code related to the Elrond IDE
  - Fix `erdpy account get-transactions` (handle transactions with no data field)

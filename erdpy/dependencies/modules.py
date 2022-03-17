@@ -159,17 +159,17 @@ class VMToolsModule(StandaloneModule):
         self.make_binary_symlink_in_parent_folder(tag, 'test', 'mandos-test')
         self.copy_libwasmer_in_parent_directory(tag)
 
-    def build_binary(self, tag, binary_name):
+    def build_binary(self, tag: str, binary_name: str):
         source_folder = self.binary_source_folder(tag, binary_name)
         golang = dependencies.get_module_by_key("golang")
         golang_env = golang.get_env()
         myprocess.run_process(['go', 'build'], cwd=source_folder, env=golang_env)
 
-    def binary_source_folder(self, tag, binary_name):
+    def binary_source_folder(self, tag: str, binary_name: str):
         directory = self.get_source_directory(tag)
         return directory / 'cmd' / binary_name
 
-    def make_binary_symlink_in_parent_folder(self, tag, binary_name, symlink_name):
+    def make_binary_symlink_in_parent_folder(self, tag: str, binary_name: str, symlink_name: str):
         source_folder = self.binary_source_folder(tag, binary_name)
         binary = source_folder / binary_name
 
@@ -179,16 +179,19 @@ class VMToolsModule(StandaloneModule):
         symlink.unlink(missing_ok=True)
         symlink.symlink_to(binary)
 
-    def copy_libwasmer_in_parent_directory(self, tag):
+    def copy_libwasmer_in_parent_directory(self, tag: str):
         libwasmer_directory = self.get_source_directory(tag) / 'wasmer'
+        cmd_test_directory = self.get_source_directory(tag) / 'cmd' / 'test'
         parent_directory = self.get_parent_directory()
         for f in libwasmer_directory.iterdir():
             if f.suffix in ['.dylib', '.so', '.dll']:
+                # Copy the dynamic library near the "mandos-test" symlink
                 shutil.copy(f, parent_directory)
+                # Though, also copy the dynamic library near the target executable (seems to be necessary on MacOS)
+                shutil.copy(f, cmd_test_directory)
 
-    def get_env(self):
-        return {
-        }
+    def get_env(self) -> Dict[str, str]:
+        return dict()
 
 
 class GolangModule(StandaloneModule):
@@ -245,13 +248,35 @@ class NodejsModule(StandaloneModule):
         raise errors.UnsupportedConfigurationValue("Nodejs tag must always be explicit, not latest")
 
 
+
+class WabtModule(StandaloneModule):
+    def __init__(self, key: str, aliases: List[str]):
+        super().__init__(key, aliases)
+
+    def _post_install(self, tag: str):
+        # We'll create a "latest" symlink
+        link_target = path.join(self.get_directory(tag), f"wabt-{tag}")
+        link = path.join(self.get_parent_directory(), "latest")
+        utils.symlink(link_target, link)
+
+    def get_env(self):
+        bin_folder = path.join(self.get_parent_directory(), "latest", "bin")
+
+        return {
+            "PATH": f"{bin_folder}:{os.environ['PATH']}",
+        }
+
+    def get_latest_release(self) -> str:
+        raise errors.UnsupportedConfigurationValue("WABT tag must be explicit")
+
+
 class NpmModule(DependencyModule):
     def __init__(self, key: str, aliases: List[str] = []):
         super().__init__(key, aliases)
 
     def get_nodejs(self) -> DependencyModule:
         return dependencies.get_module_by_key("nodejs")
-    
+
     def get_nodejs_env(self) -> Dict[str, str]:
         return self.get_nodejs().get_env()
 
@@ -276,9 +301,10 @@ class NpmModule(DependencyModule):
             return True
         except FileNotFoundError:
             return False
-    
+
     def get_latest_release(self) -> str:
         return "latest"
+
 
 class Rust(DependencyModule):
     def __init__(self, key: str, aliases: List[str] = None):
@@ -331,6 +357,36 @@ class Rust(DependencyModule):
 
     def get_latest_release(self) -> str:
         raise errors.UnsupportedConfigurationValue("Rust tag must either be explicit, empty or 'nightly'")
+
+
+class CargoModule(DependencyModule):
+    def __init__(self, key: str, aliases: List[str] = None):
+        if aliases is None:
+            aliases = list()
+
+        super().__init__(key, aliases)
+
+    def _do_install(self, tag: str) -> None:
+        self._run_command_with_rust_env(["cargo", "install", self.key])
+
+    def is_installed(self, tag: str) -> bool:
+        rust = dependencies.get_module_by_key("rust")
+        output = myprocess.run_process(["cargo", "install", "--list"], rust.get_env())
+        for line in output.splitlines():
+            if self.key == line.strip():
+                return True
+        return False
+
+    def uninstall(self, tag: str):
+        if self.is_installed(tag):
+            self._run_command_with_rust_env(["cargo", "uninstall", self.key])
+
+    def get_latest_release(self) -> str:
+        return "latest"
+
+    def _run_command_with_rust_env(self, args: List[str]) -> str:
+        rust = dependencies.get_module_by_key("rust")
+        return myprocess.run_process(args, rust.get_env())
 
 
 class MclSignerModule(StandaloneModule):

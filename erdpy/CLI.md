@@ -20,7 +20,7 @@ https://docs.elrond.com/sdk-and-tools/erdpy/erdpy.
         
 
 COMMAND GROUPS:
-  {contract,tx,validator,account,ledger,wallet,network,dispatcher,blockatlas,deps,config,hyperblock,testnet,data,staking-provider,dns}
+  {contract,tx,validator,account,ledger,wallet,network,blockatlas,deps,config,hyperblock,testnet,data,staking-provider,dns}
 
 TOP-LEVEL OPTIONS:
   -h, --help            show this help message and exit
@@ -30,14 +30,13 @@ TOP-LEVEL OPTIONS:
 ----------------------
 COMMAND GROUPS summary
 ----------------------
-contract                       Build, deploy and interact with Smart Contracts
+contract                       Build, deploy, upgrade and interact with Smart Contracts
 tx                             Create and broadcast Transactions
 validator                      Stake, UnStake, UnBond, Unjail and other actions useful for Validators
 account                        Get Account data (nonce, balance) from the Network
 ledger                         Get Ledger App addresses and version
 wallet                         Create wallet, derive secret key from mnemonic, bech32 address helpers etc.
 network                        Get Network parameters, such as number of shards, chain identifier etc.
-dispatcher                     Enqueue transactions, then bulk dispatch them
 blockatlas                     Interact with an Block Atlas instance
 deps                           Manage dependencies or elrond-sdk modules
 config                         Configure elrond-sdk (default values etc.)
@@ -55,10 +54,10 @@ dns                            Operations related to the Domain Name Service
 $ erdpy contract --help
 usage: erdpy contract COMMAND [-h] ...
 
-Build, deploy and interact with Smart Contracts
+Build, deploy, upgrade and interact with Smart Contracts
 
 COMMANDS:
-  {new,templates,build,clean,test,deploy,call,upgrade,query}
+  {new,templates,build,clean,test,report,deploy,call,upgrade,query}
 
 OPTIONS:
   -h, --help            show this help message and exit
@@ -71,6 +70,7 @@ templates                      List the available Smart Contract templates.
 build                          Build a Smart Contract project using the appropriate buildchain.
 clean                          Clean a Smart Contract project.
 test                           Run Mandos tests.
+report                         Print a detailed report of the smart contracts.
 deploy                         Deploy a Smart Contract.
 call                           Interact with a Smart Contract (execute function).
 upgrade                        Upgrade a previously-deployed Smart Contract.
@@ -122,6 +122,7 @@ positional arguments:
 
 optional arguments:
   -h, --help                           show this help message and exit
+  -r, --recursive                      locate projects recursively
   --debug                              set debug flag (default: False)
   --no-optimization                    bypass optimizations (for clang) (default: False)
   --no-wasm-opt                        do not optimize wasm files after the build (default: False)
@@ -130,6 +131,8 @@ optional arguments:
                                        analysing the bytecode. Creates larger wasm files. Avoid in production (default:
                                        False)
   --wasm-name WASM_NAME                for rust projects, optionally specify the name of the wasm bytecode output file
+  --skip-eei-checks                    skip EEI compatibility checks (default: False)
+  --ignore-eei-checks                  ignore EEI compatibility errors (default: False)
 
 ```
 ### Contract.Clean
@@ -142,10 +145,11 @@ usage: erdpy contract clean [-h] ...
 Clean a Smart Contract project.
 
 positional arguments:
-  project     🗀 the project directory (default: current directory)
+  project          🗀 the project directory (default: current directory)
 
 optional arguments:
-  -h, --help  show this help message and exit
+  -h, --help       show this help message and exit
+  -r, --recursive  locate projects recursively
 
 ```
 ### Contract.Deploy
@@ -220,8 +224,9 @@ optional arguments:
   --chain CHAIN                                the chain identifier (default: T)
   --version VERSION                            the transaction version (default: 1)
   --options OPTIONS                            the transaction options (default: 0)
-  --arguments ARGUMENTS [ARGUMENTS ...]        arguments for the contract transaction, as numbers or hex-encoded. E.g.
-                                               --arguments 42 0x64 1000 0xabba
+  --arguments ARGUMENTS [ARGUMENTS ...]        arguments for the contract transaction, as [number, bech32-address, ascii
+                                               string, boolean] or hex-encoded. E.g. --arguments 42 0x64 1000 0xabba
+                                               str:TOK-a1c2ef true erd1[..]
   --wait-result                                signal to wait for the transaction result - only valid if --send is set
   --timeout TIMEOUT                            max num of seconds to wait for result - only valid if --wait-result is
                                                set
@@ -299,8 +304,9 @@ optional arguments:
   --version VERSION                            the transaction version (default: 1)
   --options OPTIONS                            the transaction options (default: 0)
   --function FUNCTION                          the function to call
-  --arguments ARGUMENTS [ARGUMENTS ...]        arguments for the contract transaction, as numbers or hex-encoded. E.g.
-                                               --arguments 42 0x64 1000 0xabba
+  --arguments ARGUMENTS [ARGUMENTS ...]        arguments for the contract transaction, as [number, bech32-address, ascii
+                                               string, boolean] or hex-encoded. E.g. --arguments 42 0x64 1000 0xabba
+                                               str:TOK-a1c2ef true erd1[..]
   --wait-result                                signal to wait for the transaction result - only valid if --send is set
   --timeout TIMEOUT                            max num of seconds to wait for result - only valid if --wait-result is
                                                set
@@ -384,8 +390,9 @@ optional arguments:
   --chain CHAIN                                the chain identifier (default: T)
   --version VERSION                            the transaction version (default: 1)
   --options OPTIONS                            the transaction options (default: 0)
-  --arguments ARGUMENTS [ARGUMENTS ...]        arguments for the contract transaction, as numbers or hex-encoded. E.g.
-                                               --arguments 42 0x64 1000 0xabba
+  --arguments ARGUMENTS [ARGUMENTS ...]        arguments for the contract transaction, as [number, bech32-address, ascii
+                                               string, boolean] or hex-encoded. E.g. --arguments 42 0x64 1000 0xabba
+                                               str:TOK-a1c2ef true erd1[..]
   --wait-result                                signal to wait for the transaction result - only valid if --send is set
   --timeout TIMEOUT                            max num of seconds to wait for result - only valid if --wait-result is
                                                set
@@ -409,8 +416,9 @@ optional arguments:
   -h, --help                             show this help message and exit
   --proxy PROXY                          🔗 the URL of the proxy (default: https://testnet-gateway.elrond.com)
   --function FUNCTION                    the function to call
-  --arguments ARGUMENTS [ARGUMENTS ...]  arguments for the contract transaction, as numbers or hex-encoded. E.g.
-                                         --arguments 42 0x64 1000 0xabba
+  --arguments ARGUMENTS [ARGUMENTS ...]  arguments for the contract transaction, as [number, bech32-address, ascii
+                                         string, boolean] or hex-encoded. E.g. --arguments 42 0x64 1000 0xabba
+                                         str:TOK-a1c2ef true erd1[..]
 
 ```
 ## Group **Transactions**
@@ -1111,110 +1119,6 @@ optional arguments:
   --proxy PROXY  🔗 the URL of the proxy (default: https://testnet-gateway.elrond.com)
 
 ```
-## Group **Dispatcher**
-
-
-```
-$ erdpy dispatcher --help
-usage: erdpy dispatcher COMMAND [-h] ...
-
-Enqueue transactions, then bulk dispatch them
-
-COMMANDS:
-  {enqueue,dispatch,dispatch-continuously,clean}
-
-OPTIONS:
-  -h, --help            show this help message and exit
-
-----------------
-COMMANDS summary
-----------------
-enqueue                        Enqueue a transaction
-dispatch                       Dispatch queued transactions
-dispatch-continuously          Continuously dispatch queued transactions
-clean                          Clear queue of transactions
-
-```
-### Dispatcher.Enqueue
-
-
-```
-$ erdpy dispatcher enqueue --help
-usage: erdpy dispatcher enqueue [-h] ...
-
-Enqueue a transaction
-
-optional arguments:
-  -h, --help                             show this help message and exit
-  --receiver RECEIVER                    🖄 the address of the receiver
-  --receiver-username RECEIVER_USERNAME  🖄 the username of the receiver
-  --gas-price GAS_PRICE                  ⛽ the gas price (default: 1000000000)
-  --gas-limit GAS_LIMIT                  ⛽ the gas limit
-  --value VALUE                          the value to transfer (default: 0)
-  --data DATA                            the payload, or 'memo' of the transaction (default: )
-  --chain CHAIN                          the chain identifier (default: T)
-  --version VERSION                      the transaction version (default: 1)
-  --options OPTIONS                      the transaction options (default: 0)
-
-```
-### Dispatcher.Dispatch
-
-
-```
-$ erdpy dispatcher dispatch --help
-usage: erdpy dispatcher dispatch [-h] ...
-
-Dispatch queued transactions
-
-optional arguments:
-  -h, --help                                   show this help message and exit
-  --proxy PROXY                                🔗 the URL of the proxy (default: https://testnet-gateway.elrond.com)
-  --pem PEM                                    🔑 the PEM file, if keyfile not provided
-  --pem-index PEM_INDEX                        🔑 the index in the PEM file (default: 0)
-  --keyfile KEYFILE                            🔑 a JSON keyfile, if PEM not provided
-  --passfile PASSFILE                          🔑 a file containing keyfile's password, if keyfile provided
-  --ledger                                     🔐 bool flag for signing transaction using ledger
-  --ledger-account-index LEDGER_ACCOUNT_INDEX  🔐 the index of the account when using Ledger
-  --ledger-address-index LEDGER_ADDRESS_INDEX  🔐 the index of the address when using Ledger
-  --sender-username SENDER_USERNAME            🖄 the username of the sender
-
-```
-### Dispatcher.DispatchContinuously
-
-
-```
-$ erdpy dispatcher dispatch-continuously --help
-usage: erdpy dispatcher dispatch-continuously [-h] ...
-
-Continuously dispatch queued transactions
-
-optional arguments:
-  -h, --help                                   show this help message and exit
-  --proxy PROXY                                🔗 the URL of the proxy (default: https://testnet-gateway.elrond.com)
-  --pem PEM                                    🔑 the PEM file, if keyfile not provided
-  --pem-index PEM_INDEX                        🔑 the index in the PEM file (default: 0)
-  --keyfile KEYFILE                            🔑 a JSON keyfile, if PEM not provided
-  --passfile PASSFILE                          🔑 a file containing keyfile's password, if keyfile provided
-  --ledger                                     🔐 bool flag for signing transaction using ledger
-  --ledger-account-index LEDGER_ACCOUNT_INDEX  🔐 the index of the account when using Ledger
-  --ledger-address-index LEDGER_ADDRESS_INDEX  🔐 the index of the address when using Ledger
-  --sender-username SENDER_USERNAME            🖄 the username of the sender
-  --interval INTERVAL                          the interval to retrieve transactions from the queue, in seconds
-
-```
-### Dispatcher.Clean
-
-
-```
-$ erdpy dispatcher clean --help
-usage: erdpy dispatcher clean [-h] ...
-
-Clear queue of transactions
-
-optional arguments:
-  -h, --help  show this help message and exit
-
-```
 ## Group **BlockAtlas**
 
 
@@ -1314,7 +1218,7 @@ usage: erdpy deps install [-h] ...
 Install dependencies or elrond-sdk modules.
 
 positional arguments:
-  {all,llvm,clang,cpp,rust,nodejs,golang,vmtools,elrond_go,elrond_proxy_go,mcl_signer,wasm-opt}
+  {all,llvm,clang,cpp,rust,nodejs,golang,wabt,vmtools,elrond_go,elrond_proxy_go,mcl_signer,wasm-opt,twiggy}
                                                   the dependency to install
 
 optional arguments:
@@ -1333,7 +1237,7 @@ usage: erdpy deps check [-h] ...
 Check whether a dependency is installed.
 
 positional arguments:
-  {all,llvm,clang,cpp,rust,nodejs,golang,vmtools,elrond_go,elrond_proxy_go,mcl_signer,wasm-opt}
+  {all,llvm,clang,cpp,rust,nodejs,golang,wabt,vmtools,elrond_go,elrond_proxy_go,mcl_signer,wasm-opt,twiggy}
                                                   the dependency to check
 
 optional arguments:
