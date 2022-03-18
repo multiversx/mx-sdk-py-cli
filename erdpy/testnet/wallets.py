@@ -6,6 +6,7 @@ from typing import Dict, Tuple
 from erdpy import errors, utils
 from erdpy.accounts import Account
 from erdpy.wallet import pem
+from erdpy.workstation import get_tools_folder
 
 MAX_NUM_NODES = 12
 
@@ -89,4 +90,4 @@ def _get_users_folder():
 
 
 def _get_folder():
-    return Path(__file__).parent.absolute().joinpath("wallets")
+    return get_tools_folder() / "testwallets" / "latest" 

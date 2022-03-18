@@ -3,7 +3,7 @@ from pathlib import Path
 from typing import Dict, List
 
 from erdpy import config, errors
-from erdpy.dependencies.modules import (CargoModule, NpmModule, VMToolsModule, DependencyModule,
+from erdpy.dependencies.modules import (CargoModule, NpmModule, TestWalletsModule, VMToolsModule, DependencyModule,
                                         GolangModule, MclSignerModule,
                                         NodejsModule, Rust, StandaloneModule, WabtModule)
 
@@ -12,7 +12,7 @@ logger = logging.getLogger("install")
 
 def install_module(key: str, tag: str = "", overwrite: bool = False):
     if key == 'all':
-        modules = _get_all_deps_installable_via_cli()
+        modules = _get_implicitly_installable_deps()
     else:
         modules = [get_module_by_key(key)]
 
@@ -47,10 +47,10 @@ def get_deps_dict() -> Dict[str, DependencyModule]:
 
 
 def _get_all_deps() -> List[DependencyModule]:
-    return _get_all_implicit_deps() + _get_all_deps_installable_via_cli()
+    return _get_explicitly_installable_deps() + _get_implicitly_installable_deps()
 
 
-def _get_all_implicit_deps() -> List[DependencyModule]:
+def _get_explicitly_installable_deps() -> List[DependencyModule]:
     return [
         StandaloneModule(key="llvm", aliases=["clang", "cpp"]),
         Rust(key="rust"),
@@ -60,7 +60,9 @@ def _get_all_implicit_deps() -> List[DependencyModule]:
     ]
 
 
-def _get_all_deps_installable_via_cli() -> List[DependencyModule]:
+def _get_implicitly_installable_deps() -> List[DependencyModule]:
+    # See: https://github.com/ElrondNetwork/elrond-sdk-erdpy/pull/55
+
     return [
         VMToolsModule(key="vmtools"),
         StandaloneModule(key="elrond_go", repo_name="elrond-go", organisation="ElrondNetwork"),
@@ -68,6 +70,7 @@ def _get_all_deps_installable_via_cli() -> List[DependencyModule]:
         MclSignerModule(key="mcl_signer"),
         NpmModule(key="wasm-opt"),
         CargoModule(key="twiggy"),
+        TestWalletsModule(key="testwallets")
     ]
 
 

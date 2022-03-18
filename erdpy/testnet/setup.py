@@ -1,6 +1,7 @@
 import logging
 import shutil
 from os import path
+from typing import Any
 
 import erdpy.utils as utils
 from erdpy import dependencies, myprocess, workstation
@@ -12,20 +13,17 @@ from erdpy.testnet.config import TestnetConfiguration
 
 logger = logging.getLogger("testnet")
 
-DEPENDENCY_KEYS = ["elrond_go", "elrond_proxy_go"]
+DEPENDENCY_KEYS = ["elrond_go", "elrond_proxy_go", "testwallets"]
 
 
 def install_dependencies():
     dependencies.install_module("golang")
 
     for key in DEPENDENCY_KEYS:
-        name: str = key
-        tag: str = ""
-        overwrite: bool = True
-        install_module(name, tag, overwrite)
+        install_module(key, tag="", overwrite=True)
 
 
-def configure(args):
+def configure(args: Any):
     testnet_config = TestnetConfiguration.from_file(args.configfile)
     logger.info('testnet folder is %s', testnet_config.root())
 
@@ -73,7 +71,6 @@ def configure(args):
 
     patch_source_code(testnet_config)
     build_binaries(testnet_config)
-    copy_wallets(testnet_config)
 
 
 def clean(args):
@@ -278,7 +275,3 @@ def _get_wasm_vm_version(testnet_config: TestnetConfiguration):
     line = next(line for line in lines if "github.com/ElrondNetwork/arwen-wasm-vm" in line)
     parts = line.split()
     return parts[1]
-
-
-def copy_wallets(testnet_config: TestnetConfiguration):
-    wallets.copy_all_to(testnet_config.root() / "wallets")
