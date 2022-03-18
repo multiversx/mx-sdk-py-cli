@@ -7,6 +7,8 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 ## [Unreleased]
  - [Prepare integration with erdjs-snippets (from templates)](https://github.com/ElrondNetwork/elrond-sdk-erdpy/pull/126)
  - [Move test wallets to a separate repository. Handle them as an erdpy dependency.](https://github.com/ElrondNetwork/elrond-sdk-erdpy/pull/127)
+ - [Fix log for builds using absolute paths.](https://github.com/ElrondNetwork/elrond-sdk-erdpy/pull/128)
+ - [CLI output builder: remove deprecated fields.](https://github.com/ElrondNetwork/elrond-sdk-erdpy/pull/129)
 
 ## [1.2.3]
  - [Fix activation flag check, fix flag name](https://github.com/ElrondNetwork/elrond-sdk-erdpy/pull/123)

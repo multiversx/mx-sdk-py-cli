@@ -172,14 +172,6 @@ Output example:
     },
     "emittedTransactionData": "the transaction data, not encoded",
     "emittedTransactionHash": "the transaction hash",
-    "tx": {
-        "DEPRECATED": "DEPRECATED"
-    },
-    "data": "DEPRECATED",
-    "hash": "DEPRECATED",
-    "emitted_tx": {
-        "DEPRECATED": "DEPRECATED"
-    },
     "contractAddress": "the address of the contract",
     "transactionOnNetwork": {
         "nonce": 42,
@@ -254,14 +246,6 @@ Output example:
     },
     "emittedTransactionData": "the transaction data, not encoded",
     "emittedTransactionHash": "the transaction hash",
-    "tx": {
-        "DEPRECATED": "DEPRECATED"
-    },
-    "data": "DEPRECATED",
-    "hash": "DEPRECATED",
-    "emitted_tx": {
-        "DEPRECATED": "DEPRECATED"
-    },
     "contractAddress": "the address of the contract",
     "transactionOnNetwork": {
         "nonce": 42,
@@ -335,14 +319,6 @@ Output example:
     },
     "emittedTransactionData": "the transaction data, not encoded",
     "emittedTransactionHash": "the transaction hash",
-    "tx": {
-        "DEPRECATED": "DEPRECATED"
-    },
-    "data": "DEPRECATED",
-    "hash": "DEPRECATED",
-    "emitted_tx": {
-        "DEPRECATED": "DEPRECATED"
-    },
     "contractAddress": "the address of the contract",
     "transactionOnNetwork": {
         "nonce": 42,
@@ -463,12 +439,7 @@ Output example:
         "...": "..."
     },
     "emittedTransactionData": "the transaction data, not encoded",
-    "emittedTransactionHash": "the transaction hash",
-    "tx": {
-        "DEPRECATED": "DEPRECATED"
-    },
-    "data": "DEPRECATED",
-    "hash": "DEPRECATED"
+    "emittedTransactionHash": "the transaction hash"
 }
 
 optional arguments:
@@ -523,12 +494,7 @@ Output example:
         "...": "..."
     },
     "emittedTransactionData": "the transaction data, not encoded",
-    "emittedTransactionHash": "the transaction hash",
-    "tx": {
-        "DEPRECATED": "DEPRECATED"
-    },
-    "data": "DEPRECATED",
-    "hash": "DEPRECATED"
+    "emittedTransactionHash": "the transaction hash"
 }
 
 optional arguments:
@@ -1218,7 +1184,7 @@ usage: erdpy deps install [-h] ...
 Install dependencies or elrond-sdk modules.
 
 positional arguments:
-  {all,llvm,clang,cpp,rust,nodejs,golang,wabt,vmtools,elrond_go,elrond_proxy_go,mcl_signer,wasm-opt,twiggy}
+  {all,llvm,clang,cpp,rust,nodejs,golang,wabt,vmtools,elrond_go,elrond_proxy_go,mcl_signer,wasm-opt,twiggy,testwallets}
                                                   the dependency to install
 
 optional arguments:
@@ -1237,7 +1203,7 @@ usage: erdpy deps check [-h] ...
 Check whether a dependency is installed.
 
 positional arguments:
-  {all,llvm,clang,cpp,rust,nodejs,golang,wabt,vmtools,elrond_go,elrond_proxy_go,mcl_signer,wasm-opt,twiggy}
+  {all,llvm,clang,cpp,rust,nodejs,golang,wabt,vmtools,elrond_go,elrond_proxy_go,mcl_signer,wasm-opt,twiggy,testwallets}
                                                   the dependency to check
 
 optional arguments:
