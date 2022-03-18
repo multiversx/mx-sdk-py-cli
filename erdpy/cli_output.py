@@ -54,25 +54,9 @@ class CLIOutputBuilder:
             output["emittedTransactionData"] = emitted_transaction_data
             output["emittedTransactionHash"] = emitted_transaction_hash
 
-            logger.warn("The fields 'tx', 'data', 'hash' are deprecated and will be removed in a future version. Please rely on 'emittedTransaction', 'emittedTransactionData' and 'emittedTransactionHash' instead.")
-            output["tx"] = emitted_transaction_dict
-            output["data"] = emitted_transaction_data
-            output["hash"] = emitted_transaction_hash
-
-            logger.warn("The field 'emitted_tx' is deprecated and will be removed in a future version. Please rely on 'emittedTransaction' instead.")
-            output["emitted_tx"] = {
-                "tx": emitted_transaction_dict,
-                "hash": emitted_transaction_hash,
-                "data": emitted_transaction_data
-            }
-
         if self.contract_address:
             contract_address = self.contract_address.bech32()
             output["contractAddress"] = contract_address
-
-            logger.warn("The field 'emitted_tx.address' is deprecated and will be removed in a future version. Please rely on 'contractAddress' instead.")
-            if "emitted_tx" in output:
-                output["emitted_tx"]["address"] = contract_address
 
         if self.transaction_on_network:
             transaction_on_network_dict = self.transaction_on_network.to_dictionary()
@@ -93,12 +77,7 @@ class CLIOutputBuilder:
             output["emittedTransactionData"] = "the transaction data, not encoded"
             output["emittedTransactionHash"] = "the transaction hash"
 
-            output["tx"] = {"DEPRECATED": "DEPRECATED"}
-            output["data"] = "DEPRECATED"
-            output["hash"] = "DEPRECATED"
-
         if with_contract:
-            output["emitted_tx"] = {"DEPRECATED": "DEPRECATED"}
             output["contractAddress"] = "the address of the contract"
 
         if with_transaction_on_network:
