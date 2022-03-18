@@ -1,13 +1,13 @@
 {
   "validators": [
     {
-      "pemFile": "../../testnet/wallets/validators/validatorKey00.pem"
+      "pemFile": "~/elrondsdk/testwallets/latest/validators/validatorKey00.pem"
     },
     {
-      "pemFile": "../../testnet/wallets/validators/validatorKey01.pem"
+      "pemFile": "~/elrondsdk/testwallets/latest/validators/validatorKey01.pem"
     },
     {
-      "pemFile": "../../testnet/wallets/validators/validatorKey02.pem"
+      "pemFile": "~/elrondsdk/testwallets/latest/validators/validatorKey02.pem"
     }
   ]
 }

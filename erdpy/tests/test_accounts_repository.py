@@ -1,9 +1,9 @@
-from pathlib import Path
 from erdpy.accounts import Address
 from erdpy.accounts_repository import AccountsRepository
 from erdpy.interfaces import IAddress, IElrondProxy
+from erdpy.workstation import get_tools_folder
 
-TESTNET_USERS_FOLDER = Path(__file__).parent.parent.joinpath("testnet/wallets/users")
+TESTNET_USERS_FOLDER = get_tools_folder() / "testwallets" / "latest" / "users"
 DUMMY_NONCE = 42
 
 
