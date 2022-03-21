@@ -20,11 +20,22 @@ jobs:
       run: |
         python3 -m pip install --upgrade pip
         pip3 install setuptools wheel twine
-    - name: Build and publish
+
+    - name: Create release
       env:
-        TWINE_USERNAME: __token__
-        TWINE_PASSWORD: ${{ secrets.PYPI_API_TOKEN }}
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
-        python setup.py sdist bdist_wheel
-        twine upload dist/*
+        echo " - [CHANGELOG](https://github.com/ElrondNetwork/elrond-sdk-erdpy/blob/main/erdpy/CHANGELOG.md)" >> notes.txt
+        echo "" >> notes.txt
+
+        RELEASE_TAG=v$(python3 -c "import erdpy._version; print(erdpy._version.__version__);")
+        gh release create --prerelease $RELEASE_TAG --title="$RELEASE_TAG" --generate-notes --notes-file=notes.txt
+  
+    # - name: Build and publish
+    #   env:
+    #     TWINE_USERNAME: __token__
+    #     TWINE_PASSWORD: ${{ secrets.PYPI_API_TOKEN }}
+    #   run: |
+    #     python setup.py sdist bdist_wheel
+    #     twine upload dist/*
 
