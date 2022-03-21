@@ -6,6 +6,9 @@ name: Publish erdpy
 on:
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 jobs:
   publish-erdpy:
     runs-on: ubuntu-latest
