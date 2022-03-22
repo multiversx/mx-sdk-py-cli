@@ -7,6 +7,9 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 ## [Unreleased]
  - TBD
 
+## [1.3.1]
+ - [Re-add the pattern erdpy/wallet/*.txt in MANIFEST.in. Was removed by mistake in a previous release.](https://github.com/ElrondNetwork/elrond-sdk-erdpy/pull/133)
+
 ## [1.3.0]
  - [Prepare integration with erdjs-snippets (from templates)](https://github.com/ElrondNetwork/elrond-sdk-erdpy/pull/126)
  - [Move test wallets to a separate repository. Handle them as an erdpy dependency.](https://github.com/ElrondNetwork/elrond-sdk-erdpy/pull/127)
