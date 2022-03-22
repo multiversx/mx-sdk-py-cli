@@ -1,2 +1,3 @@
 include erdpy/projects/*.txt
 include erdpy/projects/*.json
+include erdpy/wallet/*.txt
