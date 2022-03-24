@@ -1,6 +1,7 @@
 
 import logging
 from argparse import ArgumentParser
+from pathlib import Path
 from typing import cast
 
 from erdpy.accounts import Account, Address
@@ -16,7 +17,7 @@ def main():
     export PYTHONPATH=.
     python3 ./examples/airdrop.py \
         --proxy=https://testnet-gateway.elrond.com \
-        --accounts=./erdpy/testnet/wallets/users \
+        --accounts=~/elrondsdk/testwallets/latest/users \
         --sender=erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th\
         --value=1000000000000000000
     """
@@ -32,7 +33,7 @@ def main():
 
     proxy = ElrondProxy(args.proxy)
     network = proxy.get_network_config()
-    accounts = AccountsRepository.create_from_folder(args.accounts)
+    accounts = AccountsRepository.create_from_folder(Path(args.accounts))
     sender = cast(Account, accounts.get_account(Address(args.sender)))
     sender.sync_nonce(proxy)
     receivers = [account for account in accounts.get_all() if account.address.bech32() != sender.address.bech32()]

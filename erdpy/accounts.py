@@ -87,7 +87,7 @@ class Address(IAddress):
     BECH32_LENGTH = 62
     _value_hex: str
 
-    def __init__(self, value):
+    def __init__(self, value: Any):
         self._value_hex = ''
 
         if not value:

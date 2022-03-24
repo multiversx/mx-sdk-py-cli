@@ -17,8 +17,8 @@ def main():
     export PYTHONPATH=.
     python3 ./examples/staking.py \
         --proxy=https://testnet-gateway.elrond.com \
-        --keyfile=./erdpy/testnet/wallets/users/alice.json \
-        --passfile=./erdpy/testnet/wallets/users/password.txt \
+        --keyfile=~/elrondsdk/testwallets/latest/users/alice.json \
+        --passfile=~/elrondsdk/testwallets/latest/users/password.txt \
         --reward-address="erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th" \
         --validators-file=./erdpy/tests/testdata/validators.json \
         --value=2500000000000000000000
