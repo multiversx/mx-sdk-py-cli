@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Configuring erdpy &mdash; Elrond erdpy SDK 1.2.3 documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/dark_mode_css/general.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/dark_mode_css/dark.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/dark_mode_js/default_light.js"></script>
+        <script src="../_static/dark_mode_js/theme_switcher.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="prev" title="Installation" href="installation.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../index.html" class="icon icon-home"> Elrond erdpy SDK
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="getting-started.html">Getting Started with erdpy : CLI and Python SDK</a></li>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Configuring erdpy</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Elrond erdpy SDK</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+      <li>Configuring erdpy</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/pages/configuration.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <div class="section" id="configuring-erdpy">
+<h1>Configuring erdpy<a class="headerlink" href="#configuring-erdpy" title="Permalink to this headline"></a></h1>
+<p><strong>erdpy</strong> can be configured using the <code class="docutils literal notranslate"><span class="pre">erdpy</span> <span class="pre">config</span></code> command.</p>
+<p>In order to view the current configuration, you can run the <code class="docutils literal notranslate"><span class="pre">erdpy</span> <span class="pre">config</span> <span class="pre">dump</span></code> command.</p>
+<p>You should have this output. For example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+<span class="s2">&quot;proxy&quot;</span><span class="p">:</span> <span class="s2">&quot;https://gateway.elrond.com&quot;</span><span class="p">,</span>
+<span class="s2">&quot;txVersion&quot;</span><span class="p">:</span> <span class="s2">&quot;1&quot;</span><span class="p">,</span>
+<span class="s2">&quot;dependencies.llvm.tag&quot;</span><span class="p">:</span> <span class="s2">&quot;v...&quot;</span><span class="p">,</span>
+<span class="s2">&quot;dependencies.vmtools.tag&quot;</span><span class="p">:</span> <span class="s2">&quot;v...&quot;</span><span class="p">,</span>
+<span class="s2">&quot;chainID&quot;</span><span class="p">:</span> <span class="s2">&quot;...&quot;</span><span class="p">,</span>
+<span class="s2">&quot;dependencies.rust.tag&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>You can alter the current configuration using the <code class="docutils literal notranslate"><span class="pre">erdpy</span> <span class="pre">config</span> <span class="pre">set</span></code> command. For</p>
+<p>For example, in order to set the <em>proxy URL</em> or the <em>chain ID</em>, run the following:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ erdpy config <span class="nb">set</span> chainID <span class="m">1</span>...
+$ erdpy config <span class="nb">set</span> proxy https://gateway.elrond.com
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>For <em>mainnet</em> use proxy: <a class="reference external" href="https://gateway.elrond.com">https://gateway.elrond.com</a> and chainID: 1.</p>
+<p>For <em>devnet</em> use proxy: <a class="reference external" href="https://devnet-gateway.elrond.com">https://devnet-gateway.elrond.com</a> and chainID: D.</p>
+<p>For <em>testnet</em> use proxy: <a class="reference external" href="https://testnet-api.elrond.com">https://testnet-api.elrond.com</a> and chainID: T.</p>
+</div>
+<div class="admonition tip">
+<p class="admonition-title">Tip</p>
+<p>erdpy’s configuration is stored in the file <code class="docutils literal notranslate"><span class="pre">~/elrondsdk/erdpy.json</span></code>.</p>
+</div>
+</div>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="installation.html" class="btn btn-neutral float-left" title="Installation" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, Elrond Network.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
