@@ -6,12 +6,12 @@ Installation
 **erdpy** is currently available in Linux and MacOS. Some of its feature as may work on Windows. However, we do not recommend or support its usage on Windows at the moment. 
 
 Before installing **erdpy**, make sure you have a working Python3 environment.
-* For Linux or MacOS, version 3.8 or later is recommended.
+*For Linux or MacOS, version 3.8 or later is recommended.*
 
 
 
 
-Smart contract written in **C** require the `ncurses` library routines for compiling. To install the library, run the following command:
+Smart contract written in **C** requires the *ncurses* library routines for compiling. To install the library, run the command:
 
 .. code-block:: bash
 
@@ -32,7 +32,7 @@ This command creates a python virtual environment (based on the ``venv``) in ``~
 Troubleshooting and other notes
 ===============================
 
-If you are running `Ubuntu 20.04`, you may run into an ``invalid command 'bdist_wheel'`` error. Run the following command then retry ``erdpy-up`` command to clear the error:
+If you are using `Ubuntu 20.04`, you may run into an ``invalid command 'bdist_wheel'`` error. To clear this error, run the command below and retry ``erdpy-up`` command to clear the error:
 
 .. code-block:: python
 
@@ -51,12 +51,12 @@ On MacOS, you can switch to Python 3.8:
 Install without erdpy-up
 =========================
 
-You can install without the ``erdpy-up`` as well. If you'd like to install without relying on the easy installation script, kindly read and follow the instructions in this section. Otherwise, feel free to skip it.
-Ensure you have ``pip3`` installed.
+You can install without the ``erdpy-up`` as well. If you would like to install without relying on the installation script, simply follow the instructions in this section. Otherwise, feel free to skip.
 
 Prepare PATH
 =============
 
+Firstly, ensure you have ``pip3`` installed. 
 To have the command **erdpy** available in your shell after installation, make sure you adjust the ``PATH`` environment variable as described below:
 
 On Linux in ``~/.profile`` run:
@@ -84,6 +84,7 @@ You may need to restart your user session for these changes to take effect.
 
 Install and smoke test
 =======================
+
 To install **erdpy**, run the following command:
 
 .. code-block::
