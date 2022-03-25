@@ -92,7 +92,7 @@ To install **erdpy**, run the following command:
 
 Troubleshooting
 =================
-If you encounter *encoding-related* issues while installing, such as ``UnicodeDecodeError: 'ascii' codec can't decode byte``, kindly set the ``PYTHONENCODING`` installation command:
+If you encounter *encoding-related* issues while installing, such as ``UnicodeDecodeError: 'ascii' codec can't decode byte``, set the ``PYTHONENCODING`` environment variable:
 
 .. code-block::
 
