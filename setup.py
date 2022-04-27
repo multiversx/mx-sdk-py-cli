@@ -31,9 +31,10 @@ setuptools.setup(
         "requests",
         "pynacl",
         "pycryptodomex",
-        "cryptography>=3.2",
+        "cryptography==36.0.2",
         "prettytable",
         "ledgercomm",
+        "ledgercomm[hid]",
         "semver",
         "requests-cache"
     ],
