@@ -18,11 +18,10 @@ jobs:
         uses: actions/setup-python@v2
         with:
           python-version: ${{ matrix.python-version }}
-      - uses: rlespinasse/github-slug-action@v3.x
       - name: Install
         run: |
-          wget -O erdpy-up.py https://raw.githubusercontent.com/ElrondNetwork/elrond-sdk-erdpy/${{ env.GITHUB_HEAD_REF_SLUG_URL }}/erdpy-up.py
-          python3 erdpy-up.py
+          wget -O erdpy-up.py https://raw.githubusercontent.com/ElrondNetwork/elrond-sdk-erdpy/${{ github.ref_name }}/erdpy-up.py
+          python3 erdpy-up.py --from-branch ${{ github.ref_name }}
       - name: Smoke test
         run: |
           source /home/runner/.profile
