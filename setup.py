@@ -3,7 +3,7 @@ import setuptools
 with open("README.md", "r") as fh:
     long_description = "https://github.com/ElrondNetwork/elrond-sdk-erdpy"
 
-VERSION = "1.3.3"
+VERSION = "1.4.0"
 
 try:
     with open('./erdpy/_version.py', 'wt') as versionfile:
@@ -33,7 +33,7 @@ setuptools.setup(
         "pycryptodomex",
         "cryptography==36.0.2",
         "prettytable",
-        "ledgercomm",
+        "ledgercomm[hid]",
         "semver",
         "requests-cache"
     ],
