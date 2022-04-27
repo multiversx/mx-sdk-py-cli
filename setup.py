@@ -34,7 +34,6 @@ setuptools.setup(
         "cryptography==36.0.2",
         "prettytable",
         "ledgercomm",
-        "ledgercomm[hid]",
         "semver",
         "requests-cache"
     ],
