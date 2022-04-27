@@ -7,6 +7,9 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 ## [Unreleased]
  - TBD
 
+## [1.3.3]
+ - [Pin cryptography](https://github.com/ElrondNetwork/elrond-sdk-erdpy/pull/137)
+
 ## [1.3.2]
  - [Do not copy test wallets into the newly created contract (not necessary anymore)](https://github.com/ElrondNetwork/elrond-sdk-erdpy/pull/134)
 
