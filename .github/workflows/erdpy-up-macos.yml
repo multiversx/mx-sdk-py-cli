@@ -5,6 +5,9 @@ on:
     branches: [main, development]
   workflow_dispatch:
 
+env:
+ BRANCH_NAME: ${{ github.head_ref || github.ref_name }}
+
 jobs:
   install-erdpy:
     runs-on: macos-latest
@@ -20,8 +23,8 @@ jobs:
           python-version: ${{ matrix.python-version }}
       - name: Install
         run: |
-          wget -O erdpy-up.py https://raw.githubusercontent.com/ElrondNetwork/elrond-sdk-erdpy/${{ github.ref_name }}/erdpy-up.py
-          python3 erdpy-up.py --from-branch ${{ github.ref_name }} <<< "2"
+          wget -O erdpy-up.py https://raw.githubusercontent.com/ElrondNetwork/elrond-sdk-erdpy/$BRANCH_NAME/erdpy-up.py
+          python3 erdpy-up.py --from-branch $BRANCH_NAME <<< "2"
       - name: Smoke test
         run: |
           source /Users/runner/.bash_profile
