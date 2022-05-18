@@ -32,16 +32,14 @@ class ProjectRust(Project):
 
     def perform_build(self):
         meta = self.has_meta()
+        if not meta:
+            raise errors.NotSupportedProject("The project does not have a meta crate")
+
         try:
-            if meta:
-                # The meta crate handles the build process, ABI generation and
-                # allows contract developers to add extra
-                # preparation steps before building.
-                self.run_meta()
-            else:
-                # For backwards compatibility - build the wasm and generate the ABI
-                self.run_cargo()
-                self.generate_abi()
+            # The meta crate handles the build process, ABI generation and
+            # allows contract developers to add extra
+            # preparation steps before building.
+            self.run_meta()
         except subprocess.CalledProcessError as err:
             raise errors.BuildError(err.output)
 
@@ -50,28 +48,8 @@ class ProjectRust(Project):
             "--target=wasm32-unknown-unknown",
             "--release",
             "--out-dir",
-            self.get_output_folder(),
-            "-Z"
-            "unstable-options"
+            self.get_output_folder()
         ])
-
-    def run_cargo(self):
-        env = self.get_env()
-
-        args = [
-            "cargo",
-            "build",
-        ]
-        self.prepare_build_wasm_args(args)
-        self.decorate_cargo_args(args)
-
-        if not self.options.get("wasm_symbols"):
-            env["RUSTFLAGS"] = "-C link-arg=-s"
-
-        cwd = self.path / 'wasm'
-        return_code = myprocess.run_process_async(args, env=env, cwd=str(cwd))
-        if return_code != 0:
-            raise errors.BuildError(f"error code = {return_code}, see output")
 
     def run_meta(self):
         cwd = self.get_meta_folder()
@@ -89,42 +67,31 @@ class ProjectRust(Project):
             "run",
             "build",
         ]
-        self.prepare_build_wasm_args(args)
 
-        for (option, value) in self.options.items():
-            if isinstance(value, bool):
-                if value:
-                    args.extend([f"--{option}"])
-            else:
-                args.extend([f"--{option}", str(value)])
+        self.prepare_build_wasm_args(args)
+        self.decorate_cargo_args(args)
 
         return_code = myprocess.run_process_async(args, env=env, cwd=str(cwd))
         if return_code != 0:
             raise errors.BuildError(f"error code = {return_code}, see output")
 
-    def decorate_cargo_args(self, args):
+    def decorate_cargo_args(self, args: List[str]):
         target_dir = self.options.get("cargo_target_dir")
+        no_wasm_opt = self.options.get("no_wasm_opt")
+        wasm_symbols = self.options.get("wasm_symbols")
+        wasm_name = self.options.get("wasm_name")
+        wasm_suffix = self.options.get("wasm_suffix")
+
         if target_dir:
             args.extend(["--target-dir", target_dir])
-
-    def generate_abi(self):
-        if not self.has_abi():
-            return
-
-        args = [
-            "cargo",
-            "run"
-        ]
-        self.decorate_cargo_args(args)
-
-        env = self.get_env()
-        cwd = path.join(self.directory, "abi")
-        sink = myprocess.FileOutputSink(self.get_abi_filepath())
-        return_code = myprocess.run_process_async(args, env=env, cwd=cwd, stdout_sink=sink)
-        if return_code != 0:
-            raise errors.BuildError(f"error code = {return_code}, see output")
-
-        utils.prettify_json_file(self.get_abi_filepath())
+        if no_wasm_opt:
+            args.extend(["--no-wasm-opt"])
+        if wasm_symbols:
+            args.extend(["--wasm-symbols"])
+        if wasm_name:
+            args.extend(["--wasm-name", wasm_name])
+        if wasm_suffix:
+            args.extend(["--wasm-suffix", wasm_suffix])
 
     def has_meta(self):
         return (self.get_meta_folder() / "Cargo.toml").exists()

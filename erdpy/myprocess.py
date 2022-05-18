@@ -32,6 +32,8 @@ def run_process_async(
     stdout_sink=None,
     stderr_sink=None
 ) -> ReturnCode:
+    logger.info(f"run_process_async: {args}, in folder: {cwd}")
+    
     loop = asyncio.get_event_loop()
     result = loop.run_until_complete(_async_subprocess(args, env, stdout_sink, stderr_sink, cwd))
     loop.close()
