@@ -26,6 +26,7 @@ class Project(IProject):
         self._ensure_dependencies_installed()
         self.perform_build()
         contract_paths = self._do_after_build_custom()
+        contract_paths = rename_wasm_files(contract_paths, self.options.get("wasm_name"))
         self._do_after_build_core()
         return contract_paths
 
@@ -154,8 +155,39 @@ def glob_files(folder: Path, pattern: str) -> List[Path]:
 def exclude_files(files: List[Path], to_exclude: List[Path]) -> List[Path]:
     return list(set(files).difference(to_exclude))
 
+def rename_wasm_files(paths: List[Path], name: Union[str, None]) -> List[Path]:
+    if name is None:
+        return paths
+    new_paths = [adjust_wasm_filename(path, name) for path in paths]
+    for old_path, new_path in zip(paths, new_paths):
+        old_path.rename(new_path)
+    return new_paths
+
+def get_contract_suffix(name: str) -> str:
+    for suffix in ["-view.wasm", ".wasm"]:
+        if name.endswith(suffix):
+            return suffix
+    return ""
 
 def remove_suffix(name: str, suffix: str) -> str:
     if not name.endswith(suffix) or len(suffix) == 0:
         return name
     return name[:-len(suffix)]
+
+def adjust_wasm_filename(path: Path, name_hint: str) -> Path:
+    """
+    Adjusts the wasm's filename by using a name hint
+
+    >>> adjust_wasm_filename(Path("test/my-contract.wasm"), "hello.wasm")
+    PosixPath('test/hello.wasm')
+    >>> adjust_wasm_filename(Path("test/my-contract-view.wasm"), "hello.wasm")
+    PosixPath('test/hello-view.wasm')
+    >>> adjust_wasm_filename(Path("test/my-contract-view.wasm"), "hello")
+    PosixPath('test/hello-view.wasm')
+    >>> adjust_wasm_filename(Path("test/my-contract.wasm"), "world-view.wasm")
+    PosixPath('test/world-view.wasm')
+    >>> adjust_wasm_filename(Path("test/my-contract-view.wasm"), "world-view.wasm")
+    PosixPath('test/world-view-view.wasm')
+    """
+    new_name = remove_suffix(name_hint, ".wasm") + get_contract_suffix(path.name)
+    return path.with_name(new_name)
