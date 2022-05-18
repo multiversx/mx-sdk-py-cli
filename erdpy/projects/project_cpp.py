@@ -6,7 +6,7 @@ from os import path
 from typing import List
 
 from erdpy import dependencies, errors, myprocess, utils
-from erdpy.projects.project_base import Project
+from erdpy.projects.project_base import Project, rename_wasm_files
 
 logger = logging.getLogger("ProjectCpp")
 
@@ -87,7 +87,9 @@ class ProjectCpp(Project):
         os.remove(source_file.with_suffix(".wasm"))
         os.remove(source_file.with_suffix(".ll"))
         os.remove(source_file.with_suffix(".o"))
-        return [output_wasm_file]
+        
+        paths = rename_wasm_files([output_wasm_file], self.options.get("wasm_name"))
+        return paths
 
     def _get_llvm_path(self):
         return dependencies.get_module_directory("llvm")

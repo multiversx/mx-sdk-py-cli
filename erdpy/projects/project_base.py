@@ -26,7 +26,6 @@ class Project(IProject):
         self._ensure_dependencies_installed()
         self.perform_build()
         contract_paths = self._do_after_build_custom()
-        contract_paths = rename_wasm_files(contract_paths, self.options.get("wasm_name"))
         self._do_after_build_core()
         return contract_paths
 
