@@ -46,6 +46,8 @@ def setup_parser(args: List[str], subparsers: Any) -> Any:
                      help="for rust projects, does not strip the symbols from the wasm output. Useful for analysing the bytecode. Creates larger wasm files. Avoid in production (default: %(default)s)")
     sub.add_argument("--wasm-name", type=str,
                      help="for rust projects, optionally specify the name of the wasm bytecode output file")
+    sub.add_argument("--wasm-suffix", type=str,
+                     help="for rust projects, optionally specify the suffix of the wasm bytecode output file")
     sub.add_argument("--skip-eei-checks", action="store_true", default=False, help="skip EEI compatibility checks (default: %(default)s)")
     sub.add_argument("--ignore-eei-checks", action="store_true", default=False, help="ignore EEI compatibility errors (default: %(default)s)")
     sub.set_defaults(func=build)
@@ -214,6 +216,7 @@ def build(args: Any):
         "cargo_target_dir": args.cargo_target_dir,
         "wasm_symbols": args.wasm_symbols,
         "wasm_name": args.wasm_name,
+        "wasm_suffix": args.wasm_suffix,
         "skip-eei-checks": args.skip_eei_checks,
         "ignore-eei-checks": args.ignore_eei_checks
     }
