@@ -7,6 +7,9 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 ## [Unreleased]
  - TBD
 
+## [1.5.0]
+ - [Improve "contract build" for Rust projects](https://github.com/ElrondNetwork/elrond-sdk-erdpy/pull/140)
+
 ## [1.4.0]
  - [Add `ledgercomm[hid]`](https://github.com/ElrondNetwork/elrond-sdk-erdpy/pull/139)
 
