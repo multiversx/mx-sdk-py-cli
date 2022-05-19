@@ -7,7 +7,8 @@ import erdpy.utils as utils
 from erdpy import dependencies, myprocess, workstation
 from erdpy.dependencies.install import install_module
 from erdpy.testnet import (genesis_json, genesis_smart_contracts_json,
-                           node_config_toml, nodes_setup_json, p2p_toml,
+                           node_config_toml, nodes_setup_json, p2p_toml, 
+                           system_smart_contracts_toml,
                            wallets)
 from erdpy.testnet.config import TestnetConfiguration
 
@@ -59,6 +60,10 @@ def configure(args: Any):
     overwrite_genesis_file(
         testnet_config,
         testnet_config.observer_config_folders()
+    )
+    patch_nodes_system_smart_contracts_config(
+        testnet_config,
+        testnet_config.validator_config_folders()
     )
 
     # Seed node
@@ -156,6 +161,14 @@ def patch_nodes_p2p_config(testnet_config: TestnetConfiguration, nodes_config_fo
         config = config_folder / 'p2p.toml'
         data = utils.read_toml_file(config)
         p2p_toml.patch(data, testnet_config, index, port_first)
+        utils.write_toml_file(config, data)
+
+
+def patch_nodes_system_smart_contracts_config(testnet_config: TestnetConfiguration, nodes_config_folders):
+    for index, config_folder in enumerate(nodes_config_folders):
+        config = config_folder / 'systemSmartContractsConfig.toml'
+        data = utils.read_toml_file(config)
+        system_smart_contracts_toml.patch(data, testnet_config)
         utils.write_toml_file(config, data)
 
 

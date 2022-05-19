@@ -62,7 +62,6 @@ def patch_enable_epochs(data: ConfigDict, testnet_config: TestnetConfiguration):
     enable_epochs['ReturnDataToLastTransferEnableEpoch'] = 0
     enable_epochs['SenderInOutTransferEnableEpoch'] = 0
     enable_epochs['BalanceWaitingListsEnableEpoch'] = 0
-    enable_epochs['SaveJailedAlwaysEnableEpoch'] = 0
     enable_epochs['StakeEnableEpoch'] = 0
     enable_epochs['StakingV2EnableEpoch'] = 1
     enable_epochs['DoubleKeyProtectionEnableEpoch'] = 0
@@ -95,6 +94,23 @@ def patch_enable_epochs(data: ConfigDict, testnet_config: TestnetConfiguration):
     enable_epochs['MetaESDTSetEnableEpoch'] = 0
     enable_epochs['OptimizeGasUsedInCrossMiniBlocksEnableEpoch'] = 0
     enable_epochs['DeleteDelegatorAfterClaimRewardsEnableEpoch'] = 0
+
+    enable_epochs['OptimizeNFTStoreEnableEpoch'] = 0
+    enable_epochs['CreateNFTThroughExecByCallerEnableEpoch'] = 0
+    enable_epochs['StopDecreasingValidatorRatingWhenStuckEnableEpoch'] = 1
+    enable_epochs['FrontRunningProtectionEnableEpoch'] = 0
+    enable_epochs['IsPayableBySCEnableEpoch'] = 0
+    enable_epochs['CleanUpInformativeSCRsEnableEpoch'] = 0
+    enable_epochs['StorageAPICostOptimizationEnableEpoch'] = 0
+    enable_epochs['TransformToMultiShardCreateEnableEpoch'] = 0
+    enable_epochs['ESDTRegisterAndSetAllRolesEnableEpoch'] = 0
+    enable_epochs['ScheduledMiniBlocksEnableEpoch'] = 0
+    enable_epochs['CorrectJailedNotUnstakedEmptyQueueEpoch'] = 1
+    enable_epochs['DoNotReturnOldBlockInBlockchainHookEnableEpoch'] = 0
+    enable_epochs['AddFailedRelayedTxToInvalidMBsDisableEpoch'] = 0
+    enable_epochs['SCRSizeInvariantOnBuiltInResultEnableEpoch'] = 0
+    enable_epochs['CheckCorrectTokenIDForTransferRoleEnableEpoch'] = 0
+    enable_epochs['FailExecutionOnEveryAPIErrorEnableEpoch'] = 0
 
     enable_epochs['MaxNodesChangeEnableEpoch'] = [
         {'EpochEnable': 0, 'MaxNumNodes': 36, 'NodesToShufflePerShard': 4},
