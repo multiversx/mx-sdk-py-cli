@@ -5,6 +5,8 @@ from pathlib import Path
 from typing import Any, Dict, List, Set, cast
 
 from erdpy import dependencies, errors, myprocess, utils
+from erdpy import workstation
+from erdpy.constants import DEFAULT_CARGO_TARGET_DIR_NAME
 from erdpy.projects.project_base import Project
 
 logger = logging.getLogger("ProjectRust")
@@ -76,7 +78,7 @@ class ProjectRust(Project):
             raise errors.BuildError(f"error code = {return_code}, see output")
 
     def decorate_cargo_args(self, args: List[str]):
-        target_dir = self.options.get("cargo-target-dir")
+        target_dir = self._ensure_cargo_target_dir(self.options.get("cargo-target-dir"))
         no_wasm_opt = self.options.get("no-wasm-opt")
         wasm_symbols = self.options.get("wasm-symbols")
         wasm_name = self.options.get("wasm-name")
@@ -92,6 +94,12 @@ class ProjectRust(Project):
             args.extend(["--wasm-name", wasm_name])
         if wasm_suffix:
             args.extend(["--wasm-suffix", wasm_suffix])
+
+    def _ensure_cargo_target_dir(self, target_dir: str):
+        default_target_dir = str(workstation.get_tools_folder() / DEFAULT_CARGO_TARGET_DIR_NAME)
+        target_dir = target_dir or default_target_dir
+        utils.ensure_folder(target_dir)
+        return target_dir
 
     def has_meta(self):
         return (self.get_meta_folder() / "Cargo.toml").exists()
@@ -137,7 +145,7 @@ class ProjectRust(Project):
     def build_wasm_with_debug_symbols(self, build_options: Dict[str, Any]):
         cwd = self.get_meta_folder()
         env = self.get_env()
-        target_dir = build_options.get("cargo-target-dir")
+        target_dir = self._ensure_cargo_target_dir(build_options.get("cargo-target-dir"))
 
         args = [
             "cargo",
