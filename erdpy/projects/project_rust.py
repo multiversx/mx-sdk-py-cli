@@ -156,7 +156,7 @@ class ProjectRust(Project):
             "--wasm-symbols",
             "--wasm-suffix", "dbg",
             "--no-wasm-opt",
-            "--cargo-target-dir", target_dir
+            "--target-dir", target_dir
         ]
 
         return_code = myprocess.run_process_async(args, env=env, cwd=str(cwd))
