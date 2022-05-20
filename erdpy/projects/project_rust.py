@@ -78,14 +78,15 @@ class ProjectRust(Project):
             raise errors.BuildError(f"error code = {return_code}, see output")
 
     def decorate_cargo_args(self, args: List[str]):
-        target_dir = self._ensure_cargo_target_dir(self.options.get("cargo-target-dir"))
+        target_dir: str = self.options.get("cargo-target-dir", "")
+        target_dir = self._ensure_cargo_target_dir(target_dir)
         no_wasm_opt = self.options.get("no-wasm-opt")
         wasm_symbols = self.options.get("wasm-symbols")
         wasm_name = self.options.get("wasm-name")
         wasm_suffix = self.options.get("wasm-suffix")
 
-        if target_dir:
-            args.extend(["--target-dir", target_dir])
+        args.extend(["--target-dir", target_dir])
+
         if no_wasm_opt:
             args.extend(["--no-wasm-opt"])
         if wasm_symbols:
@@ -145,7 +146,8 @@ class ProjectRust(Project):
     def build_wasm_with_debug_symbols(self, build_options: Dict[str, Any]):
         cwd = self.get_meta_folder()
         env = self.get_env()
-        target_dir = self._ensure_cargo_target_dir(build_options.get("cargo-target-dir"))
+        target_dir: str = build_options.get("cargo-target-dir", "")
+        target_dir = self._ensure_cargo_target_dir(target_dir)
 
         args = [
             "cargo",
@@ -153,11 +155,9 @@ class ProjectRust(Project):
             "build",
             "--wasm-symbols",
             "--wasm-suffix", "dbg",
-            "--no-wasm-opt"
+            "--no-wasm-opt",
+            "--cargo-target-dir", target_dir
         ]
-
-        if target_dir:
-            args.extend(["--cargo-target-dir", target_dir])
 
         return_code = myprocess.run_process_async(args, env=env, cwd=str(cwd))
         if return_code != 0:
