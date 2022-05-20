@@ -134,9 +134,10 @@ class ProjectRust(Project):
     def get_env(self):
         return dependencies.get_module_by_key("rust").get_env()
 
-    def build_wasm_with_debug_symbols(self):
+    def build_wasm_with_debug_symbols(self, build_options: Dict[str, Any]):
         cwd = self.get_meta_folder()
         env = self.get_env()
+        target_dir = build_options.get("cargo-target-dir")
 
         args = [
             "cargo",
@@ -144,10 +145,12 @@ class ProjectRust(Project):
             "build",
             "--wasm-symbols",
             "--wasm-suffix", "dbg",
-            "--no-wasm-opt",
-            "--cargo-target-dir???"
+            "--no-wasm-opt"
         ]
-        
+
+        if target_dir:
+            args.extend(["--cargo-target-dir", target_dir])
+
         return_code = myprocess.run_process_async(args, env=env, cwd=str(cwd))
         if return_code != 0:
             raise errors.BuildError(f"error code = {return_code}, see output")
