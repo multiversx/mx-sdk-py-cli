@@ -13,7 +13,7 @@ from erdpy.projects.report.report_creator import ReportCreator
 logger = logging.getLogger("report")
 
 
-def do_report(args: Any) -> None:
+def do_report(args: Any, build_options: Any) -> None:
     compare_report_paths = args.compare
     if compare_report_paths is None:
         _build_report(args)

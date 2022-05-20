@@ -59,7 +59,7 @@ def setup_parser(args: List[str], subparsers: Any) -> Any:
     sub.add_argument("--output-file", type=Path, help="if specified, the output is written to a file, otherwise it's written to the standard output")
     sub.add_argument("--compare", type=Path, nargs='+', metavar=("report-1.json", "report-2.json"), help="create a comparison from two or more reports")
     _add_build_options_args(sub)
-    sub.set_defaults(func=projects.do_report)
+    sub.set_defaults(func=do_report)
 
     output_description = CLIOutputBuilder.describe(with_contract=True, with_transaction_on_network=True, with_simulation=True)
     sub = cli_shared.add_command_subparser(subparsers, "contract", "deploy", f"Deploy a Smart Contract.{output_description}")
@@ -232,6 +232,11 @@ def _prepare_build_options(args: Any) -> Dict[str, Any]:
         "skip-eei-checks": args.skip_eei_checks,
         "ignore-eei-checks": args.ignore_eei_checks
     }
+
+
+def do_report(args: Any):
+    build_options: Dict[str, Any] = _prepare_build_options(args)
+    projects.do_report(args, build_options)
 
 
 def run_tests(args: Any):
