@@ -68,6 +68,13 @@ async def do_start(args: Any):
         "--log-save"
     ], cwd=testnet_config.proxy_folder(), delay=PROXY_START_DELAY))
 
+    # Proxy as Rosetta
+    to_run.append(run([
+        "./proxy",
+        "--rosetta",
+        "--log-save"
+    ], cwd=testnet_config.proxy_rosetta_folder(), delay=PROXY_START_DELAY))
+
     await asyncio.gather(*to_run)
 
 
