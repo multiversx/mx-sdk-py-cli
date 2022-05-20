@@ -76,11 +76,11 @@ class ProjectRust(Project):
             raise errors.BuildError(f"error code = {return_code}, see output")
 
     def decorate_cargo_args(self, args: List[str]):
-        target_dir = self.options.get("cargo_target_dir")
-        no_wasm_opt = self.options.get("no_wasm_opt")
-        wasm_symbols = self.options.get("wasm_symbols")
-        wasm_name = self.options.get("wasm_name")
-        wasm_suffix = self.options.get("wasm_suffix")
+        target_dir = self.options.get("cargo-target-dir")
+        no_wasm_opt = self.options.get("no-wasm-opt")
+        wasm_symbols = self.options.get("wasm-symbols")
+        wasm_name = self.options.get("wasm-name")
+        wasm_suffix = self.options.get("wasm-suffix")
 
         if target_dir:
             args.extend(["--target-dir", target_dir])
@@ -144,7 +144,8 @@ class ProjectRust(Project):
             "build",
             "--wasm-symbols",
             "--wasm-suffix", "dbg",
-            "--no-wasm-opt"
+            "--no-wasm-opt",
+            "--cargo-target-dir???"
         ]
         
         return_code = myprocess.run_process_async(args, env=env, cwd=str(cwd))
