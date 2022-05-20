@@ -1,6 +1,6 @@
 import logging
 import os
-from typing import Any, List
+from typing import Any, Dict, List
 
 from pathlib import Path
 
@@ -36,20 +36,7 @@ def setup_parser(args: List[str], subparsers: Any) -> Any:
                                            "Build a Smart Contract project using the appropriate buildchain.")
     _add_project_arg(sub)
     _add_recursive_arg(sub)
-    sub.add_argument("--debug", action="store_true", default=False, help="set debug flag (default: %(default)s)")
-    sub.add_argument("--no-optimization", action="store_true", default=False,
-                     help="bypass optimizations (for clang) (default: %(default)s)")
-    sub.add_argument("--no-wasm-opt", action="store_true", default=False,
-                     help="do not optimize wasm files after the build (default: %(default)s)")
-    sub.add_argument("--cargo-target-dir", type=str, help="for rust projects, forward the parameter to Cargo")
-    sub.add_argument("--wasm-symbols", action="store_true", default=False,
-                     help="for rust projects, does not strip the symbols from the wasm output. Useful for analysing the bytecode. Creates larger wasm files. Avoid in production (default: %(default)s)")
-    sub.add_argument("--wasm-name", type=str,
-                     help="for rust projects, optionally specify the name of the wasm bytecode output file")
-    sub.add_argument("--wasm-suffix", type=str,
-                     help="for rust projects, optionally specify the suffix of the wasm bytecode output file")
-    sub.add_argument("--skip-eei-checks", action="store_true", default=False, help="skip EEI compatibility checks (default: %(default)s)")
-    sub.add_argument("--ignore-eei-checks", action="store_true", default=False, help="ignore EEI compatibility errors (default: %(default)s)")
+    _add_build_options_args(sub)
     sub.set_defaults(func=build)
 
     sub = cli_shared.add_command_subparser(subparsers, "contract", "clean", "Clean a Smart Contract project.")
@@ -71,7 +58,8 @@ def setup_parser(args: List[str], subparsers: Any) -> Any:
     sub.add_argument("--output-format", type=str, default="text-markdown", choices=["github-markdown", "text-markdown", "json"], help="report output format (default: %(default)s)")
     sub.add_argument("--output-file", type=Path, help="if specified, the output is written to a file, otherwise it's written to the standard output")
     sub.add_argument("--compare", type=Path, nargs='+', metavar=("report-1.json", "report-2.json"), help="create a comparison from two or more reports")
-    sub.set_defaults(func=projects.do_report)
+    _add_build_options_args(sub)
+    sub.set_defaults(func=do_report)
 
     output_description = CLIOutputBuilder.describe(with_contract=True, with_transaction_on_network=True, with_simulation=True)
     sub = cli_shared.add_command_subparser(subparsers, "contract", "deploy", f"Deploy a Smart Contract.{output_description}")
@@ -142,6 +130,23 @@ def _add_project_arg(sub: Any):
                      help="🗀 the project directory (default: current directory)")
 
 
+def _add_build_options_args(sub: Any):
+    sub.add_argument("--debug", action="store_true", default=False, help="set debug flag (default: %(default)s)")
+    sub.add_argument("--no-optimization", action="store_true", default=False,
+                     help="bypass optimizations (for clang) (default: %(default)s)")
+    sub.add_argument("--no-wasm-opt", action="store_true", default=False,
+                     help="do not optimize wasm files after the build (default: %(default)s)")
+    sub.add_argument("--cargo-target-dir", type=str, help="for rust projects, forward the parameter to Cargo")
+    sub.add_argument("--wasm-symbols", action="store_true", default=False,
+                     help="for rust projects, does not strip the symbols from the wasm output. Useful for analysing the bytecode. Creates larger wasm files. Avoid in production (default: %(default)s)")
+    sub.add_argument("--wasm-name", type=str,
+                     help="for rust projects, optionally specify the name of the wasm bytecode output file")
+    sub.add_argument("--wasm-suffix", type=str,
+                     help="for rust projects, optionally specify the suffix of the wasm bytecode output file")
+    sub.add_argument("--skip-eei-checks", action="store_true", default=False, help="skip EEI compatibility checks (default: %(default)s)")
+    sub.add_argument("--ignore-eei-checks", action="store_true", default=False, help="ignore EEI compatibility errors (default: %(default)s)")
+
+
 def _add_recursive_arg(sub: Any):
     sub.add_argument("-r", "--recursive", dest="recursive", action="store_true", help="locate projects recursively")
 
@@ -208,21 +213,30 @@ def clean(args: Any):
 
 def build(args: Any):
     project_paths = get_project_paths(args)
-    options = {
+    options: Dict[str, Any] = _prepare_build_options(args)
+
+    for project in project_paths:
+        projects.build_project(project, options)
+
+
+def _prepare_build_options(args: Any) -> Dict[str, Any]:
+    return {
         "debug": args.debug,
         "optimized": not args.no_optimization,
         "no-wasm-opt": args.no_wasm_opt,
         "verbose": args.verbose,
-        "cargo_target_dir": args.cargo_target_dir,
-        "wasm_symbols": args.wasm_symbols,
-        "wasm_name": args.wasm_name,
-        "wasm_suffix": args.wasm_suffix,
+        "cargo-target-dir": args.cargo_target_dir,
+        "wasm-symbols": args.wasm_symbols,
+        "wasm-name": args.wasm_name,
+        "wasm-suffix": args.wasm_suffix,
         "skip-eei-checks": args.skip_eei_checks,
         "ignore-eei-checks": args.ignore_eei_checks
     }
 
-    for project in project_paths:
-        projects.build_project(project, options)
+
+def do_report(args: Any):
+    build_options: Dict[str, Any] = _prepare_build_options(args)
+    projects.do_report(args, build_options)
 
 
 def run_tests(args: Any):

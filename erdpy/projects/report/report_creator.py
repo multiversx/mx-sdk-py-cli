@@ -2,7 +2,7 @@
 import itertools
 import operator
 from pathlib import Path
-from typing import Iterable, List, Tuple
+from typing import Any, Dict, Iterable, List, Tuple
 from erdpy import guards
 from erdpy.projects.report.data.folder_report import FolderReport
 from erdpy.projects.report.data.extracted_feature import ExtractedFeature
@@ -18,11 +18,12 @@ from erdpy.projects.report.features.twiggy_paths_check import run_twiggy_paths
 
 
 class ReportCreator:
-    def __init__(self, options: List[ReportFeature], skip_build: bool, skip_twiggy: bool) -> None:
+    def __init__(self, options: List[ReportFeature], skip_build: bool, skip_twiggy: bool, build_options: Dict[str, Any]) -> None:
         self.report_features = options
         self.skip_build = skip_build
         self.skip_twiggy = skip_twiggy
         self.require_twiggy_paths = any(report_feature.requires_twiggy_paths() for report_feature in self.report_features)
+        self.build_options = build_options
 
     def create_report(self, base_path: Path, project_paths: List[Path]) -> Report:
         base_path = base_path.resolve()
@@ -46,12 +47,12 @@ class ReportCreator:
         project = load_project(project_path)
 
         if not self.skip_build:
-            project.build()
+            project.build(self.build_options)
 
         twiggy_requirements_met = False
         should_build_twiggy = self.require_twiggy_paths and not self.skip_twiggy
         if should_build_twiggy and isinstance(project, ProjectRust):
-            project.build_wasm_with_debug_symbols()
+            project.build_wasm_with_debug_symbols(self.build_options)
             twiggy_requirements_met = True
 
         wasm_reports = [self._create_wasm_report(wasm_path, twiggy_requirements_met) for wasm_path in project.find_wasm_files()]
