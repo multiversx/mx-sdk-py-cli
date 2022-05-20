@@ -47,6 +47,7 @@ generate() {
     command "Contract.Call" "contract call"
     command "Contract.Upgrade" "contract upgrade"
     command "Contract.Query" "contract query"
+    command "Contract.Report" "contract report"
 
     group "Transactions" "tx"
     command "Transactions.New" "tx new"
