@@ -88,7 +88,7 @@ class ProjectCpp(Project):
         os.remove(source_file.with_suffix(".ll"))
         os.remove(source_file.with_suffix(".o"))
         
-        paths = rename_wasm_files([output_wasm_file], self.options.get("wasm_name"))
+        paths = rename_wasm_files([output_wasm_file], self.options.get("wasm-name"))
         return paths
 
     def _get_llvm_path(self):

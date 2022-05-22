@@ -7,6 +7,12 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 ## [Unreleased]
  - TBD
 
+## [1.5.2]
+ - [Fix build arguments for report creator](https://github.com/ElrondNetwork/elrond-sdk-erdpy/pull/143)
+
+## [1.5.1]
+ - [Pass contract build options to report creator](https://github.com/ElrondNetwork/elrond-sdk-erdpy/pull/142)
+
 ## [1.5.0]
  - [Improve "contract build" for Rust projects](https://github.com/ElrondNetwork/elrond-sdk-erdpy/pull/140)
 

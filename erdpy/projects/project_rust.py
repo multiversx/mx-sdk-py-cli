@@ -5,6 +5,8 @@ from pathlib import Path
 from typing import Any, Dict, List, Set, cast
 
 from erdpy import dependencies, errors, myprocess, utils
+from erdpy import workstation
+from erdpy.constants import DEFAULT_CARGO_TARGET_DIR_NAME
 from erdpy.projects.project_base import Project
 
 logger = logging.getLogger("ProjectRust")
@@ -76,14 +78,15 @@ class ProjectRust(Project):
             raise errors.BuildError(f"error code = {return_code}, see output")
 
     def decorate_cargo_args(self, args: List[str]):
-        target_dir = self.options.get("cargo_target_dir")
-        no_wasm_opt = self.options.get("no_wasm_opt")
-        wasm_symbols = self.options.get("wasm_symbols")
-        wasm_name = self.options.get("wasm_name")
-        wasm_suffix = self.options.get("wasm_suffix")
+        target_dir: str = self.options.get("cargo-target-dir", "")
+        target_dir = self._ensure_cargo_target_dir(target_dir)
+        no_wasm_opt = self.options.get("no-wasm-opt")
+        wasm_symbols = self.options.get("wasm-symbols")
+        wasm_name = self.options.get("wasm-name")
+        wasm_suffix = self.options.get("wasm-suffix")
 
-        if target_dir:
-            args.extend(["--target-dir", target_dir])
+        args.extend(["--target-dir", target_dir])
+
         if no_wasm_opt:
             args.extend(["--no-wasm-opt"])
         if wasm_symbols:
@@ -92,6 +95,12 @@ class ProjectRust(Project):
             args.extend(["--wasm-name", wasm_name])
         if wasm_suffix:
             args.extend(["--wasm-suffix", wasm_suffix])
+
+    def _ensure_cargo_target_dir(self, target_dir: str):
+        default_target_dir = str(workstation.get_tools_folder() / DEFAULT_CARGO_TARGET_DIR_NAME)
+        target_dir = target_dir or default_target_dir
+        utils.ensure_folder(target_dir)
+        return target_dir
 
     def has_meta(self):
         return (self.get_meta_folder() / "Cargo.toml").exists()
@@ -134,9 +143,11 @@ class ProjectRust(Project):
     def get_env(self):
         return dependencies.get_module_by_key("rust").get_env()
 
-    def build_wasm_with_debug_symbols(self):
+    def build_wasm_with_debug_symbols(self, build_options: Dict[str, Any]):
         cwd = self.get_meta_folder()
         env = self.get_env()
+        target_dir: str = build_options.get("cargo-target-dir", "")
+        target_dir = self._ensure_cargo_target_dir(target_dir)
 
         args = [
             "cargo",
@@ -144,9 +155,10 @@ class ProjectRust(Project):
             "build",
             "--wasm-symbols",
             "--wasm-suffix", "dbg",
-            "--no-wasm-opt"
+            "--no-wasm-opt",
+            "--target-dir", target_dir
         ]
-        
+
         return_code = myprocess.run_process_async(args, env=env, cwd=str(cwd))
         if return_code != 0:
             raise errors.BuildError(f"error code = {return_code}, see output")
