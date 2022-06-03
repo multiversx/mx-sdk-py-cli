@@ -129,8 +129,3 @@ def format_key_json(uid: str, pubkey: str, iv: bytes, ciphertext: bytes, salt: b
             'mac': hexlify(mac).decode(),
         }
     }
-
-
-def get_password(pass_file):
-    with open(pass_file) as pass_f:
-        return pass_f.read().strip()

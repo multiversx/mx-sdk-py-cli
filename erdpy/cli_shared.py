@@ -7,6 +7,7 @@ from typing import Any, List, Text, cast
 from erdpy import config, errors, scope, utils
 from erdpy.accounts import Account
 from erdpy.cli_output import CLIOutputBuilder
+from erdpy.cli_password import load_password
 from erdpy.ledger.ledger_functions import do_get_ledger_address
 from erdpy.proxy.core import ElrondProxy
 from erdpy.simulation import Simulator
@@ -80,7 +81,7 @@ def add_wallet_args(args: List[str], sub: Any):
     sub.add_argument("--pem", required=check_if_sign_method_required(args, "--pem"), help="🔑 the PEM file, if keyfile not provided")
     sub.add_argument("--pem-index", default=0, help="🔑 the index in the PEM file (default: %(default)s)")
     sub.add_argument("--keyfile", required=check_if_sign_method_required(args, "--keyfile"), help="🔑 a JSON keyfile, if PEM not provided")
-    sub.add_argument("--passfile", required=(utils.is_arg_present(args, "--keyfile")), help="🔑 a file containing keyfile's password, if keyfile provided")
+    sub.add_argument("--passfile", help="🔑 a file containing keyfile's password, if keyfile provided")
     sub.add_argument("--ledger", action="store_true", required=check_if_sign_method_required(args, "--ledger"), default=False, help="🔐 bool flag for signing transaction using ledger")
     sub.add_argument("--ledger-account-index", type=int, default=0, help="🔐 the index of the account when using Ledger")
     sub.add_argument("--ledger-address-index", type=int, default=0, help="🔐 the index of the address when using Ledger")
@@ -115,8 +116,9 @@ def prepare_nonce_in_args(args: Any):
     if args.recall_nonce:
         if args.pem:
             account = Account(pem_file=args.pem, pem_index=args.pem_index)
-        elif args.keyfile and args.passfile:
-            account = Account(key_file=args.keyfile, pass_file=args.passfile)
+        elif args.keyfile:
+            password = load_password(args)
+            account = Account(key_file=args.keyfile, password=password)
         elif args.ledger:
             address = do_get_ledger_address(account_index=args.ledger_account_index, address_index=args.ledger_address_index)
             account = Account(address=address)

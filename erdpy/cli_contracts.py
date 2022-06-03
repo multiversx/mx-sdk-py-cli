@@ -7,6 +7,7 @@ from pathlib import Path
 from erdpy import cli_shared, errors, projects, utils
 from erdpy.accounts import Account, Address, LedgerAccount
 from erdpy.cli_output import CLIOutputBuilder
+from erdpy.cli_password import load_password
 from erdpy.contracts import CodeMetadata, SmartContract
 from erdpy.projects import load_project
 from erdpy.projects.core import get_project_paths_recursively
@@ -284,8 +285,9 @@ def _prepare_sender(args: Any) -> Account:
         sender = LedgerAccount(account_index=args.ledger_account_index, address_index=args.ledger_address_index)
     elif args.pem:
         sender = Account(pem_file=args.pem, pem_index=args.pem_index)
-    elif args.keyfile and args.passfile:
-        sender = Account(key_file=args.keyfile, pass_file=args.passfile)
+    elif args.keyfile:
+        password = load_password(args)
+        sender = Account(key_file=args.keyfile, password=password)
     else:
         raise errors.NoWalletProvided()
 
