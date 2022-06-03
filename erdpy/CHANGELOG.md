@@ -7,7 +7,7 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 ## [Unreleased]
  - TBD
 
-## [1.6.0]
+## [2.0.0]
  - [Show password prompt if no passfile specificied](https://github.com/ElrondNetwork/elrond-sdk-erdpy/pull/144)
 
 ## [1.5.2]
