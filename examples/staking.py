@@ -1,9 +1,10 @@
 import logging
 from argparse import ArgumentParser
-from erdpy import utils
 
+from erdpy import utils
 from erdpy.accounts import Account, Address
 from erdpy.cli_output import CLIOutputBuilder
+from erdpy.cli_password import load_password
 from erdpy.proxy.core import ElrondProxy
 from erdpy.transactions import Transaction
 from erdpy.validators.core import VALIDATORS_SMART_CONTRACT_ADDRESS, prepare_transaction_data_for_stake
@@ -28,7 +29,7 @@ def main():
     parser = ArgumentParser()
     parser.add_argument("--proxy", required=True)
     parser.add_argument("--keyfile", help="wallet JSON keyfile", required=True)
-    parser.add_argument("--passfile", help="wallet password file", required=True)
+    parser.add_argument("--passfile", help="wallet keyfile's password file")
     parser.add_argument("--reward-address", required=True, help="the reward address")
     parser.add_argument("--validators-file", required=True, help="validators JSON file (with links to validator PEM files)")
     parser.add_argument("--value", type=int, required=True, help="value, as a number (atoms of EGLD)")
@@ -36,7 +37,8 @@ def main():
 
     proxy = ElrondProxy(args.proxy)
     network = proxy.get_network_config()
-    node_operator = Account(key_file=args.keyfile, pass_file=args.passfile)
+    password = load_password(args)
+    node_operator = Account(key_file=args.keyfile, password=password)
     node_operator.sync_nonce(proxy)
     reward_address = Address(args.reward_address)
     data, gas_limit = prepare_transaction_data_for_stake(node_operator.address, args.validators_file, reward_address)

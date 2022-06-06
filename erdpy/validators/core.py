@@ -2,11 +2,12 @@ import logging
 from os import path
 from pathlib import Path
 from typing import Any, List, Tuple, Union
-from erdpy.contracts import SmartContract
-from erdpy.errors import BadUsage
 
-from erdpy.validators.validators_file import ValidatorsFile
 from erdpy import utils
+from erdpy.contracts import SmartContract
+from erdpy.cli_password import load_password
+from erdpy.errors import BadUsage
+from erdpy.validators.validators_file import ValidatorsFile
 from erdpy.accounts import Account, Address
 from erdpy.config import MetaChainSystemSCsCost, MIN_GAS_LIMIT, GAS_PER_DATA_BYTE
 from erdpy.wallet.pem import parse_validator_pem
@@ -24,8 +25,9 @@ def prepare_args_for_stake(args: Any):
 
     if args.pem:
         node_operator = Account(pem_file=args.pem)
-    elif args.keyfile and args.passfile:
-        node_operator = Account(key_file=args.keyfile, pass_file=args.passfile)
+    elif args.keyfile:
+        password = load_password(args)
+        node_operator = Account(key_file=args.keyfile, password=password)
     else:
         raise BadUsage("cannot initialize node operator")
 

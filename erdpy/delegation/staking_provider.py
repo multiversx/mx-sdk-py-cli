@@ -2,9 +2,10 @@ import binascii
 from pathlib import Path
 from typing import Any
 
-from erdpy.validators.validators_file import ValidatorsFile
 from erdpy import utils
+from erdpy.validators.validators_file import ValidatorsFile
 from erdpy.accounts import Account
+from erdpy.cli_password import load_password
 from erdpy.config import MetaChainSystemSCsCost
 from erdpy.validators.core import estimate_system_sc_call
 from erdpy.wallet.pem import parse_validator_pem
@@ -34,8 +35,9 @@ def prepare_args_for_add_nodes(args: Any):
         account = Account(address=args.delegation_contract)
     elif args.pem:
         account = Account(pem_file=args.pem)
-    elif args.keyfile and args.passfile:
-        account = Account(key_file=args.keyfile, pass_file=args.passfile)
+    elif args.keyfile:
+        password = load_password(args)
+        account = Account(key_file=args.keyfile, password=password)
 
     add_nodes_data = "addNodes"
     num_of_nodes = validators_file.get_num_of_nodes()
