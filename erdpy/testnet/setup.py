@@ -1,4 +1,5 @@
 import logging
+from pathlib import Path
 import shutil
 from os import path
 from typing import Any
@@ -7,8 +8,7 @@ import erdpy.utils as utils
 from erdpy import dependencies, myprocess, workstation
 from erdpy.dependencies.install import install_module
 from erdpy.testnet import (genesis_json, genesis_smart_contracts_json,
-                           node_config_toml, nodes_setup_json, p2p_toml, 
-                           system_smart_contracts_toml,
+                           node_config_toml, nodes_setup_json, p2p_toml,
                            wallets)
 from erdpy.testnet.config import TestnetConfiguration
 
@@ -61,10 +61,6 @@ def configure(args: Any):
         testnet_config,
         testnet_config.observer_config_folders()
     )
-    patch_nodes_system_smart_contracts_config(
-        testnet_config,
-        testnet_config.validator_config_folders()
-    )
 
     # Seed node
     copy_config_to_seednode(testnet_config)
@@ -101,6 +97,17 @@ def copy_config_to_nodes(testnet_config: TestnetConfiguration):
     for node_config in testnet_config.all_nodes_config_folders():
         shutil.copytree(config_source, node_config)
 
+        # Overwrite files when applicable
+        overwrites_folder_name = "localnet-config"
+        sdk_overwrites = workstation.get_tools_folder() / overwrites_folder_name
+        cwd_overwrites = Path() / overwrites_folder_name
+        if sdk_overwrites.exists():
+            logger.info(f"Overwrite configuration with {sdk_overwrites.absolute()}")
+            shutil.copytree(sdk_overwrites, node_config, dirs_exist_ok=True)
+        if cwd_overwrites.exists():
+            logger.info(f"Overwrite configuration with {cwd_overwrites.absolute()}")
+            shutil.copytree(cwd_overwrites, node_config, dirs_exist_ok=True)
+
 
 def copy_validator_keys(testnet_config: TestnetConfiguration):
     for index, validator in enumerate(testnet_config.validators()):
@@ -123,15 +130,6 @@ def patch_node_config(testnet_config: TestnetConfiguration):
         node_config_toml.patch_api(data, testnet_config)
         utils.write_toml_file(api_config_file, data)
 
-        system_sc_config_file = node_config / 'systemSmartContractsConfig.toml'
-        data = utils.read_toml_file(system_sc_config_file)
-        node_config_toml.patch_system_smart_contracts(data, testnet_config)
-        utils.write_toml_file(system_sc_config_file, data)
-
-        enable_epochs_config_file = node_config / 'enableEpochs.toml'
-        data = utils.read_toml_file(enable_epochs_config_file)
-        node_config_toml.patch_enable_epochs(data, testnet_config)
-        utils.write_toml_file(enable_epochs_config_file, data)
 
         genesis_smart_contracts_file = node_config / 'genesisSmartContracts.json'
         data = utils.read_json_file(genesis_smart_contracts_file)
@@ -161,14 +159,6 @@ def patch_nodes_p2p_config(testnet_config: TestnetConfiguration, nodes_config_fo
         config = config_folder / 'p2p.toml'
         data = utils.read_toml_file(config)
         p2p_toml.patch(data, testnet_config, index, port_first)
-        utils.write_toml_file(config, data)
-
-
-def patch_nodes_system_smart_contracts_config(testnet_config: TestnetConfiguration, nodes_config_folders):
-    for index, config_folder in enumerate(nodes_config_folders):
-        config = config_folder / 'systemSmartContractsConfig.toml'
-        data = utils.read_toml_file(config)
-        system_smart_contracts_toml.patch(data, testnet_config)
         utils.write_toml_file(config, data)
 
 
