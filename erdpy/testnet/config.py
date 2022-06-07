@@ -177,15 +177,8 @@ class TestnetConfiguration:
         testnet = self.root()
         return testnet / 'proxy'
 
-    def proxy_rosetta_folder(self):
-        testnet = self.root()
-        return testnet / 'proxy-rosetta'
-
     def proxy_config_folder(self):
         return self.proxy_folder() / 'config'
-
-    def proxy_rosetta_config_folder(self):
-        return self.proxy_rosetta_folder() / 'config'
 
     def num_all_nodes(self):
         return self.num_all_validators() + self.num_all_observers()
@@ -302,9 +295,6 @@ class TestnetConfiguration:
 
     def proxy_port(self):
         return self.networking["port_proxy"]
-
-    def proxy_rosetta_port(self):
-        return self.networking["port_proxy"] + 1
 
     def loglevel(self) -> str:
         return self.features.get("loglevel", "")

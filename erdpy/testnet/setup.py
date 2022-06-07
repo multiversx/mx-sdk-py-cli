@@ -191,21 +191,12 @@ def overwrite_genesis_file(testnet_config: TestnetConfiguration, nodes_config_fo
 def copy_config_to_proxy(testnet_config: TestnetConfiguration):
     proxy_config_source = testnet_config.proxy_config_source()
     proxy_config = testnet_config.proxy_config_folder()
-    proxy_rosetta_config = testnet_config.proxy_rosetta_config_folder()
     makefolder(proxy_config)
-    makefolder(proxy_rosetta_config)
 
     shutil.copy(proxy_config_source / 'config.toml', proxy_config)
-    shutil.copy(proxy_config_source / 'config.toml', proxy_rosetta_config)
-
     shutil.copytree(proxy_config_source / 'apiConfig', proxy_config / 'apiConfig')
-    shutil.copytree(proxy_config_source / 'apiConfig', proxy_rosetta_config / 'apiConfig')
-
     shutil.copy(proxy_config_source / 'external.toml', proxy_config)
-    shutil.copy(proxy_config_source / 'external.toml', proxy_rosetta_config)
-
     shutil.copy(proxy_config_source / 'economics.toml', proxy_config)
-    shutil.copy(proxy_config_source / 'economics.toml', proxy_rosetta_config)
 
 
 def patch_proxy_config(testnet_config: TestnetConfiguration):
@@ -216,14 +207,6 @@ def patch_proxy_config(testnet_config: TestnetConfiguration):
     data['FullHistoryNodes'] = nodes
     data['GeneralSettings']['ServerPort'] = testnet_config.proxy_port()
     utils.write_toml_file(proxy_config_file, data)
-
-    proxy_rosetta_config_file = testnet_config.proxy_rosetta_config_folder() / 'config.toml'
-    nodes = testnet_config.api_addresses_sharded_for_proxy_config()
-    data = utils.read_toml_file(proxy_rosetta_config_file)
-    data['Observers'] = nodes
-    data['FullHistoryNodes'] = nodes
-    data['GeneralSettings']['ServerPort'] = testnet_config.proxy_rosetta_port()
-    utils.write_toml_file(proxy_rosetta_config_file, data)
 
     api_config_file = path.join(testnet_config.proxy_config_folder(), 'apiConfig', 'v1_0.toml')
     data = utils.read_toml_file(api_config_file)
@@ -284,10 +267,8 @@ def build_binaries(testnet_config: TestnetConfiguration):
             shutil.copy(libwasmer_path, destination)
 
     shutil.copy(proxy_folder / "proxy", testnet_config.proxy_folder())
-    shutil.copy(proxy_folder / "proxy", testnet_config.proxy_rosetta_folder())
     if workstation.get_platform() == "osx":
         shutil.copy(libwasmer_path, testnet_config.proxy_folder())
-        shutil.copy(libwasmer_path, testnet_config.proxy_rosetta_folder())
 
 
 def _get_wasm_vm_version(testnet_config: TestnetConfiguration):
