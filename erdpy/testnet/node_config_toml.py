@@ -1,6 +1,5 @@
 from typing import Dict, Any
 
-import erdpy.config
 
 from erdpy.testnet.config import TestnetConfiguration
 from erdpy.testnet.nodes_setup_json import CHAIN_ID
