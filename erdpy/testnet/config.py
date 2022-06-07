@@ -160,6 +160,9 @@ class TestnetConfiguration:
     def genesis_time(self):
         return int(time.time()) + int(self.timing['genesis_delay'])
 
+    def rounds_per_epoch(self):
+        return self.timing['rounds_per_epoch']
+
     def seednode_folder(self):
         testnet = self.root()
         return testnet / 'seednode'
@@ -339,6 +342,7 @@ class TestnetConfiguration:
             'validators_per_shard': 1,
         }
         config['timing'] = {
+            'rounds_per_epoch': 50,
             'genesis_delay': 10
         }
         config['systemSmartContracts'] = {
