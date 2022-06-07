@@ -345,9 +345,6 @@ class TestnetConfiguration:
             'rounds_per_epoch': 50,
             'genesis_delay': 10
         }
-        config['systemSmartContracts'] = {
-            'ESDTBaseIssuingCost': "50000000000000000"
-        }
 
         return config
 

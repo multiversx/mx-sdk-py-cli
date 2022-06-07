@@ -98,7 +98,7 @@ def copy_config_to_nodes(testnet_config: TestnetConfiguration):
         shutil.copytree(config_source, node_config)
 
         # Overwrite files when applicable
-        overwrites_folder_name = "localnet-config"
+        overwrites_folder_name = "localnet-node-config"
         sdk_overwrites = workstation.get_tools_folder() / overwrites_folder_name
         cwd_overwrites = Path() / overwrites_folder_name
         if sdk_overwrites.exists():
