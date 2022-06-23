@@ -9,6 +9,8 @@ ConfigDict = Dict[str, Any]
 
 def patch_config(data: ConfigDict, testnet_config: TestnetConfiguration):
     data['DbLookupExtensions']['Enabled'] = True
+    data['StoragePruning']['ValidatorCleanOldEpochsData'] = False
+    data['StoragePruning']['ObserverCleanOldEpochsData'] = False
 
     general_settings: ConfigDict = dict()
     general_settings['ChainID'] = CHAIN_ID
