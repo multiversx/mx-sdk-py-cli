@@ -212,7 +212,7 @@ class TemplateRust(Template):
                 (f"extern crate {template_name};", f"extern crate {project_name};"),
                 # Example: replace "empty::ContractObj" to "foo_bar::ContractObj"
                 (f"{template_name}::ContractObj", f"{project_name}::ContractObj"),
-                # Example: replace "empty::contract_obj" to "foo_bar::contract_obj"
+                (f"{template_name}::ContractBuilder", f"{project_name}::ContractBuilder"),
                 (f"{template_name}::contract_obj", f"{project_name}::contract_obj"),
             ],
             ignore_missing
