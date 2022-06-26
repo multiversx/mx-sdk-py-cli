@@ -182,12 +182,13 @@ def find_in_dictionary(dictionary, compound_path):
     return node
 
 
-def list_files(folder: Union[str, Path], suffix: Optional[str] = None) -> List[str]:
-    files = os.listdir(folder)
-    files = [os.path.join(folder, f) for f in files]
+def list_files(folder: Path, suffix: Optional[str] = None) -> List[Path]:
+    folder = folder.expanduser()
+    files: List[Path] = [folder / file for file in os.listdir(folder)]
+    files = [file for file in files if file.is_file()]
 
     if suffix:
-        files = [e for e in files if e.lower().endswith(suffix.lower())]
+        files = [file for file in files if str(file).lower().endswith(suffix.lower())]
 
     return files
 
@@ -197,7 +198,7 @@ def remove_folder(folder: Union[str, Path]):
 
 
 def symlink(real: str, link: str) -> None:
-    if os.path.exists(link):
+    if os.path.islink(link):
         os.remove(link)
     os.symlink(real, link)
 

@@ -1,4 +1,5 @@
 
+from pathlib import Path
 from typing import Any, Union
 
 
@@ -24,6 +25,11 @@ class ProgrammingError(KnownError):
 class TemplateMissingError(KnownError):
     def __init__(self, template: str):
         super().__init__(f"Template missing: {template}")
+
+
+class BadTemplateError(KnownError):
+    def __init__(self, directory: Path):
+        super().__init__(f"Bad template: {directory}")
 
 
 class DownloadError(KnownError):

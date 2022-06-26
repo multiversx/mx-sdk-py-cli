@@ -61,17 +61,17 @@ def setup_parser(args: List[str], subparsers: Any) -> Any:
     sub.set_defaults(func=testnet_clean)
 
 
-def testnet_start(args):
+def testnet_start(args: Any):
     logger.info("Starting testnet...")
     testnet.start(args)
 
 
-def testnet_config(args):
+def testnet_config(args: Any):
     logger.info("Configuring testnet...")
     testnet.configure(args)
 
 
-def testnet_clean(args):
+def testnet_clean(args: Any):
     logger.info("Cleaning testnet...")
     testnet.clean(args)
 

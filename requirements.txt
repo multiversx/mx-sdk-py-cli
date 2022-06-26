@@ -5,10 +5,10 @@ requests~=2.24.0
 types-requests
 pynacl
 pycryptodomex
-cryptography>=3.2
+cryptography==36.0.2
 prettytable
 types-prettytable
-ledgercomm
+ledgercomm[hid]
 semver
 requests-cache
 

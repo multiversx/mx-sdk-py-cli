@@ -5,6 +5,8 @@ from pathlib import Path
 from typing import Any, Dict, List, Set, cast
 
 from erdpy import dependencies, errors, myprocess, utils
+from erdpy import workstation
+from erdpy.constants import DEFAULT_CARGO_TARGET_DIR_NAME
 from erdpy.projects.project_base import Project
 
 logger = logging.getLogger("ProjectRust")
@@ -32,16 +34,14 @@ class ProjectRust(Project):
 
     def perform_build(self):
         meta = self.has_meta()
+        if not meta:
+            raise errors.NotSupportedProject("The project does not have a meta crate")
+
         try:
-            if meta:
-                # The meta crate handles the build process, ABI generation and
-                # allows contract developers to add extra
-                # preparation steps before building.
-                self.run_meta()
-            else:
-                # For backwards compatibility - build the wasm and generate the ABI
-                self.run_cargo()
-                self.generate_abi()
+            # The meta crate handles the build process, ABI generation and
+            # allows contract developers to add extra
+            # preparation steps before building.
+            self.run_meta()
         except subprocess.CalledProcessError as err:
             raise errors.BuildError(err.output)
 
@@ -50,28 +50,8 @@ class ProjectRust(Project):
             "--target=wasm32-unknown-unknown",
             "--release",
             "--out-dir",
-            self.get_output_folder(),
-            "-Z"
-            "unstable-options"
+            self.get_output_folder()
         ])
-
-    def run_cargo(self):
-        env = self.get_env()
-
-        args = [
-            "cargo",
-            "build",
-        ]
-        self.prepare_build_wasm_args(args)
-        self.decorate_cargo_args(args)
-
-        if not self.options.get("wasm_symbols"):
-            env["RUSTFLAGS"] = "-C link-arg=-s"
-
-        cwd = self.path / 'wasm'
-        return_code = myprocess.run_process_async(args, env=env, cwd=str(cwd))
-        if return_code != 0:
-            raise errors.BuildError(f"error code = {return_code}, see output")
 
     def run_meta(self):
         cwd = self.get_meta_folder()
@@ -89,42 +69,38 @@ class ProjectRust(Project):
             "run",
             "build",
         ]
-        self.prepare_build_wasm_args(args)
 
-        for (option, value) in self.options.items():
-            if isinstance(value, bool):
-                if value:
-                    args.extend([f"--{option}"])
-            else:
-                args.extend([f"--{option}", str(value)])
+        self.prepare_build_wasm_args(args)
+        self.decorate_cargo_args(args)
 
         return_code = myprocess.run_process_async(args, env=env, cwd=str(cwd))
         if return_code != 0:
             raise errors.BuildError(f"error code = {return_code}, see output")
 
-    def decorate_cargo_args(self, args):
-        target_dir = self.options.get("cargo_target_dir")
-        if target_dir:
-            args.extend(["--target-dir", target_dir])
+    def decorate_cargo_args(self, args: List[str]):
+        target_dir: str = self.options.get("cargo-target-dir", "")
+        target_dir = self._ensure_cargo_target_dir(target_dir)
+        no_wasm_opt = self.options.get("no-wasm-opt")
+        wasm_symbols = self.options.get("wasm-symbols")
+        wasm_name = self.options.get("wasm-name")
+        wasm_suffix = self.options.get("wasm-suffix")
 
-    def generate_abi(self):
-        if not self.has_abi():
-            return
+        args.extend(["--target-dir", target_dir])
 
-        args = [
-            "cargo",
-            "run"
-        ]
-        self.decorate_cargo_args(args)
+        if no_wasm_opt:
+            args.extend(["--no-wasm-opt"])
+        if wasm_symbols:
+            args.extend(["--wasm-symbols"])
+        if wasm_name:
+            args.extend(["--wasm-name", wasm_name])
+        if wasm_suffix:
+            args.extend(["--wasm-suffix", wasm_suffix])
 
-        env = self.get_env()
-        cwd = path.join(self.directory, "abi")
-        sink = myprocess.FileOutputSink(self.get_abi_filepath())
-        return_code = myprocess.run_process_async(args, env=env, cwd=cwd, stdout_sink=sink)
-        if return_code != 0:
-            raise errors.BuildError(f"error code = {return_code}, see output")
-
-        utils.prettify_json_file(self.get_abi_filepath())
+    def _ensure_cargo_target_dir(self, target_dir: str):
+        default_target_dir = str(workstation.get_tools_folder() / DEFAULT_CARGO_TARGET_DIR_NAME)
+        target_dir = target_dir or default_target_dir
+        utils.ensure_folder(target_dir)
+        return target_dir
 
     def has_meta(self):
         return (self.get_meta_folder() / "Cargo.toml").exists()
@@ -167,9 +143,11 @@ class ProjectRust(Project):
     def get_env(self):
         return dependencies.get_module_by_key("rust").get_env()
 
-    def build_wasm_with_debug_symbols(self):
+    def build_wasm_with_debug_symbols(self, build_options: Dict[str, Any]):
         cwd = self.get_meta_folder()
         env = self.get_env()
+        target_dir: str = build_options.get("cargo-target-dir", "")
+        target_dir = self._ensure_cargo_target_dir(target_dir)
 
         args = [
             "cargo",
@@ -177,9 +155,10 @@ class ProjectRust(Project):
             "build",
             "--wasm-symbols",
             "--wasm-suffix", "dbg",
-            "--no-wasm-opt"
+            "--no-wasm-opt",
+            "--target-dir", target_dir
         ]
-        
+
         return_code = myprocess.run_process_async(args, env=env, cwd=str(cwd))
         if return_code != 0:
             raise errors.BuildError(f"error code = {return_code}, see output")
@@ -261,7 +240,7 @@ class CargoFile:
         dev_dependencies = cast(Dict[str, Any], self.data['dev-dependencies'])
         return dev_dependencies
 
-    def get_dependency(self, name) -> Dict[str, Any]:
+    def get_dependency(self, name: str) -> Dict[str, Any]:
         dependencies = self.get_dependencies()
         dependency = cast(Dict[str, Any], dependencies.get(name))
         if dependency is None:

@@ -7,6 +7,36 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 ## [Unreleased]
  - TBD
 
+## [2.0.0]
+ - [Show password prompt if no passfile specificied](https://github.com/ElrondNetwork/elrond-sdk-erdpy/pull/144)
+
+## [1.5.2]
+ - [Fix build arguments for report creator](https://github.com/ElrondNetwork/elrond-sdk-erdpy/pull/143)
+
+## [1.5.1]
+ - [Pass contract build options to report creator](https://github.com/ElrondNetwork/elrond-sdk-erdpy/pull/142)
+
+## [1.5.0]
+ - [Improve "contract build" for Rust projects](https://github.com/ElrondNetwork/elrond-sdk-erdpy/pull/140)
+
+## [1.4.0]
+ - [Add `ledgercomm[hid]`](https://github.com/ElrondNetwork/elrond-sdk-erdpy/pull/139)
+
+## [1.3.3]
+ - [Pin cryptography](https://github.com/ElrondNetwork/elrond-sdk-erdpy/pull/137)
+
+## [1.3.2]
+ - [Do not copy test wallets into the newly created contract (not necessary anymore)](https://github.com/ElrondNetwork/elrond-sdk-erdpy/pull/134)
+
+## [1.3.1]
+ - [Re-add the pattern erdpy/wallet/*.txt in MANIFEST.in. Was removed by mistake in a previous release.](https://github.com/ElrondNetwork/elrond-sdk-erdpy/pull/133)
+
+## [1.3.0]
+ - [Prepare integration with erdjs-snippets (from templates)](https://github.com/ElrondNetwork/elrond-sdk-erdpy/pull/126)
+ - [Move test wallets to a separate repository. Handle them as an erdpy dependency.](https://github.com/ElrondNetwork/elrond-sdk-erdpy/pull/127)
+ - [Fix log for builds using absolute paths.](https://github.com/ElrondNetwork/elrond-sdk-erdpy/pull/128)
+ - [CLI output builder: remove deprecated fields.](https://github.com/ElrondNetwork/elrond-sdk-erdpy/pull/129)
+
 ## [1.2.3]
  - [Fix activation flag check, fix flag name](https://github.com/ElrondNetwork/elrond-sdk-erdpy/pull/123)
  - [Fix reference to libwasmer (referenced by mandos-test)](https://github.com/ElrondNetwork/elrond-sdk-erdpy/pull/124)

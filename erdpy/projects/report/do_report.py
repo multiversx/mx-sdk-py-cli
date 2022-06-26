@@ -1,6 +1,6 @@
 import logging
 from pathlib import Path
-from typing import Any, List
+from typing import Any, Dict, List
 from erdpy import utils
 
 from erdpy.projects.core import get_project_paths_recursively
@@ -13,19 +13,19 @@ from erdpy.projects.report.report_creator import ReportCreator
 logger = logging.getLogger("report")
 
 
-def do_report(args: Any) -> None:
+def do_report(args: Any, build_options: Any) -> None:
     compare_report_paths = args.compare
     if compare_report_paths is None:
-        _build_report(args)
+        _build_report(args, build_options)
     else:
         _compare_reports(args, compare_report_paths)
 
 
-def _build_report(args: Any) -> None:
+def _build_report(args: Any, build_options: Dict[str, Any]) -> None:
     base_path = Path(args.project)
     project_paths = get_project_paths_recursively(base_path)
     options = get_default_report_features()
-    report_creator = ReportCreator(options, skip_build=args.skip_build, skip_twiggy=args.skip_twiggy)
+    report_creator = ReportCreator(options, skip_build=args.skip_build, skip_twiggy=args.skip_twiggy, build_options=build_options)
     report = report_creator.create_report(base_path, project_paths)
     _finalize_report(report, args)
 

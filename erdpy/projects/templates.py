@@ -1,36 +1,36 @@
 import json
 import logging
 import os
-from os import path
 from pathlib import Path
-import pathlib
-from typing import Any, Dict, List, Tuple, Union
+import shutil
+from typing import Any, List, Tuple
 
 from erdpy import errors, utils
 from erdpy.projects import shared
 from erdpy.projects.project_rust import CargoFile
 from erdpy.projects.templates_config import get_templates_repositories
-from erdpy.testnet import wallets
+from erdpy.projects.templates_repository import TemplatesRepository
 
 logger = logging.getLogger("projects.templates")
+ERDJS_SNIPPETS_FOLDER_NAME = "erdjs-snippets"
 
 
 def list_project_templates():
-    templates = []
+    summaries: List[TemplateSummary] = []
 
     for repository in get_templates_repositories():
         repository.download()
         for template in repository.get_templates():
-            templates.append(TemplateSummary(template, repository))
+            summaries.append(TemplateSummary(template, repository))
 
-    templates = sorted(templates, key=lambda item: item.name)
+    summaries = sorted(summaries, key=lambda item: item.name)
 
-    pretty_json = json.dumps([item.__dict__ for item in templates], indent=4)
+    pretty_json = json.dumps([item.__dict__ for item in summaries], indent=4)
     print(pretty_json)
 
 
 class TemplateSummary():
-    def __init__(self, name, repository):
+    def __init__(self, name: str, repository: TemplatesRepository):
         self.name = name
         self.github = repository.github
         self.language = repository.get_language(name)
@@ -52,16 +52,12 @@ def create_from_template(project_name: str, template_name: str, directory: Path)
         raise errors.BadDirectory(str(project_directory))
 
     _download_templates_repositories()
-    _copy_template(template_name, project_directory)
+    _copy_template(template_name, project_directory, project_name)
 
     template = _load_as_template(project_directory)
     template.apply(template_name, project_name)
 
     logger.info("Project created, template applied.")
-
-    wallets.copy_all_to(path.join(project_directory, "wallets"))
-
-    logger.info("Test wallets have been copied into the project.")
 
 
 def _download_templates_repositories():
@@ -69,13 +65,45 @@ def _download_templates_repositories():
         repo.download()
 
 
-def _copy_template(template: str, destination_path: Path):
+def _copy_template(template: str, destination_path: Path, project_name: str):
     for repo in get_templates_repositories():
         if repo.has_template(template):
-            repo.copy_template(template, destination_path)
+            source_path = repo.get_template_folder(template)
+            shutil.copytree(source_path, destination_path)
+            _copy_erdjs_snippets(template, repo.get_payload_folder(), destination_path, project_name)
             return
 
     raise errors.TemplateMissingError(template)
+
+
+def _copy_erdjs_snippets(template: str,  templates_payload_folder: Path, destination_path: Path, project_name: str):
+    source_erdjs_snippets_folder = templates_payload_folder / ERDJS_SNIPPETS_FOLDER_NAME
+    source_erdjs_snippets_subfolder = source_erdjs_snippets_folder / template
+    destination_erdjs_snippets_folder = destination_path.parent / ERDJS_SNIPPETS_FOLDER_NAME
+    no_snippets = not source_erdjs_snippets_subfolder.is_dir()
+
+    logger.info(f"_copy_erdjs_snippets, source_erdjs_snippets_subfolder: {source_erdjs_snippets_subfolder}")
+    logger.info(f"_copy_erdjs_snippets, destination_erdjs_snippets_folder: {destination_erdjs_snippets_folder}")
+
+    if no_snippets:
+        logger.info(f"_copy_erdjs_snippets: no snippets in template {template}")
+        return
+
+    utils.ensure_folder(destination_erdjs_snippets_folder)
+
+    # Copy snippets to destination
+    # First, copy the subfolder associated with the template
+    shutil.copytree(source_erdjs_snippets_subfolder, destination_erdjs_snippets_folder / project_name)
+
+    # After that, copy the remaining files from the source folder - not recursively (on purpose).
+    for file in os.listdir(source_erdjs_snippets_folder):
+        source_file = source_erdjs_snippets_folder / file
+        destination_file = destination_erdjs_snippets_folder / file
+        should_copy = source_file.is_file() and not destination_file.exists()
+
+        if should_copy:
+            logger.info(f"_copy_erdjs_snippets, file: {file}")
+            shutil.copy(source_file, destination_file)
 
 
 def _load_as_template(directory: Path):
@@ -83,13 +111,14 @@ def _load_as_template(directory: Path):
         return TemplateClang(directory)
     if shared.is_source_rust(directory):
         return TemplateRust(directory)
+    raise errors.BadTemplateError(directory)
 
 
 class Template:
     def __init__(self, directory: Path):
         self.directory = directory
 
-    def apply(self, template_name, project_name):
+    def apply(self, template_name: str, project_name: str):
         self.template_name = template_name
         self.project_name = project_name
         self._patch()
@@ -198,7 +227,7 @@ class TemplateRust(Template):
         if not test_dir_path.is_dir():
             return
 
-        test_paths = [e for e in utils.list_files(test_dir_path, suffix=".json")]
+        test_paths = utils.list_files(test_dir_path, suffix=".json")
         self._replace_in_files(
             test_paths,
             [
@@ -211,9 +240,9 @@ class TemplateRust(Template):
             data = utils.read_json_file(file)
             # Patch fields
             data["name"] = data.get("name", "").replace(self.template_name, self.project_name)
-            utils.write_json_file(file, data)
+            utils.write_json_file(str(file), data)
 
-    def _replace_in_files(self, files: List[Path], replacements, ignore_missing: bool) -> None:
+    def _replace_in_files(self, files: List[Path], replacements: List[Tuple[str, str]], ignore_missing: bool) -> None:
         for file in files:
             if ignore_missing and not file.exists():
                 continue

@@ -2,11 +2,12 @@ import logging
 from os import path
 from pathlib import Path
 from typing import Any, List, Tuple, Union
-from erdpy.contracts import SmartContract
-from erdpy.errors import BadUsage
 
-from erdpy.validators.validators_file import ValidatorsFile
 from erdpy import utils
+from erdpy.contracts import SmartContract
+from erdpy.cli_password import load_password
+from erdpy.errors import BadUsage
+from erdpy.validators.validators_file import ValidatorsFile
 from erdpy.accounts import Account, Address
 from erdpy.config import MetaChainSystemSCsCost, MIN_GAS_LIMIT, GAS_PER_DATA_BYTE
 from erdpy.wallet.pem import parse_validator_pem
@@ -24,8 +25,9 @@ def prepare_args_for_stake(args: Any):
 
     if args.pem:
         node_operator = Account(pem_file=args.pem)
-    elif args.keyfile and args.passfile:
-        node_operator = Account(key_file=args.keyfile, pass_file=args.passfile)
+    elif args.keyfile:
+        password = load_password(args)
+        node_operator = Account(key_file=args.keyfile, password=password)
     else:
         raise BadUsage("cannot initialize node operator")
 
@@ -49,11 +51,10 @@ def prepare_transaction_data_for_stake(node_operator_address: Address, validator
     call_arguments.append(num_of_nodes)
 
     for validator in validators_list:
-        # Get path of "pemFile", relative to "validators_file_path"
-        validator_pem = validator.get("pemFile")
-        # Make path absolute
-        validator_pem = path.join(path.dirname(validators_file_path), validator_pem)
-
+        # Get path of "pemFile", make it absolute
+        validator_pem = Path(validator.get("pemFile")).expanduser()
+        validator_pem = validator_pem if validator_pem.is_absolute() else validators_file_path / validator_pem
+        
         secret_key_bytes, bls_key = parse_validator_pem(Path(validator_pem))
         signed_message = sign_message_with_bls_key(node_operator_address.hex(), secret_key_bytes.decode('ascii'))
         call_arguments.append(f"0x{bls_key}")

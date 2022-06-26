@@ -6,6 +6,7 @@ from typing import Any, Dict, List, TextIO
 
 from erdpy import config, errors, utils
 from erdpy.accounts import Account, Address, LedgerAccount
+from erdpy.cli_password import load_password
 from erdpy.interfaces import IElrondProxy, ITransaction, ITransactionOnNetwork
 
 logger = logging.getLogger("transactions")
@@ -211,8 +212,9 @@ def do_prepare_transaction(args: Any) -> Transaction:
         account = LedgerAccount(account_index=args.ledger_account_index, address_index=args.ledger_address_index)
     if args.pem:
         account = Account(pem_file=args.pem, pem_index=args.pem_index)
-    elif args.keyfile and args.passfile:
-        account = Account(key_file=args.keyfile, pass_file=args.passfile)
+    elif args.keyfile:
+        password = load_password(args)
+        account = Account(key_file=args.keyfile, password=password)
 
     tx = Transaction()
     tx.nonce = int(args.nonce)

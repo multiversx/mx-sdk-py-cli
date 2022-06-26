@@ -401,3 +401,16 @@ class MclSignerModule(StandaloneModule):
     def _post_install(self, tag: str):
         directory = self.get_directory(tag)
         utils.mark_executable(path.join(directory, "signer"))
+
+
+class TestWalletsModule(StandaloneModule):
+    def __init__(self, key: str):
+        super().__init__(key, [])
+        self.organisation = "ElrondNetwork"
+        self.repo_name = "elrond-sdk-testwallets"
+
+    def _post_install(self, tag: str):
+        # We'll create a "latest" symlink
+        target = self.get_source_directory(tag)
+        link = path.join(self.get_parent_directory(), "latest")
+        utils.symlink(str(target), link)

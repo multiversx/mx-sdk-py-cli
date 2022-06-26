@@ -12,7 +12,7 @@ from erdpy.ledger.ledger_app_handler import SIGN_USING_HASH_VERSION
 from erdpy.ledger.ledger_functions import do_get_ledger_address, do_sign_transaction_with_ledger, do_get_ledger_version, \
     TX_HASH_SIGN_VERSION, TX_HASH_SIGN_OPTIONS
 from erdpy.wallet import bech32, pem
-from erdpy.wallet.keyfile import get_password, load_from_key_file
+from erdpy.wallet.keyfile import load_from_key_file
 
 logger = logging.getLogger("accounts")
 
@@ -23,7 +23,7 @@ class Account(IAccount):
                  pem_file: Optional[str] = None,
                  pem_index: int = 0,
                  key_file: str = "",
-                 pass_file: str = "",
+                 password: str = "",
                  ledger: bool = False):
         self.address = Address(address)
         self.pem_file = pem_file
@@ -35,8 +35,7 @@ class Account(IAccount):
             secret_key, pubkey = pem.parse(Path(self.pem_file), self.pem_index)
             self.secret_key = secret_key.hex()
             self.address = Address(pubkey)
-        elif key_file and pass_file:
-            password = get_password(pass_file)
+        elif key_file and password:
             address_from_key_file, secret_key = load_from_key_file(key_file, password)
             self.secret_key = secret_key.hex()
             self.address = Address(address_from_key_file)

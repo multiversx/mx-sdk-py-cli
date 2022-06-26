@@ -131,6 +131,7 @@ optional arguments:
                                        analysing the bytecode. Creates larger wasm files. Avoid in production (default:
                                        False)
   --wasm-name WASM_NAME                for rust projects, optionally specify the name of the wasm bytecode output file
+  --wasm-suffix WASM_SUFFIX            for rust projects, optionally specify the suffix of the wasm bytecode output file
   --skip-eei-checks                    skip EEI compatibility checks (default: False)
   --ignore-eei-checks                  ignore EEI compatibility errors (default: False)
 
@@ -172,14 +173,6 @@ Output example:
     },
     "emittedTransactionData": "the transaction data, not encoded",
     "emittedTransactionHash": "the transaction hash",
-    "tx": {
-        "DEPRECATED": "DEPRECATED"
-    },
-    "data": "DEPRECATED",
-    "hash": "DEPRECATED",
-    "emitted_tx": {
-        "DEPRECATED": "DEPRECATED"
-    },
     "contractAddress": "the address of the contract",
     "transactionOnNetwork": {
         "nonce": 42,
@@ -254,14 +247,6 @@ Output example:
     },
     "emittedTransactionData": "the transaction data, not encoded",
     "emittedTransactionHash": "the transaction hash",
-    "tx": {
-        "DEPRECATED": "DEPRECATED"
-    },
-    "data": "DEPRECATED",
-    "hash": "DEPRECATED",
-    "emitted_tx": {
-        "DEPRECATED": "DEPRECATED"
-    },
     "contractAddress": "the address of the contract",
     "transactionOnNetwork": {
         "nonce": 42,
@@ -335,14 +320,6 @@ Output example:
     },
     "emittedTransactionData": "the transaction data, not encoded",
     "emittedTransactionHash": "the transaction hash",
-    "tx": {
-        "DEPRECATED": "DEPRECATED"
-    },
-    "data": "DEPRECATED",
-    "hash": "DEPRECATED",
-    "emitted_tx": {
-        "DEPRECATED": "DEPRECATED"
-    },
     "contractAddress": "the address of the contract",
     "transactionOnNetwork": {
         "nonce": 42,
@@ -421,6 +398,42 @@ optional arguments:
                                          str:TOK-a1c2ef true erd1[..]
 
 ```
+### Contract.Report
+
+
+```
+$ erdpy contract report --help
+usage: erdpy contract report [-h] ...
+
+Print a detailed report of the smart contracts.
+
+positional arguments:
+  project                                         🗀 the project directory (default: current directory)
+
+optional arguments:
+  -h, --help                                      show this help message and exit
+  --skip-build                                    skips the step of building of the wasm contracts
+  --skip-twiggy                                   skips the steps of building the debug wasm files and running twiggy
+  --output-format {github-markdown,text-markdown,json}
+                                                  report output format (default: text-markdown)
+  --output-file OUTPUT_FILE                       if specified, the output is written to a file, otherwise it's written
+                                                  to the standard output
+  --compare report-1.json [report-2.json ...]     create a comparison from two or more reports
+  --debug                                         set debug flag (default: False)
+  --no-optimization                               bypass optimizations (for clang) (default: False)
+  --no-wasm-opt                                   do not optimize wasm files after the build (default: False)
+  --cargo-target-dir CARGO_TARGET_DIR             for rust projects, forward the parameter to Cargo
+  --wasm-symbols                                  for rust projects, does not strip the symbols from the wasm output.
+                                                  Useful for analysing the bytecode. Creates larger wasm files. Avoid in
+                                                  production (default: False)
+  --wasm-name WASM_NAME                           for rust projects, optionally specify the name of the wasm bytecode
+                                                  output file
+  --wasm-suffix WASM_SUFFIX                       for rust projects, optionally specify the suffix of the wasm bytecode
+                                                  output file
+  --skip-eei-checks                               skip EEI compatibility checks (default: False)
+  --ignore-eei-checks                             ignore EEI compatibility errors (default: False)
+
+```
 ## Group **Transactions**
 
 
@@ -463,12 +476,7 @@ Output example:
         "...": "..."
     },
     "emittedTransactionData": "the transaction data, not encoded",
-    "emittedTransactionHash": "the transaction hash",
-    "tx": {
-        "DEPRECATED": "DEPRECATED"
-    },
-    "data": "DEPRECATED",
-    "hash": "DEPRECATED"
+    "emittedTransactionHash": "the transaction hash"
 }
 
 optional arguments:
@@ -523,12 +531,7 @@ Output example:
         "...": "..."
     },
     "emittedTransactionData": "the transaction data, not encoded",
-    "emittedTransactionHash": "the transaction hash",
-    "tx": {
-        "DEPRECATED": "DEPRECATED"
-    },
-    "data": "DEPRECATED",
-    "hash": "DEPRECATED"
+    "emittedTransactionHash": "the transaction hash"
 }
 
 optional arguments:
@@ -1218,7 +1221,7 @@ usage: erdpy deps install [-h] ...
 Install dependencies or elrond-sdk modules.
 
 positional arguments:
-  {all,llvm,clang,cpp,rust,nodejs,golang,wabt,vmtools,elrond_go,elrond_proxy_go,mcl_signer,wasm-opt,twiggy}
+  {all,llvm,clang,cpp,rust,nodejs,golang,wabt,vmtools,elrond_go,elrond_proxy_go,mcl_signer,wasm-opt,twiggy,testwallets}
                                                   the dependency to install
 
 optional arguments:
@@ -1237,7 +1240,7 @@ usage: erdpy deps check [-h] ...
 Check whether a dependency is installed.
 
 positional arguments:
-  {all,llvm,clang,cpp,rust,nodejs,golang,wabt,vmtools,elrond_go,elrond_proxy_go,mcl_signer,wasm-opt,twiggy}
+  {all,llvm,clang,cpp,rust,nodejs,golang,wabt,vmtools,elrond_go,elrond_proxy_go,mcl_signer,wasm-opt,twiggy,testwallets}
                                                   the dependency to check
 
 optional arguments:

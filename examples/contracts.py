@@ -16,7 +16,7 @@ if __name__ == '__main__':
     export PYTHONPATH=.
     python3 ./examples/contracts.py \
         --proxy=https://testnet-gateway.elrond.com \
-        --pem=./erdpy/testnet/wallets/users/alice.pem
+        --pem=~/elrondsdk/testwallets/latest/users/alice.pem
 
     Sample contracts to be used (at deploy & upgrade):
         ./examples/bytecode/counter.wasm (functions: increment, decrement, get)

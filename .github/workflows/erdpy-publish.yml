@@ -6,6 +6,9 @@ name: Publish erdpy
 on:
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 jobs:
   publish-erdpy:
     runs-on: ubuntu-latest
@@ -20,6 +23,17 @@ jobs:
       run: |
         python3 -m pip install --upgrade pip
         pip3 install setuptools wheel twine
+
+    - name: Create release
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        echo " - [CHANGELOG](https://github.com/ElrondNetwork/elrond-sdk-erdpy/blob/main/erdpy/CHANGELOG.md)" >> notes.txt
+        echo "" >> notes.txt
+
+        RELEASE_TAG=v$(python3 -c "import erdpy._version; print(erdpy._version.__version__);")
+        gh release create $RELEASE_TAG --title="$RELEASE_TAG" --generate-notes --notes-file=notes.txt
+  
     - name: Build and publish
       env:
         TWINE_USERNAME: __token__
