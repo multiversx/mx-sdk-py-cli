@@ -65,6 +65,7 @@ jobs:
         pytest .
     - name: Run CLI tests
       run: |
+        python3 -m erdpy.cli config set dependencies.vmtools.tag v1.4.53
         cd ./erdpy/tests
         source ./test_cli_contracts.sh && testAll || return 1
         source ./test_cli_wallet.sh && testAll || return 1
