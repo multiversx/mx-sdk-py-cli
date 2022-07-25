@@ -192,10 +192,6 @@ def copy_config_to_proxy(testnet_config: TestnetConfiguration):
         proxy_config_source / 'external.toml',
         proxy_config)
 
-    shutil.copy(
-        proxy_config_source / 'economics.toml',
-        proxy_config)
-
 
 def patch_proxy_config(testnet_config: TestnetConfiguration):
     proxy_config_file = testnet_config.proxy_config_folder() / 'config.toml'

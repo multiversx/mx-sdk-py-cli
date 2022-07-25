@@ -7,6 +7,11 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 ## [Unreleased]
  - TBD
 
+## [2.0.1]
+ - [Fix erdpy testnet config](https://github.com/ElrondNetwork/elrond-sdk-erdpy/pull/150)
+ - [Fix tests](https://github.com/ElrondNetwork/elrond-sdk-erdpy/pull/149)
+ - [Fix test replacement rules](https://github.com/ElrondNetwork/elrond-sdk-erdpy/pull/148)
+
 ## [2.0.0]
  - [Show password prompt if no passfile specificied](https://github.com/ElrondNetwork/elrond-sdk-erdpy/pull/144)
 
