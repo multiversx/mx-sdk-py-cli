@@ -1,5 +1,4 @@
-from typing import Dict, Any
-
+from typing import Any, Dict
 
 from erdpy.testnet.config import TestnetConfiguration
 from erdpy.testnet.nodes_setup_json import CHAIN_ID
@@ -11,6 +10,8 @@ def patch_config(data: ConfigDict, testnet_config: TestnetConfiguration):
     data['DbLookupExtensions']['Enabled'] = True
     data['StoragePruning']['ValidatorCleanOldEpochsData'] = False
     data['StoragePruning']['ObserverCleanOldEpochsData'] = False
+    data['StoragePruning']['AccountsTrieCleanOldEpochsData'] = False
+    data["StateTriesConfig"]["AccountsStatePruningEnabled"] = False
 
     general_settings: ConfigDict = dict()
     general_settings['ChainID'] = CHAIN_ID
