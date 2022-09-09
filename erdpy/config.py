@@ -1,7 +1,8 @@
 import os.path
-import semver
-from typing import Any, Dict, List
 from pathlib import Path
+from typing import Any, Dict, List
+
+import semver
 
 from erdpy import errors, utils, workstation
 
@@ -91,7 +92,7 @@ def get_active() -> Dict[str, Any]:
     empty_config: Dict[str, Any] = dict()
     result: Dict[str, Any] = configs.get(active_config_name, empty_config)
 
-    return result;
+    return result
 
 
 def set_active(name: str):
@@ -159,6 +160,7 @@ def get_defaults() -> Dict[str, Any]:
         "dependencies.llvm.urlTemplate.linux": "https://ide.elrond.com/vendor-llvm/{TAG}/linux-amd64.tar.gz?t=19feb",
         "dependencies.llvm.urlTemplate.osx": "https://ide.elrond.com/vendor-llvm/{TAG}/darwin-amd64.tar.gz?t=19feb",
         "dependencies.rust.tag": "nightly",
+        "dependencies.rust-docker-image": "elrondnetwork/elrond-sdk-erdpy-rust:frozen-005",
         "dependencies.nodejs.tag": "v12.18.3",
         "dependencies.nodejs.urlTemplate.linux": "https://nodejs.org/dist/{TAG}/node-{TAG}-linux-x64.tar.gz",
         "dependencies.nodejs.urlTemplate.osx": "https://nodejs.org/dist/{TAG}/node-{TAG}-darwin-x64.tar.gz",

@@ -1,10 +1,9 @@
 import logging
 import os
+from pathlib import Path
 from typing import Any, Dict, List
 
-from pathlib import Path
-
-from erdpy import cli_shared, errors, projects, utils
+from erdpy import cli_shared, config, errors, projects, utils
 from erdpy.accounts import Account, Address, LedgerAccount
 from erdpy.cli_output import CLIOutputBuilder
 from erdpy.cli_password import load_password
@@ -146,6 +145,10 @@ def _add_build_options_args(sub: Any):
                      help="for rust projects, optionally specify the suffix of the wasm bytecode output file")
     sub.add_argument("--skip-eei-checks", action="store_true", default=False, help="skip EEI compatibility checks (default: %(default)s)")
     sub.add_argument("--ignore-eei-checks", action="store_true", default=False, help="ignore EEI compatibility errors (default: %(default)s)")
+    sub.add_argument("--not-reproducible", action="store_true", default=False,
+                     help="for rust projects, do not perform a reproducible build. See https://docs.elrond.com/developers/reproducible-contract-builds (default: %(default)s)")
+    sub.add_argument("--image", type=str, default=config.get_value("dependencies.rust-docker-image"),
+                     help="for rust projects, specify the Docker image to be used for reproducible builds. See https://docs.elrond.com/developers/reproducible-contract-builds (default: %(default)s)")
 
 
 def _add_recursive_arg(sub: Any):
