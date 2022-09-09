@@ -1,7 +1,8 @@
 import os.path
-import semver
-from typing import Any, Dict, List
 from pathlib import Path
+from typing import Any, Dict, List
+
+import semver
 
 from erdpy import errors, utils, workstation
 
@@ -91,7 +92,7 @@ def get_active() -> Dict[str, Any]:
     empty_config: Dict[str, Any] = dict()
     result: Dict[str, Any] = configs.get(active_config_name, empty_config)
 
-    return result;
+    return result
 
 
 def set_active(name: str):
@@ -169,7 +170,7 @@ def get_defaults() -> Dict[str, Any]:
         "dependencies.elrond_proxy_go.tag": "latest",
         "dependencies.elrond_proxy_go.urlTemplate.linux": "https://github.com/ElrondNetwork/elrond-proxy-go/archive/{TAG}.tar.gz",
         "dependencies.elrond_proxy_go.urlTemplate.osx": "https://github.com/ElrondNetwork/elrond-proxy-go/archive/{TAG}.tar.gz",
-        "dependencies.golang.tag": "go1.17.6",
+        "dependencies.golang.tag": "go1.18.4",
         "dependencies.golang.urlTemplate.linux": "https://golang.org/dl/{TAG}.linux-amd64.tar.gz",
         "dependencies.golang.urlTemplate.osx": "https://golang.org/dl/{TAG}.darwin-amd64.tar.gz",
         "dependencies.mcl_signer.tag": "latest",

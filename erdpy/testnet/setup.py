@@ -1,7 +1,7 @@
 import logging
-from pathlib import Path
 import shutil
 from os import path
+from pathlib import Path
 from typing import Any
 
 import erdpy.utils as utils
@@ -182,9 +182,17 @@ def copy_config_to_proxy(testnet_config: TestnetConfiguration):
     proxy_config = testnet_config.proxy_config_folder()
     makefolder(proxy_config)
 
-    shutil.copy(proxy_config_source / 'config.toml', proxy_config)
-    shutil.copytree(proxy_config_source / 'apiConfig', proxy_config / 'apiConfig')
-    shutil.copy(proxy_config_source / 'external.toml', proxy_config)
+    shutil.copy(
+        proxy_config_source / 'config.toml',
+        proxy_config)
+
+    shutil.copytree(
+        proxy_config_source / 'apiConfig',
+        proxy_config / 'apiConfig')
+
+    shutil.copy(
+        proxy_config_source / 'external.toml',
+        proxy_config)
 
 
 def patch_proxy_config(testnet_config: TestnetConfiguration):
