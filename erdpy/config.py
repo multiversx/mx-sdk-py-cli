@@ -2,6 +2,8 @@ import os.path
 from pathlib import Path
 from typing import Any, Dict, List
 
+import semver
+
 from erdpy import errors, utils, workstation
 
 ROOT_FOLDER_NAME = "elrondsdk"
