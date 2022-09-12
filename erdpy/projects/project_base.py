@@ -88,13 +88,16 @@ class Project(IProject):
         self._adjust_output_permissions_and_ownership()
 
     def _adjust_output_permissions_and_ownership(self):
+        output_folder = Path(self.get_output_folder())
         output_permissions = self.get_option("output-set-permissions")
         output_owner = self.get_option("output-set-owner-id")
         output_group = self.get_option("output-set-group-id")
-        if output_permissions:
-            os.chmod(self.get_output_folder(), output_permissions)
-        if output_owner or output_group:
-            os.chown(self.get_output_folder(), output_owner, output_group)
+        output_files = utils.list_files(output_folder)
+
+        for file in [output_folder] + output_files:
+            os.chmod(file, output_permissions)
+        for file in [output_folder] + output_files:
+            os.chown(output_folder, output_owner, output_group)
 
     def _copy_to_output(self, source: Path, destination: Union[str, None] = None) -> Path:
         output_folder = self.get_output_folder()
