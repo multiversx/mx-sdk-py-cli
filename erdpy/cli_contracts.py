@@ -239,8 +239,8 @@ def _prepare_build_options(args: Any) -> Dict[str, Any]:
         "skip-eei-checks": args.skip_eei_checks,
         "ignore-eei-checks": args.ignore_eei_checks,
         "output-set-permissions": args.output_set_permissions,
-        "output-set-owner-id": args.output.set_owner_id,
-        "output-set-group-id": args.output.set_group_id
+        "output-set-owner-id": args.output_set_owner_id,
+        "output-set-group-id": args.output_set_group_id
     }
 
 
