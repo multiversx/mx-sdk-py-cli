@@ -1,7 +1,8 @@
-from abc import abstractmethod
 import glob
 import logging
+import os
 import shutil
+from abc import abstractmethod
 from os import path
 from pathlib import Path
 from typing import Any, Dict, List, Union, cast, final
@@ -69,7 +70,7 @@ class Project(IProject):
 
         file = folder / files[0]
         return Path(file).resolve()
-    
+
     def find_wasm_files(self):
         output_folder = Path(self.get_output_folder())
         wasm_files = output_folder.rglob("*.wasm")
@@ -84,6 +85,16 @@ class Project(IProject):
     def _do_after_build_core(self):
         wabt.generate_artifacts(self)
         eei_checks.check_compatibility(self)
+        self._adjust_output_permissions_and_ownership()
+
+    def _adjust_output_permissions_and_ownership(self):
+        output_permissions = self.get_option("output-set-permissions")
+        output_owner = self.get_option("output-set-owner-id")
+        output_group = self.get_option("output-set-group-id")
+        if output_permissions:
+            os.chmod(self.get_output_folder(), output_permissions)
+        if output_owner or output_group:
+            os.chown(self.get_output_folder(), output_owner, output_group)
 
     def _copy_to_output(self, source: Path, destination: Union[str, None] = None) -> Path:
         output_folder = self.get_output_folder()
@@ -94,10 +105,10 @@ class Project(IProject):
 
     def get_output_folder(self):
         return path.join(self.directory, "output")
-    
+
     def get_wasm_default_name(self, suffix: str = "") -> str:
         return f"{self.path.name}{suffix}.wasm"
-    
+
     def get_wasm_path(self, wasm_name: str) -> Path:
         return Path(self.get_output_folder(), wasm_name).resolve()
 
@@ -147,12 +158,15 @@ class Project(IProject):
                 args = [tool, test_file]
                 myprocess.run_process(args, env=tool_env)
 
+
 def glob_files(folder: Path, pattern: str) -> List[Path]:
     files = folder.rglob(pattern)
     return [Path(folder / file).resolve() for file in files]
 
+
 def exclude_files(files: List[Path], to_exclude: List[Path]) -> List[Path]:
     return list(set(files).difference(to_exclude))
+
 
 def rename_wasm_files(paths: List[Path], name: Union[str, None]) -> List[Path]:
     if name is None:
@@ -162,16 +176,19 @@ def rename_wasm_files(paths: List[Path], name: Union[str, None]) -> List[Path]:
         old_path.rename(new_path)
     return new_paths
 
+
 def get_contract_suffix(name: str) -> str:
     for suffix in ["-view.wasm", ".wasm"]:
         if name.endswith(suffix):
             return suffix
     return ""
 
+
 def remove_suffix(name: str, suffix: str) -> str:
     if not name.endswith(suffix) or len(suffix) == 0:
         return name
     return name[:-len(suffix)]
+
 
 def adjust_wasm_filename(path: Path, name_hint: str) -> Path:
     """

@@ -17,8 +17,9 @@ def run_process(args: List[str], env: Any = None, dump_to_stdout: bool = True, c
 
     try:
         output = subprocess.check_output(args, shell=False, universal_newlines=True, stderr=subprocess.STDOUT, env=env, cwd=cwd)
-        logger.info("Successful run. Output:")
+        logger.info("Successful run.")
         if dump_to_stdout:
+            print("Output:")
             print(output or "[No output]")
         return output
     except subprocess.CalledProcessError as error:
@@ -33,7 +34,7 @@ def run_process_async(
     stderr_sink=None
 ) -> ReturnCode:
     logger.info(f"run_process_async: {args}, in folder: {cwd}")
-    
+
     loop = asyncio.get_event_loop()
     result = loop.run_until_complete(_async_subprocess(args, env, stdout_sink, stderr_sink, cwd))
     loop.close()

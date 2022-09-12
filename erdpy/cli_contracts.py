@@ -145,8 +145,11 @@ def _add_build_options_args(sub: Any):
                      help="for rust projects, optionally specify the suffix of the wasm bytecode output file")
     sub.add_argument("--skip-eei-checks", action="store_true", default=False, help="skip EEI compatibility checks (default: %(default)s)")
     sub.add_argument("--ignore-eei-checks", action="store_true", default=False, help="ignore EEI compatibility errors (default: %(default)s)")
-    sub.add_argument("--not-reproducible", action="store_true", default=False,
-                     help="for rust projects, do not perform a reproducible build. See https://docs.elrond.com/developers/reproducible-contract-builds (default: %(default)s)")
+    sub.add_argument("--output-set-permissions", type=lambda value: int(value, 8), help="set permissions on output folder (octal)")
+    sub.add_argument("--output-set-owner-id", type=int, help="set owner of output folder")
+    sub.add_argument("--output-set-group-id", type=int, help="set group of output folder")
+
+
     sub.add_argument("--image", type=str, default=config.get_value("dependencies.rust-docker-image"),
                      help="for rust projects, specify the Docker image to be used for reproducible builds. See https://docs.elrond.com/developers/reproducible-contract-builds (default: %(default)s)")
 
@@ -234,7 +237,10 @@ def _prepare_build_options(args: Any) -> Dict[str, Any]:
         "wasm-name": args.wasm_name,
         "wasm-suffix": args.wasm_suffix,
         "skip-eei-checks": args.skip_eei_checks,
-        "ignore-eei-checks": args.ignore_eei_checks
+        "ignore-eei-checks": args.ignore_eei_checks,
+        "output-set-permissions": args.output_set_permissions,
+        "output-set-owner-id": args.output.set_owner_id,
+        "output-set-group-id": args.output.set_group_id
     }
 
 
