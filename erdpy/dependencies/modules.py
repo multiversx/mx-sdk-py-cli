@@ -2,10 +2,11 @@ import logging
 import os
 import shutil
 from os import path
-from typing import Dict, List, Optional
 from pathlib import Path
+from typing import Dict, List, Optional
 
-from erdpy import config, dependencies, downloader, errors, myprocess, utils, workstation
+from erdpy import (config, dependencies, downloader, errors, myprocess, utils,
+                   workstation)
 
 logger = logging.getLogger("modules")
 
@@ -248,7 +249,6 @@ class NodejsModule(StandaloneModule):
         raise errors.UnsupportedConfigurationValue("Nodejs tag must always be explicit, not latest")
 
 
-
 class WabtModule(StandaloneModule):
     def __init__(self, key: str, aliases: List[str]):
         super().__init__(key, aliases)
@@ -350,7 +350,7 @@ class Rust(DependencyModule):
         directory = self.get_directory("")
 
         return {
-            "PATH": f"{path.join(directory, 'bin')}:{os.environ['PATH']}",
+            "PATH": f"{path.join(directory, 'bin')}",
             "RUSTUP_HOME": directory,
             "CARGO_HOME": directory
         }
