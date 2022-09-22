@@ -2,10 +2,11 @@ import logging
 import os
 import shutil
 from os import path
-from typing import Dict, List, Optional
 from pathlib import Path
+from typing import Dict, List, Optional
 
-from erdpy import config, dependencies, downloader, errors, myprocess, utils, workstation
+from erdpy import (config, dependencies, downloader, errors, myprocess, utils,
+                   workstation)
 
 logger = logging.getLogger("modules")
 
@@ -248,7 +249,6 @@ class NodejsModule(StandaloneModule):
         raise errors.UnsupportedConfigurationValue("Nodejs tag must always be explicit, not latest")
 
 
-
 class WabtModule(StandaloneModule):
     def __init__(self, key: str, aliases: List[str]):
         super().__init__(key, aliases)
@@ -324,7 +324,7 @@ class Rust(DependencyModule):
 
         args = [rustup_path, "--verbose", "--default-toolchain", toolchain, "--profile",
                 "minimal", "--target", "wasm32-unknown-unknown", "--no-modify-path", "-y"]
-        myprocess.run_process(args, env=self.get_env())
+        myprocess.run_process(args, env=self.get_env_for_install())
 
     def uninstall(self, tag: str):
         directory = self.get_directory("")
@@ -333,7 +333,7 @@ class Rust(DependencyModule):
 
     def is_installed(self, tag: str) -> bool:
         try:
-            myprocess.run_process(["rustc", "--version"], env=self.get_env())
+            myprocess.run_process(["rustc", "--version"], env=self.get_env_for_is_installed())
             return True
         except Exception:
             return False
@@ -350,6 +350,25 @@ class Rust(DependencyModule):
         directory = self.get_directory("")
 
         return {
+            "PATH": f"{path.join(directory, 'bin')}",
+            "RUSTUP_HOME": directory,
+            "CARGO_HOME": directory
+        }
+
+    def get_env_for_is_installed(self):
+        directory = self.get_directory("")
+
+        return {
+            "PATH": f"{path.join(directory, 'bin')}",
+            "RUSTUP_HOME": directory,
+            "CARGO_HOME": directory
+        }
+
+    def get_env_for_install(self):
+        directory = self.get_directory("")
+
+        return {
+            # For installation, wget (or curl) and cc (build-essential) are also required.
             "PATH": f"{path.join(directory, 'bin')}:{os.environ['PATH']}",
             "RUSTUP_HOME": directory,
             "CARGO_HOME": directory

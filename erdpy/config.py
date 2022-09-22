@@ -1,7 +1,8 @@
 import os.path
-import semver
-from typing import Any, Dict, List
 from pathlib import Path
+from typing import Any, Dict, List
+
+import semver
 
 from erdpy import errors, utils, workstation
 
@@ -91,7 +92,7 @@ def get_active() -> Dict[str, Any]:
     empty_config: Dict[str, Any] = dict()
     result: Dict[str, Any] = configs.get(active_config_name, empty_config)
 
-    return result;
+    return result
 
 
 def set_active(name: str):
