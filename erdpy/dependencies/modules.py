@@ -333,7 +333,7 @@ class Rust(DependencyModule):
 
     def is_installed(self, tag: str) -> bool:
         try:
-            myprocess.run_process(["rustc", "--version"], env=self.get_env())
+            myprocess.run_process(["rustc", "--version"], env=self.get_env_for_is_installed())
             return True
         except Exception:
             return False
@@ -347,6 +347,15 @@ class Rust(DependencyModule):
         return path.join(tools_folder, "vendor-rust")
 
     def get_env(self):
+        directory = self.get_directory("")
+
+        return {
+            "PATH": f"{path.join(directory, 'bin')}:{os.environ['PATH']}",
+            "RUSTUP_HOME": directory,
+            "CARGO_HOME": directory
+        }
+
+    def get_env_for_is_installed(self):
         directory = self.get_directory("")
 
         return {
