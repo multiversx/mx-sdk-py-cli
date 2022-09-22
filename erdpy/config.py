@@ -152,7 +152,7 @@ def get_defaults() -> Dict[str, Any]:
         "proxy": "https://testnet-gateway.elrond.com",
         "chainID": "T",
         "txVersion": "1",
-        "dependencies.vmtools.tag": "v1.4.60",
+        "dependencies.vmtools.tag": "latest",
         "dependencies.elrond_wasm_rs.tag": "latest",
         "dependencies.vmtools.urlTemplate.linux": "https://github.com/ElrondNetwork/wasm-vm/archive/{TAG}.tar.gz",
         "dependencies.vmtools.urlTemplate.osx": "https://github.com/ElrondNetwork/wasm-vm/archive/{TAG}.tar.gz",
