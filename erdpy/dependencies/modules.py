@@ -324,7 +324,7 @@ class Rust(DependencyModule):
 
         args = [rustup_path, "--verbose", "--default-toolchain", toolchain, "--profile",
                 "minimal", "--target", "wasm32-unknown-unknown", "--no-modify-path", "-y"]
-        myprocess.run_process(args, env=self.get_env())
+        myprocess.run_process(args, env=self.get_env_for_install())
 
     def uninstall(self, tag: str):
         directory = self.get_directory("")
@@ -350,7 +350,7 @@ class Rust(DependencyModule):
         directory = self.get_directory("")
 
         return {
-            "PATH": f"{path.join(directory, 'bin')}:{os.environ['PATH']}",
+            "PATH": f"{path.join(directory, 'bin')}",
             "RUSTUP_HOME": directory,
             "CARGO_HOME": directory
         }
@@ -360,6 +360,16 @@ class Rust(DependencyModule):
 
         return {
             "PATH": f"{path.join(directory, 'bin')}",
+            "RUSTUP_HOME": directory,
+            "CARGO_HOME": directory
+        }
+
+    def get_env_for_install(self):
+        directory = self.get_directory("")
+
+        return {
+            # For installation, wget (or curl) and cc (build-essential) are also required.
+            "PATH": f"{path.join(directory, 'bin')}:{os.environ['PATH']}",
             "RUSTUP_HOME": directory,
             "CARGO_HOME": directory
         }
