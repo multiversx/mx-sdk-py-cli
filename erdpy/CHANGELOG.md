@@ -7,6 +7,9 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 ## [Unreleased]
  - TBD
 
+## [2.0.3]
+ - [Hot fix: Rust env for contract reports is missing system PATH](https://github.com/ElrondNetwork/elrond-sdk-erdpy/pull/154)
+
 ## [2.0.2]
  - [Fix environment variables for Rust](https://github.com/ElrondNetwork/elrond-sdk-erdpy/pull/153)
  

@@ -350,7 +350,8 @@ class Rust(DependencyModule):
         directory = self.get_directory("")
 
         return {
-            "PATH": f"{path.join(directory, 'bin')}",
+            # At this moment, cc (build-essential) is sometimes required by the meta crate (e.g. for reports)
+            "PATH": f"{path.join(directory, 'bin')}:{os.environ['PATH']}",
             "RUSTUP_HOME": directory,
             "CARGO_HOME": directory
         }
@@ -359,6 +360,7 @@ class Rust(DependencyModule):
         directory = self.get_directory("")
 
         return {
+            # Here, we do not include the system PATH
             "PATH": f"{path.join(directory, 'bin')}",
             "RUSTUP_HOME": directory,
             "CARGO_HOME": directory
