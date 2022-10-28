@@ -7,12 +7,15 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 ## [Unreleased]
  - TBD
 
+## [2.0.4]
+ - Fix resolving latest release of Github repositories
+
 ## [2.0.3]
  - [Hot fix: Rust env for contract reports is missing system PATH](https://github.com/ElrondNetwork/elrond-sdk-erdpy/pull/154)
 
 ## [2.0.2]
  - [Fix environment variables for Rust](https://github.com/ElrondNetwork/elrond-sdk-erdpy/pull/153)
- 
+
 ## [2.0.1]
  - [Fix erdpy testnet config](https://github.com/ElrondNetwork/elrond-sdk-erdpy/pull/150)
  - [Fix tests](https://github.com/ElrondNetwork/elrond-sdk-erdpy/pull/149)
