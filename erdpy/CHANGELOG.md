@@ -8,7 +8,7 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
  - TBD
 
 ## [2.0.5]
- - [Prepare erdpy for accepting any address hrp]()
+ - [Prepare erdpy for accepting any address hrp](https://github.com/ElrondNetwork/elrond-sdk-erdpy/pull/158)
 
 ## [2.0.4]
  - Fix resolving latest release of Github repositories
