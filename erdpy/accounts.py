@@ -80,7 +80,7 @@ class LedgerAccount(Account):
 
 
 class Address(IAddress):
-    # Default value is "erd"
+    # Default hrp value is "erd"
     DEFAULT_HRP = "erd"
     PUBKEY_LENGTH = 32
     PUBKEY_STRING_LENGTH = PUBKEY_LENGTH * 2  # hex-encoded

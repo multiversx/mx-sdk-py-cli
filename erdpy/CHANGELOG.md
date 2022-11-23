@@ -7,6 +7,9 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 ## [Unreleased]
  - TBD
 
+## [2.0.5]
+ - [Prepare erdpy for accepting any address hrp]()
+
 ## [2.0.4]
  - Fix resolving latest release of Github repositories
 
