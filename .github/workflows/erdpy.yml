@@ -49,11 +49,8 @@ jobs:
         python3 -m pip install --upgrade pip
         pip3 install -r requirements.txt
         pip3 install pytest
-    - name: Install libtinfo5
-      if: ${{ os == "macos-latest" }}
-      run: |
-        sudo apt update
-        sudo apt install -y libtinfo5
+    - name: echo os
+      run: echo ${{ matrix.os }}
     - name: Set github_api_token
       run: |
         mkdir ~/elrondsdk
