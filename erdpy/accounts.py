@@ -80,14 +80,15 @@ class LedgerAccount(Account):
 
 
 class Address(IAddress):
-    HRP = "erd"
+    HRP: str
     PUBKEY_LENGTH = 32
     PUBKEY_STRING_LENGTH = PUBKEY_LENGTH * 2  # hex-encoded
     BECH32_LENGTH = 62
     _value_hex: str
 
-    def __init__(self, value: Any):
+    def __init__(self, value: Any, HRP: str = DEFAULT_HRP):
         self._value_hex = ''
+        self.HRP = HRP
 
         if not value:
             return
