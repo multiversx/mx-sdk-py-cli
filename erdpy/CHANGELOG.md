@@ -7,6 +7,9 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 ## [Unreleased]
  - TBD
 
+## [2.1.0]
+ - [Bypass EEI checks, by default](https://github.com/ElrondNetwork/elrond-sdk-erdpy/pull/159)
+
 ## [2.0.4]
  - Fix resolving latest release of Github repositories
 
