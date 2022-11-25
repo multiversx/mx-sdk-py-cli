@@ -2,7 +2,6 @@ import logging
 from typing import List
 
 from erdpy import utils
-from erdpy.errors import NotSupportedProjectFeature
 from erdpy.projects.eei_activation import ActivationEpochsInfo
 from erdpy.projects.eei_registry import EEIRegistry
 from erdpy.projects.interfaces import IProject
@@ -31,7 +30,7 @@ def check_compatibility(project: IProject):
     compatible_with_devnet = _check_imports_compatibility(imports, activation_info_on_devnet)
 
     if not compatible_with_mainnet or not compatible_with_devnet:
-        raise NotSupportedProjectFeature()
+        logger.warn("Some features used by the project are not yet completely supported.")
 
 
 def _should_skip_checks(project: IProject):
