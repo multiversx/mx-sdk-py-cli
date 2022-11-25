@@ -83,6 +83,7 @@ class Project(IProject):
     @final
     def _do_after_build_core(self):
         wabt.generate_artifacts(self)
+        # TODO: Remove this, in the future
         eei_checks.check_compatibility(self)
 
     def _copy_to_output(self, source: Path, destination: Union[str, None] = None) -> Path:

@@ -1,8 +1,7 @@
 import logging
 import os
-from typing import Any, Dict, List
-
 from pathlib import Path
+from typing import Any, Dict, List
 
 from erdpy import cli_shared, errors, projects, utils
 from erdpy.accounts import Account, Address, LedgerAccount
@@ -144,8 +143,11 @@ def _add_build_options_args(sub: Any):
                      help="for rust projects, optionally specify the name of the wasm bytecode output file")
     sub.add_argument("--wasm-suffix", type=str,
                      help="for rust projects, optionally specify the suffix of the wasm bytecode output file")
-    sub.add_argument("--skip-eei-checks", action="store_true", default=False, help="skip EEI compatibility checks (default: %(default)s)")
-    sub.add_argument("--ignore-eei-checks", action="store_true", default=False, help="ignore EEI compatibility errors (default: %(default)s)")
+
+    # Completely disable the "EEI checks" feature (without a way to enable it).
+    # Flags are kept in order to avoid breaking changes, for the moment - we might completely remove them in the future.
+    sub.add_argument("--skip-eei-checks", action="store_true", default=True, help="deprecated flag")
+    sub.add_argument("--ignore-eei-checks", action="store_true", default=True, help="deprecated flag")
 
 
 def _add_recursive_arg(sub: Any):
@@ -230,7 +232,9 @@ def _prepare_build_options(args: Any) -> Dict[str, Any]:
         "wasm-symbols": args.wasm_symbols,
         "wasm-name": args.wasm_name,
         "wasm-suffix": args.wasm_suffix,
+        # TODO: Remove this, in the future
         "skip-eei-checks": args.skip_eei_checks,
+        # TODO: Remove this, in the future
         "ignore-eei-checks": args.ignore_eei_checks
     }
 
