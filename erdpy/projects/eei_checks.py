@@ -1,5 +1,6 @@
 import logging
 from typing import List
+
 from erdpy import utils
 from erdpy.errors import NotSupportedProjectFeature
 from erdpy.projects.eei_activation import ActivationEpochsInfo
@@ -29,19 +30,12 @@ def check_compatibility(project: IProject):
     compatible_with_mainnet = _check_imports_compatibility(imports, activation_info_on_mainnet)
     compatible_with_devnet = _check_imports_compatibility(imports, activation_info_on_devnet)
 
-    if _should_ignore_checks(project):
-        return
-
     if not compatible_with_mainnet or not compatible_with_devnet:
         raise NotSupportedProjectFeature()
 
 
 def _should_skip_checks(project: IProject):
-    return project.get_option("skip-eei-checks") is True
-
-
-def _should_ignore_checks(project: IProject):
-    return project.get_option("ignore-eei-checks") is True
+    return not project.get_option("eei-checks")
 
 
 def _check_imports_compatibility(imports: List[str], activation_info: ActivationEpochsInfo) -> bool:
