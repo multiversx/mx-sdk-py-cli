@@ -132,8 +132,9 @@ optional arguments:
                                        False)
   --wasm-name WASM_NAME                for rust projects, optionally specify the name of the wasm bytecode output file
   --wasm-suffix WASM_SUFFIX            for rust projects, optionally specify the suffix of the wasm bytecode output file
-  --skip-eei-checks                    skip EEI compatibility checks (default: False)
-  --ignore-eei-checks                  ignore EEI compatibility errors (default: False)
+  --eei-checks                         run EEI compatibility checks (default: False)
+  --skip-eei-checks                    deprecated flag
+  --ignore-eei-checks                  deprecated flag
 
 ```
 ### Contract.Clean
@@ -430,8 +431,9 @@ optional arguments:
                                                   output file
   --wasm-suffix WASM_SUFFIX                       for rust projects, optionally specify the suffix of the wasm bytecode
                                                   output file
-  --skip-eei-checks                               skip EEI compatibility checks (default: False)
-  --ignore-eei-checks                             ignore EEI compatibility errors (default: False)
+  --eei-checks                                    run EEI compatibility checks (default: False)
+  --skip-eei-checks                               deprecated flag
+  --ignore-eei-checks                             deprecated flag
 
 ```
 ## Group **Transactions**
