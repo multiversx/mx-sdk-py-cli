@@ -193,3 +193,8 @@ class TestnetError(KnownError):
 class LedgerError(KnownError):
     def __init__(self, message: str):
         super().__init__("Ledger error: " + message)
+
+
+class ContractSourceCodeNotProvided(KnownError):
+    def __init__(self):
+        super().__init__("Contract source code not provided.")
