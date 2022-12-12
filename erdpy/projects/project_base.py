@@ -26,7 +26,7 @@ class Project(IProject):
         self._ensure_dependencies_installed()
         self.perform_build()
         contract_paths = self._do_after_build_custom()
-        # self._do_after_build_core()
+        self._do_after_build_core()
         return contract_paths
 
     def get_option(self, option_name: str) -> Any:
