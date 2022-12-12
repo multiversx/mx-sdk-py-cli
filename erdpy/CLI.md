@@ -20,7 +20,7 @@ https://docs.elrond.com/sdk-and-tools/erdpy/erdpy.
         
 
 COMMAND GROUPS:
-  {contract,tx,validator,account,ledger,wallet,network,blockatlas,deps,config,hyperblock,testnet,data,staking-provider,dns}
+  {contract,tx,validator,account,ledger,wallet,network,deps,config,hyperblock,testnet,data,staking-provider,dns}
 
 TOP-LEVEL OPTIONS:
   -h, --help            show this help message and exit
@@ -37,7 +37,6 @@ account                        Get Account data (nonce, balance) from the Networ
 ledger                         Get Ledger App addresses and version
 wallet                         Create wallet, derive secret key from mnemonic, bech32 address helpers etc.
 network                        Get Network parameters, such as number of shards, chain identifier etc.
-blockatlas                     Interact with an Block Atlas instance
 deps                           Manage dependencies or elrond-sdk modules
 config                         Configure elrond-sdk (default values etc.)
 hyperblock                     Get Hyperblock from the Network
@@ -1122,73 +1121,6 @@ Get the chain identifier.
 optional arguments:
   -h, --help     show this help message and exit
   --proxy PROXY  🔗 the URL of the proxy (default: https://testnet-gateway.elrond.com)
-
-```
-## Group **BlockAtlas**
-
-
-```
-$ erdpy blockatlas --help
-usage: erdpy blockatlas COMMAND [-h] ...
-
-Interact with an Block Atlas instance
-
-COMMANDS:
-  {current-block-number,block-by-number,transactions}
-
-OPTIONS:
-  -h, --help            show this help message and exit
-  --url URL             🖧 URL of Block Atlas instance
-  --coin COIN           coin identifier (e.g. erd, bnb)
-
-----------------
-COMMANDS summary
-----------------
-current-block-number           Get latest notarized metablock (number / nonce)
-block-by-number                Get block by number (nonce)
-transactions                   Get transactions by address
-
-```
-### BlockAtlas.CurrentBlockNumber
-
-
-```
-$ erdpy blockatlas current-block-number --help
-usage: erdpy blockatlas current-block-number [-h] ...
-
-Get latest notarized metablock (number / nonce)
-
-optional arguments:
-  -h, --help  show this help message and exit
-
-```
-### BlockAtlas.BlockByNumber
-
-
-```
-$ erdpy blockatlas block-by-number --help
-usage: erdpy blockatlas block-by-number [-h] ...
-
-Get block by number (nonce)
-
-optional arguments:
-  -h, --help       show this help message and exit
-  --number NUMBER  the number (nonce)
-
-```
-### BlockAtlas.Transactions
-
-
-```
-$ erdpy blockatlas transactions --help
-usage: erdpy blockatlas transactions [-h] ...
-
-Get transactions by address
-
-optional arguments:
-  -h, --help         show this help message and exit
-  --address ADDRESS  🖄 the address to query
-  --outfile OUTFILE  where to save the output (default: stdout)
 
 ```
 ## Group **Dependencies**
