@@ -8,7 +8,7 @@ from typing import Any, Dict, List, Union, cast, final
 
 from erdpy import dependencies, errors, myprocess, utils
 from erdpy.dependencies.modules import StandaloneModule
-from erdpy.projects import eei_checks, wabt
+from erdpy.projects import eei_checks
 from erdpy.projects.interfaces import IProject
 
 logger = logging.getLogger("Project")
@@ -26,7 +26,7 @@ class Project(IProject):
         self._ensure_dependencies_installed()
         self.perform_build()
         contract_paths = self._do_after_build_custom()
-        self._do_after_build_core()
+        # self._do_after_build_core()
         return contract_paths
 
     def get_option(self, option_name: str) -> Any:
@@ -36,12 +36,9 @@ class Project(IProject):
         utils.remove_folder(self.get_output_folder())
 
     def _ensure_dependencies_installed(self):
-        module_keys = self.get_core_dependencies() + self.get_dependencies()
+        module_keys = self.get_dependencies()
         for module_key in module_keys:
             dependencies.install_module(module_key)
-
-    def get_core_dependencies(self) -> List[str]:
-        return ["wabt"]
 
     def get_dependencies(self) -> List[str]:
         raise NotImplementedError()
@@ -82,7 +79,6 @@ class Project(IProject):
 
     @final
     def _do_after_build_core(self):
-        wabt.generate_artifacts(self)
         # TODO: Remove this, in the future
         eei_checks.check_compatibility(self)
 

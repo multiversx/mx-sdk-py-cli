@@ -5,7 +5,7 @@ from typing import Dict, List
 from erdpy import config, errors
 from erdpy.dependencies.modules import (CargoModule, NpmModule, TestWalletsModule, VMToolsModule, DependencyModule,
                                         GolangModule, MclSignerModule,
-                                        NodejsModule, Rust, StandaloneModule, WabtModule)
+                                        NodejsModule, Rust, StandaloneModule)
 
 logger = logging.getLogger("install")
 
@@ -55,8 +55,7 @@ def _get_explicitly_installable_deps() -> List[DependencyModule]:
         StandaloneModule(key="llvm", aliases=["clang", "cpp"]),
         Rust(key="rust"),
         NodejsModule(key="nodejs", aliases=[]),
-        GolangModule(key="golang"),
-        WabtModule(key="wabt", aliases=[])
+        GolangModule(key="golang")
     ]
 
 
