@@ -120,6 +120,18 @@ testCleanContracts() {
     assertFileDoesNotExist ${SANDBOX}/myfunding-rs/output/myfunding-rs.abi.json || return 1
 }
 
+testVerifyContract(){
+    echo "testVerifyContract"
+
+    nohup python3 local_verify_server.py >/dev/null 2>&1 &
+    sleep 1
+
+    curl localhost:7777/initialise -X POST
+    curl localhost:7777/verify -X POST
+
+    pkill -f local_verify_server.py
+}
+
 testAll() {
     cleanSandbox || return 1
     testTrivialCommands || return 1

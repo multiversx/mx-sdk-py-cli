@@ -4,6 +4,7 @@ from erdpy.accounts import Account, Address
 from erdpy.utils import read_json_file
 from nacl.signing import SigningKey
 import requests
+from build_contract_rust.packaged_source_code import PackagedSourceCode
 
 
 class ContractVerificationRequest:
@@ -37,16 +38,24 @@ def trigger_contract_verification(
     contract: Address,
     verifier_url: str,
     docker_tag: str,
-) -> None:
+):
     if packaged_source:
         source_code = read_json_file(packaged_source)
+        source_code = PackagedSourceCode.from_dict(source_code).to_dict()
     elif project_directory:
+        source_code = PackagedSourceCode.from_folder(project_directory).to_dict()
+    else:
         raise NotImplementedError()
 
     secret_key = bytes.fromhex(owner.secret_key)
     signing_key: Any = SigningKey(secret_key)
 
-    message = f"{contract.bech32()} some dummy string"
+    response = requests.post(f"{verifier_url}/initialise", data={"contract": contract.bech32()})
+    response.raise_for_status()
+    response = response.json()
+    token = str(response.get("token", ""))
+
+    message = f"{contract.bech32()}-{token}"
     signed_message = signing_key.sign(message.encode())
     signature = signed_message.signature
 
@@ -54,4 +63,6 @@ def trigger_contract_verification(
         contract, source_code, signature, docker_tag
     )
 
-    request = requests.post(verifier_url, data=contract_verification.to_dictionary())
+    response = requests.post(f'{verifier_url}/verify', data=contract_verification.to_dictionary())
+
+    return response

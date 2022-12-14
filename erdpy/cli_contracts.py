@@ -417,6 +417,7 @@ def verify(args: Any) -> None:
     owner = _prepare_owner(args)
     docker_tag = args.docker_tag
 
-    trigger_contract_verification(
+    response = trigger_contract_verification(
         packaged_src, project_directory, owner, contract, verifier_url, docker_tag
     )
+    utils.dump_out_json(response.json())
