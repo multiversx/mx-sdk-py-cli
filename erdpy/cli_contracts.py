@@ -12,6 +12,7 @@ from erdpy.projects import load_project
 from erdpy.projects.core import get_project_paths_recursively
 from erdpy.proxy.core import ElrondProxy
 from erdpy.transactions import Transaction
+from erdpy.docker import is_docker_installed, run_docker
 
 logger = logging.getLogger("cli.contracts")
 
@@ -120,6 +121,15 @@ def setup_parser(args: List[str], subparsers: Any) -> Any:
     _add_function_arg(sub)
     _add_arguments_arg(sub)
     sub.set_defaults(func=query)
+
+    sub = cli_shared.add_command_subparser(subparsers, "contract", "reproducible-build",
+                                            "Build a Smart Contract and get the same output as a previously built Smart Contract")
+    _add_project_arg(sub)
+    _add_recursive_arg(sub)
+    _add_build_options_args(sub)
+    sub.add_argument("--docker-image-tag", required=True, type=str,
+                        help="the docker image tag used to build the contract")
+    sub.set_defaults(func=reproduce_build)
 
     parser.epilog = cli_shared.build_group_epilog(subparsers)
     return subparsers
@@ -359,3 +369,19 @@ def _send_or_simulate(tx: Transaction, contract: SmartContract, args: Any):
     output_builder = cli_shared.send_or_simulate(tx, args, dump_output=False)
     output_builder.set_contract_address(contract.address)
     utils.dump_out_json(output_builder.build(), outfile=args.outfile)
+
+
+def reproduce_build(args: Any):
+    project_path = get_project_paths(args)[0]
+    docker_image = args.docker_image_tag
+    output_path = project_path / "output-docker"
+    contract_path = ""
+
+    options = _prepare_build_options(args)
+    # cargo_target_dir = Path(options.get("cargo-target-dir", ""))
+    no_wasm_opt = options.get("no-wasm-opt", True)
+
+    if is_docker_installed():
+        return_code = run_docker(docker_image, project_path, contract_path, output_path, None, no_wasm_opt)
+
+    return return_code
