@@ -1,8 +1,12 @@
 import os
+import logging
 import subprocess
 from pathlib import Path
-from typing import Union, List
-from erdpy.errors import DockerError
+from typing import List
+from erdpy.errors import DockerMissingError
+
+
+logger = logging.getLogger("build-with-docker")
 
 
 def is_docker_installed():
@@ -13,20 +17,17 @@ def is_docker_installed():
         if "Docker version" in output:
             return True
         else:
-            raise DockerError()
+            raise DockerMissingError()
     except:
-        print("Something went wrong when checking if docker is installed!")
+        logger.error("Something went wrong when checking if docker is installed!")
 
 
-def run_docker(image: str, project_path: Union[Path, None], contract_path: str, output_path: Path,
-                cargo_target_dir: Union[Path, None], no_wasm_opt: bool):
+def run_docker(image: str, project_path: Path, contract: str, output_path: Path, no_wasm_opt: bool):
     docker_mount_args: List[str] = ["--volume", f"{output_path}:/output"]
 
     if project_path:
         docker_mount_args.extend(["--volume", f"{project_path}:/project"])
 
-    if cargo_target_dir:
-        docker_mount_args += ["--volume", f"{cargo_target_dir}:/cargo-target-dir"]
 
     docker_args = ["docker", "run"]
 
@@ -44,10 +45,12 @@ def run_docker(image: str, project_path: Union[Path, None], contract_path: str, 
     if no_wasm_opt:
         entrypoint_args.append("--no-wasm-opt")
 
-    if contract_path:
-        entrypoint_args.extend(["--contract", contract_path])
+    if contract:
+        entrypoint_args.extend(["--contract", contract])
 
     args = docker_args + entrypoint_args
+
+    logger.info(f"Docker running with args: {args}")
 
     result = subprocess.run(args)
 

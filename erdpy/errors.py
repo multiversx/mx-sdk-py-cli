@@ -190,6 +190,6 @@ class LedgerError(KnownError):
         super().__init__("Ledger error: " + message)
 
 
-class DockerError(KnownError):
+class DockerMissingError(KnownError):
     def __init__(self):
         super().__init__("Docker is not installed! Please visit https://docs.docker.com/get-docker/ to install docker.")
