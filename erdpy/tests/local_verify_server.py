@@ -13,11 +13,9 @@ class HTTP(BaseHTTPRequestHandler):
 
         if self.path == "/initialise":
             response = {'token': 7890}
-            print('dasdada')
             self.wfile.write(bytes(json.dumps(response), 'utf-8'))
         
         if self.path == "/verify":
-            print('cdafdfs')
             response = {'status': 'sent to verification'}
             self.wfile.write(bytes(json.dumps(response), 'utf-8'))
 

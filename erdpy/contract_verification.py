@@ -13,22 +13,20 @@ class ContractVerificationRequest:
         contract: Address,
         source_code: Dict[str, Any],
         signature: Any,
-        docker_tag: str,
+        docker_image: str,
     ) -> None:
         self.contract = contract
         self.source_code = source_code
         self.signature = signature
-        self.docker_tag = docker_tag
+        self.docker_image = docker_image
 
     def to_dictionary(self) -> Dict[str, Any]:
-        contract_verification_request: Dict[str, Any] = {}
-
-        contract_verification_request["contract"] = self.contract
-        contract_verification_request["source_code"] = self.source_code
-        contract_verification_request["signature"] = self.signature
-        contract_verification_request["docker_tag"] = self.docker_tag
-
-        return contract_verification_request
+        return {
+            "contract": self.contract,
+            "source_code": self.source_code,
+            "signature": self.signature,
+            "docker_tag": self.docker_image
+        }
 
 
 def trigger_contract_verification(
@@ -37,7 +35,7 @@ def trigger_contract_verification(
     owner: Account,
     contract: Address,
     verifier_url: str,
-    docker_tag: str,
+    docker_image: str,
 ):
     if packaged_source:
         source_code = read_json_file(packaged_source)
@@ -50,19 +48,25 @@ def trigger_contract_verification(
     secret_key = bytes.fromhex(owner.secret_key)
     signing_key: Any = SigningKey(secret_key)
 
-    response = requests.post(f"{verifier_url}/initialise", data={"contract": contract.bech32()})
-    response.raise_for_status()
-    response = response.json()
-    token = str(response.get("token", ""))
+    token = get_verification_token(verifier_url, contract)
 
     message = f"{contract.bech32()}-{token}"
     signed_message = signing_key.sign(message.encode())
     signature = signed_message.signature
 
     contract_verification = ContractVerificationRequest(
-        contract, source_code, signature, docker_tag
+        contract, source_code, signature, docker_image
     )
 
     response = requests.post(f'{verifier_url}/verify', data=contract_verification.to_dictionary())
 
     return response
+
+
+def get_verification_token(verifier_url: str, contract: Address) -> str:
+    response = requests.post(f"{verifier_url}/initialize", data={"contract": contract.bech32()})
+    response.raise_for_status()
+    response = response.json()
+    token = str(response.get("token", ""))
+
+    return token

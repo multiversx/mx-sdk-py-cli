@@ -145,7 +145,7 @@ def setup_parser(args: List[str], subparsers: Any) -> Any:
         required=True,
         help="the url of the service that validates the contract",
     )
-    sub.add_argument("--docker-tag", required=True, help="the tag of the docker image")
+    sub.add_argument("--docker-image", required=True, help="the docker image used for the build (i.e. elrondnetwork/build-contract-rust:v4.0.0)")
     cli_shared.add_wallet_args(args, sub)
     sub.set_defaults(func=verify)
 
@@ -331,22 +331,22 @@ def _prepare_sender(args: Any) -> Account:
     return sender
 
 
-def _prepare_owner(args: Any) -> Account:
-    owner: Account
+def _prepare_sender(args: Any) -> Account:
+    sender: Account
     if args.ledger:
-        owner = LedgerAccount(
+        sender = LedgerAccount(
             account_index=args.ledger_account_index,
             address_index=args.ledger_address_index,
         )
     elif args.pem:
-        owner = Account(pem_file=args.pem, pem_index=args.pem_index)
+        sender = Account(pem_file=args.pem, pem_index=args.pem_index)
     elif args.keyfile:
         password = load_password(args)
-        owner = Account(key_file=args.keyfile, password=password)
+        sender = Account(key_file=args.keyfile, password=password)
     else:
         raise errors.NoWalletProvided()
 
-    return owner
+    return sender
 
 
 def call(args: Any):
@@ -414,10 +414,10 @@ def verify(args: Any) -> None:
     packaged_src = Path(args.packaged_src)
     project_directory = Path(args.project)
 
-    owner = _prepare_owner(args)
-    docker_tag = args.docker_tag
+    owner = _prepare_sender(args)
+    docker_image = args.docker_image
 
     response = trigger_contract_verification(
-        packaged_src, project_directory, owner, contract, verifier_url, docker_tag
+        packaged_src, project_directory, owner, contract, verifier_url, docker_image
     )
     utils.dump_out_json(response.json())
