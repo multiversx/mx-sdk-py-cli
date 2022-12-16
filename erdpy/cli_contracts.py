@@ -373,10 +373,10 @@ def _send_or_simulate(tx: Transaction, contract: SmartContract, args: Any):
 
 
 def reproduce_build(args: Any):
-    project_path = get_project_paths(args)
+    project_paths = get_project_paths(args)
 
-    if len(project_path) == 1:
-        project_path = project_path[0].expanduser().resolve()
+    if len(project_paths) == 1:
+        project_path = project_paths[0].expanduser().resolve()
     else:
         raise NotImplementedError()
 
