@@ -331,7 +331,7 @@ def _prepare_sender(args: Any) -> Account:
     return sender
 
 
-def _prepare_sender(args: Any) -> Account:
+def _prepare_signer(args: Any) -> Account:
     sender: Account
     if args.ledger:
         sender = LedgerAccount(
@@ -414,7 +414,7 @@ def verify(args: Any) -> None:
     packaged_src = Path(args.packaged_src)
     project_directory = Path(args.project)
 
-    owner = _prepare_sender(args)
+    owner = _prepare_signer(args)
     docker_image = args.docker_image
 
     response = trigger_contract_verification(
