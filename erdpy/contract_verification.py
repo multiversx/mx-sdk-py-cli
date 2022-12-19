@@ -23,9 +23,9 @@ class ContractVerificationRequest:
     def to_dictionary(self) -> Dict[str, Any]:
         return {
             "contract": self.contract,
-            "source_code": self.source_code,
+            "sourceCode": self.source_code,
             "signature": self.signature,
-            "docker_tag": self.docker_image
+            "dockerImage": self.docker_image
         }
 
 
