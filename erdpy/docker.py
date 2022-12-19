@@ -3,7 +3,6 @@ import logging
 import subprocess
 from pathlib import Path
 from typing import List
-from erdpy.errors import DockerMissingError
 
 
 logger = logging.getLogger("build-with-docker")
@@ -17,7 +16,7 @@ def is_docker_installed():
         if "Docker version" in output:
             return True
         else:
-            raise DockerMissingError()
+            return False
     except:
         logger.error("Something went wrong when checking if docker is installed!")
 
@@ -27,7 +26,6 @@ def run_docker(image: str, project_path: Path, contract: str, output_path: Path,
 
     if project_path:
         docker_mount_args.extend(["--volume", f"{project_path}:/project"])
-
 
     docker_args = ["docker", "run"]
 
