@@ -1,3 +1,5 @@
+import json
+import hashlib
 from pathlib import Path
 from typing import Dict, Any, Union
 from erdpy.accounts import Account, Address
@@ -12,7 +14,7 @@ class ContractVerificationRequest:
         self,
         contract: Address,
         source_code: Dict[str, Any],
-        signature: Any,
+        signature: bytes,
         docker_image: str,
     ) -> None:
         self.contract = contract
@@ -22,11 +24,29 @@ class ContractVerificationRequest:
 
     def to_dictionary(self) -> Dict[str, Any]:
         return {
-            "contract": self.contract,
-            "sourceCode": self.source_code,
-            "signature": self.signature,
-            "dockerImage": self.docker_image
+            "signature": self.signature.hex(),
+            "payload":{
+                "contract": self.contract.bech32(),
+                "dockerImage": self.docker_image,
+                "sourceCode": self.source_code
+            }
         }
+
+
+class ContractVerificationPayload:
+    def __init__(self, contract: Address, source_code: Dict[str, Any], docker_image: str,) -> None:
+        self.contract = contract
+        self.source_code = source_code
+        self.docker_image = docker_image
+    
+    def get_payload(self):
+        payload = {
+            "contract": self.contract.bech32(),
+            "dockerImage": self.docker_image,
+            "sourceCode": self.source_code
+        }
+
+        return json.dumps(payload, separators=(',', ':'))
 
 
 def trigger_contract_verification(
@@ -45,28 +65,20 @@ def trigger_contract_verification(
     else:
         raise NotImplementedError()
 
+    payload = ContractVerificationPayload(contract, source_code, docker_image).get_payload()
+    
+    hashed_payload = hashlib.sha256(payload.encode()).hexdigest()
+
     secret_key = bytes.fromhex(owner.secret_key)
     signing_key: Any = SigningKey(secret_key)
 
-    token = get_verification_token(verifier_url, contract)
+    message = f"{contract.bech32()}{hashed_payload}"
 
-    message = f"{contract.bech32()}-{token}"
     signed_message = signing_key.sign(message.encode())
     signature = signed_message.signature
 
-    contract_verification = ContractVerificationRequest(
-        contract, source_code, signature, docker_image
-    )
+    contract_verification = ContractVerificationRequest(contract, source_code, signature, docker_image)
 
     response = requests.post(f'{verifier_url}/verify', data=contract_verification.to_dictionary())
 
     return response
-
-
-def get_verification_token(verifier_url: str, contract: Address) -> str:
-    response = requests.post(f"{verifier_url}/initialize", data={"contract": contract.bech32()})
-    response.raise_for_status()
-    response = response.json()
-    token = str(response.get("token", ""))
-
-    return token
