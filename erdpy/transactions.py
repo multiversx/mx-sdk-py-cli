@@ -1,15 +1,30 @@
 import base64
 import json
 import logging
+import time
 from collections import OrderedDict
-from typing import Any, Dict, List, TextIO
+from typing import Any, Dict, List, TextIO, Tuple
 
 from erdpy import config, errors, utils
 from erdpy.accounts import Account, Address, LedgerAccount
 from erdpy.cli_password import load_password
-from erdpy.interfaces import IElrondProxy, ITransaction, ITransactionOnNetwork
+from erdpy.interfaces import ITransaction, ITransactionOnNetwork
 
 logger = logging.getLogger("transactions")
+
+
+class INetworkProvider:
+    def send_transaction(self, transaction: ITransaction) -> str:
+        ...
+    
+    def send_transactions(self, transactions: List[ITransaction]) -> Tuple[int, str]:
+        ...
+    
+    def send_wait_result(self) -> ITransactionOnNetwork:
+        ...
+    
+    def get_transaction(self, tx_hash: str) -> ITransactionOnNetwork:
+        ...
 
 
 class Transaction(ITransaction):
@@ -91,25 +106,41 @@ class Transaction(ITransaction):
         instance.receiverUsername = instance.receiver_username_encoded()
         return instance
 
-    def send(self, proxy: IElrondProxy):
+    def send(self, proxy: INetworkProvider):
         if not self.signature:
             raise errors.TransactionIsNotSigned()
 
         logger.info(f"Transaction.send: nonce={self.nonce}")
 
-        dictionary = self.to_dictionary()
-        self.hash = proxy.send_transaction(dictionary)
+        self.hash = proxy.send_transaction(self)
         logger.info(f"Hash: {self.hash}")
         utils.log_explorer_transaction(self.chainID, self.hash)
         return self.hash
 
-    def send_wait_result(self, proxy: IElrondProxy, timeout: int) -> ITransactionOnNetwork:
+    def send_wait_result(self, proxy: INetworkProvider, timeout: int) -> ITransactionOnNetwork:
         if not self.signature:
             raise errors.TransactionIsNotSigned()
 
-        txOnNetwork = proxy.send_transaction_and_wait_for_result(self.to_dictionary(), timeout)
+        txOnNetwork = self.__send_transaction_and_wait_for_result(proxy , self, timeout)
         self.hash = txOnNetwork.get_hash()
         return txOnNetwork
+    
+    def __send_transaction_and_wait_for_result(self, proxy: INetworkProvider, payload: Any, num_seconds_timeout: int = 100) -> ITransactionOnNetwork:
+        AWAIT_TRANSACTION_PERIOD = 5
+
+        tx_hash = proxy.send_transaction(payload)
+        num_periods_to_wait = int(num_seconds_timeout / AWAIT_TRANSACTION_PERIOD)
+
+        for _ in range(0, num_periods_to_wait):
+            time.sleep(AWAIT_TRANSACTION_PERIOD)
+
+            tx = proxy.get_transaction(tx_hash)
+            if tx.is_completed:
+                return tx
+            else:
+                logger.info("Transaction not yet done.")
+
+        return ITransactionOnNetwork()
 
     def to_dictionary(self) -> Dict[str, Any]:
         dictionary: Dict[str, Any] = OrderedDict()
@@ -197,10 +228,9 @@ class BunchOfTransactions:
     def add_tx(self, tx):
         self.transactions.append(tx)
 
-    def send(self, proxy: IElrondProxy):
+    def send(self, proxy: INetworkProvider):
         logger.info(f"BunchOfTransactions.send: {len(self.transactions)} transactions")
-        payload = [transaction.to_dictionary() for transaction in self.transactions]
-        num_sent, hashes = proxy.send_transactions(payload)
+        num_sent, hashes = proxy.send_transactions(self.transactions)
         logger.info(f"Sent: {num_sent}")
         logger.info(f"TxsHashes: {hashes}")
         return num_sent, hashes
