@@ -1,5 +1,5 @@
 # Description
-Elrond Python Command Line Tools for interacting with the Elrond Network (in general) and Smart Contracts (in particular). 
+Python Command Line Tools for interacting with Multivers<sup>X</sup>.
 
 ## Documentation
 [docs.elrond.com](https://docs.elrond.com/sdk-and-tools/erdpy/erdpy/)
