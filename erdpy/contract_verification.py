@@ -39,7 +39,7 @@ class ContractVerificationPayload:
         self.source_code = source_code
         self.docker_image = docker_image
     
-    def get_payload(self):
+    def serialize(self):
         payload = {
             "contract": self.contract.bech32(),
             "dockerImage": self.docker_image,
@@ -65,7 +65,7 @@ def trigger_contract_verification(
     else:
         raise NotImplementedError()
 
-    payload = ContractVerificationPayload(contract, source_code, docker_image).get_payload()
+    payload = ContractVerificationPayload(contract, source_code, docker_image).serialize()
     
     hashed_payload = hashlib.sha256(payload.encode()).hexdigest()
 

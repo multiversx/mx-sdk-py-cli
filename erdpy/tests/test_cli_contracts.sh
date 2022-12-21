@@ -128,7 +128,7 @@ testVerifyContract(){
 
     query_response=$(curl -s localhost:7777/verify -X POST)
 
-    command_response=$(${ERDPY} contract verify erd1sjsk3n2d0krq3pyxxtgf0q7j3t56sgusqaujj4n82l39t9h7jers6gslr4 \
+    command_response=$(${ERDPY} contract verify erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th \
                         --verifier-url=http://localhost:7777 --packaged-src=testdata/dummy.json \
                         --pem=testdata/walletKey.pem --docker-image=elrondnetwork/build-contract-rust:v4.0.0)
 
