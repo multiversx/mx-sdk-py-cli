@@ -1,7 +1,7 @@
 from typing import Any
 
 from erdpy import cli_shared, utils
-from erdpy.proxy.core import ElrondProxy
+from erdpy_network.proxy_network_provider import ProxyNetworkProvider
 
 
 def setup_parser(subparsers: Any) -> Any:
@@ -18,6 +18,14 @@ def setup_parser(subparsers: Any) -> Any:
 
 def get_hyperblock(args: Any) -> Any:
     proxy_url = args.proxy
-    proxy = ElrondProxy(proxy_url)
-    response = proxy.get_hyperblock(args.key)
+    proxy = ProxyNetworkProvider(proxy_url)
+    key =  args.key
+
+    url = f"hyperblock/by-hash/{key}"
+    if str(key).isnumeric():
+        url = f"hyperblock/by-nonce/{key}"
+
+    response = proxy.do_get_generic(url)
+    response = response.get("hyperblock", {})
+
     utils.dump_out_json(response)
