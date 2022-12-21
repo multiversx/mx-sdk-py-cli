@@ -131,7 +131,7 @@ class ElrondProxy(IElrondProxy):
         response = do_post(url, payload)
         return response
 
-    def get_transaction(self, tx_hash: str, sender_address: str = "", with_results: bool = False) -> ITransactionOnNetwork:
+    def get_transaction(self, tx_hash: str, sender_address: str = "", with_results: bool = False) -> TransactionOnNetwork:
         url = f"{self.url}/transaction/{tx_hash}"
         url += f"?sender={sender_address or ''}"
         url += f"&withResults={with_results}"
