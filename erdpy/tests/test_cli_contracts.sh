@@ -126,8 +126,21 @@ testVerifyContract(){
     nohup python3 local_verify_server.py >/dev/null 2>&1 &
     sleep 1
 
-    curl localhost:7777/initialise -X POST
-    curl localhost:7777/verify -X POST
+    query_response=$(curl -s localhost:7777/verify -X POST)
+
+    command_response=$(${ERDPY} contract verify erd1sjsk3n2d0krq3pyxxtgf0q7j3t56sgusqaujj4n82l39t9h7jers6gslr4 \
+                        --verifier-url=http://localhost:7777 --packaged-src=testdata/dummy.json \
+                        --pem=testdata/walletKey.pem --docker-image=elrondnetwork/build-contract-rust:v4.0.0)
+
+    result_curl=$(echo $query_response | awk -F ": " '{ print $2 }' | awk -F'"' '{print $2}')
+    result_erdpy=$(echo $command_response | awk -F ": " '{ print $2 }' | awk -F'"' '{print $2}')
+
+    if [[ $result_curl == $result_erdpy ]];
+    then
+        echo "Test passed!"
+    else
+        return 1
+    fi
 
     pkill -f local_verify_server.py
 }
