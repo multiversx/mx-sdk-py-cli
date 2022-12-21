@@ -13,6 +13,8 @@ from erdpy.projects import load_project
 from erdpy.projects.core import get_project_paths_recursively
 from erdpy.proxy.core import ElrondProxy
 from erdpy.transactions import Transaction
+from erdpy.docker import is_docker_installed, run_docker
+from erdpy.errors import DockerMissingError
 
 logger = logging.getLogger("cli.contracts")
 
@@ -148,6 +150,15 @@ def setup_parser(args: List[str], subparsers: Any) -> Any:
     sub.add_argument("--docker-image", required=True, help="the docker image used for the build (i.e. elrondnetwork/build-contract-rust:v4.0.0)")
     cli_shared.add_wallet_args(args, sub)
     sub.set_defaults(func=verify)
+
+    sub = cli_shared.add_command_subparser(subparsers, "contract", "reproducible-build",
+                                            "Build a Smart Contract and get the same output as a previously built Smart Contract")
+    _add_project_arg(sub)
+    _add_build_options_args(sub)
+    sub.add_argument("--docker-image", required=True, type=str,
+                        help="the docker image tag used to build the contract")
+    sub.add_argument("--contract", type=str, help="relative path of the contract in the project")
+    sub.set_defaults(func=do_reproducible_build)
 
     parser.epilog = cli_shared.build_group_epilog(subparsers)
     return subparsers
@@ -421,3 +432,24 @@ def verify(args: Any) -> None:
         packaged_src, project_directory, owner, contract, verifier_url, docker_image
     )
     utils.dump_out_json(response.json())
+
+
+def do_reproducible_build(args: Any):
+    project_path = args.project
+    docker_image = args.docker_image
+    contract_path = args.contract
+    output_path = Path(project_path) / "output-docker"
+    utils.ensure_folder(output_path)
+
+    options = _prepare_build_options(args)
+    no_wasm_opt = options.get("no-wasm-opt", True)
+
+    if is_docker_installed():
+        logger.info("Starting the docker run...")
+        return_code = run_docker(docker_image, project_path, contract_path, output_path, no_wasm_opt)
+        logger.info("Docker build ran successfully!")
+        logger.info("You can deploy you Smart Contract, then verify it using the erdpy contract verify command")
+    else:
+        raise DockerMissingError()
+
+    return return_code
