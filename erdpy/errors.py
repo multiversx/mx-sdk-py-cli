@@ -188,3 +188,8 @@ class TestnetError(KnownError):
 class LedgerError(KnownError):
     def __init__(self, message: str):
         super().__init__("Ledger error: " + message)
+
+
+class DockerMissingError(KnownError):
+    def __init__(self):
+        super().__init__("Docker is not installed! Please visit https://docs.docker.com/get-docker/ to install docker.")

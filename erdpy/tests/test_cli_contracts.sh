@@ -120,6 +120,13 @@ testCleanContracts() {
     assertFileDoesNotExist ${SANDBOX}/myfunding-rs/output/myfunding-rs.abi.json || return 1
 }
 
+testReproducibleBuild(){
+    echo "testReproducibleBuild"
+
+    ${ERDPY} contract reproducible-build ${SANDBOX}/ping-pong-smart-contract --contract=ping-pong --docker-image=elrondnetwork/build-contract-rust:v4.0.0
+    assertFileExists ${SANDBOX}/ping-pong-smart-contract/output-docker/ping-pong/ping-pong.wasm || return 1
+}
+
 testAll() {
     cleanSandbox || return 1
     testTrivialCommands || return 1
