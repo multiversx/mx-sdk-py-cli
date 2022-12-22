@@ -5,7 +5,7 @@ name: erdpy-build
 
 on:
   pull_request:
-    branches: [ main, development ]
+    branches: [ main, development, feat/* ]
   workflow_dispatch:
 
 # At the start of each workflow run, GitHub automatically creates a unique GITHUB_TOKEN secret (we will pass it below to erdpy config).

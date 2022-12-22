@@ -2,7 +2,7 @@ name: Install erdpy using erdpy-up (Ubuntu)
 
 on:
   pull_request:
-    branches: [main, development]
+    branches: [main, development, feat/*]
   workflow_dispatch:
 
 env:
