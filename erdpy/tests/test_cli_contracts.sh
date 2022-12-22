@@ -74,7 +74,7 @@ testWasmName() {
 
     ${ERDPY} contract clean ${SANDBOX}/myadder-rs
     assertFileDoesNotExist ${SANDBOX}/myadder-rs/output/myadder-2-rs.wasm || return 1
-    ${ERDPY} contract build ${SANDBOX}/myadder-rs --cargo-target-dir=${TARGET_DIR} --wasm-name myadder-2-rs.wasm || return 1
+    ${ERDPY} contract build ${SANDBOX}/myadder-rs --cargo-target-dir=${TARGET_DIR} --wasm-name myadder-2-rs || return 1
     assertFileExists ${SANDBOX}/myadder-rs/output/myadder-2-rs.wasm || return 1
     assertFileExists ${SANDBOX}/myadder-rs/output/myadder-rs.abi.json || return 1
 }
