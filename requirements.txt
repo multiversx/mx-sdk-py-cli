@@ -16,4 +16,4 @@ pytest
 
 setuptools
 
-git+https://git@github.com/ElrondNetwork/elrond-sdk-images-build-contract-rust.git@v4.0.0#egg=build_contract_rust
+mx-sdk-build-contract-rs==4.0.0
