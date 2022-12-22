@@ -89,11 +89,6 @@ class ProxyRequestError(KnownError):
         super().__init__(f"Proxy request error for url [{url}]: {data}")
 
 
-class BlockAtlasRequestError(KnownError):
-    def __init__(self, url: str, data: Any):
-        super().__init__(f"Block Atlas request error for url [{url}]: {data}")
-
-
 class BadInputError(KnownError):
     def __init__(self, input: str, message: str):
         super().__init__(f"Bad input [{input}]: {message}")
@@ -193,3 +188,8 @@ class TestnetError(KnownError):
 class LedgerError(KnownError):
     def __init__(self, message: str):
         super().__init__("Ledger error: " + message)
+
+
+class DockerMissingError(KnownError):
+    def __init__(self):
+        super().__init__("Docker is not installed! Please visit https://docs.docker.com/get-docker/ to install docker.")

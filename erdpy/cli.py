@@ -6,7 +6,6 @@ from typing import Any, List
 
 import erdpy.cli_accounts
 import erdpy.cli_block
-import erdpy.cli_blockatlas
 import erdpy.cli_config
 import erdpy.cli_contracts
 import erdpy.cli_data
@@ -89,7 +88,6 @@ https://docs.elrond.com/sdk-and-tools/erdpy/erdpy.
     commands.append(erdpy.cli_ledger.setup_parser(subparsers))
     commands.append(erdpy.cli_wallet.setup_parser(args, subparsers))
     commands.append(erdpy.cli_network.setup_parser(subparsers))
-    commands.append(erdpy.cli_blockatlas.setup_parser(subparsers))
     commands.append(erdpy.cli_deps.setup_parser(subparsers))
     commands.append(erdpy.cli_config.setup_parser(subparsers))
     commands.append(erdpy.cli_block.setup_parser(subparsers))

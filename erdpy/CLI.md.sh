@@ -85,11 +85,6 @@ generate() {
     command "Network.BlockNonce" "network block-nonce"
     command "Network.Chain" "network chain"
 
-    group "BlockAtlas" "blockatlas"
-    command "BlockAtlas.CurrentBlockNumber" "blockatlas current-block-number"
-    command "BlockAtlas.BlockByNumber" "blockatlas block-by-number"
-    command "BlockAtlas.Transactions" "blockatlas transactions"
-
     group "Dependencies" "deps"
     command "Dependencies.Install" "deps install"
     command "Dependencies.Check" "deps check"

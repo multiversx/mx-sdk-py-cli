@@ -120,6 +120,38 @@ testCleanContracts() {
     assertFileDoesNotExist ${SANDBOX}/myfunding-rs/output/myfunding-rs.abi.json || return 1
 }
 
+testVerifyContract(){
+    echo "testVerifyContract"
+
+    nohup python3 local_verify_server.py >/dev/null 2>&1 &
+    sleep 1
+
+    query_response=$(curl -s localhost:7777/verify -X POST)
+
+    command_response=$(${ERDPY} contract verify erd1qqqqqqqqqqqqqpgquzmh78klkqwt0p4rjys0qtp3la07gz4d396qn50nnm \
+                        --verifier-url=http://localhost:7777 --packaged-src=testdata/dummy.json \
+                        --pem=testdata/walletKey.pem --docker-image=elrondnetwork/build-contract-rust:v4.0.0)
+
+    result_curl=$(echo $query_response | awk -F ": " '{ print $2 }' | awk -F'"' '{print $2}')
+    result_erdpy=$(echo $command_response | awk -F ": " '{ print $2 }' | awk -F'"' '{print $2}')
+
+    if [[ $result_curl == $result_erdpy ]];
+    then
+        echo "Test passed!"
+    else
+        return 1
+    fi
+
+    pkill -f local_verify_server.py
+}
+
+testReproducibleBuild(){
+    echo "testReproducibleBuild"
+
+    ${ERDPY} contract reproducible-build ${SANDBOX}/ping-pong-smart-contract --contract=ping-pong --docker-image=elrondnetwork/build-contract-rust:v4.0.0
+    assertFileExists ${SANDBOX}/ping-pong-smart-contract/output-docker/ping-pong/ping-pong.wasm || return 1
+}
+
 testAll() {
     cleanSandbox || return 1
     testTrivialCommands || return 1

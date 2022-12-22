@@ -249,27 +249,6 @@ class NodejsModule(StandaloneModule):
         raise errors.UnsupportedConfigurationValue("Nodejs tag must always be explicit, not latest")
 
 
-class WabtModule(StandaloneModule):
-    def __init__(self, key: str, aliases: List[str]):
-        super().__init__(key, aliases)
-
-    def _post_install(self, tag: str):
-        # We'll create a "latest" symlink
-        link_target = path.join(self.get_directory(tag), f"wabt-{tag}")
-        link = path.join(self.get_parent_directory(), "latest")
-        utils.symlink(link_target, link)
-
-    def get_env(self):
-        bin_folder = path.join(self.get_parent_directory(), "latest", "bin")
-
-        return {
-            "PATH": f"{bin_folder}:{os.environ['PATH']}",
-        }
-
-    def get_latest_release(self) -> str:
-        raise errors.UnsupportedConfigurationValue("WABT tag must be explicit")
-
-
 class NpmModule(DependencyModule):
     def __init__(self, key: str, aliases: List[str] = []):
         super().__init__(key, aliases)
