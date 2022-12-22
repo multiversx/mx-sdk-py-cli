@@ -35,7 +35,8 @@ setuptools.setup(
         "prettytable",
         "ledgercomm[hid]",
         "semver",
-        "requests-cache"
+        "requests-cache",
+        "build_contract_rust @ https://git@github.com/ElrondNetwork/elrond-sdk-images-build-contract-rust.git@v4.0.0#egg=build_contract_rust"
     ],
     zip_safe=False,
     keywords=["Elrond"],

@@ -3,6 +3,7 @@ import os
 from pathlib import Path
 from typing import Any, Dict, List
 
+from erdpy.contract_verification import trigger_contract_verification
 from erdpy import cli_shared, errors, projects, utils
 from erdpy.accounts import Account, Address, LedgerAccount
 from erdpy.cli_output import CLIOutputBuilder
@@ -123,6 +124,33 @@ def setup_parser(args: List[str], subparsers: Any) -> Any:
     _add_arguments_arg(sub)
     sub.set_defaults(func=query)
 
+    sub = cli_shared.add_command_subparser(
+        subparsers,
+        "contract",
+        "verify",
+        "Verify the authenticity of the code of a deployed Smart Contract",
+    )
+
+    group = sub.add_mutually_exclusive_group(required=True)
+    group.add_argument(
+        "--project",
+        default=os.getcwd(),
+        help="🗀 the project directory (default: current directory)",
+    )
+    group.add_argument(
+        "--packaged-src", help="JSON file containing the source code of the contract"
+    )
+
+    _add_contract_arg(sub)
+    sub.add_argument(
+        "--verifier-url",
+        required=True,
+        help="the url of the service that validates the contract",
+    )
+    sub.add_argument("--docker-image", required=True, help="the docker image used for the build (i.e. elrondnetwork/build-contract-rust:v4.0.0)")
+    cli_shared.add_wallet_args(args, sub)
+    sub.set_defaults(func=verify)
+
     sub = cli_shared.add_command_subparser(subparsers, "contract", "reproducible-build",
                                             "Build a Smart Contract and get the same output as a previously built Smart Contract")
     _add_project_arg(sub)
@@ -183,7 +211,7 @@ def _add_function_arg(sub: Any):
 
 def _add_arguments_arg(sub: Any):
     sub.add_argument("--arguments", nargs='+',
-                     help="arguments for the contract transaction, as [number, bech32-address, ascii string, "
+        help="arguments for the contract transaction, as [number, bech32-address, ascii string, "
                           "boolean] or hex-encoded. E.g. --arguments 42 0x64 1000 0xabba str:TOK-a1c2ef true erd1[..]")
 
 
@@ -314,6 +342,24 @@ def _prepare_sender(args: Any) -> Account:
     return sender
 
 
+def _prepare_signer(args: Any) -> Account:
+    sender: Account
+    if args.ledger:
+        sender = LedgerAccount(
+            account_index=args.ledger_account_index,
+            address_index=args.ledger_address_index,
+        )
+    elif args.pem:
+        sender = Account(pem_file=args.pem, pem_index=args.pem_index)
+    elif args.keyfile:
+        password = load_password(args)
+        sender = Account(key_file=args.keyfile, password=password)
+    else:
+        raise errors.NoWalletProvided()
+
+    return sender
+
+
 def call(args: Any):
     logger.debug("call")
     cli_shared.check_broadcast_args(args)
@@ -370,6 +416,22 @@ def _send_or_simulate(tx: Transaction, contract: SmartContract, args: Any):
     output_builder = cli_shared.send_or_simulate(tx, args, dump_output=False)
     output_builder.set_contract_address(contract.address)
     utils.dump_out_json(output_builder.build(), outfile=args.outfile)
+
+
+def verify(args: Any) -> None:
+    contract = Address(args.contract)
+    verifier_url = args.verifier_url
+
+    packaged_src = Path(args.packaged_src)
+    project_directory = Path(args.project)
+
+    owner = _prepare_signer(args)
+    docker_image = args.docker_image
+
+    response = trigger_contract_verification(
+        packaged_src, project_directory, owner, contract, verifier_url, docker_image
+    )
+    utils.dump_out_json(response.json())
 
 
 def do_reproducible_build(args: Any):
