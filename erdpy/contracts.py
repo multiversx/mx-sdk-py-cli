@@ -1,6 +1,6 @@
 import base64
 import logging
-from typing import Any, List, Optional, Tuple, Union
+from typing import Any, List, Optional, Tuple, Union, Protocol
 
 from Cryptodome.Hash import keccak
 
@@ -18,8 +18,8 @@ TRUE_STR_LOWER = "true"
 STR_PREFIX = "str:"
 
 
-class INetworkProvider:
-    def query_contract(self, payload: Any) -> Any:
+class INetworkProvider(Protocol):
+    def query_contract(self, query: Any) -> Any:
         ...
 
 
