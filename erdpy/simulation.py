@@ -1,7 +1,15 @@
 from collections import OrderedDict
 from typing import Any, Dict
-from erdpy.interfaces import IElrondProxy, ISimulateCostResponse, ISimulateResponse, ITransaction
+from erdpy.interfaces import ISimulateCostResponse, ISimulateResponse, ITransaction
 from erdpy.utils import ISerializable
+
+
+class INetworkProvider:
+    def simulate_transaction(self, transaction: Dict[str, Any]) -> ISimulateResponse:
+        ...
+    
+    def simulate_transaction_cost(self, trasaction: Dict[str, Any]) -> ISimulateCostResponse:
+        ...
 
 
 class Simulation(ISerializable):
@@ -17,7 +25,7 @@ class Simulation(ISerializable):
         return dictionary
 
 class Simulator():
-    def __init__(self, proxy: IElrondProxy) -> None:
+    def __init__(self, proxy: INetworkProvider) -> None:
         self.proxy = proxy
 
     def run(self, transaction: ITransaction) -> Simulation:

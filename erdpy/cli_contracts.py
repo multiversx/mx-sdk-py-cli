@@ -10,7 +10,7 @@ from erdpy.cli_password import load_password
 from erdpy.contracts import CodeMetadata, SmartContract
 from erdpy.projects import load_project
 from erdpy.projects.core import get_project_paths_recursively
-from erdpy.proxy.core import ElrondProxy
+from erdpy_network.proxy_network_provider import ProxyNetworkProvider
 from erdpy.transactions import Transaction
 
 logger = logging.getLogger("cli.contracts")
@@ -298,7 +298,7 @@ def _prepare_sender(args: Any) -> Account:
 
     sender.nonce = args.nonce
     if args.recall_nonce:
-        sender.sync_nonce(ElrondProxy(args.proxy))
+        sender.sync_nonce(ProxyNetworkProvider(args.proxy))
 
     return sender
 
@@ -351,7 +351,7 @@ def query(args: Any):
     arguments = args.arguments
 
     contract = SmartContract(contract_address)
-    result = contract.query(ElrondProxy(args.proxy), function, arguments)
+    result = contract.query(ProxyNetworkProvider(args.proxy), function, arguments)
     utils.dump_out_json(result)
 
 

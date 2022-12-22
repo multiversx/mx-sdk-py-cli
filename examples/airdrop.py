@@ -6,8 +6,7 @@ from typing import cast
 
 from erdpy.accounts import Account, Address
 from erdpy.accounts_repository import AccountsRepository
-from erdpy.proxy import ElrondProxy
-from erdpy.proxy.core import ElrondProxy
+from erdpy_network.proxy_network_provider import ProxyNetworkProvider
 from erdpy.transactions import BunchOfTransactions, Transaction
 
 
@@ -31,7 +30,7 @@ def main():
     parser.add_argument("--value", type=int, help="value, as a number (atoms of EGLD)")
     args = parser.parse_args()
 
-    proxy = ElrondProxy(args.proxy)
+    proxy = ProxyNetworkProvider(args.proxy)
     network = proxy.get_network_config()
     accounts = AccountsRepository.create_from_folder(Path(args.accounts))
     sender = cast(Account, accounts.get_account(Address(args.sender)))
@@ -51,7 +50,7 @@ def main():
         transaction.gasPrice = network.min_gas_price
         transaction.gasLimit = 50000
         transaction.chainID = network.chain_id
-        transaction.version = network.min_tx_version
+        transaction.version = network.min_transaction_version
         transaction.sign(sender)
         sender.nonce += 1
 

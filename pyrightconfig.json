@@ -1,0 +1,18 @@
+{
+    "include": [
+        "erdpy"
+    ],
+    "exclude": [
+        "**/__pycache__"
+    ],
+    "ignore": [],
+    "defineConstant": {
+        "DEBUG": true
+    },
+    "venvPath": ".",
+    "venv": ".venv",
+    "stubPath": "",
+    "reportMissingImports": true,
+    "reportMissingTypeStubs": false,
+    "reportUnknownParameterType": true
+}

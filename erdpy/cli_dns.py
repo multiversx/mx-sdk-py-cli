@@ -2,9 +2,10 @@ from typing import Any, List
 from prettytable import PrettyTable
 
 from erdpy import cli_shared
-from erdpy.dns import name_hash, dns_address_for_name, register, resolve, registration_cost, validate_name, version, compute_dns_address_for_shard_id
+from erdpy.dns import (name_hash, dns_address_for_name, register, resolve, registration_cost,
+                        validate_name, version, compute_dns_address_for_shard_id)
 from erdpy.accounts import Address
-from erdpy.proxy.core import ElrondProxy
+from erdpy_network.proxy_network_provider import ProxyNetworkProvider
 
 
 def setup_parser(args: List[str], subparsers: Any) -> Any:
@@ -66,13 +67,13 @@ def _add_name_arg(sub: Any):
 
 
 def dns_resolve(args: Any):
-    addr = resolve(args.name, ElrondProxy(args.proxy))
+    addr = resolve(args.name, ProxyNetworkProvider(args.proxy))
     if addr.hex() != Address.zero().hex():
         print(addr.bech32())
 
 
 def dns_validate_name(args: Any):
-    validate_name(args.name, args.shard_id, ElrondProxy(args.proxy))
+    validate_name(args.name, args.shard_id, ProxyNetworkProvider(args.proxy))
 
 
 def get_name_hash(args: Any):
@@ -92,11 +93,11 @@ def get_dns_address_for_name_hex(args: Any):
 
 
 def get_registration_cost(args: Any):
-    print(registration_cost(args.shard_id, ElrondProxy(args.proxy)))
+    print(registration_cost(args.shard_id, ProxyNetworkProvider(args.proxy)))
 
 
 def get_version(args: Any):
-    proxy = ElrondProxy(args.proxy)
+    proxy = ProxyNetworkProvider(args.proxy)
     if args.all:
         t = PrettyTable(['Shard ID', 'Contract address (bech32)', 'Contract address (hex)', 'Version'])
         for shard_id in range(0, 256):

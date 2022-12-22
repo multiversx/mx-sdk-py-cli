@@ -1,20 +1,23 @@
-from typing import Any, List
+from typing import Any, List, Dict
 
 from Cryptodome.Hash import keccak
 
 from erdpy import cli_shared, utils
 from erdpy.accounts import Account, Address
 from erdpy.contracts import SmartContract
-from erdpy.proxy.core import ElrondProxy
 from erdpy.transactions import do_prepare_transaction
-from erdpy.interfaces import IElrondProxy
 
 MaxNumShards = 256
 ShardIdentiferLen = 2
 InitialDNSAddress = bytes([1] * 32)
 
 
-def resolve(name: str, proxy: ElrondProxy) -> Address:
+class INetworkProvider:
+    def query_contract(self, payload: Dict[str, Any]) -> Any:
+        ...
+
+
+def resolve(name: str, proxy: INetworkProvider) -> Address:
     name_arg = "0x{}".format(str.encode(name).hex())
     dns_address = dns_address_for_name(name)
     contract = SmartContract(dns_address)
@@ -24,7 +27,7 @@ def resolve(name: str, proxy: ElrondProxy) -> Address:
     return Address(result[0].hex)
 
 
-def validate_name(name: str, shard_id: int, proxy: ElrondProxy):
+def validate_name(name: str, shard_id: int, proxy: INetworkProvider):
     name_arg = "0x{}".format(str.encode(name).hex())
     dns_address = compute_dns_address_for_shard_id(shard_id)
     contract = SmartContract(dns_address)
@@ -59,7 +62,7 @@ def name_hash(name: str) -> bytes:
     return keccak.new(digest_bits=256).update(str.encode(name)).digest()
 
 
-def registration_cost(shard_id: int, proxy: ElrondProxy) -> int:
+def registration_cost(shard_id: int, proxy: INetworkProvider) -> int:
     dns_address = compute_dns_address_for_shard_id(shard_id)
     contract = SmartContract(dns_address)
     result = contract.query(proxy, "getRegistrationCost", [])
@@ -69,7 +72,7 @@ def registration_cost(shard_id: int, proxy: ElrondProxy) -> int:
         return int("0x{}".format(result[0]))
 
 
-def version(shard_id: int, proxy: IElrondProxy) -> str:
+def version(shard_id: int, proxy: INetworkProvider) -> str:
     dns_address = compute_dns_address_for_shard_id(shard_id)
     contract = SmartContract(dns_address)
     result = contract.query(proxy, "version", [])

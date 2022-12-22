@@ -1,12 +1,11 @@
 import base64
 import logging
-from typing import Any, List, Optional, Tuple
+from typing import Any, List, Optional, Tuple, Union
 
 from Cryptodome.Hash import keccak
 
 from erdpy import config, constants, errors
 from erdpy.accounts import Account, Address
-from erdpy.interfaces import IElrondProxy
 from erdpy.transactions import Transaction
 from erdpy.utils import Object
 
@@ -19,11 +18,25 @@ TRUE_STR_LOWER = "true"
 STR_PREFIX = "str:"
 
 
+class INetworkProvider:
+    def query_contract(self, payload: Any) -> Any:
+        ...
+
+
 class QueryResult(Object):
     def __init__(self, as_base64: str, as_hex: str, as_number: int):
         self.base64 = as_base64
         self.hex = as_hex
         self.number = as_number
+
+
+class ContractQuery:
+    def __init__(self, contract: Address, function: str, value: int, caller: Union[Address, None], arguments: List[str]) -> None:
+        self.contract = contract
+        self.function = function
+        self.value = value
+        self.caller = caller
+        self.arguments = arguments
 
 
 class SmartContract:
@@ -136,7 +149,7 @@ class SmartContract:
 
     def query(
         self,
-        proxy: IElrondProxy,
+        proxy: INetworkProvider,
         function: str,
         arguments: List[Any],
         value: int = 0,
@@ -146,21 +159,14 @@ class SmartContract:
         return_data = response_data.get("returnData", []) or response_data.get("ReturnData", [])
         return [self._interpret_return_data(data) for data in return_data]
 
-    def query_detailed(self, proxy: IElrondProxy, function: str, arguments: List[Any], value: int = 0, caller: Optional[Address] = None) -> Any:
+    def query_detailed(self, proxy: INetworkProvider, function: str, arguments: List[Any],
+                        value: int = 0, caller: Optional[Address] = None) -> Any:
         arguments = arguments or []
-        prepared_arguments = [_prepare_argument(argument) for argument in arguments]
+        prepared_arguments = [argument.encode() for argument in arguments]
 
-        payload = {
-            "scAddress": self.address.bech32(),
-            "funcName": function,
-            "args": prepared_arguments,
-            "value": str(value)
-        }
+        query = ContractQuery(self.address, function, value, caller, prepared_arguments)
 
-        if caller:
-            payload["caller"] = caller.bech32()
-
-        response = proxy.query_contract(payload)
+        response = proxy.query_contract(query)
         response_data = response.get("data", {})
         return response_data
 

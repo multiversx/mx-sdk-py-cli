@@ -5,7 +5,7 @@ from erdpy import utils
 
 from erdpy.accounts import Account, Address
 from erdpy.contracts import CodeMetadata, SmartContract
-from erdpy.proxy.core import ElrondProxy
+from erdpy_network.proxy_network_provider import ProxyNetworkProvider
 
 logger = logging.getLogger("examples")
 
@@ -30,7 +30,7 @@ if __name__ == '__main__':
 
     logging.basicConfig(level=logging.DEBUG)
 
-    proxy = ElrondProxy(args.proxy)
+    proxy = ProxyNetworkProvider(args.proxy)
     network = proxy.get_network_config()
     user = Account(pem_file=args.pem)
 
@@ -49,7 +49,7 @@ if __name__ == '__main__':
             gas_limit=5000000,
             value=0,
             chain=network.chain_id,
-            version=network.min_tx_version
+            version=network.min_transaction_version
         )
 
         tx_on_network = tx.send_wait_result(proxy, 5000)

@@ -1,10 +1,15 @@
 from erdpy.accounts import Address
 from erdpy.accounts_repository import AccountsRepository
-from erdpy.interfaces import IAddress, IElrondProxy
+from erdpy.interfaces import IAddress
 from erdpy.workstation import get_tools_folder
 
 TESTNET_USERS_FOLDER = get_tools_folder() / "testwallets" / "latest" / "users"
 DUMMY_NONCE = 42
+
+
+class INetworkProvider:
+    def get_account_nonce(self, address: IAddress) -> int:
+        ...
 
 
 def test_create_from_folder():
@@ -49,6 +54,6 @@ def test_sync_nonces():
         assert account.nonce == DUMMY_NONCE
 
 
-class ElrondProxyStub(IElrondProxy):
+class ElrondProxyStub(INetworkProvider):
     def get_account_nonce(self, address: IAddress) -> int:
         return DUMMY_NONCE

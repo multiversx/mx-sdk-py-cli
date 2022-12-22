@@ -18,4 +18,4 @@ setuptools
 
 git+https://github.com/ElrondNetwork/sdk-erdpy-eggs-core.git@v0.2.0#egg=erdpy_core
 git+https://github.com/ElrondNetwork/sdk-erdpy-eggs-wallet.git@v0.2.0#egg=erdpy_wallet
-git+https://github.com/ElrondNetwork/sdk-erdpy-eggs-network-providers.git@v0.3.0#egg=erdpy_network
+git+https://github.com/ElrondNetwork/sdk-erdpy-eggs-network-providers.git@erdpy-addons#egg=erdpy_network

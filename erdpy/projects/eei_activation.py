@@ -5,7 +5,7 @@ import sys
 import requests
 import toml
 from erdpy.diskcache import DiskCache
-from erdpy.proxy.core import ElrondProxy
+from erdpy_network.proxy_network_provider import ProxyNetworkProvider
 
 logger = logging.getLogger("eei")
 
@@ -28,8 +28,8 @@ class ActivationEpochsInfo(DiskCache):
 
     def _fetch_current_epoch(self):
         logger.info(f"fetch_current_epoch: {self.proxy_url}")
-        proxy = ElrondProxy(self.proxy_url)
-        return proxy.get_epoch()
+        proxy = ProxyNetworkProvider(self.proxy_url)
+        return proxy.get_network_status().epoch_number
 
     def _fetch_enable_epochs(self):
         logger.info(f"fetch_enable_epochs: {self.enable_epochs_url}")

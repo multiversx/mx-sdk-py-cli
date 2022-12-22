@@ -4,7 +4,7 @@ from typing import Any, List
 from erdpy import cli_shared, errors, utils
 from erdpy.accounts import Address
 from erdpy.delegation import staking_provider
-from erdpy.proxy import ElrondProxy
+from erdpy_network.proxy_network_provider import ProxyNetworkProvider
 from erdpy.transactions import do_prepare_transaction
 
 
@@ -152,9 +152,9 @@ def get_contract_address_by_deploy_tx_hash(args: Any):
     args = utils.as_object(args)
     omit_fields = cli_shared.parse_omit_fields_arg(args)
 
-    proxy = ElrondProxy(args.proxy)
+    proxy = ProxyNetworkProvider(args.proxy)
 
-    transaction = proxy.get_transaction(args.create_tx_hash, with_results=True)
+    transaction = proxy.get_transaction(args.create_tx_hash)
     utils.omit_fields(transaction, omit_fields)
     _get_sc_address_from_tx(transaction)
 

@@ -5,8 +5,8 @@ from erdpy import utils
 from erdpy.accounts import Account, Address
 from erdpy.cli_output import CLIOutputBuilder
 from erdpy.cli_password import load_password
-from erdpy.proxy.core import ElrondProxy
 from erdpy.transactions import Transaction
+from erdpy_network.proxy_network_provider import ProxyNetworkProvider
 from erdpy.validators.core import VALIDATORS_SMART_CONTRACT_ADDRESS, prepare_transaction_data_for_stake
 
 logger = logging.getLogger("examples")
@@ -35,7 +35,7 @@ def main():
     parser.add_argument("--value", type=int, required=True, help="value, as a number (atoms of EGLD)")
     args = parser.parse_args()
 
-    proxy = ElrondProxy(args.proxy)
+    proxy = ProxyNetworkProvider(args.proxy)
     network = proxy.get_network_config()
     password = load_password(args)
     node_operator = Account(key_file=args.keyfile, password=password)
@@ -52,7 +52,7 @@ def main():
     tx.gasLimit = gas_limit
     tx.data = data
     tx.chainID = network.chain_id
-    tx.version = network.min_tx_version
+    tx.version = network.min_transaction_version
     tx.sign(node_operator)
 
     utils.dump_out_json(CLIOutputBuilder().set_emitted_transaction(tx).build())
