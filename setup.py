@@ -36,7 +36,7 @@ setuptools.setup(
         "ledgercomm[hid]",
         "semver",
         "requests-cache",
-        "build_contract_rust @ git+https://git@github.com/ElrondNetwork/elrond-sdk-images-build-contract-rust@v4.0.0#egg=build_contract_rust"
+        "mx-skd-build-contract-rs==4.0.0"
     ],
     zip_safe=False,
     keywords=["Elrond"],
