@@ -422,8 +422,8 @@ def verify(args: Any) -> None:
     contract = Address(args.contract)
     verifier_url = args.verifier_url
 
-    packaged_src = Path(args.packaged_src)
-    project_directory = Path(args.project)
+    packaged_src = Path(args.packaged_src) if args.packaged_src else None
+    project_directory = Path(args.project) if args.project else None
 
     owner = _prepare_signer(args)
     docker_image = args.docker_image

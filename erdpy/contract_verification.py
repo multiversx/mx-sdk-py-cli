@@ -25,7 +25,7 @@ class ContractVerificationRequest:
     def to_dictionary(self) -> Dict[str, Any]:
         return {
             "signature": self.signature.hex(),
-            "payload":{
+            "payload": {
                 "contract": self.contract.bech32(),
                 "dockerImage": self.docker_image,
                 "sourceCode": self.source_code
@@ -38,7 +38,7 @@ class ContractVerificationPayload:
         self.contract = contract
         self.source_code = source_code
         self.docker_image = docker_image
-    
+
     def serialize(self):
         payload = {
             "contract": self.contract.bech32(),
@@ -66,7 +66,7 @@ def trigger_contract_verification(
         raise NotImplementedError()
 
     payload = ContractVerificationPayload(contract, source_code, docker_image).serialize()
-    
+
     hashed_payload = hashlib.sha256(payload.encode()).hexdigest()
 
     secret_key = bytes.fromhex(owner.secret_key)
@@ -79,6 +79,7 @@ def trigger_contract_verification(
 
     contract_verification = ContractVerificationRequest(contract, source_code, signature, docker_image)
 
-    response = requests.post(f'{verifier_url}/verify', data=contract_verification.to_dictionary())
+    request_dictionary = contract_verification.to_dictionary()
+    response = requests.post(verifier_url, json=request_dictionary)
 
     return response
