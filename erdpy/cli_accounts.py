@@ -41,7 +41,6 @@ def get_account(args: Any):
     address = args.address
     proxy = ProxyNetworkProvider(proxy_url)
     account = proxy.get_account(Address(address))
-    omit_fields = cli_shared.parse_omit_fields_arg(args)
 
     if args.balance:
         print(account.balance)
@@ -50,8 +49,7 @@ def get_account(args: Any):
     elif args.username:
         print(account.username)
     else:
-        utils.omit_fields(account, omit_fields)
-        utils.dump_out_json(account)
+        utils.dump_out_json(account.to_dictionary())
 
 
 def get_account_transactions(args: Any):
@@ -60,4 +58,5 @@ def get_account_transactions(args: Any):
     proxy = ProxyNetworkProvider(proxy_url)
 
     response = proxy.get_account_transactions(Address(address))
-    utils.dump_out_json(response, args.outfile)
+    transactions_as_dictionaries = [tx.to_dictionary() for tx in response]
+    utils.dump_out_json(transactions_as_dictionaries, args.outfile)

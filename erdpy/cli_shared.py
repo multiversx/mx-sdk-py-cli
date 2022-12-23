@@ -178,7 +178,7 @@ def send_or_simulate(tx: Transaction, args: Any, dump_output: bool = True) -> CL
 
 def check_if_sign_method_required(args: List[str], checked_method: str) -> bool:
     methods = ["--pem", "--keyfile", "--ledger"]
-    rest_of_methods = []
+    rest_of_methods: List[str] = []
     for method in methods:
         if method != checked_method:
             rest_of_methods.append(method)

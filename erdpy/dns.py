@@ -1,4 +1,4 @@
-from typing import Any, List, Dict
+from typing import Any, List, Protocol
 
 from Cryptodome.Hash import keccak
 
@@ -12,8 +12,8 @@ ShardIdentiferLen = 2
 InitialDNSAddress = bytes([1] * 32)
 
 
-class INetworkProvider:
-    def query_contract(self, payload: Dict[str, Any]) -> Any:
+class INetworkProvider(Protocol):
+    def query_contract(self, query: Any) -> Any:
         ...
 
 
@@ -52,7 +52,7 @@ def register(args: Any):
 
 
 def compute_all_dns_addresses() -> List[Address]:
-    addresses = []
+    addresses: List[Address] = []
     for i in range(0, 256):
         addresses.append(compute_dns_address_for_shard_id(i))
     return addresses

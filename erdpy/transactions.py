@@ -3,24 +3,29 @@ import json
 import logging
 import time
 from collections import OrderedDict
-from typing import Any, Dict, List, TextIO, Tuple
+from typing import Any, Dict, List, TextIO, Tuple, Protocol, Sequence
 
 from erdpy import config, errors, utils
 from erdpy.accounts import Account, Address, LedgerAccount
 from erdpy.cli_password import load_password
-from erdpy.interfaces import ITransaction, ITransactionOnNetwork
+from erdpy.interfaces import ITransaction
 
 logger = logging.getLogger("transactions")
 
 
-class INetworkProvider:
+class ITransactionOnNetwork(Protocol):
+    hash: str
+    is_completed: bool
+
+    def to_dictionary(self) -> Dict[str, Any]:
+        ...
+
+
+class INetworkProvider(Protocol):
     def send_transaction(self, transaction: ITransaction) -> str:
         ...
     
-    def send_transactions(self, transactions: List[ITransaction]) -> Tuple[int, str]:
-        ...
-    
-    def send_wait_result(self) -> ITransactionOnNetwork:
+    def send_transactions(self, transactions: Sequence[ITransaction]) -> Tuple[int, str]:
         ...
     
     def get_transaction(self, tx_hash: str) -> ITransactionOnNetwork:
@@ -65,7 +70,7 @@ class Transaction(ITransaction):
         return self._field_decoded("receiverUsername")
 
     def _field_encoded(self, field: str) -> str:
-        field_bytes = self.__dict__.get(field, None).encode("utf-8")
+        field_bytes = self.__dict__.get(field, "").encode("utf-8")
         encoded = base64.b64encode(field_bytes).decode()
         return encoded
 
@@ -122,7 +127,7 @@ class Transaction(ITransaction):
             raise errors.TransactionIsNotSigned()
 
         txOnNetwork = self.__send_transaction_and_wait_for_result(proxy , self, timeout)
-        self.hash = txOnNetwork.get_hash()
+        self.hash = txOnNetwork.hash
         return txOnNetwork
     
     def __send_transaction_and_wait_for_result(self, proxy: INetworkProvider, payload: Any, num_seconds_timeout: int = 100) -> ITransactionOnNetwork:
@@ -140,7 +145,7 @@ class Transaction(ITransaction):
             else:
                 logger.info("Transaction not yet done.")
 
-        return ITransactionOnNetwork()
+        raise errors.KnownError("Took too long to get transaction.")
 
     def to_dictionary(self) -> Dict[str, Any]:
         dictionary: Dict[str, Any] = OrderedDict()
@@ -225,7 +230,7 @@ class BunchOfTransactions:
         tx.sign(sender)
         self.transactions.append(tx)
 
-    def add_tx(self, tx):
+    def add_tx(self, tx: Transaction):
         self.transactions.append(tx)
 
     def send(self, proxy: INetworkProvider):
@@ -251,8 +256,8 @@ def do_prepare_transaction(args: Any) -> Transaction:
     tx.value = args.value
     tx.receiver = args.receiver
     tx.sender = account.address.bech32()
-    tx.senderUsername = getattr(args, "sender_username", None)
-    tx.receiverUsername = getattr(args, "receiver_username", None)
+    tx.senderUsername = getattr(args, "sender_username", "")
+    tx.receiverUsername = getattr(args, "receiver_username", "")
     tx.gasPrice = int(args.gas_price)
     tx.gasLimit = int(args.gas_limit)
     tx.data = args.data

@@ -1,14 +1,14 @@
 from collections import OrderedDict
-from typing import Any, Dict
+from typing import Any, Dict, Protocol
 from erdpy.interfaces import ISimulateCostResponse, ISimulateResponse, ITransaction
 from erdpy.utils import ISerializable
 
 
-class INetworkProvider:
+class INetworkProvider(Protocol):
     def simulate_transaction(self, transaction: Dict[str, Any]) -> ISimulateResponse:
         ...
     
-    def simulate_transaction_cost(self, trasaction: Dict[str, Any]) -> ISimulateCostResponse:
+    def simulate_transaction_cost(self, transaction: Dict[str, Any]) -> ISimulateCostResponse:
         ...
 
 

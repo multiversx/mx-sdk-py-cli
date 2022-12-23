@@ -156,7 +156,7 @@ class SmartContract:
         caller: Optional[Address] = None
     ) -> List[Any]:
         response_data = self.query_detailed(proxy, function, arguments, value, caller)
-        return_data = response_data.get("returnData", []) or response_data.get("ReturnData", [])
+        return_data = response_data.return_data
         return [self._interpret_return_data(data) for data in return_data]
 
     def query_detailed(self, proxy: INetworkProvider, function: str, arguments: List[Any],
@@ -167,8 +167,7 @@ class SmartContract:
         query = ContractQuery(self.address, function, value, caller, prepared_arguments)
 
         response = proxy.query_contract(query)
-        response_data = response.get("data", {})
-        return response_data
+        return response
 
     def _interpret_return_data(self, data: str) -> Any:
         if not data:
