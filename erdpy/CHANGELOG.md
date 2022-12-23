@@ -7,6 +7,9 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 ## [Unreleased]
  - TBD
 
+## [3.0.1]
+ - [Contract verify: fix CLI arguments & json request](https://github.com/ElrondNetwork/elrond-sdk-erdpy/pull/171)
+
 ## [3.0.0]
  - [Blockatlas cleanup](https://github.com/ElrondNetwork/elrond-sdk-erdpy/pull/161)
  - [Deprecate *.wat and *.imports.json generation (replaced by elrond-wasm-rs's build pipeline)](https://github.com/ElrondNetwork/elrond-sdk-erdpy/pull/162)
