@@ -3,7 +3,7 @@ import setuptools
 with open("README.md", "r") as fh:
     long_description = "https://github.com/ElrondNetwork/elrond-sdk-erdpy"
 
-VERSION = "2.1.0"
+VERSION = "3.0.1"
 
 try:
     with open('./erdpy/_version.py', 'wt') as versionfile:
@@ -35,7 +35,8 @@ setuptools.setup(
         "prettytable",
         "ledgercomm[hid]",
         "semver",
-        "requests-cache"
+        "requests-cache",
+        "mx-sdk-build-contract-rs==4.0.0"
     ],
     zip_safe=False,
     keywords=["Elrond"],
