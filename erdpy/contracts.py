@@ -1,6 +1,6 @@
 import base64
 import logging
-from typing import Any, List, Optional, Tuple, Union, Protocol
+from typing import Any, List, Optional, Tuple, Protocol
 
 from Cryptodome.Hash import keccak
 
@@ -8,6 +8,7 @@ from erdpy import config, constants, errors
 from erdpy.accounts import Account, Address
 from erdpy.transactions import Transaction
 from erdpy.utils import Object
+from erdpy_network.proxy_network_provider import ContractQuery
 
 logger = logging.getLogger("contracts")
 
@@ -28,15 +29,6 @@ class QueryResult(Object):
         self.base64 = as_base64
         self.hex = as_hex
         self.number = as_number
-
-
-class ContractQuery:
-    def __init__(self, contract: Address, function: str, value: int, caller: Union[Address, None], arguments: List[str]) -> None:
-        self.contract = contract
-        self.function = function
-        self.value = value
-        self.caller = caller
-        self.arguments = arguments
 
 
 class SmartContract:
@@ -162,9 +154,8 @@ class SmartContract:
     def query_detailed(self, proxy: INetworkProvider, function: str, arguments: List[Any],
                         value: int = 0, caller: Optional[Address] = None) -> Any:
         arguments = arguments or []
-        prepared_arguments = [argument.encode() for argument in arguments]
 
-        query = ContractQuery(self.address, function, value, caller, prepared_arguments)
+        query = ContractQuery(self.address, function, value, arguments, caller)
 
         response = proxy.query_contract(query)
         return response
