@@ -103,7 +103,7 @@ class Transaction(ITransaction):
     @classmethod
     def load_from_file(cls, f: TextIO):
         data_json: bytes = f.read().encode()
-        fields = json.loads(data_json).get("tx")
+        fields = json.loads(data_json).get("tx") or json.loads(data_json).get("emittedTransaction")
         instance = cls()
         instance.__dict__.update(fields)
         instance.data = instance.data_decoded()
