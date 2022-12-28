@@ -25,7 +25,6 @@ def setup_parser(args: List[str], subparsers: Any) -> Any:
     sub.add_argument("--create-tx-hash", required=True, help="the hash")
     sub.add_argument("--sender", required=False, help="the sender address")
     cli_shared.add_proxy_arg(sub)
-    cli_shared.add_omit_fields_arg(sub)
     sub.set_defaults(func=get_contract_address_by_deploy_tx_hash)
 
     # add a new node
@@ -157,7 +156,7 @@ def get_contract_address_by_deploy_tx_hash(args: Any):
         contract_address = transaction_events[0].address
         print(contract_address.bech32())
     else:
-        raise errors.ProgrammingError("Tx has more than one event. Make sure it's a SC Deploy transaction.")
+        raise errors.ProgrammingError("Tx has more than one event. Make sure it's a staking provider SC Deploy transaction.")
 
 
 def add_new_nodes(args: Any):

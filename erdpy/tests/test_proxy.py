@@ -12,10 +12,10 @@ def test_get_transactions():
             "--address",
             "erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th",
             "--outfile",
-            "txs.txt",
+            "testdata-out/SANDBOX/transactions.txt",
         ]
     )
-    assert os.path.isfile("txs.txt") == True
+    assert os.path.isfile("testdata-out/SANDBOX/transactions.txt") == True
 
 
 def test_get_account():
@@ -93,17 +93,45 @@ def test_query_contract():
         assert False
 
 
-def test_get_contract_address_by_deploy_tx_hash():
+def test_get_num_shards():
+    result = main(["network", "num-shards"])
+
+    if not result:
+        assert True
+    else:
+        assert False
+
+
+def test_get_last_block_nonce():
+    result = main(["network", "block-nonce", "--shard", "4294967295"])
+
+    if not result:
+        assert True
+    else:
+        assert False
+
+
+def test_get_chain_id():
+    result = main(["network", "chain"])
+
+    if not result:
+        assert True
+    else:
+        assert False
+
+
+def test_get_transaction():
     result = main(
         [
-            "staking-provider",
-            "get-contract-address",
-            "--create-tx-hash",
-            "12b9820df0fd71fc4b81b13a5484a0038b256249aae358112892ba599808bf7e",
+            "tx",
+            "get",
             "--proxy",
             "https://devnet-api.elrond.com",
+            "--hash",
+            "2cb813be9d5e5040abb2522da75fa5c8d94f72caa510ff51d7525659f398298b",
         ]
     )
+
     if not result:
         assert True
     else:
