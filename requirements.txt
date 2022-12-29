@@ -21,4 +21,4 @@ mx-sdk-build-contract-rs==4.0.0
 git+https://github.com/ElrondNetwork/mx-sdk-erdpy-core.git@v0.3.0#egg=erdpy_core
 git+https://github.com/ElrondNetwork/mx-sdk-erdpy-wallet.git@v0.2.1#egg=erdpy_wallet
 # TODO: use release tag.
-git+https://github.com/ElrondNetwork/mx-sdk-erdpy-network-providers.git@erdpy-addons#egg=erdpy_network
+git+https://github.com/ElrondNetwork/mx-sdk-erdpy-network-providers.git@v0.6.0-alpha.1#egg=erdpy_network
