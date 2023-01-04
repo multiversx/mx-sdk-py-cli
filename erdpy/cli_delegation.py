@@ -2,7 +2,7 @@ from typing import Any, List
 
 from erdpy import cli_shared, errors, utils
 from erdpy.delegation import staking_provider
-from erdpy_network.proxy_network_provider import ProxyNetworkProvider
+from erdpy_network_providers.proxy_network_provider import ProxyNetworkProvider
 from erdpy.transactions import do_prepare_transaction
 
 

@@ -11,7 +11,7 @@ from erdpy.cli_password import load_password
 from erdpy.contracts import CodeMetadata, SmartContract
 from erdpy.projects import load_project
 from erdpy.projects.core import get_project_paths_recursively
-from erdpy_network.proxy_network_provider import ProxyNetworkProvider
+from erdpy_network_providers.proxy_network_provider import ProxyNetworkProvider
 from erdpy.transactions import Transaction
 from erdpy.docker import is_docker_installed, run_docker
 from erdpy.errors import DockerMissingError

@@ -6,7 +6,7 @@ from typing import cast
 
 from erdpy.accounts import Account, Address
 from erdpy.accounts_repository import AccountsRepository
-from erdpy_network.proxy_network_provider import ProxyNetworkProvider
+from erdpy_network_providers.proxy_network_provider import ProxyNetworkProvider
 from erdpy.transactions import BunchOfTransactions, Transaction
 
 

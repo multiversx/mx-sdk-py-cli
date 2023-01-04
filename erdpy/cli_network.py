@@ -1,4 +1,4 @@
-from erdpy_network.proxy_network_provider import ProxyNetworkProvider
+from erdpy_network_providers.proxy_network_provider import ProxyNetworkProvider
 from erdpy import cli_shared
 import logging
 from typing import Any

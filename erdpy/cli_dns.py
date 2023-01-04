@@ -5,7 +5,7 @@ from erdpy import cli_shared
 from erdpy.dns import (name_hash, dns_address_for_name, register, resolve, registration_cost,
                         validate_name, version, compute_dns_address_for_shard_id)
 from erdpy.accounts import Address
-from erdpy_network.proxy_network_provider import ProxyNetworkProvider
+from erdpy_network_providers.proxy_network_provider import ProxyNetworkProvider
 
 
 def setup_parser(args: List[str], subparsers: Any) -> Any:

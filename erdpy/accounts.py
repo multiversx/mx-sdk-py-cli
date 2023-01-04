@@ -6,7 +6,7 @@ import nacl.signing
 
 from erdpy import constants, errors
 from erdpy.interfaces import IAccount, IAddress, ITransaction
-from erdpy_network.accounts import AccountOnNetwork
+from erdpy_network_providers.accounts import AccountOnNetwork
 from erdpy.ledger.config import compare_versions
 from erdpy.ledger.ledger_app_handler import SIGN_USING_HASH_VERSION
 from erdpy.ledger.ledger_functions import do_get_ledger_address, do_sign_transaction_with_ledger, do_get_ledger_version, \

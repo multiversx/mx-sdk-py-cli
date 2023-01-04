@@ -1,7 +1,7 @@
 import os
 from erdpy.cli import main
 from erdpy.accounts import Account
-from erdpy_network.proxy_network_provider import ProxyNetworkProvider
+from erdpy_network_providers.proxy_network_provider import ProxyNetworkProvider
 
 
 def test_get_transactions():

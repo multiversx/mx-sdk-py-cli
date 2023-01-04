@@ -5,7 +5,7 @@ import sys
 import requests
 import toml
 from erdpy.diskcache import DiskCache
-from erdpy_network.proxy_network_provider import ProxyNetworkProvider
+from erdpy_network_providers.proxy_network_provider import ProxyNetworkProvider
 
 logger = logging.getLogger("eei")
 

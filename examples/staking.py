@@ -6,7 +6,7 @@ from erdpy.accounts import Account, Address
 from erdpy.cli_output import CLIOutputBuilder
 from erdpy.cli_password import load_password
 from erdpy.transactions import Transaction
-from erdpy_network.proxy_network_provider import ProxyNetworkProvider
+from erdpy_network_providers.proxy_network_provider import ProxyNetworkProvider
 from erdpy.validators.core import VALIDATORS_SMART_CONTRACT_ADDRESS, prepare_transaction_data_for_stake
 
 logger = logging.getLogger("examples")

@@ -3,7 +3,7 @@ from typing import Any, List
 
 from erdpy import cli_shared, utils
 from erdpy.cli_output import CLIOutputBuilder
-from erdpy_network.proxy_network_provider import ProxyNetworkProvider
+from erdpy_network_providers.proxy_network_provider import ProxyNetworkProvider
 from erdpy.transactions import Transaction, do_prepare_transaction
 
 

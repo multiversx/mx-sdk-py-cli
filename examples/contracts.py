@@ -5,7 +5,7 @@ from erdpy import utils
 
 from erdpy.accounts import Account, Address
 from erdpy.contracts import CodeMetadata, SmartContract
-from erdpy_network.proxy_network_provider import ProxyNetworkProvider
+from erdpy_network_providers.proxy_network_provider import ProxyNetworkProvider
 
 logger = logging.getLogger("examples")
 

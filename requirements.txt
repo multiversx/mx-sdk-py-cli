@@ -18,6 +18,4 @@ setuptools
 
 mx-sdk-build-contract-rs==4.0.0
 
-git+https://github.com/ElrondNetwork/mx-sdk-erdpy-core.git@v0.3.0#egg=erdpy_core
-git+https://github.com/ElrondNetwork/mx-sdk-erdpy-wallet.git@v0.2.1#egg=erdpy_wallet
-git+https://github.com/ElrondNetwork/mx-sdk-erdpy-network-providers.git@v0.6.0#egg=erdpy_network_providers
+mx-sdk-erdpy-network-providers==0.6.2

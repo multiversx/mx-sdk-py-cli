@@ -8,7 +8,7 @@ from erdpy import config, constants, errors
 from erdpy.accounts import Account, Address
 from erdpy.transactions import Transaction
 from erdpy.utils import Object
-from erdpy_network.proxy_network_provider import ContractQuery
+from erdpy_network_providers.proxy_network_provider import ContractQuery
 
 logger = logging.getLogger("contracts")
 

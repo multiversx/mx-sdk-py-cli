@@ -5,7 +5,7 @@ from typing import List, Set, Union, Protocol
 
 from erdpy import utils
 from erdpy.accounts import Account, Address
-from erdpy_network.accounts import AccountOnNetwork
+from erdpy_network_providers.accounts import AccountOnNetwork
 from erdpy.interfaces import IAddress
 from erdpy.wallet import pem
 

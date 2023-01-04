@@ -9,7 +9,7 @@ from erdpy.accounts import Account
 from erdpy.cli_output import CLIOutputBuilder
 from erdpy.cli_password import load_password
 from erdpy.ledger.ledger_functions import do_get_ledger_address
-from erdpy_network.proxy_network_provider import ProxyNetworkProvider
+from erdpy_network_providers.proxy_network_provider import ProxyNetworkProvider
 from erdpy.simulation import Simulator
 from erdpy.transactions import Transaction
 
