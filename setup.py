@@ -1,9 +1,9 @@
 import setuptools
 
 with open("README.md", "r") as fh:
-    long_description = "https://github.com/ElrondNetwork/elrond-sdk-erdpy"
+    long_description = "https://github.com/multiversx/mx-sdk-erdpy"
 
-VERSION = "3.0.1"
+VERSION = "3.0.2"
 
 try:
     with open('./erdpy/_version.py', 'wt') as versionfile:
@@ -18,7 +18,7 @@ setuptools.setup(
     description="Elrond Smart Contracts Tools and Python SDK",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    url="https://github.com/ElrondNetwork/elrond-sdk-erdpy",
+    url="https://github.com/multiversx/mx-sdk-erdpy",
     author="Elrond Network",
     license="GPL",
     packages=setuptools.find_packages(
