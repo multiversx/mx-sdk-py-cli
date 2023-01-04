@@ -24,7 +24,7 @@ from erdpy._version import __version__
 logger = logging.getLogger("cli")
 
 
-def main(cli_args: List[str]):
+def main(cli_args: List[str] = []):
     try:
         _do_main(cli_args)
     except errors.KnownError as err:
