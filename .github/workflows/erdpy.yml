@@ -63,6 +63,7 @@ jobs:
     - name: Setup test dependencies
       run: |
         python3 -m erdpy.cli deps install testwallets
+        ls -l /home/runner/elrondsdk/testwallets/latest/users/
     - name: Run unit tests
       run: |
         export PYTHONPATH=.
