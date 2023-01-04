@@ -26,7 +26,7 @@ def get_templates_repositories():
             key="elrond-wasm-rs",
             url=f"https://github.com/ElrondNetwork/elrond-wasm-rs/archive/{examples_rs_tag}.zip?t={timestamp}",
             github="ElrondNetwork/elrond-wasm-rs",
-            relative_path=f"elrond-wasm-rs-{examples_rs_tag_no_v}/contracts/examples"
+            relative_path=f"mx-sdk-rs-{examples_rs_tag_no_v}/contracts/examples"
         )
     ]
 

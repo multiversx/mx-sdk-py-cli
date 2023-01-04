@@ -150,8 +150,8 @@ class VMToolsModule(StandaloneModule):
             aliases = list()
 
         super().__init__(key, aliases)
-        self.repo_name = 'wasm-vm'
-        self.organisation = 'ElrondNetwork'
+        self.repo_name = 'mx-vm-wasm-go'
+        self.organisation = 'multiversx'
 
     def _post_install(self, tag: str):
         dependencies.install_module('golang')

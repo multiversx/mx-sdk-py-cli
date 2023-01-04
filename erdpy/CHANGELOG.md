@@ -7,6 +7,9 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 ## [Unreleased]
  - TBD
 
+## [3.0.2]
+ - Fixes after repository migrations
+
 ## [3.0.1]
  - [Contract verify: fix CLI arguments & json request](https://github.com/ElrondNetwork/elrond-sdk-erdpy/pull/171)
 
