@@ -407,7 +407,7 @@ class TestWalletsModule(StandaloneModule):
     def __init__(self, key: str):
         super().__init__(key, [])
         self.organisation = "ElrondNetwork"
-        self.repo_name = "elrond-sdk-testwallets"
+        self.repo_name = "mx-sdk-testwallets"
 
     def _post_install(self, tag: str):
         # We'll create a "latest" symlink
