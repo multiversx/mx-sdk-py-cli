@@ -1,10 +1,12 @@
-import os
+from pathlib import Path
 from erdpy.cli import main
 from erdpy.accounts import Account
 from erdpy_network_providers.proxy_network_provider import ProxyNetworkProvider
 
 
 def test_get_transactions():
+    output_file = Path(__file__).parent / "testdata-out" / "transactions.txt"
+
     main(
         [
             "account",
@@ -12,10 +14,10 @@ def test_get_transactions():
             "--address",
             "erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th",
             "--outfile",
-            "testdata-out/transactions.txt",
+            str(output_file),
         ]
     )
-    assert os.path.isfile("testdata-out/transactions.txt") == True
+    assert Path.is_file(output_file) == True
 
 
 def test_get_account():
