@@ -12,10 +12,10 @@ def test_get_transactions():
             "--address",
             "erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th",
             "--outfile",
-            "testdata-out/SANDBOX/transactions.txt",
+            "testdata-out/transactions.txt",
         ]
     )
-    assert os.path.isfile("testdata-out/SANDBOX/transactions.txt") == True
+    assert os.path.isfile("testdata-out/transactions.txt") == True
 
 
 def test_get_account():
