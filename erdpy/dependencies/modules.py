@@ -150,7 +150,7 @@ class VMToolsModule(StandaloneModule):
             aliases = list()
 
         super().__init__(key, aliases)
-        self.repo_name = 'mx-vm-wasm-go'
+        self.repo_name = 'mx-chain-vm-go'
         self.organisation = 'multiversx'
 
     def _post_install(self, tag: str):
