@@ -28,7 +28,7 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
-        echo " - [CHANGELOG](https://github.com/ElrondNetwork/elrond-sdk-erdpy/blob/main/erdpy/CHANGELOG.md)" >> notes.txt
+        echo " - [CHANGELOG](https://github.com/multiversx/mx-sdk-erdpy/blob/main/erdpy/CHANGELOG.md)" >> notes.txt
         echo "" >> notes.txt
 
         RELEASE_TAG=v$(python3 -c "import erdpy._version; print(erdpy._version.__version__);")

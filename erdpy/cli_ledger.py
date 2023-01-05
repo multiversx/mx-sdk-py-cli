@@ -14,7 +14,7 @@ def setup_parser(subparsers: Any) -> Any:
     sub.add_argument("--num-addresses", required=False, type=int, default=10, help="The number of addresses to fetch")
     sub.set_defaults(func=print_addresses)
 
-    sub = cli_shared.add_command_subparser(subparsers, "ledger", "version", "Get the version of the Elrond App for Ledger")
+    sub = cli_shared.add_command_subparser(subparsers, "ledger", "version", "Get the version of the MultiversX App for Ledger")
     sub.set_defaults(func=print_version)
 
     return subparsers
@@ -30,5 +30,5 @@ def print_addresses(args):
 
 def print_version(args):
     ledger_app = ElrondLedgerApp()
-    print("Elrond App version: " + ledger_app.get_version())
+    print("MultiversX App version: " + ledger_app.get_version())
     ledger_app.close()

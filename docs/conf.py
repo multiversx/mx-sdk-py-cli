@@ -17,9 +17,9 @@
 
 # -- Project information -----------------------------------------------------
 
-project = 'Elrond erdpy SDK'
-copyright = '2022, Elrond Network'
-author = 'Elrond Network'
+project = 'MultiversX erdpy SDK'
+copyright = '2022, MultiversX'
+author = 'MultiversX'
 
 # The full version, including alpha/beta/rc tags
 release = '1.2.3'
