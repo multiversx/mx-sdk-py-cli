@@ -7,25 +7,25 @@ from erdpy.utils import query_latest_release_tag
 
 def get_templates_repositories():
     timestamp = int(time.time())
-    examples_rs_tag = config.get_dependency_tag('elrond_wasm_rs')
+    examples_rs_tag = config.get_dependency_tag('mx_sdk_rs')
 
     if examples_rs_tag == 'latest':
-        examples_rs_tag = query_latest_release_tag('ElrondNetwork/elrond-wasm-rs')
+        examples_rs_tag = query_latest_release_tag('multiversx/mx-sdk-rs')
 
     examples_rs_tag_no_v = remove_initial_v_from_version(examples_rs_tag)
 
     return [
         TemplatesRepository(
             key="sc-examples",
-            url=f"https://github.com/ElrondNetwork/sc-examples/archive/master.zip?t={timestamp}",
-            github="ElrondNetwork/sc-examples",
-            relative_path="sc-examples-master"
+            url=f"https://github.com/multiversx/mx-sc-examples/archive/master.zip?t={timestamp}",
+            github="multiversx/mx-sc-examples",
+            relative_path="mx-sc-examples-master"
         ),
 
         TemplatesRepository(
-            key="elrond-wasm-rs",
-            url=f"https://github.com/ElrondNetwork/elrond-wasm-rs/archive/{examples_rs_tag}.zip?t={timestamp}",
-            github="ElrondNetwork/elrond-wasm-rs",
+            key="mx-sdk-rs",
+            url=f"https://github.com/multiversx/mx-sdk-rs/archive/{examples_rs_tag}.zip?t={timestamp}",
+            github="multiversx/mx-sdk-rs",
             relative_path=f"mx-sdk-rs-{examples_rs_tag_no_v}/contracts/examples"
         )
     ]
