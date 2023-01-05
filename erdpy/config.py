@@ -153,7 +153,7 @@ def get_defaults() -> Dict[str, Any]:
         "chainID": "T",
         "txVersion": "1",
         "dependencies.vmtools.tag": "latest",
-        "dependencies.elrond_wasm_rs.tag": "latest",
+        "dependencies.mx_sdk_rs.tag": "latest",
         "dependencies.vmtools.urlTemplate.linux": "https://github.com/ElrondNetwork/wasm-vm/archive/{TAG}.tar.gz",
         "dependencies.vmtools.urlTemplate.osx": "https://github.com/ElrondNetwork/wasm-vm/archive/{TAG}.tar.gz",
         "dependencies.llvm.tag": "v9-19feb",
