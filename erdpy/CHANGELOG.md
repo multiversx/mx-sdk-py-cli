@@ -7,6 +7,9 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 ## [Unreleased]
  - TBD
 
+## [3.0.3]
+ - Fixes after repository migrations
+
 ## [3.0.2]
  - Fixes after repository migrations
 
