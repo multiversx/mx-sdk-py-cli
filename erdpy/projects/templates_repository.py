@@ -59,8 +59,8 @@ class TemplatesRepository:
         return templates
 
     def is_template(self, subfolder: str) -> bool:
-        elrond_json_file = self.get_metadata_file(subfolder)
-        return elrond_json_file.is_file()
+        multiversx_json_file = self.get_metadata_file(subfolder)
+        return multiversx_json_file.is_file()
 
     def get_metadata_file(self, template_folder: str) -> Path:
         return self.get_payload_folder() / template_folder / "elrond.json"

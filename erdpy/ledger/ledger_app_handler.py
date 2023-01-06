@@ -1,10 +1,10 @@
 from ledgercomm import Transport
 
 from erdpy.errors import LedgerError
-from erdpy.ledger.config import load_ledger_config_from_response, ElrondLedgerAppConfiguration
+from erdpy.ledger.config import load_ledger_config_from_response, MultiversXLedgerAppConfiguration
 
 SIGN_USING_HASH_VERSION = "1.0.11"
-CONNECTION_ERROR_MSG = "check if device is plugged in, unlocked and on Elrond app"
+CONNECTION_ERROR_MSG = "check if device is plugged in, unlocked and on MultiversX app"
 
 
 class Apdu:
@@ -15,7 +15,7 @@ class Apdu:
     data: bytes
 
 
-class ElrondLedgerApp:
+class MultiversXLedgerApp:
     def __init__(self):
         try:
             self.transport = Transport(interface="hid", debug=False)  # Nano S/X using HID interface
@@ -48,7 +48,7 @@ class ElrondLedgerApp:
         address = response_body.decode("utf-8")
         return address
 
-    def get_app_configuration(self) -> ElrondLedgerAppConfiguration:
+    def get_app_configuration(self) -> MultiversXLedgerAppConfiguration:
         self.transport.send(cla=0xed, ins=0x02, p1=0x00, p2=0x00, cdata=b"")
         sw, response = self.transport.recv()
         err = get_error(sw)

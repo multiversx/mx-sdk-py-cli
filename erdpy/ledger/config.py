@@ -1,12 +1,12 @@
-class ElrondLedgerAppConfiguration:
+class MultiversXLedgerAppConfiguration:
     data_activated: bool
     account_index: int
     address_index: int
     version: str
 
 
-def load_ledger_config_from_response(response: bytes) -> ElrondLedgerAppConfiguration:
-    config = ElrondLedgerAppConfiguration()
+def load_ledger_config_from_response(response: bytes) -> MultiversXLedgerAppConfiguration:
+    config = MultiversXLedgerAppConfiguration()
 
     config.data_activated = False
     if response[0] == 0x01:

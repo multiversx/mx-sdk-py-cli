@@ -13,26 +13,26 @@ logger = logging.getLogger("installer")
 
 MIN_REQUIRED_PYTHON_VERSION = (3, 8, 0)
 
-elrondsdk_path = None
+sdk_path = None
 exact_version = None
 from_branch = None
 
 
 def main():
-    global elrondsdk_path
+    global sdk_path
     global exact_version
     global from_branch
 
     parser = ArgumentParser()
     parser.add_argument("--modify-path", dest="modify_path", action="store_true", help="whether to modify $PATH (in profile file)")
     parser.add_argument("--no-modify-path", dest="modify_path", action="store_false", help="whether to modify $PATH (in profile file)")
-    parser.add_argument("--elrondsdk-path", default=get_elrond_sdk_path_default(), help="where to install elrond-sdk")
+    parser.add_argument("--sdk-path", default=get_sdk_path_default(), help="where to install mx-sdk")
     parser.add_argument("--exact-version", help="the exact version of erdpy to install")
-    parser.add_argument("--from-branch", help="use a branch of ElrondNetwork/elrond-sdk-erdpy")
+    parser.add_argument("--from-branch", help="use a branch of multiversx/mx-sdk-erdpy")
     parser.set_defaults(modify_path=True)
     args = parser.parse_args()
 
-    elrondsdk_path = os.path.expanduser(args.elrondsdk_path)
+    sdk_path = os.path.expanduser(args.sdk_path)
     modify_path = args.modify_path
     exact_version = args.exact_version
     from_branch = args.from_branch
@@ -56,7 +56,8 @@ def main():
     if operating_system != "linux" and operating_system != "osx":
         raise InstallError("Your operating system is not supported yet.")
 
-    remove_installation()
+    # TODO: will come in a future version
+    # migrate_installation(sdk_path)
     create_venv()
     install_erdpy()
     if modify_path:
@@ -92,19 +93,14 @@ def get_operating_system():
     return operating_system
 
 
-def remove_installation():
-    old_folder = os.path.expanduser("~/ElrondSCTools")
+def migrate_installation(sdk_path: str) -> None:
+    old_folder = os.path.expanduser("~/elrondsdk")
     if os.path.isdir(old_folder):
-        answer = input(f"Older installation in {old_folder} has to be removed. Allow? (y/n)")
+        answer = input(f"Older installation folder {old_folder} has to be renamed. Allow? (y/n)")
         if answer.lower() not in ["y", "yes"]:
             raise InstallError("Installation will not continue.")
-        shutil.rmtree(old_folder)
-        logger.info("Removed previous installation (ElrondSCTools).")
-
-    folder = get_erdpy_path()
-    if os.path.isdir(folder):
-        shutil.rmtree(folder)
-        logger.info("Removed previous installation (virtual environment).")
+        shutil.move(old_folder, sdk_path)
+        logger.info("Renamed folder.")
 
 
 def create_venv():
@@ -119,7 +115,7 @@ def create_venv():
     builder.create(folder)
 
     # Create symlink to "bin/activate"
-    link_path = os.path.join(elrondsdk_path, "erdpy-activate")
+    link_path = os.path.join(sdk_path, "erdpy-activate")
     if os.path.exists(link_path):
         os.remove(link_path)
     os.symlink(os.path.join(folder, "bin", "activate"), link_path)
@@ -142,10 +138,11 @@ def require_venv():
 
 
 def get_erdpy_path():
-    return os.path.join(elrondsdk_path, "erdpy-venv")
+    return os.path.join(sdk_path, "erdpy-venv")
 
 
-def get_elrond_sdk_path_default():
+def get_sdk_path_default():
+    # TODO: will come in a future version
     return os.path.expanduser("~/elrondsdk")
 
 
@@ -156,7 +153,7 @@ def ensure_folder(folder):
 def install_erdpy():
     logger.info("Installing erdpy in virtual environment...")
     if from_branch:
-        erdpy_to_install = f"https://github.com/ElrondNetwork/elrond-sdk-erdpy/archive/refs/heads/{from_branch}.zip"
+        erdpy_to_install = f"https://github.com/multiversx/mx-sdk-erdpy/archive/refs/heads/{from_branch}.zip"
     else:
         erdpy_to_install = "erdpy" if not exact_version else f"erdpy=={exact_version}"
 
@@ -174,7 +171,7 @@ def install_erdpy():
     upgrade_erdpy_config()
 
     # Create symlink to "bin/erdpy"
-    link_path = os.path.join(elrondsdk_path, "erdpy")
+    link_path = os.path.join(sdk_path, "erdpy")
     if os.path.exists(link_path):
         os.remove(link_path)
     os.symlink(os.path.join(get_erdpy_path(), "bin", "erdpy"), link_path)
@@ -196,16 +193,16 @@ def run_in_venv(args):
 def add_sdk_to_path():
     logger.info("Checking PATH variable.")
     PATH = os.environ["PATH"]
-    if elrondsdk_path in PATH:
-        logger.info(f"elrond-sdk path ({elrondsdk_path}) already in $PATH variable.")
+    if sdk_path in PATH:
+        logger.info(f"mx-sdk path ({sdk_path}) already in $PATH variable.")
         return
 
     profile_file = get_profile_file()
-    logger.info(f"Adding elrond-sdk path [{elrondsdk_path}] to $PATH variable.")
+    logger.info(f"Adding mx-sdk path [{sdk_path}] to $PATH variable.")
     logger.info(f"[{profile_file}] will be modified.")
 
     with open(profile_file, "a") as file:
-        file.write(f'\nexport PATH="{elrondsdk_path}:$PATH"\t# elrond-sdk\n')
+        file.write(f'\nexport PATH="{sdk_path}:$PATH"\t# elrond-sdk\n')
 
     logger.info(f"""
 ###############################################################################
@@ -278,6 +275,6 @@ if __name__ == "__main__":
 
     logger.info("""
 
-For more information go to https://docs.elrond.com.
+For more information go to https://docs.multiversx.com.
 For support, please contact us at https://t.me/ElrondDevelopers.
 """)

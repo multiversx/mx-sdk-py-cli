@@ -1,5 +1,5 @@
 import logging
-from erdpy.ledger.ledger_app_handler import ElrondLedgerApp
+from erdpy.ledger.ledger_app_handler import MultiversXLedgerApp
 
 TX_HASH_SIGN_VERSION = 2
 TX_HASH_SIGN_OPTIONS = 1
@@ -13,7 +13,7 @@ def do_sign_transaction_with_ledger(
         address_index: int,
         sign_using_hash: bool
 ) -> str:
-    ledger_handler = ElrondLedgerApp()
+    ledger_handler = MultiversXLedgerApp()
     ledger_handler.set_address(account_index=account_index, address_index=address_index)
 
     logger.info("Ledger: please confirm the transaction on the device")
@@ -24,7 +24,7 @@ def do_sign_transaction_with_ledger(
 
 
 def do_get_ledger_address(account_index: int, address_index: int) -> str:
-    ledger_handler = ElrondLedgerApp()
+    ledger_handler = MultiversXLedgerApp()
     ledger_address = ledger_handler.get_address(account_index=account_index, address_index=address_index)
     ledger_handler.close()
 
@@ -32,7 +32,7 @@ def do_get_ledger_address(account_index: int, address_index: int) -> str:
 
 
 def do_get_ledger_version() -> str:
-    ledger_handler = ElrondLedgerApp()
+    ledger_handler = MultiversXLedgerApp()
     ledger_version = ledger_handler.get_version()
     ledger_handler.close()
 

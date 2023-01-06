@@ -1,4 +1,4 @@
-import os.path
+import os
 from pathlib import Path
 from typing import Any, Dict, List
 
@@ -6,9 +6,9 @@ import semver
 
 from erdpy import errors, utils, workstation
 
-ROOT_FOLDER_NAME = "multiversxsdk"
+ROOT_FOLDER_NAME = "elrondsdk"
 LOCAL_CONFIG_PATH = os.path.join(os.getcwd(), "erdpy.json")
-GLOBAL_CONFIG_PATH = os.path.expanduser("~/multiversxsdk/erdpy.json")
+GLOBAL_CONFIG_PATH = os.path.expanduser("~/elrondsdk/erdpy.json")
 
 DEFAULT_GAS_PRICE = 1000000000
 GAS_PER_DATA_BYTE = 1500
@@ -157,6 +157,7 @@ def get_defaults() -> Dict[str, Any]:
         "dependencies.vmtools.urlTemplate.linux": "https://github.com/multiversx/mx-vm-wasm-go/archive/{TAG}.tar.gz",
         "dependencies.vmtools.urlTemplate.osx": "https://github.com/multiversx/mx-vm-wasm-go//archive/{TAG}.tar.gz",
         "dependencies.llvm.tag": "v9-19feb",
+        # ide.elrond.com will be removed, TBD if clang will still be downloaded
         "dependencies.llvm.urlTemplate.linux": "https://ide.elrond.com/vendor-llvm/{TAG}/linux-amd64.tar.gz?t=19feb",
         "dependencies.llvm.urlTemplate.osx": "https://ide.elrond.com/vendor-llvm/{TAG}/darwin-amd64.tar.gz?t=19feb",
         "dependencies.rust.tag": "nightly",

@@ -3,7 +3,7 @@ import unittest
 import requests
 
 
-class TestPlaygroundElrondProxy(unittest.TestCase):
+class TestPlaygroundProxy(unittest.TestCase):
     @unittest.skip('manual run only')
     def test_do_request(self):
         # use a valid proxy address

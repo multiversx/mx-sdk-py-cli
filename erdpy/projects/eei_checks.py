@@ -8,10 +8,10 @@ from erdpy.projects.interfaces import IProject
 
 logger = logging.getLogger("eei")
 
-MAINNET_PROXY_URL = "https://gateway.elrond.com"
-MAINNET_ENABLE_EPOCHS_URL = "https://raw.githubusercontent.com/ElrondNetwork/elrond-config-mainnet/master/enableEpochs.toml"
-DEVNET_PROXY_URL = "https://devnet-gateway.elrond.com"
-DEVNET_ENABLE_EPOCHS_URL = "https://raw.githubusercontent.com/ElrondNetwork/elrond-config-devnet/master/enableEpochs.toml"
+MAINNET_PROXY_URL = "https://gateway.multiversx.com"
+MAINNET_ENABLE_EPOCHS_URL = "https://raw.githubusercontent.com/multiversx/mx-chain-mainnet-config/master/enableEpochs.toml"
+DEVNET_PROXY_URL = "https://devnet-gateway.multiversx.com"
+DEVNET_ENABLE_EPOCHS_URL = "https://raw.githubusercontent.com/multiversx/mx-chain-devnet-config/master/enableEpochs.toml"
 
 
 def check_compatibility(project: IProject):

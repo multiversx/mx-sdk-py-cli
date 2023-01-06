@@ -60,7 +60,7 @@ def _get_explicitly_installable_deps() -> List[DependencyModule]:
 
 
 def _get_implicitly_installable_deps() -> List[DependencyModule]:
-    # See: https://github.com/ElrondNetwork/elrond-sdk-erdpy/pull/55
+    # See: https://github.com/multiversx/mx-sdk-erdpy/pull/55
 
     return [
         VMToolsModule(key="vmtools"),

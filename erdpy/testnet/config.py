@@ -137,15 +137,15 @@ class TestnetConfiguration:
         return self.node_source() / 'cmd' / 'node' / 'config'
 
     def node_source(self) -> Path:
-        path = self.folders['elrond_go']
+        path = self.folders['mx_chain_go']
         assert isinstance(path, Path)
         return path
 
     def proxy_source(self) -> Path:
-        return self.folders['elrond_proxy_go']
+        return self.folders['max_chain_proxy_go']
 
     def proxy_config_source(self):
-        return self.folders['elrond_proxy_go'] / 'cmd' / 'proxy' / 'config'
+        return self.folders['mx_chain_proxy_go'] / 'cmd' / 'proxy' / 'config'
 
     def validator_key_files(self):
         for config_folder in self.validator_config_folders():
@@ -308,10 +308,10 @@ class TestnetConfiguration:
             'wasm_vm_binary': False
         }
         config['folders'] = {
-            'elrond_go':
-                '{ELRONDSDK}/elrond_go/{TAG}/elrond-go-{NOvTAG}',
-            'elrond_proxy_go':
-                '{ELRONDSDK}/elrond_proxy_go/{TAG}/elrond-proxy-go-{NOvTAG}',
+            'mx_chain_go':
+                '{ELRONDSDK}/mx_chain_go/{TAG}/mx-chain-go-{NOvTAG}',
+            'mx_chain_proxy_go':
+                '{ELRONDSDK}/mx_chain_proxy_go/{TAG}/mx-chain-proxy-go-{NOvTAG}',
         }
         config['metashard'] = {
             'consensus_size': 1,

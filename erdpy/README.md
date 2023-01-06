@@ -4,7 +4,7 @@ MultiversX Python Command Line Tools and SDK for interacting with the MultiversX
 ## Documentation
 [docs.multiversx.com](https://docs.multiversx.com/sdk-and-tools/erdpy/erdpy/)
 
-[pkg.go.dev](https://pkg.go.dev/github.com/ElrondNetwork/elrond-sdk/erdgo)
+[pkg.go.dev](https://pkg.go.dev/github.com/MultiversX/mx-sdk/erdgo)
 
 ## CLI
 [CLI](CLI.md)

@@ -85,5 +85,5 @@ def get_projects_in_workspace(workspace: Path) -> List[Project]:
 
 def get_project_paths_recursively(base_path: Path) -> List[Path]:
     guards.is_directory(base_path)
-    path_list = [elrond_json.parent for elrond_json in base_path.glob("**/elrond.json")]
+    path_list = [multiversx_json.parent for multiversx_json in base_path.glob("**/elrond.json")]
     return sorted(path_list)

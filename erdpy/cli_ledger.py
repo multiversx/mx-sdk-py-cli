@@ -1,4 +1,4 @@
-from erdpy.ledger.ledger_app_handler import ElrondLedgerApp
+from erdpy.ledger.ledger_app_handler import MultiversXLedgerApp
 from erdpy import cli_shared
 import logging
 from typing import Any
@@ -21,7 +21,7 @@ def setup_parser(subparsers: Any) -> Any:
 
 
 def print_addresses(args):
-    ledger_app = ElrondLedgerApp()
+    ledger_app = MultiversXLedgerApp()
     for i in range(args.num_addresses):
         address = ledger_app.get_address(0, i)
         print('account index = %d | address index = %d | address: %s' % (0, i, address))
@@ -29,6 +29,6 @@ def print_addresses(args):
 
 
 def print_version(args):
-    ledger_app = ElrondLedgerApp()
+    ledger_app = MultiversXLedgerApp()
     print("MultiversX App version: " + ledger_app.get_version())
     ledger_app.close()

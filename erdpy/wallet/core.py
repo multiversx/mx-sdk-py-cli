@@ -10,7 +10,7 @@ import nacl.signing
 BIP39_SALT_MODIFIER = "mnemonic"
 BIP39_PBKDF2_ROUNDS = 2048
 BIP32_SEED_MODIFIER = b'ed25519 seed'
-ELROND_DERIVATION_PATH = [44, 508, 0, 0]
+MULTIVERSX_DERIVATION_PATH = [44, 508, 0, 0]
 HARDENED_OFFSET = 0x80000000
 BITS_PER_BYTE = 8
 BIP39_WORD_COUNT = 2048
@@ -60,7 +60,7 @@ def generate_mnemonic() -> str:
 # BIP39 algorithm steps from:
 # https://medium.com/coinmonks/mnemonic-generation-bip39-simply-explained-e9ac18db9477
 # Javascript implementations:
-# https://github.com/ElrondNetwork/elrond-sdk-erdjs/blob/main/src/walletcore/mnemonic.ts
+# https://github.com/multiversx/mx-sdk-erdjs-walletcore/blob/main/src/mnemonic.ts
 # https://github.com/bitcoinjs/bip39/blob/5faee2c17b2195f30b03cb125df68c20d7dd584b/src/index.js#L108
 def generate_mnemonic_from_entropy(entropy_bytes: bytes) -> str:
     with open_text("erdpy.wallet", "bip39words.txt") as words_file:
@@ -99,7 +99,7 @@ def bip39seed_to_master_key(seed):
 def bip39seed_to_secret_key(seed, account_index=0):
     key, chain_code = bip39seed_to_master_key(seed)
 
-    for segment in ELROND_DERIVATION_PATH + [account_index]:
+    for segment in MULTIVERSX_DERIVATION_PATH + [account_index]:
         key, chain_code = _ckd_priv(key, chain_code, segment + HARDENED_OFFSET)
 
     return key
