@@ -150,8 +150,8 @@ class VMToolsModule(StandaloneModule):
             aliases = list()
 
         super().__init__(key, aliases)
-        self.repo_name = 'wasm-vm'
-        self.organisation = 'ElrondNetwork'
+        self.repo_name = 'mx-chain-vm-go'
+        self.organisation = 'multiversx'
 
     def _post_install(self, tag: str):
         dependencies.install_module('golang')
@@ -406,8 +406,8 @@ class MclSignerModule(StandaloneModule):
 class TestWalletsModule(StandaloneModule):
     def __init__(self, key: str):
         super().__init__(key, [])
-        self.organisation = "ElrondNetwork"
-        self.repo_name = "elrond-sdk-testwallets"
+        self.organisation = "multiversx"
+        self.repo_name = "mx-sdk-testwallets"
 
     def _post_install(self, tag: str):
         # We'll create a "latest" symlink
