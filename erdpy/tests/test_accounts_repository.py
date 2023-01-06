@@ -10,7 +10,7 @@ DUMMY_NONCE = 42
 
 
 class INetworkProvider(Protocol):
-    def get_account_nonce(self, address: IAddress) -> int:
+    def get_account(self, address: IAddress) -> AccountOnNetwork:
         ...
 
 
@@ -56,10 +56,7 @@ def test_sync_nonces():
         assert account.nonce == DUMMY_NONCE
 
 
-class ElrondProxyStub(INetworkProvider):
-    def get_account_nonce(self, address: IAddress) -> int:
-        return DUMMY_NONCE
-    
+class ElrondProxyStub(INetworkProvider):    
     def get_account(self, address: IAddress) -> AccountOnNetwork:
         account =  AccountOnNetwork()
         account.nonce = DUMMY_NONCE
