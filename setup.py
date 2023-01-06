@@ -3,7 +3,7 @@ import setuptools
 with open("README.md", "r") as fh:
     long_description = "https://github.com/multiversx/mx-sdk-erdpy"
 
-VERSION = "3.0.2"
+VERSION = "3.0.3"
 
 try:
     with open('./erdpy/_version.py', 'wt') as versionfile:
