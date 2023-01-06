@@ -3,7 +3,7 @@ from typing import Any, List
 
 from erdpy import cli_shared, utils
 from erdpy.cli_output import CLIOutputBuilder
-from erdpy.proxy.core import ElrondProxy
+from erdpy_network_providers.proxy_network_provider import ProxyNetworkProvider
 from erdpy.transactions import Transaction, do_prepare_transaction
 
 
@@ -70,7 +70,7 @@ def send_transaction(args: Any):
     tx = Transaction.load_from_file(args.infile)
 
     try:
-        tx.send(ElrondProxy(args.proxy))
+        tx.send(ProxyNetworkProvider(args.proxy))
     finally:
         output = CLIOutputBuilder().set_emitted_transaction(tx).build()
         utils.dump_out_json(output, outfile=args.outfile)
@@ -79,8 +79,8 @@ def send_transaction(args: Any):
 def get_transaction(args: Any):
     args = utils.as_object(args)
     omit_fields = cli_shared.parse_omit_fields_arg(args)
-    proxy = ElrondProxy(args.proxy)
+    proxy = ProxyNetworkProvider(args.proxy)
 
-    transaction = proxy.get_transaction(args.hash, args.sender, args.with_results)
+    transaction = proxy.get_transaction(args.hash)
     output = CLIOutputBuilder().set_transaction_on_network(transaction, omit_fields).build()
     utils.dump_out_json(output)

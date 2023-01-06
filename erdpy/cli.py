@@ -24,9 +24,9 @@ from erdpy._version import __version__
 logger = logging.getLogger("cli")
 
 
-def main():
+def main(cli_args: List[str] = []):
     try:
-        _do_main()
+        _do_main(cli_args)
     except errors.KnownError as err:
         logger.critical(err.get_pretty())
         return 1
@@ -36,11 +36,11 @@ def main():
     return 0
 
 
-def _do_main():
+def _do_main(cli_args: List[str]):
     logging.basicConfig(level=logging.INFO)
     scope.initialize()
 
-    argv_with_config_args = config.add_config_args(sys.argv[1:])
+    argv_with_config_args = config.add_config_args(cli_args)
     parser = setup_parser(argv_with_config_args)
     args = parser.parse_args(argv_with_config_args)
 
@@ -55,7 +55,7 @@ def _do_main():
         args.func(args)
 
 
-def setup_parser(args: List[str] = sys.argv[1:]):
+def setup_parser(args: List[str]):
     parser = ArgumentParser(
         prog="erdpy",
         usage="erdpy [-h] [-v] [--verbose] COMMAND-GROUP [-h] COMMAND ...",
@@ -108,5 +108,5 @@ COMMAND GROUPS summary
 
 
 if __name__ == "__main__":
-    ret = main()
+    ret = main(sys.argv[1:])
     sys.exit(ret)

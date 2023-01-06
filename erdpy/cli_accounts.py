@@ -3,7 +3,7 @@ from typing import Any
 
 from erdpy import cli_shared, utils
 from erdpy.accounts import Address
-from erdpy.proxy.core import ElrondProxy
+from erdpy_network_providers.proxy_network_provider import ProxyNetworkProvider
 
 logger = logging.getLogger("cli.accounts")
 
@@ -39,25 +39,24 @@ def _add_address_arg(sub: Any):
 def get_account(args: Any):
     proxy_url = args.proxy
     address = args.address
-    proxy = ElrondProxy(proxy_url)
+    proxy = ProxyNetworkProvider(proxy_url)
     account = proxy.get_account(Address(address))
-    omit_fields = cli_shared.parse_omit_fields_arg(args)
 
     if args.balance:
-        print(account.get("balance", 0))
+        print(account.balance)
     elif args.nonce:
-        print(account.get("nonce", 0))
+        print(account.nonce)
     elif args.username:
-        print(account.get("username", 0))
+        print(account.username)
     else:
-        utils.omit_fields(account, omit_fields)
-        utils.dump_out_json(account)
+        utils.dump_out_json(account.to_dictionary())
 
 
 def get_account_transactions(args: Any):
     proxy_url = args.proxy
     address = args.address
-    proxy = ElrondProxy(proxy_url)
+    proxy = ProxyNetworkProvider(proxy_url)
 
     response = proxy.get_account_transactions(Address(address))
-    utils.dump_out_json(response, args.outfile)
+    transactions_as_dictionaries = [tx.to_dictionary() for tx in response]
+    utils.dump_out_json(transactions_as_dictionaries, args.outfile)

@@ -1,10 +1,8 @@
-import binascii
 from typing import Any, List
 
 from erdpy import cli_shared, errors, utils
-from erdpy.accounts import Address
 from erdpy.delegation import staking_provider
-from erdpy.proxy import ElrondProxy
+from erdpy_network_providers.proxy_network_provider import ProxyNetworkProvider
 from erdpy.transactions import do_prepare_transaction
 
 
@@ -27,7 +25,6 @@ def setup_parser(args: List[str], subparsers: Any) -> Any:
     sub.add_argument("--create-tx-hash", required=True, help="the hash")
     sub.add_argument("--sender", required=False, help="the sender address")
     cli_shared.add_proxy_arg(sub)
-    cli_shared.add_omit_fields_arg(sub)
     sub.set_defaults(func=get_contract_address_by_deploy_tx_hash)
 
     # add a new node
@@ -150,13 +147,16 @@ def do_create_delegation_contract(args: Any):
 
 def get_contract_address_by_deploy_tx_hash(args: Any):
     args = utils.as_object(args)
-    omit_fields = cli_shared.parse_omit_fields_arg(args)
 
-    proxy = ElrondProxy(args.proxy)
+    proxy = ProxyNetworkProvider(args.proxy)
 
-    transaction = proxy.get_transaction(args.create_tx_hash, with_results=True)
-    utils.omit_fields(transaction, omit_fields)
-    _get_sc_address_from_tx(transaction)
+    transaction = proxy.get_transaction(args.create_tx_hash)
+    transaction_events = transaction.logs.events
+    if len(transaction_events) == 1:
+        contract_address = transaction_events[0].address
+        print(contract_address.bech32())
+    else:
+        raise errors.ProgrammingError("Tx has more than one event. Make sure it's a staking provider SC Deploy transaction.")
 
 
 def add_new_nodes(args: Any):
@@ -255,29 +255,3 @@ def set_metadata(args: Any):
     tx = do_prepare_transaction(args)
 
     cli_shared.send_or_simulate(tx, args)
-
-
-def _get_sc_address_from_tx(data: Any):
-    if not isinstance(data, dict):
-        raise errors.ProgrammingError("error")
-
-    sc_results = data.get('smartContractResults')
-    if sc_results is None:
-        raise errors.ProgrammingError("smart contract results missing")
-
-    # TODO improve robustness of this code in case of failed transaction
-    try:
-        sc_result = sc_results[0]
-        data_field = sc_result['data']
-
-        data_field_split = data_field.split('@')
-        arg_1 = binascii.unhexlify(data_field_split[1])
-        if not arg_1 == b'ok':
-            raise errors.ProgrammingError(arg_1.decode("utf-8"))
-
-        sc_address = binascii.unhexlify(data_field_split[2])
-        address = Address(sc_address)
-        print("Contract address: ", address)
-    except Exception:
-        raise errors.ProgrammingError(
-            "cannot get the smart contract address from transaction results, please try again")

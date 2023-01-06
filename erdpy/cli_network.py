@@ -1,4 +1,4 @@
-from erdpy.proxy.core import ElrondProxy
+from erdpy_network_providers.proxy_network_provider import ProxyNetworkProvider
 from erdpy import cli_shared
 import logging
 from typing import Any
@@ -27,26 +27,26 @@ def setup_parser(subparsers: Any) -> Any:
     return subparsers
 
 
-def get_num_shards(args):
+def get_num_shards(args: Any):
     proxy_url = args.proxy
-    proxy = ElrondProxy(proxy_url)
-    num_shards = proxy.get_num_shards()
+    proxy = ProxyNetworkProvider(proxy_url)
+    num_shards = proxy.get_network_config().num_shards_without_meta
     print(num_shards)
     return num_shards
 
 
-def get_last_block_nonce(args):
+def get_last_block_nonce(args: Any):
     proxy_url = args.proxy
     shard = args.shard
-    proxy = ElrondProxy(proxy_url)
-    nonce = proxy.get_last_block_nonce(shard)
+    proxy = ProxyNetworkProvider(proxy_url)
+    nonce = proxy.get_network_status(shard).highest_final_nonce
     print(nonce)
     return nonce
 
 
-def get_chain_id(args):
+def get_chain_id(args: Any):
     proxy_url = args.proxy
-    proxy = ElrondProxy(proxy_url)
-    chain_id = proxy.get_chain_id()
+    proxy = ProxyNetworkProvider(proxy_url)
+    chain_id = proxy.get_network_config().chain_id
     print(chain_id)
     return chain_id

@@ -20,7 +20,7 @@ def setup_parser(subparsers: Any) -> Any:
     return subparsers
 
 
-def print_addresses(args):
+def print_addresses(args: Any):
     ledger_app = ElrondLedgerApp()
     for i in range(args.num_addresses):
         address = ledger_app.get_address(0, i)
@@ -28,7 +28,7 @@ def print_addresses(args):
     ledger_app.close()
 
 
-def print_version(args):
+def print_version(args: Any):
     ledger_app = ElrondLedgerApp()
     print("Elrond App version: " + ledger_app.get_version())
     ledger_app.close()

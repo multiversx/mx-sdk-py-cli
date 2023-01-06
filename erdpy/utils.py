@@ -9,7 +9,7 @@ import requests_cache
 import tarfile
 import zipfile
 from pathlib import Path
-from typing import Any, List, Union, Optional, cast, IO, Dict
+from typing import Any, List, Union, Optional, cast, IO, Dict, Protocol, runtime_checkable
 
 import toml
 
@@ -18,7 +18,8 @@ from erdpy import errors
 
 logger = logging.getLogger("utils")
 
-class ISerializable:
+@runtime_checkable
+class ISerializable(Protocol):
     def to_dictionary(self) -> Dict[str, Any]:
         return self.__dict__
 

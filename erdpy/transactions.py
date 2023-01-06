@@ -1,15 +1,35 @@
 import base64
 import json
 import logging
+import time
 from collections import OrderedDict
-from typing import Any, Dict, List, TextIO
+from typing import Any, Dict, List, TextIO, Tuple, Protocol, Sequence
 
 from erdpy import config, errors, utils
 from erdpy.accounts import Account, Address, LedgerAccount
 from erdpy.cli_password import load_password
-from erdpy.interfaces import IElrondProxy, ITransaction, ITransactionOnNetwork
+from erdpy.interfaces import ITransaction
 
 logger = logging.getLogger("transactions")
+
+
+class ITransactionOnNetwork(Protocol):
+    hash: str
+    is_completed: bool
+
+    def to_dictionary(self) -> Dict[str, Any]:
+        ...
+
+
+class INetworkProvider(Protocol):
+    def send_transaction(self, transaction: ITransaction) -> str:
+        ...
+    
+    def send_transactions(self, transactions: Sequence[ITransaction]) -> Tuple[int, str]:
+        ...
+    
+    def get_transaction(self, tx_hash: str) -> ITransactionOnNetwork:
+        ...
 
 
 class Transaction(ITransaction):
@@ -50,7 +70,7 @@ class Transaction(ITransaction):
         return self._field_decoded("receiverUsername")
 
     def _field_encoded(self, field: str) -> str:
-        field_bytes = self.__dict__.get(field, None).encode("utf-8")
+        field_bytes = self.__dict__.get(field, "").encode("utf-8")
         encoded = base64.b64encode(field_bytes).decode()
         return encoded
 
@@ -83,7 +103,7 @@ class Transaction(ITransaction):
     @classmethod
     def load_from_file(cls, f: TextIO):
         data_json: bytes = f.read().encode()
-        fields = json.loads(data_json).get("tx")
+        fields = json.loads(data_json).get("tx") or json.loads(data_json).get("emittedTransaction")
         instance = cls()
         instance.__dict__.update(fields)
         instance.data = instance.data_decoded()
@@ -91,25 +111,41 @@ class Transaction(ITransaction):
         instance.receiverUsername = instance.receiver_username_encoded()
         return instance
 
-    def send(self, proxy: IElrondProxy):
+    def send(self, proxy: INetworkProvider):
         if not self.signature:
             raise errors.TransactionIsNotSigned()
 
         logger.info(f"Transaction.send: nonce={self.nonce}")
 
-        dictionary = self.to_dictionary()
-        self.hash = proxy.send_transaction(dictionary)
+        self.hash = proxy.send_transaction(self)
         logger.info(f"Hash: {self.hash}")
         utils.log_explorer_transaction(self.chainID, self.hash)
         return self.hash
 
-    def send_wait_result(self, proxy: IElrondProxy, timeout: int) -> ITransactionOnNetwork:
+    def send_wait_result(self, proxy: INetworkProvider, timeout: int) -> ITransactionOnNetwork:
         if not self.signature:
             raise errors.TransactionIsNotSigned()
 
-        txOnNetwork = proxy.send_transaction_and_wait_for_result(self.to_dictionary(), timeout)
-        self.hash = txOnNetwork.get_hash()
+        txOnNetwork = self.__send_transaction_and_wait_for_result(proxy , self, timeout)
+        self.hash = txOnNetwork.hash
         return txOnNetwork
+    
+    def __send_transaction_and_wait_for_result(self, proxy: INetworkProvider, payload: Any, num_seconds_timeout: int = 100) -> ITransactionOnNetwork:
+        AWAIT_TRANSACTION_PERIOD = 5
+
+        tx_hash = proxy.send_transaction(payload)
+        num_periods_to_wait = int(num_seconds_timeout / AWAIT_TRANSACTION_PERIOD)
+
+        for _ in range(0, num_periods_to_wait):
+            time.sleep(AWAIT_TRANSACTION_PERIOD)
+
+            tx = proxy.get_transaction(tx_hash)
+            if tx.is_completed:
+                return tx
+            else:
+                logger.info("Transaction not yet done.")
+
+        raise errors.KnownError("Took too long to get transaction.")
 
     def to_dictionary(self) -> Dict[str, Any]:
         dictionary: Dict[str, Any] = OrderedDict()
@@ -194,13 +230,12 @@ class BunchOfTransactions:
         tx.sign(sender)
         self.transactions.append(tx)
 
-    def add_tx(self, tx):
+    def add_tx(self, tx: Transaction):
         self.transactions.append(tx)
 
-    def send(self, proxy: IElrondProxy):
+    def send(self, proxy: INetworkProvider):
         logger.info(f"BunchOfTransactions.send: {len(self.transactions)} transactions")
-        payload = [transaction.to_dictionary() for transaction in self.transactions]
-        num_sent, hashes = proxy.send_transactions(payload)
+        num_sent, hashes = proxy.send_transactions(self.transactions)
         logger.info(f"Sent: {num_sent}")
         logger.info(f"TxsHashes: {hashes}")
         return num_sent, hashes
@@ -221,8 +256,8 @@ def do_prepare_transaction(args: Any) -> Transaction:
     tx.value = args.value
     tx.receiver = args.receiver
     tx.sender = account.address.bech32()
-    tx.senderUsername = getattr(args, "sender_username", None)
-    tx.receiverUsername = getattr(args, "receiver_username", None)
+    tx.senderUsername = getattr(args, "sender_username", "")
+    tx.receiverUsername = getattr(args, "receiver_username", "")
     tx.gasPrice = int(args.gas_price)
     tx.gasLimit = int(args.gas_limit)
     tx.data = args.data

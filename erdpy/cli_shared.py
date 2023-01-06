@@ -9,7 +9,7 @@ from erdpy.accounts import Account
 from erdpy.cli_output import CLIOutputBuilder
 from erdpy.cli_password import load_password
 from erdpy.ledger.ledger_functions import do_get_ledger_address
-from erdpy.proxy.core import ElrondProxy
+from erdpy_network_providers.proxy_network_provider import ProxyNetworkProvider
 from erdpy.simulation import Simulator
 from erdpy.transactions import Transaction
 
@@ -125,7 +125,7 @@ def prepare_nonce_in_args(args: Any):
         else:
             raise errors.NoWalletProvided()
 
-        account.sync_nonce(ElrondProxy(args.proxy))
+        account.sync_nonce(ProxyNetworkProvider(args.proxy))
         args.nonce = account.nonce
 
 
@@ -146,7 +146,7 @@ def check_broadcast_args(args: Any):
 
 
 def send_or_simulate(tx: Transaction, args: Any, dump_output: bool = True) -> CLIOutputBuilder:
-    proxy = ElrondProxy(args.proxy)
+    proxy = ProxyNetworkProvider(args.proxy)
 
     is_set_wait_result = hasattr(args, "wait_result") and args.wait_result
     is_set_send = hasattr(args, "send") and args.send
@@ -178,7 +178,7 @@ def send_or_simulate(tx: Transaction, args: Any, dump_output: bool = True) -> CL
 
 def check_if_sign_method_required(args: List[str], checked_method: str) -> bool:
     methods = ["--pem", "--keyfile", "--ledger"]
-    rest_of_methods = []
+    rest_of_methods: List[str] = []
     for method in methods:
         if method != checked_method:
             rest_of_methods.append(method)

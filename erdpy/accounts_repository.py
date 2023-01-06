@@ -1,14 +1,20 @@
 import logging
 from multiprocessing.pool import ThreadPool
 from pathlib import Path
-from typing import List, Set, Union
+from typing import List, Set, Union, Protocol
 
 from erdpy import utils
 from erdpy.accounts import Account, Address
-from erdpy.interfaces import IElrondProxy
+from erdpy_network_providers.accounts import AccountOnNetwork
+from erdpy.interfaces import IAddress
 from erdpy.wallet import pem
 
 logger = logging.getLogger("accounts")
+
+
+class INetworkProvider(Protocol):
+    def get_account(self, address: IAddress) -> AccountOnNetwork:
+        ...
 
 
 class AccountsRepository:
@@ -66,7 +72,7 @@ class AccountsRepository:
     def __len__(self):
         return len(self.accounts)
 
-    def sync_nonces(self, proxy: IElrondProxy, num_parallel: int = 10):
+    def sync_nonces(self, proxy: INetworkProvider, num_parallel: int = 10):
         logger.info("Sync nonces for", len(self.accounts), "accounts")
 
         def sync_nonce(account: Account):

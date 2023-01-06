@@ -1,14 +1,14 @@
 import base64
 import logging
-from typing import Any, List, Optional, Tuple
+from typing import Any, List, Optional, Tuple, Protocol, Sequence
 
 from Cryptodome.Hash import keccak
 
 from erdpy import config, constants, errors
 from erdpy.accounts import Account, Address
-from erdpy.interfaces import IElrondProxy
 from erdpy.transactions import Transaction
 from erdpy.utils import Object
+from erdpy_network_providers.interface import IContractQuery
 
 logger = logging.getLogger("contracts")
 
@@ -19,11 +19,40 @@ TRUE_STR_LOWER = "true"
 STR_PREFIX = "str:"
 
 
+class INetworkProvider(Protocol):
+    def query_contract(self, query: Any) -> Any:
+        ...
+
+
 class QueryResult(Object):
     def __init__(self, as_base64: str, as_hex: str, as_number: int):
         self.base64 = as_base64
         self.hex = as_hex
         self.number = as_number
+
+
+class ContractQuery(IContractQuery):
+    def __init__(self, address: Address, function: str, value: int, arguments: List[bytes], caller: Optional[Address] = None):
+        self.contract = address
+        self.function = function
+        self.caller = caller
+        self.value = value
+        self.encoded_arguments = [item.hex() for item in arguments]
+
+    def get_contract(self) -> Address:
+        return self.contract
+
+    def get_function(self) -> str:
+        return self.function
+
+    def get_encoded_arguments(self) -> Sequence[str]:
+        return self.encoded_arguments
+
+    def get_caller(self) -> Optional[Address]:
+        return self.caller
+    
+    def get_value(self) -> int:
+        return self.value
 
 
 class SmartContract:
@@ -136,33 +165,24 @@ class SmartContract:
 
     def query(
         self,
-        proxy: IElrondProxy,
+        proxy: INetworkProvider,
         function: str,
         arguments: List[Any],
         value: int = 0,
         caller: Optional[Address] = None
     ) -> List[Any]:
         response_data = self.query_detailed(proxy, function, arguments, value, caller)
-        return_data = response_data.get("returnData", []) or response_data.get("ReturnData", [])
+        return_data = response_data.return_data
         return [self._interpret_return_data(data) for data in return_data]
 
-    def query_detailed(self, proxy: IElrondProxy, function: str, arguments: List[Any], value: int = 0, caller: Optional[Address] = None) -> Any:
+    def query_detailed(self, proxy: INetworkProvider, function: str, arguments: List[Any],
+                        value: int = 0, caller: Optional[Address] = None) -> Any:
         arguments = arguments or []
-        prepared_arguments = [_prepare_argument(argument) for argument in arguments]
 
-        payload = {
-            "scAddress": self.address.bech32(),
-            "funcName": function,
-            "args": prepared_arguments,
-            "value": str(value)
-        }
+        query = ContractQuery(self.address, function, value, arguments, caller)
 
-        if caller:
-            payload["caller"] = caller.bech32()
-
-        response = proxy.query_contract(payload)
-        response_data = response.get("data", {})
-        return response_data
+        response = proxy.query_contract(query)
+        return response
 
     def _interpret_return_data(self, data: str) -> Any:
         if not data:

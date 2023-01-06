@@ -1,11 +1,12 @@
 import logging
 from pathlib import Path
-from typing import Any, Optional
+from typing import Any, Optional, Protocol
 
 import nacl.signing
 
 from erdpy import constants, errors
 from erdpy.interfaces import IAccount, IAddress, ITransaction
+from erdpy_network_providers.accounts import AccountOnNetwork
 from erdpy.ledger.config import compare_versions
 from erdpy.ledger.ledger_app_handler import SIGN_USING_HASH_VERSION
 from erdpy.ledger.ledger_functions import do_get_ledger_address, do_sign_transaction_with_ledger, do_get_ledger_version, \
@@ -14,6 +15,11 @@ from erdpy.wallet import bech32, pem
 from erdpy.wallet.keyfile import load_from_key_file
 
 logger = logging.getLogger("accounts")
+
+
+class INetworkProvider(Protocol):
+    def get_account(self, address: IAddress) -> AccountOnNetwork:
+        ...
 
 
 class Account(IAccount):
@@ -39,9 +45,9 @@ class Account(IAccount):
             self.secret_key = secret_key.hex()
             self.address = Address(address_from_key_file)
 
-    def sync_nonce(self, proxy: Any):
+    def sync_nonce(self, proxy: INetworkProvider):
         logger.info("Account.sync_nonce()")
-        self.nonce = proxy.get_account_nonce(self.address)
+        self.nonce = proxy.get_account(self.address).nonce
         logger.info(f"Account.sync_nonce() done: {self.nonce}")
 
     def sign_transaction(self, transaction: ITransaction) -> str:

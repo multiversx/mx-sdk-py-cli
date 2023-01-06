@@ -36,7 +36,8 @@ setuptools.setup(
         "ledgercomm[hid]",
         "semver",
         "requests-cache",
-        "mx-sdk-build-contract-rs==4.0.0"
+        "mx-sdk-build-contract-rs==4.0.0",
+        "mx-sdk-erdpy-network-providers==0.6.2"
     ],
     zip_safe=False,
     keywords=["Elrond"],
