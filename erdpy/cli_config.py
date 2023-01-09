@@ -9,7 +9,7 @@ logger = logging.getLogger("cli.config")
 
 
 def setup_parser(subparsers: Any) -> Any:
-    parser = cli_shared.add_group_subparser(subparsers, "config", "Configure elrond-sdk (default values etc.)")
+    parser = cli_shared.add_group_subparser(subparsers, "config", "Configure multiversx-sdk (default values etc.)")
     subparsers = parser.add_subparsers()
 
     sub = cli_shared.add_command_subparser(subparsers, "config", "dump", "Dumps configuration.")

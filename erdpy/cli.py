@@ -63,11 +63,11 @@ def setup_parser(args: List[str] = sys.argv[1:]):
 -----------
 DESCRIPTION
 -----------
-erdpy is part of the elrond-sdk and consists of Command Line Tools and Python SDK
+erdpy is part of the multiversx-sdk and consists of Command Line Tools and Python SDK
 for interacting with the Blockchain (in general) and with Smart Contracts (in particular).
 
 erdpy targets a broad audience of users and developers.
-https://docs.elrond.com/sdk-and-tools/erdpy/erdpy.
+https://docs.multiversx.com/sdk-and-tools/erdpy/erdpy.
         """,
         formatter_class=argparse.RawDescriptionHelpFormatter
     )

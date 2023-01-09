@@ -3,7 +3,7 @@ import setuptools
 with open("README.md", "r") as fh:
     long_description = "https://github.com/multiversx/mx-sdk-erdpy"
 
-VERSION = "3.0.3"
+VERSION = "4.0.0"
 
 try:
     with open('./erdpy/_version.py', 'wt') as versionfile:
@@ -15,11 +15,11 @@ except FileNotFoundError:
 setuptools.setup(
     name="erdpy",
     version=VERSION,
-    description="Elrond Smart Contracts Tools and Python SDK",
+    description="MultiversX Smart Contracts Tools",
     long_description=long_description,
     long_description_content_type="text/markdown",
     url="https://github.com/multiversx/mx-sdk-erdpy",
-    author="Elrond Network",
+    author="MultiversX",
     license="GPL",
     packages=setuptools.find_packages(
         include=["erdpy*"], exclude=["examples*"]),
@@ -39,7 +39,7 @@ setuptools.setup(
         "mx-sdk-build-contract-rs==4.0.0"
     ],
     zip_safe=False,
-    keywords=["Elrond"],
+    keywords=["MultiversX"],
     classifiers=[
         "Programming Language :: Python :: 3.8",
         "Programming Language :: Python :: 3.9",

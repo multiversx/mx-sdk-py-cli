@@ -23,7 +23,7 @@ jobs:
           python-version: ${{ matrix.python-version }}
       - name: Install
         run: |
-          wget -O erdpy-up.py https://raw.githubusercontent.com/ElrondNetwork/elrond-sdk-erdpy/$BRANCH_NAME/erdpy-up.py
+          wget -O erdpy-up.py https://raw.githubusercontent.com/multiversx/mx-sdk-erdpy/$BRANCH_NAME/erdpy-up.py
           python3 erdpy-up.py --from-branch $BRANCH_NAME <<< "2"
       - name: Smoke test
         run: |
