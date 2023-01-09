@@ -99,7 +99,7 @@ def bip39seed_to_master_key(seed):
 def bip39seed_to_secret_key(seed, account_index=0):
     key, chain_code = bip39seed_to_master_key(seed)
 
-    for segment in MULTIVERSX_DERIVATION_PATH + [account_index]:
+    for segment in BIP39_WALLET_DERIVATION_PATH + [account_index]:
         key, chain_code = _ckd_priv(key, chain_code, segment + HARDENED_OFFSET)
 
     return key
