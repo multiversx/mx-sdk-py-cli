@@ -142,7 +142,7 @@ class TestnetConfiguration:
         return path
 
     def proxy_source(self) -> Path:
-        return self.folders['max_chain_proxy_go']
+        return self.folders['mx_chain_proxy_go']
 
     def proxy_config_source(self):
         return self.folders['mx_chain_proxy_go'] / 'cmd' / 'proxy' / 'config'

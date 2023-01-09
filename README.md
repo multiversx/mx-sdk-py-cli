@@ -9,6 +9,3 @@ Python Command Line Tools for interacting with Multivers<sup>X</sup>.
 
 ## Distribution
 [erdpy-up](https://docs.multiversx.com/sdk-and-tools/erdpy/installing-erdpy/) and [PyPi](https://pypi.org/project/erdpy/#history)
-
-## CHANGELOG
-[CHANGELOG](erdpy/CHANGELOG.md)
