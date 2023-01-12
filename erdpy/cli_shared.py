@@ -21,7 +21,7 @@ def wider_help_formatter(prog: Text):
 def add_group_subparser(subparsers: Any, group: str, description: str) -> Any:
     parser = subparsers.add_parser(
         group,
-        usage=f"erdpy {group} COMMAND [-h] ...",
+        usage=f"mxpy {group} COMMAND [-h] ...",
         description=description,
         formatter_class=argparse.RawDescriptionHelpFormatter
     )
@@ -47,7 +47,7 @@ COMMANDS summary
 def add_command_subparser(subparsers: Any, group: str, command: str, description: str):
     return subparsers.add_parser(
         command,
-        usage=f"erdpy {group} {command} [-h] ...",
+        usage=f"mxpy {group} {command} [-h] ...",
         description=description,
         formatter_class=wider_help_formatter
     )

@@ -2,21 +2,21 @@
 
 ## Overview
 
-**erdpy** exposes a number of CLI **commands**, organized within **groups**.
+**mxpy** exposes a number of CLI **commands**, organized within **groups**.
 
 
 ```
-$ erdpy --help
-usage: erdpy [-h] [-v] [--verbose] COMMAND-GROUP [-h] COMMAND ...
+$ mxpy --help
+usage: mxpy [-h] [-v] [--verbose] COMMAND-GROUP [-h] COMMAND ...
 
 -----------
 DESCRIPTION
 -----------
-erdpy is part of the multiversx-sdk and consists of Command Line Tools and Python SDK
+mxpy is part of the multiversx-sdk and consists of Command Line Tools and Python SDK
 for interacting with the Blockchain (in general) and with Smart Contracts (in particular).
 
-erdpy targets a broad audience of users and developers.
-https://docs.multiversx.com/sdk-and-tools/erdpy/erdpy.
+mxpy targets a broad audience of users and developers.
+https://docs.multiversx.com/sdk-and-tools/mxpy.
         
 
 COMMAND GROUPS:
@@ -50,8 +50,8 @@ dns                            Operations related to the Domain Name Service
 
 
 ```
-$ erdpy contract --help
-usage: erdpy contract COMMAND [-h] ...
+$ mxpy contract --help
+usage: mxpy contract COMMAND [-h] ...
 
 Build, deploy, upgrade and interact with Smart Contracts
 
@@ -82,8 +82,8 @@ reproducible-build             Build a Smart Contract and get the same output as
 
 
 ```
-$ erdpy contract new --help
-usage: erdpy contract new [-h] ...
+$ mxpy contract new --help
+usage: mxpy contract new [-h] ...
 
 Create a new Smart Contract project based on a template.
 
@@ -100,8 +100,8 @@ optional arguments:
 
 
 ```
-$ erdpy contract templates --help
-usage: erdpy contract templates [-h] ...
+$ mxpy contract templates --help
+usage: mxpy contract templates [-h] ...
 
 List the available Smart Contract templates.
 
@@ -113,8 +113,8 @@ optional arguments:
 
 
 ```
-$ erdpy contract build --help
-usage: erdpy contract build [-h] ...
+$ mxpy contract build --help
+usage: mxpy contract build [-h] ...
 
 Build a Smart Contract project using the appropriate buildchain.
 
@@ -142,8 +142,8 @@ optional arguments:
 
 
 ```
-$ erdpy contract clean --help
-usage: erdpy contract clean [-h] ...
+$ mxpy contract clean --help
+usage: mxpy contract clean [-h] ...
 
 Clean a Smart Contract project.
 
@@ -159,8 +159,8 @@ optional arguments:
 
 
 ```
-$ erdpy contract deploy --help
-usage: erdpy contract deploy [-h] ...
+$ mxpy contract deploy --help
+usage: mxpy contract deploy [-h] ...
 
 Deploy a Smart Contract.
 
@@ -233,8 +233,8 @@ optional arguments:
 
 
 ```
-$ erdpy contract call --help
-usage: erdpy contract call [-h] ...
+$ mxpy contract call --help
+usage: mxpy contract call [-h] ...
 
 Interact with a Smart Contract (execute function).
 
@@ -306,8 +306,8 @@ optional arguments:
 
 
 ```
-$ erdpy contract upgrade --help
-usage: erdpy contract upgrade [-h] ...
+$ mxpy contract upgrade --help
+usage: mxpy contract upgrade [-h] ...
 
 Upgrade a previously-deployed Smart Contract.
 
@@ -383,8 +383,8 @@ optional arguments:
 
 
 ```
-$ erdpy contract query --help
-usage: erdpy contract query [-h] ...
+$ mxpy contract query --help
+usage: mxpy contract query [-h] ...
 
 Query a Smart Contract (call a pure function)
 
@@ -404,8 +404,8 @@ optional arguments:
 
 
 ```
-$ erdpy contract report --help
-usage: erdpy contract report [-h] ...
+$ mxpy contract report --help
+usage: mxpy contract report [-h] ...
 
 Print a detailed report of the smart contracts.
 
@@ -441,8 +441,8 @@ optional arguments:
 
 
 ```
-$ erdpy tx --help
-usage: erdpy tx COMMAND [-h] ...
+$ mxpy tx --help
+usage: mxpy tx COMMAND [-h] ...
 
 Create and broadcast Transactions
 
@@ -464,8 +464,8 @@ get                            Get a transaction.
 
 
 ```
-$ erdpy tx new --help
-usage: erdpy tx new [-h] ...
+$ mxpy tx new --help
+usage: mxpy tx new [-h] ...
 
 Create a new transaction.
 
@@ -519,8 +519,8 @@ optional arguments:
 
 
 ```
-$ erdpy tx send --help
-usage: erdpy tx send [-h] ...
+$ mxpy tx send --help
+usage: mxpy tx send [-h] ...
 
 Send a previously saved transaction.
 
@@ -548,8 +548,8 @@ optional arguments:
 
 
 ```
-$ erdpy tx get --help
-usage: erdpy tx get [-h] ...
+$ mxpy tx get --help
+usage: mxpy tx get [-h] ...
 
 Get a transaction.
 
@@ -577,8 +577,8 @@ optional arguments:
 
 
 ```
-$ erdpy hyperblock --help
-usage: erdpy hyperblock COMMAND [-h] ...
+$ mxpy hyperblock --help
+usage: mxpy hyperblock COMMAND [-h] ...
 
 Get Hyperblock from the Network
 
@@ -593,8 +593,8 @@ OPTIONS:
 
 
 ```
-$ erdpy hyperblock get --help
-usage: erdpy hyperblock get [-h] ...
+$ mxpy hyperblock get --help
+usage: mxpy hyperblock get [-h] ...
 
 Get hyperblock
 
@@ -608,8 +608,8 @@ optional arguments:
 
 
 ```
-$ erdpy validator --help
-usage: erdpy validator COMMAND [-h] ...
+$ mxpy validator --help
+usage: mxpy validator COMMAND [-h] ...
 
 Stake, UnStake, UnBond, Unjail and other actions useful for Validators
 
@@ -640,8 +640,8 @@ restake-unstaked-nodes         It will reStake UnStaked nodes
 
 
 ```
-$ erdpy validator stake --help
-usage: erdpy validator stake [-h] ...
+$ mxpy validator stake --help
+usage: mxpy validator stake [-h] ...
 
 Stake value into the Network
 
@@ -678,8 +678,8 @@ optional arguments:
 
 
 ```
-$ erdpy validator unstake --help
-usage: erdpy validator unstake [-h] ...
+$ mxpy validator unstake --help
+usage: mxpy validator unstake [-h] ...
 
 Unstake value
 
@@ -714,8 +714,8 @@ optional arguments:
 
 
 ```
-$ erdpy validator unjail --help
-usage: erdpy validator unjail [-h] ...
+$ mxpy validator unjail --help
+usage: mxpy validator unjail [-h] ...
 
 Unjail a Validator Node
 
@@ -750,8 +750,8 @@ optional arguments:
 
 
 ```
-$ erdpy validator unbond --help
-usage: erdpy validator unbond [-h] ...
+$ mxpy validator unbond --help
+usage: mxpy validator unbond [-h] ...
 
 Unbond tokens for a bls key
 
@@ -786,8 +786,8 @@ optional arguments:
 
 
 ```
-$ erdpy validator change-reward-address --help
-usage: erdpy validator change-reward-address [-h] ...
+$ mxpy validator change-reward-address --help
+usage: mxpy validator change-reward-address [-h] ...
 
 Change the reward address
 
@@ -822,8 +822,8 @@ optional arguments:
 
 
 ```
-$ erdpy validator claim --help
-usage: erdpy validator claim [-h] ...
+$ mxpy validator claim --help
+usage: mxpy validator claim [-h] ...
 
 Claim rewards
 
@@ -857,8 +857,8 @@ optional arguments:
 
 
 ```
-$ erdpy account --help
-usage: erdpy account COMMAND [-h] ...
+$ mxpy account --help
+usage: mxpy account COMMAND [-h] ...
 
 Get Account data (nonce, balance) from the Network
 
@@ -879,8 +879,8 @@ get-transactions               Query account transactions
 
 
 ```
-$ erdpy account get --help
-usage: erdpy account get [-h] ...
+$ mxpy account get --help
+usage: mxpy account get [-h] ...
 
 Query account details (nonce, balance etc.)
 
@@ -898,8 +898,8 @@ optional arguments:
 
 
 ```
-$ erdpy account get-transactions --help
-usage: erdpy account get-transactions [-h] ...
+$ mxpy account get-transactions --help
+usage: mxpy account get-transactions [-h] ...
 
 Query account transactions
 
@@ -914,8 +914,8 @@ optional arguments:
 
 
 ```
-$ erdpy wallet --help
-usage: erdpy wallet COMMAND [-h] ...
+$ mxpy wallet --help
+usage: mxpy wallet COMMAND [-h] ...
 
 Create wallet, derive secret key from mnemonic, bech32 address helpers etc.
 
@@ -939,8 +939,8 @@ pem-address-hex                Get the public address out of a PEM file as hex
 
 
 ```
-$ erdpy wallet new --help
-usage: erdpy wallet new [-h] ...
+$ mxpy wallet new --help
+usage: mxpy wallet new [-h] ...
 
 Create a new wallet and print its mnemonic; optionally save as password-protected JSON (recommended) or PEM (not recommended)
 
@@ -955,8 +955,8 @@ optional arguments:
 
 
 ```
-$ erdpy wallet derive --help
-usage: erdpy wallet derive [-h] ...
+$ mxpy wallet derive --help
+usage: mxpy wallet derive [-h] ...
 
 Derive a PEM file from a mnemonic or generate a new PEM file (for tests only!)
 
@@ -973,8 +973,8 @@ optional arguments:
 
 
 ```
-$ erdpy wallet bech32 --help
-usage: erdpy wallet bech32 [-h] ...
+$ mxpy wallet bech32 --help
+usage: mxpy wallet bech32 [-h] ...
 
 Helper for encoding and decoding bech32 addresses
 
@@ -991,8 +991,8 @@ optional arguments:
 
 
 ```
-$ erdpy testnet --help
-usage: erdpy testnet COMMAND [-h] ...
+$ mxpy testnet --help
+usage: mxpy testnet COMMAND [-h] ...
 
 Set up, start and control local testnets
 
@@ -1007,8 +1007,8 @@ OPTIONS:
 
 
 ```
-$ erdpy testnet prerequisites --help
-usage: erdpy testnet prerequisites [-h] ...
+$ mxpy testnet prerequisites --help
+usage: mxpy testnet prerequisites [-h] ...
 
 Download and verify the prerequisites for running a testnet
 
@@ -1021,8 +1021,8 @@ optional arguments:
 
 
 ```
-$ erdpy testnet config --help
-usage: erdpy testnet config [-h] ...
+$ mxpy testnet config --help
+usage: mxpy testnet config [-h] ...
 
 Configure a testnet (required before starting it the first time or after clean)
 
@@ -1035,8 +1035,8 @@ optional arguments:
 
 
 ```
-$ erdpy testnet start --help
-usage: erdpy testnet start [-h] ...
+$ mxpy testnet start --help
+usage: mxpy testnet start [-h] ...
 
 Start a testnet
 
@@ -1049,8 +1049,8 @@ optional arguments:
 
 
 ```
-$ erdpy testnet clean --help
-usage: erdpy testnet clean [-h] ...
+$ mxpy testnet clean --help
+usage: mxpy testnet clean [-h] ...
 
 Erase the currently configured testnet (must be already stopped)
 
@@ -1063,8 +1063,8 @@ optional arguments:
 
 
 ```
-$ erdpy network --help
-usage: erdpy network COMMAND [-h] ...
+$ mxpy network --help
+usage: mxpy network COMMAND [-h] ...
 
 Get Network parameters, such as number of shards, chain identifier etc.
 
@@ -1086,8 +1086,8 @@ chain                          Get the chain identifier.
 
 
 ```
-$ erdpy network num-shards --help
-usage: erdpy network num-shards [-h] ...
+$ mxpy network num-shards --help
+usage: mxpy network num-shards [-h] ...
 
 Get the number of shards.
 
@@ -1100,8 +1100,8 @@ optional arguments:
 
 
 ```
-$ erdpy network block-nonce --help
-usage: erdpy network block-nonce [-h] ...
+$ mxpy network block-nonce --help
+usage: mxpy network block-nonce [-h] ...
 
 Get the latest block nonce, by shard.
 
@@ -1115,8 +1115,8 @@ optional arguments:
 
 
 ```
-$ erdpy network chain --help
-usage: erdpy network chain [-h] ...
+$ mxpy network chain --help
+usage: mxpy network chain [-h] ...
 
 Get the chain identifier.
 
@@ -1129,8 +1129,8 @@ optional arguments:
 
 
 ```
-$ erdpy deps --help
-usage: erdpy deps COMMAND [-h] ...
+$ mxpy deps --help
+usage: mxpy deps COMMAND [-h] ...
 
 Manage dependencies or multiversx-sdk modules
 
@@ -1151,8 +1151,8 @@ check                          Check whether a dependency is installed.
 
 
 ```
-$ erdpy deps install --help
-usage: erdpy deps install [-h] ...
+$ mxpy deps install --help
+usage: mxpy deps install [-h] ...
 
 Install dependencies or multiversx-sdk modules.
 
@@ -1170,8 +1170,8 @@ optional arguments:
 
 
 ```
-$ erdpy deps check --help
-usage: erdpy deps check [-h] ...
+$ mxpy deps check --help
+usage: mxpy deps check [-h] ...
 
 Check whether a dependency is installed.
 
@@ -1188,8 +1188,8 @@ optional arguments:
 
 
 ```
-$ erdpy config --help
-usage: erdpy config COMMAND [-h] ...
+$ mxpy config --help
+usage: mxpy config COMMAND [-h] ...
 
 Configure multiversx-sdk (default values etc.)
 
@@ -1215,8 +1215,8 @@ list                           List available configs
 
 
 ```
-$ erdpy config dump --help
-usage: erdpy config dump [-h] ...
+$ mxpy config dump --help
+usage: mxpy config dump [-h] ...
 
 Dumps configuration.
 
@@ -1229,8 +1229,8 @@ optional arguments:
 
 
 ```
-$ erdpy config get --help
-usage: erdpy config get [-h] ...
+$ mxpy config get --help
+usage: mxpy config get [-h] ...
 
 Gets a configuration value.
 
@@ -1245,8 +1245,8 @@ optional arguments:
 
 
 ```
-$ erdpy config set --help
-usage: erdpy config set [-h] ...
+$ mxpy config set --help
+usage: mxpy config set [-h] ...
 
 Sets a configuration value.
 
@@ -1262,8 +1262,8 @@ optional arguments:
 
 
 ```
-$ erdpy config new --help
-usage: erdpy config new [-h] ...
+$ mxpy config new --help
+usage: mxpy config new [-h] ...
 
 Creates a new configuration.
 
@@ -1279,8 +1279,8 @@ optional arguments:
 
 
 ```
-$ erdpy config switch --help
-usage: erdpy config switch [-h] ...
+$ mxpy config switch --help
+usage: mxpy config switch [-h] ...
 
 Switch to a different config
 
@@ -1295,8 +1295,8 @@ optional arguments:
 
 
 ```
-$ erdpy config list --help
-usage: erdpy config list [-h] ...
+$ mxpy config list --help
+usage: mxpy config list [-h] ...
 
 List available configs
 
@@ -1308,8 +1308,8 @@ optional arguments:
 
 
 ```
-$ erdpy data --help
-usage: erdpy data COMMAND [-h] ...
+$ mxpy data --help
+usage: mxpy data COMMAND [-h] ...
 
 Data manipulation omnitool
 
@@ -1331,8 +1331,8 @@ load                           Loads a key-value pair from a storage partition
 
 
 ```
-$ erdpy data parse --help
-usage: erdpy data parse [-h] ...
+$ mxpy data parse --help
+usage: mxpy data parse [-h] ...
 
 Parses values from a given file
 
@@ -1346,8 +1346,8 @@ optional arguments:
 
 
 ```
-$ erdpy data store --help
-usage: erdpy data store [-h] ...
+$ mxpy data store --help
+usage: mxpy data store [-h] ...
 
 Stores a key-value pair within a partition
 
@@ -1363,8 +1363,8 @@ optional arguments:
 
 
 ```
-$ erdpy data load --help
-usage: erdpy data load [-h] ...
+$ mxpy data load --help
+usage: mxpy data load [-h] ...
 
 Loads a key-value pair from a storage partition
 

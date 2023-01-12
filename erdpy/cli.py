@@ -31,7 +31,7 @@ def main(cli_args: List[str] = []):
         logger.critical(err.get_pretty())
         return 1
     except KeyboardInterrupt:
-        print("erdpy process killed by user.")
+        print("process killed by user.")
         return 1
     return 0
 
@@ -57,17 +57,17 @@ def _do_main(cli_args: List[str]):
 
 def setup_parser(args: List[str]):
     parser = ArgumentParser(
-        prog="erdpy",
-        usage="erdpy [-h] [-v] [--verbose] COMMAND-GROUP [-h] COMMAND ...",
+        prog="mxpy",
+        usage="mxpy [-h] [-v] [--verbose] COMMAND-GROUP [-h] COMMAND ...",
         description="""
 -----------
 DESCRIPTION
 -----------
-erdpy is part of the multiversx-sdk and consists of Command Line Tools and Python SDK
+mxpy is part of the multiversx-sdk and consists of Command Line Tools and Python SDK
 for interacting with the Blockchain (in general) and with Smart Contracts (in particular).
 
-erdpy targets a broad audience of users and developers.
-https://docs.multiversx.com/sdk-and-tools/erdpy/erdpy.
+mxpy targets a broad audience of users and developers.
+https://docs.multiversx.com/sdk-and-tools/mxpy.
         """,
         formatter_class=argparse.RawDescriptionHelpFormatter
     )
@@ -75,7 +75,7 @@ https://docs.multiversx.com/sdk-and-tools/erdpy/erdpy.
     parser._positionals.title = "COMMAND GROUPS"
     parser._optionals.title = "TOP-LEVEL OPTIONS"
 
-    parser.add_argument("-v", "--version", action="version", version=f"erdpy {__version__}")
+    parser.add_argument("-v", "--version", action="version", version=f"MultiversX Python CLI (mxpy) {__version__}")
     parser.add_argument("--verbose", action="store_true", default=False)
 
     subparsers = parser.add_subparsers()
