@@ -1,4 +1,4 @@
-name: Install erdpy using erdpy-up (MacOS)
+name: Install mxpy using erdpy-up (MacOS)
 
 on:
   pull_request:
@@ -9,7 +9,7 @@ env:
  BRANCH_NAME: ${{ github.head_ref || github.ref_name }}
 
 jobs:
-  install-erdpy:
+  install-mxpy:
     runs-on: macos-latest
 
     strategy:
