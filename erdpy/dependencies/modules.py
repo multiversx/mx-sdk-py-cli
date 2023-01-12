@@ -395,8 +395,8 @@ class MclSignerModule(StandaloneModule):
             aliases = list()
 
         super().__init__(key, aliases)
-        self.organisation = 'ElrondNetwork'
-        self.repo_name = 'elrond-sdk-go-tools'
+        self.organisation = 'multiversx'
+        self.repo_name = 'mx-sdk-erdgo-tools'
 
     def _post_install(self, tag: str):
         directory = self.get_directory(tag)

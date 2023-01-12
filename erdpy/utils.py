@@ -273,9 +273,9 @@ def breakpoint():
 
 def log_explorer(chain, name, path, details):
     networks = {
-        "1": ("Elrond Mainnet Explorer", "https://explorer.elrond.com"),
-        "T": ("Elrond Testnet Explorer", "https://testnet-explorer.elrond.com"),
-        "D": ("Elrond Devnet Explorer", "https://devnet-explorer.elrond.com"),
+        "1": ("MultiversX Mainnet Explorer", "https://explorer.multiversx.com"),
+        "T": ("MultiversX Testnet Explorer", "https://testnet-explorer.multiversx.com"),
+        "D": ("MultiversX Devnet Explorer", "https://devnet-explorer.multiversx.com"),
     }
     try:
         explorer_name, explorer_url = networks[chain]

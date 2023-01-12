@@ -60,12 +60,12 @@ def _get_explicitly_installable_deps() -> List[DependencyModule]:
 
 
 def _get_implicitly_installable_deps() -> List[DependencyModule]:
-    # See: https://github.com/ElrondNetwork/elrond-sdk-erdpy/pull/55
+    # See: https://github.com/multiversx/mx-sdk-erdpy/pull/55
 
     return [
         VMToolsModule(key="vmtools"),
-        StandaloneModule(key="elrond_go", repo_name="elrond-go", organisation="ElrondNetwork"),
-        StandaloneModule(key="elrond_proxy_go", repo_name="elrond-proxy-go", organisation="ElrondNetwork"),
+        StandaloneModule(key="mx_chain_go", repo_name="mx-chain-go", organisation="multiversx"),
+        StandaloneModule(key="mx_chain_proxy_go", repo_name="mx-chain-proxy-go", organisation="multiversx"),
         MclSignerModule(key="mcl_signer"),
         NpmModule(key="wasm-opt"),
         CargoModule(key="twiggy"),

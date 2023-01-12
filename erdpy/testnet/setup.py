@@ -13,7 +13,7 @@ from erdpy.testnet.config import TestnetConfiguration
 
 logger = logging.getLogger("testnet")
 
-DEPENDENCY_KEYS = ["elrond_go", "elrond_proxy_go", "testwallets"]
+DEPENDENCY_KEYS = ["mx_chain_go", "mx_chain_proxy_go", "testwallets"]
 
 
 def install_dependencies():
