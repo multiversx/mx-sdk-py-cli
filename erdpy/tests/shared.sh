@@ -7,7 +7,7 @@ function absolute_path() {
 export PYTHONPATH=$(absolute_path ../../)
 echo "PYTHONPATH = ${PYTHONPATH}"
 
-ERDPY="python3.8 -m erdpy.cli"
+CLI="python3.8 -m erdpy.cli"
 SANDBOX=./testdata-out/SANDBOX
 USERS=~/elrondsdk/testwallets/latest/users
 VALIDATORS=~/elrondsdk/testwallets/latest/validators
