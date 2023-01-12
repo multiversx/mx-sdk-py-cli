@@ -1,4 +1,4 @@
-from typing import Any, Dict
+from typing import Any, Dict, Protocol
 from erdpy.utils import ISerializable
 
 
@@ -44,9 +44,6 @@ class IAccount:
         return ""
 
 
-class ISimulateResponse(ISerializable):
-    pass
-
-
-class ISimulateCostResponse(ISerializable):
-    pass
+class ISimulateResponse(Protocol):
+    def to_dictionary(self) -> Dict[str, Any]:
+        ...
