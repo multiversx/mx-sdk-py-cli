@@ -2,7 +2,8 @@
 
 export PYTHONPATH=../
 
-ERDPY="python3.8 -m erdpy.cli"
+CLI="python3 -m erdpy.cli"
+CLI_ALIAS="mxpy"
 
 code() {
     printf "\n\`\`\`\n" >> CLI.md
@@ -12,8 +13,8 @@ group() {
     printf "## Group **$1**\n\n" >> CLI.md
 
     code
-    printf "$ erdpy $2 --help\n" >> CLI.md
-    ${ERDPY} ${2} --help >> CLI.md
+    printf "$ ${CLI_ALIAS} $2 --help\n" >> CLI.md
+    ${CLI} ${2} --help >> CLI.md
     code
 }
 
@@ -21,8 +22,8 @@ command() {
     printf "### $1\n\n" >> CLI.md
 
     code
-    printf "$ erdpy $2 --help\n" >> CLI.md
-    ${ERDPY} ${2} --help >> CLI.md
+    printf "$ ${CLI_ALIAS} $2 --help\n" >> CLI.md
+    ${CLI} ${2} --help >> CLI.md
     code
 }
 
@@ -31,11 +32,11 @@ generate() {
     printf "# Command Line Interface\n\n" >> CLI.md
 
     printf "## Overview\n\n" >> CLI.md
-    printf "**erdpy** exposes a number of CLI **commands**, organized within **groups**.\n\n" >> CLI.md
+    printf "**${CLI_ALIAS}** exposes a number of CLI **commands**, organized within **groups**.\n\n" >> CLI.md
 
     code
-    printf "$ erdpy --help\n" >> CLI.md
-    ${ERDPY} --help >> CLI.md
+    printf "$ ${CLI_ALIAS} --help\n" >> CLI.md
+    ${CLI} --help >> CLI.md
     code
 
     group "Contract" "contract"
