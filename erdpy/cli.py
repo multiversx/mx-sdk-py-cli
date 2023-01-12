@@ -75,7 +75,7 @@ https://docs.multiversx.com/sdk-and-tools/mxpy.
     parser._positionals.title = "COMMAND GROUPS"
     parser._optionals.title = "TOP-LEVEL OPTIONS"
 
-    parser.add_argument("-v", "--version", action="version", version=f"mxpy {__version__}")
+    parser.add_argument("-v", "--version", action="version", version=f"MultiversX Python CLI (mxpy) {__version__}")
     parser.add_argument("--verbose", action="store_true", default=False)
 
     subparsers = parser.add_subparsers()
