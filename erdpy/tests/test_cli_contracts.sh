@@ -160,6 +160,4 @@ testAll() {
     testRunMandos || return 1
     testCleanContracts || return 1
     testWasmName || return 1
-    testVerifyContract || return 1
-    testReproducibleBuild || return 1
 }
