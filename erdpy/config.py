@@ -1,4 +1,4 @@
-import os.path
+import os
 from pathlib import Path
 from typing import Any, Dict, List
 
@@ -149,38 +149,39 @@ def _guard_valid_config_deletion(name: str):
 
 def get_defaults() -> Dict[str, Any]:
     return {
-        "proxy": "https://testnet-gateway.elrond.com",
+        "proxy": "https://testnet-gateway.multiversx.com",
         "chainID": "T",
         "txVersion": "1",
         "dependencies.vmtools.tag": "latest",
         "dependencies.mx_sdk_rs.tag": "latest",
-        "dependencies.vmtools.urlTemplate.linux": "https://github.com/ElrondNetwork/wasm-vm/archive/{TAG}.tar.gz",
-        "dependencies.vmtools.urlTemplate.osx": "https://github.com/ElrondNetwork/wasm-vm/archive/{TAG}.tar.gz",
+        "dependencies.vmtools.urlTemplate.linux": "https://github.com/multiversx/mx-chain-vm-go/archive/{TAG}.tar.gz",
+        "dependencies.vmtools.urlTemplate.osx": "https://github.com/multiversx/mx-chain-vm-go/archive/{TAG}.tar.gz",
         "dependencies.llvm.tag": "v9-19feb",
+        # ide.elrond.com will be removed, TBD if clang will still be downloaded
         "dependencies.llvm.urlTemplate.linux": "https://ide.elrond.com/vendor-llvm/{TAG}/linux-amd64.tar.gz?t=19feb",
         "dependencies.llvm.urlTemplate.osx": "https://ide.elrond.com/vendor-llvm/{TAG}/darwin-amd64.tar.gz?t=19feb",
         "dependencies.rust.tag": "nightly",
         "dependencies.nodejs.tag": "v12.18.3",
         "dependencies.nodejs.urlTemplate.linux": "https://nodejs.org/dist/{TAG}/node-{TAG}-linux-x64.tar.gz",
         "dependencies.nodejs.urlTemplate.osx": "https://nodejs.org/dist/{TAG}/node-{TAG}-darwin-x64.tar.gz",
-        "dependencies.elrond_go.tag": "latest",
-        "dependencies.elrond_go.urlTemplate.linux": "https://github.com/ElrondNetwork/elrond-go/archive/{TAG}.tar.gz",
-        "dependencies.elrond_go.urlTemplate.osx": "https://github.com/ElrondNetwork/elrond-go/archive/{TAG}.tar.gz",
-        "dependencies.elrond_go.url": "https://github.com/ElrondNetwork/elrond-go/archive/{TAG}.tar.gz",
-        "dependencies.elrond_proxy_go.tag": "latest",
-        "dependencies.elrond_proxy_go.urlTemplate.linux": "https://github.com/ElrondNetwork/elrond-proxy-go/archive/{TAG}.tar.gz",
-        "dependencies.elrond_proxy_go.urlTemplate.osx": "https://github.com/ElrondNetwork/elrond-proxy-go/archive/{TAG}.tar.gz",
+        "dependencies.mx_chain_go.tag": "latest",
+        "dependencies.mx_chain_go.urlTemplate.linux": "https://github.com/multiversx/mx-chain-go/archive/{TAG}.tar.gz",
+        "dependencies.mx_chain_go.urlTemplate.osx": "https://github.com/multiversx/mx-chain-go/archive/{TAG}.tar.gz",
+        "dependencies.mx_chain_go.url": "https://github.com/multiversx/mx-chain-go/archive/{TAG}.tar.gz",
+        "dependencies.mx_chain_proxy_go.tag": "latest",
+        "dependencies.mx_chain_proxy_go.urlTemplate.linux": "https://github.com/multiversx/mx-chain-proxy-go/archive/{TAG}.tar.gz",
+        "dependencies.mx_chain_proxy_go.urlTemplate.osx": "https://github.com/multiversx/mx-chain-proxy-go/archive/{TAG}.tar.gz",
         "dependencies.golang.tag": "go1.18.4",
         "dependencies.golang.urlTemplate.linux": "https://golang.org/dl/{TAG}.linux-amd64.tar.gz",
         "dependencies.golang.urlTemplate.osx": "https://golang.org/dl/{TAG}.darwin-amd64.tar.gz",
         "dependencies.mcl_signer.tag": "latest",
-        "dependencies.mcl_signer.urlTemplate.linux": "https://github.com/ElrondNetwork/elrond-sdk-go-tools/releases/download/{TAG}/mcl_signer_{TAG}_ubuntu-latest.tar.gz",
-        "dependencies.mcl_signer.urlTemplate.osx": "https://github.com/ElrondNetwork/elrond-sdk-go-tools/releases/download/{TAG}/mcl_signer_{TAG}_macos-latest.tar.gz",
+        "dependencies.mcl_signer.urlTemplate.linux": "https://github.com/multiversx/mx-sdk-erdgo-tools/releases/download/{TAG}/mcl_signer_{TAG}_ubuntu-latest.tar.gz",
+        "dependencies.mcl_signer.urlTemplate.osx": "https://github.com/multiversx/mx-sdk-erdgo-tools/releases/download/{TAG}/mcl_signer_{TAG}_macos-latest.tar.gz",
         "dependencies.wasm-opt.tag": "latest",
         "dependencies.twiggy.tag": "latest",
         "dependencies.testwallets.tag": "latest",
-        "dependencies.testwallets.urlTemplate.linux": "https://github.com/ElrondNetwork/elrond-sdk-testwallets/archive/{TAG}.tar.gz",
-        "dependencies.testwallets.urlTemplate.osx": "https://github.com/ElrondNetwork/elrond-sdk-testwallets/archive/{TAG}.tar.gz",
+        "dependencies.testwallets.urlTemplate.linux": "https://github.com/multiversx/mx-sdk-testwallets/archive/{TAG}.tar.gz",
+        "dependencies.testwallets.urlTemplate.osx": "https://github.com/multiversx/mx-sdk-testwallets/archive/{TAG}.tar.gz",
         "testnet.validate_expected_keys": "false",
         "github_api_token": "",
     }

@@ -12,11 +12,11 @@ usage: erdpy [-h] [-v] [--verbose] COMMAND-GROUP [-h] COMMAND ...
 -----------
 DESCRIPTION
 -----------
-erdpy is part of the elrond-sdk and consists of Command Line Tools and Python SDK
+erdpy is part of the multiversx-sdk and consists of Command Line Tools and Python SDK
 for interacting with the Blockchain (in general) and with Smart Contracts (in particular).
 
 erdpy targets a broad audience of users and developers.
-https://docs.elrond.com/sdk-and-tools/erdpy/erdpy.
+https://docs.multiversx.com/sdk-and-tools/erdpy/erdpy.
         
 
 COMMAND GROUPS:
@@ -37,8 +37,8 @@ account                        Get Account data (nonce, balance) from the Networ
 ledger                         Get Ledger App addresses and version
 wallet                         Create wallet, derive secret key from mnemonic, bech32 address helpers etc.
 network                        Get Network parameters, such as number of shards, chain identifier etc.
-deps                           Manage dependencies or elrond-sdk modules
-config                         Configure elrond-sdk (default values etc.)
+deps                           Manage dependencies or multiversx-sdk modules
+config                         Configure multiversx-sdk (default values etc.)
 hyperblock                     Get Hyperblock from the Network
 testnet                        Set up, start and control local testnets
 data                           Data manipulation omnitool
@@ -56,7 +56,7 @@ usage: erdpy contract COMMAND [-h] ...
 Build, deploy, upgrade and interact with Smart Contracts
 
 COMMANDS:
-  {new,templates,build,clean,test,report,deploy,call,upgrade,query}
+  {new,templates,build,clean,test,report,deploy,call,upgrade,query,verify,reproducible-build}
 
 OPTIONS:
   -h, --help            show this help message and exit
@@ -74,6 +74,8 @@ deploy                         Deploy a Smart Contract.
 call                           Interact with a Smart Contract (execute function).
 upgrade                        Upgrade a previously-deployed Smart Contract.
 query                          Query a Smart Contract (call a pure function)
+verify                         Verify the authenticity of the code of a deployed Smart Contract
+reproducible-build             Build a Smart Contract and get the same output as a previously built Smart Contract
 
 ```
 ### Contract.New
@@ -207,7 +209,7 @@ optional arguments:
   --ledger-account-index LEDGER_ACCOUNT_INDEX  🔐 the index of the account when using Ledger
   --ledger-address-index LEDGER_ADDRESS_INDEX  🔐 the index of the address when using Ledger
   --sender-username SENDER_USERNAME            🖄 the username of the sender
-  --proxy PROXY                                🔗 the URL of the proxy (default: https://testnet-gateway.elrond.com)
+  --proxy PROXY                                🔗 the URL of the proxy (default: https://testnet-gateway.multiversx.com)
   --nonce NONCE                                # the nonce for the transaction
   --recall-nonce                               ⭮ whether to recall the nonce when creating the transaction (default:
                                                False)
@@ -278,7 +280,7 @@ optional arguments:
   --ledger-account-index LEDGER_ACCOUNT_INDEX  🔐 the index of the account when using Ledger
   --ledger-address-index LEDGER_ADDRESS_INDEX  🔐 the index of the address when using Ledger
   --sender-username SENDER_USERNAME            🖄 the username of the sender
-  --proxy PROXY                                🔗 the URL of the proxy (default: https://testnet-gateway.elrond.com)
+  --proxy PROXY                                🔗 the URL of the proxy (default: https://testnet-gateway.multiversx.com)
   --nonce NONCE                                # the nonce for the transaction
   --recall-nonce                               ⭮ whether to recall the nonce when creating the transaction (default:
                                                False)
@@ -357,7 +359,7 @@ optional arguments:
   --ledger-account-index LEDGER_ACCOUNT_INDEX  🔐 the index of the account when using Ledger
   --ledger-address-index LEDGER_ADDRESS_INDEX  🔐 the index of the address when using Ledger
   --sender-username SENDER_USERNAME            🖄 the username of the sender
-  --proxy PROXY                                🔗 the URL of the proxy (default: https://testnet-gateway.elrond.com)
+  --proxy PROXY                                🔗 the URL of the proxy (default: https://testnet-gateway.multiversx.com)
   --nonce NONCE                                # the nonce for the transaction
   --recall-nonce                               ⭮ whether to recall the nonce when creating the transaction (default:
                                                False)
@@ -391,7 +393,7 @@ positional arguments:
 
 optional arguments:
   -h, --help                             show this help message and exit
-  --proxy PROXY                          🔗 the URL of the proxy (default: https://testnet-gateway.elrond.com)
+  --proxy PROXY                          🔗 the URL of the proxy (default: https://testnet-gateway.multiversx.com)
   --function FUNCTION                    the function to call
   --arguments ARGUMENTS [ARGUMENTS ...]  arguments for the contract transaction, as [number, bech32-address, ascii
                                          string, boolean] or hex-encoded. E.g. --arguments 42 0x64 1000 0xabba
@@ -507,7 +509,7 @@ optional arguments:
   --send                                       ✓ whether to broadcast the transaction (default: False)
   --simulate                                   whether to simulate the transaction (default: False)
   --relay                                      whether to relay the transaction (default: False)
-  --proxy PROXY                                🔗 the URL of the proxy (default: https://testnet-gateway.elrond.com)
+  --proxy PROXY                                🔗 the URL of the proxy (default: https://testnet-gateway.multiversx.com)
   --wait-result                                signal to wait for the transaction result - only valid if --send is set
   --timeout TIMEOUT                            max num of seconds to wait for result - only valid if --wait-result is
                                                set
@@ -539,7 +541,7 @@ optional arguments:
   -h, --help         show this help message and exit
   --infile INFILE    input file (a previously saved transaction)
   --outfile OUTFILE  where to save the output (the hash) (default: stdout)
-  --proxy PROXY      🔗 the URL of the proxy (default: https://testnet-gateway.elrond.com)
+  --proxy PROXY      🔗 the URL of the proxy (default: https://testnet-gateway.multiversx.com)
 
 ```
 ### Transactions.Get
@@ -567,7 +569,7 @@ optional arguments:
   --hash HASH                the hash
   --sender SENDER            the sender address
   --with-results             will also return the results of transaction
-  --proxy PROXY              🔗 the URL of the proxy (default: https://testnet-gateway.elrond.com)
+  --proxy PROXY              🔗 the URL of the proxy (default: https://testnet-gateway.multiversx.com)
   --omit-fields OMIT_FIELDS  omit fields in the output payload (default: [])
 
 ```
@@ -598,7 +600,7 @@ Get hyperblock
 
 optional arguments:
   -h, --help     show this help message and exit
-  --proxy PROXY  🔗 the URL of the proxy (default: https://testnet-gateway.elrond.com)
+  --proxy PROXY  🔗 the URL of the proxy (default: https://testnet-gateway.multiversx.com)
   --key KEY      the hash or the nonce of the hyperblock
 
 ```
@@ -645,7 +647,7 @@ Stake value into the Network
 
 optional arguments:
   -h, --help                                   show this help message and exit
-  --proxy PROXY                                🔗 the URL of the proxy (default: https://testnet-gateway.elrond.com)
+  --proxy PROXY                                🔗 the URL of the proxy (default: https://testnet-gateway.multiversx.com)
   --pem PEM                                    🔑 the PEM file, if keyfile not provided
   --pem-index PEM_INDEX                        🔑 the index in the PEM file (default: 0)
   --keyfile KEYFILE                            🔑 a JSON keyfile, if PEM not provided
@@ -683,7 +685,7 @@ Unstake value
 
 optional arguments:
   -h, --help                                   show this help message and exit
-  --proxy PROXY                                🔗 the URL of the proxy (default: https://testnet-gateway.elrond.com)
+  --proxy PROXY                                🔗 the URL of the proxy (default: https://testnet-gateway.multiversx.com)
   --pem PEM                                    🔑 the PEM file, if keyfile not provided
   --pem-index PEM_INDEX                        🔑 the index in the PEM file (default: 0)
   --keyfile KEYFILE                            🔑 a JSON keyfile, if PEM not provided
@@ -719,7 +721,7 @@ Unjail a Validator Node
 
 optional arguments:
   -h, --help                                   show this help message and exit
-  --proxy PROXY                                🔗 the URL of the proxy (default: https://testnet-gateway.elrond.com)
+  --proxy PROXY                                🔗 the URL of the proxy (default: https://testnet-gateway.multiversx.com)
   --pem PEM                                    🔑 the PEM file, if keyfile not provided
   --pem-index PEM_INDEX                        🔑 the index in the PEM file (default: 0)
   --keyfile KEYFILE                            🔑 a JSON keyfile, if PEM not provided
@@ -755,7 +757,7 @@ Unbond tokens for a bls key
 
 optional arguments:
   -h, --help                                   show this help message and exit
-  --proxy PROXY                                🔗 the URL of the proxy (default: https://testnet-gateway.elrond.com)
+  --proxy PROXY                                🔗 the URL of the proxy (default: https://testnet-gateway.multiversx.com)
   --pem PEM                                    🔑 the PEM file, if keyfile not provided
   --pem-index PEM_INDEX                        🔑 the index in the PEM file (default: 0)
   --keyfile KEYFILE                            🔑 a JSON keyfile, if PEM not provided
@@ -791,7 +793,7 @@ Change the reward address
 
 optional arguments:
   -h, --help                                   show this help message and exit
-  --proxy PROXY                                🔗 the URL of the proxy (default: https://testnet-gateway.elrond.com)
+  --proxy PROXY                                🔗 the URL of the proxy (default: https://testnet-gateway.multiversx.com)
   --pem PEM                                    🔑 the PEM file, if keyfile not provided
   --pem-index PEM_INDEX                        🔑 the index in the PEM file (default: 0)
   --keyfile KEYFILE                            🔑 a JSON keyfile, if PEM not provided
@@ -827,7 +829,7 @@ Claim rewards
 
 optional arguments:
   -h, --help                                   show this help message and exit
-  --proxy PROXY                                🔗 the URL of the proxy (default: https://testnet-gateway.elrond.com)
+  --proxy PROXY                                🔗 the URL of the proxy (default: https://testnet-gateway.multiversx.com)
   --pem PEM                                    🔑 the PEM file, if keyfile not provided
   --pem-index PEM_INDEX                        🔑 the index in the PEM file (default: 0)
   --keyfile KEYFILE                            🔑 a JSON keyfile, if PEM not provided
@@ -884,7 +886,7 @@ Query account details (nonce, balance etc.)
 
 optional arguments:
   -h, --help                 show this help message and exit
-  --proxy PROXY              🔗 the URL of the proxy (default: https://testnet-gateway.elrond.com)
+  --proxy PROXY              🔗 the URL of the proxy (default: https://testnet-gateway.multiversx.com)
   --address ADDRESS          🖄 the address to query
   --balance                  whether to only fetch the balance
   --nonce                    whether to only fetch the nonce
@@ -903,7 +905,7 @@ Query account transactions
 
 optional arguments:
   -h, --help         show this help message and exit
-  --proxy PROXY      🔗 the URL of the proxy (default: https://testnet-gateway.elrond.com)
+  --proxy PROXY      🔗 the URL of the proxy (default: https://testnet-gateway.multiversx.com)
   --outfile OUTFILE  where to save the output (default: stdout)
   --address ADDRESS  🖄 the address to query
 
@@ -1091,7 +1093,7 @@ Get the number of shards.
 
 optional arguments:
   -h, --help     show this help message and exit
-  --proxy PROXY  🔗 the URL of the proxy (default: https://testnet-gateway.elrond.com)
+  --proxy PROXY  🔗 the URL of the proxy (default: https://testnet-gateway.multiversx.com)
 
 ```
 ### Network.BlockNonce
@@ -1105,7 +1107,7 @@ Get the latest block nonce, by shard.
 
 optional arguments:
   -h, --help     show this help message and exit
-  --proxy PROXY  🔗 the URL of the proxy (default: https://testnet-gateway.elrond.com)
+  --proxy PROXY  🔗 the URL of the proxy (default: https://testnet-gateway.multiversx.com)
   --shard SHARD  the shard ID (use 4294967295 for metachain)
 
 ```
@@ -1120,7 +1122,7 @@ Get the chain identifier.
 
 optional arguments:
   -h, --help     show this help message and exit
-  --proxy PROXY  🔗 the URL of the proxy (default: https://testnet-gateway.elrond.com)
+  --proxy PROXY  🔗 the URL of the proxy (default: https://testnet-gateway.multiversx.com)
 
 ```
 ## Group **Dependencies**
@@ -1130,7 +1132,7 @@ optional arguments:
 $ erdpy deps --help
 usage: erdpy deps COMMAND [-h] ...
 
-Manage dependencies or elrond-sdk modules
+Manage dependencies or multiversx-sdk modules
 
 COMMANDS:
   {install,check}
@@ -1141,7 +1143,7 @@ OPTIONS:
 ----------------
 COMMANDS summary
 ----------------
-install                        Install dependencies or elrond-sdk modules.
+install                        Install dependencies or multiversx-sdk modules.
 check                          Check whether a dependency is installed.
 
 ```
@@ -1152,10 +1154,10 @@ check                          Check whether a dependency is installed.
 $ erdpy deps install --help
 usage: erdpy deps install [-h] ...
 
-Install dependencies or elrond-sdk modules.
+Install dependencies or multiversx-sdk modules.
 
 positional arguments:
-  {all,llvm,clang,cpp,rust,nodejs,golang,wabt,vmtools,elrond_go,elrond_proxy_go,mcl_signer,wasm-opt,twiggy,testwallets}
+  {all,llvm,clang,cpp,rust,nodejs,golang,vmtools,mx_chain_go,mx_chain_proxy_go,mcl_signer,wasm-opt,twiggy,testwallets}
                                                   the dependency to install
 
 optional arguments:
@@ -1174,7 +1176,7 @@ usage: erdpy deps check [-h] ...
 Check whether a dependency is installed.
 
 positional arguments:
-  {all,llvm,clang,cpp,rust,nodejs,golang,wabt,vmtools,elrond_go,elrond_proxy_go,mcl_signer,wasm-opt,twiggy,testwallets}
+  {all,llvm,clang,cpp,rust,nodejs,golang,vmtools,mx_chain_go,mx_chain_proxy_go,mcl_signer,wasm-opt,twiggy,testwallets}
                                                   the dependency to check
 
 optional arguments:
@@ -1189,7 +1191,7 @@ optional arguments:
 $ erdpy config --help
 usage: erdpy config COMMAND [-h] ...
 
-Configure elrond-sdk (default values etc.)
+Configure multiversx-sdk (default values etc.)
 
 COMMANDS:
   {dump,get,set,delete,new,switch,list}
