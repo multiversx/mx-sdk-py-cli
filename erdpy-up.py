@@ -171,11 +171,13 @@ def install_erdpy():
     upgrade_erdpy_config()
 
     # Create symlink to "bin/erdpy"
-    link_path = os.path.join(sdk_path, "erdpy")
+    link_path = os.path.join(sdk_path, "mxpy")
     if os.path.exists(link_path):
         os.remove(link_path)
-    os.symlink(os.path.join(get_erdpy_path(), "bin", "erdpy"), link_path)
+    print("before instalation")
+    os.symlink(os.path.join(get_erdpy_path(), "bin", "mxpy"), link_path)
     logger.info("You have successfully installed erdpy.")
+    print("after instalation")
 
 
 def run_in_venv(args):
