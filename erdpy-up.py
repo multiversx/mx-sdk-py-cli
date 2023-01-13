@@ -236,7 +236,7 @@ def get_profile_file():
 
 
 def upgrade_erdpy_config():
-    config_path = os.path.expanduser("~/elrondsdk/erdpy.json")
+    config_path = os.path.expanduser("~/elrondsdk/mxpy.json")
 
     if not os.path.exists(config_path):
         return
