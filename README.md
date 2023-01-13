@@ -8,4 +8,4 @@ Python Command Line Tools for interacting with Multivers<sup>X</sup>.
 [CLI](multiversx_sdk_cli/CLI.md)
 
 ## Distribution
-[erdpy-up](https://docs.multiversx.com/sdk-and-tools/mxpy/installing-mxpy/) and [PyPi](https://pypi.org/project/mulyiversx-sdk-cli/#history)
+[erdpy-up](https://docs.multiversx.com/sdk-and-tools/mxpy/installing-mxpy/) and [PyPi](https://pypi.org/project/multiversx-sdk-cli/#history)
