@@ -47,9 +47,9 @@ def setup_parser(args: List[str], subparsers: Any) -> Any:
     _add_recursive_arg(sub)
     sub.set_defaults(func=clean)
 
-    sub = cli_shared.add_command_subparser(subparsers, "contract", "test", "Run Mandos tests.")
+    sub = cli_shared.add_command_subparser(subparsers, "contract", "test", "Run scenarios (tests).")
     _add_project_arg(sub)
-    sub.add_argument("--directory", default="mandos",
+    sub.add_argument("--directory", default="scenarios",
                      help="🗀 the directory containing the tests (default: %(default)s)")
     sub.add_argument("--wildcard", required=False, help="wildcard to match only specific test files")
     sub.set_defaults(func=run_tests)
