@@ -163,9 +163,9 @@ def install_erdpy():
     return_code = run_in_venv(["pip3", "install", "--no-cache-dir", erdpy_to_install])
     if return_code != 0:
         raise InstallError("Could not install erdpy.")
-    return_code = run_in_venv(["erdpy", "--version"])
+    return_code = run_in_venv(["mxpy", "--version"])
     if return_code != 0:
-        raise InstallError("Could not install erdpy.")
+        raise InstallError("Could not install mxpy.")
 
     logger.info("Checking and upgrading configuration file")
     upgrade_erdpy_config()
@@ -174,10 +174,8 @@ def install_erdpy():
     link_path = os.path.join(sdk_path, "mxpy")
     if os.path.exists(link_path):
         os.remove(link_path)
-    print("before instalation")
     os.symlink(os.path.join(get_erdpy_path(), "bin", "mxpy"), link_path)
-    logger.info("You have successfully installed erdpy.")
-    print("after instalation")
+    logger.info("You have successfully installed mxpy.")
 
 
 def run_in_venv(args):
