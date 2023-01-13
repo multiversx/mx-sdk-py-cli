@@ -6,7 +6,7 @@ from multiversx_sdk_cli.accounts import Account, Address
 from multiversx_sdk_cli.utils import read_json_file
 from nacl.signing import SigningKey
 import requests
-from build_contract_rust.packaged_source_code import PackagedSourceCode
+from multiversx_sdk_rust_contract_builder.packaged_source_code import PackagedSourceCode
 
 
 class ContractVerificationRequest:
