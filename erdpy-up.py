@@ -151,9 +151,9 @@ def ensure_folder(folder):
 
 
 def install_erdpy():
-    logger.info("Installing erdpy in virtual environment...")
+    logger.info("Installing mxpy in virtual environment...")
     if from_branch:
-        erdpy_to_install = f"https://github.com/multiversx/mx-sdk-erdpy/archive/refs/heads/{from_branch}.zip"
+        erdpy_to_install = f"https://github.com/multiversx/mx-sdk-py-cli/archive/refs/heads/{from_branch}.zip"
     else:
         erdpy_to_install = "erdpy" if not exact_version else f"erdpy=={exact_version}"
 
@@ -236,7 +236,7 @@ def get_profile_file():
 
 
 def upgrade_erdpy_config():
-    config_path = os.path.expanduser("~/elrondsdk/mxpy.json")
+    config_path = os.path.expanduser("~/elrondsdk/erdpy.json")
 
     if not os.path.exists(config_path):
         return

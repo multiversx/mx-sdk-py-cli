@@ -7,8 +7,8 @@ import semver
 from multiversx_sdk_cli import errors, utils, workstation
 
 ROOT_FOLDER_NAME = "elrondsdk"
-LOCAL_CONFIG_PATH = os.path.join(os.getcwd(), "mxpy.json")
-GLOBAL_CONFIG_PATH = os.path.expanduser("~/elrondsdk/mxpy.json")
+LOCAL_CONFIG_PATH = os.path.join(os.getcwd(), "erdpy.json")
+GLOBAL_CONFIG_PATH = os.path.expanduser("~/elrondsdk/erdpy.json")
 
 DEFAULT_GAS_PRICE = 1000000000
 GAS_PER_DATA_BYTE = 1500
