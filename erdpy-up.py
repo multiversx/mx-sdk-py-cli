@@ -27,8 +27,8 @@ def main():
     parser.add_argument("--modify-path", dest="modify_path", action="store_true", help="whether to modify $PATH (in profile file)")
     parser.add_argument("--no-modify-path", dest="modify_path", action="store_false", help="whether to modify $PATH (in profile file)")
     parser.add_argument("--sdk-path", default=get_sdk_path_default(), help="where to install mx-sdk")
-    parser.add_argument("--exact-version", help="the exact version of erdpy to install")
-    parser.add_argument("--from-branch", help="use a branch of multiversx/mx-sdk-erdpy")
+    parser.add_argument("--exact-version", help="the exact version of mxpy to install")
+    parser.add_argument("--from-branch", help="use a branch of multiversx/mx-sdk-py-cli")
     parser.set_defaults(modify_path=True)
     args = parser.parse_args()
 
@@ -44,7 +44,7 @@ def main():
 
     logger.info("Checking user.")
     if os.getuid() == 0:
-        raise InstallError("You should not install erdpy as root.")
+        raise InstallError("You should not install mxpy as root.")
 
     logger.info("Checking Python version.")
     logger.info(f"Python version: {format_version(python_version)}")
@@ -64,8 +64,8 @@ def main():
         add_sdk_to_path()
         logger.info("""
 ###############################################################################
-Upon restarting the user session, [$ erdpy] command should be available in your shell.
-Furthermore, after restarting the user session, you can use [$ source erdpy-activate] to activate the Python virtual environment containing erdpy.
+Upon restarting the user session, [$ mxpy] command should be available in your shell.
+Furthermore, after restarting the user session, you can use [$ source mxpy-activate] to activate the Python virtual environment containing mxpy.
 ###############################################################################
 """)
 

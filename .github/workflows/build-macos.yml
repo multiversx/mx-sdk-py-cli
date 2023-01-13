@@ -28,4 +28,4 @@ jobs:
       - name: Smoke test
         run: |
           source /Users/runner/.bash_profile
-          erdpy --version
+          mxpy --version

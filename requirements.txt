@@ -16,6 +16,6 @@ pytest
 
 setuptools
 
-mx-sdk-build-contract-rs==4.0.0
+multiversx-sdk-rust-contract-builder==4.0.2
 
-mx-sdk-erdpy-network-providers==0.6.2
+multiversx-sdk-network-providers==0.6.4
