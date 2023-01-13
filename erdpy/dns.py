@@ -91,7 +91,7 @@ def compute_dns_address_for_shard_id(shard_id) -> Address:
     deployer_pubkey = deployer_pubkey_prefix + bytes([0, shard_id])
     deployer = Account(address=Address(deployer_pubkey))
     deployer.nonce = 0
-    # Workaround: currently, in mxpy, in order to compute the address of a contract, one has to create an instance of the class "SmartContract".
+    # Workaround: In order to compute the address of a contract, one has to create an instance of the class "SmartContract".
     # This might change in the future.
     contract = SmartContract()
     contract.owner = deployer

@@ -49,7 +49,7 @@ class Transaction(ITransaction):
         self.options = 0
         self.signature = ""
 
-    # The data field is base64-encoded. mxpy only supports utf-8 "data" at this moment.
+    # The data field is base64-encoded. Here, we only support utf-8 "data" at this moment.
     def data_encoded(self) -> str:
         return self._field_encoded("data")
 
