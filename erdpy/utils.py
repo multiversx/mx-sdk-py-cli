@@ -253,7 +253,7 @@ def query_latest_release_tag(repo: str) -> str:
     if github_api_token != '':
         headers['Authorization'] = f'token {github_api_token}'
 
-    session = requests_cache.CachedSession('erdpy_requests_cache', use_cache_dir=True, cache_control=True)
+    session = requests_cache.CachedSession('mxpy_requests_cache', use_cache_dir=True, cache_control=True)
     response = session.get(url, headers=headers)
     response.raise_for_status()
 

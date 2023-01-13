@@ -57,12 +57,12 @@ testBuildContracts() {
     assertFileExists ${SANDBOX}/myfunding-rs/output/myfunding-rs.abi.json || return 1
 }
 
-testRunMandos() {
-    echo "testRunMandos"
-    ${CLI} --verbose contract test --directory="mandos" ${SANDBOX}/myadder-rs || return 1
-    ${CLI} --verbose contract test --directory="mandos" ${SANDBOX}/mybubbles-rs || return 1
-    ${CLI} --verbose contract test --directory="mandos" ${SANDBOX}/mylottery-rs || return 1
-    ${CLI} --verbose contract test --directory="mandos" ${SANDBOX}/myfunding-rs || return 1
+testRunScenarios() {
+    echo "testRunScenarios"
+    ${CLI} --verbose contract test --directory="scenarios" ${SANDBOX}/myadder-rs || return 1
+    ${CLI} --verbose contract test --directory="scenarios" ${SANDBOX}/mybubbles-rs || return 1
+    ${CLI} --verbose contract test --directory="scenarios" ${SANDBOX}/mylottery-rs || return 1
+    ${CLI} --verbose contract test --directory="scenarios" ${SANDBOX}/myfunding-rs || return 1
 }
 
 testWasmName() {
@@ -157,7 +157,7 @@ testAll() {
     testTrivialCommands || return 1
     testCreateContracts || return 1
     testBuildContracts || return 1
-    testRunMandos || return 1
+    testRunScenarios || return 1
     testCleanContracts || return 1
     testWasmName || return 1
 }

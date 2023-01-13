@@ -282,8 +282,8 @@ def check_wasm_opt_installed() -> None:
     Skipping optimization because wasm-opt is not installed.
 
     To install it run:
-        erdpy deps install nodejs
-        erdpy deps install wasm-opt
+        mxpy deps install nodejs
+        mxpy deps install wasm-opt
 
     Alternatively, pass the "--no-wasm-opt" argument in order to skip the optimization step.
         """)

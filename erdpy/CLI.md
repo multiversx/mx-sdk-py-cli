@@ -68,7 +68,7 @@ new                            Create a new Smart Contract project based on a te
 templates                      List the available Smart Contract templates.
 build                          Build a Smart Contract project using the appropriate buildchain.
 clean                          Clean a Smart Contract project.
-test                           Run Mandos tests.
+test                           Run scenarios (tests).
 report                         Print a detailed report of the smart contracts.
 deploy                         Deploy a Smart Contract.
 call                           Interact with a Smart Contract (execute function).

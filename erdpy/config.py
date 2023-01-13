@@ -7,8 +7,8 @@ import semver
 from erdpy import errors, utils, workstation
 
 ROOT_FOLDER_NAME = "elrondsdk"
-LOCAL_CONFIG_PATH = os.path.join(os.getcwd(), "erdpy.json")
-GLOBAL_CONFIG_PATH = os.path.expanduser("~/elrondsdk/erdpy.json")
+LOCAL_CONFIG_PATH = os.path.join(os.getcwd(), "mxpy.json")
+GLOBAL_CONFIG_PATH = os.path.expanduser("~/elrondsdk/mxpy.json")
 
 DEFAULT_GAS_PRICE = 1000000000
 GAS_PER_DATA_BYTE = 1500
@@ -220,7 +220,7 @@ def add_config_args(argv: List[str]) -> List[str]:
         return argv
 
     final_args = determine_final_args(argv, config_args)
-    print(f"Found extra arguments in erdpy.json. Final arguments: {final_args}")
+    print(f"Found extra arguments in mxpy.json. Final arguments: {final_args}")
     return final_args
 
 
@@ -243,7 +243,7 @@ def determine_final_args(argv: List[str], config_args: Dict[str, Any]) -> List[s
             extra_args.append(str(value))
 
     # the verbose flag is an exception since it has to go before the command and subcommand
-    # eg. erdpy --verbose contract deploy
+    # eg. mxpy --verbose contract deploy
     verbose_flag = '--verbose'
     pre_args = []
     if verbose_flag in extra_args:

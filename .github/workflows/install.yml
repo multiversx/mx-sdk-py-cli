@@ -8,7 +8,7 @@ on:
     branches: [ main, feat/* ]
   workflow_dispatch:
 
-# At the start of each workflow run, GitHub automatically creates a unique GITHUB_TOKEN secret (we will pass it below to erdpy config).
+# At the start of each workflow run, GitHub automatically creates a unique GITHUB_TOKEN secret (we will pass it below to mxpy config).
 # The token's permissions are limited to the repository that contains your workflow.
 # https://docs.github.com/en/actions/security-guides/automatic-token-authentication#about-the-github_token-secret
 # https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#permissions

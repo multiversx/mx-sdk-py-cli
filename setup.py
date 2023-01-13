@@ -1,7 +1,7 @@
 import setuptools
 
 with open("README.md", "r") as fh:
-    long_description = "https://github.com/multiversx/mx-sdk-erdpy"
+    long_description = "https://github.com/multiversx/mx-sdk-py-cli"
 
 VERSION = "4.0.0"
 

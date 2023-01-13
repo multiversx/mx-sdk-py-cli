@@ -7,7 +7,7 @@ from erdpy import cli_shared, errors, utils, workstation
 
 logger = logging.getLogger("cli.data")
 
-DATA_FILENAME = "erdpy.data-storage.json"
+DATA_FILENAME = "mxpy.data-storage.json"
 
 
 def setup_parser(subparsers: Any) -> Any:

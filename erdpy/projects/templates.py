@@ -151,7 +151,7 @@ class TemplateRust(Template):
         self._patch_source_code_tests()
 
         logger.info("Patching test files...")
-        self._patch_mandos_tests()
+        self._patch_scenarios_tests()
 
     def _patch_cargo(self):
         cargo_path = self.directory / TemplateRust.CARGO_TOML
@@ -226,8 +226,8 @@ class TemplateRust(Template):
         test_paths = utils.list_files(test_dir_path)
         self._patch_source_code_files(test_paths, ignore_missing=False)
 
-    def _patch_mandos_tests(self):
-        test_dir_path = self.directory / "mandos"
+    def _patch_scenarios_tests(self):
+        test_dir_path = self.directory / "scenarios"
         if not test_dir_path.is_dir():
             return
 
