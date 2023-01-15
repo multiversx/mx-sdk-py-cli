@@ -1,3 +1,4 @@
+import json
 import logging
 import os
 import os.path
@@ -5,7 +6,6 @@ import pathlib
 import shutil
 import subprocess
 import sys
-import json
 from argparse import ArgumentParser
 from typing import Tuple
 
@@ -237,25 +237,6 @@ def get_profile_file():
 
 def upgrade_erdpy_config():
     config_path = os.path.expanduser("~/elrondsdk/erdpy.json")
-
-    if not os.path.exists(config_path):
-        return
-
-    with open(config_path) as f:
-        data = json.load(f)
-
-    if "active" in data:
-        return
-
-    new_data = {
-        "active": "default",
-        "configurations": {
-            "default": data
-        }
-    }
-
-    with open(config_path, "w") as f:
-        json.dump(new_data, f, indent=4)
 
 
 class InstallError(Exception):
