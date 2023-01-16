@@ -92,7 +92,7 @@ def new_wallet(args: Any):
     print(f"Mnemonic: {mnemonic.get_text()}")
     secret_key = mnemonic.derive_key()
     pubkey = secret_key.generate_public_key()
-    
+
     if args.pem:
         pem_file = prepare_file(args.output_path, ".pem")
         address = Address(pubkey)
@@ -127,7 +127,7 @@ def generate_pem(args: Any):
         secret_key = mnemonic.derive_key(index)
         pubkey = secret_key.generate_public_key()
 
-    address = Address(pubkey)
+    address = Address(pubkey.hex())
     pem.write(pem_file, secret_key.buffer, pubkey.buffer, name=address.bech32())
     logger.info(f"Created PEM file [{pem_file}] for [{address.bech32()}]")
 
