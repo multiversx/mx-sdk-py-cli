@@ -1,8 +1,5 @@
-import base64
-import codecs
 import logging
 from pathlib import Path
-from time import sleep
 from typing import Any
 
 import nacl.encoding
@@ -11,9 +8,9 @@ from multiversx_sdk_cli.accounts import Account, Address
 from multiversx_sdk_cli.errors import GasLimitTooLarge
 from multiversx_sdk_cli.tests.utils import MyTestCase
 from multiversx_sdk_cli.transactions import Transaction
-from multiversx_sdk_cli.wallet import (bip39seed_to_secret_key, generate_pair,
-                          mnemonic_to_bip39seed, pem)
-from multiversx_sdk_cli.wallet.core import bytes_to_binary_string, generate_mnemonic_from_entropy, split_to_fixed_size_slices
+from multiversx_sdk_cli.wallet import pem
+from multiversx_sdk_wallet.mnemonic import Mnemonic
+from multiversx_sdk_wallet.core import mnemonic_to_bip39seed, bip39seed_to_secret_key
 
 logging.basicConfig(level=logging.INFO)
 
@@ -145,13 +142,16 @@ class WalletTestCase(MyTestCase):
         self.assertRaises(GasLimitTooLarge, lambda: transaction.sign(self.alice))
 
     def test_generate_pair_pem(self):
-        secret_key, pubkey = generate_pair()
+        mnemonic = Mnemonic.generate()
+        secret_key = mnemonic.derive_key()
+        pubkey = secret_key.generate_public_key()
+
         pem_file = Path(self.testdata_out, "foo.pem")
-        pem.write(pem_file, secret_key, pubkey)
+        pem.write(pem_file, secret_key.buffer, pubkey.buffer)
         parsed_secret_key, parsed_pubkey = pem.parse(pem_file)
 
-        self.assertEqual(secret_key, parsed_secret_key)
-        self.assertEqual(pubkey, parsed_pubkey)
+        self.assertEqual(secret_key.buffer, parsed_secret_key)
+        self.assertEqual(pubkey.buffer, parsed_pubkey)
 
     def test_derive_secret_key(self):
         # password = "Password1!"
@@ -187,25 +187,3 @@ class WalletTestCase(MyTestCase):
         self.assertEqual(mnemonic_seed, actual_mnemonic_seed.hex())
         self.assertEqual(secret_key, actual_secret_key.hex())
         self.assertEqual(public_key, actual_public_key.hex())
-
-    def test_bytes_to_binary_string(self):
-        self.assertEqual(bytes_to_binary_string(b"\xA7"), '10100111')
-        self.assertEqual(bytes_to_binary_string(b"\x0F"), '00001111')
-        self.assertEqual(bytes_to_binary_string(b"\x12\x34\x56\x78\x9a\xbc\xde\xff"), '0001001000110100010101100111100010011010101111001101111011111111')
-
-    def test_split_to_fixed_size_slices(self):
-        self.assertEqual(split_to_fixed_size_slices('1234567890abcdef', 4), ['1234', '5678', '90ab', 'cdef'])
-
-    def test_generate_mnemonic_from_entropy(self):
-        self.assertEqual(
-            generate_mnemonic_from_entropy(bytes.fromhex('e4708a379dd31b94aff5e64b17fb10d43956a5ae8764602d8e1f2e4ebc4b9296')),
-            'tongue lounge mistake desert coyote ski save rubber enrich save service position nice fan ring uncle gasp hockey march frame type chair engage stove'
-        )
-        self.assertEqual(
-            generate_mnemonic_from_entropy(bytes.fromhex('a2c450adc68a627bfe9a822361433dee844b344a8d8502ca602ff0f006b1feab')),
-            'people card clock minimum plate digital whip expect casino anxiety sorry tackle dwarf olive clay radar actress fantasy armor tiger about flight wide ladder'
-        )
-        self.assertEqual(
-            generate_mnemonic_from_entropy(bytes.fromhex('8b1897060e4b24bb7c07491159c6c234238be0412973af4e39effc57756cb490')),
-            'mention seven screen broken rather frozen useless truck bacon soda rack hair december usual again common quantum impact know weather jar rent spoil angry'
-        )
