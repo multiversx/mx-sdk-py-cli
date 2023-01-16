@@ -1,9 +1,11 @@
-from pathlib import Path
 import shutil
 import time
 from os import path
+from pathlib import Path
 
 from multiversx_sdk_cli import downloader, utils, workstation
+from multiversx_sdk_cli.projects.constants import PROJECT_CONFIG_FILENAME
+from multiversx_sdk_cli.projects.migrations import migrate_project_templates
 
 
 class TemplatesRepository:
@@ -15,7 +17,7 @@ class TemplatesRepository:
 
     def download(self):
         self._download_if_old()
-        
+
         templates_folder = self.get_folder()
         try:
             shutil.rmtree(templates_folder)
@@ -24,6 +26,7 @@ class TemplatesRepository:
 
         archive = self._get_archive_path()
         utils.unzip(archive, templates_folder)
+        migrate_project_templates(templates_folder)
 
     def _download_if_old(self):
         CACHE_DURATION = 30
@@ -62,14 +65,13 @@ class TemplatesRepository:
         project_config_file = self.get_metadata_file(subfolder)
         return project_config_file.is_file()
 
-    def get_metadata_file(self, template_folder: str) -> Path:
-        return self.get_payload_folder() / template_folder / "elrond.json"
+    def get_metadata_file(self, template: str) -> Path:
+        return self.get_payload_folder() / template / PROJECT_CONFIG_FILENAME
 
     def get_language(self, template: str):
         metadata_file = self.get_metadata_file(template)
         metadata = utils.read_json_file(metadata_file)
         return metadata.get("language", "unknown")
-
 
     def get_payload_folder(self) -> Path:
         return self.get_folder() / self.relative_path

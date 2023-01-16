@@ -2,7 +2,6 @@ import logging
 import subprocess
 from os import path
 from pathlib import Path
-
 from typing import List
 
 from multiversx_sdk_cli import dependencies, errors, myprocess, utils
@@ -15,7 +14,6 @@ class ProjectClang(Project):
 
     def __init__(self, directory: Path):
         super().__init__(directory)
-        self.ensure_config_file()
 
     def perform_build(self):
         self.config = self.load_config()
@@ -109,7 +107,7 @@ class ProjectClang(Project):
                 ll_file.unlink()
             except FileNotFoundError:
                 pass
-        
+
         paths = rename_wasm_files([output_wasm_file], self.options.get("wasm-name"))
         return paths
 
