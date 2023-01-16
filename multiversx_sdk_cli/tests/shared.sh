@@ -4,10 +4,10 @@ function absolute_path() {
   (cd "$DIR" && echo "$(pwd -P)")
 }
 
-export PYTHONPATH=$(absolute_path ../../)
+export PYTHONPATH=$PYTHONPATH::$(absolute_path ../../)
 echo "PYTHONPATH = ${PYTHONPATH}"
 
-CLI="python3.8 -m multiversx_sdk_cli.cli"
+CLI="python3 -m multiversx_sdk_cli.cli"
 SANDBOX=./testdata-out/SANDBOX
 USERS=~/elrondsdk/testwallets/latest/users
 VALIDATORS=~/elrondsdk/testwallets/latest/validators

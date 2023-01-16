@@ -114,16 +114,16 @@ def prepare_file(output_path: str, suffix: str) -> Path:
 
 def generate_pem(args: Any):
     pem_file = Path(args.pem)
-    mnemonic = args.mnemonic
+    ask_mnemonic = args.mnemonic
     index = args.index
 
-    mnemonic = Mnemonic.generate()
-    secret_key = mnemonic.derive_key(index)
-    pubkey = secret_key.generate_public_key()
-
-    if mnemonic:
+    if ask_mnemonic:
         mnemonic = input("Enter mnemonic:\n")
         mnemonic = Mnemonic(mnemonic)
+        secret_key = mnemonic.derive_key(index)
+        pubkey = secret_key.generate_public_key()
+    else:
+        mnemonic = Mnemonic.generate()
         secret_key = mnemonic.derive_key(index)
         pubkey = secret_key.generate_public_key()
 
