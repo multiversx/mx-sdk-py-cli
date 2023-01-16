@@ -108,6 +108,9 @@ def migrate_old_elrondsdk(sdk_path: Path) -> None:
     if old_erdpy_activate.exists():
         old_erdpy_activate.unlink()
 
+    # OLD_LOCAL_CONFIG_PATH = Path("erdpy.json").resolve()
+    # OLDGLOBAL_CONFIG_PATH = SDK_PATH / "erdpy.json"
+
 
 def create_venv(sdk_path: Path):
     require_venv()
@@ -133,7 +136,7 @@ def require_venv():
     except ModuleNotFoundError:
         if operating_system == "linux":
             python_venv = f"python{sys.version_info.major}.{sys.version_info.minor}-venv"
-            raise InstallError(f'Packages [venv] or [ensurepip] not found. Please run "sudo apt install {python_venv}" and then run erdpy-up again.')
+            raise InstallError(f'Packages [venv] or [ensurepip] not found. Please run "sudo apt install {python_venv}" and then run mxpy-up again.')
         else:
             raise InstallError("Packages [venv] or [ensurepip] not found, please install them first. See https://docs.python.org/3/tutorial/venv.html.")
 
@@ -249,3 +252,6 @@ if __name__ == "__main__":
 For more information go to https://docs.multiversx.com.
 For support, please contact us at https://t.me/ElrondDevelopers.
 """)
+
+
+# ISSUES WITH already exported paths in .profile...
