@@ -9,8 +9,8 @@ echo "PYTHONPATH = ${PYTHONPATH}"
 
 CLI="python3.8 -m multiversx_sdk_cli.cli"
 SANDBOX=./testdata-out/SANDBOX
-USERS=~/elrondsdk/testwallets/latest/users
-VALIDATORS=~/elrondsdk/testwallets/latest/validators
+USERS=~/multiversx-sdk/testwallets/latest/users
+VALIDATORS=~/multiversx-sdk/testwallets/latest/validators
 DENOMINATION="000000000000000000"
 PROXY="http://localhost:7950"
 CHAIN_ID="local-testnet"

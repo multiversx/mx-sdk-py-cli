@@ -11,6 +11,7 @@ from typing import List, Tuple
 logger = logging.getLogger("installer")
 
 MIN_REQUIRED_PYTHON_VERSION = (3, 8, 0)
+sdk_path = Path("~/multiversx-sdk").expanduser().resolve()
 
 
 def main():
@@ -22,7 +23,6 @@ def main():
     parser.set_defaults(modify_path=True)
     args = parser.parse_args()
 
-    sdk_path = Path("~/multiversx-sdk").expanduser().resolve()
     modify_path = args.modify_path
     exact_version = args.exact_version
     from_branch = args.from_branch
@@ -46,22 +46,22 @@ def main():
     if operating_system != "linux" and operating_system != "osx":
         raise InstallError("Your operating system is not supported yet.")
 
-    migrate_old_elrondsdk(sdk_path)
+    migrate_old_elrondsdk()
 
     # In case of a fresh install:
     sdk_path.mkdir(parents=True, exist_ok=True)
 
-    create_venv(sdk_path)
-    install_mxpy(sdk_path, exact_version, from_branch)
+    create_venv()
+    install_mxpy(exact_version, from_branch)
     if modify_path:
-        add_sdk_to_path(sdk_path)
+        add_sdk_to_path()
         logger.info("""
 ###############################################################################
 Upon restarting the user session, [$ mxpy] command should be available in your shell.
 ###############################################################################
 """)
 
-    run_post_install_checks(sdk_path)
+    run_post_install_checks()
 
 
 def format_version(version: Tuple[int, int, int]) -> str:
@@ -87,7 +87,7 @@ def get_operating_system():
     return operating_system
 
 
-def migrate_old_elrondsdk(sdk_path: Path) -> None:
+def migrate_old_elrondsdk() -> None:
     old_sdk_path = Path("~/elrondsdk").expanduser().resolve()
     if not old_sdk_path.exists():
         return
@@ -117,9 +117,9 @@ def migrate_old_elrondsdk(sdk_path: Path) -> None:
         logger.info(f"Renamed {old_config_path} to {new_config_path}.")
 
 
-def create_venv(sdk_path: Path):
-    require_venv()
-    venv_folder = get_mxpy_venv_path(sdk_path)
+def create_venv():
+    require_python_venv_tools()
+    venv_folder = get_mxpy_venv_path()
     venv_folder.mkdir(parents=True, exist_ok=True)
 
     logger.info(f"Creating virtual environment in: {venv_folder}.")
@@ -131,7 +131,7 @@ def create_venv(sdk_path: Path):
     logger.info(f"Virtual environment has been created in: {venv_folder}.")
 
 
-def require_venv():
+def require_python_venv_tools():
     operating_system = get_operating_system()
 
     try:
@@ -146,11 +146,11 @@ def require_venv():
             raise InstallError("Packages [venv] or [ensurepip] not found, please install them first. See https://docs.python.org/3/tutorial/venv.html.")
 
 
-def get_mxpy_venv_path(sdk_path: Path):
+def get_mxpy_venv_path():
     return sdk_path / "mxpy-venv"
 
 
-def install_mxpy(sdk_path: Path, exact_version: str, from_branch: str):
+def install_mxpy(exact_version: str, from_branch: str):
     logger.info("Installing mxpy in virtual environment...")
 
     if from_branch:
@@ -158,7 +158,7 @@ def install_mxpy(sdk_path: Path, exact_version: str, from_branch: str):
     else:
         package_to_install = "multiversx_sdk_cli" if not exact_version else f"multiversx_sdk_cli=={exact_version}"
 
-    venv_path = get_mxpy_venv_path(sdk_path)
+    venv_path = get_mxpy_venv_path()
 
     return_code = run_in_venv(["python3", "-m", "pip", "install", "--upgrade", "pip"], venv_path)
     if return_code != 0:
@@ -175,7 +175,7 @@ def install_mxpy(sdk_path: Path, exact_version: str, from_branch: str):
     link_path = os.path.join(sdk_path, "mxpy")
     if os.path.exists(link_path):
         os.remove(link_path)
-    os.symlink(str(get_mxpy_venv_path(sdk_path) / "bin" / "mxpy"), link_path)
+    os.symlink(str(get_mxpy_venv_path() / "bin" / "mxpy"), link_path)
     logger.info("You have successfully installed mxpy.")
 
 
@@ -191,7 +191,7 @@ def run_in_venv(args: List[str], venv_path: Path):
     return process.wait()
 
 
-def add_sdk_to_path(sdk_path: Path):
+def add_sdk_to_path():
     old_export_directive = f'export PATH="{Path("~/elrondsdk").expanduser()}:$PATH"\t# elrond-sdk'
     new_export_directive = f'export PATH="${{HOME}}/multiversx-sdk:$PATH"\t# multiversx-sdk'
 
@@ -274,5 +274,5 @@ if __name__ == "__main__":
     logger.info("""
 
 For more information go to https://docs.multiversx.com.
-For support, please contact us at https://t.me/ElrondDevelopers.
+For support, please contact us at https://t.me/MultiversXDevelopers.
 """)
