@@ -6,23 +6,23 @@ with open("README.md", "r") as fh:
 VERSION = "4.0.0"
 
 try:
-    with open('./erdpy/_version.py', 'wt') as versionfile:
+    with open('./multiversx_sdk_cli/_version.py', 'wt') as versionfile:
         versionfile.write(f'__version__ = "{VERSION}"\n')
 except FileNotFoundError:
     pass
 
 # See https://packaging.python.org/tutorials/packaging-projects/
 setuptools.setup(
-    name="erdpy",
+    name="mxpy",
     version=VERSION,
     description="MultiversX Smart Contracts Tools",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    url="https://github.com/multiversx/mx-sdk-erdpy",
+    url="https://github.com/multiversx/mx-sdk-py-cli",
     author="MultiversX",
     license="GPL",
     packages=setuptools.find_packages(
-        include=["erdpy*"], exclude=["examples*"]),
+        include=["multiversx_sdk_cli*"], exclude=["examples*"]),
     include_package_data=True,
     setup_requires=["wheel"],
     install_requires=[
@@ -36,8 +36,8 @@ setuptools.setup(
         "ledgercomm[hid]",
         "semver",
         "requests-cache",
-        "mx-sdk-build-contract-rs==4.0.0",
-        "mx-sdk-erdpy-network-providers==0.6.2"
+        "multiversx-sdk-rust-contract-builder==4.0.2",
+        "multiversx-sdk-network-providers==0.6.4"
     ],
     zip_safe=False,
     keywords=["MultiversX"],
@@ -51,7 +51,7 @@ setuptools.setup(
     ],
     entry_points={
         "console_scripts": [
-            "erdpy=erdpy.cli:main",
+            "mxpy=multiversx_sdk_cli.cli:main",
         ],
     },
     python_requires=">=3.8"

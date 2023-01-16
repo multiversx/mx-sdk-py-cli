@@ -27,8 +27,8 @@ def main():
     parser.add_argument("--modify-path", dest="modify_path", action="store_true", help="whether to modify $PATH (in profile file)")
     parser.add_argument("--no-modify-path", dest="modify_path", action="store_false", help="whether to modify $PATH (in profile file)")
     parser.add_argument("--sdk-path", default=get_sdk_path_default(), help="where to install mx-sdk")
-    parser.add_argument("--exact-version", help="the exact version of erdpy to install")
-    parser.add_argument("--from-branch", help="use a branch of multiversx/mx-sdk-erdpy")
+    parser.add_argument("--exact-version", help="the exact version of mxpy to install")
+    parser.add_argument("--from-branch", help="use a branch of multiversx/mx-sdk-py-cli")
     parser.set_defaults(modify_path=True)
     args = parser.parse_args()
 
@@ -44,7 +44,7 @@ def main():
 
     logger.info("Checking user.")
     if os.getuid() == 0:
-        raise InstallError("You should not install erdpy as root.")
+        raise InstallError("You should not install mxpy as root.")
 
     logger.info("Checking Python version.")
     logger.info(f"Python version: {format_version(python_version)}")
@@ -64,8 +64,8 @@ def main():
         add_sdk_to_path()
         logger.info("""
 ###############################################################################
-Upon restarting the user session, [$ erdpy] command should be available in your shell.
-Furthermore, after restarting the user session, you can use [$ source erdpy-activate] to activate the Python virtual environment containing erdpy.
+Upon restarting the user session, [$ mxpy] command should be available in your shell.
+Furthermore, after restarting the user session, you can use [$ source mxpy-activate] to activate the Python virtual environment containing mxpy.
 ###############################################################################
 """)
 
@@ -151,9 +151,9 @@ def ensure_folder(folder):
 
 
 def install_erdpy():
-    logger.info("Installing erdpy in virtual environment...")
+    logger.info("Installing mxpy in virtual environment...")
     if from_branch:
-        erdpy_to_install = f"https://github.com/multiversx/mx-sdk-erdpy/archive/refs/heads/{from_branch}.zip"
+        erdpy_to_install = f"https://github.com/multiversx/mx-sdk-py-cli/archive/refs/heads/{from_branch}.zip"
     else:
         erdpy_to_install = "erdpy" if not exact_version else f"erdpy=={exact_version}"
 
@@ -163,19 +163,19 @@ def install_erdpy():
     return_code = run_in_venv(["pip3", "install", "--no-cache-dir", erdpy_to_install])
     if return_code != 0:
         raise InstallError("Could not install erdpy.")
-    return_code = run_in_venv(["erdpy", "--version"])
+    return_code = run_in_venv(["mxpy", "--version"])
     if return_code != 0:
-        raise InstallError("Could not install erdpy.")
+        raise InstallError("Could not install mxpy.")
 
     logger.info("Checking and upgrading configuration file")
     upgrade_erdpy_config()
 
     # Create symlink to "bin/erdpy"
-    link_path = os.path.join(sdk_path, "erdpy")
+    link_path = os.path.join(sdk_path, "mxpy")
     if os.path.exists(link_path):
         os.remove(link_path)
-    os.symlink(os.path.join(get_erdpy_path(), "bin", "erdpy"), link_path)
-    logger.info("You have successfully installed erdpy.")
+    os.symlink(os.path.join(get_erdpy_path(), "bin", "mxpy"), link_path)
+    logger.info("You have successfully installed mxpy.")
 
 
 def run_in_venv(args):

@@ -1,6 +1,6 @@
 {
     "include": [
-        "erdpy"
+        "multiversx_sdk_cli"
     ],
     "exclude": [
         "**/__pycache__"
