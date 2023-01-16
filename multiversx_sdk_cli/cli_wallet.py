@@ -117,13 +117,13 @@ def generate_pem(args: Any):
     mnemonic = args.mnemonic
     index = args.index
 
+    mnemonic = Mnemonic.generate()
+    secret_key = mnemonic.derive_key(index)
+    pubkey = secret_key.generate_public_key()
+
     if mnemonic:
         mnemonic = input("Enter mnemonic:\n")
         mnemonic = Mnemonic(mnemonic)
-        secret_key = mnemonic.derive_key(index)
-        pubkey = secret_key.generate_public_key()
-    else:
-        mnemonic = Mnemonic.generate()
         secret_key = mnemonic.derive_key(index)
         pubkey = secret_key.generate_public_key()
 
