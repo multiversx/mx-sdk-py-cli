@@ -143,18 +143,18 @@ def get_mxpy_venv_path(sdk_path: Path):
 def install_mxpy(sdk_path: Path, exact_version: str, from_branch: str):
     logger.info("Installing mxpy in virtual environment...")
     if from_branch:
-        erdpy_to_install = f"https://github.com/multiversx/mx-sdk-py-cli/archive/refs/heads/{from_branch}.zip"
+        package_to_install = f"https://github.com/multiversx/mx-sdk-py-cli/archive/refs/heads/{from_branch}.zip"
     else:
-        erdpy_to_install = "erdpy" if not exact_version else f"erdpy=={exact_version}"
+        package_to_install = "multiversx_sdk_cli" if not exact_version else f"multiversx_sdk_cli=={exact_version}"
 
     venv_path = get_mxpy_venv_path(sdk_path)
 
     return_code = run_in_venv(["python3", "-m", "pip", "install", "--upgrade", "pip"], venv_path)
     if return_code != 0:
         raise InstallError("Could not upgrade pip.")
-    return_code = run_in_venv(["pip3", "install", "--no-cache-dir", erdpy_to_install], venv_path)
+    return_code = run_in_venv(["pip3", "install", "--no-cache-dir", package_to_install], venv_path)
     if return_code != 0:
-        raise InstallError("Could not install erdpy.")
+        raise InstallError("Could not install mxpy.")
     return_code = run_in_venv(["mxpy", "--version"], venv_path)
     if return_code != 0:
         raise InstallError("Could not install mxpy.")

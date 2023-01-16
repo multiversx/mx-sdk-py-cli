@@ -24,7 +24,7 @@ jobs:
       - name: Install erdpy (old)
         run: |
           wget -O erdpy-up.py https://raw.githubusercontent.com/multiversx/mx-sdk-py-cli/v4.0.0/erdpy-up.py
-          python3 erdpy-up.py --from-branch v4.0.0
+          python3 erdpy-up.py --exact-version 4.0.0
 
           source /home/runner/.profile
           erpdy contract new --template=adder adder
