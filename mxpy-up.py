@@ -202,8 +202,7 @@ def add_sdk_to_path():
 
     if old_export_directive in profile_info_content:
         # We don't perform the removal automatically (a bit risky)
-        logger.warn(f"Please manually remove the following entry from the shell profile ({profile_file}): {old_export_directive}.")
-        return
+        logger.warning(f"Please manually remove the following entry from the shell profile ({profile_file}): {old_export_directive}.")
 
     if new_export_directive in profile_info_content:
         # Note: in some (rare) cases, here we'll have false positives (e.g. if the export directive is commented out).
