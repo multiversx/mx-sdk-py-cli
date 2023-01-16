@@ -1,38 +1,29 @@
-import json
 import logging
 import os
 import os.path
-import pathlib
 import shutil
 import subprocess
 import sys
 from argparse import ArgumentParser
-from typing import Tuple
+from pathlib import Path
+from typing import List, Tuple
 
 logger = logging.getLogger("installer")
 
 MIN_REQUIRED_PYTHON_VERSION = (3, 8, 0)
 
-sdk_path = None
-exact_version = None
-from_branch = None
-
 
 def main():
-    global sdk_path
-    global exact_version
-    global from_branch
-
     parser = ArgumentParser()
     parser.add_argument("--modify-path", dest="modify_path", action="store_true", help="whether to modify $PATH (in profile file)")
     parser.add_argument("--no-modify-path", dest="modify_path", action="store_false", help="whether to modify $PATH (in profile file)")
-    parser.add_argument("--sdk-path", default=get_sdk_path_default(), help="where to install mx-sdk")
+    parser.add_argument("--sdk-path", default="~/multiversx-sdk", help="where to install multiversx-sdk")
     parser.add_argument("--exact-version", help="the exact version of mxpy to install")
     parser.add_argument("--from-branch", help="use a branch of multiversx/mx-sdk-py-cli")
     parser.set_defaults(modify_path=True)
     args = parser.parse_args()
 
-    sdk_path = os.path.expanduser(args.sdk_path)
+    sdk_path = Path(args.sdk_path).expanduser().resolve()
     modify_path = args.modify_path
     exact_version = args.exact_version
     from_branch = args.from_branch
@@ -56,18 +47,18 @@ def main():
     if operating_system != "linux" and operating_system != "osx":
         raise InstallError("Your operating system is not supported yet.")
 
-    # TODO: will come in a future version
-    # migrate_installation(sdk_path)
-    create_venv()
-    install_erdpy()
+    migrate_old_elrondsdk(sdk_path)
+    create_venv(sdk_path)
+    install_mxpy(sdk_path, exact_version, from_branch)
     if modify_path:
-        add_sdk_to_path()
+        add_sdk_to_path(sdk_path)
         logger.info("""
 ###############################################################################
 Upon restarting the user session, [$ mxpy] command should be available in your shell.
-Furthermore, after restarting the user session, you can use [$ source mxpy-activate] to activate the Python virtual environment containing mxpy.
 ###############################################################################
 """)
+
+    run_post_install_checks(sdk_path)
 
 
 def format_version(version: Tuple[int, int, int]) -> str:
@@ -93,7 +84,7 @@ def get_operating_system():
     return operating_system
 
 
-def migrate_installation(sdk_path: str) -> None:
+def migrate_old_elrondsdk(sdk_path: Path) -> None:
     old_folder = os.path.expanduser("~/elrondsdk")
     if os.path.isdir(old_folder):
         answer = input(f"Older installation folder {old_folder} has to be renamed. Allow? (y/n)")
@@ -102,24 +93,32 @@ def migrate_installation(sdk_path: str) -> None:
         shutil.move(old_folder, sdk_path)
         logger.info("Renamed folder.")
 
+    # Remove erdpy-venv (since mxpy-venv is used instead).
+    old_venv = sdk_path / "erdpy-venv"
+    if old_venv.exists():
+        shutil.rmtree(old_venv)
+        logger.info("Removed old virtual environment.")
 
-def create_venv():
+    # Remove "erdpy-activate", since it is not recommended anymore when writing Python scripts.
+    # The multiversx-sdk-* libraries should be used instead for writing Python scripts and modules that interact with the Network
+    # (according to the official cookbook).
+    old_erdpy_activate = sdk_path / "erdpy-activate"
+    if old_erdpy_activate.exists():
+        old_erdpy_activate.unlink()
+
+
+def create_venv(sdk_path: Path):
     require_venv()
-    folder = get_erdpy_path()
-    ensure_folder(folder)
+    venv_folder = get_mxpy_venv_path(sdk_path)
+    venv_folder.mkdir(parents=True, exist_ok=True)
 
-    logger.info(f"Creating virtual environment in: {folder}.")
+    logger.info(f"Creating virtual environment in: {venv_folder}.")
     import venv
     builder = venv.EnvBuilder(with_pip=True)
-    builder.clear_directory(folder)
-    builder.create(folder)
+    builder.clear_directory(venv_folder)
+    builder.create(venv_folder)
 
-    # Create symlink to "bin/activate"
-    link_path = os.path.join(sdk_path, "erdpy-activate")
-    if os.path.exists(link_path):
-        os.remove(link_path)
-    os.symlink(os.path.join(folder, "bin", "activate"), link_path)
-    logger.info(f"Virtual environment has been created in: {folder}.")
+    logger.info(f"Virtual environment has been created in: {venv_folder}.")
 
 
 def require_venv():
@@ -137,68 +136,60 @@ def require_venv():
             raise InstallError("Packages [venv] or [ensurepip] not found, please install them first. See https://docs.python.org/3/tutorial/venv.html.")
 
 
-def get_erdpy_path():
-    return os.path.join(sdk_path, "erdpy-venv")
+def get_mxpy_venv_path(sdk_path: Path):
+    return sdk_path / "mxpy-venv"
 
 
-def get_sdk_path_default():
-    # TODO: will come in a future version
-    return os.path.expanduser("~/elrondsdk")
-
-
-def ensure_folder(folder):
-    pathlib.Path(folder).mkdir(parents=True, exist_ok=True)
-
-
-def install_erdpy():
+def install_mxpy(sdk_path: Path, exact_version: str, from_branch: str):
     logger.info("Installing mxpy in virtual environment...")
     if from_branch:
         erdpy_to_install = f"https://github.com/multiversx/mx-sdk-py-cli/archive/refs/heads/{from_branch}.zip"
     else:
         erdpy_to_install = "erdpy" if not exact_version else f"erdpy=={exact_version}"
 
-    return_code = run_in_venv(["python3", "-m", "pip", "install", "--upgrade", "pip"])
+    venv_path = get_mxpy_venv_path(sdk_path)
+
+    return_code = run_in_venv(["python3", "-m", "pip", "install", "--upgrade", "pip"], venv_path)
     if return_code != 0:
         raise InstallError("Could not upgrade pip.")
-    return_code = run_in_venv(["pip3", "install", "--no-cache-dir", erdpy_to_install])
+    return_code = run_in_venv(["pip3", "install", "--no-cache-dir", erdpy_to_install], venv_path)
     if return_code != 0:
         raise InstallError("Could not install erdpy.")
-    return_code = run_in_venv(["mxpy", "--version"])
+    return_code = run_in_venv(["mxpy", "--version"], venv_path)
     if return_code != 0:
         raise InstallError("Could not install mxpy.")
 
     logger.info("Checking and upgrading configuration file")
-    upgrade_erdpy_config()
 
-    # Create symlink to "bin/erdpy"
+    # Create symlink to "bin/mxpy"
     link_path = os.path.join(sdk_path, "mxpy")
     if os.path.exists(link_path):
         os.remove(link_path)
-    os.symlink(os.path.join(get_erdpy_path(), "bin", "mxpy"), link_path)
+    os.symlink(str(get_mxpy_venv_path(sdk_path) / "bin" / "mxpy"), link_path)
     logger.info("You have successfully installed mxpy.")
 
 
-def run_in_venv(args):
+def run_in_venv(args: List[str], venv_path: Path):
     if "PYTHONHOME" in os.environ:
         del os.environ["PYTHONHOME"]
 
     process = subprocess.Popen(args, env={
-        "PATH": os.path.join(get_erdpy_path(), "bin") + ":" + os.environ["PATH"],
-        "VIRTUAL_ENV": get_erdpy_path()
+        "PATH": str(venv_path / "bin") + ":" + os.environ["PATH"],
+        "VIRTUAL_ENV": str(venv_path)
     })
 
     return process.wait()
 
 
-def add_sdk_to_path():
+def add_sdk_to_path(sdk_path: Path):
     logger.info("Checking PATH variable.")
     PATH = os.environ["PATH"]
-    if sdk_path in PATH:
-        logger.info(f"mx-sdk path ({sdk_path}) already in $PATH variable.")
+    if str(sdk_path) in PATH:
+        logger.info(f"multiversx-sdk path ({sdk_path}) already in $PATH variable.")
         return
 
     profile_file = get_profile_file()
-    logger.info(f"Adding mx-sdk path [{sdk_path}] to $PATH variable.")
+    logger.info(f"Adding multiversx-sdk path [{sdk_path}] to $PATH variable.")
     logger.info(f"[{profile_file}] will be modified.")
 
     with open(profile_file, "a") as file:
@@ -235,16 +226,13 @@ def get_profile_file():
     return os.path.expanduser(file)
 
 
-def upgrade_erdpy_config():
-    config_path = os.path.expanduser("~/elrondsdk/erdpy.json")
+def run_post_install_checks(sdk_path: Path):
+    pass
 
 
 class InstallError(Exception):
-    inner = None
-
-    def __init__(self, message, inner=None):
+    def __init__(self, message: str):
         super().__init__(message)
-        self.inner = inner
 
 
 if __name__ == "__main__":
