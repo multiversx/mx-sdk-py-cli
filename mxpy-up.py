@@ -108,8 +108,13 @@ def migrate_old_elrondsdk(sdk_path: Path) -> None:
     if old_erdpy_activate.exists():
         old_erdpy_activate.unlink()
 
-    # OLD_LOCAL_CONFIG_PATH = Path("erdpy.json").resolve()
-    # OLDGLOBAL_CONFIG_PATH = SDK_PATH / "erdpy.json"
+    # Rename the global config file.
+    # We won't handle local config files, they have to be migrated manually.
+    old_config_path = sdk_path / "erdpy.json"
+    new_config_path = sdk_path / "mxpy.json"
+    if old_config_path.exists():
+        old_config_path.rename(new_config_path)
+        logger.info(f"Renamed {old_config_path} to {new_config_path}.")
 
 
 def create_venv(sdk_path: Path):
@@ -187,18 +192,29 @@ def run_in_venv(args: List[str], venv_path: Path):
 
 
 def add_sdk_to_path(sdk_path: Path):
-    logger.info("Checking PATH variable.")
-    PATH = os.environ["PATH"]
-    if str(sdk_path) in PATH:
-        logger.info(f"multiversx-sdk path ({sdk_path}) already in $PATH variable.")
-        return
+    old_export_directive = f'export PATH="{Path("~/elrondsdk").expanduser()}:$PATH"\t# elrond-sdk'
+    new_export_directive = f'export PATH="${{HOME}}/multiversx-sdk:$PATH"\t# multiversx-sdk'
 
     profile_file = get_profile_file()
-    logger.info(f"Adding multiversx-sdk path [{sdk_path}] to $PATH variable.")
-    logger.info(f"[{profile_file}] will be modified.")
+    profile_info_content = profile_file.read_text()
+
+    logger.info(f"Using shell profile: {profile_file}")
+
+    if old_export_directive in profile_info_content:
+        # We don't perform the removal automatically (a bit risky)
+        logger.warn(f"Please manually remove the following entry from the shell profile ({profile_file}): {old_export_directive}.")
+        return
+
+    if new_export_directive in profile_info_content:
+        # Note: in some (rare) cases, here we'll have false positives (e.g. if the export directive is commented out).
+        logger.info(f"multiversx-sdk path ({sdk_path}) already configured in shell profile.")
+        return
+
+    logger.info(f"Configuring multiversx-sdk path [{sdk_path}] in shell profile...")
+    logger.info(f"[{profile_file}] is being modified...")
 
     with open(profile_file, "a") as file:
-        file.write(f'\nexport PATH="{sdk_path}:$PATH"\t# elrond-sdk\n')
+        file.write(f'\n{new_export_directive}\n')
 
     logger.info(f"""
 ###############################################################################
@@ -228,11 +244,19 @@ def get_profile_file():
         else:
             file = "~/.bash_profile"
 
-    return os.path.expanduser(file)
+    return Path(file).expanduser().resolve()
 
 
-def run_post_install_checks(sdk_path: Path):
-    pass
+def run_post_install_checks():
+    multiversx_sdk_path = Path("~/multiversx-sdk").expanduser()
+    elrond_sdk_path = Path("~/elrondsdk").expanduser()
+
+    logger.info("Running post-install checks...")
+    print("~/multiversx-sdk exists", "✓" if multiversx_sdk_path.exists() else "✗")
+    print("~/elrondsdk is removed or missing", "✓" if not elrond_sdk_path.exists() else "✗")
+    print("~/multiversx-sdk/mxpy link created", "✓" if (multiversx_sdk_path / "mxpy").exists() else "✗")
+    print("~/multiversx-sdk/mxpy.json exists", "✓" if (multiversx_sdk_path / "mxpy.json").exists() else "✗")
+    print("~/multiversx-sdk/erdpy.json is renamed or missing", "✓" if not (multiversx_sdk_path / "erdpy.json").exists() else "✗")
 
 
 class InstallError(Exception):
@@ -252,6 +276,3 @@ if __name__ == "__main__":
 For more information go to https://docs.multiversx.com.
 For support, please contact us at https://t.me/ElrondDevelopers.
 """)
-
-
-# ISSUES WITH already exported paths in .profile...
