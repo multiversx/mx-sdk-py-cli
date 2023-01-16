@@ -48,6 +48,10 @@ def main():
         raise InstallError("Your operating system is not supported yet.")
 
     migrate_old_elrondsdk(sdk_path)
+
+    # In case of a fresh install:
+    sdk_path.mkdir(parents=True, exist_ok=True)
+
     create_venv(sdk_path)
     install_mxpy(sdk_path, exact_version, from_branch)
     if modify_path:
@@ -85,13 +89,12 @@ def get_operating_system():
 
 
 def migrate_old_elrondsdk(sdk_path: Path) -> None:
-    old_folder = os.path.expanduser("~/elrondsdk")
-    if os.path.isdir(old_folder):
-        answer = input(f"Older installation folder {old_folder} has to be renamed. Allow? (y/n)")
-        if answer.lower() not in ["y", "yes"]:
-            raise InstallError("Installation will not continue.")
-        shutil.move(old_folder, sdk_path)
-        logger.info("Renamed folder.")
+    old_sdk_path = Path("~/elrondsdk").expanduser().resolve()
+    if not old_sdk_path.exists():
+        return
+
+    old_sdk_path.rename(sdk_path)
+    logger.info(f"Renamed {old_sdk_path} to {sdk_path}.")
 
     # Remove erdpy-venv (since mxpy-venv is used instead).
     old_venv = sdk_path / "erdpy-venv"
