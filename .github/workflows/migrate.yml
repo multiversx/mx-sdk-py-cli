@@ -21,6 +21,11 @@ jobs:
         uses: actions/setup-python@v2
         with:
           python-version: ${{ matrix.python-version }}
+      - name: Install libtinfo5
+        if: ${{ matrix.os != 'macos-latest' }}
+        run: |
+          sudo apt update
+          sudo apt install -y libtinfo5
       - name: Install erdpy (old)
         run: |
           wget -O erdpy-up.py https://raw.githubusercontent.com/multiversx/mx-sdk-py-cli/v4.0.0/erdpy-up.py
