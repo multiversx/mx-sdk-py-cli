@@ -17,13 +17,12 @@ def main():
     parser = ArgumentParser()
     parser.add_argument("--modify-path", dest="modify_path", action="store_true", help="whether to modify $PATH (in profile file)")
     parser.add_argument("--no-modify-path", dest="modify_path", action="store_false", help="whether to modify $PATH (in profile file)")
-    parser.add_argument("--sdk-path", default="~/multiversx-sdk", help="where to install multiversx-sdk")
     parser.add_argument("--exact-version", help="the exact version of mxpy to install")
     parser.add_argument("--from-branch", help="use a branch of multiversx/mx-sdk-py-cli")
     parser.set_defaults(modify_path=True)
     args = parser.parse_args()
 
-    sdk_path = Path(args.sdk_path).expanduser().resolve()
+    sdk_path = Path("~/multiversx-sdk").expanduser().resolve()
     modify_path = args.modify_path
     exact_version = args.exact_version
     from_branch = args.from_branch
@@ -145,6 +144,7 @@ def get_mxpy_venv_path(sdk_path: Path):
 
 def install_mxpy(sdk_path: Path, exact_version: str, from_branch: str):
     logger.info("Installing mxpy in virtual environment...")
+
     if from_branch:
         package_to_install = f"https://github.com/multiversx/mx-sdk-py-cli/archive/refs/heads/{from_branch}.zip"
     else:
@@ -162,9 +162,8 @@ def install_mxpy(sdk_path: Path, exact_version: str, from_branch: str):
     if return_code != 0:
         raise InstallError("Could not install mxpy.")
 
-    logger.info("Checking and upgrading configuration file")
+    logger.info("Creating symlink to mxpy...")
 
-    # Create symlink to "bin/mxpy"
     link_path = os.path.join(sdk_path, "mxpy")
     if os.path.exists(link_path):
         os.remove(link_path)

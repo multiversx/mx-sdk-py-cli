@@ -26,7 +26,7 @@ jobs:
         run: |
           sudo apt update
           sudo apt install -y libtinfo5
-      - name: Install erdpy (old)
+      - name: Install (and smoke test) erdpy (old)
         run: |
           wget -O erdpy-up.py https://raw.githubusercontent.com/multiversx/mx-sdk-py-cli/v4.0.0/erdpy-up.py
           python3 erdpy-up.py --exact-version 4.0.0
@@ -36,7 +36,7 @@ jobs:
           erdpy contract build adder
           erdpy contract new --template=simple-counter simple-counter
           erdpy contract build simple-counter
-      - name: Install mxpy (new)
+      - name: Install (and smoke test) mxpy (new)
         run: |
           wget -O erdpy-up.py https://raw.githubusercontent.com/multiversx/mx-sdk-py-cli/$BRANCH_NAME/erdpy-up.py
           python3 erdpy-up.py --from-branch $BRANCH_NAME
