@@ -26,7 +26,7 @@ class TemplatesRepository:
 
         archive = self._get_archive_path()
         utils.unzip(archive, templates_folder)
-        migrate_project_templates(templates_folder)
+        migrate_project_templates(self.get_payload_folder())
 
     def _download_if_old(self):
         CACHE_DURATION = 30

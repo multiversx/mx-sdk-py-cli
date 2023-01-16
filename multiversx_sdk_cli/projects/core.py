@@ -4,13 +4,13 @@ from typing import Any, Dict, List
 
 from multiversx_sdk_cli import dependencies, errors, guards, utils
 from multiversx_sdk_cli.projects import shared
+from multiversx_sdk_cli.projects.constants import (OLD_PROJECT_CONFIG_FILENAME,
+                                                   PROJECT_CONFIG_FILENAME)
 from multiversx_sdk_cli.projects.project_base import Project
 from multiversx_sdk_cli.projects.project_clang import ProjectClang
 from multiversx_sdk_cli.projects.project_cpp import ProjectCpp
 from multiversx_sdk_cli.projects.project_rust import ProjectRust
 from multiversx_sdk_cli.projects.project_sol import ProjectSol
-
-from multiversx_sdk_cli.projects.constants import OLD_PROJECT_CONFIG_FILENAME, PROJECT_CONFIG_FILENAME
 
 logger = logging.getLogger("projects.core")
 
@@ -86,8 +86,8 @@ def get_projects_in_workspace(workspace: Path) -> List[Project]:
 
 def get_project_paths_recursively(base_path: Path) -> List[Path]:
     guards.is_directory(base_path)
-    old_markers = list(base_path.glob(f"**/{OLD_PROJECT_CONFIG_FILENAME}}"))
-    new_markers = list(base_path.glob(f"**/{PROJECT_CONFIG_FILENAME}}"))
+    old_markers = list(base_path.glob(f"**/{OLD_PROJECT_CONFIG_FILENAME}"))
+    new_markers = list(base_path.glob(f"**/{PROJECT_CONFIG_FILENAME}"))
     project_marker_files = old_markers + new_markers
     path_list = [marker_file.parent for marker_file in project_marker_files]
     return sorted(path_list)
