@@ -97,16 +97,29 @@ def migrate_old_elrondsdk() -> None:
 
     # Remove erdpy-venv (since mxpy-venv is used instead).
     old_venv = sdk_path / "erdpy-venv"
-    if old_venv.exists():
+    try:
         shutil.rmtree(old_venv)
         logger.info("Removed old virtual environment.")
+    except FileNotFoundError:
+        logger.info("Old virtual environment does not exist.")
 
     # Remove "erdpy-activate", since it is not recommended anymore when writing Python scripts.
     # The multiversx-sdk-* libraries should be used instead for writing Python scripts and modules that interact with the Network
     # (according to the official cookbook).
     old_erdpy_activate = sdk_path / "erdpy-activate"
-    if old_erdpy_activate.exists():
+    try:
         old_erdpy_activate.unlink()
+        logger.info("Removed old erdpy-activate.")
+    except FileNotFoundError:
+        logger.info("Old erdpy-activate does not exist.")
+
+    # Remove old erdpy symlink.
+    old_erdpy = sdk_path / "erdpy"
+    try:
+        old_erdpy.unlink()
+        logger.info("Removed old erdpy symlink.")
+    except FileNotFoundError:
+        logger.info("Old erdpy symlink does not exist.")
 
     # Rename the global config file.
     # We won't handle local config files, they have to be migrated manually.
@@ -115,6 +128,8 @@ def migrate_old_elrondsdk() -> None:
     if old_config_path.exists():
         old_config_path.rename(new_config_path)
         logger.info(f"Renamed {old_config_path} to {new_config_path}.")
+    else:
+        logger.info(f"Old config path does not exist: {old_config_path}.")
 
 
 def create_venv():
@@ -173,9 +188,16 @@ def install_mxpy(exact_version: str, from_branch: str):
     logger.info("Creating symlink to mxpy...")
 
     link_path = sdk_path / "mxpy"
-    if link_path.exists():
+
+    try:
         link_path.unlink()
+        logger.info(f"Removed symlink: {link_path}")
+    except FileNotFoundError:
+        logger.info(f"Symlink does not exist yet: {link_path}")
+        pass
+
     os.symlink(str(get_mxpy_venv_path() / "bin" / "mxpy"), link_path)
+    logger.info(f"Created symlink: {link_path}")
     logger.info("You have successfully installed mxpy.")
 
 
