@@ -57,7 +57,7 @@ class TestnetConfiguration:
             if folder_key == 'testnet':
                 continue
 
-            folder_path = folder_path.replace('{ELRONDSDK}', str(sdk_folder))
+            folder_path = folder_path.replace('{MULTIVERSX_SDK}', str(sdk_folder))
 
             default_tag = multiversx_sdk_cli.config.get_dependency_tag(folder_key)
             if default_tag == 'latest':
@@ -309,9 +309,9 @@ class TestnetConfiguration:
         }
         config['folders'] = {
             'mx_chain_go':
-                '{ELRONDSDK}/mx_chain_go/{TAG}/mx-chain-go-{NOvTAG}',
+                '{MULTIVERSX_SDK}/mx_chain_go/{TAG}/mx-chain-go-{NOvTAG}',
             'mx_chain_proxy_go':
-                '{ELRONDSDK}/mx_chain_proxy_go/{TAG}/mx-chain-proxy-go-{NOvTAG}',
+                '{MULTIVERSX_SDK}/mx_chain_proxy_go/{TAG}/mx-chain-proxy-go-{NOvTAG}',
         }
         config['metashard'] = {
             'consensus_size': 1,

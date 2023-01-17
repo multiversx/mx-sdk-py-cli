@@ -5,7 +5,7 @@ from multiversx_sdk_cli import config, utils
 
 
 def get_tools_folder() -> Path:
-    folder = Path.home() / config.ROOT_FOLDER_NAME
+    folder = config.SDK_PATH
     utils.ensure_folder(folder)
     return folder
 

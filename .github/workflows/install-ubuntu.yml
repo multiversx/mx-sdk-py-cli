@@ -23,8 +23,8 @@ jobs:
           python-version: ${{ matrix.python-version }}
       - name: Install
         run: |
-          wget -O erdpy-up.py https://raw.githubusercontent.com/multiversx/mx-sdk-py-cli/$BRANCH_NAME/erdpy-up.py
-          python3 erdpy-up.py --from-branch $BRANCH_NAME
+          wget -O mxpy-up.py https://raw.githubusercontent.com/multiversx/mx-sdk-py-cli/$BRANCH_NAME/mxpy-up.py
+          python3 mxpy-up.py --from-branch $BRANCH_NAME
       - name: Smoke test
         run: |
           source /home/runner/.profile

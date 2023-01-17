@@ -1,7 +1,7 @@
-from abc import abstractmethod
 import glob
 import logging
 import shutil
+from abc import abstractmethod
 from os import path
 from pathlib import Path
 from typing import Any, Dict, List, Union, cast, final
@@ -9,7 +9,9 @@ from typing import Any, Dict, List, Union, cast, final
 from multiversx_sdk_cli import dependencies, errors, myprocess, utils
 from multiversx_sdk_cli.dependencies.modules import StandaloneModule
 from multiversx_sdk_cli.projects import eei_checks
+from multiversx_sdk_cli.projects.constants import PROJECT_CONFIG_FILENAME
 from multiversx_sdk_cli.projects.interfaces import IProject
+from multiversx_sdk_cli.projects.migrations import migrate_project_config_file
 
 logger = logging.getLogger("Project")
 
@@ -21,6 +23,8 @@ class Project(IProject):
         self.directory = str(self.path)
 
     def build(self, options: Union[Dict[str, Any], None] = None) -> List[Path]:
+        migrate_project_config_file(self.path)
+
         self.options = options or dict()
         self.debug = self.options.get("debug", False)
         self._ensure_dependencies_installed()
@@ -66,7 +70,7 @@ class Project(IProject):
 
         file = folder / files[0]
         return Path(file).resolve()
-    
+
     def find_wasm_files(self):
         output_folder = Path(self.get_output_folder())
         wasm_files = output_folder.rglob("*.wasm")
@@ -91,10 +95,10 @@ class Project(IProject):
 
     def get_output_folder(self):
         return path.join(self.directory, "output")
-    
+
     def get_wasm_default_name(self, suffix: str = "") -> str:
         return f"{self.path.name}{suffix}.wasm"
-    
+
     def get_wasm_path(self, wasm_name: str) -> Path:
         return Path(self.get_output_folder(), wasm_name).resolve()
 
@@ -110,18 +114,20 @@ class Project(IProject):
         return bytecode_hex
 
     def load_config(self):
+        self.ensure_config_file()
         config_file = self.get_config_file()
         config = utils.read_json_file(str(config_file))
         return config
 
-    def get_config_file(self):
-        return self.path / 'elrond.json'
+    def get_config_file(self) -> Path:
+        return self.path / PROJECT_CONFIG_FILENAME
 
-    def ensure_config_file(self):
+    def ensure_config_file(self) -> None:
         config_file = self.get_config_file()
+
         if not config_file.exists():
             utils.write_json_file(str(config_file), self.default_config())
-            logger.info("created default configuration in elrond.json")
+            logger.info("created default project configuration")
 
     def default_config(self) -> Dict[str, Any]:
         return dict()
@@ -144,12 +150,15 @@ class Project(IProject):
                 args = [tool, test_file]
                 myprocess.run_process(args, env=tool_env)
 
+
 def glob_files(folder: Path, pattern: str) -> List[Path]:
     files = folder.rglob(pattern)
     return [Path(folder / file).resolve() for file in files]
 
+
 def exclude_files(files: List[Path], to_exclude: List[Path]) -> List[Path]:
     return list(set(files).difference(to_exclude))
+
 
 def rename_wasm_files(paths: List[Path], name: Union[str, None]) -> List[Path]:
     if name is None:
@@ -159,16 +168,19 @@ def rename_wasm_files(paths: List[Path], name: Union[str, None]) -> List[Path]:
         old_path.rename(new_path)
     return new_paths
 
+
 def get_contract_suffix(name: str) -> str:
     for suffix in ["-view.wasm", ".wasm"]:
         if name.endswith(suffix):
             return suffix
     return ""
 
+
 def remove_suffix(name: str, suffix: str) -> str:
     if not name.endswith(suffix) or len(suffix) == 0:
         return name
     return name[:-len(suffix)]
+
 
 def adjust_wasm_filename(path: Path, name_hint: str) -> Path:
     """

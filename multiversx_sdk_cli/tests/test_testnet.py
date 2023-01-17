@@ -1,6 +1,5 @@
 import os
 import sys
-
 from pathlib import Path
 
 import multiversx_sdk_cli.config
@@ -56,8 +55,8 @@ def test_merge_configs():
 def test_init():
     data = dict()
     data['folders'] = {
-        'mx_chain_go': '{ELRONDSDK}/bar',
-        'mx_chain_proxy_go': '{ELRONDSDK}/foobar',
+        'mx_chain_go': '{MULTIVERSX_SDK}/bar',
+        'mx_chain_proxy_go': '{MULTIVERSX_SDK}/foobar',
         'testnet': '/some/where/mytestnet',
     }
 

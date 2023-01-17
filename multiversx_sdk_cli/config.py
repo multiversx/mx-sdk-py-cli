@@ -4,11 +4,11 @@ from typing import Any, Dict, List
 
 import semver
 
-from multiversx_sdk_cli import errors, utils, workstation
+from multiversx_sdk_cli import errors, utils
 
-ROOT_FOLDER_NAME = "elrondsdk"
-LOCAL_CONFIG_PATH = os.path.join(os.getcwd(), "erdpy.json")
-GLOBAL_CONFIG_PATH = os.path.expanduser("~/elrondsdk/erdpy.json")
+SDK_PATH = Path("~/multiversx-sdk").expanduser().resolve()
+LOCAL_CONFIG_PATH = Path("mxpy.json").resolve()
+GLOBAL_CONFIG_PATH = SDK_PATH / "mxpy.json"
 
 DEFAULT_GAS_PRICE = 1000000000
 GAS_PER_DATA_BYTE = 1500
@@ -184,7 +184,7 @@ def get_defaults() -> Dict[str, Any]:
     }
 
 
-def resolve_config_path() -> str:
+def resolve_config_path() -> Path:
     if os.path.isfile(LOCAL_CONFIG_PATH):
         return LOCAL_CONFIG_PATH
     return GLOBAL_CONFIG_PATH
@@ -192,7 +192,7 @@ def resolve_config_path() -> str:
 
 def read_file() -> Dict[str, Any]:
     config_path = resolve_config_path()
-    if os.path.isfile(config_path):
+    if config_path.exists():
         data: Dict[str, Any] = utils.read_json_file(config_path)
         return data
     return dict()
@@ -200,7 +200,7 @@ def read_file() -> Dict[str, Any]:
 
 def write_file(data: Dict[str, Any]):
     config_path = resolve_config_path()
-    utils.write_json_file(config_path, data)
+    utils.write_json_file(str(config_path), data)
 
 
 def add_config_args(argv: List[str]) -> List[str]:
@@ -259,8 +259,7 @@ def get_dependency_directory(key: str, tag: str) -> Path:
 
 
 def get_dependency_parent_directory(key: str) -> Path:
-    tools_folder = Path(workstation.get_tools_folder())
-    return tools_folder / key
+    return SDK_PATH / key
 
 
 def get_latest_semver_from_directory(directory: Path) -> str:
