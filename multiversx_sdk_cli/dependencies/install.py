@@ -3,9 +3,8 @@ from pathlib import Path
 from typing import Dict, List
 
 from multiversx_sdk_cli import config, errors
-from multiversx_sdk_cli.dependencies.modules import (CargoModule, NpmModule, TestWalletsModule, VMToolsModule, DependencyModule,
-                                        GolangModule, MclSignerModule,
-                                        NodejsModule, Rust, StandaloneModule)
+from multiversx_sdk_cli.dependencies.modules import (CargoModule, NpmModule, TestWalletsModule, VMToolsModule,
+                                                DependencyModule, GolangModule, NodejsModule, Rust, StandaloneModule)
 
 logger = logging.getLogger("install")
 
@@ -66,7 +65,6 @@ def _get_implicitly_installable_deps() -> List[DependencyModule]:
         VMToolsModule(key="vmtools"),
         StandaloneModule(key="mx_chain_go", repo_name="mx-chain-go", organisation="multiversx"),
         StandaloneModule(key="mx_chain_proxy_go", repo_name="mx-chain-proxy-go", organisation="multiversx"),
-        MclSignerModule(key="mcl_signer"),
         NpmModule(key="wasm-opt"),
         CargoModule(key="twiggy"),
         TestWalletsModule(key="testwallets")

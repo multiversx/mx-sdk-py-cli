@@ -141,6 +141,9 @@ class Address(IAddress):
     @classmethod
     def zero(cls) -> 'Address':
         return Address("0" * 64)
+    
+    def serialize_for_signing(self) -> bytes:
+        return bytes.fromhex(self._value_hex)
 
 
 def _as_string(value):
