@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 
-export PYTHONPATH=../
+export PYTHONPATH=.
 
-CLI="python3 -m mxpy.cli"
+CLI="python3 -m multiversx_sdk_cli.cli"
 CLI_ALIAS="mxpy"
 
 code() {
