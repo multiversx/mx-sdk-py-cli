@@ -118,8 +118,8 @@ def generate_pem(args: Any):
     index = args.index
 
     if ask_mnemonic:
-        mnemonic = input("Enter mnemonic:\n").rstrip().replace("\n", "")
-        mnemonic = Mnemonic(mnemonic)
+        mnemonic_str = input("Enter mnemonic:\n").rstrip().replace("\n", "")
+        mnemonic = Mnemonic(mnemonic_str)
         secret_key = mnemonic.derive_key(index)
         pubkey = secret_key.generate_public_key()
     else:

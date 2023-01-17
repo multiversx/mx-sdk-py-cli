@@ -39,9 +39,9 @@ class ITransaction(ISerializable):
         return ""
 
 
-class IAccount:
+class IAccount(Protocol):
     def sign_transaction(self, transaction: ITransaction) -> str:
-        return ""
+        ...
 
 
 class ISimulateResponse(Protocol):

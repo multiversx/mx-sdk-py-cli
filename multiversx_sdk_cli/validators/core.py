@@ -1,5 +1,4 @@
 import logging
-from os import path
 from pathlib import Path
 from typing import Any, List, Tuple, Union
 
@@ -11,7 +10,9 @@ from multiversx_sdk_cli.validators.validators_file import ValidatorsFile
 from multiversx_sdk_cli.accounts import Account, Address
 from multiversx_sdk_cli.config import MetaChainSystemSCsCost, MIN_GAS_LIMIT, GAS_PER_DATA_BYTE
 from multiversx_sdk_cli.wallet.pem import parse_validator_pem
-from multiversx_sdk_cli.wallet.signing import sign_message_with_bls_key
+from multiversx_sdk_wallet.validator_signer import ValidatorSigner
+from multiversx_sdk_wallet.validator_keys import ValidatorSecretKey
+from multiversx_sdk_core.message import Message
 
 logger = logging.getLogger("validators")
 
@@ -56,7 +57,14 @@ def prepare_transaction_data_for_stake(node_operator_address: Address, validator
         validator_pem = validator_pem if validator_pem.is_absolute() else validators_file_path / validator_pem
         
         secret_key_bytes, bls_key = parse_validator_pem(Path(validator_pem))
-        signed_message = sign_message_with_bls_key(node_operator_address.hex(), secret_key_bytes.decode('ascii'))
+        secret_key_str = secret_key_bytes.decode()
+
+        validator_secret_key = ValidatorSecretKey.from_string(secret_key_str)
+        validator_signer = ValidatorSigner(validator_secret_key)
+        message = Message(bytes.fromhex(node_operator_address.hex()))
+
+        signed_message = validator_signer.sign(message).hex()
+
         call_arguments.append(f"0x{bls_key}")
         call_arguments.append(f"0x{signed_message}")
 

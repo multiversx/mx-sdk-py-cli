@@ -389,20 +389,6 @@ class CargoModule(DependencyModule):
         return myprocess.run_process(args, rust.get_env())
 
 
-class MclSignerModule(StandaloneModule):
-    def __init__(self, key: str, aliases: List[str] = None):
-        if aliases is None:
-            aliases = list()
-
-        super().__init__(key, aliases)
-        self.organisation = 'multiversx'
-        self.repo_name = 'mx-sdk-erdgo-tools'
-
-    def _post_install(self, tag: str):
-        directory = self.get_directory(tag)
-        utils.mark_executable(path.join(directory, "signer"))
-
-
 class TestWalletsModule(StandaloneModule):
     def __init__(self, key: str):
         super().__init__(key, [])

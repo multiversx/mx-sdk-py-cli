@@ -9,7 +9,9 @@ from multiversx_sdk_cli.cli_password import load_password
 from multiversx_sdk_cli.config import MetaChainSystemSCsCost
 from multiversx_sdk_cli.validators.core import estimate_system_sc_call
 from multiversx_sdk_cli.wallet.pem import parse_validator_pem
-from multiversx_sdk_cli.wallet.signing import sign_message_with_bls_key
+from multiversx_sdk_wallet.validator_signer import ValidatorSigner
+from multiversx_sdk_wallet.validator_keys import ValidatorSecretKey
+from multiversx_sdk_core.message import Message
 
 DELEGATION_MANAGER_SC_ADDRESS = "erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqylllslmq6y6"
 
@@ -29,6 +31,7 @@ def prepare_args_for_create_new_staking_contract(args: Any):
 def prepare_args_for_add_nodes(args: Any):
     validators_file_path = Path(args.validators_file).expanduser()
     validators_file = ValidatorsFile(validators_file_path)
+    account = Account()
 
     # TODO: Refactor, so that only address is received here.
     if args.using_delegation_manager:
@@ -47,7 +50,14 @@ def prepare_args_for_add_nodes(args: Any):
         validator_pem = validator_pem if validator_pem.is_absolute() else validators_file_path / validator_pem
 
         secret_key_bytes, bls_key = parse_validator_pem(validator_pem)
-        signed_message = sign_message_with_bls_key(account.address.pubkey().hex(), secret_key_bytes.decode('ascii'))
+        secret_key_str = secret_key_bytes.decode()
+
+        validator_secret_key = ValidatorSecretKey.from_string(secret_key_str)
+        validator_signer = ValidatorSigner(validator_secret_key)
+        message = Message(bytes.fromhex(account.address.hex()))
+        
+        signed_message = validator_signer.sign(message).hex()
+
         add_nodes_data += f"@{bls_key}@{signed_message}"
 
     args.receiver = args.delegation_contract
