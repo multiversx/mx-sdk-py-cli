@@ -30,7 +30,6 @@ setuptools.setup(
         "bottle",
         "requests",
         "pynacl",
-        "pycryptodomex",
         "cryptography==36.0.2",
         "prettytable",
         "ledgercomm[hid]",
