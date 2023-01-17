@@ -89,11 +89,11 @@ def get_operating_system():
 
 def migrate_old_elrondsdk() -> None:
     old_sdk_path = Path("~/elrondsdk").expanduser().resolve()
-    if not old_sdk_path.exists():
-        return
-
-    old_sdk_path.rename(sdk_path)
-    logger.info(f"Renamed {old_sdk_path} to {sdk_path}.")
+    if old_sdk_path.exists():
+        old_sdk_path.rename(sdk_path)
+        logger.info(f"Renamed {old_sdk_path} to {sdk_path}.")
+    else:
+        logger.info(f"Old SDK path does not exist: {old_sdk_path}.")
 
     # Remove erdpy-venv (since mxpy-venv is used instead).
     old_venv = sdk_path / "erdpy-venv"
@@ -172,9 +172,9 @@ def install_mxpy(exact_version: str, from_branch: str):
 
     logger.info("Creating symlink to mxpy...")
 
-    link_path = os.path.join(sdk_path, "mxpy")
-    if os.path.exists(link_path):
-        os.remove(link_path)
+    link_path = sdk_path / "mxpy"
+    if link_path.exists():
+        link_path.unlink()
     os.symlink(str(get_mxpy_venv_path() / "bin" / "mxpy"), link_path)
     logger.info("You have successfully installed mxpy.")
 
