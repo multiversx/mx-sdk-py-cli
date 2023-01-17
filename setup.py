@@ -3,7 +3,7 @@ import setuptools
 with open("README.md", "r") as fh:
     long_description = "https://github.com/multiversx/mx-sdk-py-cli"
 
-VERSION = "5.0.0"
+VERSION = "5.0.0b1"
 
 try:
     with open('./multiversx_sdk_cli/_version.py', 'wt') as versionfile:
