@@ -31,9 +31,9 @@ jobs:
         RELEASE_TAG=v$(python3 -c "import multiversx_sdk_cli._version; print(multiversx_sdk_cli._version.__version__);")
 
         if [[ "$RELEASE_TAG" == *"a"* || "$RELEASE_TAG" == *"b"* ]]; then
-          gh release create $RELEASE_TAG --target=$GITHUB_SHA --title="$RELEASE_TAG" --generate-notes
-        else
           gh release create $RELEASE_TAG --target=$GITHUB_SHA --title="$RELEASE_TAG" --generate-notes --prerelease
+        else
+          gh release create $RELEASE_TAG --target=$GITHUB_SHA --title="$RELEASE_TAG" --generate-notes
         fi
   
     - name: Build and publish
