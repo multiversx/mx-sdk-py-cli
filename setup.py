@@ -13,7 +13,7 @@ except FileNotFoundError:
 
 # See https://packaging.python.org/tutorials/packaging-projects/
 setuptools.setup(
-    name="mxpy",
+    name="multiversx-sdk-cli",
     version=VERSION,
     description="MultiversX Smart Contracts Tools",
     long_description=long_description,
