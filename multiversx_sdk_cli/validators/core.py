@@ -61,7 +61,7 @@ def prepare_transaction_data_for_stake(node_operator_address: Address, validator
 
         validator_secret_key = ValidatorSecretKey.from_string(secret_key_str)
         validator_signer = ValidatorSigner(validator_secret_key)
-        message = Message.from_string(node_operator_address.bech32())
+        message = Message(bytes.fromhex(node_operator_address.hex()))
 
         signed_message = validator_signer.sign(message).hex()
 

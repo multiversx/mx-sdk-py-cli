@@ -54,7 +54,7 @@ def prepare_args_for_add_nodes(args: Any):
 
         validator_secret_key = ValidatorSecretKey.from_string(secret_key_str)
         validator_signer = ValidatorSigner(validator_secret_key)
-        message = Message.from_string(account.address.bech32())
+        message = Message(bytes.fromhex(account.address.hex()))
         
         signed_message = validator_signer.sign(message).hex()
 
