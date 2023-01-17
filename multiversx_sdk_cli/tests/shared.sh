@@ -7,7 +7,7 @@ function absolute_path() {
 export PYTHONPATH=$(absolute_path ../../)
 echo "PYTHONPATH = ${PYTHONPATH}"
 
-CLI="python3.8 -m multiversx_sdk_cli.cli"
+CLI="python3 -m multiversx_sdk_cli.cli"
 SANDBOX=./testdata-out/SANDBOX
 USERS=~/multiversx-sdk/testwallets/latest/users
 VALIDATORS=~/multiversx-sdk/testwallets/latest/validators
