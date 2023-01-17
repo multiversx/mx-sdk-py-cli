@@ -56,8 +56,11 @@ def prepare_transaction_data_for_stake(node_operator_address: Address, validator
         validator_pem = validator_pem if validator_pem.is_absolute() else validators_file_path / validator_pem
         
         secret_key_bytes, bls_key = parse_validator_pem(Path(validator_pem))
-        validator_secret_key = ValidatorSecretKey(secret_key_bytes)
+        secret_key_str = secret_key_bytes.decode()
+
+        validator_secret_key = ValidatorSecretKey.from_string(secret_key_str)
         validator_signer = ValidatorSigner(validator_secret_key)
+
         signed_message = validator_signer.sign(node_operator_address).hex()
 
         call_arguments.append(f"0x{bls_key}")

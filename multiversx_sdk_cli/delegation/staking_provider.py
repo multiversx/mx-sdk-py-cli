@@ -49,8 +49,11 @@ def prepare_args_for_add_nodes(args: Any):
         validator_pem = validator_pem if validator_pem.is_absolute() else validators_file_path / validator_pem
 
         secret_key_bytes, bls_key = parse_validator_pem(validator_pem)
-        validator_secret_key = ValidatorSecretKey(secret_key_bytes)
+        secret_key_str = secret_key_bytes.decode()
+
+        validator_secret_key = ValidatorSecretKey.from_string(secret_key_str)
         validator_signer = ValidatorSigner(validator_secret_key)
+        
         signed_message = validator_signer.sign(account.address).hex()
 
         add_nodes_data += f"@{bls_key}@{signed_message}"
