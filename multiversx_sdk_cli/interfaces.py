@@ -42,9 +42,6 @@ class ITransaction(ISerializable):
 class IAccount(Protocol):
     def sign_transaction(self, transaction: ITransaction) -> str:
         ...
-    
-    def serialize_for_signing(self) -> bytes:
-        ...
 
 
 class ISimulateResponse(Protocol):

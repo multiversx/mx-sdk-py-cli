@@ -11,6 +11,7 @@ from multiversx_sdk_cli.validators.core import estimate_system_sc_call
 from multiversx_sdk_cli.wallet.pem import parse_validator_pem
 from multiversx_sdk_wallet.validator_signer import ValidatorSigner
 from multiversx_sdk_wallet.validator_keys import ValidatorSecretKey
+from multiversx_sdk_core.message import Message
 
 DELEGATION_MANAGER_SC_ADDRESS = "erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqylllslmq6y6"
 
@@ -53,8 +54,9 @@ def prepare_args_for_add_nodes(args: Any):
 
         validator_secret_key = ValidatorSecretKey.from_string(secret_key_str)
         validator_signer = ValidatorSigner(validator_secret_key)
+        message = Message.from_string(account.address.bech32())
         
-        signed_message = validator_signer.sign(account.address).hex()
+        signed_message = validator_signer.sign(message).hex()
 
         add_nodes_data += f"@{bls_key}@{signed_message}"
 

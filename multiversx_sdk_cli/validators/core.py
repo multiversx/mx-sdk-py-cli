@@ -12,6 +12,7 @@ from multiversx_sdk_cli.config import MetaChainSystemSCsCost, MIN_GAS_LIMIT, GAS
 from multiversx_sdk_cli.wallet.pem import parse_validator_pem
 from multiversx_sdk_wallet.validator_signer import ValidatorSigner
 from multiversx_sdk_wallet.validator_keys import ValidatorSecretKey
+from multiversx_sdk_core.message import Message
 
 logger = logging.getLogger("validators")
 
@@ -60,8 +61,9 @@ def prepare_transaction_data_for_stake(node_operator_address: Address, validator
 
         validator_secret_key = ValidatorSecretKey.from_string(secret_key_str)
         validator_signer = ValidatorSigner(validator_secret_key)
+        message = Message.from_string(node_operator_address.bech32())
 
-        signed_message = validator_signer.sign(node_operator_address).hex()
+        signed_message = validator_signer.sign(message).hex()
 
         call_arguments.append(f"0x{bls_key}")
         call_arguments.append(f"0x{signed_message}")
