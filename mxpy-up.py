@@ -228,7 +228,7 @@ def add_sdk_to_path():
 
     if new_export_directive in profile_info_content:
         # Note: in some (rare) cases, here we'll have false positives (e.g. if the export directive is commented out).
-        logger.info(f"multiversx-sdk path ({sdk_path}) already configured in shell profile.")
+        logger.info(f"multiversx-sdk path ({sdk_path}) is already configured in shell profile.")
         return
 
     logger.info(f"Configuring multiversx-sdk path [{sdk_path}] in shell profile...")
@@ -276,7 +276,6 @@ def run_post_install_checks():
     print("~/multiversx-sdk exists", "✓" if multiversx_sdk_path.exists() else "✗")
     print("~/elrondsdk is removed or missing", "✓" if not elrond_sdk_path.exists() else "✗")
     print("~/multiversx-sdk/mxpy link created", "✓" if (multiversx_sdk_path / "mxpy").exists() else "✗")
-    print("~/multiversx-sdk/mxpy.json exists", "✓" if (multiversx_sdk_path / "mxpy.json").exists() else "✗")
     print("~/multiversx-sdk/erdpy.json is renamed or missing", "✓" if not (multiversx_sdk_path / "erdpy.json").exists() else "✗")
 
 
