@@ -1,7 +1,6 @@
-import setuptools
+from pathlib import Path
 
-with open("README.md", "r") as fh:
-    long_description = "https://github.com/multiversx/mx-sdk-py-cli"
+import setuptools
 
 VERSION = "5.0.0b1"
 
@@ -16,7 +15,7 @@ setuptools.setup(
     name="multiversx-sdk-cli",
     version=VERSION,
     description="MultiversX Smart Contracts Tools",
-    long_description=long_description,
+    long_description=Path("README.md").read_text(),
     long_description_content_type="text/markdown",
     url="https://github.com/multiversx/mx-sdk-py-cli",
     author="MultiversX",
