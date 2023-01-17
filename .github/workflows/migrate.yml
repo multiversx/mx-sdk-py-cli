@@ -32,6 +32,10 @@ jobs:
           python3 erdpy-up.py --exact-version 4.0.0
 
           source /home/runner/.profile
+
+          erdpy config new test
+          erdpy config set github_api_token ${{ secrets.GITHUB_TOKEN }}
+
           erdpy contract new --template=adder adder
           erdpy contract build adder
           erdpy contract new --template=simple-counter simple-counter
