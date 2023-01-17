@@ -294,5 +294,5 @@ if __name__ == "__main__":
     logger.info("""
 
 For more information go to https://docs.multiversx.com.
-For support, please contact us at https://t.me/MultiversXDevelopers.
+For support, please contact us at http://discord.gg/MultiversXBuilders (recommended) or https://t.me/MultiversXDevelopers.
 """)
