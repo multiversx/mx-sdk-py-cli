@@ -2,17 +2,19 @@ import logging
 from pathlib import Path
 from typing import Any, List, Tuple, Union
 
+from multiversx_sdk_core.message import Message
+from multiversx_sdk_wallet.validator_keys import ValidatorSecretKey
+from multiversx_sdk_wallet.validator_signer import ValidatorSigner
+
 from multiversx_sdk_cli import utils
-from multiversx_sdk_cli.contracts import SmartContract
+from multiversx_sdk_cli.accounts import Account, Address
 from multiversx_sdk_cli.cli_password import load_password
+from multiversx_sdk_cli.config import (GAS_PER_DATA_BYTE, MIN_GAS_LIMIT,
+                                       MetaChainSystemSCsCost)
+from multiversx_sdk_cli.contracts import SmartContract
 from multiversx_sdk_cli.errors import BadUsage
 from multiversx_sdk_cli.validators.validators_file import ValidatorsFile
-from multiversx_sdk_cli.accounts import Account, Address
-from multiversx_sdk_cli.config import MetaChainSystemSCsCost, MIN_GAS_LIMIT, GAS_PER_DATA_BYTE
 from multiversx_sdk_cli.wallet.pem import parse_validator_pem
-from multiversx_sdk_wallet.validator_signer import ValidatorSigner
-from multiversx_sdk_wallet.validator_keys import ValidatorSecretKey
-from multiversx_sdk_core.message import Message
 
 logger = logging.getLogger("validators")
 
@@ -54,8 +56,8 @@ def prepare_transaction_data_for_stake(node_operator_address: Address, validator
     for validator in validators_list:
         # Get path of "pemFile", make it absolute
         validator_pem = Path(validator.get("pemFile")).expanduser()
-        validator_pem = validator_pem if validator_pem.is_absolute() else validators_file_path / validator_pem
-        
+        validator_pem = validator_pem if validator_pem.is_absolute() else validators_file_path.parent / validator_pem
+
         secret_key_bytes, bls_key = parse_validator_pem(Path(validator_pem))
         secret_key_str = secret_key_bytes.decode()
 
