@@ -56,7 +56,7 @@ jobs:
         sudo apt install -y libtinfo5
     - name: Set github_api_token
       run: |
-        mkdir ~/elrondsdk
+        mkdir ~/multiversx-sdk
         export PYTHONPATH=.
         python3 -m multiversx_sdk_cli.cli config new test
         python3 -m multiversx_sdk_cli.cli config set github_api_token ${{ secrets.GITHUB_TOKEN }}

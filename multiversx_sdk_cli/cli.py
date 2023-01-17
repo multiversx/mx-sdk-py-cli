@@ -9,22 +9,22 @@ import multiversx_sdk_cli.cli_block
 import multiversx_sdk_cli.cli_config
 import multiversx_sdk_cli.cli_contracts
 import multiversx_sdk_cli.cli_data
+import multiversx_sdk_cli.cli_delegation
 import multiversx_sdk_cli.cli_deps
+import multiversx_sdk_cli.cli_dns
 import multiversx_sdk_cli.cli_ledger
 import multiversx_sdk_cli.cli_network
 import multiversx_sdk_cli.cli_testnet
 import multiversx_sdk_cli.cli_transactions
 import multiversx_sdk_cli.cli_validators
 import multiversx_sdk_cli.cli_wallet
-import multiversx_sdk_cli.cli_delegation
-import multiversx_sdk_cli.cli_dns
 from multiversx_sdk_cli import config, errors, scope
 from multiversx_sdk_cli._version import __version__
 
 logger = logging.getLogger("cli")
 
 
-def main(cli_args: List[str] = []):
+def main(cli_args: List[str] = sys.argv[1:]):
     try:
         _do_main(cli_args)
     except errors.KnownError as err:

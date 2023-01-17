@@ -1,0 +1,2 @@
+PROJECT_CONFIG_FILENAME = "multiversx.json"
+OLD_PROJECT_CONFIG_FILENAME = "elrond.json"
