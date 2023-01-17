@@ -2,16 +2,17 @@ import binascii
 from pathlib import Path
 from typing import Any
 
+from multiversx_sdk_core.message import Message
+from multiversx_sdk_wallet.validator_keys import ValidatorSecretKey
+from multiversx_sdk_wallet.validator_signer import ValidatorSigner
+
 from multiversx_sdk_cli import utils
-from multiversx_sdk_cli.validators.validators_file import ValidatorsFile
 from multiversx_sdk_cli.accounts import Account
 from multiversx_sdk_cli.cli_password import load_password
 from multiversx_sdk_cli.config import MetaChainSystemSCsCost
 from multiversx_sdk_cli.validators.core import estimate_system_sc_call
+from multiversx_sdk_cli.validators.validators_file import ValidatorsFile
 from multiversx_sdk_cli.wallet.pem import parse_validator_pem
-from multiversx_sdk_wallet.validator_signer import ValidatorSigner
-from multiversx_sdk_wallet.validator_keys import ValidatorSecretKey
-from multiversx_sdk_core.message import Message
 
 DELEGATION_MANAGER_SC_ADDRESS = "erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqylllslmq6y6"
 
@@ -47,7 +48,7 @@ def prepare_args_for_add_nodes(args: Any):
     for validator in validators_file.get_validators_list():
         # Get path of "pemFile", make it absolute
         validator_pem = Path(validator.get("pemFile")).expanduser()
-        validator_pem = validator_pem if validator_pem.is_absolute() else validators_file_path / validator_pem
+        validator_pem = validator_pem if validator_pem.is_absolute() else validators_file_path.parent / validator_pem
 
         secret_key_bytes, bls_key = parse_validator_pem(validator_pem)
         secret_key_str = secret_key_bytes.decode()
@@ -55,7 +56,7 @@ def prepare_args_for_add_nodes(args: Any):
         validator_secret_key = ValidatorSecretKey.from_string(secret_key_str)
         validator_signer = ValidatorSigner(validator_secret_key)
         message = Message(bytes.fromhex(account.address.hex()))
-        
+
         signed_message = validator_signer.sign(message).hex()
 
         add_nodes_data += f"@{bls_key}@{signed_message}"
