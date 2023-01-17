@@ -3,7 +3,7 @@ import setuptools
 with open("README.md", "r") as fh:
     long_description = "https://github.com/multiversx/mx-sdk-py-cli"
 
-VERSION = "4.0.0"
+VERSION = "5.0.0"
 
 try:
     with open('./multiversx_sdk_cli/_version.py', 'wt') as versionfile:
@@ -20,7 +20,7 @@ setuptools.setup(
     long_description_content_type="text/markdown",
     url="https://github.com/multiversx/mx-sdk-py-cli",
     author="MultiversX",
-    license="GPL",
+    license="MIT",
     packages=setuptools.find_packages(
         include=["multiversx_sdk_cli*"], exclude=["examples*"]),
     include_package_data=True,
