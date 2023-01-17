@@ -4,7 +4,7 @@ function absolute_path() {
   (cd "$DIR" && echo "$(pwd -P)")
 }
 
-export PYTHONPATH=$PYTHONPATH::$(absolute_path ../../)
+export PYTHONPATH=$(absolute_path ../../)
 echo "PYTHONPATH = ${PYTHONPATH}"
 
 CLI="python3 -m multiversx_sdk_cli.cli"

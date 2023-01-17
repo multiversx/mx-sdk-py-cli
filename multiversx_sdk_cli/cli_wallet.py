@@ -119,14 +119,14 @@ def generate_pem(args: Any):
 
     if ask_mnemonic:
         mnemonic = input("Enter mnemonic:\n").rstrip().replace("\n", "")
-        print(mnemonic, 'asad')
         mnemonic = Mnemonic(mnemonic)
         secret_key = mnemonic.derive_key(index)
         pubkey = secret_key.generate_public_key()
     else:
         mnemonic = Mnemonic.generate()
-        secret_key = mnemonic.derive_key(index)
-        pubkey = secret_key.generate_public_key()
+    
+    secret_key = mnemonic.derive_key(index)
+    pubkey = secret_key.generate_public_key()
 
     address = Address(pubkey.hex())
     pem.write(pem_file, secret_key.buffer, pubkey.buffer, name=address.bech32())
