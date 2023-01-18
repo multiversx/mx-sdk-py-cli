@@ -131,6 +131,34 @@ def migrate_old_elrondsdk() -> None:
     else:
         logger.info(f"Old config path does not exist: {old_config_path}.")
 
+    # Fix existing symlinks.
+    old_mandos_link = old_sdk_path / "vmtools" / "mandos-test"
+    old_testwallets_link = old_sdk_path / "testwallets" / "latest"
+    old_nodejs_link = old_sdk_path / "nodejs" / "latest"
+
+    new_mandos_link = sdk_path / "vmtools" / "run-scenarios"
+    new_testwallets_link = sdk_path / "testwallets" / "latest"
+    new_nodejs_link = sdk_path / "nodejs" / "latest"
+
+    if old_mandos_link.is_symlink():
+        old_target = os.readlink(old_mandos_link)
+        new_target = old_target.replace("elrondsdk", "multiversx-sdk")
+        old_mandos_link.unlink()
+        os.symlink(str(new_mandos_link), new_target)
+
+    if old_testwallets_link.is_symlink():
+        old_target = os.readlink(old_testwallets_link)
+        new_target = old_target.replace("elrondsdk", "multiversx-sdk")
+        old_testwallets_link.unlink()
+        os.symlink(str(new_testwallets_link), new_target)
+
+    if old_nodejs_link.is_symlink():
+        old_target = os.readlink(old_nodejs_link)
+        new_target = old_target.replace("elrondsdk", "multiversx-sdk")
+        old_nodejs_link.unlink()
+        os.symlink(str(new_nodejs_link), new_target)
+        
+
 
 def create_venv():
     require_python_venv_tools()
