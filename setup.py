@@ -2,7 +2,7 @@ from pathlib import Path
 
 import setuptools
 
-VERSION = "5.0.0b3"
+VERSION = "5.0.1"
 
 try:
     with open('./multiversx_sdk_cli/_version.py', 'wt') as versionfile:
