@@ -132,9 +132,9 @@ def migrate_old_elrondsdk() -> None:
         logger.info(f"Old config path does not exist: {old_config_path}.")
 
     # Fix existing symlinks.
-    old_mandos_link = old_sdk_path / "vmtools" / "mandos-test"
-    old_testwallets_link = old_sdk_path / "testwallets" / "latest"
-    old_nodejs_link = old_sdk_path / "nodejs" / "latest"
+    old_mandos_link = sdk_path / "vmtools" / "mandos-test"
+    old_testwallets_link = sdk_path / "testwallets" / "latest"
+    old_nodejs_link = sdk_path / "nodejs" / "latest"
 
     new_mandos_link = sdk_path / "vmtools" / "run-scenarios"
     new_testwallets_link = sdk_path / "testwallets" / "latest"
