@@ -5,7 +5,7 @@ from typing import Dict, Tuple
 
 from multiversx_sdk_cli import errors, utils
 from multiversx_sdk_cli.accounts import Account
-from multiversx_sdk_cli.wallet import pem
+from multiversx_sdk_wallet.validator_pem import ValidatorPEM
 from multiversx_sdk_cli.workstation import get_tools_folder
 
 MAX_NUM_NODES = 12
@@ -46,7 +46,8 @@ def get_validators(num_validators: int) -> Dict[str, Tuple[str, Account]]:
 
     for i in range(0, num_validators):
         validator_pem_file = get_validator_key_file(i)
-        _, pubkey = pem.parse_validator_pem(validator_pem_file)
+        pem_from_file = ValidatorPEM.from_file(validator_pem_file)
+        pubkey = pem_from_file.label
 
         pem_file = get_validator_wallet_file(i)
         nickname = "validator{:02}".format(i)
