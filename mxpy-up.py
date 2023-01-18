@@ -144,7 +144,7 @@ def migrate_old_elrondsdk() -> None:
         old_target = os.readlink(old_mandos_link)
         new_target = old_target.replace("elrondsdk", "multiversx-sdk")
         old_mandos_link.unlink()
-        os.symlink(str(new_mandos_link), new_target)
+        os.symlink(new_target, str(new_mandos_link))
         logger.info("Fixed old mandos symlink.")
     except FileNotFoundError:
         logger.info("Old mandos symlink does not exist.")
@@ -153,7 +153,7 @@ def migrate_old_elrondsdk() -> None:
         old_target = os.readlink(old_testwallets_link)
         new_target = old_target.replace("elrondsdk", "multiversx-sdk")
         old_testwallets_link.unlink()
-        os.symlink(str(new_testwallets_link), new_target)
+        os.symlink(new_target, str(new_testwallets_link))
         logger.info("Fixed old testwallets symlink.")
     except FileNotFoundError:
         logger.info("Old testwallets symlink does not exist.")
@@ -162,7 +162,7 @@ def migrate_old_elrondsdk() -> None:
         old_target = os.readlink(old_nodejs_link)
         new_target = old_target.replace("elrondsdk", "multiversx-sdk")
         old_nodejs_link.unlink()
-        os.symlink(str(new_nodejs_link), new_target)
+        os.symlink(new_target, str(new_nodejs_link))
         logger.info("Fixed old nodejs symlink.")
     except FileNotFoundError:
         logger.info("Old nodejs symlink does not exist.")
