@@ -140,24 +140,32 @@ def migrate_old_elrondsdk() -> None:
     new_testwallets_link = sdk_path / "testwallets" / "latest"
     new_nodejs_link = sdk_path / "nodejs" / "latest"
 
-    if old_mandos_link.is_symlink():
+    try:
         old_target = os.readlink(old_mandos_link)
         new_target = old_target.replace("elrondsdk", "multiversx-sdk")
         old_mandos_link.unlink()
         os.symlink(str(new_mandos_link), new_target)
+        logger.info("Fixed old mandos symlink.")
+    except FileNotFoundError:
+        logger.info("Old mandos symlink does not exist.")
 
-    if old_testwallets_link.is_symlink():
+    try:
         old_target = os.readlink(old_testwallets_link)
         new_target = old_target.replace("elrondsdk", "multiversx-sdk")
         old_testwallets_link.unlink()
         os.symlink(str(new_testwallets_link), new_target)
+        logger.info("Fixed old testwallets symlink.")
+    except FileNotFoundError:
+        logger.info("Old testwallets symlink does not exist.")
 
-    if old_nodejs_link.is_symlink():
+    try:
         old_target = os.readlink(old_nodejs_link)
         new_target = old_target.replace("elrondsdk", "multiversx-sdk")
         old_nodejs_link.unlink()
         os.symlink(str(new_nodejs_link), new_target)
-        
+        logger.info("Fixed old nodejs symlink.")
+    except FileNotFoundError:
+        logger.info("Old nodejs symlink does not exist.")
 
 
 def create_venv():
