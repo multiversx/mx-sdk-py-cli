@@ -38,6 +38,8 @@ jobs:
 
           erdpy contract new --template=adder adder
           erdpy contract build adder
+          erdpy contract test --directory="scenarios" adder
+
           erdpy contract new --template=simple-counter simple-counter
           erdpy contract build simple-counter
       - name: Install (and smoke test) mxpy (new)
@@ -48,5 +50,7 @@ jobs:
           source /home/runner/.profile
           mxpy contract new --template=lottery-esdt lottery-esdt
           mxpy contract build lottery-esdt
+          mxpy contract test --directory="scenarios" adder
+
           mxpy contract new --template=ultimate-answer ultimate-answer
           mxpy contract build ultimate-answer
