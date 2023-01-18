@@ -131,23 +131,21 @@ def migrate_old_elrondsdk() -> None:
     else:
         logger.info(f"Old config path does not exist: {old_config_path}.")
 
+    # Remove vmtools, if exists. Has to be re-downloaded, and re-compiled (libwasmer-related issues will arise otherwise).
+    old_vmtools = sdk_path / "vmtools"
+    try:
+        shutil.rmtree(old_vmtools)
+        logger.warning("Removed old vmtools.")
+        logger.warning("You have to re-download vmtools using [mxpy deps install vmtools].")
+    except FileNotFoundError:
+        logger.info("Old vmtools does not exist.")
+
     # Fix existing symlinks.
-    old_mandos_link = sdk_path / "vmtools" / "mandos-test"
     old_testwallets_link = sdk_path / "testwallets" / "latest"
     old_nodejs_link = sdk_path / "nodejs" / "latest"
 
-    new_mandos_link = sdk_path / "vmtools" / "run-scenarios"
     new_testwallets_link = sdk_path / "testwallets" / "latest"
     new_nodejs_link = sdk_path / "nodejs" / "latest"
-
-    try:
-        old_target = os.readlink(old_mandos_link)
-        new_target = old_target.replace("elrondsdk", "multiversx-sdk")
-        old_mandos_link.unlink()
-        os.symlink(new_target, str(new_mandos_link))
-        logger.info("Fixed old mandos symlink.")
-    except FileNotFoundError:
-        logger.info("Old mandos symlink does not exist.")
 
     try:
         old_target = os.readlink(old_testwallets_link)
