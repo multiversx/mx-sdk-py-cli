@@ -1,0 +1,13 @@
+{
+  "validators": [
+    {
+      "pemFile": "~/multiversx-sdk/testwallets/latest/validators/validatorKey00.pem"
+    },
+    {
+      "pemFile": "~/multiversx-sdk/testwallets/latest/validators/validatorKey01.pem"
+    },
+    {
+      "pemFile": "~/multiversx-sdk/testwallets/latest/validators/validatorKey02.pem"
+    }
+  ]
+}

@@ -1,0 +1,56 @@
+name: Migrate erdpy to mxpy (Ubuntu)
+
+on:
+  pull_request:
+    branches: [main, feat/*]
+  workflow_dispatch:
+
+env:
+ BRANCH_NAME: ${{ github.head_ref || github.ref_name }}
+
+jobs:
+  install:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        python-version: [3.8]
+
+    steps:
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install libtinfo5
+        if: ${{ matrix.os != 'macos-latest' }}
+        run: |
+          sudo apt update
+          sudo apt install -y libtinfo5
+      - name: Install (and smoke test) erdpy (old)
+        run: |
+          wget -O erdpy-up.py https://raw.githubusercontent.com/multiversx/mx-sdk-py-cli/v4.0.0/erdpy-up.py
+          python3 erdpy-up.py --exact-version 4.0.0
+
+          source /home/runner/.profile
+
+          erdpy config new test
+          erdpy config set github_api_token ${{ secrets.GITHUB_TOKEN }}
+
+          erdpy contract new --template=adder adder
+          erdpy contract build adder
+          erdpy contract test --directory="scenarios" adder
+
+          erdpy contract new --template=simple-counter simple-counter
+          erdpy contract build simple-counter
+      - name: Install (and smoke test) mxpy (new)
+        run: |
+          wget -O mxpy-up.py https://raw.githubusercontent.com/multiversx/mx-sdk-py-cli/$BRANCH_NAME/mxpy-up.py
+          python3 mxpy-up.py --from-branch $BRANCH_NAME
+
+          source /home/runner/.profile
+          mxpy contract new --template=lottery-esdt lottery-esdt
+          mxpy contract build lottery-esdt
+          mxpy contract test --directory="scenarios" adder
+
+          mxpy contract new --template=ultimate-answer ultimate-answer
+          mxpy contract build ultimate-answer

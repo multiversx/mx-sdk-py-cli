@@ -2,10 +2,35 @@
 Python Command Line Tools for interacting with Multivers<sup>X</sup>.
 
 ## Documentation
-[docs.multiversx.com](https://docs.multiversx.com/sdk-and-tools/erdpy/erdpy/)
+[docs.multiversx.com](https://docs.multiversx.com/sdk-and-tools/sdk-py/)
 
 ## CLI
-[CLI](erdpy/CLI.md)
+[CLI](CLI.md)
 
 ## Distribution
-[erdpy-up](https://docs.multiversx.com/sdk-and-tools/erdpy/installing-erdpy/) and [PyPi](https://pypi.org/project/erdpy/#history)
+[mxpy-up](https://docs.multiversx.com/sdk-and-tools/sdk-py/installing-mxpy/) and [PyPi](https://pypi.org/project/multiversx-sdk-cli/#history)
+
+## Development setup
+
+### Virtual environment
+
+Create a virtual environment and install the dependencies:
+
+```
+python3 -m venv ./.venv
+source ./.venv/bin/activate
+pip install -r ./requirements.txt --upgrade
+```
+
+Install development dependencies, as well:
+
+```
+pip install -r ./requirements-dev.txt --upgrade
+```
+
+Above, `requirements.txt` should mirror the **dependencies** section of `setup.py`.
+
+If using VSCode, restart it or follow these steps:
+ - `Ctrl + Shift + P`
+ - _Select Interpreter_
+ - Choose `./.venv/bin/python`.
