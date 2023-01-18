@@ -157,7 +157,7 @@ class VMToolsModule(StandaloneModule):
         dependencies.install_module('golang')
 
         self.build_binary(tag, 'test')
-        self.make_binary_symlink_in_parent_folder(tag, 'test', 'mandos-test')
+        self.make_binary_symlink_in_parent_folder(tag, 'test', 'run-scenarios')
         self.copy_libwasmer_in_parent_directory(tag)
 
     def build_binary(self, tag: str, binary_name: str):
@@ -186,7 +186,7 @@ class VMToolsModule(StandaloneModule):
         parent_directory = self.get_parent_directory()
         for f in libwasmer_directory.iterdir():
             if f.suffix in ['.dylib', '.so', '.dll']:
-                # Copy the dynamic library near the "mandos-test" symlink
+                # Copy the dynamic library near the "run-scenarios" symlink
                 shutil.copy(f, parent_directory)
                 # Though, also copy the dynamic library near the target executable (seems to be necessary on MacOS)
                 shutil.copy(f, cmd_test_directory)

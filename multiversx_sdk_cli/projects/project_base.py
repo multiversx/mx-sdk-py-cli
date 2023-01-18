@@ -135,7 +135,7 @@ class Project(IProject):
     def run_tests(self, tests_directory: Path, wildcard: str = ""):
         vmtools = cast(StandaloneModule, dependencies.get_module_by_key("vmtools"))
         tool_env = vmtools.get_env()
-        tool = path.join(vmtools.get_parent_directory(), "mandos-test")
+        tool = path.join(vmtools.get_parent_directory(), "run-scenarios")
         test_folder = self.directory / tests_directory
 
         if not wildcard:

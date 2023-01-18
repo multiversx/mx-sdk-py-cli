@@ -1,9 +1,8 @@
+from pathlib import Path
+
 import setuptools
 
-with open("README.md", "r") as fh:
-    long_description = "https://github.com/multiversx/mx-sdk-py-cli"
-
-VERSION = "5.0.0"
+VERSION = "5.0.0b4"
 
 try:
     with open('./multiversx_sdk_cli/_version.py', 'wt') as versionfile:
@@ -13,10 +12,10 @@ except FileNotFoundError:
 
 # See https://packaging.python.org/tutorials/packaging-projects/
 setuptools.setup(
-    name="mxpy",
+    name="multiversx-sdk-cli",
     version=VERSION,
     description="MultiversX Smart Contracts Tools",
-    long_description=long_description,
+    long_description=Path("README.md").read_text(),
     long_description_content_type="text/markdown",
     url="https://github.com/multiversx/mx-sdk-py-cli",
     author="MultiversX",
