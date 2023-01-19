@@ -1,16 +1,17 @@
 import base64
 import os
 from binascii import b2a_base64, hexlify, unhexlify
+from json import dump, load
 from pathlib import Path
 from typing import Any
-import multiversx_sdk_cli.accounts as accounts
-from json import load, dump
 from uuid import uuid4
 
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import hashes, hmac
 from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
 from cryptography.hazmat.primitives.kdf.scrypt import Scrypt
+
+import multiversx_sdk_cli.accounts as accounts
 from multiversx_sdk_cli import errors
 
 
@@ -102,8 +103,8 @@ def make_cyphertext(backend: Any, key: bytes, iv: bytes, secret_key: str):
     return encryptor.update(secret_key) + encryptor.finalize()
 
 
-# erdjs implementation:
-# https://github.com/multiversx/mx-sdk-erdjs-walletcore/blob/main/src/userWallet.ts
+# sdk-js implementation:
+# https://github.com/multiversx/mx-sdk-js-wallet/blob/main/src/userWallet.ts
 def format_key_json(uid: str, pubkey: str, iv: bytes, ciphertext: bytes, salt: bytes, mac: bytes) -> Any:
     address = accounts.Address(pubkey)
 
