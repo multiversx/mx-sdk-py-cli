@@ -1,18 +1,18 @@
 import json
 import logging
-import os
-from pathlib import Path
 import shutil
+from pathlib import Path
 from typing import Any, List, Tuple
 
 from multiversx_sdk_cli import errors, utils
 from multiversx_sdk_cli.projects import shared
 from multiversx_sdk_cli.projects.project_rust import CargoFile
-from multiversx_sdk_cli.projects.templates_config import get_templates_repositories
-from multiversx_sdk_cli.projects.templates_repository import TemplatesRepository
+from multiversx_sdk_cli.projects.templates_config import \
+    get_templates_repositories
+from multiversx_sdk_cli.projects.templates_repository import \
+    TemplatesRepository
 
 logger = logging.getLogger("projects.templates")
-ERDJS_SNIPPETS_FOLDER_NAME = "erdjs-snippets"
 
 
 def list_project_templates():
@@ -70,40 +70,9 @@ def _copy_template(template: str, destination_path: Path, project_name: str):
         if repo.has_template(template):
             source_path = repo.get_template_folder(template)
             shutil.copytree(source_path, destination_path)
-            _copy_erdjs_snippets(template, repo.get_payload_folder(), destination_path, project_name)
             return
 
     raise errors.TemplateMissingError(template)
-
-
-def _copy_erdjs_snippets(template: str,  templates_payload_folder: Path, destination_path: Path, project_name: str):
-    source_erdjs_snippets_folder = templates_payload_folder / ERDJS_SNIPPETS_FOLDER_NAME
-    source_erdjs_snippets_subfolder = source_erdjs_snippets_folder / template
-    destination_erdjs_snippets_folder = destination_path.parent / ERDJS_SNIPPETS_FOLDER_NAME
-    no_snippets = not source_erdjs_snippets_subfolder.is_dir()
-
-    logger.info(f"_copy_erdjs_snippets, source_erdjs_snippets_subfolder: {source_erdjs_snippets_subfolder}")
-    logger.info(f"_copy_erdjs_snippets, destination_erdjs_snippets_folder: {destination_erdjs_snippets_folder}")
-
-    if no_snippets:
-        logger.info(f"_copy_erdjs_snippets: no snippets in template {template}")
-        return
-
-    utils.ensure_folder(destination_erdjs_snippets_folder)
-
-    # Copy snippets to destination
-    # First, copy the subfolder associated with the template
-    shutil.copytree(source_erdjs_snippets_subfolder, destination_erdjs_snippets_folder / project_name)
-
-    # After that, copy the remaining files from the source folder - not recursively (on purpose).
-    for file in os.listdir(source_erdjs_snippets_folder):
-        source_file = source_erdjs_snippets_folder / file
-        destination_file = destination_erdjs_snippets_folder / file
-        should_copy = source_file.is_file() and not destination_file.exists()
-
-        if should_copy:
-            logger.info(f"_copy_erdjs_snippets, file: {file}")
-            shutil.copy(source_file, destination_file)
 
 
 def _load_as_template(directory: Path):
