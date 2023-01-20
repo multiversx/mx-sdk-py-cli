@@ -20,7 +20,7 @@ STR_PREFIX = "str:"
 
 
 class INetworkProvider(Protocol):
-    def query_contract(self, query: Any) -> Any:
+    def query_contract(self, query: Any) -> 'IContractQueryResponse':
         ...
 
 
@@ -53,6 +53,12 @@ class ContractQuery(IContractQuery):
 
     def get_value(self) -> int:
         return self.value
+
+
+class IContractQueryResponse(Protocol):
+    return_data: List[str]
+    return_code: str
+    return_message: str
 
 
 class SmartContract:
@@ -184,6 +190,9 @@ class SmartContract:
         query = ContractQuery(self.address, function, value, prepared_arguments, caller)
 
         response = proxy.query_contract(query)
+        # Temporary workaround, until we add "isSuccess" on the response class.
+        if response.return_code != "ok":
+            raise RuntimeError(f"Query failed: {response.return_message}")
         return response
 
     def _interpret_return_data(self, data: str) -> Any:
