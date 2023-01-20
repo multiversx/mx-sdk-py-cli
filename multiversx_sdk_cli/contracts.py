@@ -50,7 +50,7 @@ class ContractQuery(IContractQuery):
 
     def get_caller(self) -> Optional[Address]:
         return self.caller
-    
+
     def get_value(self) -> int:
         return self.value
 
@@ -176,10 +176,12 @@ class SmartContract:
         return [self._interpret_return_data(data) for data in return_data]
 
     def query_detailed(self, proxy: INetworkProvider, function: str, arguments: List[Any],
-                        value: int = 0, caller: Optional[Address] = None) -> Any:
+                       value: int = 0, caller: Optional[Address] = None) -> Any:
         arguments = arguments or []
+        # Temporary workaround, until we use sdk-core's serializer.
+        prepared_arguments = [bytes.fromhex(_prepare_argument(arg)) for arg in arguments]
 
-        query = ContractQuery(self.address, function, value, arguments, caller)
+        query = ContractQuery(self.address, function, value, prepared_arguments, caller)
 
         response = proxy.query_contract(query)
         return response
