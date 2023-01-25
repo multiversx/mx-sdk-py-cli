@@ -141,7 +141,7 @@ def setup_parser(args: List[str], subparsers: Any) -> Any:
         required=True,
         help="the url of the service that validates the contract",
     )
-    sub.add_argument("--docker-image", required=True, help="the docker image used for the build (i.e. multiversx/sdk-rust-contract-builder:next)")
+    sub.add_argument("--docker-image", required=True, help="the docker image used for the build")
     cli_shared.add_wallet_args(args, sub)
     sub.set_defaults(func=verify)
 
