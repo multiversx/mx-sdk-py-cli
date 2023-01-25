@@ -58,7 +58,7 @@ PosixPath('test/contract-dbg.wasm')
 def _get_twiggy_paths_path(wasm_path: Path) -> Path:
     """
 >>> _get_twiggy_paths_path(Path('test/contract.wasm'))
-PosixPath('test/twiggy-paths-contract.txt')
+PosixPath('test/twiggy-paths-contract-dbg.txt')
     """
-    txt_file_path = _replace_file_suffix(wasm_path, '.txt')
+    txt_file_path = _replace_file_suffix(wasm_path, '-dbg.txt')
     return _add_file_prefix(txt_file_path, 'twiggy-paths-')
