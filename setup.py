@@ -34,7 +34,6 @@ setuptools.setup(
         "ledgercomm[hid]",
         "semver",
         "requests-cache",
-        "multiversx-sdk-rust-contract-builder==4.0.2",
         "multiversx-sdk-network-providers==0.6.4",
         "multiversx-sdk-wallet==0.4.1",
         "multiversx-sdk-core==0.3.*",

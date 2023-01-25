@@ -1,13 +1,17 @@
 import json
+import time
 import hashlib
+import logging
 from pathlib import Path
-from typing import Dict, Any, Union
+from typing import Dict, Any
+
+from multiversx_sdk_cli.utils import dump_out_json
 from multiversx_sdk_cli.accounts import Account, Address
 from multiversx_sdk_cli.utils import read_json_file
 from nacl.signing import SigningKey
 import requests
-from multiversx_sdk_rust_contract_builder.packaged_source_code import PackagedSourceCode
 
+logger = logging.getLogger("cli.contracts.verifier")
 
 class ContractVerificationRequest:
     def __init__(
@@ -50,20 +54,13 @@ class ContractVerificationPayload:
 
 
 def trigger_contract_verification(
-    packaged_source: Union[Path, None],
-    project_directory: Union[Path, None],
+    packaged_source: Path,
     owner: Account,
     contract: Address,
     verifier_url: str,
     docker_image: str,
 ):
-    if packaged_source:
-        source_code = read_json_file(packaged_source)
-        source_code = PackagedSourceCode.from_dict(source_code).to_dict()
-    elif project_directory:
-        source_code = PackagedSourceCode.from_folder(project_directory).to_dict()
-    else:
-        raise NotImplementedError()
+    source_code = read_json_file(packaged_source)
 
     payload = ContractVerificationPayload(contract, source_code, docker_image).serialize()
 
@@ -80,6 +77,38 @@ def trigger_contract_verification(
     contract_verification = ContractVerificationRequest(contract, source_code, signature, docker_image)
 
     request_dictionary = contract_verification.to_dictionary()
-    response = requests.post(verifier_url, json=request_dictionary)
 
-    return response
+    url = f"{verifier_url}/verifier"
+    response = requests.post(url, json=request_dictionary).json()
+
+    status = response.get("status", "")
+    if status:
+        logger.info(f"Task status: {status}")
+
+        if status == "error":
+            dump_out_json(response)
+        else:
+            dump_out_json(response)
+    else:
+        task_id = response.get("taskId", "")
+        query_status_with_task_id(verifier_url, task_id)
+
+
+def query_status_with_task_id(url: str, task_id: str, interval: int = 10):
+    logger.info(f"Please wait while we verify your contract. This may take a while.")
+    old_status = ""
+
+    while True:
+        response = requests.get(f"{url}/tasks/{task_id}").json()
+        status = response.get("status", "")
+
+        if status == "finished":
+            logger.info(f"Verification finished!")
+            dump_out_json(response)
+            break
+        elif status != old_status:
+            logger.info(f"Task status: {status}")
+            dump_out_json(response)
+            old_status = status
+        
+        time.sleep(interval)
