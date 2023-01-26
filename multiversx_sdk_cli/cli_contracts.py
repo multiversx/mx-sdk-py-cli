@@ -52,6 +52,7 @@ def setup_parser(args: List[str], subparsers: Any) -> Any:
     sub.add_argument("--directory", default="scenarios",
                      help="🗀 the directory containing the tests (default: %(default)s)")
     sub.add_argument("--wildcard", required=False, help="wildcard to match only specific test files")
+    _add_recursive_arg(sub)
     sub.set_defaults(func=run_tests)
 
     sub = cli_shared.add_command_subparser(subparsers, "contract", "report", "Print a detailed report of the smart contracts.")
@@ -279,7 +280,9 @@ def do_report(args: Any):
 
 
 def run_tests(args: Any):
-    projects.run_tests(args)
+    project_paths = get_project_paths(args)
+    for project in project_paths:
+        projects.run_tests(project, args)
 
 
 def deploy(args: Any):
