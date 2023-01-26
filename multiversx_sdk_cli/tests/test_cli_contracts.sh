@@ -62,7 +62,7 @@ testRunScenarios() {
     ${CLI} --verbose contract test --directory="scenarios" ${SANDBOX}/myadder-rs || return 1
     ${CLI} --verbose contract test --directory="scenarios" ${SANDBOX}/mybubbles-rs || return 1
     ${CLI} --verbose contract test --directory="scenarios" ${SANDBOX}/mylottery-rs || return 1
-    ${CLI} --verbose contract test --directory="scenarios" ${SANDBOX}/myfunding-rs || return 1
+    ${CLI} --verbose contract test --directory="scenarios" --recursive ${SANDBOX}/myfunding-rs || return 1
 }
 
 testWasmName() {
