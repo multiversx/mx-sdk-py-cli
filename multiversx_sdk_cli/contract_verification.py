@@ -11,6 +11,9 @@ from multiversx_sdk_cli.utils import read_json_file
 from nacl.signing import SigningKey
 import requests
 
+HTTP_REQUEST_TIMEOUT = 408
+HTTP_SUCCESS = 200
+
 logger = logging.getLogger("cli.contracts.verifier")
 
 class ContractVerificationRequest:
@@ -81,24 +84,20 @@ def trigger_contract_verification(
     url = f"{verifier_url}/verifier"
     response = requests.post(url, json=request_dictionary)
 
-    if response.status_code == 408:
+    if response.status_code == HTTP_REQUEST_TIMEOUT:
         task_id = response.json().get("taskId", "")
 
         if task_id:
             query_status_with_task_id(verifier_url, task_id)
         else:
             dump_out_json(response.json())
-    elif response.status_code != 200:
+    elif response.status_code != HTTP_SUCCESS:
         dump_out_json(response.json())
-    elif response.status_code == 200:
+    elif response.status_code == HTTP_SUCCESS:
         status = response.json().get("status", "")
         if status:
             logger.info(f"Task status: {status}")
-
-            if status == "error":
-                dump_out_json(response.json())
-            else:
-                dump_out_json(response.json())
+            dump_out_json(response.json())
         else:
             task_id = response.json().get("taskId", "")
             query_status_with_task_id(verifier_url, task_id)
