@@ -79,19 +79,29 @@ def trigger_contract_verification(
     request_dictionary = contract_verification.to_dictionary()
 
     url = f"{verifier_url}/verifier"
-    response = requests.post(url, json=request_dictionary).json()
+    response = requests.post(url, json=request_dictionary)
 
-    status = response.get("status", "")
-    if status:
-        logger.info(f"Task status: {status}")
+    if response.status_code == 408:
+        task_id = response.json().get("taskId", "")
 
-        if status == "error":
-            dump_out_json(response)
+        if task_id:
+            query_status_with_task_id(verifier_url, task_id)
         else:
-            dump_out_json(response)
-    else:
-        task_id = response.get("taskId", "")
-        query_status_with_task_id(verifier_url, task_id)
+            dump_out_json(response.json())
+    elif response.status_code != 200:
+        dump_out_json(response.json())
+    elif response.status_code == 200:
+        status = response.json().get("status", "")
+        if status:
+            logger.info(f"Task status: {status}")
+
+            if status == "error":
+                dump_out_json(response.json())
+            else:
+                dump_out_json(response.json())
+        else:
+            task_id = response.json().get("taskId", "")
+            query_status_with_task_id(verifier_url, task_id)
 
 
 def query_status_with_task_id(url: str, task_id: str, interval: int = 10):
