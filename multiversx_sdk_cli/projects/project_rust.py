@@ -130,7 +130,7 @@ class ProjectRust(Project):
                 abi_file = self.get_abi_filepath()
                 abi_file_renamed = Path(self.get_output_folder(), f"{base_name}.abi.json")
                 abi_file.rename(abi_file_renamed)
-        
+
         outputs = [self.get_wasm_default_path()]
         if self.has_wasm_view():
             outputs.append(self.get_wasm_view_default_path())
@@ -281,7 +281,6 @@ def check_wasm_opt_installed() -> None:
     Skipping optimization because wasm-opt is not installed.
 
     To install it run:
-        mxpy deps install nodejs
         mxpy deps install wasm-opt
 
     Alternatively, pass the "--no-wasm-opt" argument in order to skip the optimization step.

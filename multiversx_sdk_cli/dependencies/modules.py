@@ -6,7 +6,7 @@ from pathlib import Path
 from typing import Dict, List, Optional
 
 from multiversx_sdk_cli import (config, dependencies, downloader, errors, myprocess, utils,
-                   workstation)
+                                workstation)
 
 logger = logging.getLogger("modules")
 
@@ -225,66 +225,6 @@ class GolangModule(StandaloneModule):
         raise errors.UnsupportedConfigurationValue("Golang tag must always be explicit, not latest")
 
 
-class NodejsModule(StandaloneModule):
-    def __init__(self, key: str, aliases: List[str]):
-        super().__init__(key, aliases)
-
-    def _post_install(self, tag: str):
-        # We'll create a symlink towards the payload folder
-        subfolder_to_bypass = self._get_download_url(tag).split("/")[-1]
-        subfolder_to_bypass = subfolder_to_bypass.replace(f".{self.archive_type}", "")
-        payload_folder = path.join(self.get_directory(tag), subfolder_to_bypass)
-        link = path.join(self.get_parent_directory(), "latest")
-
-        utils.symlink(payload_folder, link)
-
-    def get_env(self):
-        bin_folder = path.join(self.get_parent_directory(), "latest", "bin")
-
-        return {
-            "PATH": f"{bin_folder}:{os.environ['PATH']}",
-        }
-
-    def get_latest_release(self) -> str:
-        raise errors.UnsupportedConfigurationValue("Nodejs tag must always be explicit, not latest")
-
-
-class NpmModule(DependencyModule):
-    def __init__(self, key: str, aliases: List[str] = []):
-        super().__init__(key, aliases)
-
-    def get_nodejs(self) -> DependencyModule:
-        return dependencies.get_module_by_key("nodejs")
-
-    def get_nodejs_env(self) -> Dict[str, str]:
-        return self.get_nodejs().get_env()
-
-    def _do_install(self, tag: str) -> None:
-        args = ["npm", "install", f"{self.key}@{tag}", "-g"]
-        myprocess.run_process(args, env=self.get_nodejs_env())
-
-    def uninstall(self, tag: str) -> None:
-        args = ["npm", "uninstall", self.key, "-g"]
-        myprocess.run_process(args, env=self.get_nodejs_env())
-
-    def get_env(self):
-        bin_folder = config.get_dependency_parent_directory("nodejs") / "latest" / "lib" / "node_modules" / self.key / "bin"
-
-        return {
-            "PATH": f"{bin_folder}:{os.environ['PATH']}",
-        }
-
-    def is_installed(self, tag: str) -> bool:
-        try:
-            myprocess.run_process(["wasm-opt", "--version"], env=self.get_env())
-            return True
-        except FileNotFoundError:
-            return False
-
-    def get_latest_release(self) -> str:
-        return "latest"
-
-
 class Rust(DependencyModule):
     def __init__(self, key: str, aliases: List[str] = None):
         if aliases is None:
@@ -400,3 +340,16 @@ class TestWalletsModule(StandaloneModule):
         target = self.get_source_directory(tag)
         link = path.join(self.get_parent_directory(), "latest")
         utils.symlink(str(target), link)
+
+
+class WasmOptModule(StandaloneModule):
+    def __init__(self, key: str):
+        super().__init__(key, [])
+        self.organisation = "WebAssembly"
+        self.repo_name = "binaryen"
+
+    def _post_install(self, tag: str):
+        pass
+
+    def get_latest_release(self) -> str:
+        raise errors.UnsupportedConfigurationValue("wasm-opt tag must either be explicit")
