@@ -12,7 +12,7 @@ from multiversx_sdk_cli.ledger.config import compare_versions
 from multiversx_sdk_cli.ledger.ledger_app_handler import SIGN_USING_HASH_VERSION
 from multiversx_sdk_cli.ledger.ledger_functions import do_get_ledger_address, do_sign_transaction_with_ledger, do_get_ledger_version, \
     TX_HASH_SIGN_VERSION, TX_HASH_SIGN_OPTIONS
-from multiversx_sdk_cli.wallet import bech32
+from multiversx_sdk_core import bech32
 from multiversx_sdk_wallet import UserPEM
 from multiversx_sdk_wallet.keyfile import load_from_key_file_object
 
