@@ -1,10 +1,11 @@
-from multiversx_sdk_cli.wallet.keyfile import save_to_key_file
-from multiversx_sdk_wallet.mnemonic import Mnemonic
+from json import dump
 import logging
 import getpass
 from pathlib import Path
 from typing import Any, List
 
+from multiversx_sdk_wallet.keyfile import convert_to_keyfile_object
+from multiversx_sdk_wallet.mnemonic import Mnemonic
 from multiversx_sdk_cli import cli_shared, utils
 from multiversx_sdk_cli.accounts import Account, Address
 from multiversx_sdk_wallet.user_pem import UserPEM
@@ -93,6 +94,7 @@ def new_wallet(args: Any):
     secret_key = mnemonic.derive_key()
     pubkey = secret_key.generate_public_key()
     address = Address(pubkey.hex())
+    output_path = args.output_path
 
     if args.pem:
         pem_file = UserPEM(address.bech32(), secret_key)
@@ -102,7 +104,11 @@ def new_wallet(args: Any):
     if args.json:
         json_file = prepare_file(args.output_path, ".json")
         password = getpass.getpass("Enter a new password:")
-        save_to_key_file(json_file, secret_key.hex(), pubkey.hex(), password)
+
+        keyfile = convert_to_keyfile_object(secret_key.buffer, pubkey.buffer, password, None, "erd")
+        with open(output_path, 'w') as json_file:
+            dump(keyfile, json_file, indent=4)
+
         logger.info(f"Json wallet generated: {json_file}")
 
 
