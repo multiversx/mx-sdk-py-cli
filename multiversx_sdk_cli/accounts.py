@@ -11,7 +11,8 @@ from multiversx_sdk_cli.ledger.config import compare_versions
 from multiversx_sdk_cli.ledger.ledger_app_handler import SIGN_USING_HASH_VERSION
 from multiversx_sdk_cli.ledger.ledger_functions import do_get_ledger_address, do_sign_transaction_with_ledger, do_get_ledger_version, \
     TX_HASH_SIGN_VERSION, TX_HASH_SIGN_OPTIONS
-from multiversx_sdk_cli.wallet import bech32, pem
+from multiversx_sdk_cli.wallet import bech32
+from multiversx_sdk_wallet import UserPEM
 from multiversx_sdk_cli.wallet.keyfile import load_from_key_file
 
 logger = logging.getLogger("accounts")
@@ -37,9 +38,9 @@ class Account(IAccount):
         self.ledger = ledger
 
         if self.pem_file:
-            secret_key, pubkey = pem.parse(Path(self.pem_file), self.pem_index)
-            self.secret_key = secret_key.hex()
-            self.address = Address(pubkey)
+            user_pem_file = UserPEM.from_file(Path(self.pem_file), self.pem_index)
+            self.secret_key = user_pem_file.secret_key.hex()
+            self.address = Address(user_pem_file.public_key.hex())
         elif key_file and password:
             address_from_key_file, secret_key = load_from_key_file(key_file, password)
             self.secret_key = secret_key.hex()
