@@ -4,12 +4,14 @@ import sys
 from argparse import FileType
 from typing import Any, List, Text, cast
 
-from multiversx_sdk_cli import config, errors, scope, utils
+from multiversx_sdk_network_providers.proxy_network_provider import \
+    ProxyNetworkProvider
+
+from multiversx_sdk_cli import config, errors, utils
 from multiversx_sdk_cli.accounts import Account
 from multiversx_sdk_cli.cli_output import CLIOutputBuilder
 from multiversx_sdk_cli.cli_password import load_password
 from multiversx_sdk_cli.ledger.ledger_functions import do_get_ledger_address
-from multiversx_sdk_network_providers.proxy_network_provider import ProxyNetworkProvider
 from multiversx_sdk_cli.simulation import Simulator
 from multiversx_sdk_cli.transactions import Transaction
 
@@ -55,7 +57,7 @@ def add_command_subparser(subparsers: Any, group: str, command: str, description
 
 def add_tx_args(args: List[str], sub: Any, with_nonce: bool = True, with_receiver: bool = True, with_data: bool = True, with_estimate_gas: bool = False):
     if with_nonce:
-        sub.add_argument("--nonce", type=int, required=not("--recall-nonce" in args), help="# the nonce for the transaction")
+        sub.add_argument("--nonce", type=int, required=not ("--recall-nonce" in args), help="# the nonce for the transaction")
         sub.add_argument("--recall-nonce", action="store_true", default=False, help="⭮ whether to recall the nonce when creating the transaction (default: %(default)s)")
 
     if with_receiver:
@@ -63,7 +65,7 @@ def add_tx_args(args: List[str], sub: Any, with_nonce: bool = True, with_receive
         sub.add_argument("--receiver-username", required=False, help="🖄 the username of the receiver")
 
     sub.add_argument("--gas-price", default=config.DEFAULT_GAS_PRICE, help="⛽ the gas price (default: %(default)d)")
-    sub.add_argument("--gas-limit", required=not("--estimate-gas" in args), help="⛽ the gas limit")
+    sub.add_argument("--gas-limit", required=not ("--estimate-gas" in args), help="⛽ the gas limit")
     if with_estimate_gas:
         sub.add_argument("--estimate-gas", action="store_true", default=False, help="⛽ whether to estimate the gas limit (default: %(default)d)")
 
@@ -72,8 +74,8 @@ def add_tx_args(args: List[str], sub: Any, with_nonce: bool = True, with_receive
     if with_data:
         sub.add_argument("--data", default="", help="the payload, or 'memo' of the transaction (default: %(default)s)")
 
-    sub.add_argument("--chain", default=scope.get_chain_id(), help="the chain identifier (default: %(default)s)")
-    sub.add_argument("--version", type=int, default=scope.get_tx_version(), help="the transaction version (default: %(default)s)")
+    sub.add_argument("--chain", required=True, help="the chain identifier (default: %(default)s)")
+    sub.add_argument("--version", type=int, default=1, help="the transaction version (default: %(default)s)")
     sub.add_argument("--options", type=int, default=0, help="the transaction options (default: 0)")
 
 
@@ -89,7 +91,7 @@ def add_wallet_args(args: List[str], sub: Any):
 
 
 def add_proxy_arg(sub: Any):
-    sub.add_argument("--proxy", default=scope.get_proxy(), help="🔗 the URL of the proxy (default: %(default)s)")
+    sub.add_argument("--proxy", default=config.get_proxy(), help="🔗 the URL of the proxy (default: %(default)s)")
 
 
 def add_outfile_arg(sub: Any, what: str = ""):
