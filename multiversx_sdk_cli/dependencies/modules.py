@@ -5,14 +5,14 @@ from os import path
 from pathlib import Path
 from typing import Dict, List, Optional
 
-from multiversx_sdk_cli import (config, dependencies, downloader, errors, myprocess, utils,
-                   workstation)
+from multiversx_sdk_cli import (config, dependencies, downloader, errors,
+                                myprocess, utils, workstation)
 
 logger = logging.getLogger("modules")
 
 
 class DependencyModule:
-    def __init__(self, key: str, aliases: List[str]):
+    def __init__(self, key: str, aliases: List[str] = []):
         self.key = key
         self.aliases = aliases
 
@@ -64,12 +64,9 @@ class DependencyModule:
 class StandaloneModule(DependencyModule):
     def __init__(self,
                  key: str,
-                 aliases: List[str] = None,
+                 aliases: List[str] = [],
                  repo_name: Optional[str] = None,
                  organisation: Optional[str] = None):
-        if aliases is None:
-            aliases = list()
-
         super().__init__(key, aliases)
         self.archive_type = "tar.gz"
         self.repo_name = repo_name
@@ -114,8 +111,10 @@ class StandaloneModule(DependencyModule):
         if tag_no_v.startswith("v"):
             tag_no_v = tag_no_v[1:]
         assert isinstance(self.repo_name, str)
-        source_folder = self.get_directory(tag) / f'{self.repo_name}-{tag_no_v}'
-        return source_folder
+
+        source_folder_option_1 = self.get_directory(tag) / f'{self.repo_name}-{tag_no_v}'
+        source_folder_option_2 = self.get_directory(tag) / f'{self.repo_name}-{tag}'
+        return source_folder_option_1 if source_folder_option_1.exists() else source_folder_option_2
 
     def get_parent_directory(self) -> Path:
         return config.get_dependency_parent_directory(self.key)
@@ -145,10 +144,7 @@ class StandaloneModule(DependencyModule):
 
 
 class VMToolsModule(StandaloneModule):
-    def __init__(self, key: str, aliases: List[str] = None):
-        if aliases is None:
-            aliases = list()
-
+    def __init__(self, key: str, aliases: List[str] = []):
         super().__init__(key, aliases)
         self.repo_name = 'mx-chain-vm-go'
         self.organisation = 'multiversx'
@@ -196,12 +192,6 @@ class VMToolsModule(StandaloneModule):
 
 
 class GolangModule(StandaloneModule):
-    def __init__(self, key: str, aliases: List[str] = None):
-        if aliases is None:
-            aliases = list()
-
-        super().__init__(key, aliases)
-
     def _post_install(self, tag: str):
         parent_directory = self.get_parent_directory()
         utils.ensure_folder(path.join(parent_directory, "GOPATH"))
@@ -225,73 +215,7 @@ class GolangModule(StandaloneModule):
         raise errors.UnsupportedConfigurationValue("Golang tag must always be explicit, not latest")
 
 
-class NodejsModule(StandaloneModule):
-    def __init__(self, key: str, aliases: List[str]):
-        super().__init__(key, aliases)
-
-    def _post_install(self, tag: str):
-        # We'll create a symlink towards the payload folder
-        subfolder_to_bypass = self._get_download_url(tag).split("/")[-1]
-        subfolder_to_bypass = subfolder_to_bypass.replace(f".{self.archive_type}", "")
-        payload_folder = path.join(self.get_directory(tag), subfolder_to_bypass)
-        link = path.join(self.get_parent_directory(), "latest")
-
-        utils.symlink(payload_folder, link)
-
-    def get_env(self):
-        bin_folder = path.join(self.get_parent_directory(), "latest", "bin")
-
-        return {
-            "PATH": f"{bin_folder}:{os.environ['PATH']}",
-        }
-
-    def get_latest_release(self) -> str:
-        raise errors.UnsupportedConfigurationValue("Nodejs tag must always be explicit, not latest")
-
-
-class NpmModule(DependencyModule):
-    def __init__(self, key: str, aliases: List[str] = []):
-        super().__init__(key, aliases)
-
-    def get_nodejs(self) -> DependencyModule:
-        return dependencies.get_module_by_key("nodejs")
-
-    def get_nodejs_env(self) -> Dict[str, str]:
-        return self.get_nodejs().get_env()
-
-    def _do_install(self, tag: str) -> None:
-        args = ["npm", "install", f"{self.key}@{tag}", "-g"]
-        myprocess.run_process(args, env=self.get_nodejs_env())
-
-    def uninstall(self, tag: str) -> None:
-        args = ["npm", "uninstall", self.key, "-g"]
-        myprocess.run_process(args, env=self.get_nodejs_env())
-
-    def get_env(self):
-        bin_folder = config.get_dependency_parent_directory("nodejs") / "latest" / "lib" / "node_modules" / self.key / "bin"
-
-        return {
-            "PATH": f"{bin_folder}:{os.environ['PATH']}",
-        }
-
-    def is_installed(self, tag: str) -> bool:
-        try:
-            myprocess.run_process(["wasm-opt", "--version"], env=self.get_env())
-            return True
-        except FileNotFoundError:
-            return False
-
-    def get_latest_release(self) -> str:
-        return "latest"
-
-
 class Rust(DependencyModule):
-    def __init__(self, key: str, aliases: List[str] = None):
-        if aliases is None:
-            aliases = list()
-
-        super().__init__(key, aliases)
-
     def _do_install(self, tag: str) -> None:
         rustup_path = self._get_rustup_path()
         downloader.download("https://sh.rustup.rs", rustup_path)
@@ -360,12 +284,6 @@ class Rust(DependencyModule):
 
 
 class CargoModule(DependencyModule):
-    def __init__(self, key: str, aliases: List[str] = None):
-        if aliases is None:
-            aliases = list()
-
-        super().__init__(key, aliases)
-
     def _do_install(self, tag: str) -> None:
         self._run_command_with_rust_env(["cargo", "install", self.key])
 
@@ -400,3 +318,30 @@ class TestWalletsModule(StandaloneModule):
         target = self.get_source_directory(tag)
         link = path.join(self.get_parent_directory(), "latest")
         utils.symlink(str(target), link)
+
+
+class WasmOptModule(StandaloneModule):
+    def __init__(self, key: str):
+        super().__init__(key, [])
+        self.organisation = "WebAssembly"
+        self.repo_name = "binaryen"
+
+    def _post_install(self, tag: str):
+        binary = self.get_source_directory(tag) / "bin" / "wasm-opt"
+        shutil.copy(binary, self.get_directory(tag))
+        shutil.rmtree(self.get_source_directory(tag))
+
+    def is_installed(self, tag: str) -> bool:
+        tag = tag or config.get_dependency_tag(self.key)
+        return (self.get_directory(tag) / "wasm-opt").exists()
+
+    def get_env(self):
+        tag = config.get_dependency_tag(self.key)
+        bin_folder = self.get_directory(tag)
+
+        return {
+            "PATH": f"{bin_folder}:{os.environ['PATH']}",
+        }
+
+    def get_latest_release(self) -> str:
+        raise errors.UnsupportedConfigurationValue("wasm-opt tag must either be explicit")
