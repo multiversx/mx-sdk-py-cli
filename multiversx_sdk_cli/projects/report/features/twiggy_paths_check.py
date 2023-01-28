@@ -42,6 +42,11 @@ def _replace_file_suffix(file_path: Path, suffix: str) -> Path:
     return file_path.with_name(new_name)
 
 
+def _add_file_prefix(file_path: Path, prefix: str) -> Path:
+    new_name = prefix + file_path.name
+    return file_path.with_name(new_name)
+
+
 def _get_debug_wasm_path(wasm_path: Path) -> Path:
     """
 >>> _get_debug_wasm_path(Path('test/contract.wasm'))
@@ -52,7 +57,8 @@ PosixPath('test/contract-dbg.wasm')
 
 def _get_twiggy_paths_path(wasm_path: Path) -> Path:
     """
->>> _replace_file_suffix(Path('test/contract.wasm'), '-paths.txt')
-PosixPath('test/contract-paths.txt')
+>>> _get_twiggy_paths_path(Path('test/contract.wasm'))
+PosixPath('test/twiggy-paths-contract-dbg.txt')
     """
-    return _replace_file_suffix(wasm_path, '-paths.txt')
+    txt_file_path = _replace_file_suffix(wasm_path, '-dbg.txt')
+    return _add_file_prefix(txt_file_path, 'twiggy-paths-')
