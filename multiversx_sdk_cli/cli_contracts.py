@@ -52,6 +52,7 @@ def setup_parser(args: List[str], subparsers: Any) -> Any:
     sub.add_argument("--directory", default="scenarios",
                      help="🗀 the directory containing the tests (default: %(default)s)")
     sub.add_argument("--wildcard", required=False, help="wildcard to match only specific test files")
+    _add_recursive_arg(sub)
     sub.set_defaults(func=run_tests)
 
     sub = cli_shared.add_command_subparser(subparsers, "contract", "report", "Print a detailed report of the smart contracts.")
@@ -131,14 +132,8 @@ def setup_parser(args: List[str], subparsers: Any) -> Any:
         "Verify the authenticity of the code of a deployed Smart Contract",
     )
 
-    group = sub.add_mutually_exclusive_group(required=True)
-    group.add_argument(
-        "--project",
-        default=os.getcwd(),
-        help="🗀 the project directory (default: current directory)",
-    )
-    group.add_argument(
-        "--packaged-src", help="JSON file containing the source code of the contract"
+    sub.add_argument(
+        "--packaged-src", required=True, help="JSON file containing the source code of the contract"
     )
 
     _add_contract_arg(sub)
@@ -147,7 +142,7 @@ def setup_parser(args: List[str], subparsers: Any) -> Any:
         required=True,
         help="the url of the service that validates the contract",
     )
-    sub.add_argument("--docker-image", required=True, help="the docker image used for the build (i.e. multiversx/sdk-rust-contract-builder:v4.0.0)")
+    sub.add_argument("--docker-image", required=True, help="the docker image used for the build")
     cli_shared.add_wallet_args(args, sub)
     sub.set_defaults(func=verify)
 
@@ -285,7 +280,9 @@ def do_report(args: Any):
 
 
 def run_tests(args: Any):
-    projects.run_tests(args)
+    project_paths = get_project_paths(args)
+    for project in project_paths:
+        projects.run_tests(project, args)
 
 
 def deploy(args: Any):
@@ -422,16 +419,15 @@ def verify(args: Any) -> None:
     contract = Address(args.contract)
     verifier_url = args.verifier_url
 
-    packaged_src = Path(args.packaged_src) if args.packaged_src else None
-    project_directory = Path(args.project) if args.project else None
+    packaged_src = Path(args.packaged_src)
 
     owner = _prepare_signer(args)
     docker_image = args.docker_image
 
-    response = trigger_contract_verification(
-        packaged_src, project_directory, owner, contract, verifier_url, docker_image
+    trigger_contract_verification(
+        packaged_src, owner, contract, verifier_url, docker_image
     )
-    utils.dump_out_json(response.json())
+    logger.info("Contract verification request completed!")
 
 
 def do_reproducible_build(args: Any):
