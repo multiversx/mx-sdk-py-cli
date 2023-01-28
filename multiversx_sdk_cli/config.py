@@ -35,14 +35,6 @@ def get_proxy() -> str:
     return get_value("proxy")
 
 
-def get_chain_id() -> str:
-    return get_value("chainID")
-
-
-def get_tx_version() -> int:
-    return int(get_value("txVersion"))
-
-
 def get_dependency_tag(key: str) -> str:
     return get_value(f"dependencies.{key}.tag")
 
@@ -150,8 +142,6 @@ def _guard_valid_config_deletion(name: str):
 def get_defaults() -> Dict[str, Any]:
     return {
         "proxy": "https://testnet-gateway.multiversx.com",
-        "chainID": "T",
-        "txVersion": "1",
         "dependencies.vmtools.tag": "latest",
         "dependencies.mx_sdk_rs.tag": "latest",
         "dependencies.vmtools.urlTemplate.linux": "https://github.com/multiversx/mx-chain-vm-go/archive/{TAG}.tar.gz",
