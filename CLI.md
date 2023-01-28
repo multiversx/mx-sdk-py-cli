@@ -1157,7 +1157,7 @@ usage: mxpy deps install [-h] ...
 Install dependencies or multiversx-sdk modules.
 
 positional arguments:
-  {all,llvm,clang,cpp,rust,nodejs,golang,vmtools,mx_chain_go,mx_chain_proxy_go,wasm-opt,twiggy,testwallets}
+  {all,llvm,clang,cpp,rust,golang,vmtools,mx_chain_go,mx_chain_proxy_go,wasm-opt,twiggy,testwallets}
                                                   the dependency to install
 
 optional arguments:
@@ -1176,7 +1176,7 @@ usage: mxpy deps check [-h] ...
 Check whether a dependency is installed.
 
 positional arguments:
-  {all,llvm,clang,cpp,rust,nodejs,golang,vmtools,mx_chain_go,mx_chain_proxy_go,wasm-opt,twiggy,testwallets}
+  {all,llvm,clang,cpp,rust,golang,vmtools,mx_chain_go,mx_chain_proxy_go,wasm-opt,twiggy,testwallets}
                                                   the dependency to check
 
 optional arguments:
