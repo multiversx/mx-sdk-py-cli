@@ -44,7 +44,10 @@ def get_tx_version() -> int:
 
 
 def get_dependency_resolution(key: str) -> str:
-    return get_value(f"dependencies.{key}.resolution")
+    try:
+        return get_value(f"dependencies.{key}.resolution")
+    except:
+        return ""
 
 
 def get_dependency_tag(key: str) -> str:
