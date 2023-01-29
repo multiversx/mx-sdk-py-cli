@@ -175,7 +175,7 @@ def get_defaults() -> Dict[str, Any]:
         "dependencies.mx_chain_proxy_go.urlTemplate.linux": "https://github.com/multiversx/mx-chain-proxy-go/archive/{TAG}.tar.gz",
         "dependencies.mx_chain_proxy_go.urlTemplate.osx": "https://github.com/multiversx/mx-chain-proxy-go/archive/{TAG}.tar.gz",
         "dependencies.golang.resolution": "SDK",
-        "dependencies.golang.tag": "go1.18.4",
+        "dependencies.golang.tag": "go1.18.10",
         "dependencies.golang.urlTemplate.linux": "https://go.dev/dl/{TAG}.linux-amd64.tar.gz",
         "dependencies.golang.urlTemplate.osx": "https://go.dev/dl/{TAG}.darwin-amd64.tar.gz",
         "dependencies.wasm-opt.tag": "latest",
