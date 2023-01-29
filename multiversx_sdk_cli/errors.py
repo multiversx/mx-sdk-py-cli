@@ -54,6 +54,11 @@ class UnknownDependency(KnownError):
         super().__init__(f"Unknown dependency: {name}")
 
 
+class BadDependencyResolution(ProgrammingError):
+    def __init__(self, dependency: str, resolution: Any):
+        super().__init__(f"Bad dependency resolution for {dependency}: {resolution}")
+
+
 class BadDirectory(KnownError):
     def __init__(self, directory: str):
         super().__init__(f"Bad directory: {directory}")

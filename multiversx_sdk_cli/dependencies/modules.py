@@ -7,6 +7,8 @@ from typing import Dict, List, Optional
 
 from multiversx_sdk_cli import (config, dependencies, downloader, errors,
                                 myprocess, utils, workstation)
+from multiversx_sdk_cli.dependencies.resolution import (
+    DependencyResolution, get_dependency_resolution)
 
 logger = logging.getLogger("modules")
 
@@ -20,6 +22,8 @@ class DependencyModule:
         raise NotImplementedError()
 
     def install(self, tag: str, overwrite: bool) -> None:
+        self._guard_cannot_install_on_host()
+
         # Fallback to default tag if not provided
         tag = tag or config.get_dependency_tag(self.key)
 
@@ -59,6 +63,13 @@ class DependencyModule:
 
     def get_latest_release(self) -> str:
         raise NotImplementedError()
+
+    def get_resolution(self) -> DependencyResolution:
+        return get_dependency_resolution(self.key)
+
+    def _guard_cannot_install_on_host(self):
+        if self.get_resolution() == DependencyResolution.Host:
+            raise errors.KnownError(f"Installation of {self.key} on the host machine is not supported. Perhaps set 'dependencies.{self.key}.resolution' to 'SDK' in config?")
 
 
 class StandaloneModule(DependencyModule):
@@ -197,16 +208,38 @@ class GolangModule(StandaloneModule):
         utils.ensure_folder(path.join(parent_directory, "GOPATH"))
         utils.ensure_folder(path.join(parent_directory, "GOCACHE"))
 
-    def get_env(self):
+    def is_installed(self, tag: str) -> bool:
+        resolution = self.get_resolution()
+
+        if resolution == DependencyResolution.Host:
+            return shutil.which("go") is not None
+        if resolution == DependencyResolution.SDK:
+            return super().is_installed(tag)
+
+        raise errors.BadDependencyResolution(self.key, resolution)
+
+    def get_env(self) -> Dict[str, str]:
+        resolution = self.get_resolution()
         directory = self.get_directory(config.get_dependency_tag(self.key))
         parent_directory = self.get_parent_directory()
 
-        return {
-            "PATH": f"{path.join(directory, 'go/bin')}:{os.environ['PATH']}",
-            "GOPATH": self.get_gopath(),
-            "GOCACHE": path.join(parent_directory, "GOCACHE"),
-            "GOROOT": path.join(directory, "go")
-        }
+        if resolution == DependencyResolution.Host:
+            return {
+                "PATH": os.environ.get("PATH", ""),
+                "GOPATH": os.environ.get("GOPATH", ""),
+                "GOCACHE": os.environ.get("GOCACHE", ""),
+                "GOROOT": os.environ.get("GOROOT", "")
+            }
+        if resolution == DependencyResolution.SDK:
+            return {
+                # At this moment, cc (build-essential) is needed to compile go dependencies (e.g. Node, VM)
+                "PATH": f"{(directory / 'go' / 'bin')}:{os.environ['PATH']}",
+                "GOPATH": self.get_gopath(),
+                "GOCACHE": str(parent_directory / "GOCACHE"),
+                "GOROOT": str(directory / "go")
+            }
+
+        raise errors.BadDependencyResolution(self.key, resolution)
 
     def get_gopath(self):
         return path.join(self.get_parent_directory(), "GOPATH")
@@ -235,38 +268,55 @@ class Rust(DependencyModule):
             shutil.rmtree(directory)
 
     def is_installed(self, tag: str) -> bool:
-        try:
-            myprocess.run_process(["rustc", "--version"], env=self.get_env_for_is_installed())
-            return True
-        except Exception:
-            return False
+        resolution = self.get_resolution()
+
+        if resolution == DependencyResolution.Host:
+            return shutil.which("rustc") is not None and shutil.which("cargo") is not None
+        if resolution == DependencyResolution.SDK:
+            try:
+                env = self._get_env_for_is_installed_in_sdk()
+                myprocess.run_process(["rustc", "--version"], env=env)
+                return True
+            except Exception:
+                return False
+
+        raise errors.BadDependencyResolution(self.key, resolution)
 
     def _get_rustup_path(self):
         tools_folder = workstation.get_tools_folder()
         return path.join(tools_folder, "rustup.sh")
 
-    def get_directory(self, tag: str):
+    def get_directory(self, tag: str) -> Path:
         tools_folder = workstation.get_tools_folder()
-        return path.join(tools_folder, "vendor-rust")
+        return tools_folder / "vendor-rust"
 
     def get_env(self):
         directory = self.get_directory("")
+        resolution = self.get_resolution()
 
-        return {
-            # At this moment, cc (build-essential) is sometimes required by the meta crate (e.g. for reports)
-            "PATH": f"{path.join(directory, 'bin')}:{os.environ['PATH']}",
-            "RUSTUP_HOME": directory,
-            "CARGO_HOME": directory
-        }
+        if resolution == DependencyResolution.Host:
+            return {
+                "PATH": os.environ.get("PATH", ""),
+                "RUSTUP_HOME": os.environ.get("RUSTUP_HOME", ""),
+                "CARGO_HOME": os.environ.get("CARGO_HOME", "")
+            }
+        if resolution == DependencyResolution.SDK:
+            return {
+                # At this moment, cc (build-essential) is sometimes required by the meta crate (e.g. for reports)
+                "PATH": f"{path.join(directory, 'bin')}:{os.environ['PATH']}",
+                "RUSTUP_HOME": str(directory),
+                "CARGO_HOME": str(directory)
+            }
 
-    def get_env_for_is_installed(self):
+        raise errors.BadDependencyResolution(self.key, resolution)
+
+    def _get_env_for_is_installed_in_sdk(self) -> Dict[str, str]:
         directory = self.get_directory("")
 
         return {
-            # Here, we do not include the system PATH
-            "PATH": f"{path.join(directory, 'bin')}",
-            "RUSTUP_HOME": directory,
-            "CARGO_HOME": directory
+            "PATH": str(directory / "bin"),
+            "RUSTUP_HOME": str(directory),
+            "CARGO_HOME": str(directory)
         }
 
     def get_env_for_install(self):
@@ -332,8 +382,14 @@ class WasmOptModule(StandaloneModule):
         shutil.rmtree(self.get_source_directory(tag))
 
     def is_installed(self, tag: str) -> bool:
+        resolution = self.get_resolution()
         tag = tag or config.get_dependency_tag(self.key)
-        return (self.get_directory(tag) / "wasm-opt").exists()
+
+        if resolution == DependencyResolution.Host:
+            return shutil.which("wasm-opt") is not None
+        if resolution == DependencyResolution.SDK:
+            return super().is_installed(tag)
+        raise errors.BadDependencyResolution(self.key, resolution)
 
     def get_env(self):
         tag = config.get_dependency_tag(self.key)
