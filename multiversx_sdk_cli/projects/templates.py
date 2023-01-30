@@ -110,10 +110,11 @@ class TemplateRust(Template):
         self._patch_sub_crate("wasm")
         self._patch_sub_crate("abi")
         self._patch_sub_crate("meta")
+        template_name = self._with_underscores(self.template_name)
 
         logger.info("Patching source code...")
         self._patch_source_code_files([
-            self.directory / "src" / "adder.rs",
+            self.directory / "src" / f"{template_name}.rs",
             self.directory / "src" / "lib.rs",
             self.directory / "abi" / "src" / "main.rs",
             self.directory / "wasm" / "src" / "lib.rs",
