@@ -191,7 +191,7 @@ class TemplateRust(Template):
                 # Example: replace contract name "pub trait SimpleERC20" to "pub trait MyContract"
                 (f"pub trait {template_contract_name}", f"pub trait {project_contract_name}"),
                 # Example: replace "simple_erc20.wasm" to "my_token.wasm"
-                (f"{template_name}.wasm", f"{project_name}.wasm"),
+                (f"{self.template_name}.wasm", f"{self.project_name}.wasm"),
                 # Example: replace "use simple_erc20::*" to "use my_token::*"
                 (f"use {template_name}::*", f"use {project_name}::*"),
                 # Example: replace "<simple_erc20::AbiProvider>()" to "<my_token::AbiProvider>()"
