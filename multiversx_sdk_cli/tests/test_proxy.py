@@ -41,7 +41,7 @@ def test_get_hyperblock_by_nonce():
             "hyperblock",
             "get",
             "--key",
-            "3895403",
+            "4312144",
             "--proxy",
             "https://devnet-api.multiversx.com",
         ]
@@ -58,7 +58,7 @@ def test_get_hyperblock_by_hash():
             "hyperblock",
             "get",
             "--key",
-            "85ccf29f51d7acf0fbb6cfcf2e4b89eee2f2264dd989edd5a870d33dacc24743",
+            "756cb9c0a2d16b0fe9027a21c845a4f4eb1f1331630632669c88250128b40440",
             "--proxy",
             "https://devnet-api.multiversx.com",
         ]
@@ -130,7 +130,7 @@ def test_get_transaction():
             "--proxy",
             "https://devnet-api.multiversx.com",
             "--hash",
-            "2cb813be9d5e5040abb2522da75fa5c8d94f72caa510ff51d7525659f398298b",
+            "cbe2026b8d9c3ee75f2846ea8e0b646b19e6fca754e43edb4113757fc3350952",
         ]
     )
 

@@ -53,8 +53,7 @@ def clean_project(directory: Path):
     logger.info("Project cleaned.")
 
 
-def run_tests(args: Any):
-    project_path = Path(args.project)
+def run_tests(project_path: Path, args: Any):
     directory = Path(args.directory)
     wildcard = args.wildcard
 
