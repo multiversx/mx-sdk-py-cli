@@ -328,9 +328,9 @@ class WasmOptModule(StandaloneModule):
 
     def _post_install(self, tag: str):
         # Bit of cleanup, we don't need the rest of the binaries.
-        bin_to_remove = self._get_bin_directory(tag).glob("*")
+        bin_to_remove = list(self._get_bin_directory(tag).glob("*"))
         bin_to_remove = [file for file in bin_to_remove if file.name != "wasm-opt"]
-        lib_to_remove = (self.get_source_directory(tag) / "lib").glob("*")
+        lib_to_remove = list((self.get_source_directory(tag) / "lib").glob("*"))
         lib_to_remove = [file for file in lib_to_remove if file.suffix != ".dylib"]
 
         for file in bin_to_remove + lib_to_remove:
