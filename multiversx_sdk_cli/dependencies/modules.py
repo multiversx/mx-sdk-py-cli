@@ -327,20 +327,29 @@ class WasmOptModule(StandaloneModule):
         self.repo_name = "binaryen"
 
     def _post_install(self, tag: str):
-        binary = self.get_source_directory(tag) / "bin" / "wasm-opt"
-        shutil.copy(binary, self.get_directory(tag))
-        shutil.rmtree(self.get_source_directory(tag))
+        # Bit of cleanup, we don't need the rest of the binaries.
+        bin_to_remove = self._get_bin_directory(tag).glob("*")
+        bin_to_remove = [file for file in bin_to_remove if file.name != "wasm-opt"]
+        lib_to_remove = (self.get_source_directory(tag) / "lib").glob("*")
+        lib_to_remove = [file for file in lib_to_remove if file.suffix != ".dylib"]
+
+        for file in bin_to_remove + lib_to_remove:
+            file.unlink()
+
+    def _get_bin_directory(self, tag: str) -> Path:
+        return self.get_source_directory(tag) / "bin"
 
     def is_installed(self, tag: str) -> bool:
         tag = tag or config.get_dependency_tag(self.key)
-        return (self.get_directory(tag) / "wasm-opt").exists()
+        bin_file = self._get_bin_directory(tag) / "wasm-opt"
+        return bin_file.exists()
 
     def get_env(self):
         tag = config.get_dependency_tag(self.key)
-        bin_folder = self.get_directory(tag)
+        bin_directory = self._get_bin_directory(tag)
 
         return {
-            "PATH": f"{bin_folder}:{os.environ['PATH']}",
+            "PATH": f"{bin_directory}:{os.environ['PATH']}",
         }
 
     def get_latest_release(self) -> str:
