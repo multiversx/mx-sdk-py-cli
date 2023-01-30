@@ -112,14 +112,20 @@ class TemplateRust(Template):
         self._patch_sub_crate("meta")
         template_name = self._with_underscores(self.template_name)
 
-        logger.info("Patching source code...")
-        self._patch_source_code_files([
+        tests = (self.directory / "tests").glob("*.rs")
+
+        source_code_files = [
             self.directory / "src" / f"{template_name}.rs",
             self.directory / "src" / "lib.rs",
             self.directory / "abi" / "src" / "main.rs",
             self.directory / "wasm" / "src" / "lib.rs",
             self.directory / "meta" / "src" / "main.rs",
-        ], ignore_missing=True)
+        ]
+
+        source_code_files.extend(tests)
+
+        logger.info("Patching source code...")
+        self._patch_source_code_files(source_code_files, ignore_missing=True)
         self._patch_source_code_tests()
 
         logger.info("Patching test files...")
@@ -184,6 +190,8 @@ class TemplateRust(Template):
             [
                 # Example: replace contract name "pub trait SimpleERC20" to "pub trait MyContract"
                 (f"pub trait {template_contract_name}", f"pub trait {project_contract_name}"),
+                # Example: replace "simple_erc20.wasm" to "my_token.wasm"
+                (f"{template_name}.wasm", f"{project_name}.wasm"),
                 # Example: replace "use simple_erc20::*" to "use my_token::*"
                 (f"use {template_name}::*", f"use {project_name}::*"),
                 # Example: replace "<simple_erc20::AbiProvider>()" to "<my_token::AbiProvider>()"
