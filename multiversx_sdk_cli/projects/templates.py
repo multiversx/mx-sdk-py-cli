@@ -113,6 +113,7 @@ class TemplateRust(Template):
 
         logger.info("Patching source code...")
         self._patch_source_code_files([
+            self.directory / "src" / "adder.rs",
             self.directory / "src" / "lib.rs",
             self.directory / "abi" / "src" / "main.rs",
             self.directory / "wasm" / "src" / "lib.rs",
@@ -167,23 +168,21 @@ class TemplateRust(Template):
     def _with_underscores(self, name: str) -> str:
         return name.replace('-', '_')
 
-    def _to_cammel_case(self, name: str) -> str:
+    def _contract_name(self, name: str) -> str:
         chars = name.replace("-", " ").replace("_", " ").split()
-        if len(name) == 0:
-            return name
-        return chars[0] + ''.join(i.capitalize() for i in chars[1:])
+        return ''.join(i.capitalize() for i in chars[0:])
 
     def _patch_source_code_files(self, source_paths: List[Path], ignore_missing: bool) -> None:
         template_name = self._with_underscores(self.template_name)
         project_name = self._with_underscores(self.project_name)
-        template_contract_name = self._to_cammel_case(self.template_name)
-        project_contract_name = self._to_cammel_case(self.project_name)
+        template_contract_name = self._contract_name(self.template_name)
+        project_contract_name = self._contract_name(self.project_name)
 
         self._replace_in_files(
             source_paths,
             [
-                # Example: replace contract name "pub trait SimpleERC20::*" to "pub trait MyContract::*"
-                (f"#[multiversx_sc::contract]\npub trait {template_contract_name}::*", f"#[multiversx_sc::contract]\npub trait {project_contract_name}::*"),
+                # Example: replace contract name "pub trait SimpleERC20" to "pub trait MyContract"
+                (f"pub trait {template_contract_name}", f"pub trait {project_contract_name}"),
                 # Example: replace "use simple_erc20::*" to "use my_token::*"
                 (f"use {template_name}::*", f"use {project_name}::*"),
                 # Example: replace "<simple_erc20::AbiProvider>()" to "<my_token::AbiProvider>()"
