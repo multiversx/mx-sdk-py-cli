@@ -102,7 +102,7 @@ class StandaloneModule(DependencyModule):
     def get_directory(self, tag: str) -> Path:
         return config.get_dependency_directory(self.key, tag)
 
-    def get_source_directory(self, tag: str):
+    def get_source_directory(self, tag: str) -> Path:
         # Due to how the GitHub creates archives for repository releases, the
         # path will contain the tag in two variants: with the 'v' prefix (e.g.
         # "v1.1.0"), but also without (e.g. "1.1.0"), hence the need to remove
