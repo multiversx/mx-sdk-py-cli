@@ -35,6 +35,7 @@ jobs:
 
           erdpy config new test
           erdpy config set github_api_token ${{ secrets.GITHUB_TOKEN }}
+          erdpy deps install wasm-opt
 
           erdpy contract new --template=adder adder
           erdpy contract build adder
@@ -45,9 +46,11 @@ jobs:
       - name: Install (and smoke test) mxpy (new)
         run: |
           wget -O mxpy-up.py https://raw.githubusercontent.com/multiversx/mx-sdk-py-cli/$BRANCH_NAME/mxpy-up.py
-          python3 mxpy-up.py --from-branch $BRANCH_NAME
+          python3 mxpy-up.py --from-branch $BRANCH_NAME --yes
 
           source /home/runner/.profile
+
+          mxpy deps install wasm-opt
           mxpy contract new --template=lottery-esdt lottery-esdt
           mxpy contract build lottery-esdt
           mxpy contract test --directory="scenarios" adder
