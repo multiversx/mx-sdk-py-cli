@@ -212,7 +212,10 @@ class GolangModule(StandaloneModule):
         resolution = self.get_resolution()
 
         if resolution == DependencyResolution.Host:
-            return shutil.which("go") is not None
+            which_go = shutil.which("go")
+            logger.info(f"which go: {which_go}")
+
+            return which_go is not None
         if resolution == DependencyResolution.SDK:
             return super().is_installed(tag)
 
@@ -271,7 +274,12 @@ class Rust(DependencyModule):
         resolution = self.get_resolution()
 
         if resolution == DependencyResolution.Host:
-            return shutil.which("rustc") is not None and shutil.which("cargo") is not None
+            which_rustc = shutil.which("rustc")
+            which_cargo = shutil.which("cargo")
+            logger.info(f"which rustc: {which_rustc}")
+            logger.info(f"which cargo: {which_cargo}")
+
+            return which_rustc is not None and which_cargo is not None
         if resolution == DependencyResolution.SDK:
             try:
                 env = self._get_env_for_is_installed_in_sdk()
@@ -395,6 +403,9 @@ class WasmOptModule(StandaloneModule):
         bin_file = self._get_bin_directory(tag) / "wasm-opt"
 
         if resolution == DependencyResolution.Host:
+            which_wasm_opt = shutil.which("wasm-opt")
+            logger.info(f"which wasm-opt: {which_wasm_opt}")
+
             return shutil.which("wasm-opt") is not None
         if resolution == DependencyResolution.SDK:
             return bin_file.exists()
