@@ -15,8 +15,6 @@ pytest
 
 setuptools
 
-multiversx-sdk-rust-contract-builder==4.0.*
-
 multiversx-sdk-network-providers==0.6.*
 
 multiversx-sdk-wallet==0.4.*
