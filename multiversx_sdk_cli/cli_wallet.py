@@ -95,7 +95,7 @@ def new_wallet(args: Any):
 
     if args.pem:
         pem_file = prepare_file(args.output_path, ".pem")
-        address = Address(pubkey)
+        address = Address(pubkey.buffer)
         pem.write(pem_file, secret_key.buffer, pubkey.buffer, name=address.bech32())
         logger.info(f"Pem wallet generated: {pem_file}")
     if args.json:
@@ -124,7 +124,7 @@ def generate_pem(args: Any):
         pubkey = secret_key.generate_public_key()
     else:
         mnemonic = Mnemonic.generate()
-    
+
     secret_key = mnemonic.derive_key(index)
     pubkey = secret_key.generate_public_key()
 
