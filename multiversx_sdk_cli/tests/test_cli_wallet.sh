@@ -3,23 +3,30 @@
 source "./shared.sh"
 
 testAll() {
-    testGeneration || return 1
-    testGenerationWithSpaces || return 1
+    testDerive || return 1
+    testDeriveWithSpaces || return 1
+    testNewPem || return 1
     testBech32 || return 1
 }
 
-testGeneration() {
-    echo "testGeneration"
+testDerive() {
+    echo "testDerive"
     ${CLI} wallet derive ./testdata-out/myaccount.pem || return 1
     assertFileExists "./testdata-out/myaccount.pem" || return 1
     echo -e "moral volcano peasant pass circle pen over picture flat shop clap goat never lyrics gather prepare woman film husband gravity behind test tiger improve\n" | ${CLI} wallet derive --mnemonic ./testdata-out/myaccount-from-mnemonic.pem || return 1
     assertFileExists "./testdata-out/myaccount-from-mnemonic.pem" || return 1
 }
 
-testGenerationWithSpaces() {
-    echo "testGenerationWithSpaces"
+testDeriveWithSpaces() {
+    echo "testDeriveWithSpaces"
     echo -e "moral volcano peasant pass circle pen over picture flat shop clap goat never lyrics gather prepare woman film husband gravity behind test tiger improve     " | ${CLI} wallet derive --mnemonic ./testdata-out/myaccount-from-mnemonic.pem || return 1
     assertFileExists "./testdata-out/myaccount-from-mnemonic.pem" || return 1
+}
+
+testNewPem() {
+    echo "testNewPem"
+    ${CLI} wallet new --pem --output-path=./testdata-out/newWallet.pem || return 1
+    assertFileExists "./testdata-out/newWallet.pem" || return 1
 }
 
 testBech32() {
