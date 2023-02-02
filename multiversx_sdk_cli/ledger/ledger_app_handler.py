@@ -1,3 +1,4 @@
+from typing import List
 from ledgercomm import Transport
 
 from multiversx_sdk_cli.errors import LedgerError
@@ -5,6 +6,14 @@ from multiversx_sdk_cli.ledger.config import load_ledger_config_from_response, L
 
 SIGN_USING_HASH_VERSION = "1.0.11"
 CONNECTION_ERROR_MSG = "check if device is plugged in, unlocked and on MultiversX app"
+
+# Also see: https://github.com/multiversx/mx-sdk-js-hw-provider/blob/main/src/ledgerApp.ts
+CLA = 0xed
+SIGN_RAW_TX_INS = 0x04
+SIGN_HASH_TX_INS = 0x07
+SIGN_MESSAGE_INS = 0x06
+PROVIDE_ESDT_INFO_INS = 0x08
+GET_ADDRESS_AUTH_TOKEN_INS = 0x09
 
 
 class Apdu:
@@ -82,13 +91,13 @@ class LedgerApp:
             if has_more:
                 chunk_size = max_chunk_size
 
-            ins_signing_method = 0x04
+            ins_signing_method = SIGN_RAW_TX_INS
             if should_use_hash_signing:
-                ins_signing_method = 0x07
+                ins_signing_method = SIGN_HASH_TX_INS
 
             apdu.ins = ins_signing_method
             apdu.p2 = 0x00
-            apdu.cla = 0xed
+            apdu.cla = CLA
             apdu.data = marshaled_tx[offset:offset + chunk_size]
 
             apdus.append(apdu)
@@ -97,7 +106,7 @@ class LedgerApp:
 
         return self.get_signature_from_apdus(apdus)
 
-    def get_signature_from_apdus(self, apdus) -> str:
+    def get_signature_from_apdus(self, apdus: List[Apdu]) -> str:
         sw: int
         response: bytes
         for apdu in apdus:
@@ -122,7 +131,7 @@ class LedgerApp:
         return signature
 
 
-def get_error(code):
+def get_error(code: int):
     switcher = {
         0x9000: '',
         0x6985: 'user denied',
