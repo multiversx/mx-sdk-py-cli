@@ -148,7 +148,7 @@ testVerifyContract(){
 testReproducibleBuild(){
     echo "testReproducibleBuild"
 
-    ${CLI} contract reproducible-build ${SANDBOX}/ping-pong-smart-contract --contract=ping-pong --docker-image=multiversx/sdk-rust-contract-builder:v4.1.2
+    ${CLI} contract reproducible-build ${SANDBOX}/ping-pong-smart-contract --contract=ping-pong --docker-image=multiversx/sdk-rust-contract-builder:v4.1.2 --no-docker-interactive --no-docker-tty || return 1
     assertFileExists ${SANDBOX}/ping-pong-smart-contract/output-docker/ping-pong/ping-pong.wasm || return 1
 }
 
