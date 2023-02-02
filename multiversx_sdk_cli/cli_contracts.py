@@ -419,7 +419,7 @@ def verify(args: Any) -> None:
     contract = Address(args.contract)
     verifier_url = args.verifier_url
 
-    packaged_src = Path(args.packaged_src)
+    packaged_src = Path(args.packaged_src).expanduser().resolve()
 
     owner = _prepare_signer(args)
     docker_image = args.docker_image
