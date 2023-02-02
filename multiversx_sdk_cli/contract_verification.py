@@ -1,16 +1,16 @@
-import json
-import time
 import hashlib
+import json
 import logging
+import time
 from pathlib import Path
-from typing import Dict, Any
+from typing import Any, Dict
 
-from multiversx_sdk_core import MessageV1
-from multiversx_sdk_cli.utils import dump_out_json
-from multiversx_sdk_cli.accounts import Account, Address
-from multiversx_sdk_cli.utils import read_json_file
-from nacl.signing import SigningKey
 import requests
+from multiversx_sdk_core import MessageV1
+from nacl.signing import SigningKey
+
+from multiversx_sdk_cli.accounts import Account, Address
+from multiversx_sdk_cli.utils import dump_out_json, read_json_file
 
 HTTP_REQUEST_TIMEOUT = 408
 HTTP_SUCCESS = 200
@@ -104,7 +104,7 @@ def _create_request_signature(account: Account, contract_address: Address, reque
     message_to_sign = MessageV1(raw_data_to_sign.encode())
     message_data_to_sign: bytes = message_to_sign.serialize_for_signing()
     signed_message = signing_key.sign(message_data_to_sign)
-    signature = signed_message.signature
+    signature: bytes = signed_message.signature
 
     logger.info(f"raw_data_to_sign = {raw_data_to_sign}, message_data_to_sign = {message_data_to_sign.hex()}, signature = {signature.hex()}")
 
