@@ -148,7 +148,7 @@ testVerifyContract(){
 testReproducibleBuild(){
     echo "testReproducibleBuild"
 
-    ${CLI} contract reproducible-build ${SANDBOX}/ping-pong-smart-contract --contract=ping-pong --docker-image=multiversx/sdk-rust-contract-builder:v4.0.0
+    ${CLI} contract reproducible-build ${SANDBOX}/ping-pong-smart-contract --contract=ping-pong --docker-image=multiversx/sdk-rust-contract-builder:v4.1.2
     assertFileExists ${SANDBOX}/ping-pong-smart-contract/output-docker/ping-pong/ping-pong.wasm || return 1
 }
 
@@ -157,6 +157,7 @@ testAll() {
     testTrivialCommands || return 1
     testCreateContracts || return 1
     testBuildContracts || return 1
+    testReproducibleBuild || return 1
     testRunScenarios || return 1
     testCleanContracts || return 1
     testWasmName || return 1

@@ -435,17 +435,17 @@ def do_reproducible_build(args: Any):
     docker_image = args.docker_image
     contract_path = args.contract
     output_path = Path(project_path) / "output-docker"
+    artifacts_path = (Path(output_path) / "artifacts.json").resolve()
     utils.ensure_folder(output_path)
 
     options = _prepare_build_options(args)
     no_wasm_opt = options.get("no-wasm-opt", True)
 
-    if is_docker_installed():
-        logger.info("Starting the docker run...")
-        return_code = run_docker(docker_image, project_path, contract_path, output_path, no_wasm_opt)
-        logger.info("Docker build ran successfully!")
-        logger.info("You can deploy you Smart Contract, then verify it using the mxpy contract verify command")
-    else:
+    if not is_docker_installed():
         raise DockerMissingError()
 
-    return return_code
+    logger.info("Starting the docker run...")
+    run_docker(docker_image, project_path, contract_path, output_path, no_wasm_opt)
+    logger.info("Docker build ran successfully!")
+    logger.info(f"Inspect summary of generated artifacts here: {artifacts_path}")
+    logger.info("You can deploy you Smart Contract, then verify it using the mxpy contract verify command")
