@@ -442,8 +442,9 @@ def do_reproducible_build(args: Any):
     docker_interactive = not args.no_docker_interactive
     docker_tty = not args.no_docker_tty
 
-    output_path = Path(project_path) / "output-docker"
-    artifacts_path = (Path(output_path) / "artifacts.json").resolve()
+    project_path = Path(project_path).expanduser().resolve()
+    output_path = project_path / "output-docker"
+    artifacts_path = output_path / "artifacts.json"
 
     utils.ensure_folder(output_path)
 
