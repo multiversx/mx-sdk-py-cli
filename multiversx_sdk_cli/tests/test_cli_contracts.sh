@@ -148,8 +148,9 @@ testVerifyContract(){
 testReproducibleBuild(){
     echo "testReproducibleBuild"
 
-    ${CLI} contract reproducible-build ${SANDBOX}/ping-pong-smart-contract --contract=ping-pong --docker-image=multiversx/sdk-rust-contract-builder:v4.1.2 --no-docker-interactive --no-docker-tty || return 1
-    assertFileExists ${SANDBOX}/ping-pong-smart-contract/output-docker/ping-pong/ping-pong.wasm || return 1
+    ${CLI} contract new --template adder --directory ${SANDBOX} myadder-for-reproducible || return 1
+    ${CLI} contract reproducible-build ${SANDBOX}/myadder-for-reproducible --docker-image=multiversx/sdk-rust-contract-builder:v4.1.2 --no-docker-interactive --no-docker-tty || return 1
+    assertFileExists ${SANDBOX}/ping-pong-smart-contract/output-docker/artifacts.json || return 1
 }
 
 testAll() {
