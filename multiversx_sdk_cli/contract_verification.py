@@ -1,20 +1,22 @@
-import json
-import time
 import hashlib
+import json
 import logging
+import time
 from pathlib import Path
-from typing import Dict, Any
+from typing import Any, Dict
 
-from multiversx_sdk_cli.utils import dump_out_json
-from multiversx_sdk_cli.accounts import Account, Address
-from multiversx_sdk_cli.utils import read_json_file
-from nacl.signing import SigningKey
 import requests
+from multiversx_sdk_core import MessageV1
+from nacl.signing import SigningKey
+
+from multiversx_sdk_cli.accounts import Account, Address
+from multiversx_sdk_cli.utils import dump_out_json, read_json_file
 
 HTTP_REQUEST_TIMEOUT = 408
 HTTP_SUCCESS = 200
 
 logger = logging.getLogger("cli.contracts.verifier")
+
 
 class ContractVerificationRequest:
     def __init__(
@@ -66,17 +68,7 @@ def trigger_contract_verification(
     source_code = read_json_file(packaged_source)
 
     payload = ContractVerificationPayload(contract, source_code, docker_image).serialize()
-
-    hashed_payload = hashlib.sha256(payload.encode()).hexdigest()
-
-    secret_key = bytes.fromhex(owner.secret_key)
-    signing_key: Any = SigningKey(secret_key)
-
-    message = f"{contract.bech32()}{hashed_payload}"
-
-    signed_message = signing_key.sign(message.encode())
-    signature = signed_message.signature
-
+    signature = _create_request_signature(owner, contract, payload.encode())
     contract_verification = ContractVerificationRequest(contract, source_code, signature, docker_image)
 
     request_dictionary = contract_verification.to_dictionary()
@@ -103,6 +95,22 @@ def trigger_contract_verification(
             query_status_with_task_id(verifier_url, task_id)
 
 
+def _create_request_signature(account: Account, contract_address: Address, request_payload: bytes) -> bytes:
+    secret_key = bytes.fromhex(account.secret_key)
+    signing_key: Any = SigningKey(secret_key)
+
+    hashed_payload: str = hashlib.sha256(request_payload).hexdigest()
+    raw_data_to_sign = f"{contract_address.bech32()}{hashed_payload}"
+    message_to_sign = MessageV1(raw_data_to_sign.encode())
+    message_data_to_sign: bytes = message_to_sign.serialize_for_signing()
+    signed_message = signing_key.sign(message_data_to_sign)
+    signature: bytes = signed_message.signature
+
+    logger.info(f"raw_data_to_sign = {raw_data_to_sign}, message_data_to_sign = {message_data_to_sign.hex()}, signature = {signature.hex()}")
+
+    return signature
+
+
 def query_status_with_task_id(url: str, task_id: str, interval: int = 10):
     logger.info(f"Please wait while we verify your contract. This may take a while.")
     old_status = ""
@@ -119,5 +127,5 @@ def query_status_with_task_id(url: str, task_id: str, interval: int = 10):
             logger.info(f"Task status: {status}")
             dump_out_json(response)
             old_status = status
-        
+
         time.sleep(interval)
