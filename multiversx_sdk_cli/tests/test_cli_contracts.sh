@@ -149,9 +149,9 @@ testReproducibleBuild(){
     echo "testReproducibleBuild"
 
     wget -O ${SANDBOX}/example.zip https://github.com/multiversx/mx-reproducible-contract-build-example-sc/archive/refs/tags/v0.2.1.zip || return 1
-    unzip ${SANDBOX}/example.zip || return 1
+    unzip ${SANDBOX}/example.zip -d ${SANDBOX} || return 1
     ${CLI} contract reproducible-build ${SANDBOX}/mx-reproducible-contract-build-example-sc-0.2.1 --docker-image=multiversx/sdk-rust-contract-builder:v4.1.2 --no-docker-interactive --no-docker-tty || return 1
-    assertFileExists ${SANDBOX}/ping-pong-smart-contract/output-docker/artifacts.json || return 1
+    assertFileExists ${SANDBOX}/mx-reproducible-contract-build-example-sc-0.2.1/output-docker/artifacts.json || return 1
 }
 
 testAll() {
