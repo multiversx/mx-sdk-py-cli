@@ -1,12 +1,16 @@
 import logging
+from pathlib import Path
 import pytest
 
 from Cryptodome.Hash import keccak
-from multiversx_sdk_cli.accounts import Account
+from multiversx_sdk_cli.accounts import Account, Address
 from multiversx_sdk_cli.contracts import SmartContract, _prepare_argument
 from multiversx_sdk_cli import errors
+from multiversx_sdk_cli.contract_verification import _create_request_signature
 
 logging.basicConfig(level=logging.INFO)
+
+testdata_folder = Path(__file__).parent / "testdata"
 
 
 def test_playground_keccak():
@@ -59,3 +63,12 @@ def test_prepare_argument():
 
     assert _prepare_argument("str:") == ""
     assert _prepare_argument("0x") == ""
+
+
+def test_contract_verification_create_request_signature():
+    account = Account(pem_file=testdata_folder / "walletKey.pem")
+    contract_address = Address("erd1qqqqqqqqqqqqqpgqeyj9g344pqguukajpcfqz9p0rfqgyg4l396qespdck")
+    request_payload = b"test"
+    signature = _create_request_signature(account, contract_address, request_payload)
+
+    assert signature.hex() == "30111258cc42ea08e0c6a3e053cc7086a88d614b8b119a244904e9a19896c73295b2fe5c520a1cb07cfe20f687deef9f294a0a05071e85c78a70a448ea5f0605"
