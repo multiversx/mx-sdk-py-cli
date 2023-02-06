@@ -157,6 +157,8 @@ def _guard_valid_config_deletion(name: str):
 def get_defaults() -> Dict[str, Any]:
     return {
         "proxy": "https://testnet-gateway.multiversx.com",
+        "chainID": "T",
+        "txVersion": "1",
         "dependencies.vmtools.tag": "latest",
         "dependencies.mx_sdk_rs.tag": "latest",
         "dependencies.vmtools.urlTemplate.linux": "https://github.com/multiversx/mx-chain-vm-go/archive/{TAG}.tar.gz",
