@@ -31,6 +31,7 @@ def run_docker(
         no_wasm_opt: bool,
         docker_interactive: bool,
         docker_tty: bool,
+        no_default_platform: bool
 ):
     docker_mount_args: List[str] = ["--volume", f"{output_path}:/output"]
 
@@ -47,6 +48,9 @@ def run_docker(
     docker_args += docker_mount_args
     docker_args += ["--user", f"{str(os.getuid())}:{str(os.getgid())}"]
     docker_args += ["--rm", image]
+
+    if not(no_default_platform):
+        docker_args += ["--platform", "linux/amd64"]
 
     entrypoint_args: List[str] = []
 
