@@ -84,11 +84,6 @@ class UnknownArgumentFormat(KnownError):
         super().__init__(f"Cannot handle non-hex, non-number arguments yet: {argument}.")
 
 
-class ProxyRequestError(KnownError):
-    def __init__(self, url: str, data: Any):
-        super().__init__(f"Proxy request error for url [{url}]: {data}")
-
-
 class BadInputError(KnownError):
     def __init__(self, input: str, message: str):
         super().__init__(f"Bad input [{input}]: {message}")
