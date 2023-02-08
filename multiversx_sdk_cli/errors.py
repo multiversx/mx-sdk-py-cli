@@ -145,11 +145,6 @@ class GasLimitTooLarge(KnownError):
         super().__init__(f"The gas limit provided ({current}) exceeds the max gas limit of allowed for a transaction ({limit})")
 
 
-class InvalidKeystoreFilePassword(KnownError):
-    def __init__(self):
-        super().__init__("Provided keystore file password is invalid.")
-
-
 class BadUserInput(KnownError):
     def __init__(self, message: str):
         super().__init__(f"Bad user input: {message}.")
@@ -158,11 +153,6 @@ class BadUserInput(KnownError):
 class BadUsage(KnownError):
     def __init__(self, message: str):
         super().__init__(f"Bad usage: {message}.")
-
-
-class CannotSignMessageWithBLSKey(KnownError):
-    def __init__(self):
-        super(CannotSignMessageWithBLSKey, self).__init__("cannot sign message with BLS key")
 
 
 class CannotReadValidatorsData(KnownError):

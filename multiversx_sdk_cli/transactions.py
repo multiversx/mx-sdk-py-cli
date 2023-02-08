@@ -3,7 +3,7 @@ import json
 import logging
 import time
 from collections import OrderedDict
-from typing import Any, Dict, List, TextIO, Tuple, Protocol, Sequence
+from typing import Any, Dict, List, Protocol, Sequence, TextIO, Tuple
 
 from multiversx_sdk_cli import config, errors, utils
 from multiversx_sdk_cli.accounts import Account, Address, LedgerAccount
@@ -24,10 +24,10 @@ class ITransactionOnNetwork(Protocol):
 class INetworkProvider(Protocol):
     def send_transaction(self, transaction: ITransaction) -> str:
         ...
-    
+
     def send_transactions(self, transactions: Sequence[ITransaction]) -> Tuple[int, str]:
         ...
-    
+
     def get_transaction(self, tx_hash: str) -> ITransactionOnNetwork:
         ...
 
@@ -90,6 +90,9 @@ class Transaction(ITransaction):
         serialized = self._dict_to_json(dictionary)
         return serialized
 
+    def serialize_for_signing(self) -> bytes:
+        return self.serialize()
+
     def _dict_to_json(self, dictionary: Dict[str, Any]) -> bytes:
         serialized = json.dumps(dictionary, separators=(',', ':')).encode("utf8")
         return serialized
@@ -126,10 +129,10 @@ class Transaction(ITransaction):
         if not self.signature:
             raise errors.TransactionIsNotSigned()
 
-        txOnNetwork = self.__send_transaction_and_wait_for_result(proxy , self, timeout)
+        txOnNetwork = self.__send_transaction_and_wait_for_result(proxy, self, timeout)
         self.hash = txOnNetwork.hash
         return txOnNetwork
-    
+
     def __send_transaction_and_wait_for_result(self, proxy: INetworkProvider, payload: Any, num_seconds_timeout: int = 100) -> ITransactionOnNetwork:
         AWAIT_TRANSACTION_PERIOD = 5
 
@@ -201,7 +204,7 @@ class Transaction(ITransaction):
 
     def get_data(self) -> str:
         return self.data
-    
+
     def get_hash(self) -> str:
         return self.hash
 

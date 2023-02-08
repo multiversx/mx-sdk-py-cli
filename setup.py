@@ -28,7 +28,6 @@ setuptools.setup(
         "toml>=0.10.2",
         "bottle",
         "requests",
-        "pynacl",
         "cryptography==36.0.2",
         "prettytable",
         "ledgercomm[hid]",
