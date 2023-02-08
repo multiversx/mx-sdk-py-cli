@@ -3,13 +3,14 @@ import json
 import logging
 import time
 from pathlib import Path
-from typing import Any, Dict
+from typing import Any, Dict, Tuple
 
 import requests
 from multiversx_sdk_core import MessageV1
 from nacl.signing import SigningKey
 
 from multiversx_sdk_cli.accounts import Account, Address
+from multiversx_sdk_cli.errors import KnownError
 from multiversx_sdk_cli.utils import dump_out_json, read_json_file
 
 HTTP_REQUEST_TIMEOUT = 408
@@ -74,24 +75,25 @@ def trigger_contract_verification(
     request_dictionary = contract_verification.to_dictionary()
 
     url = f"{verifier_url}/verifier"
-    response = requests.post(url, json=request_dictionary)
+    status_code, message, data = _do_post(url, request_dictionary)
 
-    if response.status_code == HTTP_REQUEST_TIMEOUT:
-        task_id = response.json().get("taskId", "")
+    if status_code == HTTP_REQUEST_TIMEOUT:
+        task_id = data.get("taskId", "")
 
         if task_id:
             query_status_with_task_id(verifier_url, task_id)
         else:
-            dump_out_json(response.json())
-    elif response.status_code != HTTP_SUCCESS:
-        dump_out_json(response.json())
-    elif response.status_code == HTTP_SUCCESS:
-        status = response.json().get("status", "")
+            dump_out_json(data)
+    elif status_code != HTTP_SUCCESS:
+        dump_out_json(data)
+        raise KnownError(f"Cannot verify contract: {message}")
+    else:
+        status = data.get("status", "")
         if status:
             logger.info(f"Task status: {status}")
-            dump_out_json(response.json())
+            dump_out_json(data)
         else:
-            task_id = response.json().get("taskId", "")
+            task_id = data.get("taskId", "")
             query_status_with_task_id(verifier_url, task_id)
 
 
@@ -116,7 +118,7 @@ def query_status_with_task_id(url: str, task_id: str, interval: int = 10):
     old_status = ""
 
     while True:
-        response = requests.get(f"{url}/tasks/{task_id}").json()
+        _, _, response = _do_get(f"{url}/tasks/{task_id}")
         status = response.get("status", "")
 
         if status == "finished":
@@ -129,3 +131,29 @@ def query_status_with_task_id(url: str, task_id: str, interval: int = 10):
             old_status = status
 
         time.sleep(interval)
+
+
+def _do_post(url: str, payload: Any) -> Tuple[int, str, Dict[str, Any]]:
+    logger.debug(f"_do_post() to {url}")
+    response = requests.post(url, json=payload)
+
+    try:
+        data = response.json()
+        message = data.get("message", "")
+        return response.status_code, message, data
+    except Exception as error:
+        logger.error(f"Erroneous response from {url}: {response.text}")
+        raise KnownError(f"Cannot parse response from {url}", error)
+
+
+def _do_get(url: str) -> Tuple[int, str, Dict[str, Any]]:
+    logger.debug(f"_do_get() from {url}")
+    response = requests.get(url)
+
+    try:
+        data = response.json()
+        message = data.get("message", "")
+        return response.status_code, message, data
+    except Exception as error:
+        logger.error(f"Erroneous response from {url}: {response.text}")
+        raise KnownError(f"Cannot parse response from {url}", error)
