@@ -158,6 +158,8 @@ def setup_parser(args: List[str], subparsers: Any) -> Any:
     sub.add_argument("--contract", type=str, help="relative path of the contract in the project")
     sub.add_argument("--no-docker-interactive", action="store_true", default=False)
     sub.add_argument("--no-docker-tty", action="store_true", default=False)
+    sub.add_argument("--no-default-platform", action="store_true", default=False,
+                     help="do not set DOCKER_DEFAULT_PLATFORM environment variable to 'linux/amd64'")
     sub.set_defaults(func=do_reproducible_build)
 
     parser.epilog = cli_shared.build_group_epilog(subparsers)
@@ -441,6 +443,7 @@ def do_reproducible_build(args: Any):
     contract_path = args.contract
     docker_interactive = not args.no_docker_interactive
     docker_tty = not args.no_docker_tty
+    no_default_platform = args.no_default_platform
 
     project_path = Path(project_path).expanduser().resolve()
     output_path = project_path / "output-docker"
@@ -455,7 +458,7 @@ def do_reproducible_build(args: Any):
         raise DockerMissingError()
 
     logger.info("Starting the docker run...")
-    run_docker(docker_image, project_path, contract_path, output_path, no_wasm_opt, docker_interactive, docker_tty)
+    run_docker(docker_image, project_path, contract_path, output_path, no_wasm_opt, docker_interactive, docker_tty, no_default_platform)
 
     logger.info("Docker build ran successfully!")
     logger.info(f"Inspect summary of generated artifacts here: {artifacts_path}")
