@@ -3,7 +3,6 @@ types-toml
 bottle~=0.12.18
 requests~=2.24.0
 types-requests
-pynacl
 cryptography==36.0.2
 prettytable
 types-prettytable
