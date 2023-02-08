@@ -6,8 +6,6 @@ from pathlib import Path
 from typing import Any, Dict
 
 import requests
-from multiversx_sdk_core import MessageV1
-from nacl.signing import SigningKey
 
 from multiversx_sdk_cli.accounts import Account, Address
 from multiversx_sdk_cli.utils import dump_out_json, read_json_file
@@ -96,17 +94,11 @@ def trigger_contract_verification(
 
 
 def _create_request_signature(account: Account, contract_address: Address, request_payload: bytes) -> bytes:
-    secret_key = bytes.fromhex(account.secret_key)
-    signing_key: Any = SigningKey(secret_key)
-
     hashed_payload: str = hashlib.sha256(request_payload).hexdigest()
     raw_data_to_sign = f"{contract_address.bech32()}{hashed_payload}"
-    message_to_sign = MessageV1(raw_data_to_sign.encode())
-    message_data_to_sign: bytes = message_to_sign.serialize_for_signing()
-    signed_message = signing_key.sign(message_data_to_sign)
-    signature: bytes = signed_message.signature
 
-    logger.info(f"raw_data_to_sign = {raw_data_to_sign}, message_data_to_sign = {message_data_to_sign.hex()}, signature = {signature.hex()}")
+    signature_hex = account.sign_message(raw_data_to_sign.encode())
+    signature: bytes = bytes.fromhex(signature_hex)
 
     return signature
 

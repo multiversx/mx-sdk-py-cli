@@ -1,8 +1,10 @@
 from typing import List
+
 from ledgercomm import Transport
 
 from multiversx_sdk_cli.errors import LedgerError
-from multiversx_sdk_cli.ledger.config import load_ledger_config_from_response, LedgerAppConfiguration
+from multiversx_sdk_cli.ledger.config import (LedgerAppConfiguration,
+                                              load_ledger_config_from_response)
 
 SIGN_USING_HASH_VERSION = "1.0.11"
 CONNECTION_ERROR_MSG = "check if device is plugged in, unlocked and on MultiversX app"
@@ -34,15 +36,15 @@ class LedgerApp:
     def close(self):
         self.transport.close()
 
-    def set_address(self, account_index=0, address_index=0):
+    def set_address(self, account_index: int = 0, address_index: int = 0):
         data = account_index.to_bytes(4, byteorder='big') + address_index.to_bytes(4, byteorder='big')
         self.transport.send(cla=0xed, ins=0x05, p1=0x00, p2=0x00, cdata=data)
-        sw, response = self.transport.recv()
+        sw, _ = self.transport.recv()
         err = get_error(sw)
         if err != '':
             raise LedgerError(err)
 
-    def get_address(self, account_index=0, address_index=0) -> str:
+    def get_address(self, account_index: int = 0, address_index: int = 0) -> str:
         data = account_index.to_bytes(4, byteorder='big') + address_index.to_bytes(4, byteorder='big')
 
         self.transport.send(cla=0xed, ins=0x03, p1=0x00, p2=0x00, cdata=data)
@@ -69,11 +71,21 @@ class LedgerApp:
         config = self.get_app_configuration()
         return config.version
 
-    def sign_transaction(self, marshaled_tx: bytes, should_use_hash_signing: bool) -> str:
+    def sign_transaction(self, tx_bytes: bytes, should_use_hash_signing: bool) -> str:
+        ins_signing_method = SIGN_RAW_TX_INS
+        if should_use_hash_signing:
+            ins_signing_method = SIGN_HASH_TX_INS
+
+        return self._do_sign(tx_bytes, ins_signing_method)
+
+    def sign_message(self, message_bytes: bytes) -> str:
+        return self._do_sign(message_bytes, SIGN_MESSAGE_INS)
+
+    def _do_sign(self, marshaled_tx: bytes, ins_signing_method: int) -> str:
         total_size = len(marshaled_tx)
         max_chunk_size = 150
 
-        apdus = list()
+        apdus: List[Apdu] = []
 
         offset = 0
         while offset != total_size:
@@ -90,10 +102,6 @@ class LedgerApp:
             chunk_size = total_size - offset
             if has_more:
                 chunk_size = max_chunk_size
-
-            ins_signing_method = SIGN_RAW_TX_INS
-            if should_use_hash_signing:
-                ins_signing_method = SIGN_HASH_TX_INS
 
             apdu.ins = ins_signing_method
             apdu.p2 = 0x00
