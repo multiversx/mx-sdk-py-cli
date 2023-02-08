@@ -44,9 +44,9 @@ def _do_main(cli_args: List[str]):
     args = parser.parse_args(argv_with_config_args)
 
     if args.verbose:
-        logging.basicConfig(level=logging.DEBUG)
+        logging.basicConfig(level=logging.DEBUG, force=True)
     else:
-        logging.basicConfig(level=logging.WARN)
+        logging.basicConfig(level=logging.INFO, force=True)
 
     if not hasattr(args, "func"):
         parser.print_help()

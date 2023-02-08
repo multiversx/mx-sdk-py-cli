@@ -4,10 +4,9 @@ import subprocess
 from pathlib import Path
 from typing import List
 
-from multiversx_sdk_cli import myprocess
-from multiversx_sdk_cli.errors import ExternalProcessError, KnownError
+from multiversx_sdk_cli.errors import KnownError
 
-logger = logging.getLogger("build-with-docker")
+logger = logging.getLogger("docker")
 
 
 def is_docker_installed():
@@ -31,6 +30,7 @@ def run_docker(
         no_wasm_opt: bool,
         docker_interactive: bool,
         docker_tty: bool,
+        no_default_platform: bool
 ):
     docker_mount_args: List[str] = ["--volume", f"{output_path}:/output"]
 
@@ -38,6 +38,9 @@ def run_docker(
         docker_mount_args.extend(["--volume", f"{project_path}:/project"])
 
     docker_args = ["docker", "run"]
+
+    if not (no_default_platform):
+        docker_args += ["--platform", "linux/amd64"]
 
     if docker_interactive:
         docker_args += ["--interactive"]
