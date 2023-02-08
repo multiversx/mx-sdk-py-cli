@@ -51,10 +51,12 @@ class Account(AccountBase):
         super().__init__(address)
 
         if pem_file:
-            self.signer = UserSigner.from_pem_file(Path(pem_file), pem_index)
+            pem_path = Path(pem_file).expanduser().resolve()
+            self.signer = UserSigner.from_pem_file(pem_path, pem_index)
             self.address = Address(self.signer.get_pubkey().buffer)
         elif key_file and password:
-            self.signer = UserSigner.from_wallet(Path(key_file), password)
+            key_file_path = Path(key_file).expanduser().resolve()
+            self.signer = UserSigner.from_wallet(key_file_path, password)
             self.address = Address(self.signer.get_pubkey().buffer)
 
     def sign_transaction(self, transaction: ITransaction) -> str:
@@ -66,7 +68,7 @@ class Account(AccountBase):
         message = MessageV1(data)
         signature = self.signer.sign(message)
 
-        logger.debug(f"Account.sign_message(): raw_data_to_sign = {data}, message_data_to_sign = {message.serialize_for_signing()}, signature = {signature.hex()}")
+        logger.debug(f"Account.sign_message(): raw_data_to_sign = {data.hex()}, message_data_to_sign = {message.serialize_for_signing().hex()}, signature = {signature.hex()}")
         return signature.hex()
 
 
@@ -95,8 +97,9 @@ class LedgerAccount(Account):
         return signature
 
     def sign_message(self, data: bytes) -> str:
-        message = MessageV1(data)
-        message_data_to_sign: bytes = message.serialize_for_signing()
+        message_length = len(data).to_bytes(4, byteorder="big")
+        message_data_to_sign: bytes = message_length + data
+        logger.debug(f"LedgerAccount.sign_message(): raw_data_to_sign = {data.hex()}, message_data_to_sign = {message_data_to_sign.hex()}")
 
         signature = do_sign_message_with_ledger(
             message_data_to_sign,
@@ -106,7 +109,7 @@ class LedgerAccount(Account):
 
         assert isinstance(signature, str)
 
-        logger.debug(f"LedgerAccount.sign_message(): raw_data_to_sign = {data}, message_data_to_sign = {message_data_to_sign}, signature = {signature}")
+        logger.debug(f"LedgerAccount.sign_message(): signature = {signature}")
         return signature
 
 

@@ -81,8 +81,8 @@ class LedgerApp:
     def sign_message(self, message_bytes: bytes) -> str:
         return self._do_sign(message_bytes, SIGN_MESSAGE_INS)
 
-    def _do_sign(self, marshaled_tx: bytes, ins_signing_method: int) -> str:
-        total_size = len(marshaled_tx)
+    def _do_sign(self, data: bytes, ins_signing_method: int) -> str:
+        total_size = len(data)
         max_chunk_size = 150
 
         apdus: List[Apdu] = []
@@ -106,7 +106,7 @@ class LedgerApp:
             apdu.ins = ins_signing_method
             apdu.p2 = 0x00
             apdu.cla = CLA
-            apdu.data = marshaled_tx[offset:offset + chunk_size]
+            apdu.data = data[offset:offset + chunk_size]
 
             apdus.append(apdu)
 
