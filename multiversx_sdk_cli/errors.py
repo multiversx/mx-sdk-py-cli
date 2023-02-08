@@ -79,9 +79,9 @@ class BuildError(KnownError):
         super().__init__(f"Build error: {message}.", inner)
 
 
-class ProxyRequestError(KnownError):
-    def __init__(self, url: str, data: Any):
-        super().__init__(f"Proxy request error for url [{url}]: {data}")
+class UnknownArgumentFormat(KnownError):
+    def __init__(self, argument: Any):
+        super().__init__(f"Cannot handle non-hex, non-number arguments yet: {argument}.")
 
 
 class BadInputError(KnownError):
