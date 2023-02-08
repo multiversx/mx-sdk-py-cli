@@ -20,12 +20,14 @@ def main():
     parser.add_argument("--no-modify-path", dest="modify_path", action="store_false", help="whether to modify $PATH (in profile file)")
     parser.add_argument("--exact-version", help="the exact version of mxpy to install")
     parser.add_argument("--from-branch", help="use a branch of multiversx/mx-sdk-py-cli")
+    parser.add_argument("--yes", action="store_true", default=False)
     parser.set_defaults(modify_path=True)
     args = parser.parse_args()
 
     modify_path = args.modify_path
     exact_version = args.exact_version
     from_branch = args.from_branch
+    yes = args.yes
 
     logging.basicConfig(level=logging.DEBUG)
 
@@ -47,6 +49,7 @@ def main():
         raise InstallError("Your operating system is not supported yet.")
 
     migrate_old_elrondsdk()
+    migrate_v6(yes)
 
     # In case of a fresh install:
     sdk_path.mkdir(parents=True, exist_ok=True)
@@ -142,10 +145,7 @@ def migrate_old_elrondsdk() -> None:
 
     # Fix existing symlinks.
     old_testwallets_link = sdk_path / "testwallets" / "latest"
-    old_nodejs_link = sdk_path / "nodejs" / "latest"
-
     new_testwallets_link = sdk_path / "testwallets" / "latest"
-    new_nodejs_link = sdk_path / "nodejs" / "latest"
 
     try:
         old_target = os.readlink(old_testwallets_link)
@@ -156,14 +156,23 @@ def migrate_old_elrondsdk() -> None:
     except FileNotFoundError:
         logger.info("Old testwallets symlink does not exist.")
 
-    try:
-        old_target = os.readlink(old_nodejs_link)
-        new_target = old_target.replace("elrondsdk", "multiversx-sdk")
-        old_nodejs_link.unlink()
-        os.symlink(new_target, str(new_nodejs_link))
-        logger.info("Fixed old nodejs symlink.")
-    except FileNotFoundError:
-        logger.info("Old nodejs symlink does not exist.")
+
+def migrate_v6(yes: bool):
+    nodejs_folder = sdk_path / "nodejs"
+
+    if nodejs_folder.exists():
+        print(f"""
+In previous versions of the SDK, the "wasm-opt" tool was installed in the "nodejs" folder.
+
+This is no longer the case - now, "wasm-opt" is a separate module.
+
+The following folder will be removed: {nodejs_folder}.
+
+You may need to reinstall wasm-opt using `mxpy deps install wasm-opt`.
+""")
+        confirm_continuation(yes)
+
+        shutil.rmtree(nodejs_folder)
 
 
 def create_venv():
@@ -330,3 +339,13 @@ if __name__ == "__main__":
 For more information go to https://docs.multiversx.com.
 For support, please contact us at http://discord.gg/MultiversXBuilders (recommended) or https://t.me/MultiversXDevelopers.
 """)
+
+
+def confirm_continuation(yes: bool = False):
+    if (yes):
+        return
+
+    answer = input("Continue? (y/n)")
+    if answer.lower() not in ["y", "yes"]:
+        print("Confirmation not given. Will stop.")
+        exit(1)

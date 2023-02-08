@@ -43,6 +43,13 @@ def get_tx_version() -> int:
     return int(get_value("txVersion"))
 
 
+def get_dependency_resolution(key: str) -> str:
+    try:
+        return get_value(f"dependencies.{key}.resolution")
+    except:
+        return ""
+
+
 def get_dependency_tag(key: str) -> str:
     return get_value(f"dependencies.{key}.tag")
 
@@ -160,10 +167,8 @@ def get_defaults() -> Dict[str, Any]:
         # ide.elrond.com will be removed, TBD if clang will still be downloaded
         "dependencies.llvm.urlTemplate.linux": "https://ide.elrond.com/vendor-llvm/{TAG}/linux-amd64.tar.gz?t=19feb",
         "dependencies.llvm.urlTemplate.osx": "https://ide.elrond.com/vendor-llvm/{TAG}/darwin-amd64.tar.gz?t=19feb",
+        "dependencies.rust.resolution": "SDK",
         "dependencies.rust.tag": "nightly",
-        "dependencies.nodejs.tag": "v12.18.3",
-        "dependencies.nodejs.urlTemplate.linux": "https://nodejs.org/dist/{TAG}/node-{TAG}-linux-x64.tar.gz",
-        "dependencies.nodejs.urlTemplate.osx": "https://nodejs.org/dist/{TAG}/node-{TAG}-darwin-x64.tar.gz",
         "dependencies.mx_chain_go.tag": "latest",
         "dependencies.mx_chain_go.urlTemplate.linux": "https://github.com/multiversx/mx-chain-go/archive/{TAG}.tar.gz",
         "dependencies.mx_chain_go.urlTemplate.osx": "https://github.com/multiversx/mx-chain-go/archive/{TAG}.tar.gz",
@@ -171,6 +176,7 @@ def get_defaults() -> Dict[str, Any]:
         "dependencies.mx_chain_proxy_go.tag": "latest",
         "dependencies.mx_chain_proxy_go.urlTemplate.linux": "https://github.com/multiversx/mx-chain-proxy-go/archive/{TAG}.tar.gz",
         "dependencies.mx_chain_proxy_go.urlTemplate.osx": "https://github.com/multiversx/mx-chain-proxy-go/archive/{TAG}.tar.gz",
+        "dependencies.golang.resolution": "SDK",
         "dependencies.golang.tag": "go1.18.4",
         "dependencies.golang.urlTemplate.linux": "https://golang.org/dl/{TAG}.linux-amd64.tar.gz",
         "dependencies.golang.urlTemplate.osx": "https://golang.org/dl/{TAG}.darwin-amd64.tar.gz",
@@ -179,6 +185,10 @@ def get_defaults() -> Dict[str, Any]:
         "dependencies.testwallets.tag": "latest",
         "dependencies.testwallets.urlTemplate.linux": "https://github.com/multiversx/mx-sdk-testwallets/archive/{TAG}.tar.gz",
         "dependencies.testwallets.urlTemplate.osx": "https://github.com/multiversx/mx-sdk-testwallets/archive/{TAG}.tar.gz",
+        "dependencies.wasm-opt.resolution": "SDK",
+        "dependencies.wasm-opt.tag": "version_105",
+        "dependencies.wasm-opt.urlTemplate.linux": "https://github.com/WebAssembly/binaryen/releases/download/{TAG}/binaryen-{TAG}-x86_64-linux.tar.gz",
+        "dependencies.wasm-opt.urlTemplate.osx": "https://github.com/WebAssembly/binaryen/releases/download/{TAG}/binaryen-{TAG}-x86_64-macos.tar.gz",
         "testnet.validate_expected_keys": "false",
         "github_api_token": "",
     }

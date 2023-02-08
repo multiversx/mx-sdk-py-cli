@@ -7,7 +7,7 @@ from multiversx_sdk_cli import utils
 from multiversx_sdk_cli.accounts import Account, Address
 from multiversx_sdk_network_providers.accounts import AccountOnNetwork
 from multiversx_sdk_cli.interfaces import IAddress
-from multiversx_sdk_cli.wallet import pem
+from multiversx_sdk_wallet.pem_format import parse_all
 
 logger = logging.getLogger("accounts")
 
@@ -38,12 +38,12 @@ class AccountsRepository:
 
         for file in files:
             # Assume multi-account PEM files.
-            key_pairs = pem.parse_all(file)
+            key_pairs = parse_all(file)
 
-            for seed, pubkey in key_pairs:
+            for pem_entry in key_pairs:
                 account = Account()
-                account.secret_key = seed.hex()
-                account.address = Address(pubkey)
+                account.secret_key = pem_entry.message.hex()
+                account.address = Address(pem_entry.label)
                 accounts_loaded.append(account)
 
         # Deduplicate accounts (by address)
