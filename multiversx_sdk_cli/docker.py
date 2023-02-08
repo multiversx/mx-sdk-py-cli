@@ -39,6 +39,9 @@ def run_docker(
 
     docker_args = ["docker", "run"]
 
+    if not (no_default_platform):
+        docker_args += ["--platform", "linux/amd64"]
+
     if docker_interactive:
         docker_args += ["--interactive"]
     if docker_tty:
@@ -47,9 +50,6 @@ def run_docker(
     docker_args += docker_mount_args
     docker_args += ["--user", f"{str(os.getuid())}:{str(os.getgid())}"]
     docker_args += ["--rm", image]
-
-    if not (no_default_platform):
-        docker_args += ["--platform", "linux/amd64"]
 
     entrypoint_args: List[str] = []
 
