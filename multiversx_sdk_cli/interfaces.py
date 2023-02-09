@@ -1,4 +1,5 @@
 from typing import Any, Dict, Protocol
+
 from multiversx_sdk_cli.utils import ISerializable
 
 
@@ -15,6 +16,9 @@ class IAddress:
 
 class ITransaction(ISerializable):
     def serialize(self) -> bytes:
+        return bytes()
+
+    def serialize_for_signing(self) -> bytes:
         return bytes()
 
     def serialize_as_inner(self) -> str:
