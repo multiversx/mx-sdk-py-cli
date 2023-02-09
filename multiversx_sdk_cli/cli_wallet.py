@@ -1,14 +1,15 @@
-from json import dump
-import logging
 import getpass
+import logging
+from json import dump
 from pathlib import Path
 from typing import Any, List
 
 from multiversx_sdk_wallet.keyfile import convert_to_keyfile_object
 from multiversx_sdk_wallet.mnemonic import Mnemonic
+from multiversx_sdk_wallet.user_pem import UserPEM
+
 from multiversx_sdk_cli import cli_shared, utils
 from multiversx_sdk_cli.accounts import Account, Address
-from multiversx_sdk_wallet.user_pem import UserPEM
 
 logger = logging.getLogger("cli.wallet")
 
@@ -131,7 +132,7 @@ def generate_pem(args: Any):
         pubkey = secret_key.generate_public_key()
     else:
         mnemonic = Mnemonic.generate()
-    
+
     secret_key = mnemonic.derive_key(index)
     pubkey = secret_key.generate_public_key()
     address = Address(pubkey.hex())

@@ -113,7 +113,7 @@ class StandaloneModule(DependencyModule):
     def get_directory(self, tag: str) -> Path:
         return config.get_dependency_directory(self.key, tag)
 
-    def get_source_directory(self, tag: str):
+    def get_source_directory(self, tag: str) -> Path:
         # Due to how the GitHub creates archives for repository releases, the
         # path will contain the tag in two variants: with the 'v' prefix (e.g.
         # "v1.1.0"), but also without (e.g. "1.1.0"), hence the need to remove
@@ -212,7 +212,10 @@ class GolangModule(StandaloneModule):
         resolution = self.get_resolution()
 
         if resolution == DependencyResolution.Host:
-            return shutil.which("go") is not None
+            which_go = shutil.which("go")
+            logger.info(f"which go: {which_go}")
+
+            return which_go is not None
         if resolution == DependencyResolution.SDK:
             return super().is_installed(tag)
 
@@ -271,7 +274,12 @@ class Rust(DependencyModule):
         resolution = self.get_resolution()
 
         if resolution == DependencyResolution.Host:
-            return shutil.which("rustc") is not None and shutil.which("cargo") is not None
+            which_rustc = shutil.which("rustc")
+            which_cargo = shutil.which("cargo")
+            logger.info(f"which rustc: {which_rustc}")
+            logger.info(f"which cargo: {which_cargo}")
+
+            return which_rustc is not None and which_cargo is not None
         if resolution == DependencyResolution.SDK:
             try:
                 env = self._get_env_for_is_installed_in_sdk()
@@ -377,26 +385,38 @@ class WasmOptModule(StandaloneModule):
         self.repo_name = "binaryen"
 
     def _post_install(self, tag: str):
-        binary = self.get_source_directory(tag) / "bin" / "wasm-opt"
-        shutil.copy(binary, self.get_directory(tag))
-        shutil.rmtree(self.get_source_directory(tag))
+        # Bit of cleanup, we don't need the rest of the binaries.
+        bin_to_remove = list(self._get_bin_directory(tag).glob("*"))
+        bin_to_remove = [file for file in bin_to_remove if file.name != "wasm-opt"]
+        lib_to_remove = list((self.get_source_directory(tag) / "lib").glob("*"))
+        lib_to_remove = [file for file in lib_to_remove if file.suffix != ".dylib"]
+
+        for file in bin_to_remove + lib_to_remove:
+            file.unlink()
+
+    def _get_bin_directory(self, tag: str) -> Path:
+        return self.get_source_directory(tag) / "bin"
 
     def is_installed(self, tag: str) -> bool:
         resolution = self.get_resolution()
         tag = tag or config.get_dependency_tag(self.key)
+        bin_file = self._get_bin_directory(tag) / "wasm-opt"
 
         if resolution == DependencyResolution.Host:
+            which_wasm_opt = shutil.which("wasm-opt")
+            logger.info(f"which wasm-opt: {which_wasm_opt}")
+
             return shutil.which("wasm-opt") is not None
         if resolution == DependencyResolution.SDK:
-            return super().is_installed(tag)
+            return bin_file.exists()
         raise errors.BadDependencyResolution(self.key, resolution)
 
     def get_env(self):
         tag = config.get_dependency_tag(self.key)
-        bin_folder = self.get_directory(tag)
+        bin_directory = self._get_bin_directory(tag)
 
         return {
-            "PATH": f"{bin_folder}:{os.environ['PATH']}",
+            "PATH": f"{bin_directory}:{os.environ['PATH']}",
         }
 
     def get_latest_release(self) -> str:

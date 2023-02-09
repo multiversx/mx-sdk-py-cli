@@ -12,6 +12,13 @@ Python Command Line Tools for interacting with Multivers<sup>X</sup>.
 
 ## Development setup
 
+Clone this repository and cd into it:
+
+```
+git clone https://github.com/multiversx/mx-sdk-py-cli.git
+cd mx-sdk-py-cli
+```
+
 ### Virtual environment
 
 Create a virtual environment and install the dependencies:
@@ -34,3 +41,15 @@ If using VSCode, restart it or follow these steps:
  - `Ctrl + Shift + P`
  - _Select Interpreter_
  - Choose `./.venv/bin/python`.
+
+### Using your local `mxpy`
+
+If you want to test the modifications you locally made to `mxpy`, set `PYTHONPATH` with the path to your local repository path.
+
+For example, if you cloned the repository at `~/mx-sdk-py-cli`, run:
+
+```
+export PYTHONPATH="~/mx-sdk-py-cli"
+```
+
+Then `mxpy` will use the code in your local repository.
