@@ -1,6 +1,7 @@
 import logging
 
 from multiversx_sdk_cli.accounts import Account
+from multiversx_sdk_cli.errors import GasLimitTooLarge
 from multiversx_sdk_cli.tests.utils import MyTestCase
 from multiversx_sdk_cli.transactions import Transaction
 
@@ -62,9 +63,9 @@ class TransactionsTestCase(MyTestCase):
 
         serialized = transaction.serialize().decode()
         self.assertEqual("""{"nonce":89,"value":"0","receiver":"erd1spyavw0956vq68xj8y4tenjpq2wd5a9p2c6j8gsz7ztyrnpxrruqzu66jx","sender":"erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th","senderUsername":"YWxpY2U=","receiverUsername":"Ym9i","gasPrice":1000000000,"gasLimit":50000,"chainID":"local-testnet","version":1}""", serialized)
-        
+
         transaction.sign(self.alice)
-        self.assertEqual("1bed82c3f91c9d24f3a163e7b93a47453d70e8743201fe7d3656c0214569566a76503ef0968279ac942ca43b9c930bd26638dfb075a220ce80b058ab7bca140a", transaction.signature)    
+        self.assertEqual("1bed82c3f91c9d24f3a163e7b93a47453d70e8743201fe7d3656c0214569566a76503ef0968279ac942ca43b9c930bd26638dfb075a220ce80b058ab7bca140a", transaction.signature)
 
     def test_serialize_transaction_as_inner(self):
         transaction = Transaction()
@@ -81,3 +82,17 @@ class TransactionsTestCase(MyTestCase):
         serialized = transaction.serialize_as_inner()
 
         self.assertEqual("relayedTx@7b226e6f6e6365223a302c2276616c7565223a302c227265636569766572223a224f655a47687431437775596d33376655756233615256346d6d73354b48426b4443757132716670354b67343d222c2273656e646572223a222f576b62746568644543614832424235332f7a6f517454634d6f4a323074544744592f5277304d384d704d3d222c226761735072696365223a3230303030303030303030303030302c226761734c696d6974223a3530303030303030302c2264617461223a225a6d3976222c22636861696e4944223a22516d394f222c2276657273696f6e223a312c227369676e6174757265223a224a38433741664278376f594e79746b713542564845367a4f6f7563596a796a4e79375a47484961485139674f3354384a75442f325147507650724f694f58444b5031744274643338596a667a37384f736a624a7743673d3d227d", serialized)
+
+    def test_sign_when_gas_limit_too_large(self):
+        transaction = Transaction()
+        transaction.nonce = 0
+        transaction.value = "0"
+        transaction.sender = "erd1l453hd0gt5gzdp7czpuall8ggt2dcv5zwmfdf3sd3lguxseux2fsmsgldz"
+        transaction.receiver = "erd188nydpkagtpwvfklkl2tn0w6g40zdxkwfgwpjqc2a2m2n7ne9g8q2t22sr"
+        transaction.gasPrice = 200000000000000
+        transaction.gasLimit = 1500000000
+        transaction.data = "foo"
+        transaction.chainID = "chainID"
+        transaction.version = 1
+
+        self.assertRaises(GasLimitTooLarge, lambda: transaction.sign(self.alice))
