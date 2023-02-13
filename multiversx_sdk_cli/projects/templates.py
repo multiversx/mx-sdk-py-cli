@@ -238,8 +238,7 @@ class TemplateRust(Template):
         for file in files:
             if ignore_missing and not file.exists():
                 continue
-            content = utils.read_file(file)
-            assert isinstance(content, str)
+            content = file.read_text()
 
             for to_replace, replacement in replacements:
                 content = content.replace(to_replace, replacement)

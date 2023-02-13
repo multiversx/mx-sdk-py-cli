@@ -109,7 +109,7 @@ class Project(IProject):
         return self.get_wasm_path(self.get_wasm_default_name("-view"))
 
     def get_bytecode(self):
-        bytecode: bytes = cast(bytes, utils.read_file(self.get_file_wasm(), binary=True))
+        bytecode: bytes = self.get_file_wasm().read_bytes()
         bytecode_hex = bytecode.hex()
         return bytecode_hex
 

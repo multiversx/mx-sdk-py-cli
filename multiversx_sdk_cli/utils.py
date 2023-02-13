@@ -5,18 +5,20 @@ import pathlib
 import shutil
 import stat
 import sys
-import requests_cache
 import tarfile
 import zipfile
 from pathlib import Path
-from typing import Any, List, Union, Optional, cast, IO, Dict, Protocol, runtime_checkable
+from typing import (Any, Dict, List, Optional, Protocol, Union,
+                    runtime_checkable)
 
+import requests_cache
 import toml
 
 import multiversx_sdk_cli.config
 from multiversx_sdk_cli import errors
 
 logger = logging.getLogger("utils")
+
 
 @runtime_checkable
 class ISerializable(Protocol):
@@ -92,21 +94,6 @@ def read_lines(file: Path) -> List[str]:
     lines = [line.strip() for line in lines]
     lines = [line for line in lines if line]
     return lines
-
-
-# TODO delete this function, it is too generic
-# TODO find usages in legolas
-def read_file(f: Any, binary: bool = False) -> Union[str, bytes]:
-    if isinstance(f, str) or isinstance(f, pathlib.PosixPath):
-        path = Path(f)
-        if binary:
-            return read_binary_file(path)
-        return read_text_file(path)
-
-    file = cast(IO, f)
-    result = file.read()
-    assert isinstance(result, str) or isinstance(result, bytes)
-    return result
 
 
 def read_binary_file(path: Path) -> bytes:
