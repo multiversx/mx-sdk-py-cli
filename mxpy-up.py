@@ -240,6 +240,13 @@ python3 -m multiversx_sdk_cli.cli "$@"
 deactivate
 """)
 
+    if get_operating_system() == "windows":
+        shortcut_path.write_text(f"""#!/bin/sh
+. "{venv_path / 'Scripts' / 'activate'}"
+python3 -m multiversx_sdk_cli.cli "$@"
+deactivate
+""")
+
     st = os.stat(shortcut_path)
     os.chmod(shortcut_path, st.st_mode | stat.S_IEXEC)
 
