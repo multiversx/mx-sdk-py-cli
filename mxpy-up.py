@@ -235,7 +235,7 @@ def install_mxpy(exact_version: str, from_branch: str):
         pass
 
     shortcut_path.write_text(f"""#!/bin/sh
-. "{venv_path}/bin/activate"
+. "{venv_path / 'bin' / 'activate'}"
 python3 -m multiversx_sdk_cli.cli "$@"
 deactivate
 """)
