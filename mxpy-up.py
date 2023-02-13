@@ -31,6 +31,8 @@ def main():
     logging.basicConfig(level=logging.DEBUG)
 
     operating_system = get_operating_system()
+    logger.info(f"Operating system: {operating_system}")
+
     python_version = (sys.version_info.major, sys.version_info.minor, sys.version_info.micro)
 
     logger.info("Checking user.")
@@ -41,11 +43,6 @@ def main():
     logger.info(f"Python version: {format_version(python_version)}")
     if python_version < MIN_REQUIRED_PYTHON_VERSION:
         raise InstallError(f"You need Python {format_version(MIN_REQUIRED_PYTHON_VERSION)} or later.")
-
-    logger.info("Checking operating system.")
-    logger.info(f"Operating system: {operating_system}")
-    if operating_system != "linux" and operating_system != "osx":
-        raise InstallError("Your operating system is not supported yet.")
 
     migrate_old_elrondsdk()
     migrate_v6(yes)
