@@ -176,7 +176,7 @@ def create_venv():
 
     logger.info(f"Creating virtual environment in: {venv_folder}.")
     import venv
-    builder = venv.EnvBuilder(with_pip=True)
+    builder = venv.EnvBuilder(with_pip=True, symlinks=True)
 
     logger.info("builder.clear_directory()")
     builder.clear_directory(venv_folder)
