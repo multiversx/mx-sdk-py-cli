@@ -343,13 +343,19 @@ class Rust(DependencyModule):
 
     def get_env_for_install(self):
         directory = self.get_directory("")
+        platform = workstation.get_platform()
 
-        return {
+        env = {
             # For installation, wget (or curl) and cc (build-essential) are also required.
             "PATH": f"{path.join(directory, 'bin')}:{os.environ['PATH']}",
             "RUSTUP_HOME": str(directory),
             "CARGO_HOME": str(directory)
         }
+
+        if platform == "windows":
+            env["RUSTUP_USE_HYPER"] = "1"
+
+        return env
 
     def get_latest_release(self) -> str:
         raise errors.UnsupportedConfigurationValue("Rust tag must either be explicit, empty or 'nightly'")
