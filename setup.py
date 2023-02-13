@@ -21,7 +21,7 @@ setuptools.setup(
     author="MultiversX",
     license="MIT",
     packages=setuptools.find_packages(
-        include=["multiversx_sdk_cli*"], exclude=["examples*"]),
+        include=["multiversx_sdk_cli*"]),
     include_package_data=True,
     setup_requires=["wheel"],
     install_requires=[
@@ -47,10 +47,5 @@ setuptools.setup(
         "Intended Audience :: Developers",
         "Development Status :: 3 - Alpha"
     ],
-    entry_points={
-        "console_scripts": [
-            "mxpy=multiversx_sdk_cli.cli:main",
-        ],
-    },
     python_requires=">=3.8"
 )

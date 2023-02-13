@@ -16,15 +16,14 @@ sdk_path = Path("~/multiversx-sdk").expanduser().resolve()
 
 def main():
     parser = ArgumentParser()
-    parser.add_argument("--modify-path", dest="modify_path", action="store_true", help="whether to modify $PATH (in profile file)")
-    parser.add_argument("--no-modify-path", dest="modify_path", action="store_false", help="whether to modify $PATH (in profile file)")
+    parser.add_argument("--modify-path", dest="modify_path", action="store_true", help="(deprecated, not used)")
+    parser.add_argument("--no-modify-path", dest="modify_path", action="store_false", help="(deprecated, not used)")
     parser.add_argument("--exact-version", help="the exact version of mxpy to install")
     parser.add_argument("--from-branch", help="use a branch of multiversx/mx-sdk-py-cli")
     parser.add_argument("--yes", action="store_true", default=False)
     parser.set_defaults(modify_path=True)
     args = parser.parse_args()
 
-    modify_path = args.modify_path
     exact_version = args.exact_version
     from_branch = args.from_branch
     yes = args.yes
@@ -56,13 +55,6 @@ def main():
 
     create_venv()
     install_mxpy(exact_version, from_branch)
-    if modify_path:
-        add_sdk_to_path()
-        logger.info("""
-###############################################################################
-Upon restarting the user session, [$ mxpy] command should be available in your shell.
-###############################################################################
-""")
 
     run_post_install_checks()
 
@@ -260,61 +252,6 @@ def run_in_venv(args: List[str], venv_path: Path):
     return process.wait()
 
 
-def add_sdk_to_path():
-    old_export_directive = f'export PATH="{Path("~/elrondsdk").expanduser()}:$PATH"\t# elrond-sdk'
-    new_export_directive = f'export PATH="${{HOME}}/multiversx-sdk:$PATH"\t# multiversx-sdk'
-
-    profile_file = get_profile_file()
-    profile_info_content = profile_file.read_text()
-
-    logger.info(f"Using shell profile: {profile_file}")
-
-    if old_export_directive in profile_info_content:
-        # We don't perform the removal automatically (a bit risky)
-        logger.warning(f"Please manually remove the following entry from the shell profile ({profile_file}): {old_export_directive}.")
-
-    if new_export_directive in profile_info_content:
-        # Note: in some (rare) cases, here we'll have false positives (e.g. if the export directive is commented out).
-        logger.info(f"multiversx-sdk path ({sdk_path}) is already configured in shell profile.")
-        return
-
-    logger.info(f"Configuring multiversx-sdk path [{sdk_path}] in shell profile...")
-    logger.info(f"[{profile_file}] is being modified...")
-
-    with open(profile_file, "a") as file:
-        file.write(f'\n{new_export_directive}\n')
-
-    logger.info(f"""
-###############################################################################
-[{profile_file}] has been modified.
-Please RESTART THE USER SESSION.
-###############################################################################
-""")
-
-
-def get_profile_file():
-    operating_system = get_operating_system()
-    file = None
-
-    if operating_system == "linux":
-        file = "~/.profile"
-    else:
-        value = input("""Please choose your preferred shell:
-1) zsh
-2) bash
-""")
-        if value not in ["1", "2"]:
-            raise InstallError("Invalid choice.")
-
-        value = int(value)
-        if value == 1:
-            file = "~/.zshrc"
-        else:
-            file = "~/.bash_profile"
-
-    return Path(file).expanduser().resolve()
-
-
 def run_post_install_checks():
     multiversx_sdk_path = Path("~/multiversx-sdk").expanduser()
     elrond_sdk_path = Path("~/elrondsdk").expanduser()
@@ -353,3 +290,15 @@ def confirm_continuation(yes: bool = False):
     if answer.lower() not in ["y", "yes"]:
         print("Confirmation not given. Will stop.")
         exit(1)
+
+
+# do not edit profile anymore. ~/multiversx-sdk/mxpy VS. should be explicitly added by the user / developer.
+# reason: no need to restart user session
+# reason: .profile missing on some OSes
+# TODO: fix mxpy shortcut, use venv properly.
+# """
+# #!/bin/sh
+# . "/home/andrei/multiversx-sdk/mxpy-venv/bin/activate"
+# python3 -m multiversx_sdk_cli.cli "$@"
+# deactivate
+# """
