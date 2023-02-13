@@ -8,25 +8,6 @@ on:
     branches: [ main, feat/* ]
   workflow_dispatch:
 
-# At the start of each workflow run, GitHub automatically creates a unique GITHUB_TOKEN secret (we will pass it below to mxpy config).
-# The token's permissions are limited to the repository that contains your workflow.
-# https://docs.github.com/en/actions/security-guides/automatic-token-authentication#about-the-github_token-secret
-# https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#permissions
-permissions:
-  actions: none
-  checks: none
-  contents: none
-  deployments: none
-  id-token: none
-  issues: none
-  discussions: none
-  packages: none
-  pages: none
-  pull-requests: none
-  repository-projects: none
-  security-events: none
-  statuses: none
-
 jobs:
   build:
     name: Build and Test mxpy for ${{ matrix.os }}, python ${{ matrix.python-version }}

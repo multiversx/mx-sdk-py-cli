@@ -48,7 +48,7 @@ jobs:
           wget -O mxpy-up.py https://raw.githubusercontent.com/multiversx/mx-sdk-py-cli/$BRANCH_NAME/mxpy-up.py
           python3 mxpy-up.py --from-branch $BRANCH_NAME --yes
 
-          source /home/runner/.profile
+          export PATH="~/multiversx-sdk:${PATH}"
 
           mxpy deps install wasm-opt
           mxpy contract new --template=lottery-esdt lottery-esdt
