@@ -37,7 +37,7 @@ def main():
     python_version = (sys.version_info.major, sys.version_info.minor, sys.version_info.micro)
 
     logger.info("Checking user.")
-    if os.getuid() == 0:
+    if hasattr(os, "getuid") and os.getuid() == 0:
         raise InstallError("You should not install mxpy as root.")
 
     logger.info("Checking Python version.")
