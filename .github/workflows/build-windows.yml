@@ -1,0 +1,54 @@
+# This workflow will do a clean install of node dependencies, build the source code and run tests across different versions of node
+# For more information see: https://help.github.com/actions/language-and-framework-guides/using-nodejs-with-github-actions
+
+name: build
+
+on:
+  pull_request:
+    branches: [ main, feat/* ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: Build and Test mxpy for ${{ matrix.os }}, python ${{ matrix.python-version }}
+    
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      matrix:
+        os: [windows-2019]
+        python-version: [3.8]
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Install dependencies
+      run: |
+        python3 -m pip install --upgrade pip
+        pip3 install -r requirements.txt
+        pip3 install pytest
+    - name: Set github_api_token
+      run: |
+        mkdir ~/multiversx-sdk
+        export PYTHONPATH=.
+        python3 -m multiversx_sdk_cli.cli config new test
+        python3 -m multiversx_sdk_cli.cli config set github_api_token ${{ secrets.GITHUB_TOKEN }}
+    - name: Setup test dependencies
+      run: |
+        python3 -m multiversx_sdk_cli.cli deps install testwallets
+        python3 -m multiversx_sdk_cli.cli deps install wasm-opt
+    - name: Run unit tests
+      run: |
+        export PYTHONPATH=.
+        python3 -m unittest discover -s multiversx_sdk_cli/tests
+        pytest .
+    - name: Run CLI tests
+      run: |
+        python3 -m multiversx_sdk_cli.cli config set dependencies.vmtools.tag v1.4.60
+        cd ./multiversx_sdk_cli/tests
+        source ./test_cli_contracts.sh && testAll || return 1
+        source ./test_cli_wallet.sh && testAll || return 1
+        source ./test_cli_dns.sh && testOffline || return 1
