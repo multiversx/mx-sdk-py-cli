@@ -247,14 +247,15 @@ deactivate
 
 
 def run_in_venv(args: List[str], venv_path: Path):
-    if "PYTHONHOME" in os.environ:
-        del os.environ["PYTHONHOME"]
+    env = os.environ.copy()
 
-    process = subprocess.Popen(args, env={
-        "PATH": str(venv_path / "bin") + ":" + os.environ["PATH"],
-        "VIRTUAL_ENV": str(venv_path)
-    })
+    if "PYTHONHOME" in env:
+        del env["PYTHONHOME"]
 
+    env["PATH"] = str(venv_path / "bin") + ":" + env["PATH"]
+    env["VIRTUAL_ENV"] = str(venv_path)
+
+    process = subprocess.Popen(args, env=env)
     return process.wait()
 
 
