@@ -333,8 +333,8 @@ class Rust(DependencyModule):
         return {
             # For installation, wget (or curl) and cc (build-essential) are also required.
             "PATH": f"{path.join(directory, 'bin')}:{os.environ['PATH']}",
-            "RUSTUP_HOME": directory,
-            "CARGO_HOME": directory
+            "RUSTUP_HOME": str(directory),
+            "CARGO_HOME": str(directory)
         }
 
     def get_latest_release(self) -> str:
