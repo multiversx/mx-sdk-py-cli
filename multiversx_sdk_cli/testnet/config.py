@@ -99,14 +99,8 @@ class TestnetConfiguration:
         """
 
         local_config = cls.get_local_config(filename)
-        sdk_testnet_config = cls.get_sdk_testnet_config()
-        final_config = merge_configs(sdk_testnet_config, local_config)
+        final_config = merge_configs(cls.default(), local_config)
         return cls(final_config)
-
-    @classmethod
-    def from_sdk_testnet_config(cls):
-        config = cls.get_sdk_testnet_config()
-        return cls(config)
 
     @classmethod
     def from_default_config(cls):
@@ -120,18 +114,6 @@ class TestnetConfiguration:
                 return dict()
 
         return utils.read_toml_file(filename)
-
-    @classmethod
-    def get_sdk_testnet_config(cls):
-        default = cls.default()
-        filename = workstation.get_tools_folder() / "testnet.toml"
-
-        if not filename.exists():
-            logger.info('writing sdk_testnet_config from defaults')
-            utils.write_toml_file(str(filename), default)
-            return default
-        sdk_testnet_config = utils.read_toml_file(filename)
-        return merge_configs(default, sdk_testnet_config)
 
     def node_config_source(self) -> Path:
         return self.node_source() / 'cmd' / 'node' / 'config'

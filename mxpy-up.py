@@ -174,6 +174,10 @@ You may need to reinstall wasm-opt using `mxpy deps install wasm-opt`.
 
         shutil.rmtree(nodejs_folder)
 
+    global_testnet_toml = sdk_path / "testnet.toml"
+    if global_testnet_toml.exists():
+        global_testnet_toml.unlink()
+
 
 def create_venv():
     require_python_venv_tools()
