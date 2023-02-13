@@ -2,6 +2,7 @@ import logging
 import os
 import os.path
 import shutil
+import stat
 import subprocess
 import sys
 from argparse import ArgumentParser
@@ -217,23 +218,27 @@ def install_mxpy(exact_version: str, from_branch: str):
     return_code = run_in_venv(["pip3", "install", "--no-cache-dir", package_to_install], venv_path)
     if return_code != 0:
         raise InstallError("Could not install mxpy.")
-    return_code = run_in_venv(["mxpy", "--version"], venv_path)
-    if return_code != 0:
-        raise InstallError("Could not install mxpy.")
 
-    logger.info("Creating symlink to mxpy...")
+    logger.info("Creating mxpy shortcut...")
 
-    link_path = sdk_path / "mxpy"
+    shortcut_path = sdk_path / "mxpy"
 
     try:
-        link_path.unlink()
-        logger.info(f"Removed symlink: {link_path}")
+        shortcut_path.unlink()
+        logger.info(f"Removed existing shortcut: {shortcut_path}")
     except FileNotFoundError:
-        logger.info(f"Symlink does not exist yet: {link_path}")
+        logger.info(f"Shortcut does not exist yet: {shortcut_path}")
         pass
 
-    os.symlink(str(get_mxpy_venv_path() / "bin" / "mxpy"), link_path)
-    logger.info(f"Created symlink: {link_path}")
+    shortcut_path.write_text(f"""#!/bin/sh
+. "{venv_path}/bin/activate"
+python3 -m multiversx_sdk_cli.cli "$@"
+deactivate
+""")
+
+    st = os.stat(shortcut_path)
+    os.chmod(shortcut_path, st.st_mode | stat.S_IEXEC)
+
     logger.info("You have successfully installed mxpy.")
 
 
@@ -256,7 +261,7 @@ def run_post_install_checks():
     logger.info("Running post-install checks...")
     print("~/multiversx-sdk exists", "✓" if multiversx_sdk_path.exists() else "✗")
     print("~/elrondsdk is removed or missing", "✓" if not elrond_sdk_path.exists() else "✗")
-    print("~/multiversx-sdk/mxpy link created", "✓" if (multiversx_sdk_path / "mxpy").exists() else "✗")
+    print("~/multiversx-sdk/mxpy shortcut created", "✓" if (multiversx_sdk_path / "mxpy").exists() else "✗")
     print("~/multiversx-sdk/erdpy.json is renamed or missing", "✓" if not (multiversx_sdk_path / "erdpy.json").exists() else "✗")
 
 
@@ -287,15 +292,3 @@ def confirm_continuation(yes: bool = False):
     if answer.lower() not in ["y", "yes"]:
         print("Confirmation not given. Will stop.")
         exit(1)
-
-
-# do not edit profile anymore. ~/multiversx-sdk/mxpy VS. should be explicitly added by the user / developer.
-# reason: no need to restart user session
-# reason: .profile missing on some OSes
-# TODO: fix mxpy shortcut, use venv properly.
-# """
-# #!/bin/sh
-# . "/home/andrei/multiversx-sdk/mxpy-venv/bin/activate"
-# python3 -m multiversx_sdk_cli.cli "$@"
-# deactivate
-# """
