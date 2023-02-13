@@ -264,10 +264,10 @@ def run_post_install_checks():
     elrond_sdk_path = Path("~/elrondsdk").expanduser()
 
     logger.info("Running post-install checks...")
-    print("~/multiversx-sdk exists", "✓" if multiversx_sdk_path.exists() else "✗")
-    print("~/elrondsdk is removed or missing", "✓" if not elrond_sdk_path.exists() else "✗")
-    print("~/multiversx-sdk/mxpy shortcut created", "✓" if (multiversx_sdk_path / "mxpy").exists() else "✗")
-    print("~/multiversx-sdk/erdpy.json is renamed or missing", "✓" if not (multiversx_sdk_path / "erdpy.json").exists() else "✗")
+    print("~/multiversx-sdk exists", "OK" if multiversx_sdk_path.exists() else "NOK")
+    print("~/elrondsdk is removed or missing", "OK" if not elrond_sdk_path.exists() else "NOK")
+    print("~/multiversx-sdk/mxpy shortcut created", "OK" if (multiversx_sdk_path / "mxpy").exists() else "NOK")
+    print("~/multiversx-sdk/erdpy.json is renamed or missing", "OK" if not (multiversx_sdk_path / "erdpy.json").exists() else "NOK")
 
 
 class InstallError(Exception):
