@@ -1,0 +1,34 @@
+name: Install mxpy (Windows)
+
+on:
+  pull_request:
+    branches: [main, feat/*]
+  workflow_dispatch:
+
+env:
+ BRANCH_NAME: ${{ github.head_ref || github.ref_name }}
+
+jobs:
+  install:
+    runs-on: windows-2019
+
+    strategy:
+      matrix:
+        python-version: [3.8]
+
+    steps:
+      - name: Set up Python ${{ matrix.python-version }}
+        shell: bash
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install
+        shell: bash
+        run: |
+          wget -O mxpy-up.py https://raw.githubusercontent.com/multiversx/mx-sdk-py-cli/$BRANCH_NAME/mxpy-up.py
+          python3 mxpy-up.py --from-branch $BRANCH_NAME --yes
+      - name: Smoke test
+        shell: bash
+        run: |
+          export PATH="~/multiversx-sdk:${PATH}"
+          mxpy --version
