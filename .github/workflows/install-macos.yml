@@ -27,5 +27,5 @@ jobs:
           python3 mxpy-up.py --from-branch $BRANCH_NAME --yes <<< "2"
       - name: Smoke test
         run: |
-          source /Users/runner/.bash_profile
+          export PATH="~/multiversx-sdk:${PATH}"
           mxpy --version
