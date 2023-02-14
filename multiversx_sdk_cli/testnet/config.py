@@ -304,7 +304,7 @@ class TestnetConfiguration:
         config['networking'] = {
             'host': '127.0.0.1',
             'port_seednode': 9999,
-            'p2p_id_seednode': '16Uiu2HAkw5SNNtSvH1zJiQ6Gc3WoGNSxiyNueRKe6fuAuh57G3Bk',
+            'p2p_id_seednode': '16Uiu2HAkx4QqgXXDdHdUWbLu5kxhd3Uo2hqB2FfCxmxH5Sd7bZFk',
             'port_proxy': 7950,
             'port_first_observer': 21100,
             'port_first_observer_rest_api': 10000,
