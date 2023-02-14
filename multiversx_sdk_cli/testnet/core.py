@@ -106,8 +106,8 @@ async def _read_stream(stream: Any, pid: int):
 def _patch_loglevel(loglevel: str) -> str:
     loglevel = loglevel or "*:DEBUG"
 
-    if "arwen:" not in loglevel:
-        loglevel += ",arwen:TRACE"
+    if "vm:" not in loglevel:
+        loglevel += ",vm:TRACE"
     if "process/smartcontract:" not in loglevel:
         loglevel += ",process/smartcontract:TRACE"
 
@@ -115,7 +115,7 @@ def _patch_loglevel(loglevel: str) -> str:
 
 
 LOGLINE_GENESIS_THRESHOLD_MARKER = "started committing block"
-LOGLINE_AFTER_GENESIS_INTERESTING_MARKERS = ["started committing block", "ERROR", "WARN", "arwen", "smartcontract"]
+LOGLINE_AFTER_GENESIS_INTERESTING_MARKERS = ["started committing block", "ERROR", "WARN", "vm", "smartcontract"]
 # We ignore SC calls on genesis.
 LOGLINE_ON_GENESIS_INTERESTING_MARKERS = ["started committing block", "ERROR", "WARN"]
 
