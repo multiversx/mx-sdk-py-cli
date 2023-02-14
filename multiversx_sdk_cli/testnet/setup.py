@@ -1,14 +1,16 @@
 import logging
 import shutil
 from os import path
+from pathlib import Path
 from typing import Any
 
 import multiversx_sdk_cli.utils as utils
 from multiversx_sdk_cli import dependencies, myprocess, workstation
 from multiversx_sdk_cli.dependencies.install import install_module
-from multiversx_sdk_cli.testnet import (genesis_json, genesis_smart_contracts_json,
-                           node_config_toml, nodes_setup_json, p2p_toml,
-                           wallets)
+from multiversx_sdk_cli.testnet import (genesis_json,
+                                        genesis_smart_contracts_json,
+                                        node_config_toml, nodes_setup_json,
+                                        p2p_toml, wallets)
 from multiversx_sdk_cli.testnet.config import TestnetConfiguration
 
 logger = logging.getLogger("testnet")
@@ -64,6 +66,7 @@ def configure(args: Any):
     # Seed node
     copy_config_to_seednode(testnet_config)
     patch_seednode_p2p_config(testnet_config)
+    copy_seednode_p2p_key(testnet_config)
 
     # Proxy
     copy_config_to_proxy(testnet_config)
@@ -149,6 +152,11 @@ def patch_seednode_p2p_config(testnet_config: TestnetConfiguration):
     data = utils.read_toml_file(seednode_config_file)
     p2p_toml.patch_for_seednode(data, testnet_config)
     utils.write_toml_file(seednode_config_file, data)
+
+
+def copy_seednode_p2p_key(testnet_config: TestnetConfiguration):
+    p2p_key_path = Path(__file__).parent / "seednode_p2pKey.pem"
+    shutil.copy(p2p_key_path, testnet_config.seednode_config_folder() / "p2pKey.pem")
 
 
 def patch_nodes_p2p_config(testnet_config: TestnetConfiguration, nodes_config_folders, port_first):
@@ -247,27 +255,27 @@ def build_binaries(testnet_config: TestnetConfiguration):
     myprocess.run_process(['go', 'build'], cwd=proxy_folder, env=golang_env)
 
     # Now copy the binaries to the testnet folder
-    wasm_vm_version = _get_wasm_vm_version(testnet_config)
-    libwasmer_path = path.join(golang.get_gopath(), f"pkg/mod/github.com/!elrond!network/arwen-wasm-vm@{wasm_vm_version}/wasmer/libwasmer_darwin_amd64.dylib")
+    wasm_vm_package = _get_wasm_vm_package(testnet_config)
+    libwasmer_osx_path = Path(golang.get_gopath()) / "pkg" / "mod" / wasm_vm_package / "wasmer" / "libwasmer_darwin_amd64.dylib"
 
     shutil.copy(seednode_folder / "seednode", testnet_config.seednode_folder())
     if workstation.get_platform() == "osx":
-        shutil.copy(libwasmer_path, testnet_config.seednode_folder())
+        shutil.copy(libwasmer_osx_path, testnet_config.seednode_folder())
 
     for destination in testnet_config.all_nodes_folders():
         shutil.copy(node_folder / "node", destination)
 
         if workstation.get_platform() == "osx":
-            shutil.copy(libwasmer_path, destination)
+            shutil.copy(libwasmer_osx_path, destination)
 
     shutil.copy(proxy_folder / "proxy", testnet_config.proxy_folder())
     if workstation.get_platform() == "osx":
-        shutil.copy(libwasmer_path, testnet_config.proxy_folder())
+        shutil.copy(libwasmer_osx_path, testnet_config.proxy_folder())
 
 
-def _get_wasm_vm_version(testnet_config: TestnetConfiguration):
+def _get_wasm_vm_package(testnet_config: TestnetConfiguration) -> str:
     go_mod = testnet_config.node_source() / "go.mod"
     lines = utils.read_lines(go_mod)
-    line = next(line for line in lines if "github.com/ElrondNetwork/arwen-wasm-vm" in line)
+    line = [line for line in lines if "github.com/multiversx/mx-chain-vm-v" in line][-1]
     parts = line.split()
-    return parts[1]
+    return f"{parts[0]}@{parts[1]}"
