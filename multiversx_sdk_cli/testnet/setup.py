@@ -156,7 +156,7 @@ def patch_seednode_p2p_config(testnet_config: TestnetConfiguration):
 
 def copy_seednode_p2p_key(testnet_config: TestnetConfiguration):
     p2p_key_path = Path(__file__).parent / "seednode_p2pKey.pem"
-    shutil.copy(p2p_key_path, testnet_config.seednode_folder() / "p2pKey.pem")
+    shutil.copy(p2p_key_path, testnet_config.seednode_config_folder() / "p2pKey.pem")
 
 
 def patch_nodes_p2p_config(testnet_config: TestnetConfiguration, nodes_config_folders, port_first):
