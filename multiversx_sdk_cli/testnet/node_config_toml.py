@@ -30,10 +30,10 @@ def patch_config(data: ConfigDict, testnet_config: TestnetConfiguration):
     # Always use the latest VM
     virtual_machine: Dict[str, Any] = dict()
     virtual_machine['Execution'] = dict()
-    virtual_machine['Execution']['ArwenVersions'] = [{'StartEpoch': 0, 'Version': '*'}]
+    virtual_machine['Execution']['WasmVMVersions'] = [{'StartEpoch': 0, 'Version': '*'}]
     virtual_machine['Querying'] = dict()
     virtual_machine['Querying']['NumConcurrentVMs'] = 1
-    virtual_machine['Querying']['ArwenVersions'] = [{'StartEpoch': 0, 'Version': '*'}]
+    virtual_machine['Querying']['WasmVMVersions'] = [{'StartEpoch': 0, 'Version': '*'}]
 
     data['VirtualMachine'].update(virtual_machine)
 
