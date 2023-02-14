@@ -25,7 +25,7 @@ jobs:
         shell: bash
         run: |
           curl.exe --output mxpy-up.py --url https://raw.githubusercontent.com/multiversx/mx-sdk-py-cli/$BRANCH_NAME/mxpy-up.py
-          python3 mxpy-up.py --from-branch $BRANCH_NAME --yes
+          python3 mxpy-up.py --from-branch $BRANCH_NAME --not-interactive
       - name: Smoke test
         shell: bash
         run: |
