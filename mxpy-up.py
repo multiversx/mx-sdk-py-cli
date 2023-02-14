@@ -31,30 +31,70 @@ def main():
 
     logging.basicConfig(level=logging.DEBUG)
 
-    operating_system = get_operating_system()
-    logger.info(f"Operating system: {operating_system}")
+    print("""
 
-    python_version = (sys.version_info.major, sys.version_info.minor, sys.version_info.micro)
+IMPORTANT NOTE
+==============
 
-    logger.info("Checking user.")
-    if hasattr(os, "getuid") and os.getuid() == 0:
-        raise InstallError("You should not install mxpy as root.")
+Starting with v6, the mxpy installer does not modify the PATH environment variable anymore. 
+    
+Thus, in order to use the "mxpy" command shortcut, you have to manually extend the PATH variable to include "~/multiversx-sdk".
 
-    logger.info("Checking Python version.")
-    logger.info(f"Python version: {format_version(python_version)}")
-    if python_version < MIN_REQUIRED_PYTHON_VERSION:
-        raise InstallError(f"You need Python {format_version(MIN_REQUIRED_PYTHON_VERSION)} or later.")
+You can do this by adding the following line to your shell configuration file upon installation:
 
+    export PATH="${HOME}/multiversx-sdk:${PATH}"
+
+Depending on your system, the shell configuration file is located in one of the following locations:
+
+    ~/.profile
+    ~/.bashrc
+    ~/.bash_profile
+    ~/.zshrc
+
+Upon editing the shell configuration file, you may have to RESTART THE USER SESSION for the changes to take effect.
+""")
+    confirm_continuation(yes)
+
+    if get_operating_system() == "windows":
+        print("""
+IMPORTANT NOTE
+==============
+
+Windows support is limited and experimental.
+""")
+        confirm_continuation(yes)
+
+    guard_non_root_user()
+    guard_python_version()
     migrate_old_elrondsdk()
     migrate_v6(yes)
 
     # In case of a fresh install:
     sdk_path.mkdir(parents=True, exist_ok=True)
-
     create_venv()
     install_mxpy(exact_version, from_branch)
 
     run_post_install_checks()
+
+
+def guard_non_root_user():
+    logger.info("Checking user (should not be root).")
+
+    operating_system = get_operating_system()
+
+    if operating_system == "windows":
+        return
+    if os.getuid() == 0:
+        raise InstallError("You should not install mxpy as root.")
+
+
+def guard_python_version():
+    python_version = (sys.version_info.major, sys.version_info.minor, sys.version_info.micro)
+
+    logger.info("Checking Python version.")
+    logger.info(f"Python version: {format_version(python_version)}")
+    if python_version < MIN_REQUIRED_PYTHON_VERSION:
+        raise InstallError(f"You need Python {format_version(MIN_REQUIRED_PYTHON_VERSION)} or later.")
 
 
 def format_version(version: Tuple[int, int, int]) -> str:
@@ -177,11 +217,7 @@ def create_venv():
     logger.info(f"Creating virtual environment in: {venv_folder}.")
     import venv
     builder = venv.EnvBuilder(with_pip=True, symlinks=True)
-
-    logger.info("builder.clear_directory()")
     builder.clear_directory(venv_folder)
-
-    logger.info("builder.create()")
     builder.create(venv_folder)
 
     logger.info(f"Virtual environment has been created in: {venv_folder}.")
@@ -234,23 +270,31 @@ def install_mxpy(exact_version: str, from_branch: str):
         logger.info(f"Shortcut does not exist yet: {shortcut_path}")
         pass
 
-    shortcut_path.write_text(f"""#!/bin/sh
-. "{venv_path / 'bin' / 'activate'}"
-python3 -m multiversx_sdk_cli.cli "$@"
-deactivate
-""")
-
-    if get_operating_system() == "windows":
-        shortcut_path.write_text(f"""#!/bin/sh
-. "{venv_path / 'Scripts' / 'activate'}"
-python3 -m multiversx_sdk_cli.cli "$@"
-deactivate
-""")
+    shortcut_content = get_mxpy_shortcut_content()
+    shortcut_path.write_text(shortcut_content)
 
     st = os.stat(shortcut_path)
     os.chmod(shortcut_path, st.st_mode | stat.S_IEXEC)
 
     logger.info("You have successfully installed mxpy.")
+
+
+def get_mxpy_shortcut_content():
+    operating_system = get_operating_system()
+    venv_path = get_mxpy_venv_path()
+
+    if operating_system == "windows":
+        return f"""#!/bin/sh
+. "{venv_path / 'Scripts' / 'activate'}"
+python3 -m multiversx_sdk_cli.cli "$@"
+deactivate
+"""
+
+    return f"""#!/bin/sh
+. "{venv_path / 'bin' / 'activate'}"
+python3 -m multiversx_sdk_cli.cli "$@"
+deactivate
+"""
 
 
 def run_in_venv(args: List[str], venv_path: Path):
@@ -282,6 +326,16 @@ class InstallError(Exception):
         super().__init__(message)
 
 
+def confirm_continuation(yes: bool = False):
+    if (yes):
+        return
+
+    answer = input("Continue? (y/n)")
+    if answer.lower() not in ["y", "yes"]:
+        print("Confirmation not given. Will stop.")
+        exit(1)
+
+
 if __name__ == "__main__":
     try:
         main()
@@ -294,13 +348,3 @@ if __name__ == "__main__":
 For more information go to https://docs.multiversx.com.
 For support, please contact us at http://discord.gg/MultiversXBuilders (recommended) or https://t.me/MultiversXDevelopers.
 """)
-
-
-def confirm_continuation(yes: bool = False):
-    if (yes):
-        return
-
-    answer = input("Continue? (y/n)")
-    if answer.lower() not in ["y", "yes"]:
-        print("Confirmation not given. Will stop.")
-        exit(1)
