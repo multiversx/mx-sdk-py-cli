@@ -1,15 +1,16 @@
 import logging
-from pathlib import Path
 import shutil
 from os import path
+from pathlib import Path
 from typing import Any
 
 import multiversx_sdk_cli.utils as utils
 from multiversx_sdk_cli import dependencies, myprocess, workstation
 from multiversx_sdk_cli.dependencies.install import install_module
-from multiversx_sdk_cli.testnet import (genesis_json, genesis_smart_contracts_json,
-                                        node_config_toml, nodes_setup_json, p2p_toml,
-                                        wallets)
+from multiversx_sdk_cli.testnet import (genesis_json,
+                                        genesis_smart_contracts_json,
+                                        node_config_toml, nodes_setup_json,
+                                        p2p_toml, wallets)
 from multiversx_sdk_cli.testnet.config import TestnetConfiguration
 
 logger = logging.getLogger("testnet")
@@ -65,6 +66,7 @@ def configure(args: Any):
     # Seed node
     copy_config_to_seednode(testnet_config)
     patch_seednode_p2p_config(testnet_config)
+    copy_seednode_p2p_key(testnet_config)
 
     # Proxy
     copy_config_to_proxy(testnet_config)
@@ -150,6 +152,11 @@ def patch_seednode_p2p_config(testnet_config: TestnetConfiguration):
     data = utils.read_toml_file(seednode_config_file)
     p2p_toml.patch_for_seednode(data, testnet_config)
     utils.write_toml_file(seednode_config_file, data)
+
+
+def copy_seednode_p2p_key(testnet_config: TestnetConfiguration):
+    p2p_key_path = Path(__file__).parent / "seednode_p2pKey.pem"
+    shutil.copy(p2p_key_path, testnet_config.seednode_folder() / "p2pKey.pem")
 
 
 def patch_nodes_p2p_config(testnet_config: TestnetConfiguration, nodes_config_folders, port_first):

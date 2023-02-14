@@ -1,7 +1,7 @@
 import asyncio
 import logging
-from pathlib import Path
 import traceback
+from pathlib import Path
 from typing import Any, Coroutine, List
 
 from multiversx_sdk_cli.testnet.config import TestnetConfiguration
@@ -32,7 +32,7 @@ async def do_start(args: Any):
     to_run: List[Coroutine[Any, Any, None]] = []
 
     # Seed node
-    to_run.append(run(["./seednode", "--log-save"], cwd=testnet_config.seednode_folder()))
+    to_run.append(run(["./seednode", "--log-save", "--p2p-key-pem-file", "p2pKey.pem"], cwd=testnet_config.seednode_folder()))
 
     loglevel = _patch_loglevel(testnet_config.loglevel())
     logger.info(f"loglevel: {loglevel}")
