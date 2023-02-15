@@ -1,46 +1,40 @@
-# This workflow will do a clean install of node dependencies, build the source code and run tests across different versions of node
-# For more information see: https://help.github.com/actions/language-and-framework-guides/using-nodejs-with-github-actions
+# This workflow will upload a Python Package using Twine when a release is created
+# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-python#publishing-to-package-registries
 
-name: Publish
+# This workflow uses actions that are not certified by GitHub.
+# They are provided by a third-party and are governed by
+# separate terms of service, privacy policy, and support
+# documentation.
+
+name: Upload Python Package
 
 on:
   workflow_dispatch:
+  release:
+    types: [published]
 
 permissions:
-  contents: write
+  contents: read
 
 jobs:
-  publish:
+  deploy:
+
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
     - name: Set up Python
-      uses: actions/setup-python@v2
+      uses: actions/setup-python@v3
       with:
         python-version: '3.x'
     - name: Install dependencies
       run: |
-        python3 -m pip install --upgrade pip
-        pip3 install setuptools wheel twine
-
-    - name: Create release
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      run: |
-        RELEASE_TAG=v$(python3 -c "import multiversx_sdk_cli._version; print(multiversx_sdk_cli._version.__version__);")
-
-        if [[ "$RELEASE_TAG" == *"a"* || "$RELEASE_TAG" == *"b"* ]]; then
-          gh release create $RELEASE_TAG --target=$GITHUB_SHA --title="$RELEASE_TAG" --generate-notes --prerelease
-        else
-          gh release create $RELEASE_TAG --target=$GITHUB_SHA --title="$RELEASE_TAG" --generate-notes
-        fi
-  
-    - name: Build and publish
-      env:
-        TWINE_USERNAME: __token__
-        TWINE_PASSWORD: ${{ secrets.PYPI_API_TOKEN }}
-      run: |
-        python setup.py sdist bdist_wheel
-        twine upload dist/*
-
+        python -m pip install --upgrade pip
+        pip install build
+    - name: Build package
+      run: python -m build
+    - name: Publish package
+      uses: pypa/gh-action-pypi-publish@27b31702a0e7fc50959f5ad993c78deac1bdfc29
+      with:
+        user: __token__
+        password: ${{ secrets.PYPI_API_TOKEN }}
