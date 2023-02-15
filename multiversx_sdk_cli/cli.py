@@ -4,8 +4,6 @@ import sys
 from argparse import ArgumentParser
 from typing import Any, List
 
-import toml
-
 import multiversx_sdk_cli.cli_accounts
 import multiversx_sdk_cli.cli_block
 import multiversx_sdk_cli.cli_config
@@ -20,6 +18,7 @@ import multiversx_sdk_cli.cli_testnet
 import multiversx_sdk_cli.cli_transactions
 import multiversx_sdk_cli.cli_validators
 import multiversx_sdk_cli.cli_wallet
+import multiversx_sdk_cli.version
 from multiversx_sdk_cli import config, errors
 
 logger = logging.getLogger("cli")
@@ -74,7 +73,7 @@ https://docs.multiversx.com/sdk-and-tools/mxpy.
 
     parser._positionals.title = "COMMAND GROUPS"
     parser._optionals.title = "TOP-LEVEL OPTIONS"
-    version = toml.load("pyproject.toml")["project"]["version"]
+    version = multiversx_sdk_cli.version.get_version()
     parser.add_argument("-v", "--version", action="version", version=f"MultiversX Python CLI (mxpy) {version}")
     parser.add_argument("--verbose", action="store_true", default=False)
 
