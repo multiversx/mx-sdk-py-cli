@@ -305,7 +305,7 @@ def add_shortcut_to_system_path():
     if operating_system == "windows":
         print(f"""
 ###############################################################################
-On Windows, for the "mxpy" command shortcut to be available, you need to add the the directory "{sdk_path}" to the system PATH.
+On Windows, for the "mxpy" command shortcut to be available, you need to add the directory "{sdk_path}" to the system PATH.
 
 You can do this by following these steps:
 
@@ -328,7 +328,7 @@ Do you understand the above?
 ###############################################################################
 No shell profile files have been found.
 
-The "mxpy" command shortcut will not be available until you add the the directory "{sdk_path}" to the system PATH.
+The "mxpy" command shortcut will not be available until you add the directory "{sdk_path}" to the system PATH.
 ###############################################################################
 Do you understand the above?
 """)
@@ -365,7 +365,7 @@ Make sure you understand the above before proceeding further.
 ###############################################################################
 It seems that the path "~/multiversx-sdk" is already configured in shell profile.
 
-To confirm this fact, check the shell profile (now or after the installer script ends). 
+To confirm this, check the shell profile (now or after the installer script ends). 
 
 Your shell profile files:
 {profile_files_formatted}
@@ -398,6 +398,8 @@ Please pick an option:
 
 a) manually extend the PATH variable (recommended for advanced users)
 b) allow this installer script to extend the PATH variable (not recommended for advanced users)
+
+Type "a" or "b", then press ENTER.
 
 """)
     if choice not in ["a", "b"]:
@@ -432,6 +434,7 @@ If you not know what a user session is, RESTART YOUR COMPUTER, instead.
 def get_profile_files() -> List[Path]:
     files = [
         Path("~/.profile").expanduser().resolve(),
+        Path("~/.bashrc").expanduser().resolve(),
         Path("~/.bash_profile").expanduser().resolve(),
         Path("~/.zshrc").expanduser().resolve()
     ]
