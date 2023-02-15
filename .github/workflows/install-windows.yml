@@ -1,4 +1,4 @@
-name: Install mxpy (Ubuntu)
+name: Install mxpy (Windows)
 
 on:
   pull_request:
@@ -10,7 +10,7 @@ env:
 
 jobs:
   install:
-    runs-on: ubuntu-latest
+    runs-on: windows-2019
 
     strategy:
       matrix:
@@ -22,10 +22,12 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
       - name: Install
+        shell: bash
         run: |
-          wget -O mxpy-up.py https://raw.githubusercontent.com/multiversx/mx-sdk-py-cli/$BRANCH_NAME/mxpy-up.py
+          curl.exe --output mxpy-up.py --url https://raw.githubusercontent.com/multiversx/mx-sdk-py-cli/$BRANCH_NAME/mxpy-up.py
           python3 mxpy-up.py --from-branch $BRANCH_NAME --not-interactive
       - name: Smoke test
+        shell: bash
         run: |
           export PATH="~/multiversx-sdk:${PATH}"
           mxpy --version

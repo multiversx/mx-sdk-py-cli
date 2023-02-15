@@ -253,17 +253,35 @@ class GolangModule(StandaloneModule):
 
 class Rust(DependencyModule):
     def _do_install(self, tag: str) -> None:
-        rustup_path = self._get_rustup_path()
-        downloader.download("https://sh.rustup.rs", rustup_path)
-        utils.mark_executable(rustup_path)
+        installer_url = self._get_installer_url()
+        installer_path = self._get_installer_path()
+
+        downloader.download(installer_url, str(installer_path))
+        utils.mark_executable(str(installer_path))
+
         if tag:
             toolchain = tag
         else:
             toolchain = "nightly"
 
-        args = [rustup_path, "--verbose", "--default-toolchain", toolchain, "--profile",
+        args = [str(installer_path), "--verbose", "--default-toolchain", toolchain, "--profile",
                 "minimal", "--target", "wasm32-unknown-unknown", "--no-modify-path", "-y"]
         myprocess.run_process(args, env=self.get_env_for_install())
+
+    def _get_installer_url(self) -> str:
+        platform = workstation.get_platform()
+
+        if platform == "windows":
+            return "https://win.rustup.rs"
+        return "https://sh.rustup.rs"
+
+    def _get_installer_path(self) -> Path:
+        platform = workstation.get_platform()
+        tools_folder = workstation.get_tools_folder()
+
+        if platform == "windows":
+            return tools_folder / "rustup-init.exe"
+        return tools_folder / "rustup.sh"
 
     def uninstall(self, tag: str):
         directory = self.get_directory("")
@@ -289,10 +307,6 @@ class Rust(DependencyModule):
                 return False
 
         raise errors.BadDependencyResolution(self.key, resolution)
-
-    def _get_rustup_path(self):
-        tools_folder = workstation.get_tools_folder()
-        return path.join(tools_folder, "rustup.sh")
 
     def get_directory(self, tag: str) -> Path:
         tools_folder = workstation.get_tools_folder()
@@ -329,13 +343,19 @@ class Rust(DependencyModule):
 
     def get_env_for_install(self):
         directory = self.get_directory("")
+        platform = workstation.get_platform()
 
-        return {
+        env = {
             # For installation, wget (or curl) and cc (build-essential) are also required.
             "PATH": f"{path.join(directory, 'bin')}:{os.environ['PATH']}",
-            "RUSTUP_HOME": directory,
-            "CARGO_HOME": directory
+            "RUSTUP_HOME": str(directory),
+            "CARGO_HOME": str(directory)
         }
+
+        if platform == "windows":
+            env["RUSTUP_USE_HYPER"] = "1"
+
+        return env
 
     def get_latest_release(self) -> str:
         raise errors.UnsupportedConfigurationValue("Rust tag must either be explicit, empty or 'nightly'")

@@ -24,8 +24,8 @@ jobs:
       - name: Install
         run: |
           wget -O mxpy-up.py https://raw.githubusercontent.com/multiversx/mx-sdk-py-cli/$BRANCH_NAME/mxpy-up.py
-          python3 mxpy-up.py --from-branch $BRANCH_NAME --yes <<< "2"
+          python3 mxpy-up.py --from-branch $BRANCH_NAME --not-interactive
       - name: Smoke test
         run: |
-          source /Users/runner/.bash_profile
+          export PATH="~/multiversx-sdk:${PATH}"
           mxpy --version

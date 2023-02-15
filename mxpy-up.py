@@ -2,6 +2,7 @@ import logging
 import os
 import os.path
 import shutil
+import stat
 import subprocess
 import sys
 from argparse import ArgumentParser
@@ -16,55 +17,61 @@ sdk_path = Path("~/multiversx-sdk").expanduser().resolve()
 
 def main():
     parser = ArgumentParser()
-    parser.add_argument("--modify-path", dest="modify_path", action="store_true", help="whether to modify $PATH (in profile file)")
-    parser.add_argument("--no-modify-path", dest="modify_path", action="store_false", help="whether to modify $PATH (in profile file)")
     parser.add_argument("--exact-version", help="the exact version of mxpy to install")
     parser.add_argument("--from-branch", help="use a branch of multiversx/mx-sdk-py-cli")
-    parser.add_argument("--yes", action="store_true", default=False)
+    parser.add_argument("--not-interactive", action="store_true", default=False)
     parser.set_defaults(modify_path=True)
     args = parser.parse_args()
 
-    modify_path = args.modify_path
     exact_version = args.exact_version
     from_branch = args.from_branch
-    yes = args.yes
+    interactive = not args.not_interactive
 
     logging.basicConfig(level=logging.DEBUG)
 
-    operating_system = get_operating_system()
-    python_version = (sys.version_info.major, sys.version_info.minor, sys.version_info.micro)
+    if get_operating_system() == "windows":
+        print("""
+IMPORTANT NOTE
+==============
 
-    logger.info("Checking user.")
+Windows support is limited and experimental.
+""")
+        confirm_continuation(interactive)
+
+    guard_non_root_user()
+    guard_python_version()
+    migrate_old_elrondsdk()
+    migrate_v6(interactive)
+
+    # In case of a fresh install:
+    sdk_path.mkdir(parents=True, exist_ok=True)
+    create_venv()
+    install_mxpy(exact_version, from_branch)
+
+    run_post_install_checks()
+
+    if interactive:
+        add_shortcut_to_system_path()
+
+
+def guard_non_root_user():
+    logger.info("Checking user (should not be root).")
+
+    operating_system = get_operating_system()
+
+    if operating_system == "windows":
+        return
     if os.getuid() == 0:
         raise InstallError("You should not install mxpy as root.")
+
+
+def guard_python_version():
+    python_version = (sys.version_info.major, sys.version_info.minor, sys.version_info.micro)
 
     logger.info("Checking Python version.")
     logger.info(f"Python version: {format_version(python_version)}")
     if python_version < MIN_REQUIRED_PYTHON_VERSION:
         raise InstallError(f"You need Python {format_version(MIN_REQUIRED_PYTHON_VERSION)} or later.")
-
-    logger.info("Checking operating system.")
-    logger.info(f"Operating system: {operating_system}")
-    if operating_system != "linux" and operating_system != "osx":
-        raise InstallError("Your operating system is not supported yet.")
-
-    migrate_old_elrondsdk()
-    migrate_v6(yes)
-
-    # In case of a fresh install:
-    sdk_path.mkdir(parents=True, exist_ok=True)
-
-    create_venv()
-    install_mxpy(exact_version, from_branch)
-    if modify_path:
-        add_sdk_to_path()
-        logger.info("""
-###############################################################################
-Upon restarting the user session, [$ mxpy] command should be available in your shell.
-###############################################################################
-""")
-
-    run_post_install_checks()
 
 
 def format_version(version: Tuple[int, int, int]) -> str:
@@ -157,7 +164,7 @@ def migrate_old_elrondsdk() -> None:
         logger.info("Old testwallets symlink does not exist.")
 
 
-def migrate_v6(yes: bool):
+def migrate_v6(interactive: bool):
     nodejs_folder = sdk_path / "nodejs"
 
     if nodejs_folder.exists():
@@ -170,7 +177,7 @@ The following folder will be removed: {nodejs_folder}.
 
 You may need to reinstall wasm-opt using `mxpy deps install wasm-opt`.
 """)
-        confirm_continuation(yes)
+        confirm_continuation(interactive)
 
         shutil.rmtree(nodejs_folder)
 
@@ -186,7 +193,7 @@ def create_venv():
 
     logger.info(f"Creating virtual environment in: {venv_folder}.")
     import venv
-    builder = venv.EnvBuilder(with_pip=True)
+    builder = venv.EnvBuilder(with_pip=True, symlinks=True)
     builder.clear_directory(venv_folder)
     builder.create(venv_folder)
 
@@ -228,91 +235,56 @@ def install_mxpy(exact_version: str, from_branch: str):
     return_code = run_in_venv(["pip3", "install", "--no-cache-dir", package_to_install], venv_path)
     if return_code != 0:
         raise InstallError("Could not install mxpy.")
-    return_code = run_in_venv(["mxpy", "--version"], venv_path)
-    if return_code != 0:
-        raise InstallError("Could not install mxpy.")
 
-    logger.info("Creating symlink to mxpy...")
+    logger.info("Creating mxpy shortcut...")
 
-    link_path = sdk_path / "mxpy"
+    shortcut_path = sdk_path / "mxpy"
 
     try:
-        link_path.unlink()
-        logger.info(f"Removed symlink: {link_path}")
+        shortcut_path.unlink()
+        logger.info(f"Removed existing shortcut: {shortcut_path}")
     except FileNotFoundError:
-        logger.info(f"Symlink does not exist yet: {link_path}")
+        logger.info(f"Shortcut does not exist yet: {shortcut_path}")
         pass
 
-    os.symlink(str(get_mxpy_venv_path() / "bin" / "mxpy"), link_path)
-    logger.info(f"Created symlink: {link_path}")
+    shortcut_content = get_mxpy_shortcut_content()
+    shortcut_path.write_text(shortcut_content)
+
+    st = os.stat(shortcut_path)
+    os.chmod(shortcut_path, st.st_mode | stat.S_IEXEC)
+
     logger.info("You have successfully installed mxpy.")
 
 
-def run_in_venv(args: List[str], venv_path: Path):
-    if "PYTHONHOME" in os.environ:
-        del os.environ["PYTHONHOME"]
-
-    process = subprocess.Popen(args, env={
-        "PATH": str(venv_path / "bin") + ":" + os.environ["PATH"],
-        "VIRTUAL_ENV": str(venv_path)
-    })
-
-    return process.wait()
-
-
-def add_sdk_to_path():
-    old_export_directive = f'export PATH="{Path("~/elrondsdk").expanduser()}:$PATH"\t# elrond-sdk'
-    new_export_directive = f'export PATH="${{HOME}}/multiversx-sdk:$PATH"\t# multiversx-sdk'
-
-    profile_file = get_profile_file()
-    profile_info_content = profile_file.read_text()
-
-    logger.info(f"Using shell profile: {profile_file}")
-
-    if old_export_directive in profile_info_content:
-        # We don't perform the removal automatically (a bit risky)
-        logger.warning(f"Please manually remove the following entry from the shell profile ({profile_file}): {old_export_directive}.")
-
-    if new_export_directive in profile_info_content:
-        # Note: in some (rare) cases, here we'll have false positives (e.g. if the export directive is commented out).
-        logger.info(f"multiversx-sdk path ({sdk_path}) is already configured in shell profile.")
-        return
-
-    logger.info(f"Configuring multiversx-sdk path [{sdk_path}] in shell profile...")
-    logger.info(f"[{profile_file}] is being modified...")
-
-    with open(profile_file, "a") as file:
-        file.write(f'\n{new_export_directive}\n')
-
-    logger.info(f"""
-###############################################################################
-[{profile_file}] has been modified.
-Please RESTART THE USER SESSION.
-###############################################################################
-""")
-
-
-def get_profile_file():
+def get_mxpy_shortcut_content():
     operating_system = get_operating_system()
-    file = None
+    venv_path = get_mxpy_venv_path()
 
-    if operating_system == "linux":
-        file = "~/.profile"
-    else:
-        value = input("""Please choose your preferred shell:
-1) zsh
-2) bash
-""")
-        if value not in ["1", "2"]:
-            raise InstallError("Invalid choice.")
+    if operating_system == "windows":
+        return f"""#!/bin/sh
+. "{venv_path / 'Scripts' / 'activate'}"
+python3 -m multiversx_sdk_cli.cli "$@"
+deactivate
+"""
 
-        value = int(value)
-        if value == 1:
-            file = "~/.zshrc"
-        else:
-            file = "~/.bash_profile"
+    return f"""#!/bin/sh
+. "{venv_path / 'bin' / 'activate'}"
+python3 -m multiversx_sdk_cli.cli "$@"
+deactivate
+"""
 
-    return Path(file).expanduser().resolve()
+
+def run_in_venv(args: List[str], venv_path: Path):
+    env = os.environ.copy()
+
+    if "PYTHONHOME" in env:
+        del env["PYTHONHOME"]
+
+    env["PATH"] = str(venv_path / "bin") + ":" + env["PATH"]
+    env["VIRTUAL_ENV"] = str(venv_path)
+
+    process = subprocess.Popen(args, env=env)
+    return process.wait()
 
 
 def run_post_install_checks():
@@ -320,15 +292,169 @@ def run_post_install_checks():
     elrond_sdk_path = Path("~/elrondsdk").expanduser()
 
     logger.info("Running post-install checks...")
-    print("~/multiversx-sdk exists", "✓" if multiversx_sdk_path.exists() else "✗")
-    print("~/elrondsdk is removed or missing", "✓" if not elrond_sdk_path.exists() else "✗")
-    print("~/multiversx-sdk/mxpy link created", "✓" if (multiversx_sdk_path / "mxpy").exists() else "✗")
-    print("~/multiversx-sdk/erdpy.json is renamed or missing", "✓" if not (multiversx_sdk_path / "erdpy.json").exists() else "✗")
+    print("~/multiversx-sdk exists", "OK" if multiversx_sdk_path.exists() else "NOK")
+    print("~/elrondsdk is removed or missing", "OK" if not elrond_sdk_path.exists() else "NOK")
+    print("~/multiversx-sdk/mxpy shortcut created", "OK" if (multiversx_sdk_path / "mxpy").exists() else "NOK")
+    print("~/multiversx-sdk/erdpy.json is renamed or missing", "OK" if not (multiversx_sdk_path / "erdpy.json").exists() else "NOK")
+
+
+def add_shortcut_to_system_path():
+    interactive = True
+    operating_system = get_operating_system()
+
+    if operating_system == "windows":
+        print(f"""
+###############################################################################
+On Windows, for the "mxpy" command shortcut to be available, you need to add the directory "{sdk_path}" to the system PATH.
+
+You can do this by following these steps:
+
+https://superuser.com/questions/949560/how-do-i-set-system-environment-variables-in-windows-10
+
+###############################################################################
+Do you understand the above?
+###############################################################################
+""")
+        confirm_continuation(interactive)
+        return
+
+    old_export_directive = f'export PATH="{Path("~/elrondsdk").expanduser()}:$PATH"\t# elrond-sdk'
+    new_export_directive = f'export PATH="${{HOME}}/multiversx-sdk:$PATH"\t# multiversx-sdk'
+
+    profile_files = get_profile_files()
+
+    if not profile_files:
+        print(f"""
+###############################################################################
+No shell profile files have been found.
+
+The "mxpy" command shortcut will not be available until you add the directory "{sdk_path}" to the system PATH.
+###############################################################################
+Do you understand the above?
+""")
+        confirm_continuation(interactive)
+        return
+
+    profile_files_formatted = "\n".join(f" - {file}" for file in profile_files)
+    profile_files_contents = [profile_file.read_text() for profile_file in profile_files]
+    any_old_export_directive = any(old_export_directive in content for content in profile_files_contents)
+    any_new_export_directive = any(new_export_directive in content for content in profile_files_contents)
+
+    if any_old_export_directive:
+        # We don't perform the removal automatically (a bit risky)
+        print(f"""
+###############################################################################
+It seems that the old path "~/elrondsdk" is still configured in shell profile.
+
+Please MANUALLY remove it from the shell profile (now or after the installer script ends).
+
+Your shell profile files:
+{profile_files_formatted}
+
+The entry (entries) to remove: 
+    {old_export_directive}
+###############################################################################
+Make sure you understand the above before proceeding further.
+###############################################################################
+""")
+        confirm_continuation(interactive)
+
+    if any_new_export_directive:
+        # Note: in some (rare) cases, here we'll have false positives (e.g. if the export directive is commented out).
+        print(f"""
+###############################################################################
+It seems that the path "~/multiversx-sdk" is already configured in shell profile.
+
+To confirm this, check the shell profile (now or after the installer script ends). 
+
+Your shell profile files:
+{profile_files_formatted}
+
+The entry to check (it should be present): 
+    {new_export_directive}.
+###############################################################################
+Make sure you understand the above before proceeding further.
+###############################################################################
+""")
+        confirm_continuation(interactive)
+        return
+
+    choice = input(f"""
+###############################################################################
+In order to use the "mxpy" command shortcut, you have the choice to either:
+ - manually extend the PATH variable to include "~/multiversx-sdk"
+ - allow this installer script to do it for you.
+
+In order to manually extend the PATH variable, add the following line to your shell profile file upon installation:
+
+    export PATH="${{HOME}}/multiversx-sdk:${{PATH}}"
+
+Your shell profile files:
+{profile_files_formatted}
+
+Upon editing the shell profile file, you may have to RESTART THE USER SESSION for the changes to take effect.
+
+Please pick an option:
+
+a) manually extend the PATH variable (recommended for advanced users)
+b) allow this installer script to extend the PATH variable (not recommended for advanced users)
+
+Type "a" or "b", then press ENTER.
+
+""")
+    if choice not in ["a", "b"]:
+        raise InstallError("Invalid choice.")
+
+    if choice == "a":
+        return
+
+    for profile_file in profile_files:
+        with open(profile_file, "a") as file:
+            file.write(f'\n{new_export_directive}\n')
+
+    print(f"""
+###############################################################################
+The following profile files have been updated:
+{profile_files_formatted}
+
+Please RESTART THE USER SESSION.
+
+Once the user session is restarted, you can use the "mxpy" command shortcut:
+
+    $ mxpy --help
+###############################################################################
+Make sure you understand the above.
+
+If you not know what a user session is, RESTART YOUR COMPUTER, instead.
+###############################################################################
+""")
+    confirm_continuation(interactive)
+
+
+def get_profile_files() -> List[Path]:
+    files = [
+        Path("~/.profile").expanduser().resolve(),
+        Path("~/.bashrc").expanduser().resolve(),
+        Path("~/.bash_profile").expanduser().resolve(),
+        Path("~/.zshrc").expanduser().resolve()
+    ]
+
+    return [file for file in files if file.exists()]
 
 
 class InstallError(Exception):
     def __init__(self, message: str):
         super().__init__(message)
+
+
+def confirm_continuation(interactive: bool):
+    if not interactive:
+        return
+
+    answer = input("Continue? (y/n)")
+    if answer.lower() not in ["y", "yes"]:
+        print("Confirmation not given. Will stop.")
+        exit(1)
 
 
 if __name__ == "__main__":
@@ -338,18 +464,11 @@ if __name__ == "__main__":
         logger.fatal(err)
         sys.exit(1)
 
-    logger.info("""
-
+    print("""
+###############################################################################
+Installer script finished successfully.
+###############################################################################
 For more information go to https://docs.multiversx.com.
-For support, please contact us at http://discord.gg/MultiversXBuilders (recommended) or https://t.me/MultiversXDevelopers.
+For support, please contact us at http://discord.gg/MultiversXBuilders.
+###############################################################################
 """)
-
-
-def confirm_continuation(yes: bool = False):
-    if (yes):
-        return
-
-    answer = input("Continue? (y/n)")
-    if answer.lower() not in ["y", "yes"]:
-        print("Confirmation not given. Will stop.")
-        exit(1)
