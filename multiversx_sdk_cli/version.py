@@ -7,9 +7,11 @@ import toml
 
 def get_version() -> str:
     try:
+        # Works for local development
         return _get_version_from_pyproject()
     except Exception as error:
         try:
+            # Works for the installed package
             return _get_version_from_metadata()
         except Exception as error:
             logging.exception(f"Failed to get version: {error}")
