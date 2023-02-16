@@ -1,7 +1,8 @@
 import time
 
 from multiversx_sdk_cli import config
-from multiversx_sdk_cli.projects.templates_repository import TemplatesRepository
+from multiversx_sdk_cli.projects.templates_repository import \
+    TemplatesRepository
 from multiversx_sdk_cli.utils import query_latest_release_tag
 
 
@@ -15,13 +16,6 @@ def get_templates_repositories():
     examples_rs_tag_no_v = remove_initial_v_from_version(examples_rs_tag)
 
     return [
-        TemplatesRepository(
-            key="sc-examples",
-            url=f"https://github.com/multiversx/mx-sc-examples/archive/master.zip?t={timestamp}",
-            github="multiversx/mx-sc-examples",
-            relative_path="mx-sc-examples-master"
-        ),
-
         TemplatesRepository(
             key="mx-sdk-rs",
             url=f"https://github.com/multiversx/mx-sdk-rs/archive/{examples_rs_tag}.zip?t={timestamp}",
