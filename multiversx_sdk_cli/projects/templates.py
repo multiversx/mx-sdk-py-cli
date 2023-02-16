@@ -76,8 +76,6 @@ def _copy_template(template: str, destination_path: Path, project_name: str):
 
 
 def _load_as_template(directory: Path):
-    if shared.is_source_clang(directory):
-        return TemplateClang(directory)
     if shared.is_source_rust(directory):
         return TemplateRust(directory)
     raise errors.BadTemplateError(directory)
@@ -95,10 +93,6 @@ class Template:
     def _patch(self):
         """Implemented by derived classes"""
         pass
-
-
-class TemplateClang(Template):
-    pass
 
 
 class TemplateRust(Template):

@@ -9,10 +9,6 @@ testTrivialCommands() {
 
 testCreateContracts() {
     echo "testCreateContracts"
-    ${CLI} contract new --template ultimate-answer --directory ${SANDBOX} myanswer-c || return 1
-    ${CLI} contract new --template simple-counter --directory ${SANDBOX} mycounter-c || return 1
-    ${CLI} contract new --template erc20-c --directory ${SANDBOX} myerc20-c || return 1
-
     ${CLI} contract new --template adder --directory ${SANDBOX} myadder-rs || return 1
     ${CLI} contract new --template factorial --directory ${SANDBOX} myfactorial-rs || return 1
     ${CLI} contract new --template crypto-bubbles --directory ${SANDBOX} mybubbles-rs || return 1
@@ -23,14 +19,6 @@ testCreateContracts() {
 
 testBuildContracts() {
     echo "testBuildContracts"
-    ${CLI} contract build ${SANDBOX}/myanswer-c || return 1
-    assertFileExists ${SANDBOX}/myanswer-c/output/answer.wasm || return 1
-
-    ${CLI} contract build ${SANDBOX}/mycounter-c || return 1
-    assertFileExists ${SANDBOX}/mycounter-c/output/counter.wasm || return 1
-
-    ${CLI} contract build ${SANDBOX}/myerc20-c || return 1
-    assertFileExists ${SANDBOX}/myerc20-c/output/erc20.wasm || return 1
 
     # Improve compilation time by reusing build artifacts for Rust projects
     export TARGET_DIR=$(pwd)/${SANDBOX}/TARGET
@@ -67,11 +55,7 @@ testRunScenarios() {
 
 testWasmName() {
     echo "testWasmName"
-    ${CLI} contract clean ${SANDBOX}/myanswer-c || return 1
-    assertFileDoesNotExist ${SANDBOX}/myanswer-c/output/answer-2.wasm || return 1
-    ${CLI} contract build ${SANDBOX}/myanswer-c --wasm-name answer-2 || return 1
-    assertFileExists ${SANDBOX}/myanswer-c/output/answer-2.wasm || return 1
-
+   
     ${CLI} contract clean ${SANDBOX}/myadder-rs
     assertFileDoesNotExist ${SANDBOX}/myadder-rs/output/myadder-2-rs.wasm || return 1
     ${CLI} contract build ${SANDBOX}/myadder-rs --cargo-target-dir=${TARGET_DIR} --wasm-name myadder-2-rs || return 1
@@ -81,13 +65,6 @@ testWasmName() {
 
 testCleanContracts() {
     echo "testCleanContracts"
-    assertFileExists ${SANDBOX}/myanswer-c/output/answer.wasm || return 1
-    ${CLI} contract clean ${SANDBOX}/myanswer-c || return 1
-    assertFileDoesNotExist ${SANDBOX}/myanswer-c/output/answer.wasm || return 1
-
-    assertFileExists ${SANDBOX}/mycounter-c/output/counter.wasm || return 1
-    ${CLI} contract clean ${SANDBOX}/mycounter-c || return 1
-    assertFileDoesNotExist ${SANDBOX}/mycounter-c/output/counter.wasm || return 1
 
     assertFileExists ${SANDBOX}/myadder-rs/output/myadder-rs.wasm || return 1
     assertFileExists ${SANDBOX}/myadder-rs/output/myadder-rs.abi.json || return 1
