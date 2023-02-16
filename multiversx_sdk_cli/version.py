@@ -5,7 +5,7 @@ from pathlib import Path
 import toml
 
 
-def get_version():
+def get_version() -> str:
     try:
         return _get_version_from_pyproject()
     except Exception as error:
@@ -18,7 +18,8 @@ def get_version():
 
 def _get_version_from_pyproject() -> str:
     pyproject_path = Path(__file__).parent.parent / "pyproject.toml"
-    return toml.load(pyproject_path)["project"]["version"]
+    version: str = toml.load(pyproject_path)["project"]["version"]
+    return version
 
 
 def _get_version_from_metadata() -> str:
