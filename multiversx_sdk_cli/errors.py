@@ -54,6 +54,11 @@ class UnknownDependency(KnownError):
         super().__init__(f"Unknown dependency: {name}")
 
 
+class BadDependencyResolution(ProgrammingError):
+    def __init__(self, dependency: str, resolution: Any):
+        super().__init__(f"Bad dependency resolution for {dependency}: {resolution}")
+
+
 class BadDirectory(KnownError):
     def __init__(self, directory: str):
         super().__init__(f"Bad directory: {directory}")
@@ -140,11 +145,6 @@ class GasLimitTooLarge(KnownError):
         super().__init__(f"The gas limit provided ({current}) exceeds the max gas limit of allowed for a transaction ({limit})")
 
 
-class InvalidKeystoreFilePassword(KnownError):
-    def __init__(self):
-        super().__init__("Provided keystore file password is invalid.")
-
-
 class BadUserInput(KnownError):
     def __init__(self, message: str):
         super().__init__(f"Bad user input: {message}.")
@@ -153,11 +153,6 @@ class BadUserInput(KnownError):
 class BadUsage(KnownError):
     def __init__(self, message: str):
         super().__init__(f"Bad usage: {message}.")
-
-
-class CannotSignMessageWithBLSKey(KnownError):
-    def __init__(self):
-        super(CannotSignMessageWithBLSKey, self).__init__("cannot sign message with BLS key")
 
 
 class CannotReadValidatorsData(KnownError):

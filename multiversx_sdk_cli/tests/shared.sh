@@ -12,8 +12,8 @@ SANDBOX=./testdata-out/SANDBOX
 USERS=~/multiversx-sdk/testwallets/latest/users
 VALIDATORS=~/multiversx-sdk/testwallets/latest/validators
 DENOMINATION="000000000000000000"
-PROXY="http://localhost:7950"
-CHAIN_ID="local-testnet"
+PROXY="${PROXY:-http://localhost:7950}"
+CHAIN_ID="${CHAIN_ID:-local-testnet}"
 
 cleanSandbox() {
     rm -rf ${SANDBOX}

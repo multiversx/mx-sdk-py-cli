@@ -1,0 +1,45 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "multiversx-sdk-cli"
+version = "6.0.0"
+authors = [
+  { name="MultiversX" },
+]
+license = "MIT"
+description = "MultiversX Smart Contracts Tools"
+readme = "README.md"
+requires-python = ">=3.8"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Intended Audience :: Developers"
+]
+dependencies = [
+  "toml>=0.10.2",
+  "bottle",
+  "requests",
+  "cryptography==36.0.2",
+  "prettytable",
+  "ledgercomm[hid]",
+  "semver",
+  "requests-cache",
+  "multiversx-sdk-network-providers==0.6.*",
+  "multiversx-sdk-wallet==0.4.*",
+  "multiversx-sdk-core==0.3.*"
+]
+
+[tool.hatch.build]
+include = [
+  "multiversx_sdk_cli/**"
+]
+exclude = [
+  ".github",
+  "multiversx_sdk_cli/tests/**"
+]
+
+[project.urls]
+"Homepage" = "https://github.com/multiversx/mx-sdk-py-cli"

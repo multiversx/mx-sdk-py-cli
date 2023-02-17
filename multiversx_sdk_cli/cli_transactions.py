@@ -1,4 +1,5 @@
 from argparse import FileType
+from pathlib import Path
 from typing import Any, List
 
 from multiversx_sdk_cli import cli_shared, utils
@@ -43,7 +44,7 @@ def setup_parser(args: List[str], subparsers: Any) -> Any:
 def _add_common_arguments(args: List[str], sub: Any):
     cli_shared.add_wallet_args(args, sub)
     cli_shared.add_tx_args(args, sub)
-    sub.add_argument("--data-file", type=FileType("r"), default=None, help="a file containing transaction data")
+    sub.add_argument("--data-file", type=str, default=None, help="a file containing transaction data")
 
 
 def create_transaction(args: Any):
@@ -53,7 +54,7 @@ def create_transaction(args: Any):
     cli_shared.prepare_nonce_in_args(args)
 
     if args.data_file:
-        args.data = utils.read_file(args.data_file)
+        args.data = Path(args.data_file).read_text()
 
     tx = do_prepare_transaction(args)
 

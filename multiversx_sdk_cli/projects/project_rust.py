@@ -4,7 +4,8 @@ from os import path
 from pathlib import Path
 from typing import Any, Dict, List, Set, cast
 
-from multiversx_sdk_cli import dependencies, errors, myprocess, utils, workstation
+from multiversx_sdk_cli import (dependencies, errors, myprocess, utils,
+                                workstation)
 from multiversx_sdk_cli.constants import DEFAULT_CARGO_TARGET_DIR_NAME
 from multiversx_sdk_cli.projects.project_base import Project
 
@@ -130,7 +131,7 @@ class ProjectRust(Project):
                 abi_file = self.get_abi_filepath()
                 abi_file_renamed = Path(self.get_output_folder(), f"{base_name}.abi.json")
                 abi_file.rename(abi_file_renamed)
-        
+
         outputs = [self.get_wasm_default_path()]
         if self.has_wasm_view():
             outputs.append(self.get_wasm_view_default_path())
@@ -261,13 +262,13 @@ def paths_of(env: Dict[str, str], key: str) -> Set[str]:
         return set()
 
 
-def merge_env(first: Dict[str, str], second: Dict[str, str]):
+def merge_env(first: Dict[str, str], second: Dict[str, str]) -> Dict[str, str]:
     """
 >>> merge_env({'PATH':'first:common', 'CARGO_PATH': 'cargo_path'}, {'PATH':'second:common', 'EXAMPLE': 'other'})
 {'CARGO_PATH': 'cargo_path', 'EXAMPLE': 'other', 'PATH': 'common:first:second'}
     """
     keys = set(first.keys()).union(second.keys())
-    merged = dict()
+    merged: Dict[str, str] = dict()
     for key in sorted(keys):
         values = paths_of(first, key).union(paths_of(second, key))
         merged[key] = ":".join(sorted(values))
@@ -281,8 +282,9 @@ def check_wasm_opt_installed() -> None:
     Skipping optimization because wasm-opt is not installed.
 
     To install it run:
-        mxpy deps install nodejs
         mxpy deps install wasm-opt
 
     Alternatively, pass the "--no-wasm-opt" argument in order to skip the optimization step.
         """)
+    else:
+        logger.info("wasm-opt is installed.")

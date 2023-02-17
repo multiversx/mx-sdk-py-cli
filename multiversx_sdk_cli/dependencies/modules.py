@@ -5,14 +5,16 @@ from os import path
 from pathlib import Path
 from typing import Dict, List, Optional
 
-from multiversx_sdk_cli import (config, dependencies, downloader, errors, myprocess, utils,
-                   workstation)
+from multiversx_sdk_cli import (config, dependencies, downloader, errors,
+                                myprocess, utils, workstation)
+from multiversx_sdk_cli.dependencies.resolution import (
+    DependencyResolution, get_dependency_resolution)
 
 logger = logging.getLogger("modules")
 
 
 class DependencyModule:
-    def __init__(self, key: str, aliases: List[str]):
+    def __init__(self, key: str, aliases: List[str] = []):
         self.key = key
         self.aliases = aliases
 
@@ -20,6 +22,8 @@ class DependencyModule:
         raise NotImplementedError()
 
     def install(self, tag: str, overwrite: bool) -> None:
+        self._guard_cannot_install_on_host()
+
         # Fallback to default tag if not provided
         tag = tag or config.get_dependency_tag(self.key)
 
@@ -60,16 +64,20 @@ class DependencyModule:
     def get_latest_release(self) -> str:
         raise NotImplementedError()
 
+    def get_resolution(self) -> DependencyResolution:
+        return get_dependency_resolution(self.key)
+
+    def _guard_cannot_install_on_host(self):
+        if self.get_resolution() == DependencyResolution.Host:
+            raise errors.KnownError(f"Installation of {self.key} on the host machine is not supported. Perhaps set 'dependencies.{self.key}.resolution' to 'SDK' in config?")
+
 
 class StandaloneModule(DependencyModule):
     def __init__(self,
                  key: str,
-                 aliases: List[str] = None,
+                 aliases: List[str] = [],
                  repo_name: Optional[str] = None,
                  organisation: Optional[str] = None):
-        if aliases is None:
-            aliases = list()
-
         super().__init__(key, aliases)
         self.archive_type = "tar.gz"
         self.repo_name = repo_name
@@ -105,7 +113,7 @@ class StandaloneModule(DependencyModule):
     def get_directory(self, tag: str) -> Path:
         return config.get_dependency_directory(self.key, tag)
 
-    def get_source_directory(self, tag: str):
+    def get_source_directory(self, tag: str) -> Path:
         # Due to how the GitHub creates archives for repository releases, the
         # path will contain the tag in two variants: with the 'v' prefix (e.g.
         # "v1.1.0"), but also without (e.g. "1.1.0"), hence the need to remove
@@ -114,8 +122,10 @@ class StandaloneModule(DependencyModule):
         if tag_no_v.startswith("v"):
             tag_no_v = tag_no_v[1:]
         assert isinstance(self.repo_name, str)
-        source_folder = self.get_directory(tag) / f'{self.repo_name}-{tag_no_v}'
-        return source_folder
+
+        source_folder_option_1 = self.get_directory(tag) / f'{self.repo_name}-{tag_no_v}'
+        source_folder_option_2 = self.get_directory(tag) / f'{self.repo_name}-{tag}'
+        return source_folder_option_1 if source_folder_option_1.exists() else source_folder_option_2
 
     def get_parent_directory(self) -> Path:
         return config.get_dependency_parent_directory(self.key)
@@ -145,10 +155,7 @@ class StandaloneModule(DependencyModule):
 
 
 class VMToolsModule(StandaloneModule):
-    def __init__(self, key: str, aliases: List[str] = None):
-        if aliases is None:
-            aliases = list()
-
+    def __init__(self, key: str, aliases: List[str] = []):
         super().__init__(key, aliases)
         self.repo_name = 'mx-chain-vm-go'
         self.organisation = 'multiversx'
@@ -196,27 +203,46 @@ class VMToolsModule(StandaloneModule):
 
 
 class GolangModule(StandaloneModule):
-    def __init__(self, key: str, aliases: List[str] = None):
-        if aliases is None:
-            aliases = list()
-
-        super().__init__(key, aliases)
-
     def _post_install(self, tag: str):
         parent_directory = self.get_parent_directory()
         utils.ensure_folder(path.join(parent_directory, "GOPATH"))
         utils.ensure_folder(path.join(parent_directory, "GOCACHE"))
 
-    def get_env(self):
+    def is_installed(self, tag: str) -> bool:
+        resolution = self.get_resolution()
+
+        if resolution == DependencyResolution.Host:
+            which_go = shutil.which("go")
+            logger.info(f"which go: {which_go}")
+
+            return which_go is not None
+        if resolution == DependencyResolution.SDK:
+            return super().is_installed(tag)
+
+        raise errors.BadDependencyResolution(self.key, resolution)
+
+    def get_env(self) -> Dict[str, str]:
+        resolution = self.get_resolution()
         directory = self.get_directory(config.get_dependency_tag(self.key))
         parent_directory = self.get_parent_directory()
 
-        return {
-            "PATH": f"{path.join(directory, 'go/bin')}:{os.environ['PATH']}",
-            "GOPATH": self.get_gopath(),
-            "GOCACHE": path.join(parent_directory, "GOCACHE"),
-            "GOROOT": path.join(directory, "go")
-        }
+        if resolution == DependencyResolution.Host:
+            return {
+                "PATH": os.environ.get("PATH", ""),
+                "GOPATH": os.environ.get("GOPATH", ""),
+                "GOCACHE": os.environ.get("GOCACHE", ""),
+                "GOROOT": os.environ.get("GOROOT", "")
+            }
+        if resolution == DependencyResolution.SDK:
+            return {
+                # At this moment, cc (build-essential) is needed to compile go dependencies (e.g. Node, VM)
+                "PATH": f"{(directory / 'go' / 'bin')}:{os.environ['PATH']}",
+                "GOPATH": self.get_gopath(),
+                "GOCACHE": str(parent_directory / "GOCACHE"),
+                "GOROOT": str(directory / "go")
+            }
+
+        raise errors.BadDependencyResolution(self.key, resolution)
 
     def get_gopath(self):
         return path.join(self.get_parent_directory(), "GOPATH")
@@ -225,85 +251,37 @@ class GolangModule(StandaloneModule):
         raise errors.UnsupportedConfigurationValue("Golang tag must always be explicit, not latest")
 
 
-class NodejsModule(StandaloneModule):
-    def __init__(self, key: str, aliases: List[str]):
-        super().__init__(key, aliases)
-
-    def _post_install(self, tag: str):
-        # We'll create a symlink towards the payload folder
-        subfolder_to_bypass = self._get_download_url(tag).split("/")[-1]
-        subfolder_to_bypass = subfolder_to_bypass.replace(f".{self.archive_type}", "")
-        payload_folder = path.join(self.get_directory(tag), subfolder_to_bypass)
-        link = path.join(self.get_parent_directory(), "latest")
-
-        utils.symlink(payload_folder, link)
-
-    def get_env(self):
-        bin_folder = path.join(self.get_parent_directory(), "latest", "bin")
-
-        return {
-            "PATH": f"{bin_folder}:{os.environ['PATH']}",
-        }
-
-    def get_latest_release(self) -> str:
-        raise errors.UnsupportedConfigurationValue("Nodejs tag must always be explicit, not latest")
-
-
-class NpmModule(DependencyModule):
-    def __init__(self, key: str, aliases: List[str] = []):
-        super().__init__(key, aliases)
-
-    def get_nodejs(self) -> DependencyModule:
-        return dependencies.get_module_by_key("nodejs")
-
-    def get_nodejs_env(self) -> Dict[str, str]:
-        return self.get_nodejs().get_env()
-
-    def _do_install(self, tag: str) -> None:
-        args = ["npm", "install", f"{self.key}@{tag}", "-g"]
-        myprocess.run_process(args, env=self.get_nodejs_env())
-
-    def uninstall(self, tag: str) -> None:
-        args = ["npm", "uninstall", self.key, "-g"]
-        myprocess.run_process(args, env=self.get_nodejs_env())
-
-    def get_env(self):
-        bin_folder = config.get_dependency_parent_directory("nodejs") / "latest" / "lib" / "node_modules" / self.key / "bin"
-
-        return {
-            "PATH": f"{bin_folder}:{os.environ['PATH']}",
-        }
-
-    def is_installed(self, tag: str) -> bool:
-        try:
-            myprocess.run_process(["wasm-opt", "--version"], env=self.get_env())
-            return True
-        except FileNotFoundError:
-            return False
-
-    def get_latest_release(self) -> str:
-        return "latest"
-
-
 class Rust(DependencyModule):
-    def __init__(self, key: str, aliases: List[str] = None):
-        if aliases is None:
-            aliases = list()
-
-        super().__init__(key, aliases)
-
     def _do_install(self, tag: str) -> None:
-        rustup_path = self._get_rustup_path()
-        downloader.download("https://sh.rustup.rs", rustup_path)
-        utils.mark_executable(rustup_path)
+        installer_url = self._get_installer_url()
+        installer_path = self._get_installer_path()
+
+        downloader.download(installer_url, str(installer_path))
+        utils.mark_executable(str(installer_path))
+
         if tag:
             toolchain = tag
         else:
             toolchain = "nightly"
 
-        args = [rustup_path, "--verbose", "--default-toolchain", toolchain, "--profile",
+        args = [str(installer_path), "--verbose", "--default-toolchain", toolchain, "--profile",
                 "minimal", "--target", "wasm32-unknown-unknown", "--no-modify-path", "-y"]
         myprocess.run_process(args, env=self.get_env_for_install())
+
+    def _get_installer_url(self) -> str:
+        platform = workstation.get_platform()
+
+        if platform == "windows":
+            return "https://win.rustup.rs"
+        return "https://sh.rustup.rs"
+
+    def _get_installer_path(self) -> Path:
+        platform = workstation.get_platform()
+        tools_folder = workstation.get_tools_folder()
+
+        if platform == "windows":
+            return tools_folder / "rustup-init.exe"
+        return tools_folder / "rustup.sh"
 
     def uninstall(self, tag: str):
         directory = self.get_directory("")
@@ -311,61 +289,79 @@ class Rust(DependencyModule):
             shutil.rmtree(directory)
 
     def is_installed(self, tag: str) -> bool:
-        try:
-            myprocess.run_process(["rustc", "--version"], env=self.get_env_for_is_installed())
-            return True
-        except Exception:
-            return False
+        resolution = self.get_resolution()
 
-    def _get_rustup_path(self):
-        tools_folder = workstation.get_tools_folder()
-        return path.join(tools_folder, "rustup.sh")
+        if resolution == DependencyResolution.Host:
+            which_rustc = shutil.which("rustc")
+            which_cargo = shutil.which("cargo")
+            logger.info(f"which rustc: {which_rustc}")
+            logger.info(f"which cargo: {which_cargo}")
 
-    def get_directory(self, tag: str):
+            return which_rustc is not None and which_cargo is not None
+        if resolution == DependencyResolution.SDK:
+            try:
+                env = self._get_env_for_is_installed_in_sdk()
+                myprocess.run_process(["rustc", "--version"], env=env)
+                return True
+            except Exception:
+                return False
+
+        raise errors.BadDependencyResolution(self.key, resolution)
+
+    def get_directory(self, tag: str) -> Path:
         tools_folder = workstation.get_tools_folder()
-        return path.join(tools_folder, "vendor-rust")
+        return tools_folder / "vendor-rust"
 
     def get_env(self):
         directory = self.get_directory("")
+        resolution = self.get_resolution()
 
-        return {
-            # At this moment, cc (build-essential) is sometimes required by the meta crate (e.g. for reports)
-            "PATH": f"{path.join(directory, 'bin')}:{os.environ['PATH']}",
-            "RUSTUP_HOME": directory,
-            "CARGO_HOME": directory
-        }
+        if resolution == DependencyResolution.Host:
+            return {
+                "PATH": os.environ.get("PATH", ""),
+                "RUSTUP_HOME": os.environ.get("RUSTUP_HOME", ""),
+                "CARGO_HOME": os.environ.get("CARGO_HOME", "")
+            }
+        if resolution == DependencyResolution.SDK:
+            return {
+                # At this moment, cc (build-essential) is sometimes required by the meta crate (e.g. for reports)
+                "PATH": f"{path.join(directory, 'bin')}:{os.environ['PATH']}",
+                "RUSTUP_HOME": str(directory),
+                "CARGO_HOME": str(directory)
+            }
 
-    def get_env_for_is_installed(self):
+        raise errors.BadDependencyResolution(self.key, resolution)
+
+    def _get_env_for_is_installed_in_sdk(self) -> Dict[str, str]:
         directory = self.get_directory("")
 
         return {
-            # Here, we do not include the system PATH
-            "PATH": f"{path.join(directory, 'bin')}",
-            "RUSTUP_HOME": directory,
-            "CARGO_HOME": directory
+            "PATH": str(directory / "bin"),
+            "RUSTUP_HOME": str(directory),
+            "CARGO_HOME": str(directory)
         }
 
     def get_env_for_install(self):
         directory = self.get_directory("")
+        platform = workstation.get_platform()
 
-        return {
+        env = {
             # For installation, wget (or curl) and cc (build-essential) are also required.
             "PATH": f"{path.join(directory, 'bin')}:{os.environ['PATH']}",
-            "RUSTUP_HOME": directory,
-            "CARGO_HOME": directory
+            "RUSTUP_HOME": str(directory),
+            "CARGO_HOME": str(directory)
         }
+
+        if platform == "windows":
+            env["RUSTUP_USE_HYPER"] = "1"
+
+        return env
 
     def get_latest_release(self) -> str:
         raise errors.UnsupportedConfigurationValue("Rust tag must either be explicit, empty or 'nightly'")
 
 
 class CargoModule(DependencyModule):
-    def __init__(self, key: str, aliases: List[str] = None):
-        if aliases is None:
-            aliases = list()
-
-        super().__init__(key, aliases)
-
     def _do_install(self, tag: str) -> None:
         self._run_command_with_rust_env(["cargo", "install", self.key])
 
@@ -400,3 +396,48 @@ class TestWalletsModule(StandaloneModule):
         target = self.get_source_directory(tag)
         link = path.join(self.get_parent_directory(), "latest")
         utils.symlink(str(target), link)
+
+
+class WasmOptModule(StandaloneModule):
+    def __init__(self, key: str):
+        super().__init__(key, [])
+        self.organisation = "WebAssembly"
+        self.repo_name = "binaryen"
+
+    def _post_install(self, tag: str):
+        # Bit of cleanup, we don't need the rest of the binaries.
+        bin_to_remove = list(self._get_bin_directory(tag).glob("*"))
+        bin_to_remove = [file for file in bin_to_remove if file.name != "wasm-opt"]
+        lib_to_remove = list((self.get_source_directory(tag) / "lib").glob("*"))
+        lib_to_remove = [file for file in lib_to_remove if file.suffix != ".dylib"]
+
+        for file in bin_to_remove + lib_to_remove:
+            file.unlink()
+
+    def _get_bin_directory(self, tag: str) -> Path:
+        return self.get_source_directory(tag) / "bin"
+
+    def is_installed(self, tag: str) -> bool:
+        resolution = self.get_resolution()
+        tag = tag or config.get_dependency_tag(self.key)
+        bin_file = self._get_bin_directory(tag) / "wasm-opt"
+
+        if resolution == DependencyResolution.Host:
+            which_wasm_opt = shutil.which("wasm-opt")
+            logger.info(f"which wasm-opt: {which_wasm_opt}")
+
+            return shutil.which("wasm-opt") is not None
+        if resolution == DependencyResolution.SDK:
+            return bin_file.exists()
+        raise errors.BadDependencyResolution(self.key, resolution)
+
+    def get_env(self):
+        tag = config.get_dependency_tag(self.key)
+        bin_directory = self._get_bin_directory(tag)
+
+        return {
+            "PATH": f"{bin_directory}:{os.environ['PATH']}",
+        }
+
+    def get_latest_release(self) -> str:
+        raise errors.UnsupportedConfigurationValue("wasm-opt tag must either be explicit")

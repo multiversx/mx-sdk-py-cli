@@ -1,13 +1,15 @@
-from multiversx_sdk_cli.wallet.keyfile import save_to_key_file
-from multiversx_sdk_wallet.mnemonic import Mnemonic
-import logging
 import getpass
+import logging
+from json import dump
 from pathlib import Path
 from typing import Any, List
 
+from multiversx_sdk_wallet.keyfile import convert_to_keyfile_object
+from multiversx_sdk_wallet.mnemonic import Mnemonic
+from multiversx_sdk_wallet.user_pem import UserPEM
+
 from multiversx_sdk_cli import cli_shared, utils
 from multiversx_sdk_cli.accounts import Account, Address
-from multiversx_sdk_cli.wallet import pem
 
 logger = logging.getLogger("cli.wallet")
 
@@ -92,16 +94,22 @@ def new_wallet(args: Any):
     print(f"Mnemonic: {mnemonic.get_text()}")
     secret_key = mnemonic.derive_key()
     pubkey = secret_key.generate_public_key()
+    address = Address(pubkey.hex())
+    output_path = args.output_path
 
     if args.pem:
-        pem_file = prepare_file(args.output_path, ".pem")
-        address = Address(pubkey.buffer)
-        pem.write(pem_file, secret_key.buffer, pubkey.buffer, name=address.bech32())
-        logger.info(f"Pem wallet generated: {pem_file}")
+        pem_file = UserPEM(address.bech32(), secret_key)
+        pem_file_path = prepare_file(args.output_path, ".pem")
+        pem_file.save(pem_file_path)
+        logger.info(f"Pem wallet generated: {pem_file_path}")
     if args.json:
         json_file = prepare_file(args.output_path, ".json")
         password = getpass.getpass("Enter a new password:")
-        save_to_key_file(json_file, secret_key.hex(), pubkey.hex(), password)
+
+        keyfile = convert_to_keyfile_object(secret_key.buffer, pubkey.buffer, password, None, "erd")
+        with open(output_path, 'w') as json_file:
+            dump(keyfile, json_file, indent=4)
+
         logger.info(f"Json wallet generated: {json_file}")
 
 
@@ -113,7 +121,7 @@ def prepare_file(output_path: str, suffix: str) -> Path:
 
 
 def generate_pem(args: Any):
-    pem_file = Path(args.pem)
+    pem_file_path = Path(args.pem)
     ask_mnemonic = args.mnemonic
     index = args.index
 
@@ -127,10 +135,12 @@ def generate_pem(args: Any):
 
     secret_key = mnemonic.derive_key(index)
     pubkey = secret_key.generate_public_key()
-
     address = Address(pubkey.hex())
-    pem.write(pem_file, secret_key.buffer, pubkey.buffer, name=address.bech32())
-    logger.info(f"Created PEM file [{pem_file}] for [{address.bech32()}]")
+
+    pem_file = UserPEM(address.bech32(), secret_key)
+    pem_file.save(pem_file_path)
+
+    logger.info(f"Created PEM file [{pem_file_path}] for [{address.bech32()}]")
 
 
 def do_bech32(args: Any):

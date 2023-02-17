@@ -2,17 +2,19 @@ import logging
 from pathlib import Path
 from typing import Any, Optional, Protocol
 
-import nacl.signing
+from multiversx_sdk_core import MessageV1, bech32
+from multiversx_sdk_network_providers.accounts import AccountOnNetwork
+from multiversx_sdk_wallet import UserSigner
 
 from multiversx_sdk_cli import constants, errors
 from multiversx_sdk_cli.interfaces import IAccount, IAddress, ITransaction
-from multiversx_sdk_network_providers.accounts import AccountOnNetwork
 from multiversx_sdk_cli.ledger.config import compare_versions
-from multiversx_sdk_cli.ledger.ledger_app_handler import SIGN_USING_HASH_VERSION
-from multiversx_sdk_cli.ledger.ledger_functions import do_get_ledger_address, do_sign_transaction_with_ledger, do_get_ledger_version, \
-    TX_HASH_SIGN_VERSION, TX_HASH_SIGN_OPTIONS
-from multiversx_sdk_cli.wallet import bech32, pem
-from multiversx_sdk_cli.wallet.keyfile import load_from_key_file
+from multiversx_sdk_cli.ledger.ledger_app_handler import \
+    SIGN_USING_HASH_VERSION
+from multiversx_sdk_cli.ledger.ledger_functions import (
+    TX_HASH_SIGN_OPTIONS, TX_HASH_SIGN_VERSION, do_get_ledger_address,
+    do_get_ledger_version, do_sign_message_with_ledger,
+    do_sign_transaction_with_ledger)
 
 logger = logging.getLogger("accounts")
 
@@ -22,43 +24,51 @@ class INetworkProvider(Protocol):
         ...
 
 
-class Account(IAccount):
+class AccountBase(IAccount):
+    def __init__(self, address: Any = None):
+        self.address = Address(address)
+        self.nonce: int = 0
+
+    def sync_nonce(self, proxy: INetworkProvider):
+        logger.debug("AccountBase.sync_nonce()")
+        self.nonce = proxy.get_account(self.address).nonce
+        logger.debug(f"AccountBase.sync_nonce() done: {self.nonce}")
+
+    def sign_transaction(self, transaction: ITransaction) -> str:
+        raise NotImplementedError
+
+    def sign_message(self, data: bytes) -> str:
+        raise NotImplementedError
+
+
+class Account(AccountBase):
     def __init__(self,
                  address: Any = None,
                  pem_file: Optional[str] = None,
                  pem_index: int = 0,
                  key_file: str = "",
-                 password: str = "",
-                 ledger: bool = False):
-        self.address = Address(address)
-        self.pem_file = pem_file
-        self.pem_index = int(pem_index)
-        self.nonce: int = 0
-        self.ledger = ledger
+                 password: str = ""):
+        super().__init__(address)
 
-        if self.pem_file:
-            secret_key, pubkey = pem.parse(Path(self.pem_file), self.pem_index)
-            self.secret_key = secret_key.hex()
-            self.address = Address(pubkey)
+        if pem_file:
+            pem_path = Path(pem_file).expanduser().resolve()
+            self.signer = UserSigner.from_pem_file(pem_path, pem_index)
+            self.address = Address(self.signer.get_pubkey().buffer)
         elif key_file and password:
-            address_from_key_file, secret_key = load_from_key_file(key_file, password)
-            self.secret_key = secret_key.hex()
-            self.address = Address(address_from_key_file)
-
-    def sync_nonce(self, proxy: INetworkProvider):
-        logger.info("Account.sync_nonce()")
-        self.nonce = proxy.get_account(self.address).nonce
-        logger.info(f"Account.sync_nonce() done: {self.nonce}")
+            key_file_path = Path(key_file).expanduser().resolve()
+            self.signer = UserSigner.from_wallet(key_file_path, password)
+            self.address = Address(self.signer.get_pubkey().buffer)
 
     def sign_transaction(self, transaction: ITransaction) -> str:
-        secret_key = bytes.fromhex(self.secret_key)
-        signing_key: Any = nacl.signing.SigningKey(secret_key)
+        assert self.signer is not None
+        return self.signer.sign(transaction).hex()
 
-        data_json = transaction.serialize()
-        signed = signing_key.sign(data_json)
-        signature = signed.signature
-        assert isinstance(signature, bytes)
+    def sign_message(self, data: bytes) -> str:
+        assert self.signer is not None
+        message = MessageV1(data)
+        signature = self.signer.sign(message)
 
+        logger.debug(f"Account.sign_message(): raw_data_to_sign = {data.hex()}, message_data_to_sign = {message.serialize_for_signing().hex()}, signature = {signature.hex()}")
         return signature.hex()
 
 
@@ -76,12 +86,30 @@ class LedgerAccount(Account):
             transaction.set_version(TX_HASH_SIGN_VERSION)
             transaction.set_options(TX_HASH_SIGN_OPTIONS)
 
-        signature = do_sign_transaction_with_ledger(transaction.serialize(),
-                                                    account_index=self.account_index,
-                                                    address_index=self.address_index,
-                                                    sign_using_hash=should_use_hash_signing)
+        signature = do_sign_transaction_with_ledger(
+            transaction.serialize_for_signing(),
+            account_index=self.account_index,
+            address_index=self.address_index,
+            sign_using_hash=should_use_hash_signing
+        )
+
+        assert isinstance(signature, str)
+        return signature
+
+    def sign_message(self, data: bytes) -> str:
+        message_length = len(data).to_bytes(4, byteorder="big")
+        message_data_to_sign: bytes = message_length + data
+        logger.debug(f"LedgerAccount.sign_message(): raw_data_to_sign = {data.hex()}, message_data_to_sign = {message_data_to_sign.hex()}")
+
+        signature = do_sign_message_with_ledger(
+            message_data_to_sign,
+            account_index=self.account_index,
+            address_index=self.address_index
+        )
+
         assert isinstance(signature, str)
 
+        logger.debug(f"LedgerAccount.sign_message(): signature = {signature}")
         return signature
 
 

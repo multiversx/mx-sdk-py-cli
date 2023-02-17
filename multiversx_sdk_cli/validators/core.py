@@ -3,7 +3,6 @@ from pathlib import Path
 from typing import Any, List, Tuple, Union
 
 from multiversx_sdk_core.message import Message
-from multiversx_sdk_wallet.validator_keys import ValidatorSecretKey
 from multiversx_sdk_wallet.validator_signer import ValidatorSigner
 
 from multiversx_sdk_cli import utils
@@ -14,7 +13,7 @@ from multiversx_sdk_cli.config import (GAS_PER_DATA_BYTE, MIN_GAS_LIMIT,
 from multiversx_sdk_cli.contracts import SmartContract
 from multiversx_sdk_cli.errors import BadUsage
 from multiversx_sdk_cli.validators.validators_file import ValidatorsFile
-from multiversx_sdk_cli.wallet.pem import parse_validator_pem
+from multiversx_sdk_wallet.validator_pem import ValidatorPEM
 
 logger = logging.getLogger("validators")
 
@@ -58,16 +57,14 @@ def prepare_transaction_data_for_stake(node_operator_address: Address, validator
         validator_pem = Path(validator.get("pemFile")).expanduser()
         validator_pem = validator_pem if validator_pem.is_absolute() else validators_file_path.parent / validator_pem
 
-        secret_key_bytes, bls_key = parse_validator_pem(Path(validator_pem))
-        secret_key_str = secret_key_bytes.decode()
+        pem_file = ValidatorPEM.from_file(validator_pem)
 
-        validator_secret_key = ValidatorSecretKey.from_string(secret_key_str)
-        validator_signer = ValidatorSigner(validator_secret_key)
+        validator_signer = ValidatorSigner(pem_file.secret_key)
         message = Message(bytes.fromhex(node_operator_address.hex()))
 
         signed_message = validator_signer.sign(message).hex()
 
-        call_arguments.append(f"0x{bls_key}")
+        call_arguments.append(f"0x{pem_file.secret_key.generate_public_key().hex()}")
         call_arguments.append(f"0x{signed_message}")
 
     if reward_address:
