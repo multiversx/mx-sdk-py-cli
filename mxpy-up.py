@@ -51,7 +51,7 @@ Windows support is limited and experimental.
     run_post_install_checks()
 
     if interactive:
-        add_shortcut_to_system_path()
+        guide_system_path_alteration()
 
 
 def guard_non_root_user():
@@ -298,7 +298,7 @@ def run_post_install_checks():
     print("~/multiversx-sdk/erdpy.json is renamed or missing", "OK" if not (multiversx_sdk_path / "erdpy.json").exists() else "NOK")
 
 
-def add_shortcut_to_system_path():
+def guide_system_path_alteration():
     interactive = True
     operating_system = get_operating_system()
 
@@ -379,11 +379,9 @@ Make sure you understand the above before proceeding further.
         confirm_continuation(interactive)
         return
 
-    choice = input(f"""
+    print(f"""
 ###############################################################################
-In order to use the "mxpy" command shortcut, you have the choice to either:
- - manually extend the PATH variable to include "~/multiversx-sdk"
- - allow this installer script to do it for you.
+In order to use the "mxpy" command shortcut, you have to manually extend the PATH variable to include "~/multiversx-sdk".
 
 In order to manually extend the PATH variable, add the following line to your shell profile file upon installation:
 
@@ -393,40 +391,6 @@ Your shell profile files:
 {profile_files_formatted}
 
 Upon editing the shell profile file, you may have to RESTART THE USER SESSION for the changes to take effect.
-
-Please pick an option:
-
-a) manually extend the PATH variable (recommended for advanced users)
-b) allow this installer script to extend the PATH variable (not recommended for advanced users)
-
-Type "a" or "b", then press ENTER.
-
-""")
-    if choice not in ["a", "b"]:
-        raise InstallError("Invalid choice.")
-
-    if choice == "a":
-        return
-
-    for profile_file in profile_files:
-        with open(profile_file, "a") as file:
-            file.write(f'\n{new_export_directive}\n')
-
-    print(f"""
-###############################################################################
-The following profile files have been updated:
-{profile_files_formatted}
-
-Please RESTART THE USER SESSION.
-
-Once the user session is restarted, you can use the "mxpy" command shortcut:
-
-    $ mxpy --help
-###############################################################################
-Make sure you understand the above.
-
-If you not know what a user session is, RESTART YOUR COMPUTER, instead.
-###############################################################################
 """)
     confirm_continuation(interactive)
 
