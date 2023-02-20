@@ -51,7 +51,7 @@ Windows support is limited and experimental.
     run_post_install_checks()
 
     if interactive:
-        guide_system_path_alteration()
+        guide_system_path_integration()
 
 
 def guard_non_root_user():
@@ -298,7 +298,7 @@ def run_post_install_checks():
     print("~/multiversx-sdk/erdpy.json is renamed or missing", "OK" if not (multiversx_sdk_path / "erdpy.json").exists() else "NOK")
 
 
-def guide_system_path_alteration():
+def guide_system_path_integration():
     interactive = True
     operating_system = get_operating_system()
 
