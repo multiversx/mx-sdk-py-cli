@@ -20,9 +20,7 @@ classifiers = [
 ]
 dependencies = [
   "toml>=0.10.2",
-  "bottle",
   "requests",
-  "cryptography==36.0.2",
   "prettytable",
   "ledgercomm[hid]",
   "semver",
