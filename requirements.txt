@@ -10,6 +10,6 @@ requests-cache
 
 multiversx-sdk-network-providers==0.6.*
 
-multiversx-sdk-wallet==0.4.*
+multiversx-sdk-wallet==0.5.*
 
 multiversx-sdk-core==0.3.*
