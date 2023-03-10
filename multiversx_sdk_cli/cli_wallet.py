@@ -1,6 +1,7 @@
 import getpass
 import json
 import logging
+import sys
 from pathlib import Path
 from typing import Any, List, Optional, Tuple
 
@@ -172,37 +173,41 @@ def convert_wallet(args: Any):
     if outfile and outfile.exists():
         raise KnownError(f"File already exists, will not overwrite: {outfile}")
 
-    mnemonic, secret_key = _load_wallet(infile, in_format, address_index)
-    _save_wallet(outfile, out_format, mnemonic, secret_key, address_index, address_hrp)
+    if infile:
+        input_text = infile.read_text()
+    else:
+        print(f"Press 'Ctrl-D' (Linux / MacOS) or 'Ctrl-Z' (Windows) when done.")
+        input_text = sys.stdin.read().strip()
+
+    mnemonic, secret_key = _load_wallet(input_text, in_format, address_index)
+    output_text = _create_wallet_content(out_format, mnemonic, secret_key, address_index, address_hrp)
+
+    if outfile:
+        outfile.write_text(output_text)
+    else:
+        print("Output:")
+        print()
+        print(output_text)
 
 
-def _load_wallet(infile: Optional[Path], in_format: str, address_index: int) -> Tuple[Optional[Mnemonic], Optional[UserSecretKey]]:
+def _load_wallet(input_text: str, in_format: str, address_index: int) -> Tuple[Optional[Mnemonic], Optional[UserSecretKey]]:
     if in_format == WALLET_FORMAT_RAW_MNEMONIC:
-        if infile:
-            input_text = infile.read_text()
-        else:
-            input_text = input("Enter mnemonic:\n").strip()
+        input_text = " ".join(input_text.split())
         mnemonic = Mnemonic(input_text)
         return mnemonic, None
 
-    if infile is None:
-        raise KnownError(f"The --infile option is required when --in-format is different from {WALLET_FORMAT_RAW_MNEMONIC}.")
-
-    input_text = infile.read_text()
-
-    if in_format == WALLET_FORMAT_RAW_MNEMONIC:
-        mnemonic = Mnemonic(input_text)
-        return mnemonic, None
     if in_format == WALLET_FORMAT_KEYSTORE_MNEMONIC:
         password = getpass.getpass("Enter the password for the input keystore:")
         keyfile = json.loads(input_text)
         mnemonic = UserWallet.decrypt_mnemonic(keyfile, password)
         return mnemonic, None
+
     if in_format == WALLET_FORMAT_KEYSTORE_SECRET_KEY:
         password = getpass.getpass("Enter the password for the input keystore:")
         keyfile = json.loads(input_text)
         secret_key = UserWallet.decrypt_secret_key(keyfile, password)
         return None, secret_key
+
     if in_format == WALLET_FORMAT_PEM:
         secret_key = UserPEM.from_text(input_text, address_index).secret_key
         return None, secret_key
@@ -210,53 +215,46 @@ def _load_wallet(infile: Optional[Path], in_format: str, address_index: int) -> 
     raise KnownError(f"Cannot load wallet, unknown input format: {in_format}")
 
 
-def _save_wallet(
-        outfile: Optional[Path],
+def _create_wallet_content(
         out_format: str,
         mnemonic: Optional[Mnemonic],
         secret_key: Optional[UserSecretKey],
         address_index: int,
         address_hrp: str
-):
+) -> str:
     if out_format == WALLET_FORMAT_RAW_MNEMONIC:
         if mnemonic is None:
-            raise KnownError(f"Cannot convert to {out_format}.")
-
-        if outfile:
-            outfile.write_text(mnemonic.get_text())
-        else:
-            print(mnemonic.get_text())
-        return
-
-    if outfile is None:
-        raise KnownError(f"The --outfile option is required when --out-format is different from {WALLET_FORMAT_RAW_MNEMONIC}.")
+            raise KnownError(f"Cannot convert to {out_format} (mnemonic not available).")
+        return mnemonic.get_text()
 
     if out_format == WALLET_FORMAT_KEYSTORE_MNEMONIC:
         if mnemonic is None:
-            raise KnownError(f"Cannot convert to {out_format}.")
+            raise KnownError(f"Cannot convert to {out_format} (mnemonic not available).")
 
         password = getpass.getpass("Enter a new password (for the output keystore):")
         wallet = UserWallet.from_mnemonic(mnemonic.get_text(), password)
-        wallet.save(outfile)
-    elif out_format == WALLET_FORMAT_KEYSTORE_SECRET_KEY:
+        return wallet.to_json()
+
+    if out_format == WALLET_FORMAT_KEYSTORE_SECRET_KEY:
         if mnemonic:
             secret_key = mnemonic.derive_key(address_index)
         assert secret_key is not None
 
         password = getpass.getpass("Enter a new password (for the output keystore):")
         wallet = UserWallet.from_secret_key(secret_key, password)
-        wallet.save(outfile, address_hrp)
-    elif out_format == WALLET_FORMAT_PEM:
+        return wallet.to_json(address_hrp)
+
+    if out_format == WALLET_FORMAT_PEM:
         if mnemonic:
             secret_key = mnemonic.derive_key(address_index)
         assert secret_key is not None
 
         pubkey = secret_key.generate_public_key()
         address = pubkey.to_address(address_hrp)
-        pem_file = UserPEM(address.bech32(), secret_key)
-        pem_file.save(outfile)
-    else:
-        raise KnownError(f"Unknown output format: {out_format}")
+        pem = UserPEM(address.bech32(), secret_key)
+        return pem.to_text()
+
+    raise KnownError(f"Cannot create wallet, unknown output format: {out_format}")
 
 
 def wallet_derive_deprecated(args: Any):
