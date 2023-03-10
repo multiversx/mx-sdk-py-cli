@@ -2,7 +2,7 @@ import getpass
 import json
 import logging
 from pathlib import Path
-from typing import Any, List, Optional
+from typing import Any, List, Optional, Tuple
 
 from multiversx_sdk_wallet import UserSecretKey, UserWallet
 from multiversx_sdk_wallet.mnemonic import Mnemonic
@@ -65,8 +65,8 @@ def setup_parser(args: List[str], subparsers: Any) -> Any:
         "Convert a wallet from one format to another"
     )
 
-    sub.add_argument("--infile", required=True, help="path to the input file")
-    sub.add_argument("--outfile", required=True, help="path to the output file")
+    sub.add_argument("--infile", help="path to the input file")
+    sub.add_argument("--outfile", help="path to the output file")
     sub.add_argument("--in-format", required=True, choices=WALLET_FORMATS, help="the format of the input file")
     sub.add_argument("--out-format", required=True, choices=WALLET_FORMATS, help="the format of the output file")
     sub.add_argument("--address-index", help=f"the address index, if input format is {WALLET_FORMAT_RAW_MNEMONIC}, {WALLET_FORMAT_KEYSTORE_MNEMONIC} or {WALLET_FORMAT_PEM} (with multiple entries) and the output format is {WALLET_FORMAT_KEYSTORE_SECRET_KEY} or {WALLET_FORMAT_PEM}", type=int, default=0)
@@ -161,44 +161,78 @@ def new_wallet(args: Any):
 
 
 def convert_wallet(args: Any):
-    infile = Path(args.infile).expanduser().resolve()
-    outfile = Path(args.outfile).expanduser().resolve()
+    infile = Path(args.infile).expanduser().resolve() if args.infile else None
+    outfile = Path(args.outfile).expanduser().resolve() if args.outfile else None
     in_format = args.in_format
     out_format = args.out_format
     address_index = args.address_index
     address_hrp = args.address_hrp
 
-    if outfile.exists():
+    if outfile and outfile.exists():
         raise Exception(f"File already exists, will not overwrite: {outfile}")
 
-    # Parse the input
-    mnemonic: Optional[Mnemonic] = None
-    secret_key: Optional[UserSecretKey] = None
+    mnemonic, secret_key = _load_wallet(infile, in_format, address_index)
+    _save_wallet(outfile, out_format, mnemonic, secret_key, address_index, address_hrp)
+
+
+def _load_wallet(infile: Optional[Path], in_format: str, address_index: int) -> Tuple[Optional[Mnemonic], Optional[UserSecretKey]]:
+    if in_format == WALLET_FORMAT_RAW_MNEMONIC:
+        if infile:
+            input_text = infile.read_text()
+        else:
+            input_text = input("Enter mnemonic:\n").strip()
+        mnemonic = Mnemonic(input_text)
+        return mnemonic, None
+
+    if infile is None:
+        raise Exception(f"The --infile option is required when --in-format is different from {WALLET_FORMAT_RAW_MNEMONIC}.")
+
+    input_text = infile.read_text()
 
     if in_format == WALLET_FORMAT_RAW_MNEMONIC:
-        mnemonic = Mnemonic(infile.read_text())
-    elif in_format == WALLET_FORMAT_KEYSTORE_MNEMONIC:
+        mnemonic = Mnemonic(input_text)
+        return mnemonic, None
+    if in_format == WALLET_FORMAT_KEYSTORE_MNEMONIC:
         password = getpass.getpass("Enter the password for the input keystore:")
-        keyfile = json.loads(infile.read_text())
+        keyfile = json.loads(input_text)
         mnemonic = UserWallet.decrypt_mnemonic(keyfile, password)
-    elif in_format == WALLET_FORMAT_KEYSTORE_SECRET_KEY:
+        return mnemonic, None
+    if in_format == WALLET_FORMAT_KEYSTORE_SECRET_KEY:
         password = getpass.getpass("Enter the password for the input keystore:")
-        keyfile = json.loads(infile.read_text())
+        keyfile = json.loads(input_text)
         secret_key = UserWallet.decrypt_secret_key(keyfile, password)
-    elif in_format == WALLET_FORMAT_PEM:
-        secret_key = UserPEM.from_file(infile, address_index).secret_key
-    else:
-        raise Exception(f"Unknown input format: {in_format}")
+        return None, secret_key
+    if in_format == WALLET_FORMAT_PEM:
+        secret_key = UserPEM.from_text(input_text, address_index).secret_key
+        return None, secret_key
 
-    # Convert and save
+    raise Exception(f"Cannot load wallet, unknown input format: {in_format}")
+
+
+def _save_wallet(
+        outfile: Optional[Path],
+        out_format: str,
+        mnemonic: Optional[Mnemonic],
+        secret_key: Optional[UserSecretKey],
+        address_index: int,
+        address_hrp: str
+):
     if out_format == WALLET_FORMAT_RAW_MNEMONIC:
         if mnemonic is None:
-            raise Exception(f"Cannot convert {in_format} to {out_format}.")
+            raise Exception(f"Cannot convert to {out_format}.")
 
-        outfile.write_text(mnemonic.get_text())
-    elif out_format == WALLET_FORMAT_KEYSTORE_MNEMONIC:
+        if outfile:
+            outfile.write_text(mnemonic.get_text())
+        else:
+            print(mnemonic.get_text())
+        return
+
+    if outfile is None:
+        raise Exception(f"The --outfile option is required when --out-format is different from {WALLET_FORMAT_RAW_MNEMONIC}.")
+
+    if out_format == WALLET_FORMAT_KEYSTORE_MNEMONIC:
         if mnemonic is None:
-            raise Exception(f"Cannot convert {in_format} to {out_format}.")
+            raise Exception(f"Cannot convert to {out_format}.")
 
         password = getpass.getpass("Enter a new password (for the output keystore):")
         wallet = UserWallet.from_mnemonic(mnemonic.get_text(), password)
@@ -222,8 +256,6 @@ def convert_wallet(args: Any):
         pem_file.save(outfile)
     else:
         raise Exception(f"Unknown output format: {out_format}")
-
-    logger.info(f"Wallet ({out_format}) saved: {outfile}")
 
 
 def generate_pem(args: Any):
