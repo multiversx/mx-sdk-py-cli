@@ -10,6 +10,7 @@ from multiversx_sdk_wallet.user_pem import UserPEM
 
 from multiversx_sdk_cli import cli_shared
 from multiversx_sdk_cli.accounts import Account, Address
+from multiversx_sdk_cli.errors import KnownError
 
 logger = logging.getLogger("cli.wallet")
 
@@ -45,7 +46,7 @@ def setup_parser(args: List[str], subparsers: Any) -> Any:
     sub.add_argument("--format", choices=WALLET_FORMATS, help="the format of the generated wallet file (default: %(default)s)", default=None)
     sub.add_argument("--outfile", help="the output path and base file name for the generated wallet files (default: %(default)s)", type=str)
     sub.add_argument("--address-hrp", help=f"the human-readable part of the address, when format is {WALLET_FORMAT_KEYSTORE_SECRET_KEY} or {WALLET_FORMAT_PEM} (default: %(default)s)", type=str, default="erd")
-    sub.set_defaults(func=new_wallet)
+    sub.set_defaults(func=wallet_new)
 
     sub = cli_shared.add_command_subparser(
         subparsers,
@@ -56,7 +57,7 @@ def setup_parser(args: List[str], subparsers: Any) -> Any:
     sub.add_argument("pem", help="path of the output PEM file")
     sub.add_argument("--mnemonic", action="store_true", help="whether to derive from an existing mnemonic")
     sub.add_argument("--index", help="the address index", type=int, default=0)
-    sub.set_defaults(func=generate_pem)
+    sub.set_defaults(func=wallet_derive_deprecated)
 
     sub = cli_shared.add_command_subparser(
         subparsers,
@@ -109,7 +110,7 @@ def setup_parser(args: List[str], subparsers: Any) -> Any:
     return subparsers
 
 
-def new_wallet(args: Any):
+def wallet_new(args: Any):
     format = args.format
     outfile = args.outfile
     address_hrp = args.address_hrp
@@ -131,11 +132,11 @@ def new_wallet(args: Any):
     if format is None:
         return
     if outfile is None:
-        raise Exception("The --outfile option is required when --format is specified.")
+        raise KnownError("The --outfile option is required when --format is specified.")
 
     outfile = Path(outfile).expanduser().resolve()
     if outfile.exists():
-        raise Exception(f"File already exists, will not overwrite: {outfile}")
+        raise KnownError(f"File already exists, will not overwrite: {outfile}")
 
     if format == WALLET_FORMAT_RAW_MNEMONIC:
         outfile.write_text(mnemonic.get_text())
@@ -155,7 +156,7 @@ def new_wallet(args: Any):
         pem_file = UserPEM(address.bech32(), secret_key)
         pem_file.save(outfile)
     else:
-        raise Exception(f"Unknown format: {format}")
+        raise KnownError(f"Unknown format: {format}")
 
     logger.info(f"Wallet ({format}) saved: {outfile}")
 
@@ -169,7 +170,7 @@ def convert_wallet(args: Any):
     address_hrp = args.address_hrp
 
     if outfile and outfile.exists():
-        raise Exception(f"File already exists, will not overwrite: {outfile}")
+        raise KnownError(f"File already exists, will not overwrite: {outfile}")
 
     mnemonic, secret_key = _load_wallet(infile, in_format, address_index)
     _save_wallet(outfile, out_format, mnemonic, secret_key, address_index, address_hrp)
@@ -185,7 +186,7 @@ def _load_wallet(infile: Optional[Path], in_format: str, address_index: int) -> 
         return mnemonic, None
 
     if infile is None:
-        raise Exception(f"The --infile option is required when --in-format is different from {WALLET_FORMAT_RAW_MNEMONIC}.")
+        raise KnownError(f"The --infile option is required when --in-format is different from {WALLET_FORMAT_RAW_MNEMONIC}.")
 
     input_text = infile.read_text()
 
@@ -206,7 +207,7 @@ def _load_wallet(infile: Optional[Path], in_format: str, address_index: int) -> 
         secret_key = UserPEM.from_text(input_text, address_index).secret_key
         return None, secret_key
 
-    raise Exception(f"Cannot load wallet, unknown input format: {in_format}")
+    raise KnownError(f"Cannot load wallet, unknown input format: {in_format}")
 
 
 def _save_wallet(
@@ -219,7 +220,7 @@ def _save_wallet(
 ):
     if out_format == WALLET_FORMAT_RAW_MNEMONIC:
         if mnemonic is None:
-            raise Exception(f"Cannot convert to {out_format}.")
+            raise KnownError(f"Cannot convert to {out_format}.")
 
         if outfile:
             outfile.write_text(mnemonic.get_text())
@@ -228,11 +229,11 @@ def _save_wallet(
         return
 
     if outfile is None:
-        raise Exception(f"The --outfile option is required when --out-format is different from {WALLET_FORMAT_RAW_MNEMONIC}.")
+        raise KnownError(f"The --outfile option is required when --out-format is different from {WALLET_FORMAT_RAW_MNEMONIC}.")
 
     if out_format == WALLET_FORMAT_KEYSTORE_MNEMONIC:
         if mnemonic is None:
-            raise Exception(f"Cannot convert to {out_format}.")
+            raise KnownError(f"Cannot convert to {out_format}.")
 
         password = getpass.getpass("Enter a new password (for the output keystore):")
         wallet = UserWallet.from_mnemonic(mnemonic.get_text(), password)
@@ -255,10 +256,10 @@ def _save_wallet(
         pem_file = UserPEM(address.bech32(), secret_key)
         pem_file.save(outfile)
     else:
-        raise Exception(f"Unknown output format: {out_format}")
+        raise KnownError(f"Unknown output format: {out_format}")
 
 
-def generate_pem(args: Any):
+def wallet_derive_deprecated(args: Any):
     logger.warning("This command is deprecated. Use 'wallet convert' instead.")
 
     pem_file_path = Path(args.pem)

@@ -3,70 +3,76 @@ import json
 from pathlib import Path
 from typing import Any
 
-import pytest
 from multiversx_sdk_wallet import Mnemonic, UserPEM, UserWallet
 
-from multiversx_sdk_cli.accounts import Account
 from multiversx_sdk_cli.cli import main
 
 testdata_path = Path(__file__).parent / "testdata"
 testdata_out_path = Path(__file__).parent / "testdata-out"
 
 
-def test_generate_wallet():
-    result = main(['wallet', 'new'])
-    assert result == 0
+def test_wallet_new(capsys: Any):
+    main(["wallet", "new"])
+    displayed_mnemonic = capsys.readouterr().out.replace("Mnemonic:", "").strip()
+    assert Mnemonic.is_text_valid(displayed_mnemonic)
 
 
-def test_generate_wallet_and_save_in_pem_format():
-    output_path = testdata_out_path / "testWallet.pem"
-    output_path.unlink(missing_ok=True)
-    result = main(['wallet', 'new', '--pem', '--output-path', str(output_path)])
+def test_wallet_new_and_save_in_pem_format(capsys: Any):
+    # Legacy invocation
+    outfile = testdata_out_path / "testWallet.pem"
+    outfile.unlink(missing_ok=True)
+    main(["wallet", "new", "--pem", "--output-path", str(outfile)])
 
-    assert result == 0
-    assert Path.is_file(output_path) == True
+    mnemonic = Mnemonic(capsys.readouterr().out.replace("Mnemonic:", "").strip())
+    expected_secret_key = mnemonic.derive_key(0)
+    pem = UserPEM.from_file(outfile)
+    assert pem.secret_key.hex() == expected_secret_key.hex()
+
+    # New invocation
+    outfile = testdata_out_path / "testWallet.pem"
+    outfile.unlink(missing_ok=True)
+    main(["wallet", "new", "--format", "pem", "--outfile", str(outfile)])
+
+    mnemonic = Mnemonic(capsys.readouterr().out.replace("Mnemonic:", "").strip())
+    expected_secret_key = mnemonic.derive_key(0)
+    pem = UserPEM.from_file(outfile)
+    assert pem.secret_key.hex() == expected_secret_key.hex()
 
 
-def test_derive_pem_from_mnemonic(monkeypatch: Any):
-    output_path = testdata_out_path / "wallet.pem"
+def test_wallet_new_and_save_in_json_format(capsys: Any, monkeypatch: Any):
+    # Legacy invocation
+    outfile = testdata_out_path / "testWallet.json"
+    outfile.unlink(missing_ok=True)
+    monkeypatch.setattr(getpass, "getpass", lambda _: "password")
+    main(["wallet", "new", "--json", "--output-path", str(outfile)])
+
+    expected_mnemonic = Mnemonic(capsys.readouterr().out.replace("Mnemonic:", "").strip())
+    keyfile = json.loads(outfile.read_text())
+    mnemonic = UserWallet.decrypt_mnemonic(keyfile, "password")
+    assert mnemonic.get_text() == expected_mnemonic.get_text()
+
+    # New invocation
+    outfile = testdata_out_path / "testWallet.json"
+    outfile.unlink(missing_ok=True)
+    monkeypatch.setattr(getpass, "getpass", lambda _: "password")
+    main(["wallet", "new", "--format", "keystore-mnemonic", "--outfile", str(outfile)])
+
+    expected_mnemonic = Mnemonic(capsys.readouterr().out.replace("Mnemonic:", "").strip())
+    keyfile = json.loads(outfile.read_text())
+    mnemonic = UserWallet.decrypt_mnemonic(keyfile, "password")
+    assert mnemonic.get_text() == expected_mnemonic.get_text()
+
+
+def test_wallet_derive_pem_from_mnemonic_deprecated(monkeypatch: Any):
+    outfile = testdata_out_path / "wallet.pem"
     test_mnemonic = "moral volcano peasant pass circle pen over picture flat shop clap goat never lyrics gather prepare woman film husband gravity behind test tiger improve"
-    with monkeypatch.context() as mp:
-        mp.setattr('builtins.input', lambda _: test_mnemonic)
+    monkeypatch.setattr("builtins.input", lambda _: test_mnemonic)
 
-        result = main(['wallet', 'derive', str(output_path), '--mnemonic'])
+    main(["wallet", "derive", str(outfile), "--mnemonic"])
 
-    assert result == 0
-    assert Path.is_file(output_path) == True
-
-
-def test_generate_wallet_and_save_in_json_format(monkeypatch: Any):
-    output_path = testdata_out_path / "testWallet.json"
-    output_path.unlink(missing_ok=True)
-
-    with monkeypatch.context() as mp:
-        mp.setattr('getpass.getpass', lambda _: "TestPassword")
-
-        result = main(['wallet', 'new', '--json', '--output-path', str(output_path)])
-
-    assert result == 0
-    assert Path.is_file(output_path) == True
-
-
-def test_get_account_from_json():
-    json_file = testdata_out_path / "testWallet.json"
-
-    try:
-        _ = Account(key_file=str(json_file), password="TestPassword")
-        assert True
-    except:
-        assert False
-
-
-def test_get_account_from_json_with_wrong_password():
-    json_file = testdata_out_path / "testWallet.json"
-
-    with pytest.raises(Exception):
-        _ = Account(key_file=str(json_file), password="WrongPassword")
+    expected_secret_key = Mnemonic(test_mnemonic).derive_key(0)
+    pem = UserPEM.from_file(outfile)
+    assert pem.secret_key.hex() == expected_secret_key.hex()
 
 
 def test_wallet_new_as_mnemonic():
@@ -119,8 +125,7 @@ def test_wallet_new_as_keystore_with_mnemonic(capsys: Any, monkeypatch: Any):
     ])
 
     displayed_mnemonic = capsys.readouterr().out.replace("Mnemonic:", "").strip()
-    keyfile_json = outfile.read_text()
-    keyfile = json.loads(keyfile_json)
+    keyfile = json.loads(outfile.read_text())
     mnemonic = UserWallet.decrypt_mnemonic(keyfile, "password")
     assert mnemonic.get_text() == displayed_mnemonic
 
