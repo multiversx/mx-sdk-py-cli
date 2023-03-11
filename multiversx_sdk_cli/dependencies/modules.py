@@ -22,8 +22,6 @@ class DependencyModule:
         raise NotImplementedError()
 
     def install(self, tag: str, overwrite: bool) -> None:
-        self._guard_cannot_install_on_host()
-
         # Fallback to default tag if not provided
         tag = tag or config.get_dependency_tag(self.key)
 
@@ -36,6 +34,7 @@ class DependencyModule:
             logger.debug("Already exists. Skip install.")
             return
 
+        self._guard_cannot_install_on_host()
         self.uninstall(tag)
         self._do_install(tag)
 
