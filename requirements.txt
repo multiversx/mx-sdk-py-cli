@@ -10,8 +10,6 @@ requests-cache
 
 multiversx-sdk-network-providers==0.6.*
 
-# TODO: Change once a proper release is available
-# multiversx-sdk-wallet==0.6.*
-git+https://github.com/multiversx/mx-sdk-py-wallet@pem-format-10#egg=multiversx-sdk-wallet
+multiversx-sdk-wallet==0.6.*
 
 multiversx-sdk-core==0.3.*
