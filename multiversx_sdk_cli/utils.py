@@ -78,16 +78,6 @@ def ensure_folder(folder: Union[str, Path]):
     pathlib.Path(folder).mkdir(parents=True, exist_ok=True)
 
 
-def uniquify(path: Path) -> Path:
-    '''Generates the next available non-already-existing filename, by adding a _1, _2, _3, etc. suffix before the extension if necessary'''
-    i = 1
-    stem = path.stem
-    while path.exists():
-        path = path.with_name(f"{stem}_{i}").with_suffix(path.suffix)
-        i += 1
-    return path
-
-
 def read_lines(file: Path) -> List[str]:
     with open(file) as f:
         lines = f.readlines()

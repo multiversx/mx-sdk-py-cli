@@ -1,21 +1,13 @@
 toml>=0.10.2
 types-toml
-bottle~=0.12.18
 requests~=2.24.0
 types-requests
-cryptography==36.0.2
 prettytable
 types-prettytable
 ledgercomm[hid]
 semver
 requests-cache
 
-pytest
-
-setuptools
-
+multiversx-sdk-core>=0.4.1
 multiversx-sdk-network-providers==0.6.*
-
-multiversx-sdk-wallet==0.4.*
-
-multiversx-sdk-core==0.3.*
+multiversx-sdk-wallet==0.6.*

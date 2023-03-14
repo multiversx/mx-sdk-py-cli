@@ -920,7 +920,7 @@ usage: mxpy wallet COMMAND [-h] ...
 Create wallet, derive secret key from mnemonic, bech32 address helpers etc.
 
 COMMANDS:
-  {new,derive,bech32,pem-address,pem-address-hex}
+  {new,derive,convert,bech32,pem-address,pem-address-hex}
 
 OPTIONS:
   -h, --help            show this help message and exit
@@ -929,7 +929,8 @@ OPTIONS:
 COMMANDS summary
 ----------------
 new                            Create a new wallet and print its mnemonic; optionally save as password-protected JSON (recommended) or PEM (not recommended)
-derive                         Derive a PEM file from a mnemonic or generate a new PEM file (for tests only!)
+derive                         DEPRECATED COMMAND, replaced by 'wallet convert'
+convert                        Convert a wallet from one format to another
 bech32                         Helper for encoding and decoding bech32 addresses
 pem-address                    Get the public address out of a PEM file as bech32
 pem-address-hex                Get the public address out of a PEM file as hex
@@ -945,10 +946,16 @@ usage: mxpy wallet new [-h] ...
 Create a new wallet and print its mnemonic; optionally save as password-protected JSON (recommended) or PEM (not recommended)
 
 optional arguments:
-  -h, --help                 show this help message and exit
-  --json                     whether to create a json key file
-  --pem                      whether to create a pem key file
-  --output-path OUTPUT_PATH  the output path and base file name for the generated wallet files (default: ./wallet)
+  -h, --help                                      show this help message and exit
+  --json                                          DEPRECATED, replaced by --format=keystore-mnemonic
+  --pem                                           DEPRECATED, replaced by --format=pem
+  --output-path OUTPUT_PATH                       DEPRECATED, replaced by --outfile
+  --format {raw-mnemonic,keystore-mnemonic,keystore-secret-key,pem}
+                                                  the format of the generated wallet file (default: None)
+  --outfile OUTFILE                               the output path and base file name for the generated wallet files
+                                                  (default: None)
+  --address-hrp ADDRESS_HRP                       the human-readable part of the address, when format is keystore-
+                                                  secret-key or pem (default: erd)
 
 ```
 ### Wallet.Derive
@@ -958,7 +965,7 @@ optional arguments:
 $ mxpy wallet derive --help
 usage: mxpy wallet derive [-h] ...
 
-Derive a PEM file from a mnemonic or generate a new PEM file (for tests only!)
+DEPRECATED COMMAND, replaced by 'wallet convert'
 
 positional arguments:
   pem            path of the output PEM file
@@ -966,7 +973,31 @@ positional arguments:
 optional arguments:
   -h, --help     show this help message and exit
   --mnemonic     whether to derive from an existing mnemonic
-  --index INDEX  the account index
+  --index INDEX  the address index
+
+```
+### Wallet.Convert
+
+
+```
+$ mxpy wallet convert --help
+usage: mxpy wallet convert [-h] ...
+
+Convert a wallet from one format to another
+
+optional arguments:
+  -h, --help                                      show this help message and exit
+  --infile INFILE                                 path to the input file
+  --outfile OUTFILE                               path to the output file
+  --in-format {raw-mnemonic,keystore-mnemonic,keystore-secret-key,pem}
+                                                  the format of the input file
+  --out-format {raw-mnemonic,keystore-mnemonic,keystore-secret-key,pem}
+                                                  the format of the output file
+  --address-index ADDRESS_INDEX                   the address index, if input format is raw-mnemonic, keystore-mnemonic
+                                                  or pem (with multiple entries) and the output format is keystore-
+                                                  secret-key or pem
+  --address-hrp ADDRESS_HRP                       the human-readable part of the address, when the output format is
+                                                  keystore-secret-key or pem (default: erd)
 
 ```
 ### Wallet.Bech32
