@@ -236,15 +236,15 @@ class GolangModule(StandaloneModule):
             return {
                 # At this moment, cc (build-essential) is needed to compile go dependencies (e.g. Node, VM)
                 "PATH": f"{(directory / 'go' / 'bin')}:{os.environ['PATH']}",
-                "GOPATH": self.get_gopath(),
+                "GOPATH": str(self.get_gopath()),
                 "GOCACHE": str(parent_directory / "GOCACHE"),
                 "GOROOT": str(directory / "go")
             }
 
         raise errors.BadDependencyResolution(self.key, resolution)
 
-    def get_gopath(self):
-        return path.join(self.get_parent_directory(), "GOPATH")
+    def get_gopath(self) -> Path:
+        return self.get_parent_directory() / "GOPATH"
 
     def get_latest_release(self) -> str:
         raise errors.UnsupportedConfigurationValue("Golang tag must always be explicit, not latest")

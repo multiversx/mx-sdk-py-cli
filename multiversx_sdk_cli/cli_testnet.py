@@ -76,6 +76,7 @@ def testnet_clean(args: Any):
     testnet.clean(args)
 
 
-def testnet_prerequisites(args):
+def testnet_prerequisites(args: Any):
     logger.info("Preparing prerequisites...")
     testnet.install_dependencies()
+    testnet.build_binaries(args)

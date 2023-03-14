@@ -19,10 +19,37 @@ DEPENDENCY_KEYS = ["mx_chain_go", "mx_chain_proxy_go", "testwallets"]
 
 
 def install_dependencies():
+    logger.info("Installing dependencies...")
+
     dependencies.install_module("golang")
 
     for key in DEPENDENCY_KEYS:
         install_module(key, tag="", overwrite=True)
+
+
+def build_binaries(args: Any):
+    logger.info("Building binaries...")
+
+    testnet_config = TestnetConfiguration.from_file(args.configfile)
+    golang = dependencies.get_golang()
+    golang_env = golang.get_env()
+    myprocess.run_process(['go', 'env'], env=golang_env)
+
+    logger.info("Building seednode...")
+    seednode_folder = testnet_config.node_source() / "cmd" / "seednode"
+    myprocess.run_process(['go', 'build'], cwd=seednode_folder, env=golang_env)
+
+    logger.info("Building node...")
+    node_folder = testnet_config.node_source() / "cmd" / "node"
+    myprocess.run_process(['go', 'build'], cwd=node_folder, env=golang_env)
+
+    wasm_vm_binary = testnet_config.wasm_vm_binary()
+    if wasm_vm_binary:
+        logger.warn("WASM VM does not require building anymore. Skipping...")
+
+    logger.info("Building proxy...")
+    proxy_folder = testnet_config.proxy_source() / "cmd" / "proxy"
+    myprocess.run_process(['go', 'build'], cwd=proxy_folder, env=golang_env)
 
 
 def configure(args: Any):
@@ -73,7 +100,7 @@ def configure(args: Any):
     patch_proxy_config(testnet_config)
 
     patch_source_code(testnet_config)
-    build_binaries(testnet_config)
+    copy_binaries_into_testnet_workspace(testnet_config)
 
 
 def clean(args):
@@ -233,30 +260,14 @@ def patch_source_code(testnet_config: TestnetConfiguration):
     utils.write_file(file, content)
 
 
-def build_binaries(testnet_config: TestnetConfiguration):
-    golang = dependencies.get_golang()
-    golang_env = golang.get_env()
-    myprocess.run_process(['go', 'env'], env=golang_env)
-
-    logger.info("Building seednode...")
+def copy_binaries_into_testnet_workspace(testnet_config: TestnetConfiguration):
+    gopath = dependencies.get_golang().get_gopath()
     seednode_folder = testnet_config.node_source() / "cmd" / "seednode"
-    myprocess.run_process(['go', 'build'], cwd=seednode_folder, env=golang_env)
-
-    logger.info("Building node...")
     node_folder = testnet_config.node_source() / "cmd" / "node"
-    myprocess.run_process(['go', 'build'], cwd=node_folder, env=golang_env)
-
-    wasm_vm_binary = testnet_config.wasm_vm_binary()
-    if wasm_vm_binary:
-        logger.warn("WASM VM does not require building anymore. Skipping...")
-
-    logger.info("Building proxy...")
     proxy_folder = testnet_config.proxy_source() / "cmd" / "proxy"
-    myprocess.run_process(['go', 'build'], cwd=proxy_folder, env=golang_env)
 
-    # Now copy the binaries to the testnet folder
     wasm_vm_package = _get_wasm_vm_package(testnet_config)
-    libwasmer_osx_path = Path(golang.get_gopath()) / "pkg" / "mod" / wasm_vm_package / "wasmer" / "libwasmer_darwin_amd64.dylib"
+    libwasmer_osx_path = gopath / "pkg" / "mod" / wasm_vm_package / "wasmer" / "libwasmer_darwin_amd64.dylib"
 
     shutil.copy(seednode_folder / "seednode", testnet_config.seednode_folder())
     if workstation.get_platform() == "osx":
