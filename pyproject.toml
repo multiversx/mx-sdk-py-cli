@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "multiversx-sdk-cli"
-version = "6.1.0"
+version = "6.1.1"
 authors = [
   { name="MultiversX" },
 ]
@@ -26,8 +26,8 @@ dependencies = [
   "semver",
   "requests-cache",
   "multiversx-sdk-network-providers==0.6.*",
-  "multiversx-sdk-wallet==0.5.*",
-  "multiversx-sdk-core==0.3.*"
+  "multiversx-sdk-wallet==0.6.*",
+  "multiversx-sdk-core>=0.4.1"
 ]
 
 [tool.hatch.build]
