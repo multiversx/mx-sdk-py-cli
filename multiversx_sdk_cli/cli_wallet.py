@@ -176,7 +176,7 @@ def convert_wallet(args: Any):
     if infile:
         input_text = infile.read_text()
     else:
-        print(f"Press 'Ctrl-D' (Linux / MacOS) or 'Ctrl-Z' (Windows) when done.")
+        print(f"Insert text below. Press 'Ctrl-D' (Linux / MacOS) or 'Ctrl-Z' (Windows) when done.")
         input_text = sys.stdin.read().strip()
 
     mnemonic, secret_key = _load_wallet(input_text, in_format, address_index)
@@ -212,7 +212,7 @@ def _load_wallet(input_text: str, in_format: str, address_index: int) -> Tuple[O
         secret_key = UserPEM.from_text(input_text, address_index).secret_key
         return None, secret_key
 
-    raise KnownError(f"Cannot load wallet, unknown input format: {in_format}")
+    raise KnownError(f"Cannot load wallet, unknown input format: <{in_format}>. Make sure to use one of following: {WALLET_FORMATS}.")
 
 
 def _create_wallet_content(
@@ -254,7 +254,7 @@ def _create_wallet_content(
         pem = UserPEM(address.bech32(), secret_key)
         return pem.to_text()
 
-    raise KnownError(f"Cannot create wallet, unknown output format: {out_format}")
+    raise KnownError(f"Cannot create wallet, unknown output format: <{out_format}>. Make sure to use one of following: {WALLET_FORMATS}.")
 
 
 def wallet_derive_deprecated(args: Any):
