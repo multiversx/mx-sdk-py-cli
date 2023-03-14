@@ -1,9 +1,10 @@
+from pathlib import Path
+
 import pytest
 
 from multiversx_sdk_cli import errors
 from multiversx_sdk_cli.accounts import Account, Address
 from multiversx_sdk_cli.transactions import Transaction
-from multiversx_sdk_cli.workstation import get_tools_folder
 
 
 def test_address():
@@ -34,7 +35,7 @@ def test_address():
 
 
 def test_sign_transaction():
-    alice_pem = get_tools_folder() / "testwallets" / "latest" / "users" / "alice.pem"
+    alice_pem = Path(__file__).parent / "testdata" / "alice.pem"
     alice = Account(pem_file=str(alice_pem))
 
     # With data
@@ -69,7 +70,7 @@ def test_sign_transaction():
 
 
 def test_sign_message():
-    alice_pem = get_tools_folder() / "testwallets" / "latest" / "users" / "alice.pem"
+    alice_pem = Path(__file__).parent / "testdata" / "alice.pem"
     alice = Account(pem_file=str(alice_pem))
 
     message = b"hello"
@@ -77,14 +78,28 @@ def test_sign_message():
     assert signature == "561bc58f1dc6b10de208b2d2c22c9a474ea5e8cabb59c3d3ce06bbda21cc46454aa71a85d5a60442bd7784effa2e062fcb8fb421c521f898abf7f5ec165e5d0f"
 
 
-def test_load_account_from_keystore():
-    alice_json = get_tools_folder() / "testwallets" / "latest" / "users" / "alice.json"
+def test_load_account_from_keystore_without_kind():
+    alice_json = Path(__file__).parent / "testdata" / "alice.json"
     account = Account(key_file=str(alice_json), password="password")
     assert account.address.bech32() == "erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th"
 
-
-def test_load_account_from_keystore_with_wrong_password():
-    alice_json = get_tools_folder() / "testwallets" / "latest" / "users" / "alice.json"
-
     with pytest.raises(Exception):
         _ = Account(key_file=str(alice_json), password="wrong_password")
+
+
+def test_load_account_from_keystore_with_kind_secret_key():
+    keystore_path = Path(__file__).parent / "testdata" / "aliceWithKindSecretKey.json"
+    account = Account(key_file=str(keystore_path), password="password")
+    assert account.address.bech32() == "erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th"
+
+    with pytest.raises(Exception):
+        _ = Account(key_file=str(keystore_path), password="wrong_password")
+
+
+def test_load_account_from_keystore_with_kind_mnemonic():
+    keystore_path = Path(__file__).parent / "testdata" / "withDummyMnemonic.json"
+    account = Account(key_file=str(keystore_path), password="password")
+    assert account.address.bech32() == "erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th"
+
+    with pytest.raises(Exception):
+        _ = Account(key_file=str(keystore_path), password="wrong_password")
