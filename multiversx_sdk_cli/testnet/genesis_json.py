@@ -1,19 +1,20 @@
-from typing import Any, List
+from typing import Any, Dict, List
 
 from multiversx_sdk_cli.accounts import Account, Address
 from multiversx_sdk_cli.testnet import wallets
 from multiversx_sdk_cli.testnet.config import TestnetConfiguration
 from multiversx_sdk_cli.testnet.genesis import (get_delegation_address,
-                                   is_foundational_node, is_last_user)
+                                                is_foundational_node,
+                                                is_last_user)
 
 ENTIRE_SUPPLY = 20000000000000000000000000
 # For testnet, we delegate for 1 node
 DELEGATED_VALUE = 2500000000000000000000
 
 
-def build(testnet_config: TestnetConfiguration) -> List[Any]:
-    num_validators = testnet_config.num_all_validators()
-    genesis_items = []
+def build(config: TestnetConfiguration) -> List[Any]:
+    num_validators = config.num_all_validators()
+    genesis_items: List[Dict[str, Any]] = []
     remaining_supply = ENTIRE_SUPPLY
     remaining_to_delegate = DELEGATED_VALUE
     delegation_address = get_delegation_address()
@@ -39,7 +40,7 @@ def build(testnet_config: TestnetConfiguration) -> List[Any]:
     return genesis_items
 
 
-def _build_validator_entry(nickname: str, account: Account, value: int):
+def _build_validator_entry(nickname: str, account: Account, value: int) -> Dict[str, Any]:
     return {
         "nickname": nickname,
         "address": account.address.bech32(),
@@ -53,7 +54,7 @@ def _build_validator_entry(nickname: str, account: Account, value: int):
     }
 
 
-def _build_user_entry(nickname: str, account: Account, value: int, delegated_value: int, delegation_address: Address):
+def _build_user_entry(nickname: str, account: Account, value: int, delegated_value: int, delegation_address: Address) -> Dict[str, Any]:
     return {
         "nickname": nickname,
         "address": account.address.bech32(),

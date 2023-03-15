@@ -26,39 +26,37 @@ def start(args: Any):
 
 
 async def do_start(args: Any):
-    testnet_config = TestnetConfiguration.from_file(args.configfile)
-    logger.info('testnet folder is %s', testnet_config.root())
+    config = TestnetConfiguration.from_file(args.configfile)
+    logger.info('testnet folder is %s', config.root())
 
     to_run: List[Coroutine[Any, Any, None]] = []
 
     # Seed node
-    to_run.append(run(["./seednode", "--log-save"], cwd=testnet_config.seednode_folder()))
+    to_run.append(run(["./seednode", "--log-save"], cwd=config.seednode_folder()))
 
-    loglevel = _patch_loglevel(testnet_config.loglevel())
+    loglevel = _patch_loglevel(config.general.log_level)
     logger.info(f"loglevel: {loglevel}")
 
     # Observers
-    for observer in testnet_config.observers():
+    for observer in config.observers():
         to_run.append(run([
             "./node",
             "--use-log-view",
             "--log-save",
             f"--log-level={loglevel}",
             "--log-logger-name",
-            "--log-correlation",
             f"--destination-shard-as-observer={observer.shard}",
             f"--rest-api-interface=localhost:{observer.api_port}"
         ], cwd=observer.folder, delay=NODES_START_DELAY))
 
     # Validators
-    for validator in testnet_config.validators():
+    for validator in config.validators():
         to_run.append(run([
             "./node",
             "--use-log-view",
             "--log-save",
             f"--log-level={loglevel}",
             "--log-logger-name",
-            "--log-correlation",
             f"--rest-api-interface=localhost:{validator.api_port}"
         ], cwd=validator.folder, delay=NODES_START_DELAY))
 
@@ -66,7 +64,7 @@ async def do_start(args: Any):
     to_run.append(run([
         "./proxy",
         "--log-save"
-    ], cwd=testnet_config.proxy_folder(), delay=PROXY_START_DELAY))
+    ], cwd=config.proxy_folder(), delay=PROXY_START_DELAY))
 
     await asyncio.gather(*to_run)
 
