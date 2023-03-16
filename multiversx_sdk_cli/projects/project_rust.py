@@ -4,8 +4,7 @@ from os import path
 from pathlib import Path
 from typing import Any, Dict, List, Set, cast
 
-from multiversx_sdk_cli import (dependencies, errors, myprocess, utils,
-                                workstation)
+from multiversx_sdk_cli import dependencies, errors, utils, workstation
 from multiversx_sdk_cli.constants import DEFAULT_CARGO_TARGET_DIR_NAME
 from multiversx_sdk_cli.projects.project_base import Project
 
@@ -73,7 +72,7 @@ class ProjectRust(Project):
         self.prepare_build_wasm_args(args)
         self.decorate_cargo_args(args)
 
-        return_code = myprocess.run_process_async(args, env=env, cwd=str(cwd))
+        return_code = subprocess.check_call(args, env=env, cwd=cwd)
         if return_code != 0:
             raise errors.BuildError(f"error code = {return_code}, see output")
 
@@ -159,7 +158,7 @@ class ProjectRust(Project):
             "--target-dir", target_dir
         ]
 
-        return_code = myprocess.run_process_async(args, env=env, cwd=str(cwd))
+        return_code = subprocess.check_call(args, env=env, cwd=cwd)
         if return_code != 0:
             raise errors.BuildError(f"error code = {return_code}, see output")
 
