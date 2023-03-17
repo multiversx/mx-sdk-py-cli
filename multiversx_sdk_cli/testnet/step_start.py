@@ -72,6 +72,8 @@ async def do_start(args: Any):
 async def run(args: List[str], cwd: Path, delay: int = 0):
     await asyncio.sleep(delay)
 
+    logger.info("Starting process", args, "in folder", cwd)
+
     process = await asyncio.create_subprocess_exec(*args, stdout=asyncio.subprocess.PIPE,
                                                    stderr=asyncio.subprocess.PIPE, cwd=cwd, limit=1024 * 512)
 
