@@ -1,5 +1,6 @@
 import asyncio
 import logging
+import os
 import traceback
 from pathlib import Path
 from typing import Any, Coroutine, List
@@ -72,10 +73,14 @@ async def do_start(args: Any):
 async def run(args: List[str], cwd: Path, delay: int = 0):
     await asyncio.sleep(delay)
 
-    logger.info("Starting process", args, "in folder", cwd)
+    logger.info(f"Starting process {args} in folder {cwd}")
+
+    # TODO: Fix this. Useful for Linux, but not for Mac
+    env = os.environ.copy()
+    env["LD_LIBRARY_PATH"] = str(cwd)
 
     process = await asyncio.create_subprocess_exec(*args, stdout=asyncio.subprocess.PIPE,
-                                                   stderr=asyncio.subprocess.PIPE, cwd=cwd, limit=1024 * 512)
+                                                   stderr=asyncio.subprocess.PIPE, cwd=cwd, limit=1024 * 512, env=env)
 
     pid = process.pid
 
