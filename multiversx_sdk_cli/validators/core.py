@@ -2,7 +2,8 @@ import logging
 from pathlib import Path
 from typing import Any, List, Tuple, Union
 
-from multiversx_sdk_core.message import Message
+from multiversx_sdk_core import ArbitraryMessage
+from multiversx_sdk_wallet.validator_pem import ValidatorPEM
 from multiversx_sdk_wallet.validator_signer import ValidatorSigner
 
 from multiversx_sdk_cli import utils
@@ -13,7 +14,6 @@ from multiversx_sdk_cli.config import (GAS_PER_DATA_BYTE, MIN_GAS_LIMIT,
 from multiversx_sdk_cli.contracts import SmartContract
 from multiversx_sdk_cli.errors import BadUsage
 from multiversx_sdk_cli.validators.validators_file import ValidatorsFile
-from multiversx_sdk_wallet.validator_pem import ValidatorPEM
 
 logger = logging.getLogger("validators")
 
@@ -60,7 +60,7 @@ def prepare_transaction_data_for_stake(node_operator_address: Address, validator
         pem_file = ValidatorPEM.from_file(validator_pem)
 
         validator_signer = ValidatorSigner(pem_file.secret_key)
-        message = Message(bytes.fromhex(node_operator_address.hex()))
+        message = ArbitraryMessage(bytes.fromhex(node_operator_address.hex()))
 
         signed_message = validator_signer.sign(message).hex()
 

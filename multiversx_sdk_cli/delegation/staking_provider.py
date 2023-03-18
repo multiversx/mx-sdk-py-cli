@@ -2,7 +2,8 @@ import binascii
 from pathlib import Path
 from typing import Any
 
-from multiversx_sdk_core.message import Message
+from multiversx_sdk_core import ArbitraryMessage
+from multiversx_sdk_wallet.validator_pem import ValidatorPEM
 from multiversx_sdk_wallet.validator_signer import ValidatorSigner
 
 from multiversx_sdk_cli import utils
@@ -11,7 +12,6 @@ from multiversx_sdk_cli.cli_password import load_password
 from multiversx_sdk_cli.config import MetaChainSystemSCsCost
 from multiversx_sdk_cli.validators.core import estimate_system_sc_call
 from multiversx_sdk_cli.validators.validators_file import ValidatorsFile
-from multiversx_sdk_wallet.validator_pem import ValidatorPEM
 
 DELEGATION_MANAGER_SC_ADDRESS = "erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqylllslmq6y6"
 
@@ -52,7 +52,7 @@ def prepare_args_for_add_nodes(args: Any):
         pem_file = ValidatorPEM.from_file(validator_pem)
 
         validator_signer = ValidatorSigner(pem_file.secret_key)
-        message = Message(bytes.fromhex(account.address.hex()))
+        message = ArbitraryMessage(bytes.fromhex(account.address.hex()))
 
         signed_message = validator_signer.sign(message).hex()
 
