@@ -262,15 +262,11 @@ def get_mxpy_shortcut_content():
 
     if operating_system == "windows":
         return f"""#!/bin/sh
-. "{venv_path / 'Scripts' / 'activate'}"
-python3 -m multiversx_sdk_cli.cli "$@" || exit /b 1
-deactivate
+. "{venv_path / 'Scripts' / 'activate'}" && python3 -m multiversx_sdk_cli.cli "$@" && deactivate
 """
 
     return f"""#!/bin/sh
-. "{venv_path / 'bin' / 'activate'}"
-python3 -m multiversx_sdk_cli.cli "$@" || exit 1
-deactivate
+. "{venv_path / 'bin' / 'activate'}" && python3 -m multiversx_sdk_cli.cli "$@" && deactivate
 """
 
 
