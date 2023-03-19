@@ -99,11 +99,12 @@ def get_operating_system():
 
 def migrate_old_elrondsdk() -> None:
     old_sdk_path = Path("~/elrondsdk").expanduser().resolve()
-    if old_sdk_path.exists():
-        old_sdk_path.rename(sdk_path)
-        logger.info(f"Renamed {old_sdk_path} to {sdk_path}.")
-    else:
-        logger.info(f"Old SDK path does not exist: {old_sdk_path}.")
+    if not old_sdk_path.exists():
+        logger.info("Old SDK path does not exist.")
+        return
+
+    old_sdk_path.rename(sdk_path)
+    logger.info(f"Renamed {old_sdk_path} to {sdk_path}.")
 
     # Remove erdpy-venv (since mxpy-venv is used instead).
     old_venv = sdk_path / "erdpy-venv"
