@@ -27,7 +27,7 @@ dependencies = [
   "requests-cache",
   "multiversx-sdk-network-providers==0.6.*",
   "multiversx-sdk-wallet==0.6.*",
-  "multiversx-sdk-core>=0.4.1"
+  "multiversx-sdk-core==0.3.*"
 ]
 
 [tool.hatch.build]
