@@ -66,5 +66,6 @@ def patch_enable_epochs(data: ConfigDict, config: TestnetConfiguration):
     enable_epochs['FixOOGReturnCodeEnableEpoch'] = 0
     enable_epochs['CorrectFirstQueuedEpoch'] = 0
     enable_epochs['MetaESDTSetEnableEpoch'] = 0
+    enable_epochs['DelegationManagerEnableEpoch'] = 0
 
     data['EnableEpochs'].update(enable_epochs)
