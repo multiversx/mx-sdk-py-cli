@@ -20,7 +20,7 @@ https://docs.multiversx.com/sdk-and-tools/mxpy.
         
 
 COMMAND GROUPS:
-  {contract,tx,validator,account,ledger,wallet,network,deps,config,hyperblock,testnet,data,staking-provider,dns}
+  {contract,tx,validator,account,ledger,wallet,network,deps,config,hyperblock,localnet,data,staking-provider,dns}
 
 TOP-LEVEL OPTIONS:
   -h, --help            show this help message and exit
@@ -40,7 +40,7 @@ network                        Get Network parameters, such as number of shards,
 deps                           Manage dependencies or multiversx-sdk modules
 config                         Configure multiversx-sdk (default values etc.)
 hyperblock                     Get Hyperblock from the Network
-testnet                        Set up, start and control local testnets
+localnet                       Set up, start and control localnets
 data                           Data manipulation omnitool
 staking-provider               Staking provider omnitool
 dns                            Operations related to the Domain Name Service
@@ -1018,76 +1018,90 @@ optional arguments:
   --decode    whether to decode
 
 ```
-## Group **Testnet**
+## Group **Localnet**
 
 
 ```
-$ mxpy testnet --help
-usage: mxpy testnet COMMAND [-h] ...
+$ mxpy localnet --help
+usage: mxpy localnet COMMAND [-h] ...
 
-Set up, start and control local testnets
+Set up, start and control localnets
 
 COMMANDS:
-  {prerequisites,start,config,clean}
+  {prerequisites,build,start,config,clean}
 
 OPTIONS:
   -h, --help            show this help message and exit
 
 ```
-### Testnet.Prerequisites
+### Localnet.Prerequisites
 
 
 ```
-$ mxpy testnet prerequisites --help
-usage: mxpy testnet prerequisites [-h] ...
+$ mxpy localnet prerequisites --help
+usage: mxpy localnet prerequisites [-h] ...
 
-Download and verify the prerequisites for running a testnet
+Download and verify the prerequisites for running a localnet
 
 optional arguments:
   -h, --help               show this help message and exit
-  --configfile CONFIGFILE  An optional configuration file describing the testnet
+  --configfile CONFIGFILE  An optional configuration file describing the localnet
 
 ```
-### Testnet.Config
+### Localnet.Build
 
 
 ```
-$ mxpy testnet config --help
-usage: mxpy testnet config [-h] ...
+$ mxpy localnet build --help
+usage: mxpy localnet build [-h] ...
 
-Configure a testnet (required before starting it the first time or after clean)
+Build necessary software for running a localnet
 
 optional arguments:
   -h, --help               show this help message and exit
-  --configfile CONFIGFILE  An optional configuration file describing the testnet
+  --configfile CONFIGFILE  An optional configuration file describing the localnet
 
 ```
-### Testnet.Start
+### Localnet.Config
 
 
 ```
-$ mxpy testnet start --help
-usage: mxpy testnet start [-h] ...
+$ mxpy localnet config --help
+usage: mxpy localnet config [-h] ...
 
-Start a testnet
+Configure a localnet (required before starting it the first time or after clean)
 
 optional arguments:
   -h, --help               show this help message and exit
-  --configfile CONFIGFILE  An optional configuration file describing the testnet
+  --configfile CONFIGFILE  An optional configuration file describing the localnet
 
 ```
-### Testnet.Clean
+### Localnet.Start
 
 
 ```
-$ mxpy testnet clean --help
-usage: mxpy testnet clean [-h] ...
+$ mxpy localnet start --help
+usage: mxpy localnet start [-h] ...
 
-Erase the currently configured testnet (must be already stopped)
+Start a localnet
 
 optional arguments:
   -h, --help               show this help message and exit
-  --configfile CONFIGFILE  An optional configuration file describing the testnet
+  --configfile CONFIGFILE  An optional configuration file describing the localnet
+
+```
+### Localnet.Clean
+
+
+```
+$ mxpy localnet clean --help
+usage: mxpy localnet clean [-h] ...
+
+Erase the currently configured localnet (must be already stopped)
+
+optional arguments:
+  -h, --help               show this help message and exit
+  --configfile CONFIGFILE  An optional configuration file describing the localnet
 
 ```
 ## Group **Network**
