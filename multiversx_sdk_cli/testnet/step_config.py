@@ -12,12 +12,12 @@ from multiversx_sdk_cli.testnet import (genesis_json,
                                         p2p_toml, wallets)
 from multiversx_sdk_cli.testnet.config import TestnetConfiguration
 
-logger = logging.getLogger("testnet")
+logger = logging.getLogger("localnet")
 
 
 def configure(args: Any):
     config = TestnetConfiguration.from_file(args.configfile)
-    logger.info('testnet folder is %s', config.root())
+    logger.info("localnet folder is %s", config.root())
 
     create_folders(config)
 

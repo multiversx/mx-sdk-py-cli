@@ -37,11 +37,11 @@ jobs:
         run: |
           mkdir ~/multiversx-sdk
           export PYTHONPATH=.
-          python3 -m multiversx_sdk_cli.cli testnet prerequisites --configfile=./multiversx_sdk_cli/tests/testdata/testnets/localnet.toml
-          python3 -m multiversx_sdk_cli.cli testnet build --configfile=./multiversx_sdk_cli/tests/testdata/testnets/localnet.toml
-          python3 -m multiversx_sdk_cli.cli testnet config --configfile=./multiversx_sdk_cli/tests/testdata/testnets/localnet.toml
+          python3 -m multiversx_sdk_cli.cli localnet prerequisites --configfile=./multiversx_sdk_cli/tests/testdata/localnet.toml
+          python3 -m multiversx_sdk_cli.cli localnet build --configfile=./multiversx_sdk_cli/tests/testdata/localnet.toml
+          python3 -m multiversx_sdk_cli.cli localnet config --configfile=./multiversx_sdk_cli/tests/testdata/localnet.toml
           
-          # Leave the testnet to run for some time, then assert for "time out error" (124).
-          timeout 1m python3 -m multiversx_sdk_cli.cli testnet start --configfile=./multiversx_sdk_cli/tests/testdata/testnets/localnet.toml || \
+          # Leave the localnet to run for some time, then assert for "time out error" (124).
+          timeout 1m python3 -m multiversx_sdk_cli.cli localnet start --configfile=./multiversx_sdk_cli/tests/testdata/localnet.toml || \
           test $? -eq 124 || \
           echo "Timeout error expected, but something else happened."

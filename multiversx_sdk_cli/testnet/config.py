@@ -6,7 +6,7 @@ from typing import Any, Dict, List
 import multiversx_sdk_cli.utils as utils
 from multiversx_sdk_cli.testnet import config_default
 
-logger = logging.getLogger("testnet")
+logger = logging.getLogger("localnet")
 
 
 class Node:
@@ -42,9 +42,8 @@ class TestnetConfiguration:
         self.networking.override(other.get("networking", dict()))
 
     @classmethod
-    def from_file(cls, filename: str):
-        # TODO use path
-        path = Path(filename or "testnet.toml").expanduser().resolve()
+    def from_file(cls, path: Path):
+        path = path.expanduser().resolve()
         instance = cls()
         local_config_dict = utils.read_toml_file(path)
         instance.override(local_config_dict)
@@ -52,7 +51,7 @@ class TestnetConfiguration:
         return instance
 
     def root(self) -> Path:
-        return Path("testnet").resolve()
+        return Path("localnet").resolve()
 
     def seednode_folder(self):
         return self.root() / "seednode"

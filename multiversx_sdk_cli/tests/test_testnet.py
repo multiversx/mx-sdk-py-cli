@@ -1,73 +1,48 @@
 import os
 import sys
-from pathlib import Path
+from typing import Any, Dict
 
-import multiversx_sdk_cli.config
-from multiversx_sdk_cli import workstation
-from multiversx_sdk_cli.testnet import config
+from multiversx_sdk_cli.testnet.config import TestnetConfiguration
+from multiversx_sdk_cli.testnet.config_software import SoftwareResolution
 
-sys.path = [os.getcwd() + '/..'] + sys.path
+sys.path = [os.getcwd() + "/.."] + sys.path
 
 
-def test_merge_configs():
-    left = dict()
-    left['networking'] = {
-        'port_proxy': 7950,
-        'port_seednode_port': 9999,
-        'somekey': 'somestring',
-    }
-    left['metashard'] = {
-        'metashardID': 4294967295,
-        'observers': 0,
-        'validators': 1,
-    }
+def test_override_config():
+    config = TestnetConfiguration()
 
-    right = dict()
-    right['metashard'] = {
-        'consensus_size': 1,
-        'metashardID': 4294967295,
-        'validators': 4,
-    }
-    right['timing'] = {
-        'genesis_delay': 30,
-    }
+    # Check a few default values
+    assert config.general.rounds_per_epoch == 100
+    assert config.general.round_duration_milliseconds == 6000
+    assert config.metashard.consensus_size == 1
+    assert config.networking.port_proxy == 7950
+    assert config.software.resolution == SoftwareResolution.RemoteArchives
+    assert config.software.remote_archives.mx_chain_go == "https://github.com/multiversx/mx-chain-go/archive/refs/heads/master.zip"
 
-    expected_merged = dict()
-    expected_merged['metashard'] = {
-        'consensus_size': 1,
-        'metashardID': 4294967295,
-        'observers': 0,
-        'validators': 4,
+    # Now partly override the config
+    config_patch: Dict[str, Any] = dict()
+    config_patch["general"] = {
+        "rounds_per_epoch": 200,
+        "round_duration_milliseconds": 4000,
     }
-    expected_merged['timing'] = {
-        'genesis_delay': 30
+    config_patch["metashard"] = {
+        "consensus_size": 2,
     }
-    expected_merged['networking'] = {
-        'port_proxy': 7950,
-        'port_seednode_port': 9999,
-        'somekey': 'somestring',
+    config_patch["networking"] = {
+        "port_proxy": 7951,
+    }
+    config_patch["software"] = {
+        "remote_archives": {
+            "mx_chain_go": "https://github.com/multiversx/mx-chain-go/archive/refs/tags/v1.5.1.zip"
+        }
     }
 
-    result_merged = config.merge_configs(left, right)
-    assert expected_merged == result_merged
+    config.override(config_patch)
 
-
-def test_init():
-    data = dict()
-    data['folders'] = {
-        'mx_chain_go': '{MULTIVERSX_SDK}/bar',
-        'mx_chain_proxy_go': '{MULTIVERSX_SDK}/foobar',
-        'testnet': '/some/where/mytestnet',
-    }
-
-    sdk_folder = workstation.get_tools_folder()
-    node_folder = multiversx_sdk_cli.config.get_dependency_parent_directory('mx_chain_go')
-    (node_folder / 'v1.2.3').mkdir(parents=True, exist_ok=True)
-
-    proxy_folder = multiversx_sdk_cli.config.get_dependency_parent_directory('mx_chain_proxy_go')
-    (proxy_folder / 'v2.3.4').mkdir(parents=True, exist_ok=True)
-
-    testnet_config = config.TestnetConfiguration(data)
-    assert testnet_config.folders["mx_chain_go"] == sdk_folder / "bar"
-    assert testnet_config.folders["mx_chain_proxy_go"] == sdk_folder / "foobar"
-    assert testnet_config.folders["testnet"] == Path("/some/where/mytestnet")
+    # Check the overridden values
+    assert config.general.rounds_per_epoch == 200
+    assert config.general.round_duration_milliseconds == 4000
+    assert config.metashard.consensus_size == 2
+    assert config.networking.port_proxy == 7951
+    assert config.software.resolution == SoftwareResolution.RemoteArchives
+    assert config.software.remote_archives.mx_chain_go == "https://github.com/multiversx/mx-chain-go/archive/refs/tags/v1.5.1.zip"

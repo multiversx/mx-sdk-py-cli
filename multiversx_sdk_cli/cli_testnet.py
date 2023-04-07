@@ -1,4 +1,5 @@
 import logging
+from pathlib import Path
 from typing import Any, List
 
 from multiversx_sdk_cli import cli_shared
@@ -12,84 +13,87 @@ logger = logging.getLogger("cli.testnet")
 def setup_parser(args: List[str], subparsers: Any) -> Any:
     parser = cli_shared.add_group_subparser(
         subparsers,
-        "testnet",
+        "localnet",
         "Set up, start and control local testnets"
     )
     subparsers = parser.add_subparsers()
 
-    help_config_file = "An optional configuration file describing the testnet"
-
     # Prerequisites
     sub = cli_shared.add_command_subparser(
         subparsers,
-        "testnet",
+        "localnet",
         "prerequisites",
         "Download and verify the prerequisites for running a testnet"
     )
-    sub.add_argument("--configfile", type=str, required=False, default=None, help=help_config_file)
-    sub.set_defaults(func=testnet_prerequisites)
+    add_argument_configfile(sub)
+    sub.set_defaults(func=localnet_prerequisites)
 
     # Build
     sub = cli_shared.add_command_subparser(
         subparsers,
-        "testnet",
+        "localnet",
         "build",
         "Build necessary software for running a testnet"
     )
-    sub.add_argument("--configfile", type=str, required=False, default=None, help=help_config_file)
-    sub.set_defaults(func=testnet_build)
+    add_argument_configfile(sub)
+    sub.set_defaults(func=localnet_build)
 
     # Start
     sub = cli_shared.add_command_subparser(
         subparsers,
-        "testnet",
+        "localnet",
         "start",
-        "Start a testnet"
+        "Start a localnet"
     )
-    sub.add_argument("--configfile", type=str, required=False, default=None, help=help_config_file)
-    sub.set_defaults(func=testnet_start)
+    add_argument_configfile(sub)
+    sub.set_defaults(func=localnet_start)
 
     # Config
     sub = cli_shared.add_command_subparser(
         subparsers,
-        "testnet",
+        "localnet",
         "config",
-        "Configure a testnet (required before starting it the first time or after clean)"
+        "Configure a localnet (required before starting it the first time or after clean)"
     )
-    sub.add_argument("--configfile", type=str, required=False, default=None, help=help_config_file)
-    sub.set_defaults(func=testnet_config)
+    add_argument_configfile(sub)
+    sub.set_defaults(func=localnet_config)
 
     # Clean
     sub = cli_shared.add_command_subparser(
         subparsers,
-        "testnet",
+        "localnet",
         "clean",
-        "Erase the currently configured testnet (must be already stopped)"
+        "Erase the currently configured localnet (must be already stopped)"
     )
-    sub.add_argument("--configfile", type=str, required=False, default=None, help=help_config_file)
-    sub.set_defaults(func=testnet_clean)
+    add_argument_configfile(sub)
+    sub.set_defaults(func=localnet_clean)
 
 
-def testnet_clean(args: Any):
-    logger.info("Cleaning testnet...")
+def add_argument_configfile(parser: Any):
+    help_config_file = "An optional configuration file describing the localnet"
+    parser.add_argument("--configfile", type=Path, required=False, default=Path("localnet.toml"), help=help_config_file)
+
+
+def localnet_clean(args: Any):
+    logger.info("Cleaning localnet...")
     step_clean.clean(args)
 
 
-def testnet_prerequisites(args: Any):
+def localnet_prerequisites(args: Any):
     logger.info("Gathering prerequisites...")
     step_prerequisites.prepare(args)
 
 
-def testnet_build(args: Any):
+def localnet_build(args: Any):
     logger.info("Building binaries...")
     step_build_software.build(args)
 
 
-def testnet_config(args: Any):
-    logger.info("Configuring testnet...")
+def localnet_config(args: Any):
+    logger.info("Configuring localnet...")
     step_config.configure(args)
 
 
-def testnet_start(args: Any):
-    logger.info("Starting testnet...")
+def localnet_start(args: Any):
+    logger.info("Starting localnet...")
     step_start.start(args)

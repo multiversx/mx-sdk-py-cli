@@ -8,7 +8,7 @@ from multiversx_sdk_cli.errors import KnownError
 from multiversx_sdk_cli.testnet.config import TestnetConfiguration
 from multiversx_sdk_cli.testnet.config_software import SoftwareResolution
 
-logger = logging.getLogger("testnet")
+logger = logging.getLogger("localnet")
 
 
 def prepare(args: Any):

@@ -9,11 +9,10 @@ from multiversx_sdk_cli.errors import KnownError
 from multiversx_sdk_cli.testnet.config import TestnetConfiguration
 from multiversx_sdk_cli.testnet.config_software import SoftwareResolution
 
-logger = logging.getLogger("testnet")
+logger = logging.getLogger("localnet")
 
 
 def build(args: Any):
-
     config = TestnetConfiguration.from_file(args.configfile)
     resolution = config.software.resolution
 

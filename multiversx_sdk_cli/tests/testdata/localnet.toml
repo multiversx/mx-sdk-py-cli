@@ -1,0 +1,4 @@
+[general]
+log_level = "*:DEBUG"
+rounds_per_epoch = 40
+round_duration_milliseconds = 3000

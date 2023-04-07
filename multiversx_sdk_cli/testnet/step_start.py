@@ -7,7 +7,7 @@ from typing import Any, Coroutine, List
 
 from multiversx_sdk_cli.testnet.config import TestnetConfiguration
 
-logger = logging.getLogger("testnet")
+logger = logging.getLogger("localnet")
 
 
 NODES_START_DELAY = 1

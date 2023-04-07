@@ -76,11 +76,12 @@ generate() {
     command "Wallet.Convert" "wallet convert"
     command "Wallet.Bech32" "wallet bech32"
 
-    group "Testnet" "testnet"
-    command "Testnet.Prerequisites" "testnet prerequisites"
-    command "Testnet.Config" "testnet config"
-    command "Testnet.Start" "testnet start"
-    command "Testnet.Clean" "testnet clean"
+    group "Localnet" "localnet"
+    command "Localnet.Prerequisites" "testnet prerequisites"
+    command "Localnet.Build" "testnet build"
+    command "Localnet.Config" "testnet config"
+    command "Localnet.Start" "testnet start"
+    command "Localnet.Clean" "testnet clean"
 
     group "Network" "network"
     command "Network.NumShards" "network num-shards"
