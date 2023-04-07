@@ -1,18 +1,18 @@
 from typing import Any, Dict, List
 
 from multiversx_sdk_cli.accounts import Account, Address
-from multiversx_sdk_cli.testnet import wallets
-from multiversx_sdk_cli.testnet.config import TestnetConfiguration
-from multiversx_sdk_cli.testnet.genesis import (get_delegation_address,
-                                                is_foundational_node,
-                                                is_last_user)
+from multiversx_sdk_cli.localnet import wallets
+from multiversx_sdk_cli.localnet.config import LocalnetConfiguration
+from multiversx_sdk_cli.localnet.genesis import (get_delegation_address,
+                                                 is_foundational_node,
+                                                 is_last_user)
 
 ENTIRE_SUPPLY = 20000000000000000000000000
-# For testnet, we delegate for 1 node
+# For localnet, we delegate for 1 node
 DELEGATED_VALUE = 2500000000000000000000
 
 
-def build(config: TestnetConfiguration) -> List[Any]:
+def build(config: LocalnetConfiguration) -> List[Any]:
     num_validators = config.num_all_validators()
     genesis_items: List[Dict[str, Any]] = []
     remaining_supply = ENTIRE_SUPPLY

@@ -1,9 +1,10 @@
 from pathlib import Path
 
-from multiversx_sdk_cli.testnet.config_general import General
-from multiversx_sdk_cli.testnet.config_networking import Networking
-from multiversx_sdk_cli.testnet.config_sharding import Metashard, RegularShards
-from multiversx_sdk_cli.testnet.config_software import (
+from multiversx_sdk_cli.localnet.config_general import General
+from multiversx_sdk_cli.localnet.config_networking import Networking
+from multiversx_sdk_cli.localnet.config_sharding import (Metashard,
+                                                         RegularShards)
+from multiversx_sdk_cli.localnet.config_software import (
     Software, SoftwareLocalPrebuiltCmdFolders, SoftwareLocalSourceFolders,
     SoftwareRemoteArchives, SoftwareResolution)
 
@@ -17,7 +18,7 @@ general = General(
 software = Software(
     resolution=SoftwareResolution.RemoteArchives,
     remote_archives=SoftwareRemoteArchives(
-        downloads_folder=Path("~/multiversx-sdk").expanduser().resolve() / "testnet_software_archives",
+        downloads_folder=Path("~/multiversx-sdk").expanduser().resolve() / "localnet_software_archives",
         mx_chain_go="https://github.com/multiversx/mx-chain-go/archive/refs/heads/master.zip",
         mx_chain_proxy_go="https://github.com/multiversx/mx-chain-proxy-go/archive/refs/heads/master.zip"
     ),

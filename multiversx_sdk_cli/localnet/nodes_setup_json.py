@@ -1,15 +1,15 @@
 from typing import Any, Dict, List
 
 from multiversx_sdk_cli.accounts import Account
-from multiversx_sdk_cli.testnet import wallets
-from multiversx_sdk_cli.testnet.config import TestnetConfiguration
-from multiversx_sdk_cli.testnet.genesis import (get_delegation_address,
-                                                is_foundational_node)
+from multiversx_sdk_cli.localnet import wallets
+from multiversx_sdk_cli.localnet.config import LocalnetConfiguration
+from multiversx_sdk_cli.localnet.genesis import (get_delegation_address,
+                                                 is_foundational_node)
 
-CHAIN_ID = "local-testnet"
+CHAIN_ID = "localnet"
 
 
-def build(config: TestnetConfiguration) -> Any:
+def build(config: LocalnetConfiguration) -> Any:
     num_validators = config.num_all_validators()
     initial_nodes: List[Dict[str, str]] = []
 

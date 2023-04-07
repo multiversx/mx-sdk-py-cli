@@ -3,18 +3,18 @@ from pathlib import Path
 from typing import Any, List
 
 from multiversx_sdk_cli import cli_shared
-from multiversx_sdk_cli.testnet import (step_build_software, step_clean,
-                                        step_config, step_prerequisites,
-                                        step_start)
+from multiversx_sdk_cli.localnet import (step_build_software, step_clean,
+                                         step_config, step_prerequisites,
+                                         step_start)
 
-logger = logging.getLogger("cli.testnet")
+logger = logging.getLogger("cli.localnet")
 
 
 def setup_parser(args: List[str], subparsers: Any) -> Any:
     parser = cli_shared.add_group_subparser(
         subparsers,
         "localnet",
-        "Set up, start and control local testnets"
+        "Set up, start and control localnets"
     )
     subparsers = parser.add_subparsers()
 
@@ -23,7 +23,7 @@ def setup_parser(args: List[str], subparsers: Any) -> Any:
         subparsers,
         "localnet",
         "prerequisites",
-        "Download and verify the prerequisites for running a testnet"
+        "Download and verify the prerequisites for running a localnet"
     )
     add_argument_configfile(sub)
     sub.set_defaults(func=localnet_prerequisites)
@@ -33,7 +33,7 @@ def setup_parser(args: List[str], subparsers: Any) -> Any:
         subparsers,
         "localnet",
         "build",
-        "Build necessary software for running a testnet"
+        "Build necessary software for running a localnet"
     )
     add_argument_configfile(sub)
     sub.set_defaults(func=localnet_build)

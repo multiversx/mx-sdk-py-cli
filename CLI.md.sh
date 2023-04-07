@@ -77,11 +77,11 @@ generate() {
     command "Wallet.Bech32" "wallet bech32"
 
     group "Localnet" "localnet"
-    command "Localnet.Prerequisites" "testnet prerequisites"
-    command "Localnet.Build" "testnet build"
-    command "Localnet.Config" "testnet config"
-    command "Localnet.Start" "testnet start"
-    command "Localnet.Clean" "testnet clean"
+    command "Localnet.Prerequisites" "localnet prerequisites"
+    command "Localnet.Build" "localnet build"
+    command "Localnet.Config" "localnet config"
+    command "Localnet.Start" "localnet start"
+    command "Localnet.Clean" "localnet clean"
 
     group "Network" "network"
     command "Network.NumShards" "network num-shards"

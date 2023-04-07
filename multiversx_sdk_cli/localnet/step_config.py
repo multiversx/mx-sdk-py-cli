@@ -6,17 +6,17 @@ from pathlib import Path
 from typing import Any, List
 
 import multiversx_sdk_cli.utils as utils
-from multiversx_sdk_cli.testnet import (genesis_json,
-                                        genesis_smart_contracts_json,
-                                        node_config_toml, nodes_setup_json,
-                                        p2p_toml, wallets)
-from multiversx_sdk_cli.testnet.config import TestnetConfiguration
+from multiversx_sdk_cli.localnet import (genesis_json,
+                                         genesis_smart_contracts_json,
+                                         node_config_toml, nodes_setup_json,
+                                         p2p_toml, wallets)
+from multiversx_sdk_cli.localnet.config import LocalnetConfiguration
 
 logger = logging.getLogger("localnet")
 
 
 def configure(args: Any):
-    config = TestnetConfiguration.from_file(args.configfile)
+    config = LocalnetConfiguration.from_file(args.configfile)
     logger.info("localnet folder is %s", config.root())
 
     create_folders(config)
@@ -62,10 +62,10 @@ def configure(args: Any):
     copy_config_to_proxy(config)
     patch_proxy_config(config)
 
-    copy_binaries_into_testnet_workspace(config)
+    copy_binaries_into_localnet_workspace(config)
 
 
-def create_folders(config: TestnetConfiguration):
+def create_folders(config: LocalnetConfiguration):
     makefolder(config.seednode_folder())
 
     folder = config.proxy_folder()
@@ -76,13 +76,13 @@ def create_folders(config: TestnetConfiguration):
         makefolder(folder)
 
 
-def copy_config_to_nodes(config: TestnetConfiguration):
+def copy_config_to_nodes(config: LocalnetConfiguration):
     config_prototype = config.software.get_node_config_folder()
     for node_config in config.all_nodes_config_folders():
         shutil.copytree(config_prototype, node_config)
 
 
-def copy_validator_keys(config: TestnetConfiguration):
+def copy_validator_keys(config: LocalnetConfiguration):
     for index, validator in enumerate(config.validators()):
         shutil.copy(wallets.get_validator_key_file(index), validator.key_file_path())
 
@@ -91,7 +91,7 @@ def copy_validator_keys(config: TestnetConfiguration):
         shutil.copy(wallets.get_observer_key_file(index), observer.key_file_path())
 
 
-def patch_node_config(config: TestnetConfiguration):
+def patch_node_config(config: LocalnetConfiguration):
     for node_config in config.all_nodes_config_folders():
         node_config_file = node_config / 'config.toml'
         data = utils.read_toml_file(node_config_file)
@@ -114,7 +114,7 @@ def patch_node_config(config: TestnetConfiguration):
         utils.write_json_file(genesis_smart_contracts_file, data)
 
 
-def copy_config_to_seednode(config: TestnetConfiguration):
+def copy_config_to_seednode(config: LocalnetConfiguration):
     config_source = config.software.get_seednode_config_folder()
     seednode_config = config.seednode_config_folder()
     makefolder(seednode_config)
@@ -122,7 +122,7 @@ def copy_config_to_seednode(config: TestnetConfiguration):
     shutil.copy(config_source / 'config.toml', seednode_config / 'config.toml')
 
 
-def patch_seednode_p2p_config(config: TestnetConfiguration):
+def patch_seednode_p2p_config(config: LocalnetConfiguration):
     seednode_config = config.seednode_config_folder()
     seednode_config_file = seednode_config / 'p2p.toml'
 
@@ -131,12 +131,12 @@ def patch_seednode_p2p_config(config: TestnetConfiguration):
     utils.write_toml_file(seednode_config_file, data)
 
 
-def copy_seednode_p2p_key(config: TestnetConfiguration):
+def copy_seednode_p2p_key(config: LocalnetConfiguration):
     p2p_key_path = Path(__file__).parent / "seednode_p2pKey.pem"
     shutil.copy(p2p_key_path, config.seednode_config_folder() / "p2pKey.pem")
 
 
-def patch_nodes_p2p_config(config: TestnetConfiguration, nodes_config_folders: List[Path], port_first: int):
+def patch_nodes_p2p_config(config: LocalnetConfiguration, nodes_config_folders: List[Path], port_first: int):
     for index, config_folder in enumerate(nodes_config_folders):
         config_file = config_folder / 'p2p.toml'
         data = utils.read_toml_file(config_file)
@@ -144,21 +144,21 @@ def patch_nodes_p2p_config(config: TestnetConfiguration, nodes_config_folders: L
         utils.write_toml_file(config_file, data)
 
 
-def overwrite_nodes_setup(config: TestnetConfiguration, nodes_config_folders: List[Path]):
+def overwrite_nodes_setup(config: LocalnetConfiguration, nodes_config_folders: List[Path]):
     nodes_setup = nodes_setup_json.build(config)
 
     for _, config_folder in enumerate(nodes_config_folders):
         utils.write_json_file(config_folder / 'nodesSetup.json', nodes_setup)
 
 
-def overwrite_genesis_file(config: TestnetConfiguration, nodes_config_folders: List[Path]):
+def overwrite_genesis_file(config: LocalnetConfiguration, nodes_config_folders: List[Path]):
     genesis = genesis_json.build(config)
 
     for _, config_folder in enumerate(nodes_config_folders):
         utils.write_json_file(config_folder / 'genesis.json', genesis)
 
 
-def copy_config_to_proxy(config: TestnetConfiguration):
+def copy_config_to_proxy(config: LocalnetConfiguration):
     config_prototype = config.software.get_proxy_config_folder()
     proxy_config = config.proxy_config_folder()
     makefolder(proxy_config)
@@ -176,7 +176,7 @@ def copy_config_to_proxy(config: TestnetConfiguration):
         proxy_config)
 
 
-def patch_proxy_config(config: TestnetConfiguration):
+def patch_proxy_config(config: LocalnetConfiguration):
     proxy_config_file = config.proxy_config_folder() / 'config.toml'
     nodes = config.api_addresses_sharded_for_proxy_config()
     data = utils.read_toml_file(proxy_config_file)
@@ -197,7 +197,7 @@ def makefolder(path_where_to_make_folder: Path):
     path_where_to_make_folder.mkdir(parents=True, exist_ok=True)
 
 
-def copy_binaries_into_testnet_workspace(config: TestnetConfiguration):
+def copy_binaries_into_localnet_workspace(config: LocalnetConfiguration):
     [node_cmd, seednode_cmd, proxy_cmd] = config.software.get_binaries_parents()
 
     for destination in config.all_nodes_folders():

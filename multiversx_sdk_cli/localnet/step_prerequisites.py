@@ -5,8 +5,8 @@ from typing import Any
 
 from multiversx_sdk_cli import dependencies, downloader
 from multiversx_sdk_cli.errors import KnownError
-from multiversx_sdk_cli.testnet.config import TestnetConfiguration
-from multiversx_sdk_cli.testnet.config_software import SoftwareResolution
+from multiversx_sdk_cli.localnet.config import LocalnetConfiguration
+from multiversx_sdk_cli.localnet.config_software import SoftwareResolution
 
 logger = logging.getLogger("localnet")
 
@@ -14,7 +14,7 @@ logger = logging.getLogger("localnet")
 def prepare(args: Any):
     dependencies.install_module("testwallets", tag="", overwrite=True)
 
-    config = TestnetConfiguration.from_file(args.configfile)
+    config = LocalnetConfiguration.from_file(args.configfile)
     resolution = config.software.resolution
 
     if resolution == SoftwareResolution.LocalPrebuiltCmdFolders:
@@ -33,7 +33,7 @@ def prepare(args: Any):
             any_library = any(item.glob("*.dylib")) or any(item.glob("*.so"))
 
             if not any_library:
-                logger.warning(f"libwasmer might be missing from {item}. Testnet might not work.")
+                logger.warning(f"libwasmer might be missing from {item}. Localnet might not work.")
 
         return
 

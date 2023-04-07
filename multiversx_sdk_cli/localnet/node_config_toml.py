@@ -1,12 +1,12 @@
 from typing import Any, Dict
 
-from multiversx_sdk_cli.testnet.config import TestnetConfiguration
-from multiversx_sdk_cli.testnet.nodes_setup_json import CHAIN_ID
+from multiversx_sdk_cli.localnet.config import LocalnetConfiguration
+from multiversx_sdk_cli.localnet.nodes_setup_json import CHAIN_ID
 
 ConfigDict = Dict[str, Any]
 
 
-def patch_config(data: ConfigDict, config: TestnetConfiguration):
+def patch_config(data: ConfigDict, config: LocalnetConfiguration):
     data['DbLookupExtensions']['Enabled'] = True
 
     general_settings: ConfigDict = dict()
@@ -34,13 +34,13 @@ def patch_config(data: ConfigDict, config: TestnetConfiguration):
     data['VirtualMachine'].update(virtual_machine)
 
 
-def patch_api(data: ConfigDict, config: TestnetConfiguration):
+def patch_api(data: ConfigDict, config: LocalnetConfiguration):
     routes = data['APIPackages']['transaction']['Routes']
     for route in routes:
         route['Open'] = True
 
 
-def patch_enable_epochs(data: ConfigDict, config: TestnetConfiguration):
+def patch_enable_epochs(data: ConfigDict, config: LocalnetConfiguration):
     enable_epochs: ConfigDict = dict()
     enable_epochs['SCDeployEnableEpoch'] = 0
     enable_epochs['BuiltInFunctionsEnableEpoch'] = 0

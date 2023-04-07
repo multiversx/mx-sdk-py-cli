@@ -14,8 +14,8 @@ testStartThenStop() {
     ${CLI} localnet build
     ${CLI} localnet config
 
-    # Leave the testnet to run for some time, then assert for "time out error" (124).
-    timeout 30s ${CLI} localnet start || \
+    # Leave the localnet to run for some time, then assert for "time out error" (124).
+    timeout 1m ${CLI} localnet start || \
     test $? -eq 124 || \
     echo "Timeout error expected, but something else happened."
 

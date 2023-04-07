@@ -4,7 +4,7 @@ from pathlib import Path
 from typing import Any, Dict, List
 
 import multiversx_sdk_cli.utils as utils
-from multiversx_sdk_cli.testnet import config_default
+from multiversx_sdk_cli.localnet import config_default
 
 logger = logging.getLogger("localnet")
 
@@ -26,7 +26,7 @@ class Node:
         return f"Node {self.index}, shard={self.shard}, port={self.api_port}, folder={self.folder}"
 
 
-class TestnetConfiguration:
+class LocalnetConfiguration:
     def __init__(self):
         self.general = config_default.general
         self.software = config_default.software
