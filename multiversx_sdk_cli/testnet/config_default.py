@@ -9,8 +9,9 @@ from multiversx_sdk_cli.testnet.config_software import (
 
 general = General(
     log_level="*:DEBUG",
-    genesis_delay=10,
-    # TODO rounds_per_epoch=100,
+    genesis_delay_seconds=10,
+    rounds_per_epoch=100,
+    round_duration_milliseconds=6000
 )
 
 software = Software(

@@ -73,7 +73,7 @@ class TestnetConfiguration:
         return self.validator_config_folders() + self.observer_config_folders()
 
     def genesis_time(self):
-        return int(time.time()) + int(self.general.genesis_delay)
+        return int(time.time()) + int(self.general.genesis_delay_seconds)
 
     def seednode_address(self):
         host = self.networking.host

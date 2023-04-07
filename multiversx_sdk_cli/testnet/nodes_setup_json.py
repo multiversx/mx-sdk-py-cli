@@ -24,7 +24,7 @@ def build(config: TestnetConfiguration) -> Any:
 
     return {
         "startTime": config.genesis_time(),
-        "roundDuration": 6000,
+        "roundDuration": config.general.round_duration_milliseconds,
         "consensusGroupSize": config.shards.consensus_size,
         "minNodesPerShard": config.shards.consensus_size,
         "metaChainConsensusGroupSize": config.metashard.consensus_size,

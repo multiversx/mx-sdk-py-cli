@@ -18,8 +18,8 @@ def patch_config(data: ConfigDict, config: TestnetConfiguration):
 
     # Make epochs shorter
     epoch_start_config: ConfigDict = dict()
-    epoch_start_config['RoundsPerEpoch'] = 100
-    epoch_start_config['MinRoundsBetweenEpochs'] = 20
+    epoch_start_config['RoundsPerEpoch'] = config.general.rounds_per_epoch
+    epoch_start_config['MinRoundsBetweenEpochs'] = int(config.general.rounds_per_epoch / 4)
 
     data['EpochStartConfig'].update(epoch_start_config)
 
