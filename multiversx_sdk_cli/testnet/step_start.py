@@ -2,6 +2,7 @@ import asyncio
 import logging
 import os
 import traceback
+from asyncio import Task
 from pathlib import Path
 from typing import Any, Coroutine, List
 
@@ -67,7 +68,8 @@ async def do_start(args: Any):
         "--log-save"
     ], cwd=config.proxy_folder(), delay=PROXY_START_DELAY))
 
-    await asyncio.gather(*to_run)
+    tasks = [asyncio.create_task(item) for item in to_run]
+    await asyncio.gather(*tasks)
 
 
 async def run(args: List[str], cwd: Path, delay: int = 0):
@@ -86,8 +88,8 @@ async def run(args: List[str], cwd: Path, delay: int = 0):
 
     print(f"Started process [{pid}]", args)
     await asyncio.wait([
-        _read_stream(process.stdout, pid),
-        _read_stream(process.stderr, pid)
+        asyncio.create_task(_read_stream(process.stdout, pid)),
+        asyncio.create_task(_read_stream(process.stderr, pid))
     ])
 
     return_code = await process.wait()
