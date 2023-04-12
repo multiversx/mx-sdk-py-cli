@@ -3,6 +3,7 @@ from pathlib import Path
 from typing import Any, List
 
 from multiversx_sdk_cli import cli_shared
+from multiversx_sdk_cli.errors import KnownError
 from multiversx_sdk_cli.localnet import (step_build_software, step_clean,
                                          step_config, step_prerequisites,
                                          step_start)
@@ -76,24 +77,41 @@ def add_argument_configfile(parser: Any):
 
 def localnet_clean(args: Any):
     logger.info("Cleaning localnet...")
+    guard_configfile(args)
     step_clean.clean(args)
 
 
 def localnet_prerequisites(args: Any):
     logger.info("Gathering prerequisites...")
+    guard_configfile(args)
     step_prerequisites.prepare(args)
 
 
 def localnet_build(args: Any):
     logger.info("Building binaries...")
+    guard_configfile(args)
     step_build_software.build(args)
 
 
 def localnet_config(args: Any):
     logger.info("Configuring localnet...")
+    guard_configfile(args)
     step_config.configure(args)
 
 
 def localnet_start(args: Any):
     logger.info("Starting localnet...")
+    guard_configfile(args)
     step_start.start(args)
+
+
+def guard_configfile(args: Any):
+    configfile = args.configfile.resolve()
+    old_configfile_in_workdir = Path("testnet.toml").resolve()
+
+    if not configfile.exists():
+        raise KnownError(f"Localnet config file does not exist: {configfile}")
+
+    if old_configfile_in_workdir.exists():
+        logger.error(f"""For less ambiguity, the old "testnet.toml" config file should be removed: {old_configfile_in_workdir}""")
+        raise KnownError(f"""Found old "testnet.toml" config file in working directory: {old_configfile_in_workdir}""")
