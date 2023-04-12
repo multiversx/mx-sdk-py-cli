@@ -33,6 +33,12 @@ jobs:
           python3 -m pip install --upgrade pip
           pip3 install -r requirements.txt
 
+      - name: Install dependencies (macos)
+        if: ${{ matrix.os == 'macos-latest' }}
+        run: |
+          # For timeout: https://stackoverflow.com/questions/3504945/timeout-command-on-mac-os-x
+          brew install coreutils
+
       - name: Smoke test
         run: |
           mkdir ~/multiversx-sdk
