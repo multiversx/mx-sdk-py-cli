@@ -1,6 +1,6 @@
 from typing import Any
 
-from multiversx_sdk_cli.localnet.config import ConfigRoot
+from multiversx_sdk_cli.localnet.config_root import ConfigRoot
 
 PROTOCOL_ID = '/erd/kad/sandbox'
 

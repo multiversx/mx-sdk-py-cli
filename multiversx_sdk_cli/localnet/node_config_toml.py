@@ -1,6 +1,6 @@
 from typing import Any, Dict
 
-from multiversx_sdk_cli.localnet.config import ConfigRoot
+from multiversx_sdk_cli.localnet.config_root import ConfigRoot
 from multiversx_sdk_cli.localnet.nodes_setup_json import CHAIN_ID
 
 ConfigDict = Dict[str, Any]

@@ -5,7 +5,7 @@ import traceback
 from pathlib import Path
 from typing import Any, Coroutine, List
 
-from multiversx_sdk_cli.localnet.config import ConfigRoot
+from multiversx_sdk_cli.localnet.config_root import ConfigRoot
 
 logger = logging.getLogger("localnet")
 

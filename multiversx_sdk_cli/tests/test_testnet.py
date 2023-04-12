@@ -2,7 +2,7 @@ import os
 import sys
 from typing import Any, Dict
 
-from multiversx_sdk_cli.localnet.config import ConfigRoot
+from multiversx_sdk_cli.localnet.config_root import ConfigRoot
 from multiversx_sdk_cli.localnet.config_software import SoftwareResolution
 
 sys.path = [os.getcwd() + "/.."] + sys.path

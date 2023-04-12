@@ -2,7 +2,7 @@ from typing import Any, Dict, List
 
 from multiversx_sdk_cli.accounts import Account, Address
 from multiversx_sdk_cli.localnet import wallets
-from multiversx_sdk_cli.localnet.config import ConfigRoot
+from multiversx_sdk_cli.localnet.config_root import ConfigRoot
 from multiversx_sdk_cli.localnet.genesis import (get_delegation_address,
                                                  is_foundational_node,
                                                  is_last_user)

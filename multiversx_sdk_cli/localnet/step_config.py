@@ -10,7 +10,7 @@ from multiversx_sdk_cli.localnet import (genesis_json,
                                          genesis_smart_contracts_json,
                                          node_config_toml, nodes_setup_json,
                                          p2p_toml, wallets)
-from multiversx_sdk_cli.localnet.config import ConfigRoot
+from multiversx_sdk_cli.localnet.config_root import ConfigRoot
 
 logger = logging.getLogger("localnet")
 

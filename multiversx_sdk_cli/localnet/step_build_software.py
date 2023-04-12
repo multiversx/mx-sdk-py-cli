@@ -6,7 +6,7 @@ from typing import Any, List
 
 from multiversx_sdk_cli import dependencies, myprocess, utils
 from multiversx_sdk_cli.errors import KnownError
-from multiversx_sdk_cli.localnet.config import ConfigRoot
+from multiversx_sdk_cli.localnet.config_root import ConfigRoot
 from multiversx_sdk_cli.localnet.config_software import SoftwareResolution
 
 logger = logging.getLogger("localnet")
