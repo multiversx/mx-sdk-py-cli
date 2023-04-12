@@ -39,6 +39,10 @@ jobs:
           export PYTHONPATH=.
           python3 -m multiversx_sdk_cli.cli localnet prerequisites --configfile=./multiversx_sdk_cli/tests/testdata/localnet.toml
           python3 -m multiversx_sdk_cli.cli localnet build --configfile=./multiversx_sdk_cli/tests/testdata/localnet.toml
+         
+          # "Go" and artifacts from "GOPATH/pkg/mod" are not needed anymore.
+          rm -rf ~/multiversx-sdk/golang
+          
           python3 -m multiversx_sdk_cli.cli localnet config --configfile=./multiversx_sdk_cli/tests/testdata/localnet.toml
           
           # Leave the localnet to run for some time, then assert for "time out error" (124).

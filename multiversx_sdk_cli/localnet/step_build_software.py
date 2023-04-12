@@ -41,7 +41,6 @@ def build(args: Any):
 
         copy_libraries(wasmer_path, node_parent)
         copy_libraries(wasmer_path, seednode_parent)
-        copy_libraries(wasmer_path, proxy_parent)
 
         return
 

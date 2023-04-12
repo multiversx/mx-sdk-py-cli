@@ -23,13 +23,13 @@ def prepare(args: Any):
         subconfig = config.software.local_prebuilt_cmd_folders
         node = subconfig.ensure_mx_chain_go_node_path()
         seednode = subconfig.ensure_mx_chain_go_seednode_path()
-        proxy = subconfig.ensure_mx_chain_proxy_go_path()
+        _proxy = subconfig.ensure_mx_chain_proxy_go_path()
 
         subconfig.ensure_mx_chain_go_node_config_path()
         subconfig.ensure_mx_chain_go_seednode_config_path()
         subconfig.ensure_mx_chain_proxy_go_config_path()
 
-        for item in [node, seednode, proxy]:
+        for item in [node, seednode]:
             any_library = any(item.glob("*.dylib")) or any(item.glob("*.so"))
 
             if not any_library:
