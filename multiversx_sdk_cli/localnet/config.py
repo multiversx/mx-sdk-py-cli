@@ -5,6 +5,7 @@ from typing import Any, Dict, List
 
 import multiversx_sdk_cli.utils as utils
 from multiversx_sdk_cli.localnet import config_default
+from multiversx_sdk_cli.localnet.config_part import ConfigPart
 
 logger = logging.getLogger("localnet")
 
@@ -26,7 +27,7 @@ class Node:
         return f"Node {self.index}, shard={self.shard}, port={self.api_port}, folder={self.folder}"
 
 
-class LocalnetConfiguration:
+class ConfigRoot(ConfigPart):
     def __init__(self):
         self.general = config_default.general
         self.software = config_default.software
@@ -34,12 +35,15 @@ class LocalnetConfiguration:
         self.shards = config_default.shards
         self.networking = config_default.networking
 
-    def override(self, other: Dict[str, Any]):
-        self.general.override(other.get("general", dict()))
-        self.software.override(other.get("software", dict()))
-        self.metashard.override(other.get("metashard", dict()))
-        self.shards.override(other.get("shards", dict()))
-        self.networking.override(other.get("networking", dict()))
+    def get_name(self) -> str:
+        return "(configuration root)"
+
+    def _do_override(self, other: Dict[str, Any]):
+        self.general.override(other.get(self.general.get_name(), dict()))
+        self.software.override(other.get(self.software.get_name(), dict()))
+        self.metashard.override(other.get(self.metashard.get_name(), dict()))
+        self.shards.override(other.get(self.shards.get_name(), dict()))
+        self.networking.override(other.get(self.networking.get_name(), dict()))
 
     @classmethod
     def from_file(cls, path: Path):

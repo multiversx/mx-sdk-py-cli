@@ -10,13 +10,13 @@ from multiversx_sdk_cli.localnet import (genesis_json,
                                          genesis_smart_contracts_json,
                                          node_config_toml, nodes_setup_json,
                                          p2p_toml, wallets)
-from multiversx_sdk_cli.localnet.config import LocalnetConfiguration
+from multiversx_sdk_cli.localnet.config import ConfigRoot
 
 logger = logging.getLogger("localnet")
 
 
 def configure(args: Any):
-    config = LocalnetConfiguration.from_file(args.configfile)
+    config = ConfigRoot.from_file(args.configfile)
     logger.info("localnet folder is %s", config.root())
 
     create_folders(config)
@@ -65,7 +65,7 @@ def configure(args: Any):
     copy_binaries_into_localnet_workspace(config)
 
 
-def create_folders(config: LocalnetConfiguration):
+def create_folders(config: ConfigRoot):
     makefolder(config.seednode_folder())
 
     folder = config.proxy_folder()
@@ -76,13 +76,13 @@ def create_folders(config: LocalnetConfiguration):
         makefolder(folder)
 
 
-def copy_config_to_nodes(config: LocalnetConfiguration):
+def copy_config_to_nodes(config: ConfigRoot):
     config_prototype = config.software.get_node_config_folder()
     for node_config in config.all_nodes_config_folders():
         shutil.copytree(config_prototype, node_config)
 
 
-def copy_validator_keys(config: LocalnetConfiguration):
+def copy_validator_keys(config: ConfigRoot):
     for index, validator in enumerate(config.validators()):
         shutil.copy(wallets.get_validator_key_file(index), validator.key_file_path())
 
@@ -91,7 +91,7 @@ def copy_validator_keys(config: LocalnetConfiguration):
         shutil.copy(wallets.get_observer_key_file(index), observer.key_file_path())
 
 
-def patch_node_config(config: LocalnetConfiguration):
+def patch_node_config(config: ConfigRoot):
     for node_config in config.all_nodes_config_folders():
         node_config_file = node_config / 'config.toml'
         data = utils.read_toml_file(node_config_file)
@@ -114,7 +114,7 @@ def patch_node_config(config: LocalnetConfiguration):
         utils.write_json_file(genesis_smart_contracts_file, data)
 
 
-def copy_config_to_seednode(config: LocalnetConfiguration):
+def copy_config_to_seednode(config: ConfigRoot):
     config_source = config.software.get_seednode_config_folder()
     seednode_config = config.seednode_config_folder()
     makefolder(seednode_config)
@@ -122,7 +122,7 @@ def copy_config_to_seednode(config: LocalnetConfiguration):
     shutil.copy(config_source / 'config.toml', seednode_config / 'config.toml')
 
 
-def patch_seednode_p2p_config(config: LocalnetConfiguration):
+def patch_seednode_p2p_config(config: ConfigRoot):
     seednode_config = config.seednode_config_folder()
     seednode_config_file = seednode_config / 'p2p.toml'
 
@@ -131,12 +131,12 @@ def patch_seednode_p2p_config(config: LocalnetConfiguration):
     utils.write_toml_file(seednode_config_file, data)
 
 
-def copy_seednode_p2p_key(config: LocalnetConfiguration):
+def copy_seednode_p2p_key(config: ConfigRoot):
     p2p_key_path = Path(__file__).parent / "seednode_p2pKey.pem"
     shutil.copy(p2p_key_path, config.seednode_config_folder() / "p2pKey.pem")
 
 
-def patch_nodes_p2p_config(config: LocalnetConfiguration, nodes_config_folders: List[Path], port_first: int):
+def patch_nodes_p2p_config(config: ConfigRoot, nodes_config_folders: List[Path], port_first: int):
     for index, config_folder in enumerate(nodes_config_folders):
         config_file = config_folder / 'p2p.toml'
         data = utils.read_toml_file(config_file)
@@ -144,21 +144,21 @@ def patch_nodes_p2p_config(config: LocalnetConfiguration, nodes_config_folders: 
         utils.write_toml_file(config_file, data)
 
 
-def overwrite_nodes_setup(config: LocalnetConfiguration, nodes_config_folders: List[Path]):
+def overwrite_nodes_setup(config: ConfigRoot, nodes_config_folders: List[Path]):
     nodes_setup = nodes_setup_json.build(config)
 
     for _, config_folder in enumerate(nodes_config_folders):
         utils.write_json_file(config_folder / 'nodesSetup.json', nodes_setup)
 
 
-def overwrite_genesis_file(config: LocalnetConfiguration, nodes_config_folders: List[Path]):
+def overwrite_genesis_file(config: ConfigRoot, nodes_config_folders: List[Path]):
     genesis = genesis_json.build(config)
 
     for _, config_folder in enumerate(nodes_config_folders):
         utils.write_json_file(config_folder / 'genesis.json', genesis)
 
 
-def copy_config_to_proxy(config: LocalnetConfiguration):
+def copy_config_to_proxy(config: ConfigRoot):
     config_prototype = config.software.get_proxy_config_folder()
     proxy_config = config.proxy_config_folder()
     makefolder(proxy_config)
@@ -176,7 +176,7 @@ def copy_config_to_proxy(config: LocalnetConfiguration):
         proxy_config)
 
 
-def patch_proxy_config(config: LocalnetConfiguration):
+def patch_proxy_config(config: ConfigRoot):
     proxy_config_file = config.proxy_config_folder() / 'config.toml'
     nodes = config.api_addresses_sharded_for_proxy_config()
     data = utils.read_toml_file(proxy_config_file)
@@ -197,7 +197,7 @@ def makefolder(path_where_to_make_folder: Path):
     path_where_to_make_folder.mkdir(parents=True, exist_ok=True)
 
 
-def copy_binaries_into_localnet_workspace(config: LocalnetConfiguration):
+def copy_binaries_into_localnet_workspace(config: ConfigRoot):
     [node_cmd, seednode_cmd, proxy_cmd] = config.software.get_binaries_parents()
 
     for destination in config.all_nodes_folders():

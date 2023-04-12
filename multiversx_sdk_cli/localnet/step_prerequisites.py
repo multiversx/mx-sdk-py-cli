@@ -5,7 +5,7 @@ from typing import Any
 
 from multiversx_sdk_cli import dependencies, downloader
 from multiversx_sdk_cli.errors import KnownError
-from multiversx_sdk_cli.localnet.config import LocalnetConfiguration
+from multiversx_sdk_cli.localnet.config import ConfigRoot
 from multiversx_sdk_cli.localnet.config_software import SoftwareResolution
 
 logger = logging.getLogger("localnet")
@@ -14,7 +14,7 @@ logger = logging.getLogger("localnet")
 def prepare(args: Any):
     dependencies.install_module("testwallets", tag="", overwrite=True)
 
-    config = LocalnetConfiguration.from_file(args.configfile)
+    config = ConfigRoot.from_file(args.configfile)
     resolution = config.software.resolution
 
     if resolution == SoftwareResolution.LocalPrebuiltCmdFolders:

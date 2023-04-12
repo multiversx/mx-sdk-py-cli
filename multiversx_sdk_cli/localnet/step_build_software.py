@@ -6,14 +6,14 @@ from typing import Any, List
 
 from multiversx_sdk_cli import dependencies, myprocess, utils
 from multiversx_sdk_cli.errors import KnownError
-from multiversx_sdk_cli.localnet.config import LocalnetConfiguration
+from multiversx_sdk_cli.localnet.config import ConfigRoot
 from multiversx_sdk_cli.localnet.config_software import SoftwareResolution
 
 logger = logging.getLogger("localnet")
 
 
 def build(args: Any):
-    config = LocalnetConfiguration.from_file(args.configfile)
+    config = ConfigRoot.from_file(args.configfile)
     resolution = config.software.resolution
 
     if resolution == SoftwareResolution.LocalPrebuiltCmdFolders:
@@ -48,7 +48,7 @@ def build(args: Any):
     raise KnownError(f"Unknown software resolution: {resolution}")
 
 
-def _get_wasm_vm_package(config: LocalnetConfiguration) -> str:
+def _get_wasm_vm_package(config: ConfigRoot) -> str:
     go_mod = config.software.get_mx_chain_go_path_in_source(Path("go.mod"))
     lines = utils.read_lines(go_mod)
     line = [line for line in lines if "github.com/multiversx/mx-chain-vm-v" in line][-1]

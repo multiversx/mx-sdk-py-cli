@@ -3,6 +3,7 @@ from pathlib import Path
 from typing import Any, Dict, Tuple, Union
 
 from multiversx_sdk_cli.errors import KnownError
+from multiversx_sdk_cli.localnet.config_part import ConfigPart
 
 
 class SoftwareResolution(Enum):
@@ -11,7 +12,7 @@ class SoftwareResolution(Enum):
     LocalPrebuiltCmdFolders = "local_prebuilt_cmd_folders"
 
 
-class Software:
+class Software(ConfigPart):
     def __init__(
             self,
             resolution: SoftwareResolution,
@@ -23,11 +24,14 @@ class Software:
         self.local_source_folders: SoftwareLocalSourceFolders = local_source_folders
         self.local_prebuilt_cmd_folders: SoftwareLocalPrebuiltCmdFolders = local_prebuilt_cmd_folders
 
-    def override(self, other: Dict[str, Any]):
+    def get_name(self) -> str:
+        return "software"
+
+    def _do_override(self, other: Dict[str, Any]):
         self.resolution = SoftwareResolution(other.get("resolution", self.resolution.value))
-        self.remote_archives.override(other.get("remote_archives", dict()))
-        self.local_source_folders.override(other.get("local_source_folders", dict()))
-        self.local_prebuilt_cmd_folders.override(other.get("local_prebuilt_cmd_folders", dict()))
+        self.remote_archives.override(other.get(self.remote_archives.get_name(), dict()))
+        self.local_source_folders.override(other.get(self.local_source_folders.get_name(), dict()))
+        self.local_prebuilt_cmd_folders.override(other.get(self.local_prebuilt_cmd_folders.get_name(), dict()))
 
     def get_binaries_parents(self) -> Tuple[Path, Path, Path]:
         if self.resolution == SoftwareResolution.RemoteArchives:
@@ -74,7 +78,7 @@ class Software:
         raise KnownError(f"Software resolution {self.resolution} not supported")
 
 
-class SoftwareRemoteArchives:
+class SoftwareRemoteArchives(ConfigPart):
     def __init__(self,
                  downloads_folder: Path,
                  mx_chain_go: str = "",
@@ -83,7 +87,10 @@ class SoftwareRemoteArchives:
         self.mx_chain_go: str = mx_chain_go
         self.mx_chain_proxy_go: str = mx_chain_proxy_go
 
-    def override(self, other: Dict[str, Any]):
+    def get_name(self) -> str:
+        return "remote_archives"
+
+    def _do_override(self, other: Dict[str, Any]):
         self.downloads_folder = Path(other.get("downloads_folder", self.downloads_folder)).expanduser().resolve()
         self.mx_chain_go = other.get("mx_chain_go", self.mx_chain_go)
         self.mx_chain_proxy_go = other.get("mx_chain_proxy_go", self.mx_chain_proxy_go)
@@ -132,14 +139,17 @@ class SoftwareRemoteArchives:
         return source_folder
 
 
-class SoftwareLocalSourceFolders:
+class SoftwareLocalSourceFolders(ConfigPart):
     def __init__(self,
                  mx_chain_go: str = "",
                  mx_chain_proxy_go: str = ""):
         self.mx_chain_go: str = mx_chain_go
         self.mx_chain_proxy_go: str = mx_chain_proxy_go
 
-    def override(self, other: Dict[str, Any]):
+    def get_name(self) -> str:
+        return "local_source_folders"
+
+    def _do_override(self, other: Dict[str, Any]):
         self.mx_chain_go = other.get("mx_chain_go", self.mx_chain_go)
         self.mx_chain_proxy_go = other.get("mx_chain_proxy_go", self.mx_chain_proxy_go)
 
@@ -161,7 +171,7 @@ class SoftwareLocalSourceFolders:
         return path
 
 
-class SoftwareLocalPrebuiltCmdFolders:
+class SoftwareLocalPrebuiltCmdFolders(ConfigPart):
     def __init__(self,
                  mx_chain_go_node: str = "",
                  mx_chain_go_seednode: str = "",
@@ -170,7 +180,10 @@ class SoftwareLocalPrebuiltCmdFolders:
         self.mx_chain_go_seednode: str = mx_chain_go_seednode
         self.mx_chain_proxy_go: str = mx_chain_proxy_go
 
-    def override(self, other: Dict[str, Any]):
+    def get_name(self) -> str:
+        return "local_prebuilt_cmd_folders"
+
+    def _do_override(self, other: Dict[str, Any]):
         self.mx_chain_go_node = other.get("mx_chain_go_node", self.mx_chain_go_node)
         self.mx_chain_go_seednode = other.get("mx_chain_go_seednode", self.mx_chain_go_seednode)
         self.mx_chain_proxy_go = other.get("mx_chain_proxy_go", self.mx_chain_proxy_go)

@@ -2,7 +2,7 @@ from typing import Any, Dict, List
 
 from multiversx_sdk_cli.accounts import Account, Address
 from multiversx_sdk_cli.localnet import wallets
-from multiversx_sdk_cli.localnet.config import LocalnetConfiguration
+from multiversx_sdk_cli.localnet.config import ConfigRoot
 from multiversx_sdk_cli.localnet.genesis import (get_delegation_address,
                                                  is_foundational_node,
                                                  is_last_user)
@@ -12,7 +12,7 @@ ENTIRE_SUPPLY = 20000000000000000000000000
 DELEGATED_VALUE = 2500000000000000000000
 
 
-def build(config: LocalnetConfiguration) -> List[Any]:
+def build(config: ConfigRoot) -> List[Any]:
     num_validators = config.num_all_validators()
     genesis_items: List[Dict[str, Any]] = []
     remaining_supply = ENTIRE_SUPPLY

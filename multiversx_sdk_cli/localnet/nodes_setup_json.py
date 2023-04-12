@@ -2,14 +2,14 @@ from typing import Any, Dict, List
 
 from multiversx_sdk_cli.accounts import Account
 from multiversx_sdk_cli.localnet import wallets
-from multiversx_sdk_cli.localnet.config import LocalnetConfiguration
+from multiversx_sdk_cli.localnet.config import ConfigRoot
 from multiversx_sdk_cli.localnet.genesis import (get_delegation_address,
                                                  is_foundational_node)
 
 CHAIN_ID = "localnet"
 
 
-def build(config: LocalnetConfiguration) -> Any:
+def build(config: ConfigRoot) -> Any:
     num_validators = config.num_all_validators()
     initial_nodes: List[Dict[str, str]] = []
 

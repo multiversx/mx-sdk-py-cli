@@ -1,7 +1,9 @@
 from typing import Any, Dict
 
+from multiversx_sdk_cli.localnet.config_part import ConfigPart
 
-class Networking:
+
+class Networking(ConfigPart):
     def __init__(self,
                  host: str,
                  port_seednode: int,
@@ -20,7 +22,10 @@ class Networking:
         self.port_first_validator: int = port_first_validator
         self.port_first_validator_rest_api: int = port_first_validator_rest_api
 
-    def override(self, other: Dict[str, Any]):
+    def get_name(self) -> str:
+        return "networking"
+
+    def _do_override(self, other: Dict[str, Any]):
         self.host = other.get("host", self.host)
         self.port_seednode = other.get("port_seednode", self.port_seednode)
         self.p2p_id_seednode = other.get("p2p_id_seednode", self.p2p_id_seednode)

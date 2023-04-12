@@ -5,7 +5,7 @@ import traceback
 from pathlib import Path
 from typing import Any, Coroutine, List
 
-from multiversx_sdk_cli.localnet.config import LocalnetConfiguration
+from multiversx_sdk_cli.localnet.config import ConfigRoot
 
 logger = logging.getLogger("localnet")
 
@@ -27,7 +27,7 @@ def start(args: Any):
 
 
 async def do_start(args: Any):
-    config = LocalnetConfiguration.from_file(args.configfile)
+    config = ConfigRoot.from_file(args.configfile)
     logger.info('localnet folder is %s', config.root())
 
     to_run: List[Coroutine[Any, Any, None]] = []

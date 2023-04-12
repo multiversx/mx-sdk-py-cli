@@ -2,14 +2,14 @@ import os
 import sys
 from typing import Any, Dict
 
-from multiversx_sdk_cli.localnet.config import LocalnetConfiguration
+from multiversx_sdk_cli.localnet.config import ConfigRoot
 from multiversx_sdk_cli.localnet.config_software import SoftwareResolution
 
 sys.path = [os.getcwd() + "/.."] + sys.path
 
 
 def test_override_config():
-    config = LocalnetConfiguration()
+    config = ConfigRoot()
 
     # Check a few default values
     assert config.general.rounds_per_epoch == 100

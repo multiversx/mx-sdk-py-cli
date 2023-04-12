@@ -1,10 +1,10 @@
 from typing import Any
 
 from multiversx_sdk_cli.localnet import genesis
-from multiversx_sdk_cli.localnet.config import LocalnetConfiguration
+from multiversx_sdk_cli.localnet.config import ConfigRoot
 
 
-def patch(data: Any, config: LocalnetConfiguration):
+def patch(data: Any, config: ConfigRoot):
     owner = genesis.get_owner_of_genesis_contracts()
 
     delegation_config = data[0]
