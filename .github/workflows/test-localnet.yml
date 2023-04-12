@@ -10,10 +10,10 @@ env:
 
 jobs:
   install:
-    runs-on: ubuntu-latest
-
+    runs-on: ${{ matrix.os }}
     strategy:
       matrix:
+        os: [ubuntu-latest, macos-latest]
         python-version: [3.11]
 
     steps:
