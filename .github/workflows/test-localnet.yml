@@ -48,7 +48,7 @@ jobs:
           python3 -m multiversx_sdk_cli.cli localnet build --configfile=./multiversx_sdk_cli/tests/testdata/localnet.toml
          
           # "Go" and artifacts from "GOPATH/pkg/mod" are not needed anymore.
-          #sudo rm -rf ~/multiversx-sdk/golang
+          sudo rm -rf ~/multiversx-sdk/golang
           
           python3 -m multiversx_sdk_cli.cli localnet config --configfile=./multiversx_sdk_cli/tests/testdata/localnet.toml
           
