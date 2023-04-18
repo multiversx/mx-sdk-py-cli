@@ -1,9 +1,10 @@
 import asyncio
 import logging
 import os
+import sys
 import traceback
 from pathlib import Path
-from typing import Any, Coroutine, List, Optional
+from typing import Any, Coroutine, List
 
 from multiversx_sdk_cli import workstation
 from multiversx_sdk_cli.localnet.config_root import ConfigRoot
@@ -17,10 +18,7 @@ PROXY_START_DELAY = 10
 is_after_genesis = False
 
 
-def start(
-        configfile: Path,
-        stop_after_seconds: Optional[int] = None
-):
+def start(configfile: Path, stop_after_seconds: int):
     try:
         loop = asyncio.get_event_loop()
         loop.run_until_complete(do_start(configfile, stop_after_seconds))
@@ -30,10 +28,7 @@ def start(
         pass
 
 
-async def do_start(
-        configfile: Path,
-        stop_after_seconds: Optional[int] = None
-):
+async def do_start(configfile: Path, stop_after_seconds: int):
     config = ConfigRoot.from_file(configfile)
     logger.info('localnet folder is %s', config.root())
 
@@ -74,8 +69,23 @@ async def do_start(
         "--log-save"
     ], cwd=config.proxy_folder(), delay=PROXY_START_DELAY))
 
+    # Monitor network
+    to_run.append(monitor_network(config, stop_after_seconds))
+
     tasks = [asyncio.create_task(item) for item in to_run]
     await asyncio.gather(*tasks)
+
+
+async def monitor_network(config: ConfigRoot, stop_after_seconds: int):
+    loop = asyncio.get_running_loop()
+    end_time = loop.time() + stop_after_seconds
+
+    while True:
+        if loop.time() >= end_time:
+            loop.stop()
+            sys.exit(0)
+
+        await asyncio.sleep(1)
 
 
 async def run(args: List[str], cwd: Path, delay: int = 0):
@@ -83,7 +93,6 @@ async def run(args: List[str], cwd: Path, delay: int = 0):
 
     logger.info(f"Starting process {args} in folder {cwd}")
 
-    # TODO: Fix this. Useful for Linux, but not for Mac
     env = os.environ.copy()
 
     if workstation.is_linux():

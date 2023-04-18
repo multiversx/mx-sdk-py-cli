@@ -3,6 +3,7 @@ from pathlib import Path
 from typing import Any, List
 
 from multiversx_sdk_cli import cli_shared
+from multiversx_sdk_cli.constants import ONE_YEAR_IN_SECONDS
 from multiversx_sdk_cli.errors import KnownError
 from multiversx_sdk_cli.localnet import (step_build_software, step_clean,
                                          step_config, step_prerequisites,
@@ -47,7 +48,7 @@ def setup_parser(args: List[str], subparsers: Any) -> Any:
         "Start a localnet"
     )
     add_argument_configfile(sub)
-    sub.add_argument("--stop-after-seconds", type=int, required=False, default=None, help="Stop the localnet after a given number of seconds")
+    sub.add_argument("--stop-after-seconds", type=int, required=False, default=ONE_YEAR_IN_SECONDS, help="Stop the localnet after a given number of seconds (default: %(default)s)")
     sub.set_defaults(func=localnet_start)
 
     # Config
