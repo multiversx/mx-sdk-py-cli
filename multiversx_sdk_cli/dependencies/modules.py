@@ -233,9 +233,14 @@ class GolangModule(StandaloneModule):
                 "GOROOT": os.environ.get("GOROOT", "")
             }
         if resolution == DependencyResolution.SDK:
+            current_path = os.environ.get("PATH", "")
+            current_path_parts = current_path.split(":")
+            current_path_parts_without_go = [part for part in current_path_parts if "/go/bin" not in part]
+            current_path_without_go = ":".join(current_path_parts_without_go)
+
             return {
                 # At this moment, cc (build-essential) is needed to compile go dependencies (e.g. Node, VM)
-                "PATH": f"{(directory / 'go' / 'bin')}:{os.environ['PATH']}",
+                "PATH": f"{(directory / 'go' / 'bin')}:{current_path_without_go}",
                 "GOPATH": str(self.get_gopath()),
                 "GOCACHE": str(parent_directory / "GOCACHE"),
                 "GOROOT": str(directory / "go")
