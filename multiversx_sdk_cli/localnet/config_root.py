@@ -6,6 +6,7 @@ from typing import Any, Dict, List
 import multiversx_sdk_cli.utils as utils
 from multiversx_sdk_cli.localnet import config_default
 from multiversx_sdk_cli.localnet.config_part import ConfigPart
+from multiversx_sdk_cli.localnet.constants import METACHAIN_ID
 
 logger = logging.getLogger("localnet")
 
@@ -21,7 +22,10 @@ class Node:
         return self.folder / "config" / "validatorKey.pem"
 
     def api_address(self):
-        return f"http://localhost:{self.api_port}"
+        return f"http://{self.api_interface()}"
+
+    def api_interface(self):
+        return f"localhost:{self.api_port}"
 
     def __repr__(self) -> str:
         return f"Node {self.index}, shard={self.shard}, port={self.api_port}, folder={self.folder}"
@@ -106,7 +110,7 @@ class ConfigRoot(ConfigPart):
 
     def _get_shard_of_validator(self, observer_index: int) -> int:
         shard = int(observer_index // self.shards.num_validators_per_shard)
-        return shard if shard < self.shards.num_shards else 4294967295
+        return shard if shard < self.shards.num_shards else METACHAIN_ID
 
     def validator_folders(self):
         return [self.root() / "validator{:02}".format(i) for i in range(self.num_all_validators())]
@@ -127,7 +131,7 @@ class ConfigRoot(ConfigPart):
 
     def _get_shard_of_observer(self, observer_index: int):
         shard = int(observer_index // self.shards.num_observers_per_shard)
-        return shard if shard < self.shards.num_shards else 4294967295
+        return shard if shard < self.shards.num_shards else METACHAIN_ID
 
     def observer_config_folders(self) -> List[Path]:
         return [folder / "config" for folder in self.observer_folders()]

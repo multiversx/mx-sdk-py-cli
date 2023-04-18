@@ -10,6 +10,14 @@ def get_tools_folder() -> Path:
     return folder
 
 
+def is_linux():
+    return get_platform() == "linux"
+
+
+def is_windows():
+    return get_platform() == "windows"
+
+
 def get_platform():
     platforms = {
         "linux": "linux",

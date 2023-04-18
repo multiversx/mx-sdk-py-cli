@@ -3,8 +3,9 @@ import logging
 import os
 import traceback
 from pathlib import Path
-from typing import Any, Coroutine, List
+from typing import Any, Coroutine, List, Optional
 
+from multiversx_sdk_cli import workstation
 from multiversx_sdk_cli.localnet.config_root import ConfigRoot
 
 logger = logging.getLogger("localnet")
@@ -16,18 +17,24 @@ PROXY_START_DELAY = 10
 is_after_genesis = False
 
 
-def start(args: Any):
+def start(
+        configfile: Path,
+        stop_after_seconds: Optional[int] = None
+):
     try:
         loop = asyncio.get_event_loop()
-        loop.run_until_complete(do_start(args))
+        loop.run_until_complete(do_start(configfile, stop_after_seconds))
         loop.close()
         asyncio.set_event_loop(asyncio.new_event_loop())
     except KeyboardInterrupt:
         pass
 
 
-async def do_start(args: Any):
-    config = ConfigRoot.from_file(args.configfile)
+async def do_start(
+        configfile: Path,
+        stop_after_seconds: Optional[int] = None
+):
+    config = ConfigRoot.from_file(configfile)
     logger.info('localnet folder is %s', config.root())
 
     to_run: List[Coroutine[Any, Any, None]] = []
@@ -47,7 +54,7 @@ async def do_start(args: Any):
             f"--log-level={loglevel}",
             "--log-logger-name",
             f"--destination-shard-as-observer={observer.shard}",
-            f"--rest-api-interface=localhost:{observer.api_port}"
+            f"--rest-api-interface={observer.api_interface()}"
         ], cwd=observer.folder, delay=NODES_START_DELAY))
 
     # Validators
@@ -58,7 +65,7 @@ async def do_start(args: Any):
             "--log-save",
             f"--log-level={loglevel}",
             "--log-logger-name",
-            f"--rest-api-interface=localhost:{validator.api_port}"
+            f"--rest-api-interface={validator.api_interface()}"
         ], cwd=validator.folder, delay=NODES_START_DELAY))
 
     # Proxy
@@ -78,7 +85,12 @@ async def run(args: List[str], cwd: Path, delay: int = 0):
 
     # TODO: Fix this. Useful for Linux, but not for Mac
     env = os.environ.copy()
-    env["LD_LIBRARY_PATH"] = str(cwd)
+
+    if workstation.is_linux():
+        env["LD_LIBRARY_PATH"] = str(cwd)
+    else:
+        # For MacOS, libwasmer is directly found near the binary (no workaround needed)
+        pass
 
     process = await asyncio.create_subprocess_exec(*args, stdout=asyncio.subprocess.PIPE,
                                                    stderr=asyncio.subprocess.PIPE, cwd=cwd, limit=1024 * 512, env=env)

@@ -47,6 +47,7 @@ def setup_parser(args: List[str], subparsers: Any) -> Any:
         "Start a localnet"
     )
     add_argument_configfile(sub)
+    sub.add_argument("--stop-after-seconds", type=int, required=False, default=None, help="Stop the localnet after a given number of seconds")
     sub.set_defaults(func=localnet_start)
 
     # Config
@@ -102,7 +103,11 @@ def localnet_config(args: Any):
 def localnet_start(args: Any):
     logger.info("Starting localnet...")
     guard_configfile(args)
-    step_start.start(args)
+
+    step_start.start(
+        configfile=args.configfile,
+        stop_after_seconds=args.stop_after_seconds
+    )
 
 
 def guard_configfile(args: Any):

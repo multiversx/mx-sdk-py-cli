@@ -34,3 +34,6 @@ class Networking(ConfigPart):
         self.port_first_observer_rest_api = other.get("port_first_observer_rest_api", self.port_first_observer_rest_api)
         self.port_first_validator = other.get("port_first_validator", self.port_first_validator)
         self.port_first_validator_rest_api = other.get("port_first_validator_rest_api", self.port_first_validator_rest_api)
+
+    def get_proxy_url(self) -> str:
+        return f"http://{self.host}:{self.port_proxy}"

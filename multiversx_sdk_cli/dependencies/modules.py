@@ -268,17 +268,14 @@ class Rust(DependencyModule):
         myprocess.run_process(args, env=self.get_env_for_install())
 
     def _get_installer_url(self) -> str:
-        platform = workstation.get_platform()
-
-        if platform == "windows":
+        if workstation.is_windows():
             return "https://win.rustup.rs"
         return "https://sh.rustup.rs"
 
     def _get_installer_path(self) -> Path:
-        platform = workstation.get_platform()
         tools_folder = workstation.get_tools_folder()
 
-        if platform == "windows":
+        if workstation.is_windows():
             return tools_folder / "rustup-init.exe"
         return tools_folder / "rustup.sh"
 
@@ -342,7 +339,6 @@ class Rust(DependencyModule):
 
     def get_env_for_install(self):
         directory = self.get_directory("")
-        platform = workstation.get_platform()
 
         env = {
             # For installation, wget (or curl) and cc (build-essential) are also required.
@@ -351,7 +347,7 @@ class Rust(DependencyModule):
             "CARGO_HOME": str(directory)
         }
 
-        if platform == "windows":
+        if workstation.is_windows():
             env["RUSTUP_USE_HYPER"] = "1"
 
         return env
