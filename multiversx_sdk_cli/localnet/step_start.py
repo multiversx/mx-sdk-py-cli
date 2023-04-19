@@ -6,8 +6,13 @@ import traceback
 from pathlib import Path
 from typing import Any, Coroutine, List
 
+from prettytable import PrettyTable
+
 from multiversx_sdk_cli import workstation
 from multiversx_sdk_cli.localnet.config_root import ConfigRoot
+from multiversx_sdk_cli.localnet.constants import (
+    CHECK_NODE_STATUS_INTERVAL_IN_SECONDS,
+    NETWORK_MONITORING_INTERVAL_IN_SECONDS)
 
 logger = logging.getLogger("localnet")
 
@@ -52,6 +57,8 @@ async def do_start(configfile: Path, stop_after_seconds: int):
             f"--rest-api-interface={observer.api_interface()}"
         ], cwd=observer.folder, delay=NODES_START_DELAY))
 
+        logger.info(f"Observer: shard = {observer.shard}, API = {observer.api_address()}")
+
     # Validators
     for validator in config.validators():
         to_run.append(run([
@@ -63,11 +70,15 @@ async def do_start(configfile: Path, stop_after_seconds: int):
             f"--rest-api-interface={validator.api_interface()}"
         ], cwd=validator.folder, delay=NODES_START_DELAY))
 
+        logger.info(f"Validator: shard = {validator.shard}, API = {validator.api_address()}")
+
     # Proxy
     to_run.append(run([
         "./proxy",
         "--log-save"
     ], cwd=config.proxy_folder(), delay=PROXY_START_DELAY))
+
+    logger.info(f"Proxy: API = {config.networking.get_proxy_url()}")
 
     # Monitor network
     to_run.append(monitor_network(config, stop_after_seconds))
@@ -79,13 +90,36 @@ async def do_start(configfile: Path, stop_after_seconds: int):
 async def monitor_network(config: ConfigRoot, stop_after_seconds: int):
     loop = asyncio.get_running_loop()
     end_time = loop.time() + stop_after_seconds
+    last_check_node_status_time = 0
 
     while True:
-        if loop.time() >= end_time:
+        current_loop_time = loop.time()
+        time_since_last_check_node_status = current_loop_time - last_check_node_status_time
+        should_check_node_status = time_since_last_check_node_status >= CHECK_NODE_STATUS_INTERVAL_IN_SECONDS
+
+        if should_check_node_status:
+            last_check_node_status_time = current_loop_time
+            display_nodes_status(config)
+
+        if current_loop_time >= end_time:
             loop.stop()
             sys.exit(0)
 
-        await asyncio.sleep(1)
+        await asyncio.sleep(NETWORK_MONITORING_INTERVAL_IN_SECONDS)
+
+
+def display_nodes_status(config: ConfigRoot):
+    table: Any = PrettyTable(field_names=["Node", "Shard", "Nonce"])
+
+    for node in config.all_nodes():
+        try:
+            status = node.get_status()
+            table.add_row([node.index, node.shard, status.nonce])
+        except Exception:
+            pass
+
+    if table.rows:
+        print(table)
 
 
 async def run(args: List[str], cwd: Path, delay: int = 0):

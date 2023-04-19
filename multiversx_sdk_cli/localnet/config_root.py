@@ -7,28 +7,9 @@ import multiversx_sdk_cli.utils as utils
 from multiversx_sdk_cli.localnet import config_default
 from multiversx_sdk_cli.localnet.config_part import ConfigPart
 from multiversx_sdk_cli.localnet.constants import METACHAIN_ID
+from multiversx_sdk_cli.localnet.node import Node
 
 logger = logging.getLogger("localnet")
-
-
-class Node:
-    def __init__(self, index: int, folder: Path, shard: str, api_port: int) -> None:
-        self.index = index
-        self.folder = folder
-        self.shard = shard
-        self.api_port = api_port
-
-    def key_file_path(self):
-        return self.folder / "config" / "validatorKey.pem"
-
-    def api_address(self):
-        return f"http://{self.api_interface()}"
-
-    def api_interface(self):
-        return f"localhost:{self.api_port}"
-
-    def __repr__(self) -> str:
-        return f"Node {self.index}, shard={self.shard}, port={self.api_port}, folder={self.folder}"
 
 
 class ConfigRoot(ConfigPart):
@@ -97,6 +78,9 @@ class ConfigRoot(ConfigPart):
     def num_all_observers(self) -> int:
         return self.shards.num_shards * self.shards.num_observers_per_shard + self.metashard.num_observers
 
+    def all_nodes(self) -> List[Node]:
+        return self.validators() + self.observers()
+
     def validators(self) -> List[Node]:
         first_port = self.networking.port_first_validator_rest_api
         nodes: List[Node] = []
@@ -138,22 +122,6 @@ class ConfigRoot(ConfigPart):
 
     def observer_folders(self) -> List[Path]:
         return [self.root() / "observer{:02}".format(i) for i in range(self.num_all_observers())]
-
-    # TODO PRINT
-    # def observer_addresses(self):
-    #     host = self.networking["host"]
-    #     first_port = self.networking["port_first_observer_rest_api"]
-    #     for port in range(self.num_all_observers()):
-    #         port = first_port + port
-    #         yield f"http://{host}:{port}"
-
-    # TODO PRINT
-    # def validator_addresses(self):
-    #     host = self.networking["host"]
-    #     first_port = self.networking["port_first_observer_rest_api"]
-    #     for port in range(self.num_all_observers()):
-    #         port = first_port + port
-    #         yield f"http://{host}:{port}"
 
     def api_addresses_sharded_for_proxy_config(self) -> List[Dict[str, Any]]:
         nodes: List[Dict[str, Any]] = []
