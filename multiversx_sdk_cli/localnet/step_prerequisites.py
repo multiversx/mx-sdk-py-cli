@@ -1,10 +1,8 @@
 import logging
 import shutil
-from pathlib import Path
 from typing import Any
 
 from multiversx_sdk_cli import dependencies, downloader
-from multiversx_sdk_cli.errors import KnownError
 from multiversx_sdk_cli.localnet.config_root import ConfigRoot
 from multiversx_sdk_cli.localnet.config_software import SoftwareResolution
 
@@ -15,64 +13,50 @@ def prepare(args: Any):
     dependencies.install_module("testwallets", tag="", overwrite=True)
 
     config = ConfigRoot.from_file(args.configfile)
-    resolution = config.software.resolution
 
-    if resolution == SoftwareResolution.LocalPrebuiltCmdFolders:
-        logger.info("Using local prebuilt CMD folders")
+    resolution_chain_go = config.software.mx_chain_go.resolution
+    resolution_chain_proxy_go = config.software.mx_chain_proxy_go.resolution
 
-        subconfig = config.software.local_prebuilt_cmd_folders
-        node = subconfig.ensure_mx_chain_go_node_path()
-        seednode = subconfig.ensure_mx_chain_go_seednode_path()
-        _proxy = subconfig.ensure_mx_chain_proxy_go_path()
+    if resolution_chain_go == SoftwareResolution.Remote:
+        download_folder = config.software.mx_chain_go.archive_download_folder
+        extraction_folder = config.software.mx_chain_go.archive_extraction_folder
+        url = config.software.mx_chain_go.archive_url
 
-        subconfig.ensure_mx_chain_go_node_config_path()
-        subconfig.ensure_mx_chain_go_seednode_config_path()
-        subconfig.ensure_mx_chain_proxy_go_config_path()
+        shutil.rmtree(str(download_folder), ignore_errors=True)
+        shutil.rmtree(str(extraction_folder), ignore_errors=True)
 
-        for item in [node, seednode]:
-            any_library = any(item.glob("*.dylib")) or any(item.glob("*.so"))
+        download_folder.mkdir(parents=True, exist_ok=True)
+        extraction_folder.mkdir(parents=True, exist_ok=True)
+        archive_extension = url.split(".")[-1]
+        download_path = download_folder / f"archive.{archive_extension}"
 
-            if not any_library:
-                logger.warning(f"libwasmer might be missing from {item}. Localnet might not work.")
+        downloader.download(url, str(download_path))
+        shutil.unpack_archive(str(download_path), str(extraction_folder))
 
-        return
+    if resolution_chain_proxy_go == SoftwareResolution.Remote:
+        download_folder = config.software.mx_chain_proxy_go.archive_download_folder
+        extraction_folder = config.software.mx_chain_proxy_go.archive_extraction_folder
+        url = config.software.mx_chain_proxy_go.archive_url
 
-    if resolution == SoftwareResolution.LocalSourceFolders:
-        logger.info("Using local source folders")
+        shutil.rmtree(str(download_folder), ignore_errors=True)
+        shutil.rmtree(str(extraction_folder), ignore_errors=True)
 
-        subconfig = config.software.local_source_folders
-        subconfig.ensure_mx_chain_go_path()
-        subconfig.ensure_mx_chain_proxy_go_path()
+        download_folder.mkdir(parents=True, exist_ok=True)
+        extraction_folder.mkdir(parents=True, exist_ok=True)
+        archive_extension = url.split(".")[-1]
+        download_path = download_folder / f"archive.{archive_extension}"
 
+        downloader.download(url, str(download_path))
+        shutil.unpack_archive(str(download_path), str(extraction_folder))
+
+    config.software.mx_chain_go.node_config_must_exist()
+    config.software.mx_chain_go.seednode_config_must_exist()
+    config.software.mx_chain_proxy_go.proxy_config_must_exist()
+
+    is_node_built = config.software.mx_chain_go.is_node_built()
+    is_seednode_built = config.software.mx_chain_go.is_seednode_built()
+    is_proxy_built = config.software.mx_chain_proxy_go.is_proxy_built()
+
+    is_golang_needed = not (is_node_built and is_seednode_built and is_proxy_built)
+    if is_golang_needed:
         dependencies.install_module("golang")
-        return
-
-    if resolution == SoftwareResolution.RemoteArchives:
-        logger.info("Using remote archives")
-
-        subconfig = config.software.remote_archives
-
-        _download_archive(
-            url=subconfig.ensure_mx_chain_go_url(),
-            archive_path=subconfig.get_mx_chain_go_archive_path(),
-            destination_folder=subconfig.get_mx_chain_go_extract_path()
-        )
-
-        _download_archive(
-            url=subconfig.ensure_mx_chain_proxy_go_url(),
-            archive_path=subconfig.get_mx_chain_proxy_go_archive_path(),
-            destination_folder=subconfig.get_mx_chain_proxy_go_extract_path()
-        )
-
-        dependencies.install_module("golang")
-        return
-
-    raise KnownError(f"Unknown software resolution: {resolution}")
-
-
-def _download_archive(url: str, archive_path: Path, destination_folder: Path):
-    archive_path.parent.mkdir(parents=True, exist_ok=True)
-    destination_folder.mkdir(parents=True, exist_ok=True)
-
-    downloader.download(url, str(archive_path))
-    shutil.unpack_archive(str(archive_path), str(destination_folder))

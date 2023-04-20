@@ -38,6 +38,7 @@ def setup_parser(args: List[str], subparsers: Any) -> Any:
         "Build necessary software for running a localnet"
     )
     add_argument_configfile(sub)
+    sub.add_argument('--software', choices=["node", "seednode", "proxy"], nargs="+", default=["node", "seednode", "proxy"], help="The software to build (default: %(default)s)")
     sub.set_defaults(func=localnet_build)
 
     # Start
@@ -92,7 +93,11 @@ def localnet_prerequisites(args: Any):
 def localnet_build(args: Any):
     logger.info("Building binaries...")
     guard_configfile(args)
-    step_build_software.build(args)
+
+    step_build_software.build(
+        configfile=args.configfile,
+        software_pieces=args.software
+    )
 
 
 def localnet_config(args: Any):

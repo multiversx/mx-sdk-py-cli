@@ -1,218 +1,199 @@
 from enum import Enum
 from pathlib import Path
-from typing import Any, Dict, Tuple, Union
+from typing import Any, Dict, Optional
 
 from multiversx_sdk_cli.errors import KnownError
 from multiversx_sdk_cli.localnet.config_part import ConfigPart
 
 
 class SoftwareResolution(Enum):
-    RemoteArchives = "remote_archives"
-    LocalSourceFolders = "local_source_folders"
-    LocalPrebuiltCmdFolders = "local_prebuilt_cmd_folders"
+    Remote = "remote"
+    Local = "local"
 
 
 class Software(ConfigPart):
     def __init__(
             self,
-            resolution: SoftwareResolution,
-            remote_archives: 'SoftwareRemoteArchives',
-            local_source_folders: 'SoftwareLocalSourceFolders',
-            local_prebuilt_cmd_folders: 'SoftwareLocalPrebuiltCmdFolders'):
-        self.resolution: SoftwareResolution = resolution
-        self.remote_archives: SoftwareRemoteArchives = remote_archives
-        self.local_source_folders: SoftwareLocalSourceFolders = local_source_folders
-        self.local_prebuilt_cmd_folders: SoftwareLocalPrebuiltCmdFolders = local_prebuilt_cmd_folders
+            mx_chain_go: 'SoftwareChainGo',
+            mx_chain_proxy_go: 'SoftwareChainProxyGo'):
+        self.mx_chain_go = mx_chain_go
+        self.mx_chain_proxy_go = mx_chain_proxy_go
 
     def get_name(self) -> str:
         return "software"
 
     def _do_override(self, other: Dict[str, Any]):
-        self.resolution = SoftwareResolution(other.get("resolution", self.resolution.value))
-        self.remote_archives.override(other.get(self.remote_archives.get_name(), dict()))
-        self.local_source_folders.override(other.get(self.local_source_folders.get_name(), dict()))
-        self.local_prebuilt_cmd_folders.override(other.get(self.local_prebuilt_cmd_folders.get_name(), dict()))
+        self.mx_chain_go.override(other.get("mx_chain_go", {}))
+        self.mx_chain_proxy_go.override(other.get("mx_chain_proxy_go", {}))
 
-    def get_binaries_parents(self) -> Tuple[Path, Path, Path]:
-        if self.resolution == SoftwareResolution.RemoteArchives:
-            return (
-                self.remote_archives.get_mx_chain_go_source_path() / "cmd" / "node",
-                self.remote_archives.get_mx_chain_go_source_path() / "cmd" / "seednode",
-                self.remote_archives.get_mx_chain_proxy_go_source_path() / "cmd" / "proxy",
-            )
-        elif self.resolution == SoftwareResolution.LocalSourceFolders:
-            return (
-                self.local_source_folders.ensure_mx_chain_go_path() / "cmd" / "node",
-                self.local_source_folders.ensure_mx_chain_go_path() / "cmd" / "seednode",
-                self.local_source_folders.ensure_mx_chain_proxy_go_path() / "cmd" / "proxy"
-            )
-        elif self.resolution == SoftwareResolution.LocalPrebuiltCmdFolders:
-            return (
-                self.local_prebuilt_cmd_folders.ensure_mx_chain_go_node_path(),
-                self.local_prebuilt_cmd_folders.ensure_mx_chain_go_seednode_path(),
-                self.local_prebuilt_cmd_folders.ensure_mx_chain_proxy_go_path()
-            )
 
-        raise KnownError(f"Software resolution {self.resolution} not supported")
+class SoftwareChainGo(ConfigPart):
+    def __init__(self,
+                 resolution: SoftwareResolution,
+                 archive_url: str,
+                 archive_download_folder: Path,
+                 archive_extraction_folder: Path,
+                 local_path: Optional[Path]):
+        self.resolution: SoftwareResolution = resolution
+        self.archive_url: str = archive_url
+        self.archive_download_folder: Path = archive_download_folder
+        self.archive_extraction_folder: Path = archive_extraction_folder
+        self.local_path: Optional[Path] = local_path
+        self._verify()
+
+    def get_name(self) -> str:
+        return "mx_chain_go"
+
+    def _do_override(self, other: Dict[str, Any]) -> None:
+        self.resolution = SoftwareResolution(other.get("resolution", self.resolution))
+        self.archive_url = other.get("archive_url", self.archive_url)
+        self.archive_download_folder = other.get("archive_download_folder", self.archive_download_folder)
+        self.archive_extraction_folder = other.get("archive_extraction_folder", self.archive_extraction_folder)
+        self.local_path = other.get("local_path", self.local_path)
+        self._verify()
+
+    def _verify(self):
+        if self.resolution == SoftwareResolution.Remote:
+            if not self.archive_url:
+                raise KnownError(f"Resolution is {self.resolution}, but configuration section {self.get_name()} has no 'archive_url'")
+        if self.resolution == SoftwareResolution.Local:
+            if not self.local_path:
+                raise KnownError(f"Resolution is {self.resolution}, but configuration section {self.get_name()} has no 'local_path'")
+            folder_must_exist(self.local_path)
+
+    def get_path_within_source(self, relative_path: Path) -> Path:
+        return self.get_source_folder() / relative_path
+
+    def get_source_folder(self) -> Path:
+        if self.resolution == SoftwareResolution.Remote:
+            return self._locate_source_folder_in_archive_extraction_folder()
+        if self.resolution == SoftwareResolution.Local:
+            assert self.local_path
+            return self.local_path
+
+        raise KnownError(f"Unknown resolution: {self.resolution}")
+
+    def _locate_source_folder_in_archive_extraction_folder(self) -> Path:
+        # If has one subfolder, that one is the source code
+        subfolders = list(self.archive_extraction_folder.glob("*"))
+        source_folder = subfolders[0] if len(subfolders) == 1 else self.archive_extraction_folder
+        # Heuristic to check if this is a valid source code folder
+        assert (source_folder / "go.mod").exists(), f"This is not a valid source code folder: {source_folder}"
+        return source_folder
+
+    def get_cmd_node_folder(self):
+        folder = self._get_cmd_folder() / "node"
+        folder_must_exist(folder)
+        return folder
+
+    def get_cmd_seednode_folder(self):
+        folder = self._get_cmd_folder() / "seednode"
+        folder_must_exist(folder)
+        return folder
+
+    def _get_cmd_folder(self):
+        folder = self.get_path_within_source(Path("cmd"))
+        folder_must_exist(folder)
+        return folder
+
+    def is_node_built(self):
+        return (self.get_cmd_node_folder() / "node").exists()
+
+    def is_seednode_built(self):
+        return (self.get_cmd_seednode_folder() / "seednode").exists()
 
     def get_node_config_folder(self):
-        [node, _, _] = self.get_binaries_parents()
-        return node / "config"
+        return self.get_cmd_node_folder() / "config"
 
     def get_seednode_config_folder(self):
-        [_, seednode, _] = self.get_binaries_parents()
-        return seednode / "config"
+        return self.get_cmd_seednode_folder() / "config"
+
+    def node_config_must_exist(self):
+        folder_must_exist(self.get_node_config_folder())
+
+    def seednode_config_must_exist(self):
+        folder_must_exist(self.get_seednode_config_folder())
+
+
+class SoftwareChainProxyGo(ConfigPart):
+    def __init__(self,
+                 resolution: SoftwareResolution,
+                 archive_url: str,
+                 archive_download_folder: Path,
+                 archive_extraction_folder: Path,
+                 local_path: Optional[Path]):
+        self.resolution: SoftwareResolution = resolution
+        self.archive_url: str = archive_url
+        self.archive_download_folder: Path = archive_download_folder
+        self.archive_extraction_folder: Path = archive_extraction_folder
+        self.local_path: Optional[Path] = local_path
+        self._verify()
+
+    def get_name(self) -> str:
+        return "mx_chain_proxy_go"
+
+    def _do_override(self, other: Dict[str, Any]) -> None:
+        self.resolution = SoftwareResolution(other.get("resolution", self.resolution))
+        self.archive_url = other.get("archive_url", self.archive_url)
+        self.archive_download_folder = other.get("archive_download_folder", self.archive_download_folder)
+        self.archive_extraction_folder = other.get("archive_extraction_folder", self.archive_extraction_folder)
+        self.local_path = other.get("local_path", self.local_path)
+        self._verify()
+
+    def _verify(self):
+        if self.resolution == SoftwareResolution.Remote:
+            if not self.archive_url:
+                raise KnownError(f"Resolution is {self.resolution}, but configuration section {self.get_name()} has no 'archive_url'")
+        if self.resolution == SoftwareResolution.Local:
+            if not self.local_path:
+                raise KnownError(f"Resolution is {self.resolution}, but configuration section {self.get_name()} has no 'local_path'")
+            folder_must_exist(self.local_path)
+
+    def get_path_within_source(self, relative_path: Path) -> Path:
+        return self.get_source_folder() / relative_path
+
+    def get_source_folder(self) -> Path:
+        if self.resolution == SoftwareResolution.Remote:
+            return self._locate_source_folder_in_archive_extraction_folder()
+        if self.resolution == SoftwareResolution.Local:
+            assert self.local_path
+            return self.local_path
+
+        raise KnownError(f"Unknown resolution: {self.resolution}")
+
+    def _locate_source_folder_in_archive_extraction_folder(self) -> Path:
+        # If has one subfolder, that one is the source code
+        subfolders = list(self.archive_extraction_folder.glob("*"))
+        source_folder = subfolders[0] if len(subfolders) == 1 else self.archive_extraction_folder
+        # Heuristic to check if this is a valid source code folder
+        assert (source_folder / "go.mod").exists(), f"This is not a valid source code folder: {source_folder}"
+        return source_folder
+
+    def get_cmd_proxy_folder(self):
+        folder = self._get_cmd_folder() / "proxy"
+        folder_must_exist(folder)
+        return folder
+
+    def _get_cmd_folder(self):
+        folder = self.get_path_within_source(Path("cmd"))
+        folder_must_exist(folder)
+        return folder
+
+    def is_proxy_built(self):
+        return (self.get_cmd_proxy_folder() / "proxy").exists()
 
     def get_proxy_config_folder(self):
-        [_, _, proxy] = self.get_binaries_parents()
-        return proxy / "config"
+        return self.get_cmd_proxy_folder() / "config"
 
-    def get_mx_chain_go_path_in_source(self, relative_path: Path) -> Path:
-        if self.resolution == SoftwareResolution.RemoteArchives:
-            return self.remote_archives.get_mx_chain_go_source_path() / relative_path
-        elif self.resolution == SoftwareResolution.LocalSourceFolders:
-            return self.local_source_folders.ensure_mx_chain_go_path() / relative_path
-        elif self.resolution == SoftwareResolution.LocalPrebuiltCmdFolders:
-            raise KnownError(f"Software resolution {self.resolution} does not support source code lookup")
-
-        raise KnownError(f"Software resolution {self.resolution} not supported")
+    def proxy_config_must_exist(self):
+        folder_must_exist(self.get_proxy_config_folder())
 
 
-class SoftwareRemoteArchives(ConfigPart):
-    def __init__(self,
-                 downloads_folder: Path,
-                 mx_chain_go: str = "",
-                 mx_chain_proxy_go: str = ""):
-        self.downloads_folder: Path = downloads_folder.expanduser().resolve()
-        self.mx_chain_go: str = mx_chain_go
-        self.mx_chain_proxy_go: str = mx_chain_proxy_go
-
-    def get_name(self) -> str:
-        return "remote_archives"
-
-    def _do_override(self, other: Dict[str, Any]):
-        self.downloads_folder = Path(other.get("downloads_folder", self.downloads_folder)).expanduser().resolve()
-        self.mx_chain_go = other.get("mx_chain_go", self.mx_chain_go)
-        self.mx_chain_proxy_go = other.get("mx_chain_proxy_go", self.mx_chain_proxy_go)
-
-    def ensure_mx_chain_go_url(self) -> str:
-        return self._ensure_url("mx_chain_go", self.mx_chain_go)
-
-    def ensure_mx_chain_proxy_go_url(self) -> str:
-        return self._ensure_url("mx_chain_proxy_go", self.mx_chain_proxy_go)
-
-    def _ensure_url(self, name: str, url: str) -> str:
-        if not url:
-            raise KnownError(f"URL {name} is not properly configured")
-        return url
-
-    def get_mx_chain_go_archive_path(self) -> Path:
-        archive_suffix = Path(self.mx_chain_go).suffix
-        return self.downloads_folder / f"mx_chain_go{archive_suffix}"
-
-    def get_mx_chain_proxy_go_archive_path(self) -> Path:
-        archive_suffix = Path(self.mx_chain_proxy_go).suffix
-        return self.downloads_folder / f"mx_chain_proxy_go{archive_suffix}"
-
-    def get_mx_chain_go_extract_path(self) -> Path:
-        return self.downloads_folder / "mx_chain_go"
-
-    def get_mx_chain_proxy_go_extract_path(self) -> Path:
-        return self.downloads_folder / "mx_chain_proxy_go"
-
-    def get_mx_chain_go_source_path(self) -> Path:
-        extract_path = self.get_mx_chain_go_extract_path()
-        # If has one subfolder, that one is the source code
-        subfolders = list(extract_path.glob("*"))
-        source_folder = subfolders[0] if len(subfolders) == 1 else extract_path
-        # Heuristic to check if this is a valid source code folder
-        assert (source_folder / "go.mod").exists(), f"This is not a valid source code folder: {source_folder}"
-        return source_folder
-
-    def get_mx_chain_proxy_go_source_path(self) -> Path:
-        extract_path = self.get_mx_chain_proxy_go_extract_path()
-        # If has one subfolder, that one is the source code
-        subfolders = list(extract_path.glob("*"))
-        source_folder = subfolders[0] if len(subfolders) == 1 else extract_path
-        # Heuristic to check if this is a valid source code folder
-        assert (source_folder / "go.mod").exists(), f"This is not a valid source code folder: {source_folder}"
-        return source_folder
+def folder_must_exist(path: Path) -> None:
+    if not path.exists():
+        raise KnownError(f"Folder does not exist: {path}")
 
 
-class SoftwareLocalSourceFolders(ConfigPart):
-    def __init__(self,
-                 mx_chain_go: str = "",
-                 mx_chain_proxy_go: str = ""):
-        self.mx_chain_go: str = mx_chain_go
-        self.mx_chain_proxy_go: str = mx_chain_proxy_go
-
-    def get_name(self) -> str:
-        return "local_source_folders"
-
-    def _do_override(self, other: Dict[str, Any]):
-        self.mx_chain_go = other.get("mx_chain_go", self.mx_chain_go)
-        self.mx_chain_proxy_go = other.get("mx_chain_proxy_go", self.mx_chain_proxy_go)
-
-    def ensure_mx_chain_go_path(self) -> Path:
-        return self._ensure_path("mx_chain_go", self.mx_chain_go)
-
-    def ensure_mx_chain_proxy_go_path(self) -> Path:
-        return self._ensure_path("mx_chain_proxy_go", self.mx_chain_proxy_go)
-
-    def _ensure_path(self, name: str, path_value: str) -> Path:
-        if not path_value:
-            raise KnownError(f"{name} is not properly configured")
-
-        path = Path(path_value).expanduser().resolve()
-
-        if not path.is_dir():
-            raise KnownError(f"{name} path is not a directory: {path}")
-
-        return path
-
-
-class SoftwareLocalPrebuiltCmdFolders(ConfigPart):
-    def __init__(self,
-                 mx_chain_go_node: str = "",
-                 mx_chain_go_seednode: str = "",
-                 mx_chain_proxy_go: str = ""):
-        self.mx_chain_go_node: str = mx_chain_go_node
-        self.mx_chain_go_seednode: str = mx_chain_go_seednode
-        self.mx_chain_proxy_go: str = mx_chain_proxy_go
-
-    def get_name(self) -> str:
-        return "local_prebuilt_cmd_folders"
-
-    def _do_override(self, other: Dict[str, Any]):
-        self.mx_chain_go_node = other.get("mx_chain_go_node", self.mx_chain_go_node)
-        self.mx_chain_go_seednode = other.get("mx_chain_go_seednode", self.mx_chain_go_seednode)
-        self.mx_chain_proxy_go = other.get("mx_chain_proxy_go", self.mx_chain_proxy_go)
-
-    def ensure_mx_chain_go_node_path(self) -> Path:
-        return self._ensure_path("mx_chain_go_node", self.mx_chain_go_node)
-
-    def ensure_mx_chain_go_seednode_path(self) -> Path:
-        return self._ensure_path("mx_chain_go_seednode", self.mx_chain_go_seednode)
-
-    def ensure_mx_chain_proxy_go_path(self) -> Path:
-        return self._ensure_path("mx_chain_proxy_go", self.mx_chain_proxy_go)
-
-    def ensure_mx_chain_go_node_config_path(self) -> Path:
-        return self._ensure_path("mx_chain_go_node_config", self.ensure_mx_chain_go_node_path() / "config")
-
-    def ensure_mx_chain_go_seednode_config_path(self) -> Path:
-        return self._ensure_path("mx_chain_go_seednode_config", self.ensure_mx_chain_go_seednode_path() / "config")
-
-    def ensure_mx_chain_proxy_go_config_path(self) -> Path:
-        return self._ensure_path("mx_chain_proxy_go_config", self.ensure_mx_chain_proxy_go_path() / "config")
-
-    def _ensure_path(self, name: str, path_value: Union[str, Path]) -> Path:
-        if not path_value:
-            raise KnownError(f"{name} is not properly configured")
-
-        path = Path(path_value).expanduser().resolve()
-
-        if not path.is_dir():
-            raise KnownError(f"{name} path is not a directory: {path}")
-
-        return path
+def file_must_exist(path: Path) -> None:
+    if not path.exists():
+        raise KnownError(f"File does not exist: {path}")

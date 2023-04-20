@@ -4,9 +4,10 @@ from multiversx_sdk_cli.localnet.config_general import General
 from multiversx_sdk_cli.localnet.config_networking import Networking
 from multiversx_sdk_cli.localnet.config_sharding import (Metashard,
                                                          RegularShards)
-from multiversx_sdk_cli.localnet.config_software import (
-    Software, SoftwareLocalPrebuiltCmdFolders, SoftwareLocalSourceFolders,
-    SoftwareRemoteArchives, SoftwareResolution)
+from multiversx_sdk_cli.localnet.config_software import (Software,
+                                                         SoftwareChainGo,
+                                                         SoftwareChainProxyGo,
+                                                         SoftwareResolution)
 
 general = General(
     log_level="*:DEBUG",
@@ -16,14 +17,20 @@ general = General(
 )
 
 software = Software(
-    resolution=SoftwareResolution.RemoteArchives,
-    remote_archives=SoftwareRemoteArchives(
-        downloads_folder=Path("~/multiversx-sdk").expanduser().resolve() / "localnet_software_archives",
-        mx_chain_go="https://github.com/multiversx/mx-chain-go/archive/refs/heads/master.zip",
-        mx_chain_proxy_go="https://github.com/multiversx/mx-chain-proxy-go/archive/refs/heads/master.zip"
+    mx_chain_go=SoftwareChainGo(
+        resolution=SoftwareResolution.Remote,
+        archive_url="https://github.com/multiversx/mx-chain-go/archive/refs/heads/master.zip",
+        archive_download_folder=Path("~/multiversx-sdk").expanduser().resolve() / "localnet_software_archives" / "downloaded" / "mx-chain-go",
+        archive_extraction_folder=Path("~/multiversx-sdk").expanduser().resolve() / "localnet_software_archives" / "extracted" / "mx-chain-go",
+        local_path=None
     ),
-    local_source_folders=SoftwareLocalSourceFolders(),
-    local_prebuilt_cmd_folders=SoftwareLocalPrebuiltCmdFolders()
+    mx_chain_proxy_go=SoftwareChainProxyGo(
+        resolution=SoftwareResolution.Remote,
+        archive_url="https://github.com/multiversx/mx-chain-proxy-go/archive/refs/heads/master.zip",
+        archive_download_folder=Path("~/multiversx-sdk").expanduser().resolve() / "localnet_software_archives" / "downloaded" / "mx-chain-proxy-go",
+        archive_extraction_folder=Path("~/multiversx-sdk").expanduser().resolve() / "localnet_software_archives" / "extracted" / "mx-chain-proxy-go",
+        local_path=None
+    )
 )
 
 metashard = Metashard(

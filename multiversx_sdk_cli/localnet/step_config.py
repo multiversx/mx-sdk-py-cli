@@ -1,5 +1,4 @@
 import logging
-import os
 import shutil
 from os import path
 from pathlib import Path
@@ -8,8 +7,8 @@ from typing import Any, List
 import multiversx_sdk_cli.utils as utils
 from multiversx_sdk_cli.localnet import (genesis_json,
                                          genesis_smart_contracts_json,
-                                         node_config_toml, nodes_setup_json,
-                                         p2p_toml, wallets)
+                                         libraries, node_config_toml,
+                                         nodes_setup_json, p2p_toml, wallets)
 from multiversx_sdk_cli.localnet.config_root import ConfigRoot
 
 logger = logging.getLogger("localnet")
@@ -77,7 +76,7 @@ def create_folders(config: ConfigRoot):
 
 
 def copy_config_to_nodes(config: ConfigRoot):
-    config_prototype = config.software.get_node_config_folder()
+    config_prototype = config.software.mx_chain_go.get_node_config_folder()
     for node_config in config.all_nodes_config_folders():
         shutil.copytree(config_prototype, node_config)
 
@@ -115,7 +114,7 @@ def patch_node_config(config: ConfigRoot):
 
 
 def copy_config_to_seednode(config: ConfigRoot):
-    config_source = config.software.get_seednode_config_folder()
+    config_source = config.software.mx_chain_go.get_seednode_config_folder()
     seednode_config = config.seednode_config_folder()
     makefolder(seednode_config)
     shutil.copy(config_source / 'p2p.toml', seednode_config / 'p2p.toml')
@@ -159,7 +158,7 @@ def overwrite_genesis_file(config: ConfigRoot, nodes_config_folders: List[Path])
 
 
 def copy_config_to_proxy(config: ConfigRoot):
-    config_prototype = config.software.get_proxy_config_folder()
+    config_prototype = config.software.mx_chain_proxy_go.get_proxy_config_folder()
     proxy_config = config.proxy_config_folder()
     makefolder(proxy_config)
 
@@ -198,24 +197,15 @@ def makefolder(path_where_to_make_folder: Path):
 
 
 def copy_binaries_into_localnet_workspace(config: ConfigRoot):
-    [node_cmd, seednode_cmd, proxy_cmd] = config.software.get_binaries_parents()
+    cmd_node = config.software.mx_chain_go.get_cmd_node_folder()
+    cmd_seednode = config.software.mx_chain_go.get_cmd_seednode_folder()
+    cmd_proxy = config.software.mx_chain_proxy_go.get_cmd_proxy_folder()
 
     for destination in config.all_nodes_folders():
-        shutil.copy(node_cmd / "node", destination)
-        copy_libraries(node_cmd, destination)
+        shutil.copy(cmd_node / "node", destination)
+        libraries.copy_libraries(cmd_node, destination)
 
-    shutil.copy(seednode_cmd / "seednode", config.seednode_folder())
-    copy_libraries(seednode_cmd, config.seednode_folder())
+    shutil.copy(cmd_seednode / "seednode", config.seednode_folder())
+    libraries.copy_libraries(cmd_seednode, config.seednode_folder())
 
-    shutil.copy(proxy_cmd / "proxy", config.proxy_folder())
-    copy_libraries(proxy_cmd, config.proxy_folder())
-
-
-def copy_libraries(source: Path, destination: Path):
-    libraries: List[Path] = list(source.glob("*.dylib")) + list(source.glob("*.so"))
-
-    for library in libraries:
-        logger.info(f"Copying {library} to {destination}")
-
-        shutil.copy(library, destination)
-        os.chmod(destination / library.name, 0o755)
+    shutil.copy(cmd_proxy / "proxy", config.proxy_folder())

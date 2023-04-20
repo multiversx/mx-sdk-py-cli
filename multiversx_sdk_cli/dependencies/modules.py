@@ -28,10 +28,10 @@ class DependencyModule:
         if tag == 'latest':
             tag = self.get_latest_release()
 
-        logger.debug(f"install: key={self.key}, tag={tag}")
+        logger.info(f"install: key={self.key}, tag={tag}, overwrite={overwrite}")
 
         if self._should_skip(tag, overwrite):
-            logger.debug("Already exists. Skip install.")
+            logger.info("Already exists. Skip install.")
             return
 
         self._guard_cannot_install_on_host()
