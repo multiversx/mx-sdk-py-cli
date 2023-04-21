@@ -33,7 +33,7 @@ class RegularShards(ConfigPart):
         self.num_validators_per_shard: int = num_validators_per_shard
 
     def get_name(self) -> str:
-        return "sharding"
+        return "shards"
 
     def _do_override(self, other: Dict[str, Any]):
         self.num_shards = other.get("num_shards", self.num_shards)

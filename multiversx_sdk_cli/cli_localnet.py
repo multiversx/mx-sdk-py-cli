@@ -6,8 +6,8 @@ from multiversx_sdk_cli import cli_shared
 from multiversx_sdk_cli.constants import ONE_YEAR_IN_SECONDS
 from multiversx_sdk_cli.errors import KnownError
 from multiversx_sdk_cli.localnet import (step_build_software, step_clean,
-                                         step_config, step_prerequisites,
-                                         step_start)
+                                         step_config, step_new,
+                                         step_prerequisites, step_start)
 
 logger = logging.getLogger("cli.localnet")
 
@@ -19,6 +19,16 @@ def setup_parser(args: List[str], subparsers: Any) -> Any:
         "Set up, start and control localnets"
     )
     subparsers = parser.add_subparsers()
+
+    # New
+    sub = cli_shared.add_command_subparser(
+        subparsers,
+        "localnet",
+        "new",
+        "Create a new localnet configuration"
+    )
+    add_argument_configfile(sub)
+    sub.set_defaults(func=localnet_new)
 
     # Prerequisites
     sub = cli_shared.add_command_subparser(
@@ -76,6 +86,12 @@ def setup_parser(args: List[str], subparsers: Any) -> Any:
 def add_argument_configfile(parser: Any):
     help_config_file = "An optional configuration file describing the localnet"
     parser.add_argument("--configfile", type=Path, required=False, default=Path("localnet.toml"), help=help_config_file)
+
+
+def localnet_new(args: Any):
+    logger.info("New localnet (creating configuration file)...")
+
+    step_new.new_config(args.configfile)
 
 
 def localnet_clean(args: Any):

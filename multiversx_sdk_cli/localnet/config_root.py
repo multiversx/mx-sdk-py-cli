@@ -3,7 +3,8 @@ import time
 from pathlib import Path
 from typing import Any, Dict, List
 
-import multiversx_sdk_cli.utils as utils
+import toml
+
 from multiversx_sdk_cli.localnet import config_default
 from multiversx_sdk_cli.localnet.config_part import ConfigPart
 from multiversx_sdk_cli.localnet.constants import METACHAIN_ID
@@ -34,13 +35,18 @@ class ConfigRoot(ConfigPart):
     def from_file(cls, path: Path):
         path = path.expanduser().resolve()
         instance = cls()
-        local_config_dict = utils.read_toml_file(path)
+        local_config_dict = toml.load(str(path))
         instance.override(local_config_dict)
 
         return instance
 
+    def save(self, path: Path):
+        path = path.expanduser().resolve()
+        with open(path, "w") as f:
+            toml.dump(self.to_dictionary(), f)
+
     def root(self) -> Path:
-        return Path("localnet").resolve()
+        return Path("localnet").expanduser().resolve()
 
     def seednode_folder(self):
         return self.root() / "seednode"
@@ -141,3 +147,13 @@ class ConfigRoot(ConfigPart):
             })
 
         return nodes
+
+    def to_dictionary(self) -> Dict[str, Any]:
+        result: Dict[str, Any] = dict()
+        result[self.general.get_name()] = self.general.to_dictionary()
+        result[self.software.get_name()] = self.software.to_dictionary()
+        result[self.metashard.get_name()] = self.metashard.to_dictionary()
+        result[self.shards.get_name()] = self.shards.to_dictionary()
+        result[self.networking.get_name()] = self.networking.to_dictionary()
+
+        return result

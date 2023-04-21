@@ -10,9 +10,9 @@ logger = logging.getLogger("localnet")
 
 
 def prepare(args: Any):
-    dependencies.install_module("testwallets", tag="", overwrite=True)
-
     config = ConfigRoot.from_file(args.configfile)
+
+    dependencies.install_module("testwallets", tag="", overwrite=True)
 
     resolution_chain_go = config.software.mx_chain_go.resolution
     resolution_chain_proxy_go = config.software.mx_chain_proxy_go.resolution

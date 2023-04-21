@@ -26,6 +26,12 @@ class Software(ConfigPart):
         self.mx_chain_go.override(other.get("mx_chain_go", {}))
         self.mx_chain_proxy_go.override(other.get("mx_chain_proxy_go", {}))
 
+    def to_dictionary(self) -> Dict[str, Any]:
+        return {
+            "mx_chain_go": self.mx_chain_go.to_dictionary(),
+            "mx_chain_proxy_go": self.mx_chain_proxy_go.to_dictionary(),
+        }
+
 
 class SoftwareChainGo(ConfigPart):
     def __init__(self,
@@ -114,6 +120,15 @@ class SoftwareChainGo(ConfigPart):
     def seednode_config_must_exist(self):
         folder_must_exist(self.get_seednode_config_folder())
 
+    def to_dictionary(self) -> Dict[str, Any]:
+        return {
+            "resolution": self.resolution.value,
+            "archive_url": self.archive_url,
+            "archive_download_folder": str(self.archive_download_folder),
+            "archive_extraction_folder": str(self.archive_extraction_folder),
+            "local_path": str(self.local_path) if self.local_path else None,
+        }
+
 
 class SoftwareChainProxyGo(ConfigPart):
     def __init__(self,
@@ -187,6 +202,15 @@ class SoftwareChainProxyGo(ConfigPart):
 
     def proxy_config_must_exist(self):
         folder_must_exist(self.get_proxy_config_folder())
+
+    def to_dictionary(self) -> Dict[str, Any]:
+        return {
+            "resolution": self.resolution.value,
+            "archive_url": self.archive_url,
+            "archive_download_folder": str(self.archive_download_folder),
+            "archive_extraction_folder": str(self.archive_extraction_folder),
+            "local_path": str(self.local_path) if self.local_path else None,
+        }
 
 
 def folder_must_exist(path: Path) -> None:

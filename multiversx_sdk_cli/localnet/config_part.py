@@ -31,3 +31,6 @@ For "{self.get_name()}", the allowed entries are: {allowed_entries}.""")
 
     def _do_override(self, other: Dict[str, Any]) -> None:
         raise NotImplementedError()
+
+    def to_dictionary(self) -> Dict[str, Any]:
+        return self.__dict__

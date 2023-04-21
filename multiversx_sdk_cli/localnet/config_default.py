@@ -20,16 +20,16 @@ software = Software(
     mx_chain_go=SoftwareChainGo(
         resolution=SoftwareResolution.Remote,
         archive_url="https://github.com/multiversx/mx-chain-go/archive/refs/heads/master.zip",
-        archive_download_folder=Path("~/multiversx-sdk").expanduser().resolve() / "localnet_software_archives" / "downloaded" / "mx-chain-go",
-        archive_extraction_folder=Path("~/multiversx-sdk").expanduser().resolve() / "localnet_software_archives" / "extracted" / "mx-chain-go",
-        local_path=None
+        archive_download_folder=Path("~/multiversx-sdk") / "localnet_software_archives" / "downloaded" / "mx-chain-go",
+        archive_extraction_folder=Path("~/multiversx-sdk") / "localnet_software_archives" / "extracted" / "mx-chain-go",
+        local_path=Path("~/multiversx-sdk") / "localnet_software" / "mx-chain-go"
     ),
     mx_chain_proxy_go=SoftwareChainProxyGo(
         resolution=SoftwareResolution.Remote,
         archive_url="https://github.com/multiversx/mx-chain-proxy-go/archive/refs/heads/master.zip",
-        archive_download_folder=Path("~/multiversx-sdk").expanduser().resolve() / "localnet_software_archives" / "downloaded" / "mx-chain-proxy-go",
-        archive_extraction_folder=Path("~/multiversx-sdk").expanduser().resolve() / "localnet_software_archives" / "extracted" / "mx-chain-proxy-go",
-        local_path=None
+        archive_download_folder=Path("~/multiversx-sdk") / "localnet_software_archives" / "downloaded" / "mx-chain-proxy-go",
+        archive_extraction_folder=Path("~/multiversx-sdk") / "localnet_software_archives" / "extracted" / "mx-chain-proxy-go",
+        local_path=Path("~/multiversx-sdk") / "localnet_software" / "mx-chain-proxy-go"
     )
 )
 
