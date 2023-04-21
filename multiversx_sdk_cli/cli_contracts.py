@@ -185,11 +185,6 @@ def _add_build_options_args(sub: Any):
     sub.add_argument("--wasm-suffix", type=str,
                      help="for rust projects, optionally specify the suffix of the wasm bytecode output file")
 
-    sub.add_argument("--eei-checks", action="store_true", default=False, help="run EEI compatibility checks (default: %(default)s)")
-    # Flags are kept in order to avoid breaking changes, for the moment - we might completely remove them in the future.
-    sub.add_argument("--skip-eei-checks", action="store_true", default=True, help="deprecated flag")
-    sub.add_argument("--ignore-eei-checks", action="store_true", default=True, help="deprecated flag")
-
 
 def _add_recursive_arg(sub: Any):
     sub.add_argument("-r", "--recursive", dest="recursive", action="store_true", help="locate projects recursively")
@@ -272,12 +267,7 @@ def _prepare_build_options(args: Any) -> Dict[str, Any]:
         "cargo-target-dir": args.cargo_target_dir,
         "wasm-symbols": args.wasm_symbols,
         "wasm-name": args.wasm_name,
-        "wasm-suffix": args.wasm_suffix,
-        "eei-checks": args.eei_checks,
-        # TODO: Remove this, in the future
-        "skip-eei-checks": args.skip_eei_checks,
-        # TODO: Remove this, in the future
-        "ignore-eei-checks": args.ignore_eei_checks
+        "wasm-suffix": args.wasm_suffix
     }
 
 
