@@ -64,6 +64,15 @@ class SoftwarePiece(ConfigPart):
                 raise KnownError(f"Resolution is {self.resolution}, but configuration section {self.get_name()} has a bad 'local_path': {self.local_path}")
             folder_must_exist(self.local_path)
 
+    def get_archive_download_folder(self):
+        return self.archive_download_folder.expanduser().resolve()
+
+    def get_archive_extraction_folder(self):
+        return self.archive_extraction_folder.expanduser().resolve()
+
+    def get_local_path(self):
+        return self.local_path.expanduser().resolve()
+
     def get_path_within_source(self, relative_path: Path) -> Path:
         path = self._get_source_folder() / relative_path
         return path.expanduser().resolve()
@@ -72,15 +81,16 @@ class SoftwarePiece(ConfigPart):
         if self.resolution == SoftwareResolution.Remote:
             return self._locate_source_folder_in_archive_extraction_folder()
         if self.resolution == SoftwareResolution.Local:
-            assert self.local_path
             return self.local_path
 
         raise KnownError(f"Unknown resolution: {self.resolution}")
 
     def _locate_source_folder_in_archive_extraction_folder(self) -> Path:
+        extraction_folder = self.get_archive_extraction_folder()
+
         # If has one subfolder, that one is the source code
-        subfolders = list(self.archive_extraction_folder.glob("*"))
-        source_folder = subfolders[0] if len(subfolders) == 1 else self.archive_extraction_folder
+        subfolders = list(extraction_folder.glob("*"))
+        source_folder = subfolders[0] if len(subfolders) == 1 else extraction_folder
         # Heuristic to check if this is a valid source code folder
         assert (source_folder / "go.mod").exists(), f"This is not a valid source code folder: {source_folder}"
         return source_folder

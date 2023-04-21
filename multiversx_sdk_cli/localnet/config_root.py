@@ -33,6 +33,8 @@ class ConfigRoot(ConfigPart):
 
     @classmethod
     def from_file(cls, path: Path):
+        logger.info(f"Loading localnet configuration from: {path}")
+
         path = path.expanduser().resolve()
         instance = cls()
         local_config_dict = toml.load(str(path))
@@ -44,6 +46,8 @@ class ConfigRoot(ConfigPart):
         path = path.expanduser().resolve()
         with open(path, "w") as f:
             toml.dump(self.to_dictionary(), f)
+
+        logger.info(f"Saved localnet configuration to: {path}")
 
     def root(self) -> Path:
         return Path("localnet").expanduser().resolve()
