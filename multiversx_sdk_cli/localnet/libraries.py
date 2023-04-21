@@ -11,7 +11,7 @@ def copy_libraries(source: Path, destination: Path):
     libraries: List[Path] = list(source.glob("*.dylib")) + list(source.glob("*.so"))
 
     for library in libraries:
-        logger.info(f"Copying {library} to {destination}")
+        logger.debug(f"Copying {library} to {destination}")
 
         shutil.copy(library, destination)
         os.chmod(destination / library.name, 0o755)

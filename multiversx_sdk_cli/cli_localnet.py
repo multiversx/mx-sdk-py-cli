@@ -82,6 +82,16 @@ def setup_parser(args: List[str], subparsers: Any) -> Any:
     add_argument_configfile(sub)
     sub.set_defaults(func=localnet_clean)
 
+    # Setup
+    sub = cli_shared.add_command_subparser(
+        subparsers,
+        "localnet",
+        "setup",
+        "Sets up a localnet (runs 'prerequisites', 'build' and 'config' in one go)"
+    )
+    add_argument_configfile(sub)
+    sub.set_defaults(func=localnet_setup)
+
 
 def add_argument_configfile(parser: Any):
     help_config_file = "An optional configuration file describing the localnet"
@@ -93,43 +103,60 @@ def localnet_new(args: Any):
 
     step_new.new_config(args.configfile)
 
+    logger.info("New localnet configuration file created (or already existing). Make sure to inspect it. Now, you can run 'mxpy localnet prerequisites' to fetch localnet prerequisites.")
+
 
 def localnet_clean(args: Any):
     logger.info("Cleaning localnet...")
     guard_configfile(args)
-    step_clean.clean(args)
+
+    step_clean.clean(configfile=args.configfile)
 
 
 def localnet_prerequisites(args: Any):
     logger.info("Gathering prerequisites...")
     guard_configfile(args)
-    step_prerequisites.prepare(args)
+
+    step_prerequisites.fetch_prerequisites(configfile=args.configfile)
+
+    logger.info("Prerequisites gathered. Now, you can run 'mxpy localnet build' to build the localnet software.")
 
 
 def localnet_build(args: Any):
     logger.info("Building binaries...")
     guard_configfile(args)
 
-    step_build_software.build(
-        configfile=args.configfile,
-        software_pieces=args.software
-    )
+    step_build_software.build(configfile=args.configfile, software_pieces=args.software)
+
+    logger.info("Binaries built. Now, you can run 'mxpy localnet config' to configure the localnet.")
 
 
 def localnet_config(args: Any):
     logger.info("Configuring localnet...")
     guard_configfile(args)
-    step_config.configure(args)
+
+    step_config.configure(configfile=args.configfile)
+
+    logger.info("Localnet configured. You can now start it with 'mxpy localnet start'.")
 
 
 def localnet_start(args: Any):
     logger.info("Starting localnet...")
     guard_configfile(args)
 
-    step_start.start(
-        configfile=args.configfile,
-        stop_after_seconds=args.stop_after_seconds
-    )
+    step_start.start(configfile=args.configfile, stop_after_seconds=args.stop_after_seconds)
+
+
+def localnet_setup(args: Any):
+    logger.info("Setting up localnet...")
+
+    step_new.new_config(args.configfile)
+    step_prerequisites.fetch_prerequisites(configfile=args.configfile)
+    step_build_software.build(configfile=args.configfile, software_pieces=["node", "seednode", "proxy"])
+    step_clean.clean(configfile=args.configfile)
+    step_config.configure(configfile=args.configfile)
+
+    logger.info("Localnet setup complete. You can now start it with 'mxpy localnet start'.")
 
 
 def guard_configfile(args: Any):

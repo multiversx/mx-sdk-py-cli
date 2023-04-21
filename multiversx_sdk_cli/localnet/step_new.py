@@ -7,10 +7,12 @@ logger = logging.getLogger("localnet")
 
 
 def new_config(configfile: Path):
+    logger.info("new_config()")
+
     configfile = configfile.expanduser().resolve()
 
     if configfile.exists():
-        logger.error(f"Configuration file already exists: {configfile}")
+        logger.warning(f"Configuration file already exists: {configfile}")
         return
 
     config = ConfigRoot()

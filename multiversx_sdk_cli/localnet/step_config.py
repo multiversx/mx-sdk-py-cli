@@ -2,9 +2,10 @@ import logging
 import shutil
 from os import path
 from pathlib import Path
-from typing import Any, List
+from typing import List
 
 import multiversx_sdk_cli.utils as utils
+from multiversx_sdk_cli.errors import KnownError
 from multiversx_sdk_cli.localnet import (genesis_json,
                                          genesis_smart_contracts_json,
                                          libraries, node_config_toml,
@@ -14,9 +15,16 @@ from multiversx_sdk_cli.localnet.config_root import ConfigRoot
 logger = logging.getLogger("localnet")
 
 
-def configure(args: Any):
-    config = ConfigRoot.from_file(args.configfile)
-    logger.info("localnet folder is %s", config.root())
+def configure(configfile: Path):
+    logger.info("configure()")
+
+    config = ConfigRoot.from_file(configfile)
+
+    if config.root().exists():
+        logger.error(f"Localnet folder already exists: {config.root()}. Perhaps run 'clean' first?")
+        raise KnownError(f"Localnet folder already exists: {config.root()}.")
+
+    logger.info("Localnet folder is %s", config.root())
 
     create_folders(config)
 

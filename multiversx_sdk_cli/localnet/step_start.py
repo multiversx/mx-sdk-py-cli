@@ -21,6 +21,8 @@ is_after_genesis = False
 
 
 def start(configfile: Path, stop_after_seconds: int):
+    logger.info("start()")
+
     try:
         loop = asyncio.get_event_loop()
         loop.run_until_complete(do_start(configfile, stop_after_seconds))
@@ -32,7 +34,7 @@ def start(configfile: Path, stop_after_seconds: int):
 
 async def do_start(configfile: Path, stop_after_seconds: int):
     config = ConfigRoot.from_file(configfile)
-    logger.info('localnet folder is %s', config.root())
+    logger.info('Localnet folder is %s', config.root())
 
     to_run: List[Coroutine[Any, Any, None]] = []
 

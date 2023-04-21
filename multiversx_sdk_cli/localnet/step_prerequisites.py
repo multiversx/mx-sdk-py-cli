@@ -1,7 +1,7 @@
 import logging
 import shutil
 import urllib.request
-from typing import Any
+from pathlib import Path
 
 from multiversx_sdk_cli import dependencies
 from multiversx_sdk_cli.localnet.config_root import ConfigRoot
@@ -11,8 +11,10 @@ from multiversx_sdk_cli.localnet.config_software import (SoftwarePiece,
 logger = logging.getLogger("localnet")
 
 
-def prepare(args: Any):
-    config = ConfigRoot.from_file(args.configfile)
+def fetch_prerequisites(configfile: Path):
+    logger.info("fetch_prerequisites()")
+
+    config = ConfigRoot.from_file(configfile)
 
     dependencies.install_module("testwallets", tag="", overwrite=True)
 
