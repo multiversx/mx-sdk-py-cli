@@ -77,6 +77,8 @@ generate() {
     command "Wallet.Bech32" "wallet bech32"
 
     group "Localnet" "localnet"
+    command "Localnet.Setup" "localnet setup"
+    command "Localnet.New" "localnet new"
     command "Localnet.Prerequisites" "localnet prerequisites"
     command "Localnet.Build" "localnet build"
     command "Localnet.Config" "localnet config"

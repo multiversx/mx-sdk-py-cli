@@ -20,6 +20,16 @@ def setup_parser(args: List[str], subparsers: Any) -> Any:
     )
     subparsers = parser.add_subparsers()
 
+    # Setup
+    sub = cli_shared.add_command_subparser(
+        subparsers,
+        "localnet",
+        "setup",
+        "Set up a localnet (runs 'prerequisites', 'build' and 'config' in one go)"
+    )
+    add_argument_configfile(sub)
+    sub.set_defaults(func=localnet_setup)
+
     # New
     sub = cli_shared.add_command_subparser(
         subparsers,
@@ -81,16 +91,6 @@ def setup_parser(args: List[str], subparsers: Any) -> Any:
     )
     add_argument_configfile(sub)
     sub.set_defaults(func=localnet_clean)
-
-    # Setup
-    sub = cli_shared.add_command_subparser(
-        subparsers,
-        "localnet",
-        "setup",
-        "Sets up a localnet (runs 'prerequisites', 'build' and 'config' in one go)"
-    )
-    add_argument_configfile(sub)
-    sub.set_defaults(func=localnet_setup)
 
 
 def add_argument_configfile(parser: Any):

@@ -1028,10 +1028,38 @@ usage: mxpy localnet COMMAND [-h] ...
 Set up, start and control localnets
 
 COMMANDS:
-  {prerequisites,build,start,config,clean}
+  {setup,new,prerequisites,build,start,config,clean}
 
 OPTIONS:
   -h, --help            show this help message and exit
+
+```
+### Localnet.Setup
+
+
+```
+$ mxpy localnet setup --help
+usage: mxpy localnet setup [-h] ...
+
+Set up a localnet (runs 'prerequisites', 'build' and 'config' in one go)
+
+optional arguments:
+  -h, --help               show this help message and exit
+  --configfile CONFIGFILE  An optional configuration file describing the localnet
+
+```
+### Localnet.New
+
+
+```
+$ mxpy localnet new --help
+usage: mxpy localnet new [-h] ...
+
+Create a new localnet configuration
+
+optional arguments:
+  -h, --help               show this help message and exit
+  --configfile CONFIGFILE  An optional configuration file describing the localnet
 
 ```
 ### Localnet.Prerequisites
@@ -1058,8 +1086,10 @@ usage: mxpy localnet build [-h] ...
 Build necessary software for running a localnet
 
 optional arguments:
-  -h, --help               show this help message and exit
-  --configfile CONFIGFILE  An optional configuration file describing the localnet
+  -h, --help                                      show this help message and exit
+  --configfile CONFIGFILE                         An optional configuration file describing the localnet
+  --software {node,seednode,proxy} [{node,seednode,proxy} ...]
+                                                  The software to build (default: ['node', 'seednode', 'proxy'])
 
 ```
 ### Localnet.Config
@@ -1086,8 +1116,9 @@ usage: mxpy localnet start [-h] ...
 Start a localnet
 
 optional arguments:
-  -h, --help               show this help message and exit
-  --configfile CONFIGFILE  An optional configuration file describing the localnet
+  -h, --help                               show this help message and exit
+  --configfile CONFIGFILE                  An optional configuration file describing the localnet
+  --stop-after-seconds STOP_AFTER_SECONDS  Stop the localnet after a given number of seconds (default: 31536000)
 
 ```
 ### Localnet.Clean
