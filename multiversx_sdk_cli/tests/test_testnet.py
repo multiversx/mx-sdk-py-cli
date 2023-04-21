@@ -16,8 +16,8 @@ def test_override_config():
     assert config.general.round_duration_milliseconds == 6000
     assert config.metashard.consensus_size == 1
     assert config.networking.port_proxy == 7950
-    assert config.software.resolution == SoftwareResolution.RemoteArchives
-    assert config.software.remote_archives.mx_chain_go == "https://github.com/multiversx/mx-chain-go/archive/refs/heads/master.zip"
+    assert config.software.mx_chain_go.resolution == SoftwareResolution.Remote
+    assert config.software.mx_chain_go.archive_url == "https://github.com/multiversx/mx-chain-go/archive/refs/heads/master.zip"
 
     # Now partly override the config
     config_patch: Dict[str, Any] = dict()
@@ -32,8 +32,8 @@ def test_override_config():
         "port_proxy": 7951,
     }
     config_patch["software"] = {
-        "remote_archives": {
-            "mx_chain_go": "https://github.com/multiversx/mx-chain-go/archive/refs/tags/v1.5.1.zip"
+        "mx_chain_go": {
+            "archive_url": "https://github.com/multiversx/mx-chain-go/archive/refs/tags/v1.5.1.zip"
         }
     }
 
@@ -44,5 +44,5 @@ def test_override_config():
     assert config.general.round_duration_milliseconds == 4000
     assert config.metashard.consensus_size == 2
     assert config.networking.port_proxy == 7951
-    assert config.software.resolution == SoftwareResolution.RemoteArchives
-    assert config.software.remote_archives.mx_chain_go == "https://github.com/multiversx/mx-chain-go/archive/refs/tags/v1.5.1.zip"
+    assert config.software.mx_chain_go.resolution == SoftwareResolution.Remote
+    assert config.software.mx_chain_go.archive_url == "https://github.com/multiversx/mx-chain-go/archive/refs/tags/v1.5.1.zip"
