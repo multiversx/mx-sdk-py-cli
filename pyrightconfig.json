@@ -10,7 +10,7 @@
         "DEBUG": true
     },
     "venvPath": ".",
-    "venv": ".venv",
+    "venv": "venv",
     "stubPath": "",
     "reportMissingImports": true,
     "reportMissingTypeStubs": false,
