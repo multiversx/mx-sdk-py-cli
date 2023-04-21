@@ -1,6 +1,6 @@
 from enum import Enum
 from pathlib import Path
-from typing import Any, Dict, Optional
+from typing import Any, Dict
 
 from multiversx_sdk_cli.errors import KnownError
 from multiversx_sdk_cli.localnet.config_part import ConfigPart
@@ -33,29 +33,26 @@ class Software(ConfigPart):
         }
 
 
-class SoftwareChainGo(ConfigPart):
+class SoftwarePiece(ConfigPart):
     def __init__(self,
                  resolution: SoftwareResolution,
                  archive_url: str,
                  archive_download_folder: Path,
                  archive_extraction_folder: Path,
-                 local_path: Optional[Path]):
+                 local_path: Path):
         self.resolution: SoftwareResolution = resolution
         self.archive_url: str = archive_url
         self.archive_download_folder: Path = archive_download_folder
         self.archive_extraction_folder: Path = archive_extraction_folder
-        self.local_path: Optional[Path] = local_path
+        self.local_path: Path = local_path
         self._verify()
-
-    def get_name(self) -> str:
-        return "mx_chain_go"
 
     def _do_override(self, other: Dict[str, Any]) -> None:
         self.resolution = SoftwareResolution(other.get("resolution", self.resolution))
         self.archive_url = other.get("archive_url", self.archive_url)
-        self.archive_download_folder = other.get("archive_download_folder", self.archive_download_folder)
-        self.archive_extraction_folder = other.get("archive_extraction_folder", self.archive_extraction_folder)
-        self.local_path = other.get("local_path", self.local_path)
+        self.archive_download_folder = Path(other.get("archive_download_folder", self.archive_download_folder))
+        self.archive_extraction_folder = Path(other.get("archive_extraction_folder", self.archive_extraction_folder))
+        self.local_path = Path(other.get("local_path", self.local_path))
         self._verify()
 
     def _verify(self):
@@ -63,14 +60,15 @@ class SoftwareChainGo(ConfigPart):
             if not self.archive_url:
                 raise KnownError(f"Resolution is {self.resolution}, but configuration section {self.get_name()} has no 'archive_url'")
         if self.resolution == SoftwareResolution.Local:
-            if not self.local_path:
-                raise KnownError(f"Resolution is {self.resolution}, but configuration section {self.get_name()} has no 'local_path'")
+            if not self.local_path.is_dir():
+                raise KnownError(f"Resolution is {self.resolution}, but configuration section {self.get_name()} has a bad 'local_path': {self.local_path}")
             folder_must_exist(self.local_path)
 
     def get_path_within_source(self, relative_path: Path) -> Path:
-        return self.get_source_folder() / relative_path
+        path = self._get_source_folder() / relative_path
+        return path.expanduser().resolve()
 
-    def get_source_folder(self) -> Path:
+    def _get_source_folder(self) -> Path:
         if self.resolution == SoftwareResolution.Remote:
             return self._locate_source_folder_in_archive_extraction_folder()
         if self.resolution == SoftwareResolution.Local:
@@ -86,6 +84,20 @@ class SoftwareChainGo(ConfigPart):
         # Heuristic to check if this is a valid source code folder
         assert (source_folder / "go.mod").exists(), f"This is not a valid source code folder: {source_folder}"
         return source_folder
+
+    def to_dictionary(self) -> Dict[str, Any]:
+        return {
+            "resolution": self.resolution.value,
+            "archive_url": self.archive_url,
+            "archive_download_folder": str(self.archive_download_folder),
+            "archive_extraction_folder": str(self.archive_extraction_folder),
+            "local_path": str(self.local_path) if self.local_path else None,
+        }
+
+
+class SoftwareChainGo(SoftwarePiece):
+    def get_name(self) -> str:
+        return "mx_chain_go"
 
     def get_cmd_node_folder(self):
         folder = self._get_cmd_folder() / "node"
@@ -120,69 +132,10 @@ class SoftwareChainGo(ConfigPart):
     def seednode_config_must_exist(self):
         folder_must_exist(self.get_seednode_config_folder())
 
-    def to_dictionary(self) -> Dict[str, Any]:
-        return {
-            "resolution": self.resolution.value,
-            "archive_url": self.archive_url,
-            "archive_download_folder": str(self.archive_download_folder),
-            "archive_extraction_folder": str(self.archive_extraction_folder),
-            "local_path": str(self.local_path) if self.local_path else None,
-        }
 
-
-class SoftwareChainProxyGo(ConfigPart):
-    def __init__(self,
-                 resolution: SoftwareResolution,
-                 archive_url: str,
-                 archive_download_folder: Path,
-                 archive_extraction_folder: Path,
-                 local_path: Optional[Path]):
-        self.resolution: SoftwareResolution = resolution
-        self.archive_url: str = archive_url
-        self.archive_download_folder: Path = archive_download_folder
-        self.archive_extraction_folder: Path = archive_extraction_folder
-        self.local_path: Optional[Path] = local_path
-        self._verify()
-
+class SoftwareChainProxyGo(SoftwarePiece):
     def get_name(self) -> str:
         return "mx_chain_proxy_go"
-
-    def _do_override(self, other: Dict[str, Any]) -> None:
-        self.resolution = SoftwareResolution(other.get("resolution", self.resolution))
-        self.archive_url = other.get("archive_url", self.archive_url)
-        self.archive_download_folder = other.get("archive_download_folder", self.archive_download_folder)
-        self.archive_extraction_folder = other.get("archive_extraction_folder", self.archive_extraction_folder)
-        self.local_path = other.get("local_path", self.local_path)
-        self._verify()
-
-    def _verify(self):
-        if self.resolution == SoftwareResolution.Remote:
-            if not self.archive_url:
-                raise KnownError(f"Resolution is {self.resolution}, but configuration section {self.get_name()} has no 'archive_url'")
-        if self.resolution == SoftwareResolution.Local:
-            if not self.local_path:
-                raise KnownError(f"Resolution is {self.resolution}, but configuration section {self.get_name()} has no 'local_path'")
-            folder_must_exist(self.local_path)
-
-    def get_path_within_source(self, relative_path: Path) -> Path:
-        return self.get_source_folder() / relative_path
-
-    def get_source_folder(self) -> Path:
-        if self.resolution == SoftwareResolution.Remote:
-            return self._locate_source_folder_in_archive_extraction_folder()
-        if self.resolution == SoftwareResolution.Local:
-            assert self.local_path
-            return self.local_path
-
-        raise KnownError(f"Unknown resolution: {self.resolution}")
-
-    def _locate_source_folder_in_archive_extraction_folder(self) -> Path:
-        # If has one subfolder, that one is the source code
-        subfolders = list(self.archive_extraction_folder.glob("*"))
-        source_folder = subfolders[0] if len(subfolders) == 1 else self.archive_extraction_folder
-        # Heuristic to check if this is a valid source code folder
-        assert (source_folder / "go.mod").exists(), f"This is not a valid source code folder: {source_folder}"
-        return source_folder
 
     def get_cmd_proxy_folder(self):
         folder = self._get_cmd_folder() / "proxy"
@@ -202,15 +155,6 @@ class SoftwareChainProxyGo(ConfigPart):
 
     def proxy_config_must_exist(self):
         folder_must_exist(self.get_proxy_config_folder())
-
-    def to_dictionary(self) -> Dict[str, Any]:
-        return {
-            "resolution": self.resolution.value,
-            "archive_url": self.archive_url,
-            "archive_download_folder": str(self.archive_download_folder),
-            "archive_extraction_folder": str(self.archive_extraction_folder),
-            "local_path": str(self.local_path) if self.local_path else None,
-        }
 
 
 def folder_must_exist(path: Path) -> None:
