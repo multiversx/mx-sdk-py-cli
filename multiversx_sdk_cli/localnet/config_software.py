@@ -58,11 +58,10 @@ class SoftwarePiece(ConfigPart):
     def _verify(self):
         if self.resolution == SoftwareResolution.Remote:
             if not self.archive_url:
-                raise KnownError(f"Resolution is {self.resolution}, but configuration section {self.get_name()} has no 'archive_url'")
+                raise KnownError(f"In configuration section '{self.get_name()}', resolution is '{self.resolution.value}', but 'archive_url' is bad (empty)")
         if self.resolution == SoftwareResolution.Local:
-            if not self.local_path.is_dir():
-                raise KnownError(f"Resolution is {self.resolution}, but configuration section {self.get_name()} has a bad 'local_path': {self.local_path}")
-            folder_must_exist(self.local_path)
+            if not self.get_local_path().is_dir():
+                raise KnownError(f"In configuration section '{self.get_name()}', resolution is '{self.resolution.value}', but 'local_path' is not a directory: {self.local_path}")
 
     def get_archive_download_folder(self):
         return self.archive_download_folder.expanduser().resolve()

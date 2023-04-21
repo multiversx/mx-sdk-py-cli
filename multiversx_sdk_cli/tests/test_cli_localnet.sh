@@ -7,7 +7,7 @@ testStartThenStop() {
 
     cleanSandbox
     mkdir -p ${SANDBOX}/localnet_foo
-    cp ./testdata/localnet.toml ${SANDBOX}/localnet_foo/localnet.toml
+    cp ./testdata/localnet_with_resolution_remote.toml ${SANDBOX}/localnet_foo/localnet.toml
     cd ${SANDBOX}/localnet_foo
 
     ${CLI} localnet prerequisites
