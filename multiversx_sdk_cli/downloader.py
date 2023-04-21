@@ -35,6 +35,7 @@ def download(url: str, filename: str) -> None:
                 file.write(chunk)
                 progress = _report_download_progress(progress, chunk_number, total_size)
                 chunk_number += 1
+            file.flush()
         print('', file=sys.stderr)
         sys.stderr.flush()
     except requests.HTTPError as err:
