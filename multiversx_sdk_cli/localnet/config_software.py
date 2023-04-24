@@ -33,7 +33,7 @@ class Software(ConfigPart):
         }
 
 
-class SoftwarePiece(ConfigPart):
+class SoftwareComponent(ConfigPart):
     def __init__(self,
                  resolution: SoftwareResolution,
                  archive_url: str,
@@ -104,7 +104,7 @@ class SoftwarePiece(ConfigPart):
         }
 
 
-class SoftwareChainGo(SoftwarePiece):
+class SoftwareChainGo(SoftwareComponent):
     def get_name(self) -> str:
         return "mx_chain_go"
 
@@ -142,7 +142,7 @@ class SoftwareChainGo(SoftwarePiece):
         folder_must_exist(self.get_seednode_config_folder())
 
 
-class SoftwareChainProxyGo(SoftwarePiece):
+class SoftwareChainProxyGo(SoftwareComponent):
     def get_name(self) -> str:
         return "mx_chain_proxy_go"
 

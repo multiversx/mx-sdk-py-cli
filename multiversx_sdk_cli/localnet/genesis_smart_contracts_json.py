@@ -12,5 +12,5 @@ def patch(data: Any, config: ConfigRoot):
 
     delegation_config["owner"] = owner.address.bech32()
     dns_config["owner"] = owner.address.bech32()
-    # registration price = 100 atoms of EGLD
+    # registration price = 100 atto-EGLD
     dns_config["init-parameters"] = "0064"

@@ -126,7 +126,7 @@ def localnet_build(args: Any):
     logger.info("Building binaries...")
     guard_configfile(args)
 
-    step_build_software.build(configfile=args.configfile, software_pieces=args.software)
+    step_build_software.build(configfile=args.configfile, software_components=args.software)
 
     logger.info("Binaries built. Now, you can run 'mxpy localnet config' to configure the localnet.")
 
@@ -152,7 +152,7 @@ def localnet_setup(args: Any):
 
     step_new.new_config(args.configfile)
     step_prerequisites.fetch_prerequisites(configfile=args.configfile)
-    step_build_software.build(configfile=args.configfile, software_pieces=["node", "seednode", "proxy"])
+    step_build_software.build(configfile=args.configfile, software_components=["node", "seednode", "proxy"])
     step_clean.clean(configfile=args.configfile)
     step_config.configure(configfile=args.configfile)
 

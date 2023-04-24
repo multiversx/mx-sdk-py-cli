@@ -11,13 +11,13 @@ from multiversx_sdk_cli.localnet.config_root import ConfigRoot
 logger = logging.getLogger("localnet")
 
 
-def build(configfile: Path, software_pieces: List[str]):
+def build(configfile: Path, software_components: List[str]):
     config = ConfigRoot.from_file(configfile)
 
     golang = dependencies.get_golang()
     golang_env = golang.get_env()
 
-    if "node" in software_pieces:
+    if "node" in software_components:
         logger.info("Building node...")
 
         cmd_node = config.software.mx_chain_go.get_cmd_node_folder()
@@ -26,7 +26,7 @@ def build(configfile: Path, software_pieces: List[str]):
         wasmer_path = golang.get_gopath() / "pkg" / "mod" / _get_wasm_vm_package(config) / "wasmer"
         libraries.copy_libraries(wasmer_path, cmd_node)
 
-    if "seednode" in software_pieces:
+    if "seednode" in software_components:
         logger.info("Building seednode...")
 
         cmd_seednode = config.software.mx_chain_go.get_cmd_seednode_folder()
@@ -35,7 +35,7 @@ def build(configfile: Path, software_pieces: List[str]):
         wasmer_path = golang.get_gopath() / "pkg" / "mod" / _get_wasm_vm_package(config) / "wasmer"
         libraries.copy_libraries(wasmer_path, cmd_seednode)
 
-    if "proxy" in software_pieces:
+    if "proxy" in software_components:
         logger.info("Building proxy...")
 
         cmd_proxy = config.software.mx_chain_proxy_go.get_cmd_proxy_folder()

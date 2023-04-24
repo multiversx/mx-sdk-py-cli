@@ -5,7 +5,7 @@ from pathlib import Path
 
 from multiversx_sdk_cli import dependencies
 from multiversx_sdk_cli.localnet.config_root import ConfigRoot
-from multiversx_sdk_cli.localnet.config_software import (SoftwarePiece,
+from multiversx_sdk_cli.localnet.config_software import (SoftwareComponent,
                                                          SoftwareResolution)
 
 logger = logging.getLogger("localnet")
@@ -19,10 +19,10 @@ def fetch_prerequisites(configfile: Path):
     dependencies.install_module("testwallets", tag="", overwrite=True)
 
     if config.software.mx_chain_go.resolution == SoftwareResolution.Remote:
-        download_software_piece(config.software.mx_chain_go)
+        download_software_component(config.software.mx_chain_go)
 
     if config.software.mx_chain_proxy_go.resolution == SoftwareResolution.Remote:
-        download_software_piece(config.software.mx_chain_proxy_go)
+        download_software_component(config.software.mx_chain_proxy_go)
 
     config.software.mx_chain_go.node_config_must_exist()
     config.software.mx_chain_go.seednode_config_must_exist()
@@ -37,10 +37,10 @@ def fetch_prerequisites(configfile: Path):
         dependencies.install_module("golang")
 
 
-def download_software_piece(piece: SoftwarePiece):
-    download_folder = piece.get_archive_download_folder()
-    extraction_folder = piece.get_archive_extraction_folder()
-    url = piece.archive_url
+def download_software_component(component: SoftwareComponent):
+    download_folder = component.get_archive_download_folder()
+    extraction_folder = component.get_archive_extraction_folder()
+    url = component.archive_url
 
     shutil.rmtree(str(download_folder), ignore_errors=True)
     shutil.rmtree(str(extraction_folder), ignore_errors=True)
