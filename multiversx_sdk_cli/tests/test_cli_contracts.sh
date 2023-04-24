@@ -122,7 +122,7 @@ testVerifyContract(){
     pkill -f local_verify_server.py
 }
 
-testReproducibleBuild(){
+testReproducibleBuild() {
     echo "testReproducibleBuild"
 
     wget -O ${SANDBOX}/example.zip https://github.com/multiversx/mx-reproducible-contract-build-example-sc/archive/refs/tags/v0.2.1.zip || return 1
@@ -132,6 +132,8 @@ testReproducibleBuild(){
 }
 
 testAll() {
+    ${CLI} config set dependencies.rust.tag ${RUST_VERSION}
+
     cleanSandbox || return 1
     testTrivialCommands || return 1
     testCreateContracts || return 1
