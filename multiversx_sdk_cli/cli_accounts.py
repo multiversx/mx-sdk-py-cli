@@ -1,9 +1,11 @@
 import logging
 from typing import Any
 
+from multiversx_sdk_network_providers.proxy_network_provider import \
+    ProxyNetworkProvider
+
 from multiversx_sdk_cli import cli_shared, utils
 from multiversx_sdk_cli.accounts import Address
-from multiversx_sdk_network_providers.proxy_network_provider import ProxyNetworkProvider
 
 logger = logging.getLogger("cli.accounts")
 
@@ -53,6 +55,7 @@ def get_account(args: Any):
 
 
 def get_account_transactions(args: Any):
+    # TODO (argsconfig): remove
     proxy_url = args.proxy
     address = args.address
     proxy = ProxyNetworkProvider(proxy_url)

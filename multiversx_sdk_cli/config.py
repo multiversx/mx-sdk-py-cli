@@ -32,14 +32,17 @@ class MetaChainSystemSCsCost:
 
 
 def get_proxy() -> str:
+    # TODO (argsconfig): IF SET IN CONFIG, WARN!
     return get_value("proxy")
 
 
 def get_chain_id() -> str:
+    # TODO (argsconfig): IF SET IN CONFIG, WARN!
     return get_value("chainID")
 
 
 def get_tx_version() -> int:
+    # TODO (argsconfig): IF SET IN CONFIG, WARN!
     return int(get_value("txVersion"))
 
 
@@ -230,12 +233,16 @@ def add_config_args(argv: List[str]) -> List[str]:
     except KeyError:
         return argv
 
-    final_args = determine_final_args(argv, config_args)
+    # TODO (argsconfig): LOG LEGACY, WARNING! use "--argsfile" instead
+
+    final_args = _determine_final_args(argv, config_args)
     print(f"Found extra arguments in mxpy.json. Final arguments: {final_args}")
     return final_args
 
 
-def determine_final_args(argv: List[str], config_args: Dict[str, Any]) -> List[str]:
+def _determine_final_args(argv: List[str], config_args: Dict[str, Any]) -> List[str]:
+    # TODO (argsconfig): IF "chainID" in config, especially add extra WARN!
+
     extra_args = []
     for key, value in config_args.items():
         key_arg = f'--{key}'

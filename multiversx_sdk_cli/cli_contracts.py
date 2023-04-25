@@ -329,6 +329,7 @@ def _prepare_sender(args: Any) -> Account:
     else:
         raise errors.NoWalletProvided()
 
+    # TODO (argsconfig): deduplicate
     sender.nonce = args.nonce
     if args.recall_nonce:
         sender.sync_nonce(ProxyNetworkProvider(args.proxy))

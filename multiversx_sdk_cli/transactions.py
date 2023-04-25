@@ -245,6 +245,7 @@ class BunchOfTransactions:
 
 
 def do_prepare_transaction(args: Any) -> Transaction:
+    # TODO (argsconfig): de-duplicate
     account = Account()
     if args.ledger:
         account = LedgerAccount(account_index=args.ledger_account_index, address_index=args.ledger_address_index)

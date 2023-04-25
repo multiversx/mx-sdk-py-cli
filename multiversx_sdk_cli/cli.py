@@ -43,6 +43,8 @@ def _do_main(cli_args: List[str]):
     parser = setup_parser(argv_with_config_args)
     args = parser.parse_args(argv_with_config_args)
 
+    # TODO (argsconfig): if args.argsfile, load file, reparse?
+
     if args.verbose:
         logging.basicConfig(level=logging.DEBUG, force=True)
     else:
@@ -76,6 +78,7 @@ https://docs.multiversx.com/sdk-and-tools/mxpy.
     version = multiversx_sdk_cli.version.get_version()
     parser.add_argument("-v", "--version", action="version", version=f"MultiversX Python CLI (mxpy) {version}")
     parser.add_argument("--verbose", action="store_true", default=False)
+    # TODO (argsconfig): parser.add_argument("--argsfile", type=Path, help="Path to a file containing arguments to be passed to the command")
 
     subparsers = parser.add_subparsers()
     commands: List[Any] = []

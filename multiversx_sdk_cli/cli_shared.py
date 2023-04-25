@@ -75,6 +75,8 @@ def add_tx_args(args: List[str], sub: Any, with_nonce: bool = True, with_receive
         sub.add_argument("--data", default="", help="the payload, or 'memo' of the transaction (default: %(default)s)")
 
     sub.add_argument("--chain", default=config.get_chain_id(), help="the chain identifier (default: %(default)s)")
+    # TODO (argsconfig): how to --recall-network-config (automatically == true
+    # TODO (argsconfig): is "--proxy" in args?
     sub.add_argument("--version", type=int, default=config.get_tx_version(), help="the transaction version (default: %(default)s)")
     sub.add_argument("--options", type=int, default=0, help="the transaction options (default: 0)")
 
@@ -127,9 +129,12 @@ def prepare_nonce_in_args(args: Any):
         else:
             raise errors.NoWalletProvided()
 
+        # TODO (argsconfig): de-duplicate
         account.sync_nonce(ProxyNetworkProvider(args.proxy))
         args.nonce = account.nonce
 
+
+# TODO (argsconfig): def prepare_chain_id_in_args()?
 
 def add_broadcast_args(sub: Any, simulate: bool = True, relay: bool = False):
     sub.add_argument("--send", action="store_true", default=False, help="✓ whether to broadcast the transaction (default: %(default)s)")
