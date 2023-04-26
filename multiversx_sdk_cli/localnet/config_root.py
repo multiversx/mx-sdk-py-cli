@@ -104,8 +104,9 @@ class ConfigRoot(ConfigPart):
 
         for i, folder in enumerate(self.validator_folders()):
             shard = self._get_shard_of_validator(i)
+            host = self.networking.host
             port = first_port + i
-            nodes.append(Node(index=i, folder=folder, shard=str(shard), api_port=port))
+            nodes.append(Node(index=i, folder=folder, shard=str(shard), host=host, api_port=port))
 
         return nodes
 
@@ -125,8 +126,9 @@ class ConfigRoot(ConfigPart):
 
         for i, folder in enumerate(self.observer_folders()):
             shard = self._get_shard_of_observer(i)
+            host = self.networking.host
             port = first_port + i
-            nodes.append(Node(index=i, folder=folder, shard=str(shard), api_port=port))
+            nodes.append(Node(index=i, folder=folder, shard=str(shard), host=host, api_port=port))
 
         return nodes
 
