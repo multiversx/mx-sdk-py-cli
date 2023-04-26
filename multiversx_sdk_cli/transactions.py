@@ -6,8 +6,7 @@ from collections import OrderedDict
 from typing import Any, Dict, List, Protocol, Sequence, TextIO, Tuple
 
 from multiversx_sdk_cli import config, errors, utils
-from multiversx_sdk_cli.accounts import Account, Address, LedgerAccount
-from multiversx_sdk_cli.cli_password import load_password
+from multiversx_sdk_cli.accounts import Account, Address
 from multiversx_sdk_cli.interfaces import ITransaction
 
 logger = logging.getLogger("transactions")
@@ -244,22 +243,12 @@ class BunchOfTransactions:
         return num_sent, hashes
 
 
-def do_prepare_transaction(args: Any) -> Transaction:
-    # TODO (argsconfig): de-duplicate
-    account = Account()
-    if args.ledger:
-        account = LedgerAccount(account_index=args.ledger_account_index, address_index=args.ledger_address_index)
-    if args.pem:
-        account = Account(pem_file=args.pem, pem_index=args.pem_index)
-    elif args.keyfile:
-        password = load_password(args)
-        account = Account(key_file=args.keyfile, password=password)
-
+def do_prepare_transaction(args: Any, sender: Account) -> Transaction:
     tx = Transaction()
     tx.nonce = int(args.nonce)
     tx.value = args.value
     tx.receiver = args.receiver
-    tx.sender = account.address.bech32()
+    tx.sender = sender.address.bech32()
     tx.senderUsername = getattr(args, "sender_username", "")
     tx.receiverUsername = getattr(args, "receiver_username", "")
     tx.gasPrice = int(args.gas_price)
@@ -269,5 +258,5 @@ def do_prepare_transaction(args: Any) -> Transaction:
     tx.version = int(args.version)
     tx.options = int(args.options)
 
-    tx.sign(account)
+    tx.sign(sender)
     return tx

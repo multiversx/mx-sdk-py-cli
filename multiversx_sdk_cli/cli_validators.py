@@ -1,6 +1,6 @@
 from typing import Any, List
 
-from multiversx_sdk_cli import cli_shared, validators, utils
+from multiversx_sdk_cli import cli_shared, utils, validators
 from multiversx_sdk_cli.transactions import do_prepare_transaction
 
 
@@ -98,108 +98,96 @@ def _add_nodes_arg(sub: Any):
 
 
 def do_stake(args: Any):
-    cli_shared.check_broadcast_args(args)
-    cli_shared.prepare_nonce_in_args(args)
+    sender, _ = cli_shared.acquire_tx_prerequisites(args)
     validators.prepare_args_for_stake(args)
-    tx = do_prepare_transaction(args)
+    tx = do_prepare_transaction(args, sender)
 
     cli_shared.send_or_simulate(tx, args)
 
 
 def do_unstake(args: Any):
-    cli_shared.check_broadcast_args(args)
-    cli_shared.prepare_nonce_in_args(args)
+    sender, _ = cli_shared.acquire_tx_prerequisites(args)
     validators.prepare_args_for_unstake(args)
-    tx = do_prepare_transaction(args)
+    tx = do_prepare_transaction(args, sender)
 
     cli_shared.send_or_simulate(tx, args)
 
 
 def do_unjail(args: Any):
-    cli_shared.check_broadcast_args(args)
-    cli_shared.prepare_nonce_in_args(args)
+    sender, _ = cli_shared.acquire_tx_prerequisites(args)
     validators.prepare_args_for_unjail(args)
-    tx = do_prepare_transaction(args)
+    tx = do_prepare_transaction(args, sender)
 
     cli_shared.send_or_simulate(tx, args)
 
 
 def do_unbond(args: Any):
-    cli_shared.check_broadcast_args(args)
-    cli_shared.prepare_nonce_in_args(args)
+    sender, _ = cli_shared.acquire_tx_prerequisites(args)
     validators.prepare_args_for_unbond(args)
-    tx = do_prepare_transaction(args)
+    tx = do_prepare_transaction(args, sender)
 
     cli_shared.send_or_simulate(tx, args)
 
 
 def change_reward_address(args: Any):
-    cli_shared.check_broadcast_args(args)
-    cli_shared.prepare_nonce_in_args(args)
+    sender, _ = cli_shared.acquire_tx_prerequisites(args)
     validators.prepare_args_for_change_reward_address(args)
-    tx = do_prepare_transaction(args)
+    tx = do_prepare_transaction(args, sender)
 
     cli_shared.send_or_simulate(tx, args)
 
 
 def do_claim(args: Any):
-    cli_shared.check_broadcast_args(args)
-    cli_shared.prepare_nonce_in_args(args)
+    sender, _ = cli_shared.acquire_tx_prerequisites(args)
     validators.prepare_args_for_claim(args)
-    tx = do_prepare_transaction(args)
+    tx = do_prepare_transaction(args, sender)
 
     cli_shared.send_or_simulate(tx, args)
 
 
 def do_unstake_nodes(args: Any):
-    cli_shared.check_broadcast_args(args)
-    cli_shared.prepare_nonce_in_args(args)
+    sender, _ = cli_shared.acquire_tx_prerequisites(args)
     validators.prepare_args_for_unstake_nodes(args)
-    tx = do_prepare_transaction(args)
+    tx = do_prepare_transaction(args, sender)
 
     cli_shared.send_or_simulate(tx, args)
 
 
 def do_unstake_tokens(args: Any):
-    cli_shared.check_broadcast_args(args)
-    cli_shared.prepare_nonce_in_args(args)
+    sender, _ = cli_shared.acquire_tx_prerequisites(args)
     validators.prepare_args_for_unstake_tokens(args)
-    tx = do_prepare_transaction(args)
+    tx = do_prepare_transaction(args, sender)
 
     cli_shared.send_or_simulate(tx, args)
 
 
 def do_unbond_nodes(args: Any):
-    cli_shared.check_broadcast_args(args)
-    cli_shared.prepare_nonce_in_args(args)
+    sender, _ = cli_shared.acquire_tx_prerequisites(args)
     validators.prepare_args_for_unbond_nodes(args)
-    tx = do_prepare_transaction(args)
+    tx = do_prepare_transaction(args, sender)
 
     cli_shared.send_or_simulate(tx, args)
 
 
 def do_unbond_tokens(args: Any):
-    cli_shared.check_broadcast_args(args)
-    cli_shared.prepare_nonce_in_args(args)
+    sender, _ = cli_shared.acquire_tx_prerequisites(args)
     validators.prepare_args_for_unbond_tokens(args)
-    tx = do_prepare_transaction(args)
+    tx = do_prepare_transaction(args, sender)
 
     cli_shared.send_or_simulate(tx, args)
 
 
 def do_clean_registered_data(args: Any):
-    cli_shared.check_broadcast_args(args)
-    cli_shared.prepare_nonce_in_args(args)
+    sender, _ = cli_shared.acquire_tx_prerequisites(args)
     validators.prepare_args_for_clean_registered_data(args)
-    tx = do_prepare_transaction(args)
+    tx = do_prepare_transaction(args, sender)
 
     cli_shared.send_or_simulate(tx, args)
 
 
 def do_restake_unstaked_nodes(args: Any):
-    cli_shared.check_broadcast_args(args)
-    cli_shared.prepare_nonce_in_args(args)
+    sender, _ = cli_shared.acquire_tx_prerequisites(args)
     validators.prepare_args_for_restake_unstaked_nodes(args)
-    tx = do_prepare_transaction(args)
+    tx = do_prepare_transaction(args, sender)
 
     cli_shared.send_or_simulate(tx, args)

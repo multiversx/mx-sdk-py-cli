@@ -6,10 +6,9 @@ from typing import Any, Dict, List
 from multiversx_sdk_network_providers.proxy_network_provider import \
     ProxyNetworkProvider
 
-from multiversx_sdk_cli import cli_shared, errors, projects, utils
-from multiversx_sdk_cli.accounts import Account, Address, LedgerAccount
+from multiversx_sdk_cli import cli_shared, projects, utils
+from multiversx_sdk_cli.accounts import Address
 from multiversx_sdk_cli.cli_output import CLIOutputBuilder
-from multiversx_sdk_cli.cli_password import load_password
 from multiversx_sdk_cli.contract_verification import \
     trigger_contract_verification
 from multiversx_sdk_cli.contracts import CodeMetadata, SmartContract
@@ -283,8 +282,7 @@ def run_tests(args: Any):
 
 
 def deploy(args: Any):
-    logger.debug("deploy")
-    cli_shared.check_broadcast_args(args)
+    sender, _ = cli_shared.acquire_tx_prerequisites(args)
 
     arguments = args.arguments
     gas_price = args.gas_price
@@ -294,7 +292,6 @@ def deploy(args: Any):
     version = args.version
 
     contract = _prepare_contract(args)
-    sender = _prepare_sender(args)
 
     tx = contract.deploy(sender, arguments, gas_price, gas_limit, value, chain, version)
     logger.info("Contract address: %s", contract.address)
@@ -317,47 +314,8 @@ def _prepare_contract(args: Any) -> SmartContract:
     return contract
 
 
-def _prepare_sender(args: Any) -> Account:
-    sender: Account
-    if args.ledger:
-        sender = LedgerAccount(account_index=args.ledger_account_index, address_index=args.ledger_address_index)
-    elif args.pem:
-        sender = Account(pem_file=args.pem, pem_index=args.pem_index)
-    elif args.keyfile:
-        password = load_password(args)
-        sender = Account(key_file=args.keyfile, password=password)
-    else:
-        raise errors.NoWalletProvided()
-
-    # TODO (argsconfig): deduplicate
-    sender.nonce = args.nonce
-    if args.recall_nonce:
-        sender.sync_nonce(ProxyNetworkProvider(args.proxy))
-
-    return sender
-
-
-def _prepare_signer(args: Any) -> Account:
-    sender: Account
-    if args.ledger:
-        sender = LedgerAccount(
-            account_index=args.ledger_account_index,
-            address_index=args.ledger_address_index,
-        )
-    elif args.pem:
-        sender = Account(pem_file=args.pem, pem_index=args.pem_index)
-    elif args.keyfile:
-        password = load_password(args)
-        sender = Account(key_file=args.keyfile, password=password)
-    else:
-        raise errors.NoWalletProvided()
-
-    return sender
-
-
 def call(args: Any):
-    logger.debug("call")
-    cli_shared.check_broadcast_args(args)
+    sender, _ = cli_shared.acquire_tx_prerequisites(args)
 
     contract_address = args.contract
     function = args.function
@@ -369,15 +327,13 @@ def call(args: Any):
     version = args.version
 
     contract = SmartContract(contract_address)
-    sender = _prepare_sender(args)
 
     tx = contract.execute(sender, function, arguments, gas_price, gas_limit, value, chain, version)
     _send_or_simulate(tx, contract, args)
 
 
 def upgrade(args: Any):
-    logger.debug("upgrade")
-    cli_shared.check_broadcast_args(args)
+    sender, _ = cli_shared.acquire_tx_prerequisites(args)
 
     contract_address = args.contract
     arguments = args.arguments
@@ -389,7 +345,6 @@ def upgrade(args: Any):
 
     contract = _prepare_contract(args)
     contract.address = Address(contract_address)
-    sender = _prepare_sender(args)
 
     tx = contract.upgrade(sender, arguments, gas_price, gas_limit, value, chain, version)
     _send_or_simulate(tx, contract, args)
@@ -419,7 +374,7 @@ def verify(args: Any) -> None:
 
     packaged_src = Path(args.packaged_src).expanduser().resolve()
 
-    owner = _prepare_signer(args)
+    owner = cli_shared.acquire_signer(args)
     docker_image = args.docker_image
 
     trigger_contract_verification(

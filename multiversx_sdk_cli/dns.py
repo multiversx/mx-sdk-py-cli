@@ -37,12 +37,12 @@ def validate_name(name: str, shard_id: int, proxy: INetworkProvider):
 def register(args: Any):
     args = utils.as_object(args)
 
-    cli_shared.check_broadcast_args(args)
-    cli_shared.prepare_nonce_in_args(args)
+    sender, _ = cli_shared.acquire_tx_prerequisites(args)
+
     args.receiver = dns_address_for_name(args.name).bech32()
     args.data = dns_register_data(args.name)
 
-    tx = do_prepare_transaction(args)
+    tx = do_prepare_transaction(args, sender)
 
     if hasattr(args, "relay") and args.relay:
         args.outfile.write(tx.serialize_as_inner())
@@ -85,7 +85,7 @@ def dns_address_for_name(name: str) -> Address:
     return compute_dns_address_for_shard_id(shard_id)
 
 
-def compute_dns_address_for_shard_id(shard_id) -> Address:
+def compute_dns_address_for_shard_id(shard_id: int) -> Address:
     deployer_pubkey_prefix = InitialDNSAddress[:len(InitialDNSAddress) - ShardIdentiferLen]
 
     deployer_pubkey = deployer_pubkey_prefix + bytes([0, shard_id])

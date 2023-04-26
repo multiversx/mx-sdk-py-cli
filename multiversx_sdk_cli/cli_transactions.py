@@ -51,13 +51,12 @@ def _add_common_arguments(args: List[str], sub: Any):
 def create_transaction(args: Any):
     args = utils.as_object(args)
 
-    cli_shared.check_broadcast_args(args)
-    cli_shared.prepare_nonce_in_args(args)
+    sender, _ = cli_shared.acquire_tx_prerequisites(args)
 
     if args.data_file:
         args.data = Path(args.data_file).read_text()
 
-    tx = do_prepare_transaction(args)
+    tx = do_prepare_transaction(args, sender)
 
     if hasattr(args, "relay") and args.relay:
         args.outfile.write(tx.serialize_as_inner())

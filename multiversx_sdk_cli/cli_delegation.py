@@ -1,8 +1,10 @@
 from typing import Any, List
 
+from multiversx_sdk_network_providers.proxy_network_provider import \
+    ProxyNetworkProvider
+
 from multiversx_sdk_cli import cli_shared, errors, utils
 from multiversx_sdk_cli.delegation import staking_provider
-from multiversx_sdk_network_providers.proxy_network_provider import ProxyNetworkProvider
 from multiversx_sdk_cli.transactions import do_prepare_transaction
 
 
@@ -137,10 +139,9 @@ def _add_common_arguments(args: List[str], sub: Any):
 
 
 def do_create_delegation_contract(args: Any):
-    cli_shared.check_broadcast_args(args)
-    cli_shared.prepare_nonce_in_args(args)
+    sender, _ = cli_shared.acquire_tx_prerequisites(args)
     staking_provider.prepare_args_for_create_new_staking_contract(args)
-    tx = do_prepare_transaction(args)
+    tx = do_prepare_transaction(args, sender)
 
     cli_shared.send_or_simulate(tx, args)
 
@@ -160,98 +161,88 @@ def get_contract_address_by_deploy_tx_hash(args: Any):
 
 
 def add_new_nodes(args: Any):
-    cli_shared.check_broadcast_args(args)
-    cli_shared.prepare_nonce_in_args(args)
+    sender, _ = cli_shared.acquire_tx_prerequisites(args)
     staking_provider.prepare_args_for_add_nodes(args)
-    tx = do_prepare_transaction(args)
+    tx = do_prepare_transaction(args, sender)
 
     cli_shared.send_or_simulate(tx, args)
 
 
 def remove_nodes(args: Any):
-    cli_shared.check_broadcast_args(args)
-    cli_shared.prepare_nonce_in_args(args)
+    sender, _ = cli_shared.acquire_tx_prerequisites(args)
     staking_provider.prepare_args_for_remove_nodes(args)
-    tx = do_prepare_transaction(args)
+    tx = do_prepare_transaction(args, sender)
 
     cli_shared.send_or_simulate(tx, args)
 
 
 def stake_nodes(args: Any):
-    cli_shared.check_broadcast_args(args)
-    cli_shared.prepare_nonce_in_args(args)
+    sender, _ = cli_shared.acquire_tx_prerequisites(args)
     staking_provider.prepare_args_for_stake_nodes(args)
-    tx = do_prepare_transaction(args)
+    tx = do_prepare_transaction(args, sender)
 
     cli_shared.send_or_simulate(tx, args)
 
 
 def unbond_nodes(args: Any):
-    cli_shared.check_broadcast_args(args)
-    cli_shared.prepare_nonce_in_args(args)
+    sender, _ = cli_shared.acquire_tx_prerequisites(args)
     staking_provider.prepare_args_for_unbond_nodes(args)
-    tx = do_prepare_transaction(args)
+    tx = do_prepare_transaction(args, sender)
 
     cli_shared.send_or_simulate(tx, args)
 
 
 def unstake_nodes(args: Any):
-    cli_shared.check_broadcast_args(args)
-    cli_shared.prepare_nonce_in_args(args)
+    sender, _ = cli_shared.acquire_tx_prerequisites(args)
     staking_provider.prepare_args_for_unstake_nodes(args)
-    tx = do_prepare_transaction(args)
+    tx = do_prepare_transaction(args, sender)
 
     cli_shared.send_or_simulate(tx, args)
 
 
 def unjail_nodes(args: Any):
-    cli_shared.check_broadcast_args(args)
-    cli_shared.prepare_nonce_in_args(args)
+    sender, _ = cli_shared.acquire_tx_prerequisites(args)
     staking_provider.prepare_args_for_unjail_nodes(args)
-    tx = do_prepare_transaction(args)
+    tx = do_prepare_transaction(args, sender)
 
     cli_shared.send_or_simulate(tx, args)
 
 
 def change_service_fee(args: Any):
-    cli_shared.check_broadcast_args(args)
-    cli_shared.prepare_nonce_in_args(args)
+    sender, _ = cli_shared.acquire_tx_prerequisites(args)
     staking_provider.prepare_args_change_service_fee(args)
-    tx = do_prepare_transaction(args)
+    tx = do_prepare_transaction(args, sender)
 
     cli_shared.send_or_simulate(tx, args)
 
+
 def modify_delegation_cap(args: Any):
-    cli_shared.check_broadcast_args(args)
-    cli_shared.prepare_nonce_in_args(args)
+    sender, _ = cli_shared.acquire_tx_prerequisites(args)
     staking_provider.prepare_args_modify_delegation_cap(args)
-    tx = do_prepare_transaction(args)
+    tx = do_prepare_transaction(args, sender)
 
     cli_shared.send_or_simulate(tx, args)
 
 
 def automatic_activation(args: Any):
-    cli_shared.check_broadcast_args(args)
-    cli_shared.prepare_nonce_in_args(args)
+    sender, _ = cli_shared.acquire_tx_prerequisites(args)
     staking_provider.prepare_args_automatic_activation(args)
-    tx = do_prepare_transaction(args)
+    tx = do_prepare_transaction(args, sender)
 
     cli_shared.send_or_simulate(tx, args)
 
 
 def redelegate_cap(args: Any):
-    cli_shared.check_broadcast_args(args)
-    cli_shared.prepare_nonce_in_args(args)
+    sender, _ = cli_shared.acquire_tx_prerequisites(args)
     staking_provider.prepare_args_redelegate_cap(args)
-    tx = do_prepare_transaction(args)
+    tx = do_prepare_transaction(args, sender)
 
     cli_shared.send_or_simulate(tx, args)
 
 
 def set_metadata(args: Any):
-    cli_shared.check_broadcast_args(args)
-    cli_shared.prepare_nonce_in_args(args)
+    sender, _ = cli_shared.acquire_tx_prerequisites(args)
     staking_provider.prepare_args_set_metadata(args)
-    tx = do_prepare_transaction(args)
+    tx = do_prepare_transaction(args, sender)
 
     cli_shared.send_or_simulate(tx, args)
