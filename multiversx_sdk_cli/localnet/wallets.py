@@ -3,9 +3,10 @@ from collections import OrderedDict
 from pathlib import Path
 from typing import Dict, Tuple
 
+from multiversx_sdk_wallet.validator_pem import ValidatorPEM
+
 from multiversx_sdk_cli import errors, utils
 from multiversx_sdk_cli.accounts import Account
-from multiversx_sdk_wallet.validator_pem import ValidatorPEM
 from multiversx_sdk_cli.workstation import get_tools_folder
 
 MAX_NUM_NODES = 12
@@ -30,19 +31,19 @@ def get_observer_key_file(observer_index: int):
 
 
 def get_validator_wallets(num_validators: int) -> Dict[str, Account]:
-    result = {}
+    result: Dict[str, Account] = {}
 
     for i in range(0, num_validators):
         pem_file = get_validator_wallet_file(i)
         nickname = "validator{:02}".format(i)
-        account = Account(pem_file=pem_file)
+        account = Account(pem_file=str(pem_file))
         result[nickname] = account
 
     return result
 
 
 def get_validators(num_validators: int) -> Dict[str, Tuple[str, Account]]:
-    result = {}
+    result: Dict[str, Tuple[str, Account]] = {}
 
     for i in range(0, num_validators):
         validator_pem_file = get_validator_key_file(i)
@@ -51,7 +52,7 @@ def get_validators(num_validators: int) -> Dict[str, Tuple[str, Account]]:
 
         pem_file = get_validator_wallet_file(i)
         nickname = "validator{:02}".format(i)
-        account = Account(pem_file=pem_file)
+        account = Account(pem_file=str(pem_file))
         result[nickname] = (pubkey, account)
 
     return result
@@ -64,7 +65,7 @@ def get_validator_wallet_file(validator_index: int):
 
 def _guard_validator_index(validator_index: int):
     if validator_index >= MAX_NUM_NODES:
-        raise errors.TestnetError(f"Invalid validator index: {validator_index} >= {MAX_NUM_NODES}.")
+        raise errors.KnownError(f"Invalid validator index: {validator_index} >= {MAX_NUM_NODES}.")
 
 
 def _get_validators_folder():
@@ -91,4 +92,4 @@ def _get_users_folder():
 
 
 def _get_folder():
-    return get_tools_folder() / "testwallets" / "latest" 
+    return get_tools_folder() / "testwallets" / "latest"

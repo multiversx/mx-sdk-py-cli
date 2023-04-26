@@ -1,0 +1,67 @@
+name: Test localnet
+
+on:
+  pull_request:
+    branches: [main, feat/*]
+  workflow_dispatch:
+
+env:
+ BRANCH_NAME: ${{ github.head_ref || github.ref_name }}
+
+jobs:
+  localnet:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+        python-version: [3.11]
+
+    steps:
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - uses: actions/checkout@v2
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install dependencies
+        run: |
+          python3 -m pip install --upgrade pip
+          pip3 install -r requirements.txt
+
+      - name: Smoke test (with resolution == remote)
+        run: |
+          mkdir -p ~/multiversx-sdk
+          export PYTHONPATH=.
+          python3 -m multiversx_sdk_cli.cli config set github_api_token ${{ secrets.GITHUB_TOKEN }}
+          python3 -m multiversx_sdk_cli.cli localnet prerequisites --configfile=./multiversx_sdk_cli/tests/testdata/localnet_with_resolution_remote.toml
+          python3 -m multiversx_sdk_cli.cli localnet build --configfile=./multiversx_sdk_cli/tests/testdata/localnet_with_resolution_remote.toml
+         
+          # "Go" and artifacts from "GOPATH/pkg/mod" are not needed anymore.
+          sudo rm -rf ~/multiversx-sdk/golang
+          
+          python3 -m multiversx_sdk_cli.cli localnet clean --configfile=./multiversx_sdk_cli/tests/testdata/localnet_with_resolution_remote.toml
+          python3 -m multiversx_sdk_cli.cli localnet config --configfile=./multiversx_sdk_cli/tests/testdata/localnet_with_resolution_remote.toml
+          python3 -m multiversx_sdk_cli.cli localnet start --configfile=./multiversx_sdk_cli/tests/testdata/localnet_with_resolution_remote.toml --stop-after-seconds=120
+
+      - name: Smoke test (with resolution == local)
+        run: |
+          mkdir -p ~/multiversx-sdk/sandbox
+          export PYTHONPATH=.
+
+          git clone https://github.com/multiversx/mx-chain-go --branch=master --single-branch ~/multiversx-sdk/sandbox/mx-chain-go
+          git clone https://github.com/multiversx/mx-chain-proxy-go --branch=master --single-branch ~/multiversx-sdk/sandbox/mx-chain-proxy-go
+          
+          python3 -m multiversx_sdk_cli.cli localnet prerequisites --configfile=./multiversx_sdk_cli/tests/testdata/localnet_with_resolution_local.toml
+          python3 -m multiversx_sdk_cli.cli localnet build --configfile=./multiversx_sdk_cli/tests/testdata/localnet_with_resolution_local.toml
+         
+          # "Go" and artifacts from "GOPATH/pkg/mod" are not needed anymore.
+          sudo rm -rf ~/multiversx-sdk/golang
+          
+          python3 -m multiversx_sdk_cli.cli localnet clean --configfile=./multiversx_sdk_cli/tests/testdata/localnet_with_resolution_local.toml
+          python3 -m multiversx_sdk_cli.cli localnet config --configfile=./multiversx_sdk_cli/tests/testdata/localnet_with_resolution_local.toml
+          python3 -m multiversx_sdk_cli.cli localnet start --configfile=./multiversx_sdk_cli/tests/testdata/localnet_with_resolution_local.toml --stop-after-seconds=120

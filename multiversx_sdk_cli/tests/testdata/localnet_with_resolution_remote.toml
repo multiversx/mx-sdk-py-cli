@@ -1,0 +1,12 @@
+[general]
+log_level = "*:DEBUG"
+rounds_per_epoch = 40
+round_duration_milliseconds = 3000
+
+[software.mx_chain_go]
+resolution = "remote"
+archive_url = "https://github.com/multiversx/mx-chain-go/archive/refs/heads/master.zip"
+
+[software.mx_chain_proxy_go]
+resolution = "remote"
+archive_url = "https://github.com/multiversx/mx-chain-proxy-go/archive/refs/heads/master.zip"

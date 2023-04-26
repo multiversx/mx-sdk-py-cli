@@ -1,6 +1,6 @@
 from multiversx_sdk_cli.accounts import Address
 from multiversx_sdk_cli.contracts import SmartContract
-from multiversx_sdk_cli.testnet import wallets
+from multiversx_sdk_cli.localnet import wallets
 
 
 def get_owner_of_genesis_contracts():

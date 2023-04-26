@@ -20,7 +20,7 @@ https://docs.multiversx.com/sdk-and-tools/mxpy.
         
 
 COMMAND GROUPS:
-  {contract,tx,validator,account,ledger,wallet,network,deps,config,hyperblock,testnet,data,staking-provider,dns}
+  {contract,tx,validator,account,ledger,wallet,network,deps,config,hyperblock,localnet,data,staking-provider,dns}
 
 TOP-LEVEL OPTIONS:
   -h, --help            show this help message and exit
@@ -40,7 +40,7 @@ network                        Get Network parameters, such as number of shards,
 deps                           Manage dependencies or multiversx-sdk modules
 config                         Configure multiversx-sdk (default values etc.)
 hyperblock                     Get Hyperblock from the Network
-testnet                        Set up, start and control local testnets
+localnet                       Set up, start and control localnets
 data                           Data manipulation omnitool
 staking-provider               Staking provider omnitool
 dns                            Operations related to the Domain Name Service
@@ -1012,76 +1012,121 @@ optional arguments:
   --decode    whether to decode
 
 ```
-## Group **Testnet**
+## Group **Localnet**
 
 
 ```
-$ mxpy testnet --help
-usage: mxpy testnet COMMAND [-h] ...
+$ mxpy localnet --help
+usage: mxpy localnet COMMAND [-h] ...
 
-Set up, start and control local testnets
+Set up, start and control localnets
 
 COMMANDS:
-  {prerequisites,start,config,clean}
+  {setup,new,prerequisites,build,start,config,clean}
 
 OPTIONS:
   -h, --help            show this help message and exit
 
 ```
-### Testnet.Prerequisites
+### Localnet.Setup
 
 
 ```
-$ mxpy testnet prerequisites --help
-usage: mxpy testnet prerequisites [-h] ...
+$ mxpy localnet setup --help
+usage: mxpy localnet setup [-h] ...
 
-Download and verify the prerequisites for running a testnet
+Set up a localnet (runs 'prerequisites', 'build' and 'config' in one go)
 
 optional arguments:
   -h, --help               show this help message and exit
-  --configfile CONFIGFILE  An optional configuration file describing the testnet
+  --configfile CONFIGFILE  An optional configuration file describing the localnet
 
 ```
-### Testnet.Config
+### Localnet.New
 
 
 ```
-$ mxpy testnet config --help
-usage: mxpy testnet config [-h] ...
+$ mxpy localnet new --help
+usage: mxpy localnet new [-h] ...
 
-Configure a testnet (required before starting it the first time or after clean)
+Create a new localnet configuration
 
 optional arguments:
   -h, --help               show this help message and exit
-  --configfile CONFIGFILE  An optional configuration file describing the testnet
+  --configfile CONFIGFILE  An optional configuration file describing the localnet
 
 ```
-### Testnet.Start
+### Localnet.Prerequisites
 
 
 ```
-$ mxpy testnet start --help
-usage: mxpy testnet start [-h] ...
+$ mxpy localnet prerequisites --help
+usage: mxpy localnet prerequisites [-h] ...
 
-Start a testnet
+Download and verify the prerequisites for running a localnet
 
 optional arguments:
   -h, --help               show this help message and exit
-  --configfile CONFIGFILE  An optional configuration file describing the testnet
+  --configfile CONFIGFILE  An optional configuration file describing the localnet
 
 ```
-### Testnet.Clean
+### Localnet.Build
 
 
 ```
-$ mxpy testnet clean --help
-usage: mxpy testnet clean [-h] ...
+$ mxpy localnet build --help
+usage: mxpy localnet build [-h] ...
 
-Erase the currently configured testnet (must be already stopped)
+Build necessary software for running a localnet
+
+optional arguments:
+  -h, --help                                      show this help message and exit
+  --configfile CONFIGFILE                         An optional configuration file describing the localnet
+  --software {node,seednode,proxy} [{node,seednode,proxy} ...]
+                                                  The software to build (default: ['node', 'seednode', 'proxy'])
+
+```
+### Localnet.Config
+
+
+```
+$ mxpy localnet config --help
+usage: mxpy localnet config [-h] ...
+
+Configure a localnet (required before starting it the first time or after clean)
 
 optional arguments:
   -h, --help               show this help message and exit
-  --configfile CONFIGFILE  An optional configuration file describing the testnet
+  --configfile CONFIGFILE  An optional configuration file describing the localnet
+
+```
+### Localnet.Start
+
+
+```
+$ mxpy localnet start --help
+usage: mxpy localnet start [-h] ...
+
+Start a localnet
+
+optional arguments:
+  -h, --help                               show this help message and exit
+  --configfile CONFIGFILE                  An optional configuration file describing the localnet
+  --stop-after-seconds STOP_AFTER_SECONDS  Stop the localnet after a given number of seconds (default: 31536000)
+
+```
+### Localnet.Clean
+
+
+```
+$ mxpy localnet clean --help
+usage: mxpy localnet clean [-h] ...
+
+Erase the currently configured localnet (must be already stopped)
+
+optional arguments:
+  -h, --help               show this help message and exit
+  --configfile CONFIGFILE  An optional configuration file describing the localnet
 
 ```
 ## Group **Network**

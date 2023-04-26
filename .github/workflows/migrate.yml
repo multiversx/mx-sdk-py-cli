@@ -35,6 +35,7 @@ jobs:
 
           erdpy config new test
           erdpy config set github_api_token ${{ secrets.GITHUB_TOKEN }}
+          erdpy config set dependencies.rust.tag "nightly-2022-10-16"
           erdpy deps install wasm-opt
 
           erdpy contract new --template=adder adder
