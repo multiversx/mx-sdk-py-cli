@@ -2,7 +2,7 @@ import logging
 from pathlib import Path
 from typing import Any, List
 
-from multiversx_sdk_cli import cli_shared
+from multiversx_sdk_cli import cli_shared, ux
 from multiversx_sdk_cli.constants import ONE_YEAR_IN_SECONDS
 from multiversx_sdk_cli.errors import KnownError
 from multiversx_sdk_cli.localnet import (step_build_software, step_clean,
@@ -103,7 +103,7 @@ def localnet_new(args: Any):
 
     step_new.new_config(args.configfile)
 
-    logger.info("New localnet configuration file created (or already existing). Make sure to inspect it. Now, you can run 'mxpy localnet prerequisites' to fetch localnet prerequisites.")
+    ux.show_message("New localnet configuration file created (or already existing). Make sure to inspect it. In order to fetch localnet prerequisites, run:\n\n$ mxpy localnet prerequisites")
 
 
 def localnet_clean(args: Any):
@@ -112,6 +112,8 @@ def localnet_clean(args: Any):
 
     step_clean.clean(configfile=args.configfile)
 
+    ux.show_message("Localnet cleaned. In order to configure (prepare) the localnet, run:\n\n$ mxpy localnet config")
+
 
 def localnet_prerequisites(args: Any):
     logger.info("Gathering prerequisites...")
@@ -119,7 +121,7 @@ def localnet_prerequisites(args: Any):
 
     step_prerequisites.fetch_prerequisites(configfile=args.configfile)
 
-    logger.info("Prerequisites gathered. Now, you can run 'mxpy localnet build' to build the localnet software.")
+    ux.show_message("Prerequisites gathered. In order to build the localnet software, run:\n\n$ mxpy localnet build")
 
 
 def localnet_build(args: Any):
@@ -128,7 +130,7 @@ def localnet_build(args: Any):
 
     step_build_software.build(configfile=args.configfile, software_components=args.software)
 
-    logger.info("Binaries built. Now, you can run 'mxpy localnet config' to configure the localnet.")
+    ux.show_message("Binaries built. In order to configure (prepare) the localnet, run:\n\n$ mxpy localnet config")
 
 
 def localnet_config(args: Any):
@@ -137,7 +139,7 @@ def localnet_config(args: Any):
 
     step_config.configure(configfile=args.configfile)
 
-    logger.info("Localnet configured. You can now start it with 'mxpy localnet start'.")
+    ux.show_message("Localnet configured. In order to start it, run:\n\n$ mxpy localnet start")
 
 
 def localnet_start(args: Any):
@@ -156,7 +158,7 @@ def localnet_setup(args: Any):
     step_clean.clean(configfile=args.configfile)
     step_config.configure(configfile=args.configfile)
 
-    logger.info("Localnet setup complete. You can now start it with 'mxpy localnet start'.")
+    ux.show_message("Localnet setup complete. In order to start it, run:\n\n$ mxpy localnet start")
 
 
 def guard_configfile(args: Any):

@@ -79,6 +79,13 @@ class ConfigRoot(ConfigPart):
         identifier = self.networking.p2p_id_seednode
         return f"/ip4/{host}/tcp/{port}/p2p/{identifier}"
 
+    def seednode_api_interface(self):
+        port = self.networking.port_seednode_rest_api
+        return f"{self.networking.host}:{port}"
+
+    def seednode_api_address(self):
+        return f"http://{self.seednode_api_interface()}"
+
     def num_all_nodes(self) -> int:
         return self.num_all_validators() + self.num_all_observers()
 

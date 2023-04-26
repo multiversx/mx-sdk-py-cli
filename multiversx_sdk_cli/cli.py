@@ -19,7 +19,7 @@ import multiversx_sdk_cli.cli_transactions
 import multiversx_sdk_cli.cli_validators
 import multiversx_sdk_cli.cli_wallet
 import multiversx_sdk_cli.version
-from multiversx_sdk_cli import config, errors
+from multiversx_sdk_cli import config, errors, ux
 
 logger = logging.getLogger("cli")
 
@@ -29,6 +29,7 @@ def main(cli_args: List[str] = sys.argv[1:]):
         _do_main(cli_args)
     except errors.KnownError as err:
         logger.critical(err.get_pretty())
+        ux.show_critical_error(err.get_pretty())
         return 1
     except KeyboardInterrupt:
         print("process killed by user.")

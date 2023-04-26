@@ -21,8 +21,9 @@ def configure(configfile: Path):
     config = ConfigRoot.from_file(configfile)
 
     if config.root().exists():
-        logger.error(f"Localnet folder already exists: {config.root()}. Perhaps run 'clean' first?")
-        raise KnownError(f"Localnet folder already exists: {config.root()}.")
+        error_message = f"Localnet folder already exists: {config.root()}. Perhaps run 'mxpy localnet clean' first?"
+        logger.error(error_message)
+        raise KnownError(error_message)
 
     logger.info("Localnet folder is %s", config.root())
 

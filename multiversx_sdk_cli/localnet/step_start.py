@@ -6,6 +6,9 @@ import traceback
 from pathlib import Path
 from typing import Any, Coroutine, List
 
+from rich.console import Console
+from rich.table import Table
+
 from multiversx_sdk_cli import workstation
 from multiversx_sdk_cli.localnet.config_root import ConfigRoot
 from multiversx_sdk_cli.localnet.constants import \
@@ -34,12 +37,19 @@ def start(configfile: Path, stop_after_seconds: int):
 
 async def do_start(configfile: Path, stop_after_seconds: int):
     config = ConfigRoot.from_file(configfile)
+
+    display_api_table(config)
+
     logger.info('Localnet folder is %s', config.root())
 
     to_run: List[Coroutine[Any, Any, None]] = []
 
     # Seed node
-    to_run.append(run(["./seednode", "--log-save"], cwd=config.seednode_folder()))
+    to_run.append(run([
+        "./seednode",
+        "--log-save",
+        f"--rest-api-interface={config.seednode_api_interface()}",
+    ], cwd=config.seednode_folder()))
 
     loglevel = _patch_loglevel(config.general.log_level)
     logger.info(f"loglevel: {loglevel}")
@@ -56,8 +66,6 @@ async def do_start(configfile: Path, stop_after_seconds: int):
             f"--rest-api-interface={observer.api_interface()}"
         ], cwd=observer.folder, delay=NODES_START_DELAY))
 
-        logger.info(f"Observer: shard = {observer.shard}, API = {observer.api_address()}")
-
     # Validators
     for validator in config.validators():
         to_run.append(run([
@@ -69,21 +77,38 @@ async def do_start(configfile: Path, stop_after_seconds: int):
             f"--rest-api-interface={validator.api_interface()}"
         ], cwd=validator.folder, delay=NODES_START_DELAY))
 
-        logger.info(f"Validator: shard = {validator.shard}, API = {validator.api_address()}")
-
     # Proxy
     to_run.append(run([
         "./proxy",
         "--log-save"
     ], cwd=config.proxy_folder(), delay=PROXY_START_DELAY))
 
-    logger.info(f"Proxy: API = {config.networking.get_proxy_url()}")
-
     # Monitor network
     to_run.append(monitor_network(stop_after_seconds))
 
     tasks = [asyncio.create_task(item) for item in to_run]
     await asyncio.gather(*tasks)
+
+
+def display_api_table(config: ConfigRoot):
+    table = Table(title="APIs")
+
+    table.add_column("Type")
+    table.add_column("Shard")
+    table.add_column("URL")
+
+    table.add_row("Proxy", "*", config.networking.get_proxy_url())
+
+    for observer in config.observers():
+        table.add_row("Observer", observer.shard, observer.api_address())
+
+    for validator in config.validators():
+        table.add_row("Validator", validator.shard, validator.api_address())
+
+    table.add_row("Seednode", "N / A", config.seednode_api_address())
+
+    console = Console()
+    console.print(table)
 
 
 async def monitor_network(stop_after_seconds: int):

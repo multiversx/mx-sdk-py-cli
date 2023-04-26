@@ -40,7 +40,7 @@ metashard = Metashard(
 )
 
 shards = RegularShards(
-    num_shards=1,
+    num_shards=2,
     consensus_size=1,
     num_observers_per_shard=0,
     num_validators_per_shard=1,
@@ -49,10 +49,11 @@ shards = RegularShards(
 networking = Networking(
     host="127.0.0.1",
     port_seednode=9999,
+    port_seednode_rest_api=10000,
     p2p_id_seednode="16Uiu2HAkx4QqgXXDdHdUWbLu5kxhd3Uo2hqB2FfCxmxH5Sd7bZFk",
     port_proxy=7950,
     port_first_observer=21100,
-    port_first_observer_rest_api=10000,
+    port_first_observer_rest_api=10100,
     port_first_validator=21500,
-    port_first_validator_rest_api=10100
+    port_first_validator_rest_api=10200
 )
