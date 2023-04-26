@@ -13,13 +13,13 @@ import multiversx_sdk_cli.cli_delegation
 import multiversx_sdk_cli.cli_deps
 import multiversx_sdk_cli.cli_dns
 import multiversx_sdk_cli.cli_ledger
+import multiversx_sdk_cli.cli_localnet
 import multiversx_sdk_cli.cli_network
-import multiversx_sdk_cli.cli_testnet
 import multiversx_sdk_cli.cli_transactions
 import multiversx_sdk_cli.cli_validators
 import multiversx_sdk_cli.cli_wallet
 import multiversx_sdk_cli.version
-from multiversx_sdk_cli import config, errors
+from multiversx_sdk_cli import config, errors, ux
 
 logger = logging.getLogger("cli")
 
@@ -29,6 +29,7 @@ def main(cli_args: List[str] = sys.argv[1:]):
         _do_main(cli_args)
     except errors.KnownError as err:
         logger.critical(err.get_pretty())
+        ux.show_critical_error(err.get_pretty())
         return 1
     except KeyboardInterrupt:
         print("process killed by user.")
@@ -93,7 +94,7 @@ https://docs.multiversx.com/sdk-and-tools/mxpy.
     commands.append(multiversx_sdk_cli.cli_deps.setup_parser(subparsers))
     commands.append(multiversx_sdk_cli.cli_config.setup_parser(subparsers))
     commands.append(multiversx_sdk_cli.cli_block.setup_parser(subparsers))
-    commands.append(multiversx_sdk_cli.cli_testnet.setup_parser(args, subparsers))
+    commands.append(multiversx_sdk_cli.cli_localnet.setup_parser(args, subparsers))
     commands.append(multiversx_sdk_cli.cli_data.setup_parser(subparsers))
     commands.append(multiversx_sdk_cli.cli_delegation.setup_parser(args, subparsers))
     commands.append(multiversx_sdk_cli.cli_dns.setup_parser(args, subparsers))

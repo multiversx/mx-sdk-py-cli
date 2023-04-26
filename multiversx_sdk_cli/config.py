@@ -173,13 +173,6 @@ def get_defaults() -> Dict[str, Any]:
         "dependencies.llvm.urlTemplate.osx": "https://ide.elrond.com/vendor-llvm/{TAG}/darwin-amd64.tar.gz?t=19feb",
         "dependencies.rust.resolution": "SDK",
         "dependencies.rust.tag": "nightly",
-        "dependencies.mx_chain_go.tag": "latest",
-        "dependencies.mx_chain_go.urlTemplate.linux": "https://github.com/multiversx/mx-chain-go/archive/{TAG}.tar.gz",
-        "dependencies.mx_chain_go.urlTemplate.osx": "https://github.com/multiversx/mx-chain-go/archive/{TAG}.tar.gz",
-        "dependencies.mx_chain_go.url": "https://github.com/multiversx/mx-chain-go/archive/{TAG}.tar.gz",
-        "dependencies.mx_chain_proxy_go.tag": "latest",
-        "dependencies.mx_chain_proxy_go.urlTemplate.linux": "https://github.com/multiversx/mx-chain-proxy-go/archive/{TAG}.tar.gz",
-        "dependencies.mx_chain_proxy_go.urlTemplate.osx": "https://github.com/multiversx/mx-chain-proxy-go/archive/{TAG}.tar.gz",
         "dependencies.golang.resolution": "SDK",
         "dependencies.golang.tag": "go1.18.4",
         "dependencies.golang.urlTemplate.linux": "https://golang.org/dl/{TAG}.linux-amd64.tar.gz",
@@ -196,7 +189,6 @@ def get_defaults() -> Dict[str, Any]:
         "dependencies.wasm-opt.urlTemplate.linux": "https://github.com/WebAssembly/binaryen/releases/download/{TAG}/binaryen-{TAG}-x86_64-linux.tar.gz",
         "dependencies.wasm-opt.urlTemplate.osx": "https://github.com/WebAssembly/binaryen/releases/download/{TAG}/binaryen-{TAG}-x86_64-macos.tar.gz",
         "dependencies.wasm-opt.urlTemplate.windows": "https://github.com/WebAssembly/binaryen/releases/download/{TAG}/binaryen-{TAG}-x86_64-windows.tar.gz",
-        "testnet.validate_expected_keys": "false",
         "github_api_token": "",
     }
 
