@@ -190,16 +190,6 @@ def as_object(data: Object) -> Object:
     return data
 
 
-def is_arg_present(args: List[str], key: str) -> bool:
-    for arg in args:
-        if arg.find("--data") != -1:
-            continue
-        if arg.find(key) != -1:
-            return True
-
-    return False
-
-
 def str_int_to_hex_str(number_str: str) -> str:
     num_of_bytes = 1
     if len(number_str) > 2:

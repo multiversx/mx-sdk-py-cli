@@ -1,6 +1,6 @@
 from typing import Any, List
 
-from multiversx_sdk_cli import cli_shared, utils, validators
+from multiversx_sdk_cli import cli_shared, validators
 from multiversx_sdk_cli.transactions import do_prepare_transaction
 
 
@@ -13,10 +13,10 @@ def setup_parser(args: List[str], subparsers: Any) -> Any:
     sub = cli_shared.add_command_subparser(subparsers, "validator", "stake", "Stake value into the Network")
     _add_common_arguments(args, sub)
     sub.add_argument("--reward-address", default="", help="the reward address")
-    sub.add_argument("--validators-file", required=not (utils.is_arg_present(args, "--top-up")),
-                     help="a JSON file describing the Nodes")
-    sub.add_argument("--top-up", action="store_true", default=False,
-                     required=not (utils.is_arg_present(args, "--validators-file")), help="Stake value for top up")
+
+    mutex = sub.add_mutually_exclusive_group()
+    mutex.add_argument("--validators-file", help="a JSON file describing the Nodes")
+    mutex.add_argument("--top-up", action="store_true", default=False, help="Stake value for top up")
     sub.set_defaults(func=do_stake)
 
     sub = cli_shared.add_command_subparser(subparsers, "validator", "unstake", "Unstake value")

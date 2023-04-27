@@ -98,10 +98,9 @@ def setup_parser(args: List[str], subparsers: Any) -> Any:
     sub = cli_shared.add_command_subparser(subparsers, "staking-provider", "automatic-activation",
                                            "Automatic activation must be called by the contract owner")
 
-    sub.add_argument("--set", action="store_true", required=not (utils.is_arg_present(args, "--unset")),
-                     help="set automatic activation True")
-    sub.add_argument("--unset", action="store_true", required=not (utils.is_arg_present(args, "--set")),
-                     help="set automatic activation False")
+    mutex = sub.add_mutually_exclusive_group()
+    mutex.add_argument("--set", action="store_true", help="set automatic activation True")
+    mutex.add_argument("--unset", action="store_true", help="set automatic activation False")
     sub.add_argument("--delegation-contract", required=True, help="address of the delegation contract")
     _add_common_arguments(args, sub)
     sub.set_defaults(func=automatic_activation)
@@ -110,10 +109,9 @@ def setup_parser(args: List[str], subparsers: Any) -> Any:
     sub = cli_shared.add_command_subparser(subparsers, "staking-provider", "redelegate-cap",
                                            "Redelegate cap must be called by the contract owner")
 
-    sub.add_argument("--set", action="store_true", required=not (utils.is_arg_present(args, "--unset")),
-                     help="set redelegate cap True")
-    sub.add_argument("--unset", action="store_true", required=not (utils.is_arg_present(args, "--set")),
-                     help="set redelegate cap False")
+    mutex = sub.add_mutually_exclusive_group()
+    mutex.add_argument("--set", action="store_true", help="set redelegate cap True")
+    mutex.add_argument("--unset", action="store_true", help="set redelegate cap False")
     sub.add_argument("--delegation-contract", required=True, help="address of the delegation contract")
     _add_common_arguments(args, sub)
     sub.set_defaults(func=redelegate_cap)
