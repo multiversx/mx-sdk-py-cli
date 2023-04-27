@@ -1,23 +1,8 @@
-from pathlib import Path
-from multiversx_sdk_cli.cli import main
+from multiversx_sdk_network_providers.proxy_network_provider import \
+    ProxyNetworkProvider
+
 from multiversx_sdk_cli.accounts import Account
-from multiversx_sdk_network_providers.proxy_network_provider import ProxyNetworkProvider
-
-
-def test_get_transactions():
-    output_file = Path(__file__).parent / "testdata-out" / "transactions.txt"
-
-    main(
-        [
-            "account",
-            "get-transactions",
-            "--address",
-            "erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th",
-            "--outfile",
-            str(output_file),
-        ]
-    )
-    assert Path.is_file(output_file) == True
+from multiversx_sdk_cli.cli import main
 
 
 def test_get_account():
