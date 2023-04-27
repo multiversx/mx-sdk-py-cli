@@ -41,9 +41,6 @@ def setup_parser(args: List[str], subparsers: Any) -> Any:
         "new",
         "Create a new wallet and print its mnemonic; optionally save as password-protected JSON (recommended) or PEM (not recommended)"
     )
-    sub.add_argument("--json", help="DEPRECATED, replaced by --format=keystore-mnemonic", action="store_true", default=False)
-    sub.add_argument("--pem", help="DEPRECATED, replaced by --format=pem", action="store_true", default=False)
-    sub.add_argument("--output-path", help="DEPRECATED, replaced by --outfile", type=str)
     sub.add_argument("--format", choices=WALLET_FORMATS, help="the format of the generated wallet file (default: %(default)s)", default=None)
     sub.add_argument("--outfile", help="the output path and base file name for the generated wallet files (default: %(default)s)", type=str)
     sub.add_argument("--address-hrp", help=f"the human-readable part of the address, when format is {WALLET_FORMAT_KEYSTORE_SECRET_KEY} or {WALLET_FORMAT_PEM} (default: %(default)s)", type=str, default="erd")
@@ -52,21 +49,9 @@ def setup_parser(args: List[str], subparsers: Any) -> Any:
     sub = cli_shared.add_command_subparser(
         subparsers,
         "wallet",
-        "derive",
-        "DEPRECATED COMMAND, replaced by 'wallet convert'"
-    )
-    sub.add_argument("pem", help="path of the output PEM file")
-    sub.add_argument("--mnemonic", action="store_true", help="whether to derive from an existing mnemonic")
-    sub.add_argument("--index", help="the address index", type=int, default=0)
-    sub.set_defaults(func=wallet_derive_deprecated)
-
-    sub = cli_shared.add_command_subparser(
-        subparsers,
-        "wallet",
         "convert",
         "Convert a wallet from one format to another"
     )
-
     sub.add_argument("--infile", help="path to the input file")
     sub.add_argument("--outfile", help="path to the output file")
     sub.add_argument("--in-format", required=True, choices=WALLET_FORMATS, help="the format of the input file")
@@ -115,17 +100,6 @@ def wallet_new(args: Any):
     format = args.format
     outfile = args.outfile
     address_hrp = args.address_hrp
-
-    # Handle deprecated options
-    if args.json:
-        logger.warning("The --json option is deprecated, use --format=keystore-mnemonic instead.")
-        format = "keystore-mnemonic"
-    if args.pem:
-        logger.warning("The --pem option is deprecated, use --format=pem instead.")
-        format = "pem"
-    if args.output_path:
-        logger.warning("The --output-path option is deprecated, use --outfile instead.")
-        outfile = args.output_path
 
     mnemonic = Mnemonic.generate()
     print(f"Mnemonic: {mnemonic.get_text()}")
@@ -255,31 +229,6 @@ def _create_wallet_content(
         return pem.to_text()
 
     raise KnownError(f"Cannot create wallet, unknown output format: <{out_format}>. Make sure to use one of following: {WALLET_FORMATS}.")
-
-
-def wallet_derive_deprecated(args: Any):
-    logger.warning("This command is deprecated. Use 'wallet convert' instead.")
-
-    pem_file_path = Path(args.pem)
-    ask_mnemonic = args.mnemonic
-    index = args.index
-
-    if ask_mnemonic:
-        mnemonic_str = input("Enter mnemonic:\n").rstrip().replace("\n", "")
-        mnemonic = Mnemonic(mnemonic_str)
-        secret_key = mnemonic.derive_key(index)
-        pubkey = secret_key.generate_public_key()
-    else:
-        mnemonic = Mnemonic.generate()
-
-    secret_key = mnemonic.derive_key(index)
-    pubkey = secret_key.generate_public_key()
-    address = Address(pubkey.hex())
-
-    pem_file = UserPEM(address.bech32(), secret_key)
-    pem_file.save(pem_file_path)
-
-    logger.info(f"Created PEM file [{pem_file_path}] for [{address.bech32()}]")
 
 
 def do_bech32(args: Any):

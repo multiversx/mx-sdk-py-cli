@@ -72,7 +72,6 @@ generate() {
 
     group "Wallet" "wallet"
     command "Wallet.New" "wallet new"
-    command "Wallet.Derive" "wallet derive"
     command "Wallet.Convert" "wallet convert"
     command "Wallet.Bech32" "wallet bech32"
 
