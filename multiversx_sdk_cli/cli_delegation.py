@@ -98,7 +98,7 @@ def setup_parser(args: List[str], subparsers: Any) -> Any:
     sub = cli_shared.add_command_subparser(subparsers, "staking-provider", "automatic-activation",
                                            "Automatic activation must be called by the contract owner")
 
-    mutex = sub.add_mutually_exclusive_group()
+    mutex = sub.add_mutually_exclusive_group(required=True)
     mutex.add_argument("--set", action="store_true", help="set automatic activation True")
     mutex.add_argument("--unset", action="store_true", help="set automatic activation False")
     sub.add_argument("--delegation-contract", required=True, help="address of the delegation contract")
@@ -109,7 +109,7 @@ def setup_parser(args: List[str], subparsers: Any) -> Any:
     sub = cli_shared.add_command_subparser(subparsers, "staking-provider", "redelegate-cap",
                                            "Redelegate cap must be called by the contract owner")
 
-    mutex = sub.add_mutually_exclusive_group()
+    mutex = sub.add_mutually_exclusive_group(required=True)
     mutex.add_argument("--set", action="store_true", help="set redelegate cap True")
     mutex.add_argument("--unset", action="store_true", help="set redelegate cap False")
     sub.add_argument("--delegation-contract", required=True, help="address of the delegation contract")

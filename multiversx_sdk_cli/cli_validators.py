@@ -14,7 +14,7 @@ def setup_parser(args: List[str], subparsers: Any) -> Any:
     _add_common_arguments(args, sub)
     sub.add_argument("--reward-address", default="", help="the reward address")
 
-    mutex = sub.add_mutually_exclusive_group()
+    mutex = sub.add_mutually_exclusive_group(required=True)
     mutex.add_argument("--validators-file", help="a JSON file describing the Nodes")
     mutex.add_argument("--top-up", action="store_true", default=False, help="Stake value for top up")
     sub.set_defaults(func=do_stake)

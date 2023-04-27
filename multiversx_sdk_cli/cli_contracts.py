@@ -76,11 +76,7 @@ def setup_parser(args: List[str], subparsers: Any) -> Any:
     cli_shared.add_proxy_arg(sub)
     cli_shared.add_tx_args(args, sub, with_receiver=False, with_data=False)
     _add_arguments_arg(sub)
-    sub.add_argument("--wait-result", action="store_true", default=False,
-                     help="signal to wait for the transaction result - only valid if --send is set")
-    sub.add_argument("--timeout", default=100, help="max num of seconds to wait for result"
-                                                    " - only valid if --wait-result is set")
-    cli_shared.add_broadcast_args(sub)
+    cli_shared.add_broadcast_args(sub, with_wait_result=True)
 
     sub.set_defaults(func=deploy)
 
@@ -93,11 +89,7 @@ def setup_parser(args: List[str], subparsers: Any) -> Any:
     cli_shared.add_tx_args(args, sub, with_receiver=False, with_data=False)
     _add_function_arg(sub)
     _add_arguments_arg(sub)
-    sub.add_argument("--wait-result", action="store_true", default=False,
-                     help="signal to wait for the transaction result - only valid if --send is set")
-    sub.add_argument("--timeout", default=100, help="max num of seconds to wait for result"
-                                                    " - only valid if --wait-result is set")
-    cli_shared.add_broadcast_args(sub, relay=True)
+    cli_shared.add_broadcast_args(sub, relay=True, with_wait_result=True)
 
     sub.set_defaults(func=call)
 
@@ -111,11 +103,7 @@ def setup_parser(args: List[str], subparsers: Any) -> Any:
     cli_shared.add_proxy_arg(sub)
     cli_shared.add_tx_args(args, sub, with_receiver=False, with_data=False)
     _add_arguments_arg(sub)
-    sub.add_argument("--wait-result", action="store_true", default=False,
-                     help="signal to wait for the transaction result - only valid if --send is set")
-    sub.add_argument("--timeout", default=100, help="max num of seconds to wait for result"
-                                                    " - only valid if --wait-result is set")
-    cli_shared.add_broadcast_args(sub)
+    cli_shared.add_broadcast_args(sub, with_wait_result=True)
 
     sub.set_defaults(func=upgrade)
 

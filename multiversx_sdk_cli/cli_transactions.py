@@ -16,12 +16,8 @@ def setup_parser(args: List[str], subparsers: Any) -> Any:
     sub = cli_shared.add_command_subparser(subparsers, "tx", "new", f"Create a new transaction.{CLIOutputBuilder.describe()}")
     _add_common_arguments(args, sub)
     cli_shared.add_outfile_arg(sub, what="signed transaction, hash")
-    cli_shared.add_broadcast_args(sub, relay=True)
+    cli_shared.add_broadcast_args(sub, relay=True, with_wait_result=True)
     cli_shared.add_proxy_arg(sub)
-    sub.add_argument("--wait-result", action="store_true", default=False,
-                     help="signal to wait for the transaction result - only valid if --send is set")
-    sub.add_argument("--timeout", default=100, help="max num of seconds to wait for result"
-                                                    " - only valid if --wait-result is set")
     sub.set_defaults(func=create_transaction)
 
     sub = cli_shared.add_command_subparser(subparsers, "tx", "send", f"Send a previously saved transaction.{CLIOutputBuilder.describe()}")

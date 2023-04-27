@@ -54,18 +54,32 @@ def add_command_subparser(subparsers: Any, group: str, command: str, description
     )
 
 
-def add_tx_args(args: List[str], sub: Any, with_receiver: bool = True, with_data: bool = True, with_estimate_gas: bool = False):
-    sub.add_argument("--nonce", type=int, help="# the nonce for the transaction")
-    sub.add_argument("--recall-nonce", action="store_true", default=False, help="⭮ whether to recall the nonce when creating the transaction (default: %(default)s)")
+def add_tx_args(args: List[str],
+                sub: Any,
+                with_receiver: bool = True,
+                with_data: bool = True,
+                with_estimate_gas: bool = False):
+    group_nonce = sub.add_argument_group("nonce", "transaction nonce (necessary for serializing transactions on the Network)")
+    mutex_nonce = group_nonce.add_mutually_exclusive_group(required=True)
+    mutex_nonce.add_argument("--nonce", type=int, help="# the nonce for the transaction")
+    mutex_nonce.add_argument("--recall-nonce", action="store_true", default=False, help="⭮ whether to recall the nonce when creating the transaction (default: %(default)s)")
 
+    group_participants = sub.add_argument_group("participants", "the addresses (and usernames) involved in the transaction; the sender is learned from the wallet arguments group")
+    group_participants.add_argument("--sender-username", help="🖄 the username of the sender")
     if with_receiver:
-        sub.add_argument("--receiver", required=True, help="🖄 the address of the receiver")
-        sub.add_argument("--receiver-username", required=False, help="🖄 the username of the receiver")
+        group_participants.add_argument("--receiver", required=True, help="🖄 the address of the receiver")
+        group_participants.add_argument("--receiver-username", required=False, help="🖄 the username of the receiver")
 
-    sub.add_argument("--gas-price", default=config.DEFAULT_GAS_PRICE, help="⛽ the gas price (default: %(default)d)")
-    sub.add_argument("--gas-limit", required=not ("--estimate-gas" in args), help="⛽ the gas limit")
+    group_gas = sub.add_argument_group("gas", "the Network requires gas to process transactions")
+
+    group_gas.add_argument("--gas-price", default=config.DEFAULT_GAS_PRICE, help="⛽ the gas price (default: %(default)d)")
+
     if with_estimate_gas:
-        sub.add_argument("--estimate-gas", action="store_true", default=False, help="⛽ whether to estimate the gas limit (default: %(default)d)")
+        mutex_gas_limit = group_gas.add_mutually_exclusive_group(required=True)
+        mutex_gas_limit.add_argument("--gas-limit", help="⛽ the gas limit")
+        mutex_gas_limit.add_argument("--estimate-gas", action="store_true", default=False, help="⛽ whether to estimate the gas limit (default: %(default)d)")
+    else:
+        group_gas.add_argument("--gas-limit", required=True, help="⛽ the gas limit")
 
     sub.add_argument("--value", default="0", help="the value to transfer (default: %(default)s)")
 
@@ -80,14 +94,15 @@ def add_tx_args(args: List[str], sub: Any, with_receiver: bool = True, with_data
 
 
 def add_wallet_args(args: List[str], sub: Any):
-    sub.add_argument("--pem", help="🔑 the PEM file, if keyfile not provided")
-    sub.add_argument("--pem-index", default=0, help="🔑 the index in the PEM file (default: %(default)s)")
-    sub.add_argument("--keyfile", help="🔑 a JSON keyfile, if PEM not provided")
-    sub.add_argument("--passfile", help="🔑 a file containing keyfile's password, if keyfile provided")
-    sub.add_argument("--ledger", action="store_true", default=False, help="🔐 bool flag for signing transaction using ledger")
-    sub.add_argument("--ledger-account-index", type=int, default=0, help="🔐 the index of the account when using Ledger")
-    sub.add_argument("--ledger-address-index", type=int, default=0, help="🔐 the index of the address when using Ledger")
-    sub.add_argument("--sender-username", help="🖄 the username of the sender")
+    group = sub.add_argument_group("wallet", "sender's wallet (used for signing)")
+
+    group.add_argument("--pem", help="🔑 the PEM file, if keyfile not provided")
+    group.add_argument("--pem-index", default=0, help="🔑 the index in the PEM file (default: %(default)s)")
+    group.add_argument("--keyfile", help="🔑 a JSON keyfile, if PEM not provided")
+    group.add_argument("--passfile", help="🔑 a file containing keyfile's password, if keyfile provided")
+    group.add_argument("--ledger", action="store_true", default=False, help="🔐 bool flag for signing transaction using ledger")
+    group.add_argument("--ledger-account-index", type=int, default=0, help="🔐 the index of the account when using Ledger")
+    group.add_argument("--ledger-address-index", type=int, default=0, help="🔐 the index of the address when using Ledger")
 
 
 def add_proxy_arg(sub: Any):
@@ -116,7 +131,6 @@ def parse_omit_fields_arg(args: Any) -> List[str]:
 
 # TODO! return, actually, txPrerequisites object, to be used in do_prepare_transaction()
 def acquire_tx_prerequisites(args: Any) -> Tuple[Account, int]:
-    _check_nonce_args(args)
     _check_broadcast_args(args)
 
     sender = acquire_signer(args)
@@ -127,14 +141,6 @@ def acquire_tx_prerequisites(args: Any) -> Tuple[Account, int]:
 
     args.nonce = nonce
     return sender, nonce
-
-
-def _check_nonce_args(args: Any):
-    if args.nonce is not None and args.recall_nonce:
-        raise errors.BadUsage("You cannot provide both a nonce and the '--recall-nonce' flag")
-
-    if args.nonce is None and not args.recall_nonce:
-        raise errors.BadUsage("You must either provide a nonce for the transaction (i.e. '--nonce=42') or apply the '--recall-nonce' flag to recall the nonce from the network")
 
 
 def aquire_nonce(args: Any, address: Address) -> int:
@@ -160,16 +166,23 @@ def acquire_signer(args: Any) -> Account:
         raise errors.BadUsage("You must provide an account wallet, using either '--pem' or '--keyfile' or '--ledger'")
 
 
-def add_broadcast_args(sub: Any, simulate: bool = True, relay: bool = False):
-    sub.add_argument("--send", action="store_true", default=False, help="✓ whether to broadcast the transaction (default: %(default)s)")
+def add_broadcast_args(sub: Any, simulate: bool = True, relay: bool = False, with_wait_result: bool = True):
+    group = sub.add_argument_group("broadcasting", "broadcasting options")
+
+    group.add_argument("--send", action="store_true", default=False, help="✓ whether to broadcast the transaction (default: %(default)s)")
+
+    if with_wait_result:
+        group.add_argument("--wait-result", action="store_true", default=False, help="signal to wait for the transaction result - only valid if --send is set")
+        group.add_argument("--timeout", default=100, help="max num of seconds to wait for result - only valid if --wait-result is set")
 
     if simulate:
-        sub.add_argument("--simulate", action="store_true", default=False, help="whether to simulate the transaction (default: %(default)s)")
+        group.add_argument("--simulate", action="store_true", default=False, help="whether to simulate the transaction (default: %(default)s)")
     if relay:
-        sub.add_argument("--relay", action="store_true", default=False, help="whether to relay the transaction (default: %(default)s)")
+        group.add_argument("--relay", action="store_true", default=False, help="deprecated, will be removed in next major version")
 
 
 def _check_broadcast_args(args: Any):
+    # TODO: DEPRECATE --relay
     if hasattr(args, "relay") and args.relay and args.send:
         raise errors.BadUsage("Cannot directly send a relayed transaction. Use 'mxpy tx new --relay' first, then 'mxpy tx send --data-file'")
     if args.send and args.simulate:
