@@ -18,16 +18,6 @@ def test_wallet_new(capsys: Any):
 
 
 def test_wallet_new_and_save_in_pem_format(capsys: Any):
-    # Legacy method of invocation
-    outfile = testdata_out_path / "testWallet.pem"
-    outfile.unlink(missing_ok=True)
-    main(["wallet", "new", "--pem", "--output-path", str(outfile)])
-
-    expected_secret_key = Mnemonic(_read_stdout_mnemonic(capsys)).derive_key(0)
-    actual_secret_key = UserPEM.from_file(outfile).secret_key
-    assert actual_secret_key.hex() == expected_secret_key.hex()
-
-    # New method of invocation
     outfile = testdata_out_path / "testWallet.pem"
     outfile.unlink(missing_ok=True)
     main(["wallet", "new", "--format", "pem", "--outfile", str(outfile)])
@@ -38,18 +28,6 @@ def test_wallet_new_and_save_in_pem_format(capsys: Any):
 
 
 def test_wallet_new_and_save_in_json_format(capsys: Any, monkeypatch: Any):
-    # Legacy method of invocation
-    outfile = testdata_out_path / "testWallet.json"
-    outfile.unlink(missing_ok=True)
-    _mock_getpass(monkeypatch, "password")
-    main(["wallet", "new", "--json", "--output-path", str(outfile)])
-
-    expected_mnemonic = Mnemonic(_read_stdout_mnemonic(capsys))
-    keyfile = json.loads(outfile.read_text())
-    actual_mnemonic = UserWallet.decrypt_mnemonic(keyfile, "password")
-    assert actual_mnemonic.get_text() == expected_mnemonic.get_text()
-
-    # New method of invocation
     outfile = testdata_out_path / "testWallet.json"
     outfile.unlink(missing_ok=True)
     _mock_getpass(monkeypatch, "password")
@@ -59,18 +37,6 @@ def test_wallet_new_and_save_in_json_format(capsys: Any, monkeypatch: Any):
     keyfile = json.loads(outfile.read_text())
     actual_mnemonic = UserWallet.decrypt_mnemonic(keyfile, "password")
     assert actual_mnemonic.get_text() == expected_mnemonic.get_text()
-
-
-def test_wallet_derive_pem_from_mnemonic_deprecated(monkeypatch: Any):
-    outfile = testdata_out_path / "wallet.pem"
-    test_mnemonic = "moral volcano peasant pass circle pen over picture flat shop clap goat never lyrics gather prepare woman film husband gravity behind test tiger improve"
-    _mock_stdin(monkeypatch, test_mnemonic)
-
-    main(["wallet", "derive", str(outfile), "--mnemonic"])
-
-    expected_secret_key = Mnemonic(test_mnemonic).derive_key(0)
-    actual_secret_key = UserPEM.from_file(outfile).secret_key
-    assert actual_secret_key.hex() == expected_secret_key.hex()
 
 
 def test_wallet_new_as_mnemonic():
@@ -233,13 +199,31 @@ def test_wallet_convert_keystore_with_secret_key_to_pem(monkeypatch: Any):
     assert pem.secret_key.hex() == "413f42575f7f26fad3317a778771212fdb80245850981e48b58a4f25e344e8f9"
 
 
+def test_wallet_bech32_encode(capsys: Any):
+    main([
+        "wallet", "bech32", "--encode", "0139472eff6886771a982f3083da5d421f24c29181e63888228dc81ca60d69e1"
+    ])
+
+    out = _read_stdout(capsys)
+    assert out == "erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th"
+
+
+def test_wallet_bech32_decode(capsys: Any):
+    main([
+        "wallet", "bech32", "--decode", "erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th"
+    ])
+
+    out = _read_stdout(capsys)
+    assert out == "0139472eff6886771a982f3083da5d421f24c29181e63888228dc81ca60d69e1"
+
+
 def _read_stdout_mnemonic(capsys: Any) -> str:
-    return capsys.readouterr().out.replace("Mnemonic:", "").strip()
+    return _read_stdout(capsys).replace("Mnemonic:", "").strip()
+
+
+def _read_stdout(capsys: Any) -> str:
+    return capsys.readouterr().out.strip()
 
 
 def _mock_getpass(monkeypatch: Any, password: str):
     monkeypatch.setattr(getpass, "getpass", lambda _: password)
-
-
-def _mock_stdin(monkeypatch: Any, text: str):
-    monkeypatch.setattr("builtins.input", lambda _: text)

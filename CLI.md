@@ -923,7 +923,6 @@ OPTIONS:
 COMMANDS summary
 ----------------
 new                            Create a new wallet and print its mnemonic; optionally save as password-protected JSON (recommended) or PEM (not recommended)
-derive                         DEPRECATED COMMAND, replaced by 'wallet convert'
 convert                        Convert a wallet from one format to another
 bech32                         Helper for encoding and decoding bech32 addresses
 pem-address                    Get the public address out of a PEM file as bech32
@@ -941,9 +940,6 @@ Create a new wallet and print its mnemonic; optionally save as password-protecte
 
 optional arguments:
   -h, --help                                      show this help message and exit
-  --json                                          DEPRECATED, replaced by --format=keystore-mnemonic
-  --pem                                           DEPRECATED, replaced by --format=pem
-  --output-path OUTPUT_PATH                       DEPRECATED, replaced by --outfile
   --format {raw-mnemonic,keystore-mnemonic,keystore-secret-key,pem}
                                                   the format of the generated wallet file (default: None)
   --outfile OUTFILE                               the output path and base file name for the generated wallet files
@@ -952,24 +948,7 @@ optional arguments:
                                                   secret-key or pem (default: erd)
 
 ```
-### Wallet.Derive
 
-
-```
-$ mxpy wallet derive --help
-usage: mxpy wallet derive [-h] ...
-
-DEPRECATED COMMAND, replaced by 'wallet convert'
-
-positional arguments:
-  pem            path of the output PEM file
-
-optional arguments:
-  -h, --help     show this help message and exit
-  --mnemonic     whether to derive from an existing mnemonic
-  --index INDEX  the address index
-
-```
 ### Wallet.Convert
 
 
