@@ -57,7 +57,7 @@ def _do_main(cli_args: List[str]):
         args.func(args)
 
 
-def setup_parser(args: List[str]):
+def setup_parser(args: List[str]) -> ArgumentParser:
     parser = ArgumentParser(
         prog="mxpy",
         usage="mxpy [-h] [-v] [--verbose] COMMAND-GROUP [-h] COMMAND ...",
@@ -71,7 +71,8 @@ for interacting with the Blockchain (in general) and with Smart Contracts (in pa
 mxpy targets a broad audience of users and developers.
 https://docs.multiversx.com/sdk-and-tools/mxpy.
         """,
-        formatter_class=argparse.RawDescriptionHelpFormatter
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        fromfile_prefix_chars="@",
     )
 
     parser._positionals.title = "COMMAND GROUPS"
@@ -79,7 +80,6 @@ https://docs.multiversx.com/sdk-and-tools/mxpy.
     version = multiversx_sdk_cli.version.get_version()
     parser.add_argument("-v", "--version", action="version", version=f"MultiversX Python CLI (mxpy) {version}")
     parser.add_argument("--verbose", action="store_true", default=False)
-    # TODO (argsconfig): parser.add_argument("--argsfile", type=Path, help="Path to a file containing arguments to be passed to the command")
 
     subparsers = parser.add_subparsers()
     commands: List[Any] = []
