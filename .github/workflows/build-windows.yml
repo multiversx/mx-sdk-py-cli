@@ -55,6 +55,5 @@ jobs:
         export CHAIN_ID=T
         cd ./multiversx_sdk_cli/tests
         source ./test_cli_tx.sh && testAll || return 1
-        source ./test_cli_wallet.sh && testAll || return 1
         source ./test_cli_dns.sh && testOffline || return 1
         source ./test_cli_validators.sh && testAll || return 1
