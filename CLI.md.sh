@@ -68,7 +68,6 @@ generate() {
 
     group "Account" "account"
     command "Account.Get" "account get"
-    command "Account.GetTransactions" "account get-transactions"
 
     group "Wallet" "wallet"
     command "Wallet.New" "wallet new"

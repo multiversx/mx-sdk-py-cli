@@ -857,16 +857,15 @@ usage: mxpy account COMMAND [-h] ...
 Get Account data (nonce, balance) from the Network
 
 COMMANDS:
-  {get,get-transactions}
+  {get}
 
 OPTIONS:
-  -h, --help            show this help message and exit
+  -h, --help  show this help message and exit
 
 ----------------
 COMMANDS summary
 ----------------
 get                            Query account details (nonce, balance etc.)
-get-transactions               Query account transactions
 
 ```
 ### Account.Get
@@ -888,22 +887,6 @@ optional arguments:
   --omit-fields OMIT_FIELDS  omit fields in the output payload (default: [])
 
 ```
-### Account.GetTransactions
-
-
-```
-$ mxpy account get-transactions --help
-usage: mxpy account get-transactions [-h] ...
-
-Query account transactions
-
-optional arguments:
-  -h, --help         show this help message and exit
-  --proxy PROXY      🔗 the URL of the proxy (default: https://testnet-gateway.multiversx.com)
-  --outfile OUTFILE  where to save the output (default: stdout)
-  --address ADDRESS  🖄 the address to query
-
-```
 ## Group **Wallet**
 
 
@@ -914,7 +897,7 @@ usage: mxpy wallet COMMAND [-h] ...
 Create wallet, derive secret key from mnemonic, bech32 address helpers etc.
 
 COMMANDS:
-  {new,derive,convert,bech32,pem-address,pem-address-hex}
+  {new,convert,bech32,pem-address,pem-address-hex}
 
 OPTIONS:
   -h, --help            show this help message and exit
@@ -948,7 +931,6 @@ optional arguments:
                                                   secret-key or pem (default: erd)
 
 ```
-
 ### Wallet.Convert
 
 

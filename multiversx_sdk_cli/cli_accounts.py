@@ -24,12 +24,6 @@ def setup_parser(subparsers: Any) -> Any:
     cli_shared.add_omit_fields_arg(sub)
     sub.set_defaults(func=get_account)
 
-    sub = cli_shared.add_command_subparser(subparsers, "account", "get-transactions", "Query account transactions")
-    cli_shared.add_proxy_arg(sub)
-    cli_shared.add_outfile_arg(sub)
-    _add_address_arg(sub)
-    sub.set_defaults(func=get_account_transactions)
-
     parser.epilog = cli_shared.build_group_epilog(subparsers)
     return subparsers
 
@@ -52,14 +46,3 @@ def get_account(args: Any):
         print(account.username)
     else:
         utils.dump_out_json(account.to_dictionary())
-
-
-def get_account_transactions(args: Any):
-    # TODO (argsconfig): remove
-    proxy_url = args.proxy
-    address = args.address
-    proxy = ProxyNetworkProvider(proxy_url)
-
-    response = proxy.get_account_transactions(Address(address))
-    transactions_as_dictionaries = [tx.to_dictionary() for tx in response]
-    utils.dump_out_json(transactions_as_dictionaries, args.outfile)
