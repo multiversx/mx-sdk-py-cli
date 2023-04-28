@@ -4,7 +4,7 @@ from typing import Any, Dict, List
 
 import semver
 
-from multiversx_sdk_cli import errors, utils
+from multiversx_sdk_cli import deprecations, errors, utils
 
 SDK_PATH = Path("~/multiversx-sdk").expanduser().resolve()
 LOCAL_CONFIG_PATH = Path("mxpy.json").resolve()
@@ -32,17 +32,20 @@ class MetaChainSystemSCsCost:
 
 
 def get_proxy() -> str:
-    # TODO (argsconfig): IF SET IN CONFIG, WARN!
-    return get_value("proxy")
+    value = get_value("proxy")
+    deprecations.cli_argument_added_in_mxpy_json_is_deprecated(value, "proxy", resolve_config_path())
+    return value
 
 
 def get_chain_id() -> str:
-    # TODO (argsconfig): IF SET IN CONFIG, WARN!
-    return get_value("chainID")
+    value = get_value("chainID")
+    deprecations.cli_argument_added_in_mxpy_json_is_deprecated(value, "chainID", resolve_config_path())
+    return value
 
 
 def get_tx_version() -> int:
-    # TODO (argsconfig): IF SET IN CONFIG, WARN!
+    value = get_value("txVersion")
+    deprecations.cli_argument_added_in_mxpy_json_is_deprecated(value, "txVersion", resolve_config_path())
     return int(get_value("txVersion"))
 
 
@@ -225,7 +228,7 @@ def add_config_args(argv: List[str]) -> List[str]:
     except KeyError:
         return argv
 
-    # TODO (argsconfig): LOG LEGACY, WARNING! use "--argsfile" instead
+    deprecations.cli_subcommand_arguments_in_mxpy_json_is_deprecated(resolve_config_path())
 
     final_args = _determine_final_args(argv, config_args)
     print(f"Found extra arguments in mxpy.json. Final arguments: {final_args}")
@@ -233,8 +236,6 @@ def add_config_args(argv: List[str]) -> List[str]:
 
 
 def _determine_final_args(argv: List[str], config_args: Dict[str, Any]) -> List[str]:
-    # TODO (argsconfig): IF "chainID" in config, especially add extra WARN!
-
     extra_args = []
     for key, value in config_args.items():
         key_arg = f'--{key}'

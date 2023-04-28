@@ -7,7 +7,7 @@ from typing import Any, List, Text, Tuple, cast
 from multiversx_sdk_network_providers.proxy_network_provider import \
     ProxyNetworkProvider
 
-from multiversx_sdk_cli import config, errors, utils
+from multiversx_sdk_cli import config, deprecations, errors, utils
 from multiversx_sdk_cli.accounts import Account, Address, LedgerAccount
 from multiversx_sdk_cli.cli_output import CLIOutputBuilder
 from multiversx_sdk_cli.cli_password import load_password
@@ -87,8 +87,6 @@ def add_tx_args(args: List[str],
         sub.add_argument("--data", default="", help="the payload, or 'memo' of the transaction (default: %(default)s)")
 
     sub.add_argument("--chain", default=config.get_chain_id(), help="the chain identifier (default: %(default)s)")
-    # TODO (argsconfig): how to --recall-network-config (automatically == true
-    # TODO (argsconfig): is "--proxy" in args?
     sub.add_argument("--version", type=int, default=config.get_tx_version(), help="the transaction version (default: %(default)s)")
     sub.add_argument("--options", type=int, default=0, help="the transaction options (default: 0)")
 
@@ -129,26 +127,26 @@ def parse_omit_fields_arg(args: Any) -> List[str]:
     return cast(List[str], parsed)
 
 
-# TODO! return, actually, txPrerequisites object, to be used in do_prepare_transaction()
 def acquire_tx_prerequisites(args: Any) -> Tuple[Account, int]:
     _check_broadcast_args(args)
 
+    chain_id = _acquire_chain_id(args)
     sender = acquire_signer(args)
-    nonce = aquire_nonce(args, sender.address)
+    nonce = _aquire_nonce(args, sender.address)
 
-    # TODO CHAIN ID!
-    # TODO do not mutate args
-
+    args.chain = chain_id
     args.nonce = nonce
+
     return sender, nonce
 
 
-def aquire_nonce(args: Any, address: Address) -> int:
-    if args.nonce is not None:
-        return args.nonce
+def _acquire_chain_id(args: Any) -> str:
+    if args.chain is not None:
+        return args.chain
 
     provider = ProxyNetworkProvider(args.proxy)
-    return provider.get_account(address).nonce
+    chain_id = provider.get_network_config().chain_id
+    return chain_id
 
 
 def acquire_signer(args: Any) -> Account:
@@ -164,6 +162,15 @@ def acquire_signer(args: Any) -> Account:
         )
     else:
         raise errors.BadUsage("You must provide an account wallet, using either '--pem' or '--keyfile' or '--ledger'")
+
+
+def _aquire_nonce(args: Any, address: Address) -> int:
+    if args.nonce is not None:
+        return args.nonce
+
+    provider = ProxyNetworkProvider(args.proxy)
+    nonce = provider.get_account(address).nonce
+    return nonce
 
 
 def add_broadcast_args(sub: Any, simulate: bool = True, relay: bool = False, with_wait_result: bool = True):
@@ -182,7 +189,9 @@ def add_broadcast_args(sub: Any, simulate: bool = True, relay: bool = False, wit
 
 
 def _check_broadcast_args(args: Any):
-    # TODO: DEPRECATE --relay
+    if hasattr(args, "relay"):
+        deprecations.relay_cli_argument_is_deprecated()
+
     if hasattr(args, "relay") and args.relay and args.send:
         raise errors.BadUsage("Cannot directly send a relayed transaction. Use 'mxpy tx new --relay' first, then 'mxpy tx send --data-file'")
     if args.send and args.simulate:

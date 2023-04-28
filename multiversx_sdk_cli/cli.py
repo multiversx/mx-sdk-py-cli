@@ -44,8 +44,6 @@ def _do_main(cli_args: List[str]):
     parser = setup_parser(argv_with_config_args)
     args = parser.parse_args(argv_with_config_args)
 
-    # TODO (argsconfig): if args.argsfile, load file, reparse?
-
     if args.verbose:
         logging.basicConfig(level=logging.DEBUG, force=True)
     else:
