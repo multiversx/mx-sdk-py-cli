@@ -41,3 +41,6 @@ exclude = [
 
 [project.urls]
 "Homepage" = "https://github.com/multiversx/mx-sdk-py-cli"
+
+[tool.hatch.metadata]
+allow-direct-references = true
