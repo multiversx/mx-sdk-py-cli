@@ -4,7 +4,7 @@ requests~=2.24.0
 types-requests
 prettytable
 types-prettytable
-ledgercomm[hid]
+git+https://git@github.com/multiversx/ledgerhq-ledgercomm.git@c36f84b488c532c1d99e8724848a61dc1f2a468c#egg=ledgercomm[hid]
 semver
 requests-cache
 
