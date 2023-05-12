@@ -22,7 +22,7 @@ dependencies = [
   "toml>=0.10.2",
   "requests",
   "prettytable",
-  "git+https://git@github.com/multiversx/ledgerhq-ledgercomm.git@c36f84b488c532c1d99e8724848a61dc1f2a468c#egg=ledgercomm[hid]",
+  "ledgercomm[hid] @ git+https://git@github.com/multiversx/ledgerhq-ledgercomm.git@c36f84b488c532c1d99e8724848a61dc1f2a468c#egg=ledgercomm[hid]",
   "semver",
   "requests-cache",
   "multiversx-sdk-network-providers==0.6.*",
