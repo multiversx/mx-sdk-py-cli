@@ -29,7 +29,7 @@ class Apdu:
 class LedgerApp:
     def __init__(self):
         try:
-            self.transport = Transport(interface="hid", debug=False)  # Nano S/X using HID interface
+            self.transport = Transport(interface="hid", debug=True)  # Nano S/X using HID interface
         except:
             raise LedgerError(CONNECTION_ERROR_MSG)
 
