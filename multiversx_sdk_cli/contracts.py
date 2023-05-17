@@ -67,7 +67,7 @@ class SmartContract:
         self.bytecode = bytecode
         self.metadata = metadata or CodeMetadata()
 
-    def deploy(self, owner: Account, arguments: List[Any], gas_price: int, gas_limit: int, value: int, chain: str, version: int) -> Transaction:
+    def deploy(self, owner: Account, arguments: List[Any], gas_price: int, gas_limit: int, value: int, chain: str, version: int, guardian: str, options: int) -> Transaction:
         self.owner = owner
         self.compute_address()
 
@@ -86,6 +86,8 @@ class SmartContract:
         tx.data = self.prepare_deploy_transaction_data(arguments)
         tx.chainID = chain
         tx.version = version
+        tx.guardian = guardian
+        tx.options = options
 
         tx.sign(owner)
         return tx
@@ -109,7 +111,7 @@ class SmartContract:
         address = bytes([0] * 8) + bytes([5, 0]) + address[10:30] + owner_bytes[30:]
         self.address = Address(address)
 
-    def execute(self, caller: Account, function: str, arguments: List[str], gas_price: int, gas_limit: int, value: int, chain: str, version: int) -> Transaction:
+    def execute(self, caller: Account, function: str, arguments: List[str], gas_price: int, gas_limit: int, value: int, chain: str, version: int, guardian: str, options: int) -> Transaction:
         self.caller = caller
 
         arguments = arguments or []
@@ -127,6 +129,8 @@ class SmartContract:
         tx.data = self.prepare_execute_transaction_data(function, arguments)
         tx.chainID = chain
         tx.version = version
+        tx.guardian = guardian
+        tx.options = options
 
         tx.sign(caller)
         return tx
@@ -139,7 +143,7 @@ class SmartContract:
 
         return tx_data
 
-    def upgrade(self, owner: Account, arguments: List[Any], gas_price: int, gas_limit: int, value: int, chain: str, version: int) -> Transaction:
+    def upgrade(self, owner: Account, arguments: List[Any], gas_price: int, gas_limit: int, value: int, chain: str, version: int, guradian: str, options: int) -> Transaction:
         self.owner = owner
 
         arguments = arguments or []
@@ -157,6 +161,8 @@ class SmartContract:
         tx.data = self.prepare_upgrade_transaction_data(arguments)
         tx.chainID = chain
         tx.version = version
+        tx.guardian = guradian
+        tx.options = options
 
         tx.sign(owner)
         return tx

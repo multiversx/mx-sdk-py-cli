@@ -55,7 +55,7 @@ def add_command_subparser(subparsers: Any, group: str, command: str, description
     )
 
 
-def add_tx_args(args: List[str], sub: Any, with_nonce: bool = True, with_receiver: bool = True, with_data: bool = True, with_estimate_gas: bool = False):
+def add_tx_args(args: List[str], sub: Any, with_nonce: bool = True, with_receiver: bool = True, with_data: bool = True, with_estimate_gas: bool = False, with_guardian: bool = False):
     if with_nonce:
         sub.add_argument("--nonce", type=int, required=not ("--recall-nonce" in args), help="# the nonce for the transaction")
         sub.add_argument("--recall-nonce", action="store_true", default=False, help="⭮ whether to recall the nonce when creating the transaction (default: %(default)s)")
@@ -76,6 +76,12 @@ def add_tx_args(args: List[str], sub: Any, with_nonce: bool = True, with_receive
 
     sub.add_argument("--chain", default=config.get_chain_id(), help="the chain identifier (default: %(default)s)")
     sub.add_argument("--version", type=int, default=config.get_tx_version(), help="the transaction version (default: %(default)s)")
+
+    if with_guardian:
+        sub.add_argument("--guardian-address", type=str, help="the address of the guradian")
+        sub.add_argument("--guardian-service-url", type=str, help="the url of the guardian service")
+        sub.add_argument("--guardian-code", type=str, help="the 2fa code for the guardian")
+
     sub.add_argument("--options", type=int, default=0, help="the transaction options (default: 0)")
 
 
@@ -145,6 +151,24 @@ def check_broadcast_args(args: Any):
         raise errors.BadUsage("Cannot directly send a relayed transaction. Use 'mxpy tx new --relay' first, then 'mxpy tx send --data-file'")
     if args.send and args.simulate:
         raise errors.BadUsage("Cannot both 'simulate' and 'send' a transaction")
+
+
+def check_guardian_args(args: Any):
+    if args.guardian_address:
+        if not args.guardian_service_url or not args.guardian_code:
+            raise errors.BadUsage("All guardian arguments must be provided")
+
+    if args.guardian_service_url:
+        if not args.guardian_address or not args.guardian_code:
+            raise errors.BadUsage("All guardian arguments must be provided")
+
+    if args.guardian_code:
+        if not args.guardian_address or not args.guardian_service_url:
+            raise errors.BadUsage("All guardian arguments must be provided")
+
+    if args.guardian_address and args.guardian_service_url and args.guardian_code:
+        if not args.options == 2:
+            raise errors.BadUsage("For guarded transactions the \'options\' must be set to 2")
 
 
 def send_or_simulate(tx: Transaction, args: Any, dump_output: bool = True) -> CLIOutputBuilder:
