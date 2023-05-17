@@ -1,4 +1,3 @@
-from argparse import FileType
 from pathlib import Path
 from typing import Any, List
 
@@ -36,6 +35,11 @@ def setup_parser(args: List[str], subparsers: Any) -> Any:
     cli_shared.add_proxy_arg(sub)
     cli_shared.add_omit_fields_arg(sub)
     sub.set_defaults(func=get_transaction)
+
+    sub = cli_shared.add_command_subparser(subparsers, "tx", "sign", f"Sign a previously saved transaction.{CLIOutputBuilder.describe()}")
+    cli_shared.add_wallet_args(args, sub)
+    cli_shared.add_infile_arg(sub, what="a previously saved transaction")
+    cli_shared.add_outfile_arg(sub, what="the signed transaction")
 
     parser.epilog = cli_shared.build_group_epilog(subparsers)
     return subparsers
@@ -85,3 +89,7 @@ def get_transaction(args: Any):
     transaction = proxy.get_transaction(args.hash)
     output = CLIOutputBuilder().set_transaction_on_network(transaction, omit_fields).build()
     utils.dump_out_json(output)
+
+
+def sign_transaction(args: Any):
+    pass
