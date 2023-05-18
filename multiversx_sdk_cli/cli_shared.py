@@ -14,6 +14,7 @@ from multiversx_sdk_cli.cli_password import load_password
 from multiversx_sdk_cli.ledger.ledger_functions import do_get_ledger_address
 from multiversx_sdk_cli.simulation import Simulator
 from multiversx_sdk_cli.transactions import Transaction
+from multiversx_sdk_cli.constants import TRANSACTION_OPTIONS_TX_GUARDED
 
 
 def wider_help_formatter(prog: Text):
@@ -158,7 +159,7 @@ def check_guardian_args(args: Any):
         if not all([args.guardian, args.guardian_service_url, args.guardian_2fa_code]):
             raise errors.BadUsage("All guardian arguments must be provided")
 
-        if not args.options >> 1 & 1:
+        if not args.options & TRANSACTION_OPTIONS_TX_GUARDED == TRANSACTION_OPTIONS_TX_GUARDED:
             raise errors.BadUsage("For guarded transactions the guarded flag must be set.")
 
 
