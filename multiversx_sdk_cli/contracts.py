@@ -143,7 +143,7 @@ class SmartContract:
 
         return tx_data
 
-    def upgrade(self, owner: Account, arguments: List[Any], gas_price: int, gas_limit: int, value: int, chain: str, version: int, guradian: str, options: int) -> Transaction:
+    def upgrade(self, owner: Account, arguments: List[Any], gas_price: int, gas_limit: int, value: int, chain: str, version: int, guardian: str, options: int) -> Transaction:
         self.owner = owner
 
         arguments = arguments or []
@@ -161,7 +161,7 @@ class SmartContract:
         tx.data = self.prepare_upgrade_transaction_data(arguments)
         tx.chainID = chain
         tx.version = version
-        tx.guardian = guradian
+        tx.guardian = guardian
         tx.options = options
 
         tx.sign(owner)
