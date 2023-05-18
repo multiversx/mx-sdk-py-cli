@@ -276,11 +276,11 @@ def do_prepare_transaction(args: Any) -> Transaction:
     tx.chainID = args.chain
     tx.version = int(args.version)
     tx.options = int(args.options)
-    tx.guardian = args.guardian_address
+    tx.guardian = args.guardian
 
     tx.sign(account)
 
-    if args.guardian_address:
-        tx = cosign_transaction(tx, args.guardian_service_url, args.guardian_code)
+    if args.guardian:
+        tx = cosign_transaction(tx, args.guardian_service_url, args.guardian_2fa_code)
 
     return tx

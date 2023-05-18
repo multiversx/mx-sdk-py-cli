@@ -78,9 +78,9 @@ def add_tx_args(args: List[str], sub: Any, with_nonce: bool = True, with_receive
     sub.add_argument("--version", type=int, default=config.get_tx_version(), help="the transaction version (default: %(default)s)")
 
     if with_guardian:
-        sub.add_argument("--guardian-address", type=str, help="the address of the guradian")
+        sub.add_argument("--guardian", type=str, help="the address of the guradian")
         sub.add_argument("--guardian-service-url", type=str, help="the url of the guardian service")
-        sub.add_argument("--guardian-code", type=str, help="the 2fa code for the guardian")
+        sub.add_argument("--guardian-2fa-code", type=str, help="the 2fa code for the guardian")
 
     sub.add_argument("--options", type=int, default=0, help="the transaction options (default: 0)")
 
@@ -154,21 +154,11 @@ def check_broadcast_args(args: Any):
 
 
 def check_guardian_args(args: Any):
-    if args.guardian_address:
-        if not args.guardian_service_url or not args.guardian_code:
-            raise errors.BadUsage("All guardian arguments must be provided")
+    if not all([args.guardian, args.guardian_service_url, args.guardian_2fa_code]):
+        raise errors.BadUsage("All guardian arguments must be provided")
 
-    if args.guardian_service_url:
-        if not args.guardian_address or not args.guardian_code:
-            raise errors.BadUsage("All guardian arguments must be provided")
-
-    if args.guardian_code:
-        if not args.guardian_address or not args.guardian_service_url:
-            raise errors.BadUsage("All guardian arguments must be provided")
-
-    if args.guardian_address and args.guardian_service_url and args.guardian_code:
-        if not args.options == 2:
-            raise errors.BadUsage("For guarded transactions the \'options\' must be set to 2")
+    if not args.options >> 1 & 1:
+        raise errors.BadUsage("For guarded transactions the guarded flag must be set.")
 
 
 def send_or_simulate(tx: Transaction, args: Any, dump_output: bool = True) -> CLIOutputBuilder:

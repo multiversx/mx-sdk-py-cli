@@ -308,10 +308,10 @@ def deploy(args: Any):
     contract = _prepare_contract(args)
     sender = _prepare_sender(args)
 
-    tx = contract.deploy(sender, arguments, gas_price, gas_limit, value, chain, version, args.guardian_address, args.options)
+    tx = contract.deploy(sender, arguments, gas_price, gas_limit, value, chain, version, args.guardian, args.options)
 
-    if args.guardian_address:
-        tx = cosign_transaction(tx, args.guardian_service_url, args.guardian_code)
+    if args.guardian:
+        tx = cosign_transaction(tx, args.guardian_service_url, args.guardian_2fa_code)
 
     logger.info("Contract address: %s", contract.address)
     utils.log_explorer_contract_address(chain, contract.address)
@@ -387,10 +387,10 @@ def call(args: Any):
     contract = SmartContract(contract_address)
     sender = _prepare_sender(args)
 
-    tx = contract.execute(sender, function, arguments, gas_price, gas_limit, value, chain, version, args.guardian_address, args.options)
+    tx = contract.execute(sender, function, arguments, gas_price, gas_limit, value, chain, version, args.guardian, args.options)
 
-    if args.guardian_address:
-        tx = cosign_transaction(tx, args.guardian_service_url, args.guardian_code)
+    if args.guardian:
+        tx = cosign_transaction(tx, args.guardian_service_url, args.guardian_2fa_code)
 
     _send_or_simulate(tx, contract, args)
 
@@ -413,8 +413,8 @@ def upgrade(args: Any):
 
     tx = contract.upgrade(sender, arguments, gas_price, gas_limit, value, chain, version, args.guardian_address, args.options)
 
-    if args.guardian_address:
-        tx = cosign_transaction(tx, args.guardian_service_url, args.guardian_code)
+    if args.guardian:
+        tx = cosign_transaction(tx, args.guardian_service_url, args.guardian_2fa_code)
 
     _send_or_simulate(tx, contract, args)
 
