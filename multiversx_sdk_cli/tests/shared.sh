@@ -14,6 +14,8 @@ VALIDATORS=~/multiversx-sdk/testwallets/latest/validators
 DENOMINATION="000000000000000000"
 PROXY="${PROXY:-http://localhost:7950}"
 CHAIN_ID="${CHAIN_ID:-local-testnet}"
+TestUser=./testdata/TestUser.pem
+TestUser2=./testdata/TestUser2.pem
 
 cleanSandbox() {
     rm -rf ${SANDBOX}

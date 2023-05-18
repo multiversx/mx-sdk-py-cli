@@ -154,11 +154,12 @@ def check_broadcast_args(args: Any):
 
 
 def check_guardian_args(args: Any):
-    if not all([args.guardian, args.guardian_service_url, args.guardian_2fa_code]):
-        raise errors.BadUsage("All guardian arguments must be provided")
+    if any([args.guardian, args.guardian_service_url, args.guardian_2fa_code]):
+        if not all([args.guardian, args.guardian_service_url, args.guardian_2fa_code]):
+            raise errors.BadUsage("All guardian arguments must be provided")
 
-    if not args.options >> 1 & 1:
-        raise errors.BadUsage("For guarded transactions the guarded flag must be set.")
+        if not args.options >> 1 & 1:
+            raise errors.BadUsage("For guarded transactions the guarded flag must be set.")
 
 
 def send_or_simulate(tx: Transaction, args: Any, dump_output: bool = True) -> CLIOutputBuilder:
