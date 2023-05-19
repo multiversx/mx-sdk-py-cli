@@ -48,7 +48,9 @@ jobs:
 
           export PATH="~/multiversx-sdk:${PATH}"
 
-          mxpy deps install wasm-opt
+          mxpy config set dependencies.rust.tag "nightly-2023-04-24"
+          mxpy deps install rust --overwrite
+          mxpy deps install wasm-opt --overwrite
           mxpy contract new --template=lottery-esdt lottery-esdt
           mxpy contract build lottery-esdt
           mxpy contract test --directory="scenarios" adder
