@@ -35,7 +35,7 @@ jobs:
 
           erdpy config new test
           erdpy config set github_api_token ${{ secrets.GITHUB_TOKEN }}
-          erdpy config set dependencies.wasm-opt.tag version_112
+          erdpy config set dependencies.wasm-opt.tag 1.4.0
           erdpy deps install wasm-opt --overwrite
 
           erdpy contract new --template=adder adder
