@@ -183,3 +183,8 @@ class LedgerError(KnownError):
 class DockerMissingError(KnownError):
     def __init__(self):
         super().__init__("Docker is not installed! Please visit https://docs.docker.com/get-docker/ to install docker.")
+
+
+class GuardianServiceError(KnownError):
+    def __init__(self, message: str):
+        super().__init__(message)
