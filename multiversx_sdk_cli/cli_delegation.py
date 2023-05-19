@@ -137,7 +137,7 @@ def _add_common_arguments(args: List[str], sub: Any):
 
 
 def do_create_delegation_contract(args: Any):
-    cli_shared.check_guardian_args(args)
+    cli_shared.check_guardian_and_options_args(args)
     cli_shared.check_broadcast_args(args)
     cli_shared.prepare_nonce_in_args(args)
     staking_provider.prepare_args_for_create_new_staking_contract(args)
@@ -161,7 +161,7 @@ def get_contract_address_by_deploy_tx_hash(args: Any):
 
 
 def add_new_nodes(args: Any):
-    cli_shared.check_guardian_args(args)
+    cli_shared.check_guardian_and_options_args(args)
     cli_shared.check_broadcast_args(args)
     cli_shared.prepare_nonce_in_args(args)
     staking_provider.prepare_args_for_add_nodes(args)
@@ -171,7 +171,7 @@ def add_new_nodes(args: Any):
 
 
 def remove_nodes(args: Any):
-    cli_shared.check_guardian_args(args)
+    cli_shared.check_guardian_and_options_args(args)
     cli_shared.check_broadcast_args(args)
     cli_shared.prepare_nonce_in_args(args)
     staking_provider.prepare_args_for_remove_nodes(args)
@@ -181,7 +181,7 @@ def remove_nodes(args: Any):
 
 
 def stake_nodes(args: Any):
-    cli_shared.check_guardian_args(args)
+    cli_shared.check_guardian_and_options_args(args)
     cli_shared.check_broadcast_args(args)
     cli_shared.prepare_nonce_in_args(args)
     staking_provider.prepare_args_for_stake_nodes(args)
@@ -191,7 +191,7 @@ def stake_nodes(args: Any):
 
 
 def unbond_nodes(args: Any):
-    cli_shared.check_guardian_args(args)
+    cli_shared.check_guardian_and_options_args(args)
     cli_shared.check_broadcast_args(args)
     cli_shared.prepare_nonce_in_args(args)
     staking_provider.prepare_args_for_unbond_nodes(args)
@@ -201,7 +201,7 @@ def unbond_nodes(args: Any):
 
 
 def unstake_nodes(args: Any):
-    cli_shared.check_guardian_args(args)
+    cli_shared.check_guardian_and_options_args(args)
     cli_shared.check_broadcast_args(args)
     cli_shared.prepare_nonce_in_args(args)
     staking_provider.prepare_args_for_unstake_nodes(args)
@@ -211,7 +211,7 @@ def unstake_nodes(args: Any):
 
 
 def unjail_nodes(args: Any):
-    cli_shared.check_guardian_args(args)
+    cli_shared.check_guardian_and_options_args(args)
     cli_shared.check_broadcast_args(args)
     cli_shared.prepare_nonce_in_args(args)
     staking_provider.prepare_args_for_unjail_nodes(args)
@@ -221,7 +221,7 @@ def unjail_nodes(args: Any):
 
 
 def change_service_fee(args: Any):
-    cli_shared.check_guardian_args(args)
+    cli_shared.check_guardian_and_options_args(args)
     cli_shared.check_broadcast_args(args)
     cli_shared.prepare_nonce_in_args(args)
     staking_provider.prepare_args_change_service_fee(args)
@@ -231,7 +231,7 @@ def change_service_fee(args: Any):
 
 
 def modify_delegation_cap(args: Any):
-    cli_shared.check_guardian_args(args)
+    cli_shared.check_guardian_and_options_args(args)
     cli_shared.check_broadcast_args(args)
     cli_shared.prepare_nonce_in_args(args)
     staking_provider.prepare_args_modify_delegation_cap(args)
@@ -241,7 +241,7 @@ def modify_delegation_cap(args: Any):
 
 
 def automatic_activation(args: Any):
-    cli_shared.check_guardian_args(args)
+    cli_shared.check_guardian_and_options_args(args)
     cli_shared.check_broadcast_args(args)
     cli_shared.prepare_nonce_in_args(args)
     staking_provider.prepare_args_automatic_activation(args)
@@ -251,7 +251,7 @@ def automatic_activation(args: Any):
 
 
 def redelegate_cap(args: Any):
-    cli_shared.check_guardian_args(args)
+    cli_shared.check_guardian_and_options_args(args)
     cli_shared.check_broadcast_args(args)
     cli_shared.prepare_nonce_in_args(args)
     staking_provider.prepare_args_redelegate_cap(args)
@@ -261,7 +261,7 @@ def redelegate_cap(args: Any):
 
 
 def set_metadata(args: Any):
-    cli_shared.check_guardian_args(args)
+    cli_shared.check_guardian_and_options_args(args)
     cli_shared.check_broadcast_args(args)
     cli_shared.prepare_nonce_in_args(args)
     staking_provider.prepare_args_set_metadata(args)

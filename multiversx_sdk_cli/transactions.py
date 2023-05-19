@@ -50,7 +50,7 @@ class Transaction(ITransaction):
         self.options = 0
         self.signature = ""
         self.guardian = ""
-        self.guardian_signature = ""
+        self.guardianSignature = ""
 
     # The data field is base64-encoded. Here, we only support utf-8 "data" at this moment.
     def data_encoded(self) -> str:
@@ -186,8 +186,8 @@ class Transaction(ITransaction):
         if self.guardian:
             dictionary["guardian"] = self.guardian
 
-        if self.guardian_signature:
-            dictionary["guardianSignature"] = self.guardian_signature
+        if self.guardianSignature:
+            dictionary["guardianSignature"] = self.guardianSignature
 
         return dictionary
 

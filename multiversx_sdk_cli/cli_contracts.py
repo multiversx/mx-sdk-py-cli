@@ -295,7 +295,7 @@ def run_tests(args: Any):
 
 def deploy(args: Any):
     logger.debug("deploy")
-    cli_shared.check_guardian_args(args)
+    cli_shared.check_guardian_and_options_args(args)
     cli_shared.check_broadcast_args(args)
 
     arguments = args.arguments
@@ -372,7 +372,7 @@ def _prepare_signer(args: Any) -> Account:
 
 def call(args: Any):
     logger.debug("call")
-    cli_shared.check_guardian_args(args)
+    cli_shared.check_guardian_and_options_args(args)
     cli_shared.check_broadcast_args(args)
 
     contract_address = args.contract

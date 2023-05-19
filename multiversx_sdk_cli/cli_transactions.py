@@ -5,6 +5,7 @@ from multiversx_sdk_cli import cli_shared, utils
 from multiversx_sdk_cli.cli_output import CLIOutputBuilder
 from multiversx_sdk_network_providers.proxy_network_provider import ProxyNetworkProvider
 from multiversx_sdk_cli.transactions import Transaction, do_prepare_transaction
+from multiversx_sdk_cli.cosign_transaction import cosign_transaction
 
 
 def setup_parser(args: List[str], subparsers: Any) -> Any:
@@ -40,6 +41,10 @@ def setup_parser(args: List[str], subparsers: Any) -> Any:
     cli_shared.add_wallet_args(args, sub)
     cli_shared.add_infile_arg(sub, what="a previously saved transaction")
     cli_shared.add_outfile_arg(sub, what="the signed transaction")
+    cli_shared.add_broadcast_args(sub, relay=True)
+    cli_shared.add_proxy_arg(sub)
+    cli_shared.add_guardian_args(sub)
+    sub.set_defaults(func=sign_transaction)
 
     parser.epilog = cli_shared.build_group_epilog(subparsers)
     return subparsers
@@ -54,7 +59,7 @@ def _add_common_arguments(args: List[str], sub: Any):
 def create_transaction(args: Any):
     args = utils.as_object(args)
 
-    cli_shared.check_guardian_args(args)
+    cli_shared.check_guardian_and_options_args(args)
     cli_shared.check_broadcast_args(args)
     cli_shared.prepare_nonce_in_args(args)
 
@@ -93,4 +98,24 @@ def get_transaction(args: Any):
 
 
 def sign_transaction(args: Any):
-    pass
+    args = utils.as_object(args)
+
+    cli_shared.check_guardian_args(args)
+    cli_shared.check_broadcast_args(args)
+
+    tx = Transaction.load_from_file(args.infile)
+    if args.guardian:
+        cli_shared.check_options_for_guarded_tx(tx.options)
+
+    # empty signatures for user signing
+    tx.guardianSignature = ""
+    tx.signature = ""
+
+    account = cli_shared.prepare_account(args)
+    signature = account.sign_transaction(tx)
+    tx.signature = signature
+
+    if args.guardian:
+        tx = cosign_transaction(tx, args.guardian_service_url, args.guardian_2fa_code)
+
+    cli_shared.send_or_simulate(tx, args)
