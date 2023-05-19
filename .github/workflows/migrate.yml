@@ -35,7 +35,7 @@ jobs:
 
           erdpy config new test
           erdpy config set github_api_token ${{ secrets.GITHUB_TOKEN }}
-          mxpy config set dependencies.wasm-opt.tag version_112
+          erdpy config set dependencies.wasm-opt.tag version_112
           erdpy deps install wasm-opt --overwrite
 
           erdpy contract new --template=adder adder
@@ -47,7 +47,7 @@ jobs:
           python3 mxpy-up.py --from-branch $BRANCH_NAME --not-interactive
 
           export PATH="~/multiversx-sdk:${PATH}"
-          
+
           mxpy contract new --template=lottery-esdt lottery-esdt
           mxpy contract build lottery-esdt
           mxpy contract test --directory="scenarios" adder
