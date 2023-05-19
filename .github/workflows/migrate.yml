@@ -35,8 +35,8 @@ jobs:
 
           erdpy config new test
           erdpy config set github_api_token ${{ secrets.GITHUB_TOKEN }}
-          erdpy config set dependencies.rust.tag "nightly-2022-10-16"
-          erdpy deps install wasm-opt
+          erdpy config set dependencies.wasm-opt.tag 1.4.0
+          erdpy deps install wasm-opt --overwrite
 
           erdpy contract new --template=adder adder
           erdpy contract build adder
@@ -48,7 +48,6 @@ jobs:
 
           export PATH="~/multiversx-sdk:${PATH}"
 
-          mxpy deps install wasm-opt
           mxpy contract new --template=lottery-esdt lottery-esdt
           mxpy contract build lottery-esdt
           mxpy contract test --directory="scenarios" adder

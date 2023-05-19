@@ -14,6 +14,7 @@ from multiversx_sdk_cli.cli_password import load_password
 from multiversx_sdk_cli.ledger.ledger_functions import do_get_ledger_address
 from multiversx_sdk_cli.simulation import Simulator
 from multiversx_sdk_cli.transactions import Transaction
+from multiversx_sdk_cli.constants import TRANSACTION_OPTIONS_TX_GUARDED
 
 
 def wider_help_formatter(prog: Text):
@@ -55,7 +56,7 @@ def add_command_subparser(subparsers: Any, group: str, command: str, description
     )
 
 
-def add_tx_args(args: List[str], sub: Any, with_nonce: bool = True, with_receiver: bool = True, with_data: bool = True, with_estimate_gas: bool = False):
+def add_tx_args(args: List[str], sub: Any, with_nonce: bool = True, with_receiver: bool = True, with_data: bool = True, with_estimate_gas: bool = False, with_guardian: bool = False):
     if with_nonce:
         sub.add_argument("--nonce", type=int, required=not ("--recall-nonce" in args), help="# the nonce for the transaction")
         sub.add_argument("--recall-nonce", action="store_true", default=False, help="⭮ whether to recall the nonce when creating the transaction (default: %(default)s)")
@@ -76,6 +77,12 @@ def add_tx_args(args: List[str], sub: Any, with_nonce: bool = True, with_receive
 
     sub.add_argument("--chain", default=config.get_chain_id(), help="the chain identifier (default: %(default)s)")
     sub.add_argument("--version", type=int, default=config.get_tx_version(), help="the transaction version (default: %(default)s)")
+
+    if with_guardian:
+        sub.add_argument("--guardian", type=str, help="the address of the guradian")
+        sub.add_argument("--guardian-service-url", type=str, help="the url of the guardian service")
+        sub.add_argument("--guardian-2fa-code", type=str, help="the 2fa code for the guardian")
+
     sub.add_argument("--options", type=int, default=0, help="the transaction options (default: 0)")
 
 
@@ -145,6 +152,15 @@ def check_broadcast_args(args: Any):
         raise errors.BadUsage("Cannot directly send a relayed transaction. Use 'mxpy tx new --relay' first, then 'mxpy tx send --data-file'")
     if args.send and args.simulate:
         raise errors.BadUsage("Cannot both 'simulate' and 'send' a transaction")
+
+
+def check_guardian_args(args: Any):
+    if any([args.guardian, args.guardian_service_url, args.guardian_2fa_code]):
+        if not all([args.guardian, args.guardian_service_url, args.guardian_2fa_code]):
+            raise errors.BadUsage("All guardian arguments must be provided")
+
+        if not args.options & TRANSACTION_OPTIONS_TX_GUARDED == TRANSACTION_OPTIONS_TX_GUARDED:
+            raise errors.BadUsage("For guarded transactions the guarded flag must be set.")
 
 
 def send_or_simulate(tx: Transaction, args: Any, dump_output: bool = True) -> CLIOutputBuilder:
