@@ -158,7 +158,7 @@ def get_defaults() -> Dict[str, Any]:
     return {
         "proxy": "https://testnet-gateway.multiversx.com",
         "chainID": "T",
-        "txVersion": "1",
+        "txVersion": "2",
         "dependencies.vmtools.tag": "latest",
         "dependencies.mx_sdk_rs.tag": "latest",
         "dependencies.vmtools.urlTemplate.linux": "https://github.com/multiversx/mx-chain-vm-go/archive/{TAG}.tar.gz",

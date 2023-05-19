@@ -9,6 +9,7 @@ from multiversx_sdk_cli import config, errors, utils
 from multiversx_sdk_cli.accounts import Account, Address, LedgerAccount
 from multiversx_sdk_cli.cli_password import load_password
 from multiversx_sdk_cli.interfaces import ITransaction
+from multiversx_sdk_cli.cosign_transaction import cosign_transaction
 
 logger = logging.getLogger("transactions")
 
@@ -48,6 +49,8 @@ class Transaction(ITransaction):
         self.version = 0
         self.options = 0
         self.signature = ""
+        self.guardian = ""
+        self.guardian_signature = ""
 
     # The data field is base64-encoded. Here, we only support utf-8 "data" at this moment.
     def data_encoded(self) -> str:
@@ -180,6 +183,12 @@ class Transaction(ITransaction):
         if self.signature:
             dictionary["signature"] = self.signature
 
+        if self.guardian:
+            dictionary["guardian"] = self.guardian
+
+        if self.guardian_signature:
+            dictionary["guardianSignature"] = self.guardian_signature
+
         return dictionary
 
     # Creates the payload for a "user" / "inner" transaction
@@ -267,6 +276,11 @@ def do_prepare_transaction(args: Any) -> Transaction:
     tx.chainID = args.chain
     tx.version = int(args.version)
     tx.options = int(args.options)
+    tx.guardian = args.guardian
 
     tx.sign(account)
+
+    if args.guardian:
+        tx = cosign_transaction(tx, args.guardian_service_url, args.guardian_2fa_code)
+
     return tx
