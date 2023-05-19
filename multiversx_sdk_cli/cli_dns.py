@@ -3,7 +3,7 @@ from prettytable import PrettyTable
 
 from multiversx_sdk_cli import cli_shared
 from multiversx_sdk_cli.dns import (name_hash, dns_address_for_name, register, resolve, registration_cost,
-                        validate_name, version, compute_dns_address_for_shard_id)
+                                    validate_name, version, compute_dns_address_for_shard_id)
 from multiversx_sdk_cli.accounts import Address
 from multiversx_sdk_network_providers.proxy_network_provider import ProxyNetworkProvider
 
@@ -17,7 +17,7 @@ def setup_parser(args: List[str], subparsers: Any) -> Any:
     cli_shared.add_broadcast_args(sub, relay=True)
     cli_shared.add_wallet_args(args, sub)
     cli_shared.add_proxy_arg(sub)
-    cli_shared.add_tx_args(args, sub, with_receiver=False, with_data=False)
+    cli_shared.add_tx_args(args, sub, with_receiver=False, with_data=False, with_guardian=True)
     sub.add_argument("--name", help="the name to register")
     sub.set_defaults(func=register)
 

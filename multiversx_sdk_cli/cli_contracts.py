@@ -18,6 +18,7 @@ from multiversx_sdk_cli.errors import DockerMissingError
 from multiversx_sdk_cli.projects import load_project
 from multiversx_sdk_cli.projects.core import get_project_paths_recursively
 from multiversx_sdk_cli.transactions import Transaction
+from multiversx_sdk_cli.cosign_transaction import cosign_transaction
 
 logger = logging.getLogger("cli.contracts")
 
@@ -75,7 +76,7 @@ def setup_parser(args: List[str], subparsers: Any) -> Any:
     cli_shared.add_outfile_arg(sub)
     cli_shared.add_wallet_args(args, sub)
     cli_shared.add_proxy_arg(sub)
-    cli_shared.add_tx_args(args, sub, with_receiver=False, with_data=False)
+    cli_shared.add_tx_args(args, sub, with_receiver=False, with_data=False, with_guardian=True)
     _add_arguments_arg(sub)
     sub.add_argument("--wait-result", action="store_true", default=False,
                      help="signal to wait for the transaction result - only valid if --send is set")
@@ -91,7 +92,7 @@ def setup_parser(args: List[str], subparsers: Any) -> Any:
     cli_shared.add_outfile_arg(sub)
     cli_shared.add_wallet_args(args, sub)
     cli_shared.add_proxy_arg(sub)
-    cli_shared.add_tx_args(args, sub, with_receiver=False, with_data=False)
+    cli_shared.add_tx_args(args, sub, with_receiver=False, with_data=False, with_guardian=True)
     _add_function_arg(sub)
     _add_arguments_arg(sub)
     sub.add_argument("--wait-result", action="store_true", default=False,
@@ -110,7 +111,7 @@ def setup_parser(args: List[str], subparsers: Any) -> Any:
     _add_metadata_arg(sub)
     cli_shared.add_wallet_args(args, sub)
     cli_shared.add_proxy_arg(sub)
-    cli_shared.add_tx_args(args, sub, with_receiver=False, with_data=False)
+    cli_shared.add_tx_args(args, sub, with_receiver=False, with_data=False, with_guardian=True)
     _add_arguments_arg(sub)
     sub.add_argument("--wait-result", action="store_true", default=False,
                      help="signal to wait for the transaction result - only valid if --send is set")
@@ -294,6 +295,7 @@ def run_tests(args: Any):
 
 def deploy(args: Any):
     logger.debug("deploy")
+    cli_shared.check_guardian_args(args)
     cli_shared.check_broadcast_args(args)
 
     arguments = args.arguments
@@ -306,7 +308,11 @@ def deploy(args: Any):
     contract = _prepare_contract(args)
     sender = _prepare_sender(args)
 
-    tx = contract.deploy(sender, arguments, gas_price, gas_limit, value, chain, version)
+    tx = contract.deploy(sender, arguments, gas_price, gas_limit, value, chain, version, args.guardian, args.options)
+
+    if args.guardian:
+        tx = cosign_transaction(tx, args.guardian_service_url, args.guardian_2fa_code)
+
     logger.info("Contract address: %s", contract.address)
     utils.log_explorer_contract_address(chain, contract.address)
 
@@ -366,6 +372,7 @@ def _prepare_signer(args: Any) -> Account:
 
 def call(args: Any):
     logger.debug("call")
+    cli_shared.check_guardian_args(args)
     cli_shared.check_broadcast_args(args)
 
     contract_address = args.contract
@@ -380,7 +387,11 @@ def call(args: Any):
     contract = SmartContract(contract_address)
     sender = _prepare_sender(args)
 
-    tx = contract.execute(sender, function, arguments, gas_price, gas_limit, value, chain, version)
+    tx = contract.execute(sender, function, arguments, gas_price, gas_limit, value, chain, version, args.guardian, args.options)
+
+    if args.guardian:
+        tx = cosign_transaction(tx, args.guardian_service_url, args.guardian_2fa_code)
+
     _send_or_simulate(tx, contract, args)
 
 
@@ -400,7 +411,11 @@ def upgrade(args: Any):
     contract.address = Address(contract_address)
     sender = _prepare_sender(args)
 
-    tx = contract.upgrade(sender, arguments, gas_price, gas_limit, value, chain, version)
+    tx = contract.upgrade(sender, arguments, gas_price, gas_limit, value, chain, version, args.guardian_address, args.options)
+
+    if args.guardian:
+        tx = cosign_transaction(tx, args.guardian_service_url, args.guardian_2fa_code)
+
     _send_or_simulate(tx, contract, args)
 
 
