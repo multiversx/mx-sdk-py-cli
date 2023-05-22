@@ -107,13 +107,12 @@ def sign_transaction(args: Any):
     if args.guardian:
         cli_shared.check_options_for_guarded_tx(tx.options)
 
-    # empty signatures for user signing
+    # clear existing signatures, if any
     tx.guardianSignature = ""
     tx.signature = ""
 
     account = cli_shared.prepare_account(args)
-    signature = account.sign_transaction(tx)
-    tx.signature = signature
+    tx.signature = account.sign_transaction(tx)
 
     if args.guardian:
         tx = cosign_transaction(tx, args.guardian_service_url, args.guardian_2fa_code)
