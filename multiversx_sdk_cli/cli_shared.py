@@ -177,7 +177,7 @@ def check_guardian_args(args: Any):
 
 def check_options_for_guarded_tx(options: int):
     if not options & TRANSACTION_OPTIONS_TX_GUARDED == TRANSACTION_OPTIONS_TX_GUARDED:
-        raise errors.BadUsage("For guarded transactions the 'guarded' flag must be set.")
+        raise errors.BadUsage("Invalid guarded transaction's options. The second least significant bit must be set.")
 
 
 def send_or_simulate(tx: Transaction, args: Any, dump_output: bool = True) -> CLIOutputBuilder:
