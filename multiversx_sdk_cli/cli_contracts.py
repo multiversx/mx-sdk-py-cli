@@ -147,6 +147,7 @@ def setup_parser(args: List[str], subparsers: Any) -> Any:
         help="the url of the service that validates the contract",
     )
     sub.add_argument("--docker-image", required=True, help="the docker image used for the build")
+    sub.add_argument("--contract-name", required=False, default=None, help="in case of multicontract, specify the contract name you want to verify")
     cli_shared.add_wallet_args(args, sub)
     sub.set_defaults(func=verify)
 
@@ -445,9 +446,10 @@ def verify(args: Any) -> None:
 
     owner = _prepare_signer(args)
     docker_image = args.docker_image
+    contract_name = args.contract_name
 
     trigger_contract_verification(
-        packaged_src, owner, contract, verifier_url, docker_image
+        packaged_src, owner, contract, verifier_url, docker_image, contract_name
     )
     logger.info("Contract verification request completed!")
 
