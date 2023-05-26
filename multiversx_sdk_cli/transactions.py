@@ -8,8 +8,8 @@ from typing import Any, Dict, List, Protocol, Sequence, TextIO, Tuple
 from multiversx_sdk_cli import config, errors, utils
 from multiversx_sdk_cli.accounts import Account, Address, LedgerAccount
 from multiversx_sdk_cli.cli_password import load_password
-from multiversx_sdk_cli.interfaces import ITransaction
 from multiversx_sdk_cli.cosign_transaction import cosign_transaction
+from multiversx_sdk_cli.interfaces import ITransaction
 
 logger = logging.getLogger("transactions")
 
@@ -94,7 +94,9 @@ class Transaction(ITransaction):
         return serialized
 
     def serialize_for_signing(self) -> bytes:
-        return self.serialize()
+        dictionary = self.to_dictionary(with_signature=False)
+        serialized = self._dict_to_json(dictionary)
+        return serialized
 
     def _dict_to_json(self, dictionary: Dict[str, Any]) -> bytes:
         serialized = json.dumps(dictionary, separators=(',', ':')).encode("utf8")
@@ -153,7 +155,7 @@ class Transaction(ITransaction):
 
         raise errors.KnownError("Took too long to get transaction.")
 
-    def to_dictionary(self) -> Dict[str, Any]:
+    def to_dictionary(self, with_signature: bool = True) -> Dict[str, Any]:
         dictionary: Dict[str, Any] = OrderedDict()
         dictionary["nonce"] = self.nonce
         dictionary["value"] = self.value
@@ -180,14 +182,17 @@ class Transaction(ITransaction):
         if self.options:
             dictionary["options"] = int(self.options)
 
-        if self.signature:
-            dictionary["signature"] = self.signature
-
         if self.guardian:
             dictionary["guardian"] = self.guardian
 
-        if self.guardianSignature:
-            dictionary["guardianSignature"] = self.guardianSignature
+        # When adding signatures, we don't have to follow any ordering,
+        # so we can just add them at the end.
+        if with_signature:
+            if self.signature:
+                dictionary["signature"] = self.signature
+
+            if self.guardianSignature:
+                dictionary["guardianSignature"] = self.guardianSignature
 
         return dictionary
 

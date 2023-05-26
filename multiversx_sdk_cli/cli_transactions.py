@@ -110,10 +110,6 @@ def sign_transaction(args: Any):
     if args.guardian:
         cli_shared.check_options_for_guarded_tx(tx.options)
 
-    # clear existing signatures, if any
-    tx.guardianSignature = ""
-    tx.signature = ""
-
     account = cli_shared.prepare_account(args)
 
     if args.as_guardian:
