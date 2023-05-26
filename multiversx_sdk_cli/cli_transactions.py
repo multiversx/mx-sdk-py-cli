@@ -1,11 +1,13 @@
 from pathlib import Path
 from typing import Any, List
 
+from multiversx_sdk_network_providers.proxy_network_provider import \
+    ProxyNetworkProvider
+
 from multiversx_sdk_cli import cli_shared, utils
 from multiversx_sdk_cli.cli_output import CLIOutputBuilder
-from multiversx_sdk_network_providers.proxy_network_provider import ProxyNetworkProvider
-from multiversx_sdk_cli.transactions import Transaction, do_prepare_transaction
 from multiversx_sdk_cli.cosign_transaction import cosign_transaction
+from multiversx_sdk_cli.transactions import Transaction, do_prepare_transaction
 
 
 def setup_parser(args: List[str], subparsers: Any) -> Any:
@@ -44,6 +46,7 @@ def setup_parser(args: List[str], subparsers: Any) -> Any:
     cli_shared.add_broadcast_args(sub, relay=True)
     cli_shared.add_proxy_arg(sub)
     cli_shared.add_guardian_args(sub)
+    sub.add_argument("--as-guardian", action="store_true", help="will sign the transaction as a guardian")
     sub.set_defaults(func=sign_transaction)
 
     parser.epilog = cli_shared.build_group_epilog(subparsers)
@@ -112,7 +115,11 @@ def sign_transaction(args: Any):
     tx.signature = ""
 
     account = cli_shared.prepare_account(args)
-    tx.signature = account.sign_transaction(tx)
+
+    if args.as_guardian:
+        tx.guardianSignature = account.sign_transaction(tx)
+    else:
+        tx.signature = account.sign_transaction(tx)
 
     if args.guardian:
         tx = cosign_transaction(tx, args.guardian_service_url, args.guardian_2fa_code)
