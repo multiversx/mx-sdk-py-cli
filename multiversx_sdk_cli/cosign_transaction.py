@@ -4,7 +4,7 @@ from multiversx_sdk_cli.errors import GuardianServiceError
 
 
 class ITransaction(Protocol):
-    guardian_signature: str
+    guardianSignature: str
 
     def to_dictionary(self) -> Dict[str, Any]:
         ...
@@ -21,7 +21,7 @@ def cosign_transaction(transaction: ITransaction, service_url: str, guardian_cod
     check_for_guardian_error(response.json())
 
     tx_as_dict = response.json()["data"]["transaction"]
-    transaction.guardian_signature = tx_as_dict["guardianSignature"]
+    transaction.guardianSignature = tx_as_dict["guardianSignature"]
 
     return transaction
 
