@@ -1,0 +1,16 @@
+{
+    "emittedTransaction": {
+        "nonce": 7,
+        "value": "1000000000000000000",
+        "receiver": "erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th",
+        "sender": "erd1cqqxak4wun7508e0yj9ng843r6hv4mzd0hhpjpsejkpn9wa9yq8sj7u2u5",
+        "gasPrice": 1000000000,
+        "gasLimit": 74000,
+        "data": "dGVzdCB0cmFuc2FjdGlvbg==",
+        "chainID": "T",
+        "version": 2,
+        "signature": ""
+    },
+    "emittedTransactionData": "test transaction",
+    "emittedTransactionHash": ""
+}

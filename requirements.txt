@@ -11,4 +11,4 @@ rich==13.3.4
 
 multiversx-sdk-core>=0.4.1
 multiversx-sdk-network-providers==0.6.*
-multiversx-sdk-wallet==0.6.*
+multiversx-sdk-wallet==0.7.*
