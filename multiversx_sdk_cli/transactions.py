@@ -296,10 +296,10 @@ def sign_tx_by_guardian(args: Any, tx: Transaction) -> Transaction:
     sender_signature = tx.signature
     tx.signature = ""
 
-    if args.guardian:
-        tx = cosign_transaction(tx, args.guardian_service_url, args.guardian_2fa_code)  # type: ignore
-    elif guardian_account:
+    if guardian_account:
         tx.guardianSignature = guardian_account.sign_transaction(tx)
+    elif args.guardian:
+        tx = cosign_transaction(tx, args.guardian_service_url, args.guardian_2fa_code)  # type: ignore
 
     tx.signature = sender_signature
 

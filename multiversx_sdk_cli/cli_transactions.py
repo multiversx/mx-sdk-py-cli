@@ -122,10 +122,10 @@ def sign_transaction(args: Any):
     except NoWalletProvided:
         guardian_account = None
 
-    if args.guardian:
-        tx = cosign_transaction(tx, args.guardian_service_url, args.guardian_2fa_code)
-    elif guardian_account:
+    if guardian_account:
         tx.guardianSignature = guardian_account.sign_transaction(tx)
+    elif args.guardian:
+        tx = cosign_transaction(tx, args.guardian_service_url, args.guardian_2fa_code)
 
     tx.signature = signature
 

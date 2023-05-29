@@ -195,9 +195,20 @@ def check_guardian_and_options_args(args: Any):
 
 
 def check_guardian_args(args: Any):
-    if any([args.guardian, args.guardian_service_url, args.guardian_2fa_code]):
-        if not all([args.guardian, args.guardian_service_url, args.guardian_2fa_code]):
+    if args.guardian:
+        if sign_with_cosigner_service(args) and sign_with_guardian_key(args):
+            raise errors.BadUsage("Guarded tx should be signed using either a cosigning service or a guardian key")
+
+        if not sign_with_cosigner_service(args) and not sign_with_guardian_key(args):
             raise errors.BadUsage("All guardian arguments must be provided")
+
+
+def sign_with_cosigner_service(args: Any) -> bool:
+    return all([args.guardian_service_url, args.guardian_2fa_code])
+
+
+def sign_with_guardian_key(args: Any) -> bool:
+    return any([args.guardian_pem, args.guardian_keyfile, args.guardian_ledger])
 
 
 def check_options_for_guarded_tx(options: int):
