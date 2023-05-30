@@ -7,7 +7,7 @@ from typing import Any, Dict, List, Protocol, Sequence, TextIO, Tuple
 
 from multiversx_sdk_cli import config, errors, utils
 from multiversx_sdk_cli.accounts import Account, Address, LedgerAccount
-from multiversx_sdk_cli.cli_password import load_password
+from multiversx_sdk_cli.cli_password import load_password, load_guardian_password
 from multiversx_sdk_cli.errors import NoWalletProvided
 from multiversx_sdk_cli.interfaces import ITransaction
 from multiversx_sdk_cli.cosign_transaction import cosign_transaction
@@ -182,11 +182,11 @@ class Transaction(ITransaction):
         if self.options:
             dictionary["options"] = int(self.options)
 
-        if self.signature:
-            dictionary["signature"] = self.signature
-
         if self.guardian:
             dictionary["guardian"] = self.guardian
+
+        if self.signature:
+            dictionary["signature"] = self.signature
 
         if self.guardianSignature:
             dictionary["guardianSignature"] = self.guardianSignature
@@ -311,7 +311,7 @@ def get_guardian_account_from_args(args: Any):
     if args.guardian_pem:
         account = Account(pem_file=args.guardian_pem, pem_index=args.guardian_pem_index)
     elif args.guardian_keyfile:
-        password = load_password(args)
+        password = load_guardian_password(args)
         account = Account(key_file=args.guardian_keyfile, password=password)
     elif args.guardian_ledger:
         address = do_get_ledger_address(account_index=args.guardian_ledger_account_index, address_index=args.guardian_ledger_address_index)
