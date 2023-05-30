@@ -180,11 +180,6 @@ def check_options_for_guarded_tx(options: int):
         raise errors.BadUsage("Invalid guarded transaction's options. The second least significant bit must be set.")
 
 
-def check_bytecode_args(args: Any):
-    if not args.bytecode and len(args.bytecode):
-        raise errors.BadUsage("'--bytecode' argument not provided")
-
-
 def send_or_simulate(tx: Transaction, args: Any, dump_output: bool = True) -> CLIOutputBuilder:
     proxy = ProxyNetworkProvider(args.proxy)
 

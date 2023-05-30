@@ -191,7 +191,7 @@ def _add_recursive_arg(sub: Any):
 
 
 def _add_bytecode_arg(sub: Any):
-    sub.add_argument("--bytecode", type=str,
+    sub.add_argument("--bytecode", type=str, required=True,
                      help="the file containing the WASM bytecode")
 
 
@@ -281,7 +281,6 @@ def run_tests(args: Any):
 
 def deploy(args: Any):
     logger.debug("deploy")
-    cli_shared.check_bytecode_args(args)
     cli_shared.check_guardian_and_options_args(args)
     cli_shared.check_broadcast_args(args)
 
@@ -379,7 +378,6 @@ def call(args: Any):
 
 def upgrade(args: Any):
     logger.debug("upgrade")
-    cli_shared.check_bytecode_args(args)
     cli_shared.check_broadcast_args(args)
 
     contract_address = args.contract
