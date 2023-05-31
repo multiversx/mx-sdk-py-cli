@@ -1,10 +1,11 @@
 import logging
 from pathlib import Path
+import sys
 import pytest
 
 from Cryptodome.Hash import keccak
 from multiversx_sdk_cli.accounts import Account, Address
-from multiversx_sdk_cli.contracts import SmartContract, _prepare_argument
+from multiversx_sdk_cli.contracts import SmartContract, _prepare_argument, _interpret_as_number_if_safely
 from multiversx_sdk_cli import errors
 from multiversx_sdk_cli.contract_verification import _create_request_signature
 
@@ -72,3 +73,15 @@ def test_contract_verification_create_request_signature():
     signature = _create_request_signature(account, contract_address, request_payload)
 
     assert signature.hex() == "30111258cc42ea08e0c6a3e053cc7086a88d614b8b119a244904e9a19896c73295b2fe5c520a1cb07cfe20f687deef9f294a0a05071e85c78a70a448ea5f0605"
+
+
+def test_interpret_as_number_if_safely():
+    assert _interpret_as_number_if_safely("0x5") == 5
+    assert _interpret_as_number_if_safely("") == 0
+
+    python_version = (sys.version_info.major, sys.version_info.minor, sys.version_info.micro)
+
+    if python_version >= (3, 10, 7):
+        assert _interpret_as_number_if_safely("FF" * 10000) is None
+    else:
+        assert _interpret_as_number_if_safely("FF" * 10000) is not None

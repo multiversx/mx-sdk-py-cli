@@ -25,7 +25,7 @@ class INetworkProvider(Protocol):
 
 
 class QueryResult(Object):
-    def __init__(self, as_base64: str, as_hex: str, as_number: int):
+    def __init__(self, as_base64: str, as_hex: str, as_number: Optional[int]):
         self.base64 = as_base64
         self.hex = as_hex
         self.number = as_number
@@ -208,13 +208,27 @@ class SmartContract:
         try:
             as_bytes = base64.b64decode(data)
             as_hex = as_bytes.hex()
-            as_number = int(as_hex, 16)
+            as_number = _interpret_as_number_if_safely(as_hex)
 
             result = QueryResult(data, as_hex, as_number)
             return result
         except Exception:
             logger.warn(f"Cannot interpret return data: {data}")
             return None
+
+
+def _interpret_as_number_if_safely(as_hex: str) -> Optional[int]:
+    """
+    Makes sure the string can be safely converted to an int (and then back to a string).
+
+    See:
+        - https://stackoverflow.com/questions/73693104/valueerror-exceeds-the-limit-4300-for-integer-string-conversion 
+        - https://github.com/python/cpython/issues/95778
+    """
+    try:
+        return int(str(int(as_hex or "0", 16)))
+    except:
+        return None
 
 
 def _prepare_argument(argument: Any):
