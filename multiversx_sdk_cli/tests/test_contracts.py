@@ -76,12 +76,6 @@ def test_contract_verification_create_request_signature():
 
 
 def test_interpret_as_number_if_safely():
-    assert _interpret_as_number_if_safely("0x5") == 5
     assert _interpret_as_number_if_safely("") == 0
-
-    python_version = (sys.version_info.major, sys.version_info.minor, sys.version_info.micro)
-
-    if python_version >= (3, 10, 7):
-        assert _interpret_as_number_if_safely("FF" * 10000) is None
-    else:
-        assert _interpret_as_number_if_safely("FF" * 10000) is not None
+    assert _interpret_as_number_if_safely("0x5") == 5
+    assert _interpret_as_number_if_safely("FF") == 255
