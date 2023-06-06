@@ -10,7 +10,7 @@ from multiversx_sdk_network_providers.proxy_network_provider import \
 from multiversx_sdk_cli import config, errors, utils
 from multiversx_sdk_cli.accounts import Account
 from multiversx_sdk_cli.cli_output import CLIOutputBuilder
-from multiversx_sdk_cli.cli_password import load_password
+from multiversx_sdk_cli.cli_password import load_password, load_guardian_password
 from multiversx_sdk_cli.ledger.ledger_functions import do_get_ledger_address
 from multiversx_sdk_cli.simulation import Simulator
 from multiversx_sdk_cli.transactions import Transaction
@@ -101,6 +101,16 @@ def add_wallet_args(args: List[str], sub: Any):
     sub.add_argument("--sender-username", required=False, help="🖄 the username of the sender")
 
 
+def add_guardian_wallet_args(args: List[str], sub: Any):
+    sub.add_argument("--guardian-pem", required=check_if_sign_method_required(args, "--guardian-pem"), help="🔑 the PEM file, if keyfile not provided")
+    sub.add_argument("--guardian-pem-index", default=0, help="🔑 the index in the PEM file (default: %(default)s)")
+    sub.add_argument("--guardian-keyfile", required=check_if_sign_method_required(args, "--guardian-keyfile"), help="🔑 a JSON keyfile, if PEM not provided")
+    sub.add_argument("--guardian-passfile", help="🔑 a file containing keyfile's password, if keyfile provided")
+    sub.add_argument("--guardian-ledger", action="store_true", required=check_if_sign_method_required(args, "--guardian-ledger"), default=False, help="🔐 bool flag for signing transaction using ledger")
+    sub.add_argument("--guardian-ledger-account-index", type=int, default=0, help="🔐 the index of the account when using Ledger")
+    sub.add_argument("--guardian-ledger-address-index", type=int, default=0, help="🔐 the index of the address when using Ledger")
+
+
 def add_proxy_arg(sub: Any):
     sub.add_argument("--proxy", default=config.get_proxy(), help="🔗 the URL of the proxy (default: %(default)s)")
 
@@ -140,6 +150,21 @@ def prepare_account(args: Any):
     return account
 
 
+def prepare_guardian_account(args: Any):
+    if args.guardian_pem:
+        account = Account(pem_file=args.guardian_pem, pem_index=args.guardian_pem_index)
+    elif args.guardian_keyfile:
+        password = load_guardian_password(args)
+        account = Account(key_file=args.guardian_keyfile, password=password)
+    elif args.guardian_ledger:
+        address = do_get_ledger_address(account_index=args.guardian_ledger_account_index, address_index=args.guardian_ledger_address_index)
+        account = Account(address=address)
+    else:
+        raise errors.NoWalletProvided()
+
+    return account
+
+
 def prepare_nonce_in_args(args: Any):
     if args.recall_nonce:
         account = prepare_account(args)
@@ -170,9 +195,20 @@ def check_guardian_and_options_args(args: Any):
 
 
 def check_guardian_args(args: Any):
-    if any([args.guardian, args.guardian_service_url, args.guardian_2fa_code]):
-        if not all([args.guardian, args.guardian_service_url, args.guardian_2fa_code]):
-            raise errors.BadUsage("All guardian arguments must be provided")
+    if args.guardian:
+        if should_sign_with_cosigner_service(args) and should_sign_with_guardian_key(args):
+            raise errors.BadUsage("Guarded tx should be signed using either a cosigning service or a guardian key")
+
+        if not should_sign_with_cosigner_service(args) and not should_sign_with_guardian_key(args):
+            raise errors.BadUsage("Missing guardian signing arguments")
+
+
+def should_sign_with_cosigner_service(args: Any) -> bool:
+    return all([args.guardian_service_url, args.guardian_2fa_code])
+
+
+def should_sign_with_guardian_key(args: Any) -> bool:
+    return any([args.guardian_pem, args.guardian_keyfile, args.guardian_ledger])
 
 
 def check_options_for_guarded_tx(options: int):

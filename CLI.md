@@ -193,40 +193,54 @@ Output example:
 }
 
 optional arguments:
-  -h, --help                                   show this help message and exit
-  --project PROJECT                            🗀 the project directory (default: current directory)
-  --bytecode BYTECODE                          the file containing the WASM bytecode
-  --metadata-not-upgradeable                   ‼ mark the contract as NOT upgradeable (default: upgradeable)
-  --metadata-not-readable                      ‼ mark the contract as NOT readable (default: readable)
-  --metadata-payable                           ‼ mark the contract as payable (default: not payable)
-  --metadata-payable-by-sc                     ‼ mark the contract as payable by SC (default: not payable by SC)
-  --outfile OUTFILE                            where to save the output (default: stdout)
-  --pem PEM                                    🔑 the PEM file, if keyfile not provided
-  --pem-index PEM_INDEX                        🔑 the index in the PEM file (default: 0)
-  --keyfile KEYFILE                            🔑 a JSON keyfile, if PEM not provided
-  --passfile PASSFILE                          🔑 a file containing keyfile's password, if keyfile provided
-  --ledger                                     🔐 bool flag for signing transaction using ledger
-  --ledger-account-index LEDGER_ACCOUNT_INDEX  🔐 the index of the account when using Ledger
-  --ledger-address-index LEDGER_ADDRESS_INDEX  🔐 the index of the address when using Ledger
-  --sender-username SENDER_USERNAME            🖄 the username of the sender
-  --proxy PROXY                                🔗 the URL of the proxy (default: https://testnet-gateway.multiversx.com)
-  --nonce NONCE                                # the nonce for the transaction
-  --recall-nonce                               ⭮ whether to recall the nonce when creating the transaction (default:
-                                               False)
-  --gas-price GAS_PRICE                        ⛽ the gas price (default: 1000000000)
-  --gas-limit GAS_LIMIT                        ⛽ the gas limit
-  --value VALUE                                the value to transfer (default: 0)
-  --chain CHAIN                                the chain identifier (default: T)
-  --version VERSION                            the transaction version (default: 1)
-  --options OPTIONS                            the transaction options (default: 0)
-  --arguments ARGUMENTS [ARGUMENTS ...]        arguments for the contract transaction, as [number, bech32-address, ascii
-                                               string, boolean] or hex-encoded. E.g. --arguments 42 0x64 1000 0xabba
-                                               str:TOK-a1c2ef true erd1[..]
-  --wait-result                                signal to wait for the transaction result - only valid if --send is set
-  --timeout TIMEOUT                            max num of seconds to wait for result - only valid if --wait-result is
-                                               set
-  --send                                       ✓ whether to broadcast the transaction (default: False)
-  --simulate                                   whether to simulate the transaction (default: False)
+  -h, --help                                      show this help message and exit
+  --project PROJECT                               🗀 the project directory (default: current directory)
+  --bytecode BYTECODE                             the file containing the WASM bytecode
+  --metadata-not-upgradeable                      ‼ mark the contract as NOT upgradeable (default: upgradeable)
+  --metadata-not-readable                         ‼ mark the contract as NOT readable (default: readable)
+  --metadata-payable                              ‼ mark the contract as payable (default: not payable)
+  --metadata-payable-by-sc                        ‼ mark the contract as payable by SC (default: not payable by SC)
+  --outfile OUTFILE                               where to save the output (default: stdout)
+  --pem PEM                                       🔑 the PEM file, if keyfile not provided
+  --pem-index PEM_INDEX                           🔑 the index in the PEM file (default: 0)
+  --keyfile KEYFILE                               🔑 a JSON keyfile, if PEM not provided
+  --passfile PASSFILE                             🔑 a file containing keyfile's password, if keyfile provided
+  --ledger                                        🔐 bool flag for signing transaction using ledger
+  --ledger-account-index LEDGER_ACCOUNT_INDEX     🔐 the index of the account when using Ledger
+  --ledger-address-index LEDGER_ADDRESS_INDEX     🔐 the index of the address when using Ledger
+  --sender-username SENDER_USERNAME               🖄 the username of the sender
+  --proxy PROXY                                   🔗 the URL of the proxy (default: https://testnet-
+                                                  gateway.multiversx.com)
+  --nonce NONCE                                   # the nonce for the transaction
+  --recall-nonce                                  ⭮ whether to recall the nonce when creating the transaction (default:
+                                                  False)
+  --gas-price GAS_PRICE                           ⛽ the gas price (default: 1000000000)
+  --gas-limit GAS_LIMIT                           ⛽ the gas limit
+  --value VALUE                                   the value to transfer (default: 0)
+  --chain CHAIN                                   the chain identifier (default: T)
+  --version VERSION                               the transaction version (default: 2)
+  --guardian GUARDIAN                             the address of the guradian
+  --guardian-service-url GUARDIAN_SERVICE_URL     the url of the guardian service
+  --guardian-2fa-code GUARDIAN_2FA_CODE           the 2fa code for the guardian
+  --options OPTIONS                               the transaction options (default: 0)
+  --arguments ARGUMENTS [ARGUMENTS ...]           arguments for the contract transaction, as [number, bech32-address,
+                                                  ascii string, boolean] or hex-encoded. E.g. --arguments 42 0x64 1000
+                                                  0xabba str:TOK-a1c2ef true erd1[..]
+  --wait-result                                   signal to wait for the transaction result - only valid if --send is
+                                                  set
+  --timeout TIMEOUT                               max num of seconds to wait for result - only valid if --wait-result is
+                                                  set
+  --send                                          ✓ whether to broadcast the transaction (default: False)
+  --simulate                                      whether to simulate the transaction (default: False)
+  --guardian-pem GUARDIAN_PEM                     🔑 the PEM file, if keyfile not provided
+  --guardian-pem-index GUARDIAN_PEM_INDEX         🔑 the index in the PEM file (default: 0)
+  --guardian-keyfile GUARDIAN_KEYFILE             🔑 a JSON keyfile, if PEM not provided
+  --guardian-passfile GUARDIAN_PASSFILE           🔑 a file containing keyfile's password, if keyfile provided
+  --guardian-ledger                               🔐 bool flag for signing transaction using ledger
+  --guardian-ledger-account-index GUARDIAN_LEDGER_ACCOUNT_INDEX
+                                                  🔐 the index of the account when using Ledger
+  --guardian-ledger-address-index GUARDIAN_LEDGER_ADDRESS_INDEX
+                                                  🔐 the index of the address when using Ledger
 
 ```
 ### Contract.Call
@@ -267,39 +281,53 @@ Output example:
 }
 
 positional arguments:
-  contract                                     🖄 the address of the Smart Contract
+  contract                                        🖄 the address of the Smart Contract
 
 optional arguments:
-  -h, --help                                   show this help message and exit
-  --outfile OUTFILE                            where to save the output (default: stdout)
-  --pem PEM                                    🔑 the PEM file, if keyfile not provided
-  --pem-index PEM_INDEX                        🔑 the index in the PEM file (default: 0)
-  --keyfile KEYFILE                            🔑 a JSON keyfile, if PEM not provided
-  --passfile PASSFILE                          🔑 a file containing keyfile's password, if keyfile provided
-  --ledger                                     🔐 bool flag for signing transaction using ledger
-  --ledger-account-index LEDGER_ACCOUNT_INDEX  🔐 the index of the account when using Ledger
-  --ledger-address-index LEDGER_ADDRESS_INDEX  🔐 the index of the address when using Ledger
-  --sender-username SENDER_USERNAME            🖄 the username of the sender
-  --proxy PROXY                                🔗 the URL of the proxy (default: https://testnet-gateway.multiversx.com)
-  --nonce NONCE                                # the nonce for the transaction
-  --recall-nonce                               ⭮ whether to recall the nonce when creating the transaction (default:
-                                               False)
-  --gas-price GAS_PRICE                        ⛽ the gas price (default: 1000000000)
-  --gas-limit GAS_LIMIT                        ⛽ the gas limit
-  --value VALUE                                the value to transfer (default: 0)
-  --chain CHAIN                                the chain identifier (default: T)
-  --version VERSION                            the transaction version (default: 1)
-  --options OPTIONS                            the transaction options (default: 0)
-  --function FUNCTION                          the function to call
-  --arguments ARGUMENTS [ARGUMENTS ...]        arguments for the contract transaction, as [number, bech32-address, ascii
-                                               string, boolean] or hex-encoded. E.g. --arguments 42 0x64 1000 0xabba
-                                               str:TOK-a1c2ef true erd1[..]
-  --wait-result                                signal to wait for the transaction result - only valid if --send is set
-  --timeout TIMEOUT                            max num of seconds to wait for result - only valid if --wait-result is
-                                               set
-  --send                                       ✓ whether to broadcast the transaction (default: False)
-  --simulate                                   whether to simulate the transaction (default: False)
-  --relay                                      whether to relay the transaction (default: False)
+  -h, --help                                      show this help message and exit
+  --outfile OUTFILE                               where to save the output (default: stdout)
+  --pem PEM                                       🔑 the PEM file, if keyfile not provided
+  --pem-index PEM_INDEX                           🔑 the index in the PEM file (default: 0)
+  --keyfile KEYFILE                               🔑 a JSON keyfile, if PEM not provided
+  --passfile PASSFILE                             🔑 a file containing keyfile's password, if keyfile provided
+  --ledger                                        🔐 bool flag for signing transaction using ledger
+  --ledger-account-index LEDGER_ACCOUNT_INDEX     🔐 the index of the account when using Ledger
+  --ledger-address-index LEDGER_ADDRESS_INDEX     🔐 the index of the address when using Ledger
+  --sender-username SENDER_USERNAME               🖄 the username of the sender
+  --proxy PROXY                                   🔗 the URL of the proxy (default: https://testnet-
+                                                  gateway.multiversx.com)
+  --nonce NONCE                                   # the nonce for the transaction
+  --recall-nonce                                  ⭮ whether to recall the nonce when creating the transaction (default:
+                                                  False)
+  --gas-price GAS_PRICE                           ⛽ the gas price (default: 1000000000)
+  --gas-limit GAS_LIMIT                           ⛽ the gas limit
+  --value VALUE                                   the value to transfer (default: 0)
+  --chain CHAIN                                   the chain identifier (default: T)
+  --version VERSION                               the transaction version (default: 2)
+  --guardian GUARDIAN                             the address of the guradian
+  --guardian-service-url GUARDIAN_SERVICE_URL     the url of the guardian service
+  --guardian-2fa-code GUARDIAN_2FA_CODE           the 2fa code for the guardian
+  --options OPTIONS                               the transaction options (default: 0)
+  --function FUNCTION                             the function to call
+  --arguments ARGUMENTS [ARGUMENTS ...]           arguments for the contract transaction, as [number, bech32-address,
+                                                  ascii string, boolean] or hex-encoded. E.g. --arguments 42 0x64 1000
+                                                  0xabba str:TOK-a1c2ef true erd1[..]
+  --wait-result                                   signal to wait for the transaction result - only valid if --send is
+                                                  set
+  --timeout TIMEOUT                               max num of seconds to wait for result - only valid if --wait-result is
+                                                  set
+  --send                                          ✓ whether to broadcast the transaction (default: False)
+  --simulate                                      whether to simulate the transaction (default: False)
+  --relay                                         whether to relay the transaction (default: False)
+  --guardian-pem GUARDIAN_PEM                     🔑 the PEM file, if keyfile not provided
+  --guardian-pem-index GUARDIAN_PEM_INDEX         🔑 the index in the PEM file (default: 0)
+  --guardian-keyfile GUARDIAN_KEYFILE             🔑 a JSON keyfile, if PEM not provided
+  --guardian-passfile GUARDIAN_PASSFILE           🔑 a file containing keyfile's password, if keyfile provided
+  --guardian-ledger                               🔐 bool flag for signing transaction using ledger
+  --guardian-ledger-account-index GUARDIAN_LEDGER_ACCOUNT_INDEX
+                                                  🔐 the index of the account when using Ledger
+  --guardian-ledger-address-index GUARDIAN_LEDGER_ADDRESS_INDEX
+                                                  🔐 the index of the address when using Ledger
 
 ```
 ### Contract.Upgrade
@@ -340,43 +368,57 @@ Output example:
 }
 
 positional arguments:
-  contract                                     🖄 the address of the Smart Contract
+  contract                                        🖄 the address of the Smart Contract
 
 optional arguments:
-  -h, --help                                   show this help message and exit
-  --outfile OUTFILE                            where to save the output (default: stdout)
-  --project PROJECT                            🗀 the project directory (default: current directory)
-  --bytecode BYTECODE                          the file containing the WASM bytecode
-  --metadata-not-upgradeable                   ‼ mark the contract as NOT upgradeable (default: upgradeable)
-  --metadata-not-readable                      ‼ mark the contract as NOT readable (default: readable)
-  --metadata-payable                           ‼ mark the contract as payable (default: not payable)
-  --metadata-payable-by-sc                     ‼ mark the contract as payable by SC (default: not payable by SC)
-  --pem PEM                                    🔑 the PEM file, if keyfile not provided
-  --pem-index PEM_INDEX                        🔑 the index in the PEM file (default: 0)
-  --keyfile KEYFILE                            🔑 a JSON keyfile, if PEM not provided
-  --passfile PASSFILE                          🔑 a file containing keyfile's password, if keyfile provided
-  --ledger                                     🔐 bool flag for signing transaction using ledger
-  --ledger-account-index LEDGER_ACCOUNT_INDEX  🔐 the index of the account when using Ledger
-  --ledger-address-index LEDGER_ADDRESS_INDEX  🔐 the index of the address when using Ledger
-  --sender-username SENDER_USERNAME            🖄 the username of the sender
-  --proxy PROXY                                🔗 the URL of the proxy (default: https://testnet-gateway.multiversx.com)
-  --nonce NONCE                                # the nonce for the transaction
-  --recall-nonce                               ⭮ whether to recall the nonce when creating the transaction (default:
-                                               False)
-  --gas-price GAS_PRICE                        ⛽ the gas price (default: 1000000000)
-  --gas-limit GAS_LIMIT                        ⛽ the gas limit
-  --value VALUE                                the value to transfer (default: 0)
-  --chain CHAIN                                the chain identifier (default: T)
-  --version VERSION                            the transaction version (default: 1)
-  --options OPTIONS                            the transaction options (default: 0)
-  --arguments ARGUMENTS [ARGUMENTS ...]        arguments for the contract transaction, as [number, bech32-address, ascii
-                                               string, boolean] or hex-encoded. E.g. --arguments 42 0x64 1000 0xabba
-                                               str:TOK-a1c2ef true erd1[..]
-  --wait-result                                signal to wait for the transaction result - only valid if --send is set
-  --timeout TIMEOUT                            max num of seconds to wait for result - only valid if --wait-result is
-                                               set
-  --send                                       ✓ whether to broadcast the transaction (default: False)
-  --simulate                                   whether to simulate the transaction (default: False)
+  -h, --help                                      show this help message and exit
+  --outfile OUTFILE                               where to save the output (default: stdout)
+  --project PROJECT                               🗀 the project directory (default: current directory)
+  --bytecode BYTECODE                             the file containing the WASM bytecode
+  --metadata-not-upgradeable                      ‼ mark the contract as NOT upgradeable (default: upgradeable)
+  --metadata-not-readable                         ‼ mark the contract as NOT readable (default: readable)
+  --metadata-payable                              ‼ mark the contract as payable (default: not payable)
+  --metadata-payable-by-sc                        ‼ mark the contract as payable by SC (default: not payable by SC)
+  --pem PEM                                       🔑 the PEM file, if keyfile not provided
+  --pem-index PEM_INDEX                           🔑 the index in the PEM file (default: 0)
+  --keyfile KEYFILE                               🔑 a JSON keyfile, if PEM not provided
+  --passfile PASSFILE                             🔑 a file containing keyfile's password, if keyfile provided
+  --ledger                                        🔐 bool flag for signing transaction using ledger
+  --ledger-account-index LEDGER_ACCOUNT_INDEX     🔐 the index of the account when using Ledger
+  --ledger-address-index LEDGER_ADDRESS_INDEX     🔐 the index of the address when using Ledger
+  --sender-username SENDER_USERNAME               🖄 the username of the sender
+  --proxy PROXY                                   🔗 the URL of the proxy (default: https://testnet-
+                                                  gateway.multiversx.com)
+  --nonce NONCE                                   # the nonce for the transaction
+  --recall-nonce                                  ⭮ whether to recall the nonce when creating the transaction (default:
+                                                  False)
+  --gas-price GAS_PRICE                           ⛽ the gas price (default: 1000000000)
+  --gas-limit GAS_LIMIT                           ⛽ the gas limit
+  --value VALUE                                   the value to transfer (default: 0)
+  --chain CHAIN                                   the chain identifier (default: T)
+  --version VERSION                               the transaction version (default: 2)
+  --guardian GUARDIAN                             the address of the guradian
+  --guardian-service-url GUARDIAN_SERVICE_URL     the url of the guardian service
+  --guardian-2fa-code GUARDIAN_2FA_CODE           the 2fa code for the guardian
+  --options OPTIONS                               the transaction options (default: 0)
+  --arguments ARGUMENTS [ARGUMENTS ...]           arguments for the contract transaction, as [number, bech32-address,
+                                                  ascii string, boolean] or hex-encoded. E.g. --arguments 42 0x64 1000
+                                                  0xabba str:TOK-a1c2ef true erd1[..]
+  --wait-result                                   signal to wait for the transaction result - only valid if --send is
+                                                  set
+  --timeout TIMEOUT                               max num of seconds to wait for result - only valid if --wait-result is
+                                                  set
+  --send                                          ✓ whether to broadcast the transaction (default: False)
+  --simulate                                      whether to simulate the transaction (default: False)
+  --guardian-pem GUARDIAN_PEM                     🔑 the PEM file, if keyfile not provided
+  --guardian-pem-index GUARDIAN_PEM_INDEX         🔑 the index in the PEM file (default: 0)
+  --guardian-keyfile GUARDIAN_KEYFILE             🔑 a JSON keyfile, if PEM not provided
+  --guardian-passfile GUARDIAN_PASSFILE           🔑 a file containing keyfile's password, if keyfile provided
+  --guardian-ledger                               🔐 bool flag for signing transaction using ledger
+  --guardian-ledger-account-index GUARDIAN_LEDGER_ACCOUNT_INDEX
+                                                  🔐 the index of the account when using Ledger
+  --guardian-ledger-address-index GUARDIAN_LEDGER_ADDRESS_INDEX
+                                                  🔐 the index of the address when using Ledger
 
 ```
 ### Contract.Query
@@ -447,10 +489,10 @@ usage: mxpy tx COMMAND [-h] ...
 Create and broadcast Transactions
 
 COMMANDS:
-  {new,send,get}
+  {new,send,get,sign}
 
 OPTIONS:
-  -h, --help      show this help message and exit
+  -h, --help           show this help message and exit
 
 ----------------
 COMMANDS summary
@@ -458,6 +500,7 @@ COMMANDS summary
 new                            Create a new transaction.
 send                           Send a previously saved transaction.
 get                            Get a transaction.
+sign                           Sign a previously saved transaction.
 
 ```
 ### Transactions.New
@@ -483,36 +526,50 @@ Output example:
 }
 
 optional arguments:
-  -h, --help                                   show this help message and exit
-  --pem PEM                                    🔑 the PEM file, if keyfile not provided
-  --pem-index PEM_INDEX                        🔑 the index in the PEM file (default: 0)
-  --keyfile KEYFILE                            🔑 a JSON keyfile, if PEM not provided
-  --passfile PASSFILE                          🔑 a file containing keyfile's password, if keyfile provided
-  --ledger                                     🔐 bool flag for signing transaction using ledger
-  --ledger-account-index LEDGER_ACCOUNT_INDEX  🔐 the index of the account when using Ledger
-  --ledger-address-index LEDGER_ADDRESS_INDEX  🔐 the index of the address when using Ledger
-  --sender-username SENDER_USERNAME            🖄 the username of the sender
-  --nonce NONCE                                # the nonce for the transaction
-  --recall-nonce                               ⭮ whether to recall the nonce when creating the transaction (default:
-                                               False)
-  --receiver RECEIVER                          🖄 the address of the receiver
-  --receiver-username RECEIVER_USERNAME        🖄 the username of the receiver
-  --gas-price GAS_PRICE                        ⛽ the gas price (default: 1000000000)
-  --gas-limit GAS_LIMIT                        ⛽ the gas limit
-  --value VALUE                                the value to transfer (default: 0)
-  --data DATA                                  the payload, or 'memo' of the transaction (default: )
-  --chain CHAIN                                the chain identifier (default: T)
-  --version VERSION                            the transaction version (default: 1)
-  --options OPTIONS                            the transaction options (default: 0)
-  --data-file DATA_FILE                        a file containing transaction data
-  --outfile OUTFILE                            where to save the output (signed transaction, hash) (default: stdout)
-  --send                                       ✓ whether to broadcast the transaction (default: False)
-  --simulate                                   whether to simulate the transaction (default: False)
-  --relay                                      whether to relay the transaction (default: False)
-  --proxy PROXY                                🔗 the URL of the proxy (default: https://testnet-gateway.multiversx.com)
-  --wait-result                                signal to wait for the transaction result - only valid if --send is set
-  --timeout TIMEOUT                            max num of seconds to wait for result - only valid if --wait-result is
-                                               set
+  -h, --help                                      show this help message and exit
+  --pem PEM                                       🔑 the PEM file, if keyfile not provided
+  --pem-index PEM_INDEX                           🔑 the index in the PEM file (default: 0)
+  --keyfile KEYFILE                               🔑 a JSON keyfile, if PEM not provided
+  --passfile PASSFILE                             🔑 a file containing keyfile's password, if keyfile provided
+  --ledger                                        🔐 bool flag for signing transaction using ledger
+  --ledger-account-index LEDGER_ACCOUNT_INDEX     🔐 the index of the account when using Ledger
+  --ledger-address-index LEDGER_ADDRESS_INDEX     🔐 the index of the address when using Ledger
+  --sender-username SENDER_USERNAME               🖄 the username of the sender
+  --nonce NONCE                                   # the nonce for the transaction
+  --recall-nonce                                  ⭮ whether to recall the nonce when creating the transaction (default:
+                                                  False)
+  --receiver RECEIVER                             🖄 the address of the receiver
+  --receiver-username RECEIVER_USERNAME           🖄 the username of the receiver
+  --gas-price GAS_PRICE                           ⛽ the gas price (default: 1000000000)
+  --gas-limit GAS_LIMIT                           ⛽ the gas limit
+  --value VALUE                                   the value to transfer (default: 0)
+  --data DATA                                     the payload, or 'memo' of the transaction (default: )
+  --chain CHAIN                                   the chain identifier (default: T)
+  --version VERSION                               the transaction version (default: 2)
+  --guardian GUARDIAN                             the address of the guradian
+  --guardian-service-url GUARDIAN_SERVICE_URL     the url of the guardian service
+  --guardian-2fa-code GUARDIAN_2FA_CODE           the 2fa code for the guardian
+  --options OPTIONS                               the transaction options (default: 0)
+  --data-file DATA_FILE                           a file containing transaction data
+  --outfile OUTFILE                               where to save the output (signed transaction, hash) (default: stdout)
+  --send                                          ✓ whether to broadcast the transaction (default: False)
+  --simulate                                      whether to simulate the transaction (default: False)
+  --relay                                         whether to relay the transaction (default: False)
+  --proxy PROXY                                   🔗 the URL of the proxy (default: https://testnet-
+                                                  gateway.multiversx.com)
+  --guardian-pem GUARDIAN_PEM                     🔑 the PEM file, if keyfile not provided
+  --guardian-pem-index GUARDIAN_PEM_INDEX         🔑 the index in the PEM file (default: 0)
+  --guardian-keyfile GUARDIAN_KEYFILE             🔑 a JSON keyfile, if PEM not provided
+  --guardian-passfile GUARDIAN_PASSFILE           🔑 a file containing keyfile's password, if keyfile provided
+  --guardian-ledger                               🔐 bool flag for signing transaction using ledger
+  --guardian-ledger-account-index GUARDIAN_LEDGER_ACCOUNT_INDEX
+                                                  🔐 the index of the account when using Ledger
+  --guardian-ledger-address-index GUARDIAN_LEDGER_ADDRESS_INDEX
+                                                  🔐 the index of the address when using Ledger
+  --wait-result                                   signal to wait for the transaction result - only valid if --send is
+                                                  set
+  --timeout TIMEOUT                               max num of seconds to wait for result - only valid if --wait-result is
+                                                  set
 
 ```
 ### Transactions.Send
@@ -646,32 +703,45 @@ usage: mxpy validator stake [-h] ...
 Stake value into the Network
 
 optional arguments:
-  -h, --help                                   show this help message and exit
-  --proxy PROXY                                🔗 the URL of the proxy (default: https://testnet-gateway.multiversx.com)
-  --pem PEM                                    🔑 the PEM file, if keyfile not provided
-  --pem-index PEM_INDEX                        🔑 the index in the PEM file (default: 0)
-  --keyfile KEYFILE                            🔑 a JSON keyfile, if PEM not provided
-  --passfile PASSFILE                          🔑 a file containing keyfile's password, if keyfile provided
-  --ledger                                     🔐 bool flag for signing transaction using ledger
-  --ledger-account-index LEDGER_ACCOUNT_INDEX  🔐 the index of the account when using Ledger
-  --ledger-address-index LEDGER_ADDRESS_INDEX  🔐 the index of the address when using Ledger
-  --sender-username SENDER_USERNAME            🖄 the username of the sender
-  --nonce NONCE                                # the nonce for the transaction
-  --recall-nonce                               ⭮ whether to recall the nonce when creating the transaction (default:
-                                               False)
-  --gas-price GAS_PRICE                        ⛽ the gas price (default: 1000000000)
-  --gas-limit GAS_LIMIT                        ⛽ the gas limit
-  --estimate-gas                               ⛽ whether to estimate the gas limit (default: 0)
-  --value VALUE                                the value to transfer (default: 0)
-  --chain CHAIN                                the chain identifier (default: T)
-  --version VERSION                            the transaction version (default: 1)
-  --options OPTIONS                            the transaction options (default: 0)
-  --send                                       ✓ whether to broadcast the transaction (default: False)
-  --simulate                                   whether to simulate the transaction (default: False)
-  --outfile OUTFILE                            where to save the output (signed transaction, hash) (default: stdout)
-  --reward-address REWARD_ADDRESS              the reward address
-  --validators-file VALIDATORS_FILE            a JSON file describing the Nodes
-  --top-up                                     Stake value for top up
+  -h, --help                                      show this help message and exit
+  --proxy PROXY                                   🔗 the URL of the proxy (default: https://testnet-
+                                                  gateway.multiversx.com)
+  --pem PEM                                       🔑 the PEM file, if keyfile not provided
+  --pem-index PEM_INDEX                           🔑 the index in the PEM file (default: 0)
+  --keyfile KEYFILE                               🔑 a JSON keyfile, if PEM not provided
+  --passfile PASSFILE                             🔑 a file containing keyfile's password, if keyfile provided
+  --ledger                                        🔐 bool flag for signing transaction using ledger
+  --ledger-account-index LEDGER_ACCOUNT_INDEX     🔐 the index of the account when using Ledger
+  --ledger-address-index LEDGER_ADDRESS_INDEX     🔐 the index of the address when using Ledger
+  --sender-username SENDER_USERNAME               🖄 the username of the sender
+  --nonce NONCE                                   # the nonce for the transaction
+  --recall-nonce                                  ⭮ whether to recall the nonce when creating the transaction (default:
+                                                  False)
+  --gas-price GAS_PRICE                           ⛽ the gas price (default: 1000000000)
+  --gas-limit GAS_LIMIT                           ⛽ the gas limit
+  --estimate-gas                                  ⛽ whether to estimate the gas limit (default: 0)
+  --value VALUE                                   the value to transfer (default: 0)
+  --chain CHAIN                                   the chain identifier (default: T)
+  --version VERSION                               the transaction version (default: 2)
+  --guardian GUARDIAN                             the address of the guradian
+  --guardian-service-url GUARDIAN_SERVICE_URL     the url of the guardian service
+  --guardian-2fa-code GUARDIAN_2FA_CODE           the 2fa code for the guardian
+  --options OPTIONS                               the transaction options (default: 0)
+  --send                                          ✓ whether to broadcast the transaction (default: False)
+  --simulate                                      whether to simulate the transaction (default: False)
+  --outfile OUTFILE                               where to save the output (signed transaction, hash) (default: stdout)
+  --guardian-pem GUARDIAN_PEM                     🔑 the PEM file, if keyfile not provided
+  --guardian-pem-index GUARDIAN_PEM_INDEX         🔑 the index in the PEM file (default: 0)
+  --guardian-keyfile GUARDIAN_KEYFILE             🔑 a JSON keyfile, if PEM not provided
+  --guardian-passfile GUARDIAN_PASSFILE           🔑 a file containing keyfile's password, if keyfile provided
+  --guardian-ledger                               🔐 bool flag for signing transaction using ledger
+  --guardian-ledger-account-index GUARDIAN_LEDGER_ACCOUNT_INDEX
+                                                  🔐 the index of the account when using Ledger
+  --guardian-ledger-address-index GUARDIAN_LEDGER_ADDRESS_INDEX
+                                                  🔐 the index of the address when using Ledger
+  --reward-address REWARD_ADDRESS                 the reward address
+  --validators-file VALIDATORS_FILE               a JSON file describing the Nodes
+  --top-up                                        Stake value for top up
 
 ```
 ### Validator.Unstake
@@ -684,30 +754,43 @@ usage: mxpy validator unstake [-h] ...
 Unstake value
 
 optional arguments:
-  -h, --help                                   show this help message and exit
-  --proxy PROXY                                🔗 the URL of the proxy (default: https://testnet-gateway.multiversx.com)
-  --pem PEM                                    🔑 the PEM file, if keyfile not provided
-  --pem-index PEM_INDEX                        🔑 the index in the PEM file (default: 0)
-  --keyfile KEYFILE                            🔑 a JSON keyfile, if PEM not provided
-  --passfile PASSFILE                          🔑 a file containing keyfile's password, if keyfile provided
-  --ledger                                     🔐 bool flag for signing transaction using ledger
-  --ledger-account-index LEDGER_ACCOUNT_INDEX  🔐 the index of the account when using Ledger
-  --ledger-address-index LEDGER_ADDRESS_INDEX  🔐 the index of the address when using Ledger
-  --sender-username SENDER_USERNAME            🖄 the username of the sender
-  --nonce NONCE                                # the nonce for the transaction
-  --recall-nonce                               ⭮ whether to recall the nonce when creating the transaction (default:
-                                               False)
-  --gas-price GAS_PRICE                        ⛽ the gas price (default: 1000000000)
-  --gas-limit GAS_LIMIT                        ⛽ the gas limit
-  --estimate-gas                               ⛽ whether to estimate the gas limit (default: 0)
-  --value VALUE                                the value to transfer (default: 0)
-  --chain CHAIN                                the chain identifier (default: T)
-  --version VERSION                            the transaction version (default: 1)
-  --options OPTIONS                            the transaction options (default: 0)
-  --send                                       ✓ whether to broadcast the transaction (default: False)
-  --simulate                                   whether to simulate the transaction (default: False)
-  --outfile OUTFILE                            where to save the output (signed transaction, hash) (default: stdout)
-  --nodes-public-keys NODES_PUBLIC_KEYS        the public keys of the nodes as CSV (addrA,addrB)
+  -h, --help                                      show this help message and exit
+  --proxy PROXY                                   🔗 the URL of the proxy (default: https://testnet-
+                                                  gateway.multiversx.com)
+  --pem PEM                                       🔑 the PEM file, if keyfile not provided
+  --pem-index PEM_INDEX                           🔑 the index in the PEM file (default: 0)
+  --keyfile KEYFILE                               🔑 a JSON keyfile, if PEM not provided
+  --passfile PASSFILE                             🔑 a file containing keyfile's password, if keyfile provided
+  --ledger                                        🔐 bool flag for signing transaction using ledger
+  --ledger-account-index LEDGER_ACCOUNT_INDEX     🔐 the index of the account when using Ledger
+  --ledger-address-index LEDGER_ADDRESS_INDEX     🔐 the index of the address when using Ledger
+  --sender-username SENDER_USERNAME               🖄 the username of the sender
+  --nonce NONCE                                   # the nonce for the transaction
+  --recall-nonce                                  ⭮ whether to recall the nonce when creating the transaction (default:
+                                                  False)
+  --gas-price GAS_PRICE                           ⛽ the gas price (default: 1000000000)
+  --gas-limit GAS_LIMIT                           ⛽ the gas limit
+  --estimate-gas                                  ⛽ whether to estimate the gas limit (default: 0)
+  --value VALUE                                   the value to transfer (default: 0)
+  --chain CHAIN                                   the chain identifier (default: T)
+  --version VERSION                               the transaction version (default: 2)
+  --guardian GUARDIAN                             the address of the guradian
+  --guardian-service-url GUARDIAN_SERVICE_URL     the url of the guardian service
+  --guardian-2fa-code GUARDIAN_2FA_CODE           the 2fa code for the guardian
+  --options OPTIONS                               the transaction options (default: 0)
+  --send                                          ✓ whether to broadcast the transaction (default: False)
+  --simulate                                      whether to simulate the transaction (default: False)
+  --outfile OUTFILE                               where to save the output (signed transaction, hash) (default: stdout)
+  --guardian-pem GUARDIAN_PEM                     🔑 the PEM file, if keyfile not provided
+  --guardian-pem-index GUARDIAN_PEM_INDEX         🔑 the index in the PEM file (default: 0)
+  --guardian-keyfile GUARDIAN_KEYFILE             🔑 a JSON keyfile, if PEM not provided
+  --guardian-passfile GUARDIAN_PASSFILE           🔑 a file containing keyfile's password, if keyfile provided
+  --guardian-ledger                               🔐 bool flag for signing transaction using ledger
+  --guardian-ledger-account-index GUARDIAN_LEDGER_ACCOUNT_INDEX
+                                                  🔐 the index of the account when using Ledger
+  --guardian-ledger-address-index GUARDIAN_LEDGER_ADDRESS_INDEX
+                                                  🔐 the index of the address when using Ledger
+  --nodes-public-keys NODES_PUBLIC_KEYS           the public keys of the nodes as CSV (addrA,addrB)
 
 ```
 ### Validator.Unjail
@@ -720,30 +803,43 @@ usage: mxpy validator unjail [-h] ...
 Unjail a Validator Node
 
 optional arguments:
-  -h, --help                                   show this help message and exit
-  --proxy PROXY                                🔗 the URL of the proxy (default: https://testnet-gateway.multiversx.com)
-  --pem PEM                                    🔑 the PEM file, if keyfile not provided
-  --pem-index PEM_INDEX                        🔑 the index in the PEM file (default: 0)
-  --keyfile KEYFILE                            🔑 a JSON keyfile, if PEM not provided
-  --passfile PASSFILE                          🔑 a file containing keyfile's password, if keyfile provided
-  --ledger                                     🔐 bool flag for signing transaction using ledger
-  --ledger-account-index LEDGER_ACCOUNT_INDEX  🔐 the index of the account when using Ledger
-  --ledger-address-index LEDGER_ADDRESS_INDEX  🔐 the index of the address when using Ledger
-  --sender-username SENDER_USERNAME            🖄 the username of the sender
-  --nonce NONCE                                # the nonce for the transaction
-  --recall-nonce                               ⭮ whether to recall the nonce when creating the transaction (default:
-                                               False)
-  --gas-price GAS_PRICE                        ⛽ the gas price (default: 1000000000)
-  --gas-limit GAS_LIMIT                        ⛽ the gas limit
-  --estimate-gas                               ⛽ whether to estimate the gas limit (default: 0)
-  --value VALUE                                the value to transfer (default: 0)
-  --chain CHAIN                                the chain identifier (default: T)
-  --version VERSION                            the transaction version (default: 1)
-  --options OPTIONS                            the transaction options (default: 0)
-  --send                                       ✓ whether to broadcast the transaction (default: False)
-  --simulate                                   whether to simulate the transaction (default: False)
-  --outfile OUTFILE                            where to save the output (signed transaction, hash) (default: stdout)
-  --nodes-public-keys NODES_PUBLIC_KEYS        the public keys of the nodes as CSV (addrA,addrB)
+  -h, --help                                      show this help message and exit
+  --proxy PROXY                                   🔗 the URL of the proxy (default: https://testnet-
+                                                  gateway.multiversx.com)
+  --pem PEM                                       🔑 the PEM file, if keyfile not provided
+  --pem-index PEM_INDEX                           🔑 the index in the PEM file (default: 0)
+  --keyfile KEYFILE                               🔑 a JSON keyfile, if PEM not provided
+  --passfile PASSFILE                             🔑 a file containing keyfile's password, if keyfile provided
+  --ledger                                        🔐 bool flag for signing transaction using ledger
+  --ledger-account-index LEDGER_ACCOUNT_INDEX     🔐 the index of the account when using Ledger
+  --ledger-address-index LEDGER_ADDRESS_INDEX     🔐 the index of the address when using Ledger
+  --sender-username SENDER_USERNAME               🖄 the username of the sender
+  --nonce NONCE                                   # the nonce for the transaction
+  --recall-nonce                                  ⭮ whether to recall the nonce when creating the transaction (default:
+                                                  False)
+  --gas-price GAS_PRICE                           ⛽ the gas price (default: 1000000000)
+  --gas-limit GAS_LIMIT                           ⛽ the gas limit
+  --estimate-gas                                  ⛽ whether to estimate the gas limit (default: 0)
+  --value VALUE                                   the value to transfer (default: 0)
+  --chain CHAIN                                   the chain identifier (default: T)
+  --version VERSION                               the transaction version (default: 2)
+  --guardian GUARDIAN                             the address of the guradian
+  --guardian-service-url GUARDIAN_SERVICE_URL     the url of the guardian service
+  --guardian-2fa-code GUARDIAN_2FA_CODE           the 2fa code for the guardian
+  --options OPTIONS                               the transaction options (default: 0)
+  --send                                          ✓ whether to broadcast the transaction (default: False)
+  --simulate                                      whether to simulate the transaction (default: False)
+  --outfile OUTFILE                               where to save the output (signed transaction, hash) (default: stdout)
+  --guardian-pem GUARDIAN_PEM                     🔑 the PEM file, if keyfile not provided
+  --guardian-pem-index GUARDIAN_PEM_INDEX         🔑 the index in the PEM file (default: 0)
+  --guardian-keyfile GUARDIAN_KEYFILE             🔑 a JSON keyfile, if PEM not provided
+  --guardian-passfile GUARDIAN_PASSFILE           🔑 a file containing keyfile's password, if keyfile provided
+  --guardian-ledger                               🔐 bool flag for signing transaction using ledger
+  --guardian-ledger-account-index GUARDIAN_LEDGER_ACCOUNT_INDEX
+                                                  🔐 the index of the account when using Ledger
+  --guardian-ledger-address-index GUARDIAN_LEDGER_ADDRESS_INDEX
+                                                  🔐 the index of the address when using Ledger
+  --nodes-public-keys NODES_PUBLIC_KEYS           the public keys of the nodes as CSV (addrA,addrB)
 
 ```
 ### Validator.Unbond
@@ -756,30 +852,43 @@ usage: mxpy validator unbond [-h] ...
 Unbond tokens for a bls key
 
 optional arguments:
-  -h, --help                                   show this help message and exit
-  --proxy PROXY                                🔗 the URL of the proxy (default: https://testnet-gateway.multiversx.com)
-  --pem PEM                                    🔑 the PEM file, if keyfile not provided
-  --pem-index PEM_INDEX                        🔑 the index in the PEM file (default: 0)
-  --keyfile KEYFILE                            🔑 a JSON keyfile, if PEM not provided
-  --passfile PASSFILE                          🔑 a file containing keyfile's password, if keyfile provided
-  --ledger                                     🔐 bool flag for signing transaction using ledger
-  --ledger-account-index LEDGER_ACCOUNT_INDEX  🔐 the index of the account when using Ledger
-  --ledger-address-index LEDGER_ADDRESS_INDEX  🔐 the index of the address when using Ledger
-  --sender-username SENDER_USERNAME            🖄 the username of the sender
-  --nonce NONCE                                # the nonce for the transaction
-  --recall-nonce                               ⭮ whether to recall the nonce when creating the transaction (default:
-                                               False)
-  --gas-price GAS_PRICE                        ⛽ the gas price (default: 1000000000)
-  --gas-limit GAS_LIMIT                        ⛽ the gas limit
-  --estimate-gas                               ⛽ whether to estimate the gas limit (default: 0)
-  --value VALUE                                the value to transfer (default: 0)
-  --chain CHAIN                                the chain identifier (default: T)
-  --version VERSION                            the transaction version (default: 1)
-  --options OPTIONS                            the transaction options (default: 0)
-  --send                                       ✓ whether to broadcast the transaction (default: False)
-  --simulate                                   whether to simulate the transaction (default: False)
-  --outfile OUTFILE                            where to save the output (signed transaction, hash) (default: stdout)
-  --nodes-public-keys NODES_PUBLIC_KEYS        the public keys of the nodes as CSV (addrA,addrB)
+  -h, --help                                      show this help message and exit
+  --proxy PROXY                                   🔗 the URL of the proxy (default: https://testnet-
+                                                  gateway.multiversx.com)
+  --pem PEM                                       🔑 the PEM file, if keyfile not provided
+  --pem-index PEM_INDEX                           🔑 the index in the PEM file (default: 0)
+  --keyfile KEYFILE                               🔑 a JSON keyfile, if PEM not provided
+  --passfile PASSFILE                             🔑 a file containing keyfile's password, if keyfile provided
+  --ledger                                        🔐 bool flag for signing transaction using ledger
+  --ledger-account-index LEDGER_ACCOUNT_INDEX     🔐 the index of the account when using Ledger
+  --ledger-address-index LEDGER_ADDRESS_INDEX     🔐 the index of the address when using Ledger
+  --sender-username SENDER_USERNAME               🖄 the username of the sender
+  --nonce NONCE                                   # the nonce for the transaction
+  --recall-nonce                                  ⭮ whether to recall the nonce when creating the transaction (default:
+                                                  False)
+  --gas-price GAS_PRICE                           ⛽ the gas price (default: 1000000000)
+  --gas-limit GAS_LIMIT                           ⛽ the gas limit
+  --estimate-gas                                  ⛽ whether to estimate the gas limit (default: 0)
+  --value VALUE                                   the value to transfer (default: 0)
+  --chain CHAIN                                   the chain identifier (default: T)
+  --version VERSION                               the transaction version (default: 2)
+  --guardian GUARDIAN                             the address of the guradian
+  --guardian-service-url GUARDIAN_SERVICE_URL     the url of the guardian service
+  --guardian-2fa-code GUARDIAN_2FA_CODE           the 2fa code for the guardian
+  --options OPTIONS                               the transaction options (default: 0)
+  --send                                          ✓ whether to broadcast the transaction (default: False)
+  --simulate                                      whether to simulate the transaction (default: False)
+  --outfile OUTFILE                               where to save the output (signed transaction, hash) (default: stdout)
+  --guardian-pem GUARDIAN_PEM                     🔑 the PEM file, if keyfile not provided
+  --guardian-pem-index GUARDIAN_PEM_INDEX         🔑 the index in the PEM file (default: 0)
+  --guardian-keyfile GUARDIAN_KEYFILE             🔑 a JSON keyfile, if PEM not provided
+  --guardian-passfile GUARDIAN_PASSFILE           🔑 a file containing keyfile's password, if keyfile provided
+  --guardian-ledger                               🔐 bool flag for signing transaction using ledger
+  --guardian-ledger-account-index GUARDIAN_LEDGER_ACCOUNT_INDEX
+                                                  🔐 the index of the account when using Ledger
+  --guardian-ledger-address-index GUARDIAN_LEDGER_ADDRESS_INDEX
+                                                  🔐 the index of the address when using Ledger
+  --nodes-public-keys NODES_PUBLIC_KEYS           the public keys of the nodes as CSV (addrA,addrB)
 
 ```
 ### Validator.ChangeRewardAddress
@@ -792,30 +901,43 @@ usage: mxpy validator change-reward-address [-h] ...
 Change the reward address
 
 optional arguments:
-  -h, --help                                   show this help message and exit
-  --proxy PROXY                                🔗 the URL of the proxy (default: https://testnet-gateway.multiversx.com)
-  --pem PEM                                    🔑 the PEM file, if keyfile not provided
-  --pem-index PEM_INDEX                        🔑 the index in the PEM file (default: 0)
-  --keyfile KEYFILE                            🔑 a JSON keyfile, if PEM not provided
-  --passfile PASSFILE                          🔑 a file containing keyfile's password, if keyfile provided
-  --ledger                                     🔐 bool flag for signing transaction using ledger
-  --ledger-account-index LEDGER_ACCOUNT_INDEX  🔐 the index of the account when using Ledger
-  --ledger-address-index LEDGER_ADDRESS_INDEX  🔐 the index of the address when using Ledger
-  --sender-username SENDER_USERNAME            🖄 the username of the sender
-  --nonce NONCE                                # the nonce for the transaction
-  --recall-nonce                               ⭮ whether to recall the nonce when creating the transaction (default:
-                                               False)
-  --gas-price GAS_PRICE                        ⛽ the gas price (default: 1000000000)
-  --gas-limit GAS_LIMIT                        ⛽ the gas limit
-  --estimate-gas                               ⛽ whether to estimate the gas limit (default: 0)
-  --value VALUE                                the value to transfer (default: 0)
-  --chain CHAIN                                the chain identifier (default: T)
-  --version VERSION                            the transaction version (default: 1)
-  --options OPTIONS                            the transaction options (default: 0)
-  --send                                       ✓ whether to broadcast the transaction (default: False)
-  --simulate                                   whether to simulate the transaction (default: False)
-  --outfile OUTFILE                            where to save the output (signed transaction, hash) (default: stdout)
-  --reward-address REWARD_ADDRESS              the new reward address
+  -h, --help                                      show this help message and exit
+  --proxy PROXY                                   🔗 the URL of the proxy (default: https://testnet-
+                                                  gateway.multiversx.com)
+  --pem PEM                                       🔑 the PEM file, if keyfile not provided
+  --pem-index PEM_INDEX                           🔑 the index in the PEM file (default: 0)
+  --keyfile KEYFILE                               🔑 a JSON keyfile, if PEM not provided
+  --passfile PASSFILE                             🔑 a file containing keyfile's password, if keyfile provided
+  --ledger                                        🔐 bool flag for signing transaction using ledger
+  --ledger-account-index LEDGER_ACCOUNT_INDEX     🔐 the index of the account when using Ledger
+  --ledger-address-index LEDGER_ADDRESS_INDEX     🔐 the index of the address when using Ledger
+  --sender-username SENDER_USERNAME               🖄 the username of the sender
+  --nonce NONCE                                   # the nonce for the transaction
+  --recall-nonce                                  ⭮ whether to recall the nonce when creating the transaction (default:
+                                                  False)
+  --gas-price GAS_PRICE                           ⛽ the gas price (default: 1000000000)
+  --gas-limit GAS_LIMIT                           ⛽ the gas limit
+  --estimate-gas                                  ⛽ whether to estimate the gas limit (default: 0)
+  --value VALUE                                   the value to transfer (default: 0)
+  --chain CHAIN                                   the chain identifier (default: T)
+  --version VERSION                               the transaction version (default: 2)
+  --guardian GUARDIAN                             the address of the guradian
+  --guardian-service-url GUARDIAN_SERVICE_URL     the url of the guardian service
+  --guardian-2fa-code GUARDIAN_2FA_CODE           the 2fa code for the guardian
+  --options OPTIONS                               the transaction options (default: 0)
+  --send                                          ✓ whether to broadcast the transaction (default: False)
+  --simulate                                      whether to simulate the transaction (default: False)
+  --outfile OUTFILE                               where to save the output (signed transaction, hash) (default: stdout)
+  --guardian-pem GUARDIAN_PEM                     🔑 the PEM file, if keyfile not provided
+  --guardian-pem-index GUARDIAN_PEM_INDEX         🔑 the index in the PEM file (default: 0)
+  --guardian-keyfile GUARDIAN_KEYFILE             🔑 a JSON keyfile, if PEM not provided
+  --guardian-passfile GUARDIAN_PASSFILE           🔑 a file containing keyfile's password, if keyfile provided
+  --guardian-ledger                               🔐 bool flag for signing transaction using ledger
+  --guardian-ledger-account-index GUARDIAN_LEDGER_ACCOUNT_INDEX
+                                                  🔐 the index of the account when using Ledger
+  --guardian-ledger-address-index GUARDIAN_LEDGER_ADDRESS_INDEX
+                                                  🔐 the index of the address when using Ledger
+  --reward-address REWARD_ADDRESS                 the new reward address
 
 ```
 ### Validator.Claim
@@ -828,29 +950,42 @@ usage: mxpy validator claim [-h] ...
 Claim rewards
 
 optional arguments:
-  -h, --help                                   show this help message and exit
-  --proxy PROXY                                🔗 the URL of the proxy (default: https://testnet-gateway.multiversx.com)
-  --pem PEM                                    🔑 the PEM file, if keyfile not provided
-  --pem-index PEM_INDEX                        🔑 the index in the PEM file (default: 0)
-  --keyfile KEYFILE                            🔑 a JSON keyfile, if PEM not provided
-  --passfile PASSFILE                          🔑 a file containing keyfile's password, if keyfile provided
-  --ledger                                     🔐 bool flag for signing transaction using ledger
-  --ledger-account-index LEDGER_ACCOUNT_INDEX  🔐 the index of the account when using Ledger
-  --ledger-address-index LEDGER_ADDRESS_INDEX  🔐 the index of the address when using Ledger
-  --sender-username SENDER_USERNAME            🖄 the username of the sender
-  --nonce NONCE                                # the nonce for the transaction
-  --recall-nonce                               ⭮ whether to recall the nonce when creating the transaction (default:
-                                               False)
-  --gas-price GAS_PRICE                        ⛽ the gas price (default: 1000000000)
-  --gas-limit GAS_LIMIT                        ⛽ the gas limit
-  --estimate-gas                               ⛽ whether to estimate the gas limit (default: 0)
-  --value VALUE                                the value to transfer (default: 0)
-  --chain CHAIN                                the chain identifier (default: T)
-  --version VERSION                            the transaction version (default: 1)
-  --options OPTIONS                            the transaction options (default: 0)
-  --send                                       ✓ whether to broadcast the transaction (default: False)
-  --simulate                                   whether to simulate the transaction (default: False)
-  --outfile OUTFILE                            where to save the output (signed transaction, hash) (default: stdout)
+  -h, --help                                      show this help message and exit
+  --proxy PROXY                                   🔗 the URL of the proxy (default: https://testnet-
+                                                  gateway.multiversx.com)
+  --pem PEM                                       🔑 the PEM file, if keyfile not provided
+  --pem-index PEM_INDEX                           🔑 the index in the PEM file (default: 0)
+  --keyfile KEYFILE                               🔑 a JSON keyfile, if PEM not provided
+  --passfile PASSFILE                             🔑 a file containing keyfile's password, if keyfile provided
+  --ledger                                        🔐 bool flag for signing transaction using ledger
+  --ledger-account-index LEDGER_ACCOUNT_INDEX     🔐 the index of the account when using Ledger
+  --ledger-address-index LEDGER_ADDRESS_INDEX     🔐 the index of the address when using Ledger
+  --sender-username SENDER_USERNAME               🖄 the username of the sender
+  --nonce NONCE                                   # the nonce for the transaction
+  --recall-nonce                                  ⭮ whether to recall the nonce when creating the transaction (default:
+                                                  False)
+  --gas-price GAS_PRICE                           ⛽ the gas price (default: 1000000000)
+  --gas-limit GAS_LIMIT                           ⛽ the gas limit
+  --estimate-gas                                  ⛽ whether to estimate the gas limit (default: 0)
+  --value VALUE                                   the value to transfer (default: 0)
+  --chain CHAIN                                   the chain identifier (default: T)
+  --version VERSION                               the transaction version (default: 2)
+  --guardian GUARDIAN                             the address of the guradian
+  --guardian-service-url GUARDIAN_SERVICE_URL     the url of the guardian service
+  --guardian-2fa-code GUARDIAN_2FA_CODE           the 2fa code for the guardian
+  --options OPTIONS                               the transaction options (default: 0)
+  --send                                          ✓ whether to broadcast the transaction (default: False)
+  --simulate                                      whether to simulate the transaction (default: False)
+  --outfile OUTFILE                               where to save the output (signed transaction, hash) (default: stdout)
+  --guardian-pem GUARDIAN_PEM                     🔑 the PEM file, if keyfile not provided
+  --guardian-pem-index GUARDIAN_PEM_INDEX         🔑 the index in the PEM file (default: 0)
+  --guardian-keyfile GUARDIAN_KEYFILE             🔑 a JSON keyfile, if PEM not provided
+  --guardian-passfile GUARDIAN_PASSFILE           🔑 a file containing keyfile's password, if keyfile provided
+  --guardian-ledger                               🔐 bool flag for signing transaction using ledger
+  --guardian-ledger-account-index GUARDIAN_LEDGER_ACCOUNT_INDEX
+                                                  🔐 the index of the account when using Ledger
+  --guardian-ledger-address-index GUARDIAN_LEDGER_ADDRESS_INDEX
+                                                  🔐 the index of the address when using Ledger
 
 ```
 ## Group **Account**

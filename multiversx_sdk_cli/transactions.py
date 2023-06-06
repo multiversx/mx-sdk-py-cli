@@ -7,9 +7,11 @@ from typing import Any, Dict, List, Protocol, Sequence, TextIO, Tuple
 
 from multiversx_sdk_cli import config, errors, utils
 from multiversx_sdk_cli.accounts import Account, Address, LedgerAccount
-from multiversx_sdk_cli.cli_password import load_password
+from multiversx_sdk_cli.cli_password import load_password, load_guardian_password
+from multiversx_sdk_cli.errors import NoWalletProvided
 from multiversx_sdk_cli.interfaces import ITransaction
 from multiversx_sdk_cli.cosign_transaction import cosign_transaction
+from multiversx_sdk_cli.ledger.ledger_functions import do_get_ledger_address
 
 logger = logging.getLogger("transactions")
 
@@ -180,11 +182,11 @@ class Transaction(ITransaction):
         if self.options:
             dictionary["options"] = int(self.options)
 
-        if self.signature:
-            dictionary["signature"] = self.signature
-
         if self.guardian:
             dictionary["guardian"] = self.guardian
+
+        if self.signature:
+            dictionary["signature"] = self.signature
 
         if self.guardianSignature:
             dictionary["guardianSignature"] = self.guardianSignature
@@ -279,8 +281,42 @@ def do_prepare_transaction(args: Any) -> Transaction:
     tx.guardian = args.guardian
 
     tx.sign(account)
-
-    if args.guardian:
-        tx = cosign_transaction(tx, args.guardian_service_url, args.guardian_2fa_code)
+    tx = sign_tx_by_guardian(args, tx)
 
     return tx
+
+
+def sign_tx_by_guardian(args: Any, tx: Transaction) -> Transaction:
+    try:
+        guardian_account = get_guardian_account_from_args(args)
+    except NoWalletProvided:
+        guardian_account = None
+
+    # empty sender signature
+    sender_signature = tx.signature
+    tx.signature = ""
+
+    if guardian_account:
+        tx.guardianSignature = guardian_account.sign_transaction(tx)
+    elif args.guardian:
+        tx = cosign_transaction(tx, args.guardian_service_url, args.guardian_2fa_code)  # type: ignore
+
+    tx.signature = sender_signature
+
+    return tx
+
+
+# TODO: this is duplicated code; a proper refactoring will come later
+def get_guardian_account_from_args(args: Any):
+    if args.guardian_pem:
+        account = Account(pem_file=args.guardian_pem, pem_index=args.guardian_pem_index)
+    elif args.guardian_keyfile:
+        password = load_guardian_password(args)
+        account = Account(key_file=args.guardian_keyfile, password=password)
+    elif args.guardian_ledger:
+        address = do_get_ledger_address(account_index=args.guardian_ledger_account_index, address_index=args.guardian_ledger_address_index)
+        account = Account(address=address)
+    else:
+        raise errors.NoWalletProvided()
+
+    return account

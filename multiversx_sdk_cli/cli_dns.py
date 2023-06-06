@@ -18,6 +18,7 @@ def setup_parser(args: List[str], subparsers: Any) -> Any:
     cli_shared.add_wallet_args(args, sub)
     cli_shared.add_proxy_arg(sub)
     cli_shared.add_tx_args(args, sub, with_receiver=False, with_data=False, with_guardian=True)
+    cli_shared.add_guardian_wallet_args(args, sub)
     sub.add_argument("--name", help="the name to register")
     sub.set_defaults(func=register)
 
