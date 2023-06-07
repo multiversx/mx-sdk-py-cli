@@ -24,13 +24,13 @@ class ContractVerificationRequest:
         source_code: Dict[str, Any],
         signature: bytes,
         docker_image: str,
-        contract_name: Optional[str]
+        contract_variant: Optional[str]
     ) -> None:
         self.contract = contract
         self.source_code = source_code
         self.signature = signature
         self.docker_image = docker_image
-        self.contract_name = contract_name
+        self.contract_variant = contract_variant
 
     def to_dictionary(self) -> Dict[str, Any]:
         return {
@@ -39,7 +39,7 @@ class ContractVerificationRequest:
                 "contract": self.contract.bech32(),
                 "dockerImage": self.docker_image,
                 "sourceCode": self.source_code,
-                "contractName": self.contract_name
+                "contractVariant": self.contract_variant
             }
         }
 
@@ -66,12 +66,12 @@ def trigger_contract_verification(
         contract: Address,
         verifier_url: str,
         docker_image: str,
-        contract_name: Optional[str]):
+        contract_variant: Optional[str]):
     source_code = read_json_file(packaged_source)
 
     payload = ContractVerificationPayload(contract, source_code, docker_image).serialize()
     signature = _create_request_signature(owner, contract, payload.encode())
-    contract_verification = ContractVerificationRequest(contract, source_code, signature, docker_image, contract_name)
+    contract_verification = ContractVerificationRequest(contract, source_code, signature, docker_image, contract_variant)
 
     request_dictionary = contract_verification.to_dictionary()
 
