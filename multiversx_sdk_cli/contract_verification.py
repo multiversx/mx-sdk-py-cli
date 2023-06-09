@@ -45,16 +45,18 @@ class ContractVerificationRequest:
 
 
 class ContractVerificationPayload:
-    def __init__(self, contract: Address, source_code: Dict[str, Any], docker_image: str,) -> None:
+    def __init__(self, contract: Address, source_code: Dict[str, Any], docker_image: str, contract_variant: Optional[str]) -> None:
         self.contract = contract
         self.source_code = source_code
         self.docker_image = docker_image
+        self.contract_variant = contract_variant
 
     def serialize(self) -> str:
         payload = {
             "contract": self.contract.bech32(),
             "dockerImage": self.docker_image,
-            "sourceCode": self.source_code
+            "sourceCode": self.source_code,
+            "contractVariant": self.contract_variant
         }
 
         return json.dumps(payload, separators=(',', ':'))
@@ -69,7 +71,7 @@ def trigger_contract_verification(
         contract_variant: Optional[str]):
     source_code = read_json_file(packaged_source)
 
-    payload = ContractVerificationPayload(contract, source_code, docker_image).serialize()
+    payload = ContractVerificationPayload(contract, source_code, docker_image, contract_variant).serialize()
     signature = _create_request_signature(owner, contract, payload.encode())
     contract_verification = ContractVerificationRequest(contract, source_code, signature, docker_image, contract_variant)
 
