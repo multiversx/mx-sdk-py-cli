@@ -14,7 +14,7 @@ from multiversx_sdk_cli.contract_verification import \
     trigger_contract_verification
 from multiversx_sdk_cli.contracts import CodeMetadata, SmartContract
 from multiversx_sdk_cli.docker import is_docker_installed, run_docker
-from multiversx_sdk_cli.errors import DockerMissingError
+from multiversx_sdk_cli.errors import DockerMissingError, NoWalletProvided
 from multiversx_sdk_cli.projects.core import get_project_paths_recursively
 from multiversx_sdk_cli.transactions import Transaction
 from multiversx_sdk_cli.cosign_transaction import cosign_transaction
@@ -82,6 +82,7 @@ def setup_parser(args: List[str], subparsers: Any) -> Any:
     sub.add_argument("--timeout", default=100, help="max num of seconds to wait for result"
                                                     " - only valid if --wait-result is set")
     cli_shared.add_broadcast_args(sub)
+    cli_shared.add_guardian_wallet_args(args, sub)
 
     sub.set_defaults(func=deploy)
 
@@ -99,6 +100,7 @@ def setup_parser(args: List[str], subparsers: Any) -> Any:
     sub.add_argument("--timeout", default=100, help="max num of seconds to wait for result"
                                                     " - only valid if --wait-result is set")
     cli_shared.add_broadcast_args(sub, relay=True)
+    cli_shared.add_guardian_wallet_args(args, sub)
 
     sub.set_defaults(func=call)
 
@@ -117,6 +119,7 @@ def setup_parser(args: List[str], subparsers: Any) -> Any:
     sub.add_argument("--timeout", default=100, help="max num of seconds to wait for result"
                                                     " - only valid if --wait-result is set")
     cli_shared.add_broadcast_args(sub)
+    cli_shared.add_guardian_wallet_args(args, sub)
 
     sub.set_defaults(func=upgrade)
 
@@ -146,6 +149,7 @@ def setup_parser(args: List[str], subparsers: Any) -> Any:
         help="the url of the service that validates the contract",
     )
     sub.add_argument("--docker-image", required=True, help="the docker image used for the build")
+    sub.add_argument("--contract-variant", required=False, default=None, help="in case of a multicontract, specify the contract variant you want to verify")
     cli_shared.add_wallet_args(args, sub)
     sub.set_defaults(func=verify)
 
@@ -295,9 +299,7 @@ def deploy(args: Any):
     sender = _prepare_sender(args)
 
     tx = contract.deploy(sender, arguments, gas_price, gas_limit, value, chain, version, args.guardian, args.options)
-
-    if args.guardian:
-        tx = cosign_transaction(tx, args.guardian_service_url, args.guardian_2fa_code)
+    tx = _sign_guarded_tx(args, tx)
 
     logger.info("Contract address: %s", contract.address)
     utils.log_explorer_contract_address(chain, contract.address)
@@ -351,6 +353,25 @@ def _prepare_signer(args: Any) -> Account:
     return sender
 
 
+def _sign_guarded_tx(args: Any, tx: Transaction) -> Transaction:
+    signature = tx.signature
+    tx.signature = ""
+
+    try:
+        guardian_account = cli_shared.prepare_guardian_account(args)
+    except NoWalletProvided:
+        guardian_account = None
+
+    if guardian_account:
+        tx.guardianSignature = guardian_account.sign_transaction(tx)
+    elif args.guardian:
+        tx = cosign_transaction(tx, args.guardian_service_url, args.guardian_2fa_code)  # type: ignore
+
+    tx.signature = signature
+
+    return tx
+
+
 def call(args: Any):
     logger.debug("call")
     cli_shared.check_guardian_and_options_args(args)
@@ -369,9 +390,7 @@ def call(args: Any):
     sender = _prepare_sender(args)
 
     tx = contract.execute(sender, function, arguments, gas_price, gas_limit, value, chain, version, args.guardian, args.options)
-
-    if args.guardian:
-        tx = cosign_transaction(tx, args.guardian_service_url, args.guardian_2fa_code)
+    tx = _sign_guarded_tx(args, tx)
 
     _send_or_simulate(tx, contract, args)
 
@@ -393,9 +412,7 @@ def upgrade(args: Any):
     sender = _prepare_sender(args)
 
     tx = contract.upgrade(sender, arguments, gas_price, gas_limit, value, chain, version, args.guardian, args.options)
-
-    if args.guardian:
-        tx = cosign_transaction(tx, args.guardian_service_url, args.guardian_2fa_code)
+    tx = _sign_guarded_tx(args, tx)
 
     _send_or_simulate(tx, contract, args)
 
@@ -426,9 +443,10 @@ def verify(args: Any) -> None:
 
     owner = _prepare_signer(args)
     docker_image = args.docker_image
+    contract_variant = args.contract_variant
 
     trigger_contract_verification(
-        packaged_src, owner, contract, verifier_url, docker_image
+        packaged_src, owner, contract, verifier_url, docker_image, contract_variant
     )
     logger.info("Contract verification request completed!")
 

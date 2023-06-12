@@ -4,6 +4,7 @@ from typing import Any, List
 from multiversx_sdk_cli import cli_shared, utils
 from multiversx_sdk_cli.cli_output import CLIOutputBuilder
 from multiversx_sdk_network_providers.proxy_network_provider import ProxyNetworkProvider
+from multiversx_sdk_cli.errors import NoWalletProvided
 from multiversx_sdk_cli.transactions import Transaction, do_prepare_transaction
 from multiversx_sdk_cli.cosign_transaction import cosign_transaction
 
@@ -17,6 +18,7 @@ def setup_parser(args: List[str], subparsers: Any) -> Any:
     cli_shared.add_outfile_arg(sub, what="signed transaction, hash")
     cli_shared.add_broadcast_args(sub, relay=True)
     cli_shared.add_proxy_arg(sub)
+    cli_shared.add_guardian_wallet_args(args, sub)
     sub.add_argument("--wait-result", action="store_true", default=False,
                      help="signal to wait for the transaction result - only valid if --send is set")
     sub.add_argument("--timeout", default=100, help="max num of seconds to wait for result"
@@ -44,6 +46,7 @@ def setup_parser(args: List[str], subparsers: Any) -> Any:
     cli_shared.add_broadcast_args(sub, relay=True)
     cli_shared.add_proxy_arg(sub)
     cli_shared.add_guardian_args(sub)
+    cli_shared.add_guardian_wallet_args(args, sub)
     sub.set_defaults(func=sign_transaction)
 
     parser.epilog = cli_shared.build_group_epilog(subparsers)
@@ -112,9 +115,18 @@ def sign_transaction(args: Any):
     tx.signature = ""
 
     account = cli_shared.prepare_account(args)
-    tx.signature = account.sign_transaction(tx)
+    signature = account.sign_transaction(tx)
 
-    if args.guardian:
+    try:
+        guardian_account = cli_shared.prepare_guardian_account(args)
+    except NoWalletProvided:
+        guardian_account = None
+
+    if guardian_account:
+        tx.guardianSignature = guardian_account.sign_transaction(tx)
+    elif args.guardian:
         tx = cosign_transaction(tx, args.guardian_service_url, args.guardian_2fa_code)
+
+    tx.signature = signature
 
     cli_shared.send_or_simulate(tx, args)
