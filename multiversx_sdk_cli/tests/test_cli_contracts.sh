@@ -32,15 +32,15 @@ testBuildContracts() {
     assertFileExists ${SANDBOX}/myfactorial-rs/output/myfactorial-rs.wasm || return 1
     assertFileExists ${SANDBOX}/myfactorial-rs/output/myfactorial-rs.abi.json || return 1
 
-    ${CLI} contract build --ignore-eei-checks ${SANDBOX}/mybubbles-rs --cargo-target-dir=${TARGET_DIR} || return 1
+    ${CLI} contract build ${SANDBOX}/mybubbles-rs --cargo-target-dir=${TARGET_DIR} || return 1
     assertFileExists ${SANDBOX}/mybubbles-rs/output/mybubbles-rs.wasm || return 1
     assertFileExists ${SANDBOX}/mybubbles-rs/output/mybubbles-rs.abi.json || return 1
 
-    ${CLI} contract build --ignore-eei-checks ${SANDBOX}/mylottery-rs --cargo-target-dir=${TARGET_DIR} || return 1
+    ${CLI} contract build ${SANDBOX}/mylottery-rs --cargo-target-dir=${TARGET_DIR} || return 1
     assertFileExists ${SANDBOX}/mylottery-rs/output/mylottery-rs.wasm || return 1
     assertFileExists ${SANDBOX}/mylottery-rs/output/mylottery-rs.abi.json || return 1
 
-    ${CLI} contract build --ignore-eei-checks ${SANDBOX}/myfunding-rs --cargo-target-dir=${TARGET_DIR} || return 1
+    ${CLI} contract build ${SANDBOX}/myfunding-rs --cargo-target-dir=${TARGET_DIR} || return 1
     assertFileExists ${SANDBOX}/myfunding-rs/output/myfunding-rs.wasm || return 1
     assertFileExists ${SANDBOX}/myfunding-rs/output/myfunding-rs.abi.json || return 1
 }
@@ -122,7 +122,7 @@ testVerifyContract(){
     pkill -f local_verify_server.py
 }
 
-testReproducibleBuild(){
+testReproducibleBuild() {
     echo "testReproducibleBuild"
 
     wget -O ${SANDBOX}/example.zip https://github.com/multiversx/mx-reproducible-contract-build-example-sc/archive/refs/tags/v0.2.1.zip || return 1
@@ -132,6 +132,8 @@ testReproducibleBuild(){
 }
 
 testAll() {
+    ${CLI} config set dependencies.rust.tag ${RUST_VERSION}
+
     cleanSandbox || return 1
     testTrivialCommands || return 1
     testCreateContracts || return 1

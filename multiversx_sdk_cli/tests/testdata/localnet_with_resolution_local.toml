@@ -1,0 +1,12 @@
+[general]
+log_level = "*:DEBUG"
+rounds_per_epoch = 40
+round_duration_milliseconds = 3000
+
+[software.mx_chain_go]
+resolution = "local"
+local_path = "~/multiversx-sdk/sandbox/mx-chain-go"
+
+[software.mx_chain_proxy_go]
+resolution = "local"
+local_path = "~/multiversx-sdk/sandbox/mx-chain-proxy-go"

@@ -20,7 +20,7 @@ https://docs.multiversx.com/sdk-and-tools/mxpy.
         
 
 COMMAND GROUPS:
-  {contract,tx,validator,account,ledger,wallet,network,deps,config,hyperblock,testnet,data,staking-provider,dns}
+  {contract,tx,validator,account,ledger,wallet,network,deps,config,hyperblock,localnet,data,staking-provider,dns}
 
 TOP-LEVEL OPTIONS:
   -h, --help            show this help message and exit
@@ -40,7 +40,7 @@ network                        Get Network parameters, such as number of shards,
 deps                           Manage dependencies or multiversx-sdk modules
 config                         Configure multiversx-sdk (default values etc.)
 hyperblock                     Get Hyperblock from the Network
-testnet                        Set up, start and control local testnets
+localnet                       Set up, start and control localnets
 data                           Data manipulation omnitool
 staking-provider               Staking provider omnitool
 dns                            Operations related to the Domain Name Service
@@ -90,7 +90,7 @@ Create a new Smart Contract project based on a template.
 positional arguments:
   name
 
-optional arguments:
+options:
   -h, --help             show this help message and exit
   --template TEMPLATE    the template to use
   --directory DIRECTORY  🗀 the parent directory of the project (default: current directory)
@@ -105,7 +105,7 @@ usage: mxpy contract templates [-h] ...
 
 List the available Smart Contract templates.
 
-optional arguments:
+options:
   -h, --help  show this help message and exit
 
 ```
@@ -121,7 +121,7 @@ Build a Smart Contract project using the appropriate buildchain.
 positional arguments:
   project                              🗀 the project directory (default: current directory)
 
-optional arguments:
+options:
   -h, --help                           show this help message and exit
   -r, --recursive                      locate projects recursively
   --debug                              set debug flag (default: False)
@@ -133,9 +133,6 @@ optional arguments:
                                        False)
   --wasm-name WASM_NAME                for rust projects, optionally specify the name of the wasm bytecode output file
   --wasm-suffix WASM_SUFFIX            for rust projects, optionally specify the suffix of the wasm bytecode output file
-  --eei-checks                         run EEI compatibility checks (default: False)
-  --skip-eei-checks                    deprecated flag
-  --ignore-eei-checks                  deprecated flag
 
 ```
 ### Contract.Clean
@@ -150,7 +147,7 @@ Clean a Smart Contract project.
 positional arguments:
   project          🗀 the project directory (default: current directory)
 
-optional arguments:
+options:
   -h, --help       show this help message and exit
   -r, --recursive  locate projects recursively
 
@@ -192,9 +189,8 @@ Output example:
     }
 }
 
-optional arguments:
+options:
   -h, --help                                      show this help message and exit
-  --project PROJECT                               🗀 the project directory (default: current directory)
   --bytecode BYTECODE                             the file containing the WASM bytecode
   --metadata-not-upgradeable                      ‼ mark the contract as NOT upgradeable (default: upgradeable)
   --metadata-not-readable                         ‼ mark the contract as NOT readable (default: readable)
@@ -283,7 +279,7 @@ Output example:
 positional arguments:
   contract                                        🖄 the address of the Smart Contract
 
-optional arguments:
+options:
   -h, --help                                      show this help message and exit
   --outfile OUTFILE                               where to save the output (default: stdout)
   --pem PEM                                       🔑 the PEM file, if keyfile not provided
@@ -370,10 +366,9 @@ Output example:
 positional arguments:
   contract                                        🖄 the address of the Smart Contract
 
-optional arguments:
+options:
   -h, --help                                      show this help message and exit
   --outfile OUTFILE                               where to save the output (default: stdout)
-  --project PROJECT                               🗀 the project directory (default: current directory)
   --bytecode BYTECODE                             the file containing the WASM bytecode
   --metadata-not-upgradeable                      ‼ mark the contract as NOT upgradeable (default: upgradeable)
   --metadata-not-readable                         ‼ mark the contract as NOT readable (default: readable)
@@ -433,7 +428,7 @@ Query a Smart Contract (call a pure function)
 positional arguments:
   contract                               🖄 the address of the Smart Contract
 
-optional arguments:
+options:
   -h, --help                             show this help message and exit
   --proxy PROXY                          🔗 the URL of the proxy (default: https://testnet-gateway.multiversx.com)
   --function FUNCTION                    the function to call
@@ -454,7 +449,7 @@ Print a detailed report of the smart contracts.
 positional arguments:
   project                                         🗀 the project directory (default: current directory)
 
-optional arguments:
+options:
   -h, --help                                      show this help message and exit
   --skip-build                                    skips the step of building of the wasm contracts
   --skip-twiggy                                   skips the steps of building the debug wasm files and running twiggy
@@ -474,9 +469,6 @@ optional arguments:
                                                   output file
   --wasm-suffix WASM_SUFFIX                       for rust projects, optionally specify the suffix of the wasm bytecode
                                                   output file
-  --eei-checks                                    run EEI compatibility checks (default: False)
-  --skip-eei-checks                               deprecated flag
-  --ignore-eei-checks                             deprecated flag
 
 ```
 ## Group **Transactions**
@@ -525,7 +517,7 @@ Output example:
     "emittedTransactionHash": "the transaction hash"
 }
 
-optional arguments:
+options:
   -h, --help                                      show this help message and exit
   --pem PEM                                       🔑 the PEM file, if keyfile not provided
   --pem-index PEM_INDEX                           🔑 the index in the PEM file (default: 0)
@@ -594,7 +586,7 @@ Output example:
     "emittedTransactionHash": "the transaction hash"
 }
 
-optional arguments:
+options:
   -h, --help         show this help message and exit
   --infile INFILE    input file (a previously saved transaction)
   --outfile OUTFILE  where to save the output (the hash) (default: stdout)
@@ -621,7 +613,7 @@ Output example:
     }
 }
 
-optional arguments:
+options:
   -h, --help                 show this help message and exit
   --hash HASH                the hash
   --sender SENDER            the sender address
@@ -655,7 +647,7 @@ usage: mxpy hyperblock get [-h] ...
 
 Get hyperblock
 
-optional arguments:
+options:
   -h, --help     show this help message and exit
   --proxy PROXY  🔗 the URL of the proxy (default: https://testnet-gateway.multiversx.com)
   --key KEY      the hash or the nonce of the hyperblock
@@ -702,7 +694,7 @@ usage: mxpy validator stake [-h] ...
 
 Stake value into the Network
 
-optional arguments:
+options:
   -h, --help                                      show this help message and exit
   --proxy PROXY                                   🔗 the URL of the proxy (default: https://testnet-
                                                   gateway.multiversx.com)
@@ -753,7 +745,7 @@ usage: mxpy validator unstake [-h] ...
 
 Unstake value
 
-optional arguments:
+options:
   -h, --help                                      show this help message and exit
   --proxy PROXY                                   🔗 the URL of the proxy (default: https://testnet-
                                                   gateway.multiversx.com)
@@ -802,7 +794,7 @@ usage: mxpy validator unjail [-h] ...
 
 Unjail a Validator Node
 
-optional arguments:
+options:
   -h, --help                                      show this help message and exit
   --proxy PROXY                                   🔗 the URL of the proxy (default: https://testnet-
                                                   gateway.multiversx.com)
@@ -851,7 +843,7 @@ usage: mxpy validator unbond [-h] ...
 
 Unbond tokens for a bls key
 
-optional arguments:
+options:
   -h, --help                                      show this help message and exit
   --proxy PROXY                                   🔗 the URL of the proxy (default: https://testnet-
                                                   gateway.multiversx.com)
@@ -900,7 +892,7 @@ usage: mxpy validator change-reward-address [-h] ...
 
 Change the reward address
 
-optional arguments:
+options:
   -h, --help                                      show this help message and exit
   --proxy PROXY                                   🔗 the URL of the proxy (default: https://testnet-
                                                   gateway.multiversx.com)
@@ -949,7 +941,7 @@ usage: mxpy validator claim [-h] ...
 
 Claim rewards
 
-optional arguments:
+options:
   -h, --help                                      show this help message and exit
   --proxy PROXY                                   🔗 the URL of the proxy (default: https://testnet-
                                                   gateway.multiversx.com)
@@ -998,16 +990,15 @@ usage: mxpy account COMMAND [-h] ...
 Get Account data (nonce, balance) from the Network
 
 COMMANDS:
-  {get,get-transactions}
+  {get}
 
 OPTIONS:
-  -h, --help            show this help message and exit
+  -h, --help  show this help message and exit
 
 ----------------
 COMMANDS summary
 ----------------
 get                            Query account details (nonce, balance etc.)
-get-transactions               Query account transactions
 
 ```
 ### Account.Get
@@ -1019,7 +1010,7 @@ usage: mxpy account get [-h] ...
 
 Query account details (nonce, balance etc.)
 
-optional arguments:
+options:
   -h, --help                 show this help message and exit
   --proxy PROXY              🔗 the URL of the proxy (default: https://testnet-gateway.multiversx.com)
   --address ADDRESS          🖄 the address to query
@@ -1027,22 +1018,6 @@ optional arguments:
   --nonce                    whether to only fetch the nonce
   --username                 whether to only fetch the username
   --omit-fields OMIT_FIELDS  omit fields in the output payload (default: [])
-
-```
-### Account.GetTransactions
-
-
-```
-$ mxpy account get-transactions --help
-usage: mxpy account get-transactions [-h] ...
-
-Query account transactions
-
-optional arguments:
-  -h, --help         show this help message and exit
-  --proxy PROXY      🔗 the URL of the proxy (default: https://testnet-gateway.multiversx.com)
-  --outfile OUTFILE  where to save the output (default: stdout)
-  --address ADDRESS  🖄 the address to query
 
 ```
 ## Group **Wallet**
@@ -1055,7 +1030,7 @@ usage: mxpy wallet COMMAND [-h] ...
 Create wallet, derive secret key from mnemonic, bech32 address helpers etc.
 
 COMMANDS:
-  {new,derive,convert,bech32,pem-address,pem-address-hex}
+  {new,convert,bech32,pem-address,pem-address-hex}
 
 OPTIONS:
   -h, --help            show this help message and exit
@@ -1064,7 +1039,6 @@ OPTIONS:
 COMMANDS summary
 ----------------
 new                            Create a new wallet and print its mnemonic; optionally save as password-protected JSON (recommended) or PEM (not recommended)
-derive                         DEPRECATED COMMAND, replaced by 'wallet convert'
 convert                        Convert a wallet from one format to another
 bech32                         Helper for encoding and decoding bech32 addresses
 pem-address                    Get the public address out of a PEM file as bech32
@@ -1080,35 +1054,14 @@ usage: mxpy wallet new [-h] ...
 
 Create a new wallet and print its mnemonic; optionally save as password-protected JSON (recommended) or PEM (not recommended)
 
-optional arguments:
+options:
   -h, --help                                      show this help message and exit
-  --json                                          DEPRECATED, replaced by --format=keystore-mnemonic
-  --pem                                           DEPRECATED, replaced by --format=pem
-  --output-path OUTPUT_PATH                       DEPRECATED, replaced by --outfile
   --format {raw-mnemonic,keystore-mnemonic,keystore-secret-key,pem}
                                                   the format of the generated wallet file (default: None)
   --outfile OUTFILE                               the output path and base file name for the generated wallet files
                                                   (default: None)
   --address-hrp ADDRESS_HRP                       the human-readable part of the address, when format is keystore-
                                                   secret-key or pem (default: erd)
-
-```
-### Wallet.Derive
-
-
-```
-$ mxpy wallet derive --help
-usage: mxpy wallet derive [-h] ...
-
-DEPRECATED COMMAND, replaced by 'wallet convert'
-
-positional arguments:
-  pem            path of the output PEM file
-
-optional arguments:
-  -h, --help     show this help message and exit
-  --mnemonic     whether to derive from an existing mnemonic
-  --index INDEX  the address index
 
 ```
 ### Wallet.Convert
@@ -1120,7 +1073,7 @@ usage: mxpy wallet convert [-h] ...
 
 Convert a wallet from one format to another
 
-optional arguments:
+options:
   -h, --help                                      show this help message and exit
   --infile INFILE                                 path to the input file
   --outfile OUTFILE                               path to the output file
@@ -1147,82 +1100,127 @@ Helper for encoding and decoding bech32 addresses
 positional arguments:
   value       the value to encode or decode
 
-optional arguments:
+options:
   -h, --help  show this help message and exit
   --encode    whether to encode
   --decode    whether to decode
 
 ```
-## Group **Testnet**
+## Group **Localnet**
 
 
 ```
-$ mxpy testnet --help
-usage: mxpy testnet COMMAND [-h] ...
+$ mxpy localnet --help
+usage: mxpy localnet COMMAND [-h] ...
 
-Set up, start and control local testnets
+Set up, start and control localnets
 
 COMMANDS:
-  {prerequisites,start,config,clean}
+  {setup,new,prerequisites,build,start,config,clean}
 
 OPTIONS:
   -h, --help            show this help message and exit
 
 ```
-### Testnet.Prerequisites
+### Localnet.Setup
 
 
 ```
-$ mxpy testnet prerequisites --help
-usage: mxpy testnet prerequisites [-h] ...
+$ mxpy localnet setup --help
+usage: mxpy localnet setup [-h] ...
 
-Download and verify the prerequisites for running a testnet
+Set up a localnet (runs 'prerequisites', 'build' and 'config' in one go)
 
-optional arguments:
+options:
   -h, --help               show this help message and exit
-  --configfile CONFIGFILE  An optional configuration file describing the testnet
+  --configfile CONFIGFILE  An optional configuration file describing the localnet
 
 ```
-### Testnet.Config
+### Localnet.New
 
 
 ```
-$ mxpy testnet config --help
-usage: mxpy testnet config [-h] ...
+$ mxpy localnet new --help
+usage: mxpy localnet new [-h] ...
 
-Configure a testnet (required before starting it the first time or after clean)
+Create a new localnet configuration
 
-optional arguments:
+options:
   -h, --help               show this help message and exit
-  --configfile CONFIGFILE  An optional configuration file describing the testnet
+  --configfile CONFIGFILE  An optional configuration file describing the localnet
 
 ```
-### Testnet.Start
+### Localnet.Prerequisites
 
 
 ```
-$ mxpy testnet start --help
-usage: mxpy testnet start [-h] ...
+$ mxpy localnet prerequisites --help
+usage: mxpy localnet prerequisites [-h] ...
 
-Start a testnet
+Download and verify the prerequisites for running a localnet
 
-optional arguments:
+options:
   -h, --help               show this help message and exit
-  --configfile CONFIGFILE  An optional configuration file describing the testnet
+  --configfile CONFIGFILE  An optional configuration file describing the localnet
 
 ```
-### Testnet.Clean
+### Localnet.Build
 
 
 ```
-$ mxpy testnet clean --help
-usage: mxpy testnet clean [-h] ...
+$ mxpy localnet build --help
+usage: mxpy localnet build [-h] ...
 
-Erase the currently configured testnet (must be already stopped)
+Build necessary software for running a localnet
 
-optional arguments:
+options:
+  -h, --help                                      show this help message and exit
+  --configfile CONFIGFILE                         An optional configuration file describing the localnet
+  --software {node,seednode,proxy} [{node,seednode,proxy} ...]
+                                                  The software to build (default: ['node', 'seednode', 'proxy'])
+
+```
+### Localnet.Config
+
+
+```
+$ mxpy localnet config --help
+usage: mxpy localnet config [-h] ...
+
+Configure a localnet (required before starting it the first time or after clean)
+
+options:
   -h, --help               show this help message and exit
-  --configfile CONFIGFILE  An optional configuration file describing the testnet
+  --configfile CONFIGFILE  An optional configuration file describing the localnet
+
+```
+### Localnet.Start
+
+
+```
+$ mxpy localnet start --help
+usage: mxpy localnet start [-h] ...
+
+Start a localnet
+
+options:
+  -h, --help                               show this help message and exit
+  --configfile CONFIGFILE                  An optional configuration file describing the localnet
+  --stop-after-seconds STOP_AFTER_SECONDS  Stop the localnet after a given number of seconds (default: 31536000)
+
+```
+### Localnet.Clean
+
+
+```
+$ mxpy localnet clean --help
+usage: mxpy localnet clean [-h] ...
+
+Erase the currently configured localnet (must be already stopped)
+
+options:
+  -h, --help               show this help message and exit
+  --configfile CONFIGFILE  An optional configuration file describing the localnet
 
 ```
 ## Group **Network**
@@ -1257,7 +1255,7 @@ usage: mxpy network num-shards [-h] ...
 
 Get the number of shards.
 
-optional arguments:
+options:
   -h, --help     show this help message and exit
   --proxy PROXY  🔗 the URL of the proxy (default: https://testnet-gateway.multiversx.com)
 
@@ -1271,7 +1269,7 @@ usage: mxpy network block-nonce [-h] ...
 
 Get the latest block nonce, by shard.
 
-optional arguments:
+options:
   -h, --help     show this help message and exit
   --proxy PROXY  🔗 the URL of the proxy (default: https://testnet-gateway.multiversx.com)
   --shard SHARD  the shard ID (use 4294967295 for metachain)
@@ -1286,7 +1284,7 @@ usage: mxpy network chain [-h] ...
 
 Get the chain identifier.
 
-optional arguments:
+options:
   -h, --help     show this help message and exit
   --proxy PROXY  🔗 the URL of the proxy (default: https://testnet-gateway.multiversx.com)
 
@@ -1326,7 +1324,7 @@ positional arguments:
   {all,llvm,clang,cpp,rust,golang,vmtools,mx_chain_go,mx_chain_proxy_go,wasm-opt,twiggy,testwallets}
                                                   the dependency to install
 
-optional arguments:
+options:
   -h, --help                                      show this help message and exit
   --overwrite                                     whether to overwrite an existing installation
   --tag TAG                                       the tag or version to install
@@ -1345,7 +1343,7 @@ positional arguments:
   {all,llvm,clang,cpp,rust,golang,vmtools,mx_chain_go,mx_chain_proxy_go,wasm-opt,twiggy,testwallets}
                                                   the dependency to check
 
-optional arguments:
+options:
   -h, --help                                      show this help message and exit
   --tag TAG                                       the tag or version to check
 
@@ -1386,7 +1384,7 @@ usage: mxpy config dump [-h] ...
 
 Dumps configuration.
 
-optional arguments:
+options:
   -h, --help  show this help message and exit
   --defaults  dump defaults instead of local config
 
@@ -1403,7 +1401,7 @@ Gets a configuration value.
 positional arguments:
   name        the name of the configuration entry
 
-optional arguments:
+options:
   -h, --help  show this help message and exit
 
 ```
@@ -1420,7 +1418,7 @@ positional arguments:
   name        the name of the configuration entry
   value       the new value
 
-optional arguments:
+options:
   -h, --help  show this help message and exit
 
 ```
@@ -1436,7 +1434,7 @@ Creates a new configuration.
 positional arguments:
   name                 the name of the configuration entry
 
-optional arguments:
+options:
   -h, --help           show this help message and exit
   --template TEMPLATE  template from which to create the new config
 
@@ -1453,7 +1451,7 @@ Switch to a different config
 positional arguments:
   name        the name of the configuration entry
 
-optional arguments:
+options:
   -h, --help  show this help message and exit
 
 ```
@@ -1466,7 +1464,7 @@ usage: mxpy config list [-h] ...
 
 List available configs
 
-optional arguments:
+options:
   -h, --help  show this help message and exit
 
 ```
@@ -1502,7 +1500,7 @@ usage: mxpy data parse [-h] ...
 
 Parses values from a given file
 
-optional arguments:
+options:
   -h, --help               show this help message and exit
   --file FILE              path of the file to parse
   --expression EXPRESSION  the Python-Dictionary expression to evaluate in order to extract the data
@@ -1517,7 +1515,7 @@ usage: mxpy data store [-h] ...
 
 Stores a key-value pair within a partition
 
-optional arguments:
+options:
   -h, --help             show this help message and exit
   --key KEY              the key
   --value VALUE          the value to save
@@ -1534,7 +1532,7 @@ usage: mxpy data load [-h] ...
 
 Loads a key-value pair from a storage partition
 
-optional arguments:
+options:
   -h, --help             show this help message and exit
   --key KEY              the key
   --partition PARTITION  the storage partition (default: *)

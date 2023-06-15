@@ -28,10 +28,10 @@ class DependencyModule:
         if tag == 'latest':
             tag = self.get_latest_release()
 
-        logger.debug(f"install: key={self.key}, tag={tag}")
+        logger.info(f"install: key={self.key}, tag={tag}, overwrite={overwrite}")
 
         if self._should_skip(tag, overwrite):
-            logger.debug("Already exists. Skip install.")
+            logger.info("Already exists. Skip install.")
             return
 
         self._guard_cannot_install_on_host()
@@ -233,18 +233,23 @@ class GolangModule(StandaloneModule):
                 "GOROOT": os.environ.get("GOROOT", "")
             }
         if resolution == DependencyResolution.SDK:
+            current_path = os.environ.get("PATH", "")
+            current_path_parts = current_path.split(":")
+            current_path_parts_without_go = [part for part in current_path_parts if "/go/bin" not in part]
+            current_path_without_go = ":".join(current_path_parts_without_go)
+
             return {
                 # At this moment, cc (build-essential) is needed to compile go dependencies (e.g. Node, VM)
-                "PATH": f"{(directory / 'go' / 'bin')}:{os.environ['PATH']}",
-                "GOPATH": self.get_gopath(),
+                "PATH": f"{(directory / 'go' / 'bin')}:{current_path_without_go}",
+                "GOPATH": str(self.get_gopath()),
                 "GOCACHE": str(parent_directory / "GOCACHE"),
                 "GOROOT": str(directory / "go")
             }
 
         raise errors.BadDependencyResolution(self.key, resolution)
 
-    def get_gopath(self):
-        return path.join(self.get_parent_directory(), "GOPATH")
+    def get_gopath(self) -> Path:
+        return self.get_parent_directory() / "GOPATH"
 
     def get_latest_release(self) -> str:
         raise errors.UnsupportedConfigurationValue("Golang tag must always be explicit, not latest")
@@ -268,17 +273,14 @@ class Rust(DependencyModule):
         myprocess.run_process(args, env=self.get_env_for_install())
 
     def _get_installer_url(self) -> str:
-        platform = workstation.get_platform()
-
-        if platform == "windows":
+        if workstation.is_windows():
             return "https://win.rustup.rs"
         return "https://sh.rustup.rs"
 
     def _get_installer_path(self) -> Path:
-        platform = workstation.get_platform()
         tools_folder = workstation.get_tools_folder()
 
-        if platform == "windows":
+        if workstation.is_windows():
             return tools_folder / "rustup-init.exe"
         return tools_folder / "rustup.sh"
 
@@ -342,7 +344,6 @@ class Rust(DependencyModule):
 
     def get_env_for_install(self):
         directory = self.get_directory("")
-        platform = workstation.get_platform()
 
         env = {
             # For installation, wget (or curl) and cc (build-essential) are also required.
@@ -351,7 +352,7 @@ class Rust(DependencyModule):
             "CARGO_HOME": str(directory)
         }
 
-        if platform == "windows":
+        if workstation.is_windows():
             env["RUSTUP_USE_HYPER"] = "1"
 
         return env

@@ -15,7 +15,6 @@ from multiversx_sdk_cli.contract_verification import \
 from multiversx_sdk_cli.contracts import CodeMetadata, SmartContract
 from multiversx_sdk_cli.docker import is_docker_installed, run_docker
 from multiversx_sdk_cli.errors import DockerMissingError, NoWalletProvided
-from multiversx_sdk_cli.projects import load_project
 from multiversx_sdk_cli.projects.core import get_project_paths_recursively
 from multiversx_sdk_cli.transactions import Transaction
 from multiversx_sdk_cli.cosign_transaction import cosign_transaction
@@ -71,7 +70,7 @@ def setup_parser(args: List[str], subparsers: Any) -> Any:
 
     output_description = CLIOutputBuilder.describe(with_contract=True, with_transaction_on_network=True, with_simulation=True)
     sub = cli_shared.add_command_subparser(subparsers, "contract", "deploy", f"Deploy a Smart Contract.{output_description}")
-    _add_project_or_bytecode_arg(sub)
+    _add_bytecode_arg(sub)
     _add_metadata_arg(sub)
     cli_shared.add_outfile_arg(sub)
     cli_shared.add_wallet_args(args, sub)
@@ -109,7 +108,7 @@ def setup_parser(args: List[str], subparsers: Any) -> Any:
                                            f"Upgrade a previously-deployed Smart Contract.{output_description}")
     _add_contract_arg(sub)
     cli_shared.add_outfile_arg(sub)
-    _add_project_or_bytecode_arg(sub)
+    _add_bytecode_arg(sub)
     _add_metadata_arg(sub)
     cli_shared.add_wallet_args(args, sub)
     cli_shared.add_proxy_arg(sub)
@@ -190,22 +189,14 @@ def _add_build_options_args(sub: Any):
     sub.add_argument("--wasm-suffix", type=str,
                      help="for rust projects, optionally specify the suffix of the wasm bytecode output file")
 
-    sub.add_argument("--eei-checks", action="store_true", default=False, help="run EEI compatibility checks (default: %(default)s)")
-    # Flags are kept in order to avoid breaking changes, for the moment - we might completely remove them in the future.
-    sub.add_argument("--skip-eei-checks", action="store_true", default=True, help="deprecated flag")
-    sub.add_argument("--ignore-eei-checks", action="store_true", default=True, help="deprecated flag")
-
 
 def _add_recursive_arg(sub: Any):
     sub.add_argument("-r", "--recursive", dest="recursive", action="store_true", help="locate projects recursively")
 
 
-def _add_project_or_bytecode_arg(sub: Any):
-    group = sub.add_mutually_exclusive_group(required=True)
-    group.add_argument("--project", default=os.getcwd(),
-                       help="🗀 the project directory (default: current directory)")
-    group.add_argument("--bytecode", type=str,
-                       help="the file containing the WASM bytecode")
+def _add_bytecode_arg(sub: Any):
+    sub.add_argument("--bytecode", type=str, required=True,
+                     help="the file containing the WASM bytecode")
 
 
 def _add_contract_arg(sub: Any):
@@ -277,12 +268,7 @@ def _prepare_build_options(args: Any) -> Dict[str, Any]:
         "cargo-target-dir": args.cargo_target_dir,
         "wasm-symbols": args.wasm_symbols,
         "wasm-name": args.wasm_name,
-        "wasm-suffix": args.wasm_suffix,
-        "eei-checks": args.eei_checks,
-        # TODO: Remove this, in the future
-        "skip-eei-checks": args.skip_eei_checks,
-        # TODO: Remove this, in the future
-        "ignore-eei-checks": args.ignore_eei_checks
+        "wasm-suffix": args.wasm_suffix
     }
 
 
@@ -322,12 +308,7 @@ def deploy(args: Any):
 
 
 def _prepare_contract(args: Any) -> SmartContract:
-    if args.bytecode and len(args.bytecode):
-        bytecode = utils.read_binary_file(Path(args.bytecode)).hex()
-    else:
-        project_path = Path(args.project)
-        project = load_project(project_path)
-        bytecode = project.get_bytecode()
+    bytecode = utils.read_binary_file(Path(args.bytecode)).hex()
 
     metadata = CodeMetadata(upgradeable=args.metadata_upgradeable, readable=args.metadata_readable,
                             payable=args.metadata_payable, payable_by_sc=args.metadata_payable_by_sc)

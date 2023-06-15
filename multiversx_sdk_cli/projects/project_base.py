@@ -8,7 +8,6 @@ from typing import Any, Dict, List, Union, cast, final
 
 from multiversx_sdk_cli import dependencies, errors, myprocess, utils
 from multiversx_sdk_cli.dependencies.modules import StandaloneModule
-from multiversx_sdk_cli.projects import eei_checks
 from multiversx_sdk_cli.projects.constants import PROJECT_CONFIG_FILENAME
 from multiversx_sdk_cli.projects.interfaces import IProject
 from multiversx_sdk_cli.projects.migrations import migrate_project_config_file
@@ -83,8 +82,7 @@ class Project(IProject):
 
     @final
     def _do_after_build_core(self):
-        # TODO: Remove this, in the future
-        eei_checks.check_compatibility(self)
+        pass
 
     def _copy_to_output(self, source: Path, destination: Union[str, None] = None) -> Path:
         output_folder = self.get_output_folder()

@@ -68,19 +68,20 @@ generate() {
 
     group "Account" "account"
     command "Account.Get" "account get"
-    command "Account.GetTransactions" "account get-transactions"
 
     group "Wallet" "wallet"
     command "Wallet.New" "wallet new"
-    command "Wallet.Derive" "wallet derive"
     command "Wallet.Convert" "wallet convert"
     command "Wallet.Bech32" "wallet bech32"
 
-    group "Testnet" "testnet"
-    command "Testnet.Prerequisites" "testnet prerequisites"
-    command "Testnet.Config" "testnet config"
-    command "Testnet.Start" "testnet start"
-    command "Testnet.Clean" "testnet clean"
+    group "Localnet" "localnet"
+    command "Localnet.Setup" "localnet setup"
+    command "Localnet.New" "localnet new"
+    command "Localnet.Prerequisites" "localnet prerequisites"
+    command "Localnet.Build" "localnet build"
+    command "Localnet.Config" "localnet config"
+    command "Localnet.Start" "localnet start"
+    command "Localnet.Clean" "localnet clean"
 
     group "Network" "network"
     command "Network.NumShards" "network num-shards"
