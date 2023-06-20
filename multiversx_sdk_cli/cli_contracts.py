@@ -6,8 +6,10 @@ from typing import Any, Dict, List
 from multiversx_sdk_network_providers.proxy_network_provider import \
     ProxyNetworkProvider
 
+from multiversx_sdk_core import Address
+
 from multiversx_sdk_cli import cli_shared, errors, projects, utils
-from multiversx_sdk_cli.accounts import Account, Address, LedgerAccount
+from multiversx_sdk_cli.accounts import Account, LedgerAccount
 from multiversx_sdk_cli.cli_output import CLIOutputBuilder
 from multiversx_sdk_cli.cli_password import load_password
 from multiversx_sdk_cli.contract_verification import \
@@ -301,8 +303,8 @@ def deploy(args: Any):
     tx = contract.deploy(sender, arguments, gas_price, gas_limit, value, chain, version, args.guardian, args.options)
     tx = _sign_guarded_tx(args, tx)
 
-    logger.info("Contract address: %s", contract.address)
-    utils.log_explorer_contract_address(chain, contract.address)
+    logger.info("Contract address: %s", contract.address.bech32())
+    utils.log_explorer_contract_address(chain, contract.address.bech32())
 
     _send_or_simulate(tx, contract, args)
 
@@ -386,7 +388,7 @@ def call(args: Any):
     chain = args.chain
     version = args.version
 
-    contract = SmartContract(contract_address)
+    contract = SmartContract(Address.from_bech32(contract_address))
     sender = _prepare_sender(args)
 
     tx = contract.execute(sender, function, arguments, gas_price, gas_limit, value, chain, version, args.guardian, args.options)
@@ -408,7 +410,7 @@ def upgrade(args: Any):
     version = args.version
 
     contract = _prepare_contract(args)
-    contract.address = Address(contract_address)
+    contract.address = Address.from_bech32(contract_address)
     sender = _prepare_sender(args)
 
     tx = contract.upgrade(sender, arguments, gas_price, gas_limit, value, chain, version, args.guardian, args.options)
@@ -424,7 +426,7 @@ def query(args: Any):
     function = args.function
     arguments = args.arguments
 
-    contract = SmartContract(contract_address)
+    contract = SmartContract(address=Address.from_bech32(contract_address))
     result = contract.query(ProxyNetworkProvider(args.proxy), function, arguments)
     utils.dump_out_json(result)
 
@@ -436,7 +438,7 @@ def _send_or_simulate(tx: Transaction, contract: SmartContract, args: Any):
 
 
 def verify(args: Any) -> None:
-    contract = Address(args.contract)
+    contract = Address.from_bech32(args.contract)
     verifier_url = args.verifier_url
 
     packaged_src = Path(args.packaged_src).expanduser().resolve()
