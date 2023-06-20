@@ -217,13 +217,10 @@ def run_in_venv(args: List[str], venv_path: Path):
 
 def run_post_install_checks():
     multiversx_sdk_path = Path("~/multiversx-sdk").expanduser()
-    elrond_sdk_path = Path("~/elrondsdk").expanduser()
 
     logger.info("Running post-install checks...")
     print("~/multiversx-sdk exists", "OK" if multiversx_sdk_path.exists() else "NOK")
-    print("~/elrondsdk is removed or missing", "OK" if not elrond_sdk_path.exists() else "NOK")
     print("~/multiversx-sdk/mxpy shortcut created", "OK" if (multiversx_sdk_path / "mxpy").exists() else "NOK")
-    print("~/multiversx-sdk/erdpy.json is renamed or missing", "OK" if not (multiversx_sdk_path / "erdpy.json").exists() else "NOK")
 
 
 def guide_system_path_integration():
