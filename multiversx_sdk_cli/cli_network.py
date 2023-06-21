@@ -1,7 +1,10 @@
-from multiversx_sdk_network_providers.proxy_network_provider import ProxyNetworkProvider
-from multiversx_sdk_cli import cli_shared
 import logging
 from typing import Any
+
+from multiversx_sdk_network_providers.proxy_network_provider import \
+    ProxyNetworkProvider
+
+from multiversx_sdk_cli import cli_shared
 
 logger = logging.getLogger("cli.network")
 
@@ -27,7 +30,7 @@ def setup_parser(subparsers: Any) -> Any:
     return subparsers
 
 
-def get_num_shards(args: Any):
+def get_num_shards(args: Any) -> int:
     proxy_url = args.proxy
     proxy = ProxyNetworkProvider(proxy_url)
     num_shards = proxy.get_network_config().num_shards_without_meta
@@ -35,7 +38,7 @@ def get_num_shards(args: Any):
     return num_shards
 
 
-def get_last_block_nonce(args: Any):
+def get_last_block_nonce(args: Any) -> int:
     proxy_url = args.proxy
     shard = args.shard
     proxy = ProxyNetworkProvider(proxy_url)
@@ -44,7 +47,7 @@ def get_last_block_nonce(args: Any):
     return nonce
 
 
-def get_chain_id(args: Any):
+def get_chain_id(args: Any) -> str:
     proxy_url = args.proxy
     proxy = ProxyNetworkProvider(proxy_url)
     chain_id = proxy.get_network_config().chain_id

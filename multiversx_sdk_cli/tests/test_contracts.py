@@ -29,6 +29,7 @@ def test_compute_address():
 
     contract.owner.nonce = 0
     contract.compute_address()
+    assert contract.address
     assert contract.address.hex() == "00000000000000000500bb652200ed1f994200ab6699462cab4b1af7b11ebd5e"
     assert contract.address.bech32() == "erd1qqqqqqqqqqqqqpgqhdjjyq8dr7v5yq9tv6v5vt9tfvd00vg7h40q6779zn"
 
