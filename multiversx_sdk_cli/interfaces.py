@@ -10,9 +10,6 @@ class IAddress(Protocol):
     def bech32(self) -> str:
         ...
 
-    # def pubkey(self) -> bytes:
-    #     ...
-
 
 class ITransaction(ISerializable):
     def serialize(self) -> bytes:

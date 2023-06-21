@@ -1,10 +1,11 @@
-from collections import OrderedDict
 import json
-from typing import Any, Dict, List, Union
 import logging
-from multiversx_sdk_cli import utils
+from collections import OrderedDict
+from typing import Any, Dict, List, Union
 
-from multiversx_sdk_cli.accounts import Address
+from multiversx_sdk_core import Address
+
+from multiversx_sdk_cli import utils
 from multiversx_sdk_cli.interfaces import ITransaction
 from multiversx_sdk_cli.utils import ISerializable
 

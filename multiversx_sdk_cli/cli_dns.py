@@ -1,11 +1,16 @@
 from typing import Any, List
+
+from multiversx_sdk_core import Address
+from multiversx_sdk_network_providers.proxy_network_provider import \
+    ProxyNetworkProvider
 from prettytable import PrettyTable
 
 from multiversx_sdk_cli import cli_shared
-from multiversx_sdk_cli.dns import (name_hash, dns_address_for_name, register, resolve, registration_cost,
-                                    validate_name, version, compute_dns_address_for_shard_id)
-from multiversx_sdk_cli.accounts import Address
-from multiversx_sdk_network_providers.proxy_network_provider import ProxyNetworkProvider
+from multiversx_sdk_cli.constants import ADDRESS_ZERO
+from multiversx_sdk_cli.dns import (compute_dns_address_for_shard_id,
+                                    dns_address_for_name, name_hash, register,
+                                    registration_cost, resolve, validate_name,
+                                    version)
 
 
 def setup_parser(args: List[str], subparsers: Any) -> Any:
@@ -69,7 +74,7 @@ def _add_name_arg(sub: Any):
 
 def dns_resolve(args: Any):
     addr = resolve(args.name, ProxyNetworkProvider(args.proxy))
-    if addr.hex() != Address.zero().hex():
+    if addr.hex() != Address.from_bech32(ADDRESS_ZERO).hex():
         print(addr.bech32())
 
 

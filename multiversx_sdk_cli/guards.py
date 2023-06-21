@@ -1,4 +1,5 @@
 from pathlib import Path
+
 from multiversx_sdk_cli import errors
 
 
@@ -12,14 +13,14 @@ def is_directory(directory: Path):
         raise errors.BadDirectory(str(directory))
 
 
-def is_hex_address(input):
+def is_hex_address(input: str):
     is_hex_string(input)
 
     if len(input) != 64:
         raise errors.BadInputError(input, "is not a valid hex-encoded address")
 
 
-def is_hex_string(input):
+def is_hex_string(input: str):
     try:
         bytearray.fromhex(input)
     except Exception:

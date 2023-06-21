@@ -1,13 +1,17 @@
 import logging
 from pathlib import Path
-import sys
-import pytest
 
+import pytest
 from Cryptodome.Hash import keccak
-from multiversx_sdk_cli.accounts import Account, Address
-from multiversx_sdk_cli.contracts import SmartContract, _prepare_argument, _interpret_as_number_if_safely
+from multiversx_sdk_core import Address
+
 from multiversx_sdk_cli import errors
+from multiversx_sdk_cli.accounts import Account
+from multiversx_sdk_cli.constants import DEFAULT_HRP
 from multiversx_sdk_cli.contract_verification import _create_request_signature
+from multiversx_sdk_cli.contracts import (SmartContract,
+                                          _interpret_as_number_if_safely,
+                                          _prepare_argument)
 
 logging.basicConfig(level=logging.INFO)
 
@@ -21,7 +25,7 @@ def test_playground_keccak():
 
 def test_compute_address():
     contract = SmartContract()
-    contract.owner = Account("93ee6143cdc10ce79f15b2a6c2ad38e9b6021c72a1779051f47154fd54cfbd5e")
+    contract.owner = Account(address=Address.from_hex("93ee6143cdc10ce79f15b2a6c2ad38e9b6021c72a1779051f47154fd54cfbd5e", DEFAULT_HRP))
 
     contract.owner.nonce = 0
     contract.compute_address()
@@ -67,8 +71,8 @@ def test_prepare_argument():
 
 
 def test_contract_verification_create_request_signature():
-    account = Account(pem_file=testdata_folder / "walletKey.pem")
-    contract_address = Address("erd1qqqqqqqqqqqqqpgqeyj9g344pqguukajpcfqz9p0rfqgyg4l396qespdck")
+    account = Account(pem_file=str(testdata_folder / "walletKey.pem"))
+    contract_address = Address.from_bech32("erd1qqqqqqqqqqqqqpgqeyj9g344pqguukajpcfqz9p0rfqgyg4l396qespdck")
     request_payload = b"test"
     signature = _create_request_signature(account, contract_address, request_payload)
 

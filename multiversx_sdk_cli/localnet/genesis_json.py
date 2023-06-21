@@ -1,6 +1,8 @@
 from typing import Any, Dict, List
 
-from multiversx_sdk_cli.accounts import Account, Address
+from multiversx_sdk_core import Address
+
+from multiversx_sdk_cli.accounts import Account
 from multiversx_sdk_cli.localnet import wallets
 from multiversx_sdk_cli.localnet.config_root import ConfigRoot
 from multiversx_sdk_cli.localnet.genesis import (get_delegation_address,

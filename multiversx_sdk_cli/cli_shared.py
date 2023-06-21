@@ -4,17 +4,19 @@ import sys
 from argparse import FileType
 from typing import Any, List, Text, cast
 
+from multiversx_sdk_core import Address
 from multiversx_sdk_network_providers.proxy_network_provider import \
     ProxyNetworkProvider
 
 from multiversx_sdk_cli import config, errors, utils
 from multiversx_sdk_cli.accounts import Account
 from multiversx_sdk_cli.cli_output import CLIOutputBuilder
-from multiversx_sdk_cli.cli_password import load_password, load_guardian_password
+from multiversx_sdk_cli.cli_password import (load_guardian_password,
+                                             load_password)
+from multiversx_sdk_cli.constants import TRANSACTION_OPTIONS_TX_GUARDED
 from multiversx_sdk_cli.ledger.ledger_functions import do_get_ledger_address
 from multiversx_sdk_cli.simulation import Simulator
 from multiversx_sdk_cli.transactions import Transaction
-from multiversx_sdk_cli.constants import TRANSACTION_OPTIONS_TX_GUARDED
 
 
 def wider_help_formatter(prog: Text):
@@ -143,7 +145,7 @@ def prepare_account(args: Any):
         account = Account(key_file=args.keyfile, password=password)
     elif args.ledger:
         address = do_get_ledger_address(account_index=args.ledger_account_index, address_index=args.ledger_address_index)
-        account = Account(address=address)
+        account = Account(address=Address.from_bech32(address))
     else:
         raise errors.NoWalletProvided()
 
@@ -158,7 +160,7 @@ def prepare_guardian_account(args: Any):
         account = Account(key_file=args.guardian_keyfile, password=password)
     elif args.guardian_ledger:
         address = do_get_ledger_address(account_index=args.guardian_ledger_account_index, address_index=args.guardian_ledger_address_index)
-        account = Account(address=address)
+        account = Account(Address.from_bech32(address))
     else:
         raise errors.NoWalletProvided()
 
