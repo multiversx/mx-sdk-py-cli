@@ -47,8 +47,8 @@ class CLIOutputBuilder:
 
         if self.emitted_transaction:
             emitted_transaction_dict = self.emitted_transaction.to_dictionary()
-            emitted_transaction_hash = self.emitted_transaction.get_hash() or ""
-            emitted_transaction_data = self.emitted_transaction.get_data() or ""
+            emitted_transaction_hash = self.emitted_transaction.hash if hasattr(self.emitted_transaction, "hash") else ""
+            emitted_transaction_data = str(self.emitted_transaction.data)
             utils.omit_fields(emitted_transaction_dict, self.emitted_transaction_omitted_fields)
 
             output["emittedTransaction"] = emitted_transaction_dict

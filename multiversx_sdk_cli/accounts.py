@@ -91,8 +91,8 @@ class LedgerAccount(Account):
         ledger_version = do_get_ledger_version()
         should_use_hash_signing = compare_versions(ledger_version, SIGN_USING_HASH_VERSION) >= 0
         if should_use_hash_signing:
-            transaction.set_version(TX_HASH_SIGN_VERSION)
-            transaction.set_options(TX_HASH_SIGN_OPTIONS)
+            transaction.version = TX_HASH_SIGN_VERSION
+            transaction.options = TX_HASH_SIGN_OPTIONS
 
         signature = do_sign_transaction_with_ledger(
             transaction.serialize_for_signing(),

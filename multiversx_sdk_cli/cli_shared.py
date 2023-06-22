@@ -4,7 +4,7 @@ import sys
 from argparse import FileType
 from typing import Any, List, Text, cast
 
-from multiversx_sdk_core import Address
+from multiversx_sdk_core import Address, Transaction
 from multiversx_sdk_network_providers.proxy_network_provider import \
     ProxyNetworkProvider
 
@@ -16,7 +16,7 @@ from multiversx_sdk_cli.cli_password import (load_guardian_password,
 from multiversx_sdk_cli.constants import TRANSACTION_OPTIONS_TX_GUARDED
 from multiversx_sdk_cli.ledger.ledger_functions import do_get_ledger_address
 from multiversx_sdk_cli.simulation import Simulator
-from multiversx_sdk_cli.transactions import Transaction
+from multiversx_sdk_cli.transactions import send_and_wait_for_result
 
 
 def wider_help_formatter(prog: Text):
@@ -235,10 +235,10 @@ def send_or_simulate(tx: Transaction, args: Any, dump_output: bool = True) -> CL
 
     try:
         if send_wait_result:
-            transaction_on_network = tx.send_wait_result(proxy, args.timeout)
+            transaction_on_network = send_and_wait_for_result(tx, proxy, args.timeout)
             output_builder.set_awaited_transaction(transaction_on_network)
         elif send_only:
-            tx.send(proxy)
+            proxy.send_transaction(tx)
         elif simulate:
             simulation = Simulator(proxy).run(tx)
             output_builder.set_simulation_results(simulation)
