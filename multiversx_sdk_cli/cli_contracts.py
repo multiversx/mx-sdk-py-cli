@@ -354,10 +354,6 @@ def _prepare_signer(args: Any) -> Account:
 
 
 def _sign_guarded_tx(args: Any, tx: Transaction) -> Transaction:
-    # not needed anymore (i think)
-    # signature = tx.signature
-    # tx.signature = bytes()
-
     try:
         guardian_account = cli_shared.prepare_guardian_account(args)
     except NoWalletProvided:
@@ -367,8 +363,6 @@ def _sign_guarded_tx(args: Any, tx: Transaction) -> Transaction:
         tx.guardian_signature = bytes.fromhex(guardian_account.sign_transaction(tx))
     elif args.guardian:
         tx = cosign_transaction(tx, args.guardian_service_url, args.guardian_2fa_code)  # type: ignore
-
-    # tx.signature = signature
 
     return tx
 

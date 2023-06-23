@@ -86,13 +86,14 @@ def send_transaction(args: Any):
     args = utils.as_object(args)
 
     tx = load__transaction_from_file(args.infile)
+    output = CLIOutputBuilder()
 
     try:
         proxy = ProxyNetworkProvider(args.proxy)
         tx_hash = proxy.send_transaction(tx)
-        tx.hash = tx_hash
+        output.set_emitted_transaction_hash(tx_hash)
     finally:
-        output = CLIOutputBuilder().set_emitted_transaction(tx).build()
+        output.set_emitted_transaction(tx).build()
         utils.dump_out_json(output, outfile=args.outfile)
 
 
@@ -116,10 +117,6 @@ def sign_transaction(args: Any):
     if args.guardian:
         cli_shared.check_options_for_guarded_tx(tx.options)
 
-    # clear existing signatures, if any
-    # tx.guardianSignature = ""
-    # tx.signature = ""
-
     account = cli_shared.prepare_account(args)
     tx.signature = bytes.fromhex(account.sign_transaction(tx))
 
@@ -132,7 +129,5 @@ def sign_transaction(args: Any):
         tx.guardian_signature = bytes.fromhex(guardian_account.sign_transaction(tx))
     elif args.guardian:
         tx = cosign_transaction(tx, args.guardian_service_url, args.guardian_2fa_code)
-
-    # tx.signature = signature
 
     cli_shared.send_or_simulate(tx, args)

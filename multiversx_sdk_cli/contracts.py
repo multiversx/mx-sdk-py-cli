@@ -4,7 +4,7 @@ from typing import Any, List, Optional, Protocol, Sequence, Tuple
 
 from Cryptodome.Hash import keccak
 from multiversx_sdk_core import Address, Transaction, TransactionPayload
-from multiversx_sdk_network_providers.interface import IContractQuery
+from multiversx_sdk_network_providers.interface import IAddress, IContractQuery
 
 from multiversx_sdk_cli import config, constants, errors
 from multiversx_sdk_cli.accounts import Account, EmptyAddress
@@ -32,14 +32,14 @@ class QueryResult(Object):
 
 
 class ContractQuery(IContractQuery):
-    def __init__(self, address: Address, function: str, value: int, arguments: List[bytes], caller: Optional[Address] = None):
+    def __init__(self, address: IAddress, function: str, value: int, arguments: List[bytes], caller: Optional[IAddress] = None):
         self.contract = address
         self.function = function
         self.caller = caller
         self.value = value
         self.encoded_arguments = [item.hex() for item in arguments]
 
-    def get_contract(self) -> Address:
+    def get_contract(self) -> IAddress:
         return self.contract
 
     def get_function(self) -> str:
@@ -48,7 +48,7 @@ class ContractQuery(IContractQuery):
     def get_encoded_arguments(self) -> Sequence[str]:
         return self.encoded_arguments
 
-    def get_caller(self) -> Optional[Address]:
+    def get_caller(self) -> Optional[IAddress]:
         return self.caller
 
     def get_value(self) -> int:
@@ -62,7 +62,7 @@ class IContractQueryResponse(Protocol):
 
 
 class SmartContract:
-    def __init__(self, address: Optional[Address] = None, bytecode=None, metadata=None):
+    def __init__(self, address: Optional[IAddress] = EmptyAddress(), bytecode=None, metadata=None):
         self.address = address
         self.bytecode = bytecode
         self.metadata = metadata or CodeMetadata()
