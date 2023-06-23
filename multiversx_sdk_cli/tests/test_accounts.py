@@ -1,11 +1,10 @@
 from pathlib import Path
 
 import pytest
+from multiversx_sdk_core import Address, Transaction, TransactionPayload
 
 from multiversx_sdk_cli.accounts import Account
-from multiversx_sdk_cli.transactions import Transaction
 from multiversx_sdk_cli.constants import DEFAULT_HRP
-from multiversx_sdk_core import Address
 
 
 def test_address():
@@ -35,34 +34,35 @@ def test_sign_transaction():
     alice = Account(pem_file=str(alice_pem))
 
     # With data
-    transaction = Transaction()
-    transaction.nonce = 0
-    transaction.value = "0"
-    transaction.sender = "erd1l453hd0gt5gzdp7czpuall8ggt2dcv5zwmfdf3sd3lguxseux2fsmsgldz"
-    transaction.receiver = "erd188nydpkagtpwvfklkl2tn0w6g40zdxkwfgwpjqc2a2m2n7ne9g8q2t22sr"
-    transaction.gasPrice = 200000000000000
-    transaction.gasLimit = 500000000
-    transaction.data = "foo"
-    transaction.chainID = "chainID"
-    transaction.version = 1
-    transaction.signature = alice.sign_transaction(transaction)
+    transaction = Transaction(
+        chain_id="chainID",
+        sender=Address.from_bech32("erd1l453hd0gt5gzdp7czpuall8ggt2dcv5zwmfdf3sd3lguxseux2fsmsgldz"),
+        receiver=Address.from_bech32("erd188nydpkagtpwvfklkl2tn0w6g40zdxkwfgwpjqc2a2m2n7ne9g8q2t22sr"),
+        gas_limit=500000000,
+        gas_price=200000000000000,
+        nonce=0,
+        value=0,
+        data=TransactionPayload.from_str("foo"),
+        version=1
+    )
+    transaction.signature = bytes.fromhex(alice.sign_transaction(transaction))
 
-    assert "0e69f27e24aba2f3b7a8842dc7e7c085a0bfb5b29112b258318eed73de9c8809889756f8afaa74c7b3c7ce20a028b68ba90466a249aaf999a1a78dcf7f4eb40c" == transaction.signature
+    assert "0e69f27e24aba2f3b7a8842dc7e7c085a0bfb5b29112b258318eed73de9c8809889756f8afaa74c7b3c7ce20a028b68ba90466a249aaf999a1a78dcf7f4eb40c" == transaction.signature.hex()
 
     # Without data
-    transaction = Transaction()
-    transaction.nonce = 0
-    transaction.value = "0"
-    transaction.sender = "erd1l453hd0gt5gzdp7czpuall8ggt2dcv5zwmfdf3sd3lguxseux2fsmsgldz"
-    transaction.receiver = "erd188nydpkagtpwvfklkl2tn0w6g40zdxkwfgwpjqc2a2m2n7ne9g8q2t22sr"
-    transaction.gasPrice = 200000000000000
-    transaction.gasLimit = 500000000
-    transaction.data = ""
-    transaction.chainID = "chainID"
-    transaction.version = 1
-    transaction.signature = alice.sign_transaction(transaction)
+    transaction = Transaction(
+        chain_id="chainID",
+        sender=Address.from_bech32("erd1l453hd0gt5gzdp7czpuall8ggt2dcv5zwmfdf3sd3lguxseux2fsmsgldz"),
+        receiver=Address.from_bech32("erd188nydpkagtpwvfklkl2tn0w6g40zdxkwfgwpjqc2a2m2n7ne9g8q2t22sr"),
+        gas_limit=500000000,
+        gas_price=200000000000000,
+        nonce=0,
+        value=0,
+        version=1
+    )
+    transaction.signature = bytes.fromhex(alice.sign_transaction(transaction))
 
-    assert "83efd1bc35790ecc220b0ed6ddd1fcb44af6653dd74e37b3a49dcc1f002a1b98b6f79779192cca68bdfefd037bc81f4fa606628b751023122191f8c062362805" == transaction.signature
+    assert "83efd1bc35790ecc220b0ed6ddd1fcb44af6653dd74e37b3a49dcc1f002a1b98b6f79779192cca68bdfefd037bc81f4fa606628b751023122191f8c062362805" == transaction.signature.hex()
 
 
 def test_sign_message():
