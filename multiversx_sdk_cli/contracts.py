@@ -86,9 +86,11 @@ class SmartContract:
             value=value,
             data=self.prepare_deploy_transaction_data(arguments),
             version=version,
-            options=options,
-            guardian=Address.from_bech32(guardian)
+            options=options
         )
+
+        if guardian:
+            tx.guardian = Address.from_bech32(guardian)
 
         tx.signature = bytes.fromhex(owner.sign_transaction(tx))
         return tx
@@ -131,9 +133,11 @@ class SmartContract:
             value=value,
             data=self.prepare_execute_transaction_data(function, arguments),
             version=version,
-            options=options,
-            guardian=Address.from_bech32(guardian)
+            options=options
         )
+
+        if guardian:
+            tx.guardian = Address.from_bech32(guardian)
 
         tx.signature = bytes.fromhex(caller.sign_transaction(tx))
         return tx
@@ -165,9 +169,11 @@ class SmartContract:
             value=value,
             data=self.prepare_upgrade_transaction_data(arguments),
             version=version,
-            options=options,
-            guardian=Address.from_bech32(guardian)
+            options=options
         )
+
+        if guardian:
+            tx.guardian = Address.from_bech32(guardian)
 
         tx.signature = bytes.fromhex(owner.sign_transaction(tx))
         return tx

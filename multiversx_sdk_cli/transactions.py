@@ -2,15 +2,12 @@ import base64
 import json
 import logging
 import time
-from ast import arg
-from collections import OrderedDict
-from itertools import chain
-from typing import Any, Dict, List, Protocol, Sequence, TextIO, Tuple
+from typing import Any, Dict, List, Optional, Protocol, Sequence, TextIO, Tuple
 
 from multiversx_sdk_core import Address, Transaction, TransactionPayload
 
-from multiversx_sdk_cli import config, errors, utils
-from multiversx_sdk_cli.accounts import Account, EmptyAddress, LedgerAccount
+from multiversx_sdk_cli import errors
+from multiversx_sdk_cli.accounts import Account, LedgerAccount
 from multiversx_sdk_cli.cli_password import (load_guardian_password,
                                              load_password)
 from multiversx_sdk_cli.cosign_transaction import cosign_transaction
@@ -227,6 +224,7 @@ class INetworkProvider(Protocol):
 
 class JSONTransaction:
     def __init__(self) -> None:
+        self.hash = ""
         self.nonce = 0
         self.value = "0"
         self.receiver = ""
@@ -252,7 +250,7 @@ class BunchOfTransactions:
         self.transactions.append(transaction)
 
     def add(self, sender: Account, receiver_address: str, nonce: Any, value: Any, data: str, gas_price: int,
-            gas_limit: int, chain: str, version: int, options: int, guardian_address: str):
+            gas_limit: int, chain: str, version: int, options: int, guardian_address: Optional[str] = None):
         tx = Transaction(
             chain_id=chain,
             sender=sender.address,
@@ -264,8 +262,10 @@ class BunchOfTransactions:
             data=TransactionPayload.from_str(data),
             version=version,
             options=options,
-            guardian=Address.from_bech32(guardian_address)
         )
+
+        if guardian_address:
+            tx.guardian = Address.from_bech32(guardian_address)
 
         tx.signature = bytes.fromhex(sender.sign_transaction(tx))
         self.transactions.append(tx)
@@ -303,9 +303,11 @@ def do_prepare_transaction(args: Any) -> Transaction:
         nonce=int(args.nonce),
         value=int(args.value),
         version=int(args.version),
-        options=int(args.options),
-        guardian=Address.from_bech32(args.guardian)
+        options=int(args.options)
     )
+
+    if args.guardian:
+        tx.guardian = Address.from_bech32(args.guardian)
 
     tx.signature = bytes.fromhex(account.sign_transaction(tx))
     tx = sign_tx_by_guardian(args, tx)
@@ -387,6 +389,18 @@ def tx_to_dictionary_as_inner(tx: Transaction) -> Dict[str, Any]:
     return dictionary
 
 
+def _dict_to_json(dictionary: Dict[str, Any]) -> bytes:
+    serialized = json.dumps(dictionary, separators=(',', ':')).encode("utf8")
+    return serialized
+
+
+def serialize_as_inner(tx: Transaction) -> str:
+    inner_dictionary = tx_to_dictionary_as_inner(tx)
+    serialized = _dict_to_json(inner_dictionary)
+    serialized_hex = serialized.hex()
+    return f"relayedTx@{serialized_hex}"
+
+
 def load__transaction_from_file(f: TextIO) -> Transaction:
     data_json: bytes = f.read().encode()
     fields = json.loads(data_json).get("tx") or json.loads(data_json).get("emittedTransaction")
@@ -406,14 +420,20 @@ def load__transaction_from_file(f: TextIO) -> Transaction:
         data=TransactionPayload.from_encoded_str(instance.data),
         version=instance.version,
         options=instance.options,
-        guardian=Address.from_bech32(instance.guardian)
+        nonce=instance.nonce
     )
+
+    if instance.guardian:
+        loaded_tx.guardian = Address.from_bech32(instance.guardian)
 
     if instance.signature:
         loaded_tx.signature = bytes.fromhex(instance.signature)
 
     if instance.guardianSignature:
         loaded_tx.guardian_signature = bytes.fromhex(instance.guardianSignature)
+
+    if instance.hash:
+        loaded_tx.hash: str = instance.hash
 
     return loaded_tx
 
