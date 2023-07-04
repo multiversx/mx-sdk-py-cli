@@ -1,6 +1,5 @@
 import logging
 import os
-from email.policy import default
 from pathlib import Path
 from typing import Any, Dict, List
 

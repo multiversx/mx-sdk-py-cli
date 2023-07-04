@@ -70,6 +70,8 @@ class ProjectRust(Project):
             self.directory
         ]
 
+        self.decorate_cargo_args(args)
+
         return_code = subprocess.check_call(args, env=env, cwd=cwd)
         if return_code != 0:
             raise errors.BuildError(f"error code = {return_code}, see output")
