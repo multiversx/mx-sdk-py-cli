@@ -260,11 +260,7 @@ def create(args: Any):
 
 def get_project_paths(args: Any) -> List[Path]:
     base_path = Path(args.project)
-    if hasattr(args, "recursive"):
-        recursive = bool(args.recursive)
-    else:
-        recursive = False
-
+    recursive = bool(args.recursive)
     if recursive:
         return get_project_paths_recursively(base_path)
     return [base_path]
