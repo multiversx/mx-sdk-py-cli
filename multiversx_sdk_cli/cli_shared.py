@@ -3,6 +3,7 @@ import ast
 import copy
 import sys
 from argparse import FileType
+from pathlib import Path
 from typing import Any, Dict, List, Text, cast
 
 from multiversx_sdk_network_providers.proxy_network_provider import \
@@ -272,7 +273,10 @@ def prepare_forwarded_command_arguments(args: Any) -> List[str]:
 
     args_list: List[str] = []
     for key, val in args_dict.items():
-        modified_key = key.replace("_", "-")
+        if key == "path":
+            val = str(Path(val).resolve())
+
+        modified_key = "--" + key.replace("_", "-")
 
         if val:
             args_list.extend([modified_key, val])

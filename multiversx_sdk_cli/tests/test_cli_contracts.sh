@@ -24,23 +24,23 @@ testBuildContracts() {
     export TARGET_DIR=$(pwd)/${SANDBOX}/TARGET
     mkdir -p ${TARGET_DIR}
 
-    ${CLI} contract build ${SANDBOX}/myadder-rs --target-dir=${TARGET_DIR} || return 1
+    ${CLI} contract build --path=${SANDBOX}/myadder-rs --target-dir=${TARGET_DIR} || return 1
     assertFileExists ${SANDBOX}/myadder-rs/output/myadder-rs.wasm || return 1
     assertFileExists ${SANDBOX}/myadder-rs/output/myadder-rs.abi.json || return 1
 
-    ${CLI} contract build ${SANDBOX}/myfactorial-rs --target-dir=${TARGET_DIR} || return 1
+    ${CLI} contract build --path=${SANDBOX}/myfactorial-rs --target-dir=${TARGET_DIR} || return 1
     assertFileExists ${SANDBOX}/myfactorial-rs/output/myfactorial-rs.wasm || return 1
     assertFileExists ${SANDBOX}/myfactorial-rs/output/myfactorial-rs.abi.json || return 1
 
-    ${CLI} contract build ${SANDBOX}/mybubbles-rs --target-dir=${TARGET_DIR} || return 1
+    ${CLI} contract build --path=${SANDBOX}/mybubbles-rs --target-dir=${TARGET_DIR} || return 1
     assertFileExists ${SANDBOX}/mybubbles-rs/output/mybubbles-rs.wasm || return 1
     assertFileExists ${SANDBOX}/mybubbles-rs/output/mybubbles-rs.abi.json || return 1
 
-    ${CLI} contract build ${SANDBOX}/mylottery-rs --target-dir=${TARGET_DIR} || return 1
+    ${CLI} contract build --path=${SANDBOX}/mylottery-rs --target-dir=${TARGET_DIR} || return 1
     assertFileExists ${SANDBOX}/mylottery-rs/output/mylottery-rs.wasm || return 1
     assertFileExists ${SANDBOX}/mylottery-rs/output/mylottery-rs.abi.json || return 1
 
-    ${CLI} contract build ${SANDBOX}/myfunding-rs --target-dir=${TARGET_DIR} || return 1
+    ${CLI} contract build --path=${SANDBOX}/myfunding-rs --target-dir=${TARGET_DIR} || return 1
     assertFileExists ${SANDBOX}/myfunding-rs/output/myfunding-rs.wasm || return 1
     assertFileExists ${SANDBOX}/myfunding-rs/output/myfunding-rs.abi.json || return 1
 }
@@ -58,7 +58,7 @@ testWasmName() {
    
     ${CLI} contract clean ${SANDBOX}/myadder-rs
     assertFileDoesNotExist ${SANDBOX}/myadder-rs/output/myadder-2-rs.wasm || return 1
-    ${CLI} contract build ${SANDBOX}/myadder-rs --target-dir=${TARGET_DIR} --wasm-name myadder-2-rs || return 1
+    ${CLI} contract build --path=${SANDBOX}/myadder-rs --target-dir=${TARGET_DIR} --wasm-name myadder-2-rs || return 1
     assertFileExists ${SANDBOX}/myadder-rs/output/myadder-2-rs.wasm || return 1
     assertFileExists ${SANDBOX}/myadder-rs/output/myadder-rs.abi.json || return 1
 }

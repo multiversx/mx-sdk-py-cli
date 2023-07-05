@@ -40,7 +40,6 @@ def setup_parser(args: List[str], subparsers: Any) -> Any:
 
     sub = cli_shared.add_command_subparser(subparsers, "contract", "build",
                                            "Build a Smart Contract project using the appropriate buildchain.")
-    _add_project_arg(sub)
     _add_build_options_sc_meta(sub)
     sub.set_defaults(func=build)
 
@@ -175,6 +174,7 @@ def _add_project_arg(sub: Any):
 
 
 def _add_build_options_sc_meta(sub: Any):
+    sub.add_argument("--path", default=os.getcwd(), help="🗀 the project directory (default: current directory)")
     sub.add_argument("--no-wasm-opt", action="store_true", default=False,
                      help="do not optimize wasm files after the build (default: %(default)s)")
     sub.add_argument("--wasm-symbols", action="store_true", default=False,
@@ -277,21 +277,11 @@ def clean(args: Any):
 
 
 def build(args: Any):
-    project_paths = get_project_paths(args)
+    project_paths = [Path(args.path)]
     arg_list = cli_shared.prepare_forwarded_command_arguments(args)
-    _remove_project_arg(arg_list)
 
     for project in project_paths:
         projects.build_project(project, arg_list)
-
-
-# we forward the project path using the '--path` argument for sc-meta
-def _remove_project_arg(arg_list: List[str]):
-    project_index = arg_list.index("project")
-    arg_list.pop(project_index)
-
-    # pop the same index again to delete the project's path
-    arg_list.pop(project_index)
 
 
 def _prepare_build_options(args: Any) -> Dict[str, Any]:

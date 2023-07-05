@@ -65,9 +65,7 @@ class ProjectRust(Project):
         args = [
             "sc-meta",
             "all",
-            "build",
-            "--path",
-            self.directory
+            "build"
         ]
 
         args.extend(self.forwarded_args)
