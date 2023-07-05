@@ -70,60 +70,11 @@ class ProjectRust(Project):
             self.directory
         ]
 
-        self.decorate_cargo_args(args)
+        args.extend(self.forwarded_args)
 
         return_code = subprocess.check_call(args, env=env, cwd=cwd)
         if return_code != 0:
             raise errors.BuildError(f"error code = {return_code}, see output")
-
-    def decorate_cargo_args(self, args: List[str]):
-        target_dir: str = self.options.get("target-dir", "")
-        target_dir = self._ensure_cargo_target_dir(target_dir)
-        no_wasm_opt = self.options.get("no-wasm-opt")
-        wasm_symbols = self.options.get("wasm-symbols")
-        wasm_name = self.options.get("wasm-name")
-        wasm_suffix = self.options.get("wasm-suffix")
-        wat = self.options.get("wat")
-        mir = self.options.get("mir")
-        llvm_ir = self.options.get("llvm-ir")
-        ignore = self.options.get("ignore")
-        no_imports = self.options.get("no-imports")
-        no_abi_git_version = self.options.get("no-abi-git-version")
-        twiggy_top = self.options.get("twiggy-top")
-        twiggy_paths = self.options.get("twiggy-paths")
-        twiggy_monos = self.options.get("twiggy-monos")
-        twiggy_dominators = self.options.get("twiggy-dominators")
-
-        args.extend(["--target-dir", target_dir])
-
-        if ignore:
-            args.extend(["--ignore", ignore])
-        if no_wasm_opt:
-            args.extend(["--no-wasm-opt"])
-        if wasm_symbols:
-            args.extend(["--wasm-symbols"])
-        if wasm_name:
-            args.extend(["--wasm-name", wasm_name])
-        if wasm_suffix:
-            args.extend(["--wasm-suffix", wasm_suffix])
-        if wat:
-            args.extend(["--wat"])
-        if mir:
-            args.extend(["--mir"])
-        if llvm_ir:
-            args.extend(["--llvm-ir"])
-        if no_imports:
-            args.extend(["--no-imports"])
-        if no_abi_git_version:
-            args.extend(["--no-abi-git-version"])
-        if twiggy_top:
-            args.extend(["--twiggy-top"])
-        if twiggy_paths:
-            args.extend(["--twiggy-paths"])
-        if twiggy_monos:
-            args.extend(["--twiggy-monos"])
-        if twiggy_dominators:
-            args.extend(["--twiggy-dominators"])
 
     def _ensure_cargo_target_dir(self, target_dir: str):
         default_target_dir = str(workstation.get_tools_folder() / DEFAULT_CARGO_TARGET_DIR_NAME)

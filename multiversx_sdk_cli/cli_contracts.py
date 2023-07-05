@@ -175,7 +175,6 @@ def _add_project_arg(sub: Any):
 
 
 def _add_build_options_sc_meta(sub: Any):
-    sub.add_argument("--debug", action="store_true", default=False, help="set debug flag (default: %(default)s)")
     sub.add_argument("--no-wasm-opt", action="store_true", default=False,
                      help="do not optimize wasm files after the build (default: %(default)s)")
     sub.add_argument("--wasm-symbols", action="store_true", default=False,
@@ -279,32 +278,20 @@ def clean(args: Any):
 
 def build(args: Any):
     project_paths = get_project_paths(args)
-    options: Dict[str, Any] = _prepare_sc_meta_build_options(args)
+    arg_list = cli_shared.prepare_forwarded_command_arguments(args)
+    _remove_project_arg(arg_list)
 
     for project in project_paths:
-        projects.build_project(project, options)
+        projects.build_project(project, arg_list)
 
 
-def _prepare_sc_meta_build_options(args: Any) -> Dict[str, Any]:
-    return {
-        "debug": args.debug,
-        "no-wasm-opt": args.no_wasm_opt,
-        "target-dir": args.target_dir,
-        "wasm-symbols": args.wasm_symbols,
-        "wasm-name": args.wasm_name,
-        "wasm-suffix": args.wasm_suffix,
-        "target-dir": args.target_dir,
-        "wat": args.wat,
-        "mir": args.mir,
-        "llvm-ir": args.llvm_ir,
-        "ignore": args.ignore,
-        "no-imports": args.no_imports,
-        "no-abi-git-version": args.no_abi_git_version,
-        "twiggy-top": args.twiggy_top,
-        "twiggy-paths": args.twiggy_paths,
-        "twiggy-monos": args.twiggy_monos,
-        "twiggy-dominators": args.twiggy_dominators
-    }
+# we forward the project path using the '--path` argument for sc-meta
+def _remove_project_arg(arg_list: List[str]):
+    project_index = arg_list.index("project")
+    arg_list.pop(project_index)
+
+    # pop the same index again to delete the project's path
+    arg_list.pop(project_index)
 
 
 def _prepare_build_options(args: Any) -> Dict[str, Any]:
