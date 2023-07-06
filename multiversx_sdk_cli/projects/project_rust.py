@@ -53,7 +53,6 @@ class ProjectRust(Project):
         ])
 
     def run_meta(self):
-        cwd = self.get_meta_folder()
         env = self.get_env()
 
         with_wasm_opt = not self.options.get("no-wasm-opt")
@@ -70,7 +69,7 @@ class ProjectRust(Project):
 
         args.extend(self.forwarded_args)
 
-        return_code = subprocess.check_call(args, env=env, cwd=cwd)
+        return_code = subprocess.check_call(args, env=env)
         if return_code != 0:
             raise errors.BuildError(f"error code = {return_code}, see output")
 

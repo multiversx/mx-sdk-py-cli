@@ -273,9 +273,6 @@ def prepare_forwarded_command_arguments(args: Any) -> List[str]:
 
     args_list: List[str] = []
     for key, val in args_dict.items():
-        if key == "path":
-            val = str(Path(val).resolve())
-
         modified_key = "--" + key.replace("_", "-")
 
         if val:
