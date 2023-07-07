@@ -264,7 +264,7 @@ def check_if_sign_method_required(args: List[str], checked_method: str) -> bool:
     return True
 
 
-def prepare_forwarded_command_arguments(args: Any) -> List[str]:
+def convert_args_object_to_args_list(args: Any) -> List[str]:
     arguments = copy.deepcopy(args)
     args_dict: Dict[str, Any] = arguments.__dict__
 
@@ -274,6 +274,10 @@ def prepare_forwarded_command_arguments(args: Any) -> List[str]:
     args_list: List[str] = []
     for key, val in args_dict.items():
         modified_key = "--" + key.replace("_", "-")
+
+        if isinstance(val, bool) and val:
+            args_list.extend([modified_key])
+            continue
 
         if val:
             args_list.extend([modified_key, val])

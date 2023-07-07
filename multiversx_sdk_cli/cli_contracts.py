@@ -184,16 +184,16 @@ def _add_build_options_sc_meta(sub: Any):
     sub.add_argument("--wasm-suffix", type=str,
                      help="for rust projects, optionally specify the suffix of the wasm bytecode output file")
     sub.add_argument("--target-dir", type=str, help="for rust projects, forward the parameter to Cargo")
-    sub.add_argument("--wat", help="also generate a WAT file when building", default=False)
-    sub.add_argument("--mir", help="also emit MIR files when building", default=False)
-    sub.add_argument("--llvm-ir", help="also emit LL (LLVM) files when building", default=False)
+    sub.add_argument("--wat", action="store_true", default=False, action="store_true", default=False, help="also generate a WAT file when building", default=False)
+    sub.add_argument("--mir", action="store_true", default=False, help="also emit MIR files when building", default=False)
+    sub.add_argument("--llvm-ir", action="store_true", default=False, help="also emit LL (LLVM) files when building", default=False)
     sub.add_argument("--ignore", help="ignore all directories with these names. [default: target]")
-    sub.add_argument("--no-imports", help="skips extracting the EI imports after building the contracts")
-    sub.add_argument("--no-abi-git-version", help="skips loading the Git version into the ABI")
-    sub.add_argument("--twiggy-top", help="generate a twiggy top report after building")
-    sub.add_argument("--twiggy-paths", help="generate a twiggy paths report after building")
-    sub.add_argument("--twiggy-monos", help="generate a twiggy monos report after building")
-    sub.add_argument("--twiggy-dominators", help="generate a twiggy dominators report after building")
+    sub.add_argument("--no-imports", action="store_true", default=False, help="skips extracting the EI imports after building the contracts")
+    sub.add_argument("--no-abi-git-version", action="store_true", default=False, help="skips loading the Git version into the ABI")
+    sub.add_argument("--twiggy-top", action="store_true", default=False, help="generate a twiggy top report after building")
+    sub.add_argument("--twiggy-paths", action="store_true", default=False, help="generate a twiggy paths report after building")
+    sub.add_argument("--twiggy-monos", action="store_true", default=False, help="generate a twiggy monos report after building")
+    sub.add_argument("--twiggy-dominators", action="store_true", default=False, help="generate a twiggy dominators report after building")
 
 
 def _add_build_options_args(sub: Any):
@@ -274,7 +274,7 @@ def clean(args: Any):
 
 def build(args: Any):
     project_paths = [Path(args.path)]
-    arg_list = cli_shared.prepare_forwarded_command_arguments(args)
+    arg_list = cli_shared.convert_args_object_to_args_list(args)
 
     for project in project_paths:
         projects.build_project(project, arg_list)
