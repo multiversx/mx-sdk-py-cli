@@ -184,9 +184,9 @@ def _add_build_options_sc_meta(sub: Any):
     sub.add_argument("--wasm-suffix", type=str,
                      help="for rust projects, optionally specify the suffix of the wasm bytecode output file")
     sub.add_argument("--target-dir", type=str, help="for rust projects, forward the parameter to Cargo")
-    sub.add_argument("--wat", action="store_true", default=False, action="store_true", default=False, help="also generate a WAT file when building", default=False)
-    sub.add_argument("--mir", action="store_true", default=False, help="also emit MIR files when building", default=False)
-    sub.add_argument("--llvm-ir", action="store_true", default=False, help="also emit LL (LLVM) files when building", default=False)
+    sub.add_argument("--wat", action="store_true", action="store_true", help="also generate a WAT file when building", default=False)
+    sub.add_argument("--mir", action="store_true", help="also emit MIR files when building", default=False)
+    sub.add_argument("--llvm-ir", action="store_true", help="also emit LL (LLVM) files when building", default=False)
     sub.add_argument("--ignore", help="ignore all directories with these names. [default: target]")
     sub.add_argument("--no-imports", action="store_true", default=False, help="skips extracting the EI imports after building the contracts")
     sub.add_argument("--no-abi-git-version", action="store_true", default=False, help="skips loading the Git version into the ABI")
