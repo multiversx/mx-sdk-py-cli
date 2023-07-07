@@ -13,11 +13,11 @@ from multiversx_sdk_cli.cli_password import load_password
 from multiversx_sdk_cli.contract_verification import \
     trigger_contract_verification
 from multiversx_sdk_cli.contracts import CodeMetadata, SmartContract
+from multiversx_sdk_cli.cosign_transaction import cosign_transaction
 from multiversx_sdk_cli.docker import is_docker_installed, run_docker
 from multiversx_sdk_cli.errors import DockerMissingError, NoWalletProvided
 from multiversx_sdk_cli.projects.core import get_project_paths_recursively
 from multiversx_sdk_cli.transactions import Transaction
-from multiversx_sdk_cli.cosign_transaction import cosign_transaction
 
 logger = logging.getLogger("cli.contracts")
 
@@ -40,9 +40,7 @@ def setup_parser(args: List[str], subparsers: Any) -> Any:
 
     sub = cli_shared.add_command_subparser(subparsers, "contract", "build",
                                            "Build a Smart Contract project using the appropriate buildchain.")
-    _add_project_arg(sub)
-    _add_recursive_arg(sub)
-    _add_build_options_args(sub)
+    _add_build_options_sc_meta(sub)
     sub.set_defaults(func=build)
 
     sub = cli_shared.add_command_subparser(subparsers, "contract", "clean", "Clean a Smart Contract project.")
@@ -175,6 +173,29 @@ def _add_project_arg(sub: Any):
                      help="🗀 the project directory (default: current directory)")
 
 
+def _add_build_options_sc_meta(sub: Any):
+    sub.add_argument("--path", default=os.getcwd(), help="🗀 the project directory (default: current directory)")
+    sub.add_argument("--no-wasm-opt", action="store_true", default=False,
+                     help="do not optimize wasm files after the build (default: %(default)s)")
+    sub.add_argument("--wasm-symbols", action="store_true", default=False,
+                     help="for rust projects, does not strip the symbols from the wasm output. Useful for analysing the bytecode. Creates larger wasm files. Avoid in production (default: %(default)s)")
+    sub.add_argument("--wasm-name", type=str,
+                     help="for rust projects, optionally specify the name of the wasm bytecode output file")
+    sub.add_argument("--wasm-suffix", type=str,
+                     help="for rust projects, optionally specify the suffix of the wasm bytecode output file")
+    sub.add_argument("--target-dir", type=str, help="for rust projects, forward the parameter to Cargo")
+    sub.add_argument("--wat", action="store_true", help="also generate a WAT file when building", default=False)
+    sub.add_argument("--mir", action="store_true", help="also emit MIR files when building", default=False)
+    sub.add_argument("--llvm-ir", action="store_true", help="also emit LL (LLVM) files when building", default=False)
+    sub.add_argument("--ignore", help="ignore all directories with these names. [default: target]")
+    sub.add_argument("--no-imports", action="store_true", default=False, help="skips extracting the EI imports after building the contracts")
+    sub.add_argument("--no-abi-git-version", action="store_true", default=False, help="skips loading the Git version into the ABI")
+    sub.add_argument("--twiggy-top", action="store_true", default=False, help="generate a twiggy top report after building")
+    sub.add_argument("--twiggy-paths", action="store_true", default=False, help="generate a twiggy paths report after building")
+    sub.add_argument("--twiggy-monos", action="store_true", default=False, help="generate a twiggy monos report after building")
+    sub.add_argument("--twiggy-dominators", action="store_true", default=False, help="generate a twiggy dominators report after building")
+
+
 def _add_build_options_args(sub: Any):
     sub.add_argument("--debug", action="store_true", default=False, help="set debug flag (default: %(default)s)")
     sub.add_argument("--no-optimization", action="store_true", default=False,
@@ -252,11 +273,11 @@ def clean(args: Any):
 
 
 def build(args: Any):
-    project_paths = get_project_paths(args)
-    options: Dict[str, Any] = _prepare_build_options(args)
+    project_paths = [Path(args.path)]
+    arg_list = cli_shared.convert_args_object_to_args_list(args)
 
     for project in project_paths:
-        projects.build_project(project, options)
+        projects.build_project(project, arg_list)
 
 
 def _prepare_build_options(args: Any) -> Dict[str, Any]:

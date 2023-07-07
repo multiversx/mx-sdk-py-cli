@@ -1,8 +1,10 @@
 import argparse
 import ast
+import copy
 import sys
 from argparse import FileType
-from typing import Any, List, Text, cast
+from pathlib import Path
+from typing import Any, Dict, List, Text, cast
 
 from multiversx_sdk_network_providers.proxy_network_provider import \
     ProxyNetworkProvider
@@ -10,11 +12,12 @@ from multiversx_sdk_network_providers.proxy_network_provider import \
 from multiversx_sdk_cli import config, errors, utils
 from multiversx_sdk_cli.accounts import Account
 from multiversx_sdk_cli.cli_output import CLIOutputBuilder
-from multiversx_sdk_cli.cli_password import load_password, load_guardian_password
+from multiversx_sdk_cli.cli_password import (load_guardian_password,
+                                             load_password)
+from multiversx_sdk_cli.constants import TRANSACTION_OPTIONS_TX_GUARDED
 from multiversx_sdk_cli.ledger.ledger_functions import do_get_ledger_address
 from multiversx_sdk_cli.simulation import Simulator
 from multiversx_sdk_cli.transactions import Transaction
-from multiversx_sdk_cli.constants import TRANSACTION_OPTIONS_TX_GUARDED
 
 
 def wider_help_formatter(prog: Text):
@@ -259,3 +262,24 @@ def check_if_sign_method_required(args: List[str], checked_method: str) -> bool:
             return False
 
     return True
+
+
+def convert_args_object_to_args_list(args: Any) -> List[str]:
+    arguments = copy.deepcopy(args)
+    args_dict: Dict[str, Any] = arguments.__dict__
+
+    # delete the function key because we don't need to pass it along
+    args_dict.pop("func")
+
+    args_list: List[str] = []
+    for key, val in args_dict.items():
+        modified_key = "--" + key.replace("_", "-")
+
+        if isinstance(val, bool) and val:
+            args_list.extend([modified_key])
+            continue
+
+        if val:
+            args_list.extend([modified_key, val])
+
+    return args_list
