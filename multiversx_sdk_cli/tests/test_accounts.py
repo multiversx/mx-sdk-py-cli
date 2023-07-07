@@ -4,30 +4,6 @@ import pytest
 
 from multiversx_sdk_cli.accounts import Account
 from multiversx_sdk_cli.transactions import Transaction
-from multiversx_sdk_cli.constants import DEFAULT_HRP
-from multiversx_sdk_core import Address
-
-
-def test_address():
-    address = Address.from_bech32("erd1l453hd0gt5gzdp7czpuall8ggt2dcv5zwmfdf3sd3lguxseux2fsmsgldz")
-    address_cloned = Address.from_bech32(address.bech32())
-    assert "fd691bb5e85d102687d81079dffce842d4dc328276d2d4c60d8fd1c3433c3293" == address.hex()
-    assert "erd1l453hd0gt5gzdp7czpuall8ggt2dcv5zwmfdf3sd3lguxseux2fsmsgldz" == address.bech32()
-    assert address.hex() == address_cloned.hex()
-    assert address.bech32() == address_cloned.bech32()
-
-    address = Address.from_hex("fd691bb5e85d102687d81079dffce842d4dc328276d2d4c60d8fd1c3433c3293", DEFAULT_HRP)
-    address_cloned = Address.from_bech32(address.bech32())
-    assert "fd691bb5e85d102687d81079dffce842d4dc328276d2d4c60d8fd1c3433c3293" == address.hex()
-    assert "erd1l453hd0gt5gzdp7czpuall8ggt2dcv5zwmfdf3sd3lguxseux2fsmsgldz" == address.bech32()
-    assert address.hex() == address_cloned.hex()
-    assert address.bech32() == address_cloned.bech32()
-
-    with pytest.raises(Exception):
-        address = Address(b"", DEFAULT_HRP)
-
-    with pytest.raises(Exception):
-        address = Address.from_bech32("bad")
 
 
 def test_sign_transaction():

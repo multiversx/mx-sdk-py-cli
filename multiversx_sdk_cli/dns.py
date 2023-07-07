@@ -1,7 +1,7 @@
 from typing import Any, List, Protocol
 
 from Cryptodome.Hash import keccak
-from multiversx_sdk_core import Address
+from multiversx_sdk_core.address import Address, compute_contract_address
 
 from multiversx_sdk_cli import cli_shared, utils
 from multiversx_sdk_cli.accounts import Account
@@ -98,7 +98,7 @@ def compute_dns_address_for_shard_id(shard_id: int) -> Address:
     # This might change in the future.
     contract = SmartContract()
     contract.owner = deployer
-    contract.compute_address()
+    contract.address = compute_contract_address(contract.owner.address, contract.owner.nonce, DEFAULT_HRP)
     return contract.address
 
 

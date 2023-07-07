@@ -199,8 +199,8 @@ class Transaction(ITransaction):
     # Creates the payload for a "user" / "inner" transaction
     def to_dictionary_as_inner(self) -> Dict[str, Any]:
         dictionary = self.to_dictionary()
-        dictionary["receiver"] = base64.b64encode(bytes.fromhex(Address.from_bech32(self.receiver).hex())).decode()
-        dictionary["sender"] = base64.b64encode(bytes.fromhex(Address.from_bech32(self.sender).hex())).decode()
+        dictionary["receiver"] = base64.b64encode(Address.from_bech32(self.receiver).pubkey).decode()
+        dictionary["sender"] = base64.b64encode(Address.from_bech32(self.sender).pubkey).decode()
         dictionary["chainID"] = base64.b64encode(self.chainID.encode()).decode()
         dictionary["signature"] = base64.b64encode(bytes(bytearray.fromhex(self.signature))).decode()
         dictionary["value"] = int(self.value)
