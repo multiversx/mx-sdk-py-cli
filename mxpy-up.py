@@ -40,7 +40,6 @@ Windows support is limited and experimental.
 
     guard_non_root_user()
     guard_python_version()
-    migrate_old_elrondsdk()
     migrate_v6(interactive)
 
     # In case of a fresh install:
@@ -95,74 +94,6 @@ def get_operating_system():
         raise InstallError(f"Unknown platform: {sys.platform}")
 
     return operating_system
-
-
-def migrate_old_elrondsdk() -> None:
-    old_sdk_path = Path("~/elrondsdk").expanduser().resolve()
-    if not old_sdk_path.exists():
-        logger.info("Old SDK path does not exist.")
-        return
-
-    old_sdk_path.rename(sdk_path)
-    logger.info(f"Renamed {old_sdk_path} to {sdk_path}.")
-
-    # Remove erdpy-venv (since mxpy-venv is used instead).
-    old_venv = sdk_path / "erdpy-venv"
-    try:
-        shutil.rmtree(old_venv)
-        logger.info("Removed old virtual environment.")
-    except FileNotFoundError:
-        logger.info("Old virtual environment does not exist.")
-
-    # Remove "erdpy-activate", since it is not recommended anymore when writing Python scripts.
-    # The multiversx-sdk-* libraries should be used instead for writing Python scripts and modules that interact with the Network
-    # (according to the official cookbook).
-    old_erdpy_activate = sdk_path / "erdpy-activate"
-    try:
-        old_erdpy_activate.unlink()
-        logger.info("Removed old erdpy-activate.")
-    except FileNotFoundError:
-        logger.info("Old erdpy-activate does not exist.")
-
-    # Remove old erdpy symlink.
-    old_erdpy = sdk_path / "erdpy"
-    try:
-        old_erdpy.unlink()
-        logger.info("Removed old erdpy symlink.")
-    except FileNotFoundError:
-        logger.info("Old erdpy symlink does not exist.")
-
-    # Rename the global config file.
-    # We won't handle local config files, they have to be migrated manually.
-    old_config_path = sdk_path / "erdpy.json"
-    new_config_path = sdk_path / "mxpy.json"
-    if old_config_path.exists():
-        old_config_path.rename(new_config_path)
-        logger.info(f"Renamed {old_config_path} to {new_config_path}.")
-    else:
-        logger.info(f"Old config path does not exist: {old_config_path}.")
-
-    # Remove vmtools, if exists. Has to be re-downloaded, and re-compiled (libwasmer-related issues will arise otherwise).
-    old_vmtools = sdk_path / "vmtools"
-    try:
-        shutil.rmtree(old_vmtools)
-        logger.warning("Removed old vmtools.")
-        logger.warning("You have to re-download vmtools using [mxpy deps install vmtools].")
-    except FileNotFoundError:
-        logger.info("Old vmtools does not exist.")
-
-    # Fix existing symlinks.
-    old_testwallets_link = sdk_path / "testwallets" / "latest"
-    new_testwallets_link = sdk_path / "testwallets" / "latest"
-
-    try:
-        old_target = os.readlink(old_testwallets_link)
-        new_target = old_target.replace("elrondsdk", "multiversx-sdk")
-        old_testwallets_link.unlink()
-        os.symlink(new_target, str(new_testwallets_link))
-        logger.info("Fixed old testwallets symlink.")
-    except FileNotFoundError:
-        logger.info("Old testwallets symlink does not exist.")
 
 
 def migrate_v6(interactive: bool):
@@ -286,13 +217,10 @@ def run_in_venv(args: List[str], venv_path: Path):
 
 def run_post_install_checks():
     multiversx_sdk_path = Path("~/multiversx-sdk").expanduser()
-    elrond_sdk_path = Path("~/elrondsdk").expanduser()
 
     logger.info("Running post-install checks...")
     print("~/multiversx-sdk exists", "OK" if multiversx_sdk_path.exists() else "NOK")
-    print("~/elrondsdk is removed or missing", "OK" if not elrond_sdk_path.exists() else "NOK")
     print("~/multiversx-sdk/mxpy shortcut created", "OK" if (multiversx_sdk_path / "mxpy").exists() else "NOK")
-    print("~/multiversx-sdk/erdpy.json is renamed or missing", "OK" if not (multiversx_sdk_path / "erdpy.json").exists() else "NOK")
 
 
 def guide_system_path_integration():

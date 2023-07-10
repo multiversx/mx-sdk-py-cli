@@ -1,4 +1,6 @@
-from multiversx_sdk_cli.accounts import Address
+from multiversx_sdk_core.address import Address, compute_contract_address
+
+from multiversx_sdk_cli.constants import DEFAULT_HRP
 from multiversx_sdk_cli.contracts import SmartContract
 from multiversx_sdk_cli.localnet import wallets
 
@@ -12,7 +14,7 @@ def get_delegation_address() -> Address:
     contract = SmartContract()
     contract.owner = get_owner_of_genesis_contracts()
     contract.owner.nonce = 0
-    contract.compute_address()
+    contract.address = compute_contract_address(contract.owner.address, contract.owner.nonce, DEFAULT_HRP)
     return contract.address
 
 

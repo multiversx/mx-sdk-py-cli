@@ -21,9 +21,9 @@ class Project(IProject):
         self.path = directory.expanduser().resolve()
         self.directory = str(self.path)
 
-    def build(self, options: Union[Dict[str, Any], None] = None) -> List[Path]:
+    def build(self, args: List[str], options: Union[Dict[str, Any], None] = None) -> List[Path]:
         migrate_project_config_file(self.path)
-
+        self.forwarded_args = args
         self.options = options or dict()
         self.debug = self.options.get("debug", False)
         self._ensure_dependencies_installed()

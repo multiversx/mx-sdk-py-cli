@@ -6,7 +6,7 @@ from multiversx_sdk_network_providers.proxy_network_provider import \
 from prettytable import PrettyTable
 
 from multiversx_sdk_cli import cli_shared
-from multiversx_sdk_cli.constants import ADDRESS_ZERO
+from multiversx_sdk_cli.constants import ADDRESS_ZERO_BECH32
 from multiversx_sdk_cli.dns import (compute_dns_address_for_shard_id,
                                     dns_address_for_name, name_hash, register,
                                     registration_cost, resolve, validate_name,
@@ -74,7 +74,7 @@ def _add_name_arg(sub: Any):
 
 def dns_resolve(args: Any):
     addr = resolve(args.name, ProxyNetworkProvider(args.proxy))
-    if addr.hex() != Address.from_bech32(ADDRESS_ZERO).hex():
+    if addr.hex() != Address.from_bech32(ADDRESS_ZERO_BECH32).hex():
         print(addr.bech32())
 
 

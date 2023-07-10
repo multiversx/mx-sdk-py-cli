@@ -2,13 +2,13 @@ import base64
 import logging
 from typing import Any, List, Optional, Protocol, Sequence, Tuple
 
-from Cryptodome.Hash import keccak
-from multiversx_sdk_core import Address, Transaction, TransactionPayload
+from multiversx_sdk_core import Transaction, TransactionPayload
+from multiversx_sdk_core.address import Address, compute_contract_address
 from multiversx_sdk_network_providers.interface import IAddress, IContractQuery
 
 from multiversx_sdk_cli import config, constants, errors
 from multiversx_sdk_cli.accounts import Account, EmptyAddress
-from multiversx_sdk_cli.constants import ADDRESS_ZERO, DEFAULT_HRP
+from multiversx_sdk_cli.constants import ADDRESS_ZERO_BECH32, DEFAULT_HRP
 from multiversx_sdk_cli.utils import Object
 
 logger = logging.getLogger("contracts")
@@ -69,7 +69,7 @@ class SmartContract:
 
     def deploy(self, owner: Account, arguments: List[Any], gas_price: int, gas_limit: int, value: int, chain: str, version: int, guardian: str, options: int) -> Transaction:
         self.owner = owner
-        self.compute_address()
+        self.address = compute_contract_address(self.owner.address, self.owner.nonce, DEFAULT_HRP)
 
         arguments = arguments or []
         gas_price = int(gas_price)
@@ -79,7 +79,7 @@ class SmartContract:
         tx = Transaction(
             chain_id=chain,
             sender=owner.address,
-            receiver=Address.from_bech32(ADDRESS_ZERO),
+            receiver=Address.from_bech32(ADDRESS_ZERO_BECH32),
             gas_limit=gas_limit,
             gas_price=gas_price,
             nonce=owner.nonce,
@@ -101,18 +101,7 @@ class SmartContract:
         for arg in arguments:
             tx_data += f"@{_prepare_argument(arg)}"
 
-        return TransactionPayload.from_str(tx_data)
-
-    def compute_address(self):
-        """
-        8 bytes of zero + 2 bytes for VM type + 20 bytes of hash(owner) + 2 bytes of shard(owner)
-        """
-        owner_bytes = bytes.fromhex(self.owner.address.hex())
-        nonce_bytes = self.owner.nonce.to_bytes(8, byteorder="little")
-        bytes_to_hash = owner_bytes + nonce_bytes
-        address = keccak.new(digest_bits=256).update(bytes_to_hash).digest()
-        address = bytes([0] * 8) + bytes([5, 0]) + address[10:30] + owner_bytes[30:]
-        self.address = Address(address, DEFAULT_HRP)
+        return tx_data
 
     def execute(self, caller: Account, function: str, arguments: List[str], gas_price: int, gas_limit: int, value: int, chain: str, version: int, guardian: str, options: int) -> Transaction:
         self.caller = caller

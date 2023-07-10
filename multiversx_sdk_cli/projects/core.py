@@ -30,15 +30,14 @@ def load_project(directory: Path) -> Project:
         raise errors.NotSupportedProject(str(directory))
 
 
-def build_project(directory: Path, options: Dict[str, Any]):
+def build_project(directory: Path, args: List[str]):
     directory = directory.expanduser()
 
     logger.info("build_project.directory: %s", directory)
-    logger.info("build_project.debug: %s", options['debug'])
 
     guards.is_directory(directory)
     project = load_project(directory)
-    outputs = project.build(options)
+    outputs = project.build(args)
     logger.info("Build ran.")
     for output_wasm_file in outputs:
         logger.info(f"WASM file generated: {output_wasm_file}")
