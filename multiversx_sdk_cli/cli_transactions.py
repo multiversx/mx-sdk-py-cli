@@ -9,7 +9,7 @@ from multiversx_sdk_cli.cli_output import CLIOutputBuilder
 from multiversx_sdk_cli.cosign_transaction import cosign_transaction
 from multiversx_sdk_cli.errors import NoWalletProvided
 from multiversx_sdk_cli.transactions import (do_prepare_transaction,
-                                             load__transaction_from_file,
+                                             load_transaction_from_file,
                                              serialize_as_inner)
 
 
@@ -85,7 +85,7 @@ def create_transaction(args: Any):
 def send_transaction(args: Any):
     args = utils.as_object(args)
 
-    tx = load__transaction_from_file(args.infile)
+    tx = load_transaction_from_file(args.infile)
     output = CLIOutputBuilder()
 
     try:
@@ -93,7 +93,7 @@ def send_transaction(args: Any):
         tx_hash = proxy.send_transaction(tx)
         output.set_emitted_transaction_hash(tx_hash)
     finally:
-        output.set_emitted_transaction(tx).build()
+        output = output.set_emitted_transaction(tx).build()
         utils.dump_out_json(output, outfile=args.outfile)
 
 
@@ -113,7 +113,7 @@ def sign_transaction(args: Any):
     cli_shared.check_guardian_args(args)
     cli_shared.check_broadcast_args(args)
 
-    tx = load__transaction_from_file(args.infile)
+    tx = load_transaction_from_file(args.infile)
     if args.guardian:
         cli_shared.check_options_for_guarded_tx(tx.options)
 

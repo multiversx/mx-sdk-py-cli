@@ -188,7 +188,7 @@ def _send_transaction_and_wait_for_result(proxy: INetworkProvider, payload: ITra
 
 def tx_to_dictionary_as_inner(tx: Transaction) -> Dict[str, Any]:
     dictionary = tx.to_dictionary()
-    dictionary["receiver"] = base64.b64encode(tx.receiver.hex()).decode()  # type: ignore
+    dictionary["receiver"] = base64.b64encode(bytes.fromhex(tx.receiver.hex())).decode()  # type: ignore
     dictionary["sender"] = base64.b64encode(bytes.fromhex(tx.sender.hex())).decode()  # type: ignore
     dictionary["chainID"] = base64.b64encode(tx.chainID.encode()).decode()
     dictionary["signature"] = base64.b64encode(bytes(bytearray(tx.signature))).decode()
@@ -209,7 +209,7 @@ def serialize_as_inner(tx: Transaction) -> str:
     return f"relayedTx@{serialized_hex}"
 
 
-def load__transaction_from_file(f: TextIO) -> Transaction:
+def load_transaction_from_file(f: TextIO) -> Transaction:
     data_json: bytes = f.read().encode()
     fields = json.loads(data_json).get("tx") or json.loads(data_json).get("emittedTransaction")
 
