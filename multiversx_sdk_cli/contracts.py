@@ -101,7 +101,7 @@ class SmartContract:
         for arg in arguments:
             tx_data += f"@{_prepare_argument(arg)}"
 
-        return tx_data
+        return TransactionPayload.from_str(tx_data)
 
     def execute(self, caller: Account, function: str, arguments: List[str], gas_price: int, gas_limit: int, value: int, chain: str, version: int, guardian: str, options: int) -> Transaction:
         self.caller = caller
