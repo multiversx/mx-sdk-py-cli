@@ -2,7 +2,7 @@ import base64
 import json
 import logging
 import time
-from typing import Any, Dict, List, Optional, Protocol, Sequence, TextIO, Tuple
+from typing import Any, Dict, Protocol, Sequence, TextIO, Tuple
 
 from multiversx_sdk_core import Address, Transaction, TransactionPayload
 
@@ -55,45 +55,6 @@ class JSONTransaction:
         self.signature = ""
         self.guardian = ""
         self.guardianSignature = ""
-
-
-class BunchOfTransactions:
-    def __init__(self):
-        self.transactions: List[Transaction] = []
-
-    def add_prepared(self, transaction: Transaction):
-        self.transactions.append(transaction)
-
-    def add(self, sender: Account, receiver_address: str, nonce: Any, value: Any, data: str, gas_price: int,
-            gas_limit: int, chain: str, version: int, options: int, guardian_address: Optional[str] = None):
-        tx = Transaction(
-            chain_id=chain,
-            sender=sender.address,
-            receiver=Address.from_bech32(receiver_address),
-            gas_limit=gas_limit,
-            gas_price=gas_price,
-            nonce=nonce,
-            value=value,
-            data=TransactionPayload.from_str(data),
-            version=version,
-            options=options,
-        )
-
-        if guardian_address:
-            tx.guardian = Address.from_bech32(guardian_address)
-
-        tx.signature = bytes.fromhex(sender.sign_transaction(tx))
-        self.transactions.append(tx)
-
-    def add_tx(self, tx: Transaction):  # duplicated; same as `add_prepared()`
-        self.transactions.append(tx)
-
-    def send(self, proxy: INetworkProvider):
-        logger.info(f"BunchOfTransactions.send: {len(self.transactions)} transactions")
-        num_sent, hashes = proxy.send_transactions(self.transactions)
-        logger.info(f"Sent: {num_sent}")
-        logger.info(f"TxsHashes: {hashes}")
-        return num_sent, hashes
 
 
 def do_prepare_transaction(args: Any) -> Transaction:
