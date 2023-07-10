@@ -248,7 +248,7 @@ def breakpoint():
     debugpy.breakpoint()
 
 
-def log_explorer(chain, name, path, details):
+def log_explorer(chain: str, name: str, path: str, details: str):
     networks = {
         "1": ("MultiversX Mainnet Explorer", "https://explorer.multiversx.com"),
         "T": ("MultiversX Testnet Explorer", "https://testnet-explorer.multiversx.com"),
@@ -261,9 +261,9 @@ def log_explorer(chain, name, path, details):
         return
 
 
-def log_explorer_contract_address(chain, address):
+def log_explorer_contract_address(chain: str, address: str):
     log_explorer(chain, "contract address", "accounts", address)
 
 
-def log_explorer_transaction(chain, transaction_hash):
+def log_explorer_transaction(chain: str, transaction_hash: str):
     log_explorer(chain, "transaction", "transactions", transaction_hash)

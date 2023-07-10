@@ -2,7 +2,7 @@ import binascii
 from pathlib import Path
 from typing import Any
 
-from multiversx_sdk_core import ArbitraryMessage
+from multiversx_sdk_core import Address, ArbitraryMessage
 from multiversx_sdk_wallet.validator_pem import ValidatorPEM
 from multiversx_sdk_wallet.validator_signer import ValidatorSigner
 
@@ -35,7 +35,7 @@ def prepare_args_for_add_nodes(args: Any):
 
     # TODO: Refactor, so that only address is received here.
     if args.using_delegation_manager:
-        account = Account(address=args.delegation_contract)
+        account = Account(address=Address.from_bech32(args.delegation_contract))
     elif args.pem:
         account = Account(pem_file=args.pem)
     elif args.keyfile:

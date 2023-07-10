@@ -5,12 +5,15 @@ import time
 from collections import OrderedDict
 from typing import Any, Dict, List, Protocol, Sequence, TextIO, Tuple
 
+from multiversx_sdk_core import Address
+
 from multiversx_sdk_cli import config, errors, utils
-from multiversx_sdk_cli.accounts import Account, Address, LedgerAccount
-from multiversx_sdk_cli.cli_password import load_password, load_guardian_password
+from multiversx_sdk_cli.accounts import Account, LedgerAccount
+from multiversx_sdk_cli.cli_password import (load_guardian_password,
+                                             load_password)
+from multiversx_sdk_cli.cosign_transaction import cosign_transaction
 from multiversx_sdk_cli.errors import NoWalletProvided
 from multiversx_sdk_cli.interfaces import ITransaction
-from multiversx_sdk_cli.cosign_transaction import cosign_transaction
 from multiversx_sdk_cli.ledger.ledger_functions import do_get_ledger_address
 
 logger = logging.getLogger("transactions")
@@ -196,8 +199,8 @@ class Transaction(ITransaction):
     # Creates the payload for a "user" / "inner" transaction
     def to_dictionary_as_inner(self) -> Dict[str, Any]:
         dictionary = self.to_dictionary()
-        dictionary["receiver"] = base64.b64encode(Address(self.receiver).pubkey()).decode()
-        dictionary["sender"] = base64.b64encode(Address(self.sender).pubkey()).decode()
+        dictionary["receiver"] = base64.b64encode(Address.from_bech32(self.receiver).pubkey).decode()
+        dictionary["sender"] = base64.b64encode(Address.from_bech32(self.sender).pubkey).decode()
         dictionary["chainID"] = base64.b64encode(self.chainID.encode()).decode()
         dictionary["signature"] = base64.b64encode(bytes(bytearray.fromhex(self.signature))).decode()
         dictionary["value"] = int(self.value)
@@ -315,7 +318,7 @@ def get_guardian_account_from_args(args: Any):
         account = Account(key_file=args.guardian_keyfile, password=password)
     elif args.guardian_ledger:
         address = do_get_ledger_address(account_index=args.guardian_ledger_account_index, address_index=args.guardian_ledger_address_index)
-        account = Account(address=address)
+        account = Account(address=Address.from_bech32(address))
     else:
         raise errors.NoWalletProvided()
 

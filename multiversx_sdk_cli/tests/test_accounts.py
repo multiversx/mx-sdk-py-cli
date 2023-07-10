@@ -2,36 +2,8 @@ from pathlib import Path
 
 import pytest
 
-from multiversx_sdk_cli import errors
-from multiversx_sdk_cli.accounts import Account, Address
+from multiversx_sdk_cli.accounts import Account
 from multiversx_sdk_cli.transactions import Transaction
-
-
-def test_address():
-    address = Address("erd1l453hd0gt5gzdp7czpuall8ggt2dcv5zwmfdf3sd3lguxseux2fsmsgldz")
-    address_cloned = Address(address)
-    assert "fd691bb5e85d102687d81079dffce842d4dc328276d2d4c60d8fd1c3433c3293" == address.hex()
-    assert "erd1l453hd0gt5gzdp7czpuall8ggt2dcv5zwmfdf3sd3lguxseux2fsmsgldz" == address.bech32()
-    assert address.hex() == address_cloned.hex()
-    assert address.bech32() == address_cloned.bech32()
-
-    address = Address("fd691bb5e85d102687d81079dffce842d4dc328276d2d4c60d8fd1c3433c3293")
-    address_cloned = Address(address)
-    assert "fd691bb5e85d102687d81079dffce842d4dc328276d2d4c60d8fd1c3433c3293" == address.hex()
-    assert "erd1l453hd0gt5gzdp7czpuall8ggt2dcv5zwmfdf3sd3lguxseux2fsmsgldz" == address.bech32()
-    assert address.hex() == address_cloned.hex()
-    assert address.bech32() == address_cloned.bech32()
-
-    with pytest.raises(errors.EmptyAddressError):
-        address = Address("")
-        address.hex()
-
-    with pytest.raises(errors.EmptyAddressError):
-        address = Address("")
-        address.bech32()
-
-    with pytest.raises(errors.BadAddressFormatError):
-        address = Address("bad")
 
 
 def test_sign_transaction():

@@ -3,15 +3,12 @@ from typing import Any, Dict, Protocol
 from multiversx_sdk_cli.utils import ISerializable
 
 
-class IAddress:
+class IAddress(Protocol):
     def hex(self) -> str:
-        return ""
+        ...
 
     def bech32(self) -> str:
-        return ""
-
-    def pubkey(self) -> bytes:
-        return bytes()
+        ...
 
 
 class ITransaction(ISerializable):

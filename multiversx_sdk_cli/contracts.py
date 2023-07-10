@@ -1,19 +1,19 @@
 import base64
 import logging
-from typing import Any, List, Optional, Tuple, Protocol, Sequence
+from typing import Any, List, Optional, Protocol, Sequence, Tuple
 
-from Cryptodome.Hash import keccak
+from multiversx_sdk_core.address import Address, compute_contract_address
+from multiversx_sdk_network_providers.interface import IContractQuery
 
 from multiversx_sdk_cli import config, constants, errors
-from multiversx_sdk_cli.accounts import Account, Address
+from multiversx_sdk_cli.accounts import Account
+from multiversx_sdk_cli.constants import ADDRESS_ZERO_BECH32, DEFAULT_HRP
 from multiversx_sdk_cli.transactions import Transaction
 from multiversx_sdk_cli.utils import Object
-from multiversx_sdk_network_providers.interface import IContractQuery
 
 logger = logging.getLogger("contracts")
 
 HEX_PREFIX = "0x"
-ERD_BECH32_PREFIX = "erd"
 FALSE_STR_LOWER = "false"
 TRUE_STR_LOWER = "true"
 STR_PREFIX = "str:"
@@ -63,13 +63,13 @@ class IContractQueryResponse(Protocol):
 
 class SmartContract:
     def __init__(self, address: Optional[Address] = None, bytecode=None, metadata=None):
-        self.address = Address(address)
+        self.address = address
         self.bytecode = bytecode
         self.metadata = metadata or CodeMetadata()
 
     def deploy(self, owner: Account, arguments: List[Any], gas_price: int, gas_limit: int, value: int, chain: str, version: int, guardian: str, options: int) -> Transaction:
         self.owner = owner
-        self.compute_address()
+        self.address = compute_contract_address(self.owner.address, self.owner.nonce, DEFAULT_HRP)
 
         arguments = arguments or []
         gas_price = int(gas_price)
@@ -80,7 +80,7 @@ class SmartContract:
         tx.nonce = owner.nonce
         tx.value = str(value)
         tx.sender = owner.address.bech32()
-        tx.receiver = Address.zero().bech32()
+        tx.receiver = ADDRESS_ZERO_BECH32
         tx.gasPrice = gas_price
         tx.gasLimit = gas_limit
         tx.data = self.prepare_deploy_transaction_data(arguments)
@@ -99,17 +99,6 @@ class SmartContract:
             tx_data += f"@{_prepare_argument(arg)}"
 
         return tx_data
-
-    def compute_address(self):
-        """
-        8 bytes of zero + 2 bytes for VM type + 20 bytes of hash(owner) + 2 bytes of shard(owner)
-        """
-        owner_bytes = self.owner.address.pubkey()
-        nonce_bytes = self.owner.nonce.to_bytes(8, byteorder="little")
-        bytes_to_hash = owner_bytes + nonce_bytes
-        address = keccak.new(digest_bits=256).update(bytes_to_hash).digest()
-        address = bytes([0] * 8) + bytes([5, 0]) + address[10:30] + owner_bytes[30:]
-        self.address = Address(address)
 
     def execute(self, caller: Account, function: str, arguments: List[str], gas_price: int, gas_limit: int, value: int, chain: str, version: int, guardian: str, options: int) -> Transaction:
         self.caller = caller
@@ -243,8 +232,8 @@ def _to_hex(arg: str):
 
     if arg.isnumeric():
         return _prepare_decimal(arg)
-    elif arg.startswith(ERD_BECH32_PREFIX):
-        addr = Address(arg)
+    elif arg.startswith(DEFAULT_HRP):
+        addr = Address.from_bech32(arg)
         return _prepare_hexadecimal(f"{HEX_PREFIX}{addr.hex()}")
     elif arg.lower() == FALSE_STR_LOWER or arg.lower() == TRUE_STR_LOWER:
         as_str = f"{HEX_PREFIX}01" if arg.lower() == TRUE_STR_LOWER else f"{HEX_PREFIX}00"

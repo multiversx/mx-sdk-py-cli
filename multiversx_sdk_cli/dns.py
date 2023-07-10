@@ -1,9 +1,11 @@
 from typing import Any, List, Protocol
 
 from Cryptodome.Hash import keccak
+from multiversx_sdk_core.address import Address, compute_contract_address
 
 from multiversx_sdk_cli import cli_shared, utils
-from multiversx_sdk_cli.accounts import Account, Address
+from multiversx_sdk_cli.accounts import Account
+from multiversx_sdk_cli.constants import ADDRESS_ZERO_BECH32, DEFAULT_HRP
 from multiversx_sdk_cli.contracts import SmartContract
 from multiversx_sdk_cli.transactions import do_prepare_transaction
 
@@ -23,8 +25,8 @@ def resolve(name: str, proxy: INetworkProvider) -> Address:
     contract = SmartContract(dns_address)
     result = contract.query(proxy, "resolve", [name_arg])
     if len(result) == 0:
-        return Address.zero()
-    return Address(result[0].hex)
+        return Address.from_bech32(ADDRESS_ZERO_BECH32)
+    return Address.from_hex(result[0].hex, DEFAULT_HRP)
 
 
 def validate_name(name: str, shard_id: int, proxy: INetworkProvider):
@@ -86,17 +88,17 @@ def dns_address_for_name(name: str) -> Address:
     return compute_dns_address_for_shard_id(shard_id)
 
 
-def compute_dns_address_for_shard_id(shard_id) -> Address:
+def compute_dns_address_for_shard_id(shard_id: int) -> Address:
     deployer_pubkey_prefix = InitialDNSAddress[:len(InitialDNSAddress) - ShardIdentiferLen]
 
     deployer_pubkey = deployer_pubkey_prefix + bytes([0, shard_id])
-    deployer = Account(address=Address(deployer_pubkey))
+    deployer = Account(address=Address(deployer_pubkey, DEFAULT_HRP))
     deployer.nonce = 0
     # Workaround: In order to compute the address of a contract, one has to create an instance of the class "SmartContract".
     # This might change in the future.
     contract = SmartContract()
     contract.owner = deployer
-    contract.compute_address()
+    contract.address = compute_contract_address(contract.owner.address, contract.owner.nonce, DEFAULT_HRP)
     return contract.address
 
 

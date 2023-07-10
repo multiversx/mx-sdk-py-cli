@@ -7,7 +7,8 @@ from typing import Any, Dict, Tuple, Optional
 
 import requests
 
-from multiversx_sdk_cli.accounts import Account, Address
+from multiversx_sdk_core import Address
+from multiversx_sdk_cli.accounts import Account
 from multiversx_sdk_cli.errors import KnownError
 from multiversx_sdk_cli.utils import dump_out_json, read_json_file
 

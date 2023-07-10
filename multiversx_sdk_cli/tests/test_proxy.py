@@ -1,3 +1,4 @@
+from multiversx_sdk_core import Address
 from multiversx_sdk_network_providers.proxy_network_provider import \
     ProxyNetworkProvider
 
@@ -55,7 +56,7 @@ def test_get_hyperblock_by_hash():
 
 
 def test_sync_nonce():
-    account = Account("erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th")
+    account = Account(address=Address.from_bech32("erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th"))
     proxy = ProxyNetworkProvider("https://devnet-api.multiversx.com")
     account.sync_nonce(proxy)
 
