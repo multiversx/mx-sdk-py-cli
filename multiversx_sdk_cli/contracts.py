@@ -7,7 +7,7 @@ from multiversx_sdk_network_providers.interface import IContractQuery
 
 from multiversx_sdk_cli import config, constants, errors
 from multiversx_sdk_cli.accounts import Account
-from multiversx_sdk_cli.constants import ADDRESS_ZERO, DEFAULT_HRP
+from multiversx_sdk_cli.constants import ADDRESS_ZERO_BECH32, DEFAULT_HRP
 from multiversx_sdk_cli.transactions import Transaction
 from multiversx_sdk_cli.utils import Object
 
@@ -80,7 +80,7 @@ class SmartContract:
         tx.nonce = owner.nonce
         tx.value = str(value)
         tx.sender = owner.address.bech32()
-        tx.receiver = ADDRESS_ZERO
+        tx.receiver = ADDRESS_ZERO_BECH32
         tx.gasPrice = gas_price
         tx.gasLimit = gas_limit
         tx.data = self.prepare_deploy_transaction_data(arguments)

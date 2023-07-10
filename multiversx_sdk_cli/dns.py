@@ -5,7 +5,7 @@ from multiversx_sdk_core.address import Address, compute_contract_address
 
 from multiversx_sdk_cli import cli_shared, utils
 from multiversx_sdk_cli.accounts import Account
-from multiversx_sdk_cli.constants import ADDRESS_ZERO, DEFAULT_HRP
+from multiversx_sdk_cli.constants import ADDRESS_ZERO_BECH32, DEFAULT_HRP
 from multiversx_sdk_cli.contracts import SmartContract
 from multiversx_sdk_cli.transactions import do_prepare_transaction
 
@@ -25,7 +25,7 @@ def resolve(name: str, proxy: INetworkProvider) -> Address:
     contract = SmartContract(dns_address)
     result = contract.query(proxy, "resolve", [name_arg])
     if len(result) == 0:
-        return Address.from_bech32(ADDRESS_ZERO)
+        return Address.from_bech32(ADDRESS_ZERO_BECH32)
     return Address.from_hex(result[0].hex, DEFAULT_HRP)
 
 
