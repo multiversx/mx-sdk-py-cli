@@ -11,7 +11,6 @@ from multiversx_sdk_wallet.mnemonic import Mnemonic
 from multiversx_sdk_wallet.user_pem import UserPEM
 
 from multiversx_sdk_cli import cli_shared
-from multiversx_sdk_cli.accounts import Account
 from multiversx_sdk_cli.constants import DEFAULT_HRP
 from multiversx_sdk_cli.errors import KnownError
 
@@ -73,26 +72,6 @@ def setup_parser(args: List[str], subparsers: Any) -> Any:
     group.add_argument("--encode", action="store_true", help="whether to encode")
     group.add_argument("--decode", action="store_true", help="whether to decode")
     sub.set_defaults(func=do_bech32)
-
-    sub = cli_shared.add_command_subparser(
-        subparsers,
-        "wallet",
-        "pem-address",
-        "Get the public address out of a PEM file as bech32"
-    )
-    sub.add_argument("pem", help="path to the PEM file")
-    sub.add_argument("--pem-index", default=0, help="🔑 the index in the PEM file (default: %(default)s)")
-    sub.set_defaults(func=pem_address)
-
-    sub = cli_shared.add_command_subparser(
-        subparsers,
-        "wallet",
-        "pem-address-hex",
-        "Get the public address out of a PEM file as hex"
-    )
-    sub.add_argument("pem", help="path to the PEM file")
-    sub.add_argument("--pem-index", default=0, help="🔑 the index in the PEM file (default: %(default)s)")
-    sub.set_defaults(func=pem_address_hex)
 
     parser.epilog = cli_shared.build_group_epilog(subparsers)
     return subparsers
@@ -246,13 +225,3 @@ def do_bech32(args: Any):
 
     print(result)
     return result
-
-
-def pem_address(args: Any):
-    account = Account(pem_file=args.pem, pem_index=args.pem_index)
-    print(account.address.bech32())
-
-
-def pem_address_hex(args: Any):
-    account = Account(pem_file=args.pem, pem_index=args.pem_index)
-    print(account.address.hex())
