@@ -8,9 +8,9 @@ from multiversx_sdk_cli import cli_shared, utils
 from multiversx_sdk_cli.cli_output import CLIOutputBuilder
 from multiversx_sdk_cli.cosign_transaction import cosign_transaction
 from multiversx_sdk_cli.errors import NoWalletProvided
-from multiversx_sdk_cli.transactions import (do_prepare_transaction,
-                                             load_transaction_from_file,
-                                             serialize_as_inner)
+from multiversx_sdk_cli.transactions import (compute_relayed_v1_data,
+                                             do_prepare_transaction,
+                                             load_transaction_from_file)
 
 
 def setup_parser(args: List[str], subparsers: Any) -> Any:
@@ -76,7 +76,7 @@ def create_transaction(args: Any):
     tx = do_prepare_transaction(args)
 
     if hasattr(args, "relay") and args.relay:
-        args.outfile.write(serialize_as_inner(tx))
+        args.outfile.write(compute_relayed_v1_data(tx))
         return
 
     cli_shared.send_or_simulate(tx, args)

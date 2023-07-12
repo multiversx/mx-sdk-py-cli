@@ -163,7 +163,7 @@ def _dict_to_json(dictionary: Dict[str, Any]) -> bytes:
     return serialized
 
 
-def serialize_as_inner(tx: Transaction) -> str:
+def compute_relayed_v1_data(tx: Transaction) -> str:
     inner_dictionary = tx_to_dictionary_as_inner(tx)
     serialized = _dict_to_json(inner_dictionary)
     serialized_hex = serialized.hex()
