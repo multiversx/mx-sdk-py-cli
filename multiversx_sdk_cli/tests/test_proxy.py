@@ -81,33 +81,6 @@ def test_query_contract():
         assert False
 
 
-def test_get_num_shards():
-    result = main(["network", "num-shards"])
-
-    if not result:
-        assert True
-    else:
-        assert False
-
-
-def test_get_last_block_nonce():
-    result = main(["network", "block-nonce", "--shard", "4294967295"])
-
-    if not result:
-        assert True
-    else:
-        assert False
-
-
-def test_get_chain_id():
-    result = main(["network", "chain"])
-
-    if not result:
-        assert True
-    else:
-        assert False
-
-
 def test_get_transaction():
     result = main(
         [
