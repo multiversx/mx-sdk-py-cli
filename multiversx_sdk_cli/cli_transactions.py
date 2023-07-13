@@ -1,12 +1,16 @@
 from pathlib import Path
 from typing import Any, List
 
+from multiversx_sdk_network_providers.proxy_network_provider import \
+    ProxyNetworkProvider
+
 from multiversx_sdk_cli import cli_shared, utils
 from multiversx_sdk_cli.cli_output import CLIOutputBuilder
-from multiversx_sdk_network_providers.proxy_network_provider import ProxyNetworkProvider
-from multiversx_sdk_cli.errors import NoWalletProvided
-from multiversx_sdk_cli.transactions import Transaction, do_prepare_transaction
 from multiversx_sdk_cli.cosign_transaction import cosign_transaction
+from multiversx_sdk_cli.errors import NoWalletProvided
+from multiversx_sdk_cli.transactions import (compute_relayed_v1_data,
+                                             do_prepare_transaction,
+                                             load_transaction_from_file)
 
 
 def setup_parser(args: List[str], subparsers: Any) -> Any:
@@ -72,7 +76,7 @@ def create_transaction(args: Any):
     tx = do_prepare_transaction(args)
 
     if hasattr(args, "relay") and args.relay:
-        args.outfile.write(tx.serialize_as_inner())
+        args.outfile.write(compute_relayed_v1_data(tx))
         return
 
     cli_shared.send_or_simulate(tx, args)
@@ -81,12 +85,15 @@ def create_transaction(args: Any):
 def send_transaction(args: Any):
     args = utils.as_object(args)
 
-    tx = Transaction.load_from_file(args.infile)
+    tx = load_transaction_from_file(args.infile)
+    output = CLIOutputBuilder()
 
     try:
-        tx.send(ProxyNetworkProvider(args.proxy))
+        proxy = ProxyNetworkProvider(args.proxy)
+        tx_hash = proxy.send_transaction(tx)
+        output.set_emitted_transaction_hash(tx_hash)
     finally:
-        output = CLIOutputBuilder().set_emitted_transaction(tx).build()
+        output = output.set_emitted_transaction(tx).build()
         utils.dump_out_json(output, outfile=args.outfile)
 
 
@@ -106,16 +113,12 @@ def sign_transaction(args: Any):
     cli_shared.check_guardian_args(args)
     cli_shared.check_broadcast_args(args)
 
-    tx = Transaction.load_from_file(args.infile)
+    tx = load_transaction_from_file(args.infile)
     if args.guardian:
         cli_shared.check_options_for_guarded_tx(tx.options)
 
-    # clear existing signatures, if any
-    tx.guardianSignature = ""
-    tx.signature = ""
-
     account = cli_shared.prepare_account(args)
-    signature = account.sign_transaction(tx)
+    tx.signature = bytes.fromhex(account.sign_transaction(tx))
 
     try:
         guardian_account = cli_shared.prepare_guardian_account(args)
@@ -123,10 +126,8 @@ def sign_transaction(args: Any):
         guardian_account = None
 
     if guardian_account:
-        tx.guardianSignature = guardian_account.sign_transaction(tx)
+        tx.guardian_signature = bytes.fromhex(guardian_account.sign_transaction(tx))
     elif args.guardian:
         tx = cosign_transaction(tx, args.guardian_service_url, args.guardian_2fa_code)
-
-    tx.signature = signature
 
     cli_shared.send_or_simulate(tx, args)

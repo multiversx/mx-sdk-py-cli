@@ -71,9 +71,9 @@ def prepare_transaction_data_for_stake(node_operator_address: Address, validator
         call_arguments.append(f"0x{reward_address.hex()}")
 
     data = SmartContract().prepare_execute_transaction_data("stake", call_arguments)
-    gas_limit = estimate_system_sc_call(data, MetaChainSystemSCsCost.STAKE, num_of_nodes)
+    gas_limit = estimate_system_sc_call(str(data), MetaChainSystemSCsCost.STAKE, num_of_nodes)
 
-    return data, gas_limit
+    return str(data), gas_limit
 
 
 def prepare_args_for_top_up(args: Any):

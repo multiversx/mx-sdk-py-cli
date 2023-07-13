@@ -16,9 +16,10 @@ from multiversx_sdk_cli.cli_output import CLIOutputBuilder
 from multiversx_sdk_cli.cli_password import (load_guardian_password,
                                              load_password)
 from multiversx_sdk_cli.constants import TRANSACTION_OPTIONS_TX_GUARDED
+from multiversx_sdk_cli.interfaces import ITransaction
 from multiversx_sdk_cli.ledger.ledger_functions import do_get_ledger_address
 from multiversx_sdk_cli.simulation import Simulator
-from multiversx_sdk_cli.transactions import Transaction
+from multiversx_sdk_cli.transactions import send_and_wait_for_result
 
 
 def wider_help_formatter(prog: Text):
@@ -220,7 +221,7 @@ def check_options_for_guarded_tx(options: int):
         raise errors.BadUsage("Invalid guarded transaction's options. The second least significant bit must be set.")
 
 
-def send_or_simulate(tx: Transaction, args: Any, dump_output: bool = True) -> CLIOutputBuilder:
+def send_or_simulate(tx: ITransaction, args: Any, dump_output: bool = True) -> CLIOutputBuilder:
     proxy = ProxyNetworkProvider(args.proxy)
 
     is_set_wait_result = hasattr(args, "wait_result") and args.wait_result
@@ -237,10 +238,11 @@ def send_or_simulate(tx: Transaction, args: Any, dump_output: bool = True) -> CL
 
     try:
         if send_wait_result:
-            transaction_on_network = tx.send_wait_result(proxy, args.timeout)
+            transaction_on_network = send_and_wait_for_result(tx, proxy, args.timeout)
             output_builder.set_awaited_transaction(transaction_on_network)
         elif send_only:
-            tx.send(proxy)
+            hash = proxy.send_transaction(tx)
+            output_builder.set_emitted_transaction_hash(hash)
         elif simulate:
             simulation = Simulator(proxy).run(tx)
             output_builder.set_simulation_results(simulation)

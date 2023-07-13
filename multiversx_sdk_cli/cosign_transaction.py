@@ -1,13 +1,9 @@
+from typing import Any, Dict
+
 import requests
-from typing import Dict, Any, Protocol
+
 from multiversx_sdk_cli.errors import GuardianServiceError
-
-
-class ITransaction(Protocol):
-    guardianSignature: str
-
-    def to_dictionary(self) -> Dict[str, Any]:
-        ...
+from multiversx_sdk_cli.interfaces import ITransaction
 
 
 def cosign_transaction(transaction: ITransaction, service_url: str, guardian_code: str) -> ITransaction:
@@ -21,7 +17,7 @@ def cosign_transaction(transaction: ITransaction, service_url: str, guardian_cod
     check_for_guardian_error(response.json())
 
     tx_as_dict = response.json()["data"]["transaction"]
-    transaction.guardianSignature = tx_as_dict["guardianSignature"]
+    transaction.guardian_signature = bytes.fromhex(tx_as_dict["guardianSignature"])
 
     return transaction
 

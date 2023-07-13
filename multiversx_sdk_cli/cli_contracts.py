@@ -3,10 +3,9 @@ import os
 from pathlib import Path
 from typing import Any, Dict, List
 
+from multiversx_sdk_core import Address, Transaction
 from multiversx_sdk_network_providers.proxy_network_provider import \
     ProxyNetworkProvider
-
-from multiversx_sdk_core import Address
 
 from multiversx_sdk_cli import cli_shared, errors, projects, utils
 from multiversx_sdk_cli.accounts import Account, LedgerAccount
@@ -19,7 +18,6 @@ from multiversx_sdk_cli.cosign_transaction import cosign_transaction
 from multiversx_sdk_cli.docker import is_docker_installed, run_docker
 from multiversx_sdk_cli.errors import DockerMissingError, NoWalletProvided
 from multiversx_sdk_cli.projects.core import get_project_paths_recursively
-from multiversx_sdk_cli.transactions import Transaction
 
 logger = logging.getLogger("cli.contracts")
 
@@ -377,20 +375,15 @@ def _prepare_signer(args: Any) -> Account:
 
 
 def _sign_guarded_tx(args: Any, tx: Transaction) -> Transaction:
-    signature = tx.signature
-    tx.signature = ""
-
     try:
         guardian_account = cli_shared.prepare_guardian_account(args)
     except NoWalletProvided:
         guardian_account = None
 
     if guardian_account:
-        tx.guardianSignature = guardian_account.sign_transaction(tx)
+        tx.guardian_signature = bytes.fromhex(guardian_account.sign_transaction(tx))
     elif args.guardian:
         tx = cosign_transaction(tx, args.guardian_service_url, args.guardian_2fa_code)  # type: ignore
-
-    tx.signature = signature
 
     return tx
 
