@@ -3,14 +3,15 @@ import json
 import logging
 import time
 from collections import OrderedDict
-from typing import Any, Dict, List, Protocol, Sequence, TextIO, Tuple
+from typing import Any, Dict, List, Optional, Protocol, Sequence, TextIO, Tuple
 
 from multiversx_sdk_cli import config, errors, utils
 from multiversx_sdk_cli.accounts import Account, Address, LedgerAccount
-from multiversx_sdk_cli.cli_password import load_password, load_guardian_password
+from multiversx_sdk_cli.cli_password import (load_guardian_password,
+                                             load_password)
+from multiversx_sdk_cli.cosign_transaction import cosign_transaction
 from multiversx_sdk_cli.errors import NoWalletProvided
 from multiversx_sdk_cli.interfaces import ITransaction
-from multiversx_sdk_cli.cosign_transaction import cosign_transaction
 from multiversx_sdk_cli.ledger.ledger_functions import do_get_ledger_address
 
 logger = logging.getLogger("transactions")
@@ -18,7 +19,7 @@ logger = logging.getLogger("transactions")
 
 class ITransactionOnNetwork(Protocol):
     hash: str
-    is_completed: bool
+    is_completed: Optional[bool]
 
     def to_dictionary(self) -> Dict[str, Any]:
         ...
@@ -31,7 +32,7 @@ class INetworkProvider(Protocol):
     def send_transactions(self, transactions: Sequence[ITransaction]) -> Tuple[int, str]:
         ...
 
-    def get_transaction(self, tx_hash: str) -> ITransactionOnNetwork:
+    def get_transaction(self, tx_hash: str, with_process_status: Optional[bool]) -> ITransactionOnNetwork:
         ...
 
 
@@ -147,7 +148,7 @@ class Transaction(ITransaction):
         for _ in range(0, num_periods_to_wait):
             time.sleep(AWAIT_TRANSACTION_PERIOD)
 
-            tx = proxy.get_transaction(tx_hash)
+            tx = proxy.get_transaction(tx_hash, with_process_status=True)
             if tx.is_completed:
                 return tx
             else:
