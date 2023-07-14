@@ -138,7 +138,7 @@ def _send_transaction_and_wait_for_result(proxy: INetworkProvider, payload: ITra
     for _ in range(0, num_periods_to_wait):
         time.sleep(AWAIT_TRANSACTION_PERIOD)
 
-        tx = proxy.get_transaction(tx_hash)
+        tx = proxy.get_transaction(tx_hash, True)
         if tx.is_completed:
             return tx
         else:
