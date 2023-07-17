@@ -2,7 +2,7 @@ import base64
 import json
 import logging
 import time
-from typing import Any, Dict, Protocol, Sequence, TextIO, Tuple
+from typing import Any, Dict, Optional, Protocol, Sequence, TextIO, Tuple
 
 from multiversx_sdk_core import Address, Transaction, TransactionPayload
 
@@ -20,7 +20,7 @@ logger = logging.getLogger("transactions")
 
 class ITransactionOnNetwork(Protocol):
     hash: str
-    is_completed: bool
+    is_completed: Optional[bool]
 
     def to_dictionary(self) -> Dict[str, Any]:
         ...
@@ -33,7 +33,7 @@ class INetworkProvider(Protocol):
     def send_transactions(self, transactions: Sequence[ITransaction]) -> Tuple[int, str]:
         ...
 
-    def get_transaction(self, tx_hash: str) -> ITransactionOnNetwork:
+    def get_transaction(self, tx_hash: str, with_process_status: Optional[bool] = False) -> ITransactionOnNetwork:
         ...
 
 
@@ -138,7 +138,7 @@ def _send_transaction_and_wait_for_result(proxy: INetworkProvider, payload: ITra
     for _ in range(0, num_periods_to_wait):
         time.sleep(AWAIT_TRANSACTION_PERIOD)
 
-        tx = proxy.get_transaction(tx_hash)
+        tx = proxy.get_transaction(tx_hash, True)
         if tx.is_completed:
             return tx
         else:

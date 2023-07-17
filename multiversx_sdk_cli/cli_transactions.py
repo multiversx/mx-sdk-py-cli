@@ -102,7 +102,7 @@ def get_transaction(args: Any):
     omit_fields = cli_shared.parse_omit_fields_arg(args)
     proxy = ProxyNetworkProvider(args.proxy)
 
-    transaction = proxy.get_transaction(args.hash)
+    transaction = proxy.get_transaction(args.hash, True)
     output = CLIOutputBuilder().set_transaction_on_network(transaction, omit_fields).build()
     utils.dump_out_json(output)
 

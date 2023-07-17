@@ -3,7 +3,6 @@ import ast
 import copy
 import sys
 from argparse import FileType
-from pathlib import Path
 from typing import Any, Dict, List, Text, cast
 
 from multiversx_sdk_core import Address

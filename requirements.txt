@@ -10,5 +10,5 @@ requests-cache
 rich==13.3.4
 
 multiversx-sdk-core==0.6.0b1
-multiversx-sdk-network-providers==0.6.*
-multiversx-sdk-wallet==0.7.*
+multiversx-sdk-network-providers>=0.11.0
+multiversx-sdk-wallet>=0.7.0
