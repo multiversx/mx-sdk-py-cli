@@ -1,5 +1,6 @@
-import semver
 import pytest
+import semver
+
 from multiversx_sdk_cli.config import get_latest_semver
 
 

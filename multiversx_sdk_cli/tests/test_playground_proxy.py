@@ -1,10 +1,9 @@
-import unittest
-
+import pytest
 import requests
 
 
-class TestPlaygroundProxy(unittest.TestCase):
-    @unittest.skip('manual run only')
+class TestPlaygroundProxy:
+    @pytest.mark.skip('manual run only')
     def test_do_request(self):
         # use a valid proxy address
         url = "http://localhost:8001"
@@ -13,9 +12,9 @@ class TestPlaygroundProxy(unittest.TestCase):
         response = requests.get(url + "/address/" + address + "/nonce")
         print("response status code " + str(response.status_code))
         print(response.json())
-        self.assertTrue(self, response is not None)
+        assert response is not None
 
-    @unittest.skip('manual run only')
+    @pytest.mark.skip('manual run only')
     def test_do_request_node_status(self):
         # use a valid proxy address
         url = "http://localhost:8001"
@@ -25,4 +24,4 @@ class TestPlaygroundProxy(unittest.TestCase):
         response = requests.get(f"{url}/network/status/{shard_id}")
         print("response status code " + str(response.status_code))
         print(response.json())
-        self.assertTrue(self, response is not None)
+        assert response is not None
