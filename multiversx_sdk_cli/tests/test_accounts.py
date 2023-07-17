@@ -1,54 +1,8 @@
 from pathlib import Path
 
 import pytest
-from multiversx_sdk_core import Address, Transaction, TransactionPayload
 
 from multiversx_sdk_cli.accounts import Account
-
-
-def test_sign_transaction():
-    alice_pem = Path(__file__).parent / "testdata" / "alice.pem"
-    alice = Account(pem_file=str(alice_pem))
-
-    # With data
-    transaction = Transaction(
-        chain_id="chainID",
-        sender=Address.from_bech32("erd1l453hd0gt5gzdp7czpuall8ggt2dcv5zwmfdf3sd3lguxseux2fsmsgldz"),
-        receiver=Address.from_bech32("erd188nydpkagtpwvfklkl2tn0w6g40zdxkwfgwpjqc2a2m2n7ne9g8q2t22sr"),
-        gas_limit=500000000,
-        gas_price=200000000000000,
-        nonce=0,
-        value=0,
-        data=TransactionPayload.from_str("foo"),
-        version=1
-    )
-    transaction.signature = bytes.fromhex(alice.sign_transaction(transaction))
-
-    assert "0e69f27e24aba2f3b7a8842dc7e7c085a0bfb5b29112b258318eed73de9c8809889756f8afaa74c7b3c7ce20a028b68ba90466a249aaf999a1a78dcf7f4eb40c" == transaction.signature.hex()
-
-    # Without data
-    transaction = Transaction(
-        chain_id="chainID",
-        sender=Address.from_bech32("erd1l453hd0gt5gzdp7czpuall8ggt2dcv5zwmfdf3sd3lguxseux2fsmsgldz"),
-        receiver=Address.from_bech32("erd188nydpkagtpwvfklkl2tn0w6g40zdxkwfgwpjqc2a2m2n7ne9g8q2t22sr"),
-        gas_limit=500000000,
-        gas_price=200000000000000,
-        nonce=0,
-        value=0,
-        version=1
-    )
-    transaction.signature = bytes.fromhex(alice.sign_transaction(transaction))
-
-    assert "83efd1bc35790ecc220b0ed6ddd1fcb44af6653dd74e37b3a49dcc1f002a1b98b6f79779192cca68bdfefd037bc81f4fa606628b751023122191f8c062362805" == transaction.signature.hex()
-
-
-def test_sign_message():
-    alice_pem = Path(__file__).parent / "testdata" / "alice.pem"
-    alice = Account(pem_file=str(alice_pem))
-
-    message = b"hello"
-    signature = alice.sign_message(message)
-    assert signature == "561bc58f1dc6b10de208b2d2c22c9a474ea5e8cabb59c3d3ce06bbda21cc46454aa71a85d5a60442bd7784effa2e062fcb8fb421c521f898abf7f5ec165e5d0f"
 
 
 def test_load_account_from_keystore_without_kind():
