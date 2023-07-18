@@ -1,8 +1,10 @@
 from typing import Any, List
 
+from multiversx_sdk_network_providers.proxy_network_provider import \
+    ProxyNetworkProvider
+
 from multiversx_sdk_cli import cli_shared, errors, utils
 from multiversx_sdk_cli.delegation import staking_provider
-from multiversx_sdk_network_providers.proxy_network_provider import ProxyNetworkProvider
 from multiversx_sdk_cli.transactions import do_prepare_transaction
 
 

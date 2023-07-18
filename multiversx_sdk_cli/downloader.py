@@ -15,8 +15,8 @@ PROGRESS_RULER = 'Downloading...\n|_,_,_,_,_,,_,_,_,_,_|'
 
 
 def download(url: str, filename: str) -> None:
-    if url is None:
-        raise errors.BadUrlError()
+    if not url:
+        raise errors.BadUrlError("")
 
     logger.info(f"download_url.url: {url}")
     logger.info(f"download_url.filename: {filename}")
@@ -45,7 +45,7 @@ def download(url: str, filename: str) -> None:
     logger.info("Download done.")
 
 
-def _report_download_progress(progress, chunk_number, total_size):
+def _report_download_progress(progress: int, chunk_number: int, total_size: int):
     try:
         num_chunks = int(total_size / CHUNK_SIZE)
         new_progress = int((chunk_number / num_chunks) * 20)

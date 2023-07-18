@@ -1,9 +1,8 @@
-from multiversx_sdk_cli import cli_shared
 import logging
 import sys
 from typing import Any
 
-from multiversx_sdk_cli import config, utils
+from multiversx_sdk_cli import cli_shared, config, utils
 
 logger = logging.getLogger("cli.config")
 

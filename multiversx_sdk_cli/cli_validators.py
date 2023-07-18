@@ -1,6 +1,6 @@
 from typing import Any, List
 
-from multiversx_sdk_cli import cli_shared, validators, utils
+from multiversx_sdk_cli import cli_shared, utils, validators
 from multiversx_sdk_cli.transactions import do_prepare_transaction
 
 
