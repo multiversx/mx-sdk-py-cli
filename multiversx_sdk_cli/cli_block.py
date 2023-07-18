@@ -1,7 +1,9 @@
 from typing import Any
 
+from multiversx_sdk_network_providers.proxy_network_provider import \
+    ProxyNetworkProvider
+
 from multiversx_sdk_cli import cli_shared, utils
-from multiversx_sdk_network_providers.proxy_network_provider import ProxyNetworkProvider
 
 
 def setup_parser(subparsers: Any) -> Any:

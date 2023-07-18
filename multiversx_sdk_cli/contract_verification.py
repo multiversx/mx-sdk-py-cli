@@ -3,11 +3,11 @@ import json
 import logging
 import time
 from pathlib import Path
-from typing import Any, Dict, Tuple, Optional
+from typing import Any, Dict, Optional, Tuple
 
 import requests
-
 from multiversx_sdk_core import Address
+
 from multiversx_sdk_cli.accounts import Account
 from multiversx_sdk_cli.errors import KnownError
 from multiversx_sdk_cli.utils import dump_out_json, read_json_file
