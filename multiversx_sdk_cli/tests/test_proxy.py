@@ -12,6 +12,8 @@ def test_get_account():
             "get",
             "--address",
             "erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th",
+            "--proxy",
+            "https://testnet-api.multiversx.com"
         ]
     )
     if not result:
@@ -81,7 +83,14 @@ def test_query_contract():
 
 
 def test_get_num_shards():
-    result = main(["network", "num-shards"])
+    result = main(
+        [
+            "network",
+            "num-shards",
+            "--proxy",
+            "https://testnet-api.multiversx.com"
+        ]
+    )
 
     if not result:
         assert True
@@ -90,7 +99,16 @@ def test_get_num_shards():
 
 
 def test_get_last_block_nonce():
-    result = main(["network", "block-nonce", "--shard", "4294967295"])
+    result = main(
+        [
+            "network",
+            "block-nonce",
+            "--shard",
+            "4294967295",
+            "--proxy",
+            "https://testnet-api.multiversx.com"
+        ]
+    )
 
     if not result:
         assert True
@@ -99,7 +117,14 @@ def test_get_last_block_nonce():
 
 
 def test_get_chain_id():
-    result = main(["network", "chain"])
+    result = main(
+        [
+            "network",
+            "chain",
+            "--proxy",
+            "https://testnet-api.multiversx.com"
+        ]
+    )
 
     if not result:
         assert True
