@@ -10,11 +10,14 @@ from multiversx_sdk_network_providers.proxy_network_provider import \
 from multiversx_sdk_cli import config, errors, utils
 from multiversx_sdk_cli.accounts import Account
 from multiversx_sdk_cli.cli_output import CLIOutputBuilder
-from multiversx_sdk_cli.cli_password import load_password, load_guardian_password
+from multiversx_sdk_cli.cli_password import (load_guardian_password,
+                                             load_password)
+from multiversx_sdk_cli.constants import TRANSACTION_OPTIONS_TX_GUARDED
+from multiversx_sdk_cli.errors import ArgumentsNotProvidedError
 from multiversx_sdk_cli.ledger.ledger_functions import do_get_ledger_address
 from multiversx_sdk_cli.simulation import Simulator
 from multiversx_sdk_cli.transactions import Transaction
-from multiversx_sdk_cli.constants import TRANSACTION_OPTIONS_TX_GUARDED
+from multiversx_sdk_cli.ux import show_deprecation_warning
 
 
 def wider_help_formatter(prog: Text):
@@ -75,8 +78,8 @@ def add_tx_args(args: List[str], sub: Any, with_nonce: bool = True, with_receive
     if with_data:
         sub.add_argument("--data", default="", help="the payload, or 'memo' of the transaction (default: %(default)s)")
 
-    sub.add_argument("--chain", default=config.get_chain_id(), help="the chain identifier (default: %(default)s)")
-    sub.add_argument("--version", type=int, default=config.get_tx_version(), help="the transaction version (default: %(default)s)")
+    sub.add_argument("--chain", help="the chain identifier")
+    sub.add_argument("--version", type=int, default=2, help="the transaction version (default: %(default)s)")
 
     if with_guardian:
         add_guardian_args(sub)
@@ -112,7 +115,7 @@ def add_guardian_wallet_args(args: List[str], sub: Any):
 
 
 def add_proxy_arg(sub: Any):
-    sub.add_argument("--proxy", default=config.get_proxy(), help="🔗 the URL of the proxy (default: %(default)s)")
+    sub.add_argument("--proxy", help="🔗 the URL of the proxy")
 
 
 def add_outfile_arg(sub: Any, what: str = ""):
@@ -170,6 +173,28 @@ def prepare_nonce_in_args(args: Any):
         account = prepare_account(args)
         account.sync_nonce(ProxyNetworkProvider(args.proxy))
         args.nonce = account.nonce
+
+
+def prepare_chain_id_in_args(args: Any):
+    if not args.chain and not args.proxy:
+        raise ArgumentsNotProvidedError("chain or proxy should be provided")
+
+    if args.chain and args.proxy:
+        proxy = ProxyNetworkProvider(args.proxy)
+        chain_id = proxy.get_network_config().chain_id
+
+        if args.chain != chain_id:
+            show_deprecation_warning("The chainID you have provided does not match the chainID you got from the proxy. Will use the value from the proxy.")
+            args.chain = chain_id
+            return
+        else:
+            return
+
+    if args.chain:
+        return
+    elif args.proxy:
+        proxy = ProxyNetworkProvider(args.proxy)
+        args.chain = proxy.get_network_config().chain_id
 
 
 def add_broadcast_args(sub: Any, simulate: bool = True, relay: bool = False):
