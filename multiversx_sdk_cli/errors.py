@@ -183,3 +183,8 @@ class DockerMissingError(KnownError):
 class GuardianServiceError(KnownError):
     def __init__(self, message: str):
         super().__init__(message)
+
+
+class ArgumentsNotProvidedError(KnownError):
+    def __init__(self, message: str):
+        super().__init__(message)

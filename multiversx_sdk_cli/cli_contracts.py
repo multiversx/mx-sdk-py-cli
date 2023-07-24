@@ -313,17 +313,17 @@ def deploy(args: Any):
     gas_price = args.gas_price
     gas_limit = args.gas_limit
     value = args.value
-    chain = args.chain
     version = args.version
 
     contract = _prepare_contract(args)
     sender = _prepare_sender(args)
+    cli_shared.prepare_chain_id_in_args(args)
 
-    tx = contract.deploy(sender, arguments, gas_price, gas_limit, value, chain, version, args.guardian, args.options)
+    tx = contract.deploy(sender, arguments, gas_price, gas_limit, value, args.chain, version, args.guardian, args.options)
     tx = _sign_guarded_tx(args, tx)
 
     logger.info("Contract address: %s", contract.address.bech32())
-    utils.log_explorer_contract_address(chain, contract.address.bech32())
+    utils.log_explorer_contract_address(args.chain, contract.address.bech32())
 
     _send_or_simulate(tx, contract, args)
 
@@ -399,13 +399,13 @@ def call(args: Any):
     gas_price = args.gas_price
     gas_limit = args.gas_limit
     value = args.value
-    chain = args.chain
     version = args.version
 
     contract = SmartContract(Address.from_bech32(contract_address))
     sender = _prepare_sender(args)
+    cli_shared.prepare_chain_id_in_args(args)
 
-    tx = contract.execute(sender, function, arguments, gas_price, gas_limit, value, chain, version, args.guardian, args.options)
+    tx = contract.execute(sender, function, arguments, gas_price, gas_limit, value, args.chain, version, args.guardian, args.options)
     tx = _sign_guarded_tx(args, tx)
 
     _send_or_simulate(tx, contract, args)
@@ -420,14 +420,14 @@ def upgrade(args: Any):
     gas_price = args.gas_price
     gas_limit = args.gas_limit
     value = args.value
-    chain = args.chain
     version = args.version
 
     contract = _prepare_contract(args)
     contract.address = Address.from_bech32(contract_address)
     sender = _prepare_sender(args)
+    cli_shared.prepare_chain_id_in_args(args)
 
-    tx = contract.upgrade(sender, arguments, gas_price, gas_limit, value, chain, version, args.guardian, args.options)
+    tx = contract.upgrade(sender, arguments, gas_price, gas_limit, value, args.chain, version, args.guardian, args.options)
     tx = _sign_guarded_tx(args, tx)
 
     _send_or_simulate(tx, contract, args)
