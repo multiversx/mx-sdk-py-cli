@@ -13,11 +13,11 @@ from multiversx_sdk_cli.cli_password import load_password
 from multiversx_sdk_cli.contract_verification import \
     trigger_contract_verification
 from multiversx_sdk_cli.contracts import CodeMetadata, SmartContract
+from multiversx_sdk_cli.cosign_transaction import cosign_transaction
 from multiversx_sdk_cli.docker import is_docker_installed, run_docker
 from multiversx_sdk_cli.errors import DockerMissingError, NoWalletProvided
 from multiversx_sdk_cli.projects.core import get_project_paths_recursively
 from multiversx_sdk_cli.transactions import Transaction
-from multiversx_sdk_cli.cosign_transaction import cosign_transaction
 
 logger = logging.getLogger("cli.contracts")
 
@@ -292,17 +292,17 @@ def deploy(args: Any):
     gas_price = args.gas_price
     gas_limit = args.gas_limit
     value = args.value
-    chain = args.chain
     version = args.version
 
     contract = _prepare_contract(args)
     sender = _prepare_sender(args)
+    cli_shared.prepare_chain_id_in_args(args)
 
-    tx = contract.deploy(sender, arguments, gas_price, gas_limit, value, chain, version, args.guardian, args.options)
+    tx = contract.deploy(sender, arguments, gas_price, gas_limit, value, args.chain, version, args.guardian, args.options)
     tx = _sign_guarded_tx(args, tx)
 
     logger.info("Contract address: %s", contract.address)
-    utils.log_explorer_contract_address(chain, contract.address)
+    utils.log_explorer_contract_address(args.chain, contract.address)
 
     _send_or_simulate(tx, contract, args)
 
@@ -383,13 +383,13 @@ def call(args: Any):
     gas_price = args.gas_price
     gas_limit = args.gas_limit
     value = args.value
-    chain = args.chain
     version = args.version
 
     contract = SmartContract(contract_address)
     sender = _prepare_sender(args)
+    cli_shared.prepare_chain_id_in_args(args)
 
-    tx = contract.execute(sender, function, arguments, gas_price, gas_limit, value, chain, version, args.guardian, args.options)
+    tx = contract.execute(sender, function, arguments, gas_price, gas_limit, value, args.chain, version, args.guardian, args.options)
     tx = _sign_guarded_tx(args, tx)
 
     _send_or_simulate(tx, contract, args)
@@ -404,14 +404,14 @@ def upgrade(args: Any):
     gas_price = args.gas_price
     gas_limit = args.gas_limit
     value = args.value
-    chain = args.chain
     version = args.version
 
     contract = _prepare_contract(args)
     contract.address = Address(contract_address)
     sender = _prepare_sender(args)
+    cli_shared.prepare_chain_id_in_args(args)
 
-    tx = contract.upgrade(sender, arguments, gas_price, gas_limit, value, chain, version, args.guardian, args.options)
+    tx = contract.upgrade(sender, arguments, gas_price, gas_limit, value, args.chain, version, args.guardian, args.options)
     tx = _sign_guarded_tx(args, tx)
 
     _send_or_simulate(tx, contract, args)
