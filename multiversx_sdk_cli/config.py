@@ -5,7 +5,7 @@ from typing import Any, Dict, List
 import semver
 
 from multiversx_sdk_cli import errors, utils
-from multiversx_sdk_cli.ux import show_deprecation_warning
+from multiversx_sdk_cli.ux import show_warning
 
 SDK_PATH = Path("~/multiversx-sdk").expanduser().resolve()
 LOCAL_CONFIG_PATH = Path("mxpy.json").resolve()
@@ -217,10 +217,10 @@ def add_config_args(argv: List[str]) -> List[str]:
 
 def check_for_deprecated_args(args: List[str]) -> None:
     if "chainID" in args:
-        show_deprecation_warning("Providing `chainID` in the configuration file is deprecated. It will not be used. Please remove it!")
+        show_warning("Providing `chainID` in the configuration file is deprecated. It will not be used. Please remove it!")
 
     if "txVersion" in args:
-        show_deprecation_warning("Providing `txVersion` in the configuration file is deprecated. It will not be used. Please remove it!")
+        show_warning("Providing `txVersion` in the configuration file is deprecated. It will not be used. Please remove it!")
 
 
 def determine_final_args(argv: List[str], config_args: Dict[str, Any]) -> List[str]:

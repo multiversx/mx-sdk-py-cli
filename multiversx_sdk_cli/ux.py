@@ -10,5 +10,5 @@ def show_critical_error(message: str):
     print(Panel(f"[red]{message}"))
 
 
-def show_deprecation_warning(message: str):
+def show_warning(message: str):
     print(Panel(f"[yellow]{message}"))

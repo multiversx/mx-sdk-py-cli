@@ -10,7 +10,7 @@ class Args:
     pass
 
 
-def test_prepare_chain_id():
+def test_prepare_chain_id_in_args():
     args: Any = Args()
     args.chain = None
     args.proxy = None
