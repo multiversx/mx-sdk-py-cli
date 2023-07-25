@@ -56,7 +56,7 @@ testRunScenarios() {
 testWasmName() {
     echo "testWasmName"
    
-    ${CLI} contract clean ${SANDBOX}/myadder-rs
+    ${CLI} contract clean --path ${SANDBOX}/myadder-rs
     assertFileDoesNotExist ${SANDBOX}/myadder-rs/output/myadder-2-rs.wasm || return 1
     ${CLI} contract build --path=${SANDBOX}/myadder-rs --target-dir=${TARGET_DIR} --wasm-name myadder-2-rs || return 1
     assertFileExists ${SANDBOX}/myadder-rs/output/myadder-2-rs.wasm || return 1
@@ -68,31 +68,31 @@ testCleanContracts() {
 
     assertFileExists ${SANDBOX}/myadder-rs/output/myadder-rs.wasm || return 1
     assertFileExists ${SANDBOX}/myadder-rs/output/myadder-rs.abi.json || return 1
-    ${CLI} contract clean ${SANDBOX}/myadder-rs || return 1
+    ${CLI} contract clean --path ${SANDBOX}/myadder-rs || return 1
     assertFileDoesNotExist ${SANDBOX}/myadder-rs/output/myadder-rs.wasm || return 1
     assertFileDoesNotExist ${SANDBOX}/myadder-rs/output/myadder-rs.abi.json || return 1
 
     assertFileExists ${SANDBOX}/myfactorial-rs/output/myfactorial-rs.wasm || return 1
     assertFileExists ${SANDBOX}/myfactorial-rs/output/myfactorial-rs.abi.json || return 1
-    ${CLI} contract clean ${SANDBOX}/myfactorial-rs || return 1
+    ${CLI} contract clean --path ${SANDBOX}/myfactorial-rs || return 1
     assertFileDoesNotExist ${SANDBOX}/myfactorial-rs/output/myfactorial-rs.wasm || return 1
     assertFileDoesNotExist ${SANDBOX}/myfactorial-rs/output/myfactorial-rs.abi.json || return 1
 
     assertFileExists ${SANDBOX}/mybubbles-rs/output/mybubbles-rs.wasm || return 1
     assertFileExists ${SANDBOX}/mybubbles-rs/output/mybubbles-rs.abi.json || return 1
-    ${CLI} contract clean ${SANDBOX}/mybubbles-rs || return 1
+    ${CLI} contract clean --path ${SANDBOX}/mybubbles-rs || return 1
     assertFileDoesNotExist ${SANDBOX}/mybubbles-rs/output/mybubbles-rs.wasm || return 1
     assertFileDoesNotExist ${SANDBOX}/mybubbles-rs/output/mybubbles-rs.abi.json || return 1
 
     assertFileExists ${SANDBOX}/mylottery-rs/output/mylottery-rs.wasm || return 1
     assertFileExists ${SANDBOX}/mylottery-rs/output/mylottery-rs.abi.json || return 1
-    ${CLI} contract clean ${SANDBOX}/mylottery-rs || return 1
+    ${CLI} contract clean --path ${SANDBOX}/mylottery-rs || return 1
     assertFileDoesNotExist ${SANDBOX}/mylottery-rs/output/mylottery-rs.wasm || return 1
     assertFileDoesNotExist ${SANDBOX}/mylottery-rs/output/mylottery-rs.abi.json || return 1
 
     assertFileExists ${SANDBOX}/myfunding-rs/output/myfunding-rs.wasm || return 1
     assertFileExists ${SANDBOX}/myfunding-rs/output/myfunding-rs.abi.json || return 1
-    ${CLI} contract clean ${SANDBOX}/myfunding-rs || return 1
+    ${CLI} contract clean --path ${SANDBOX}/myfunding-rs || return 1
     assertFileDoesNotExist ${SANDBOX}/myfunding-rs/output/myfunding-rs.wasm || return 1
     assertFileDoesNotExist ${SANDBOX}/myfunding-rs/output/myfunding-rs.abi.json || return 1
 }
