@@ -101,6 +101,7 @@ def _add_nodes_arg(sub: Any):
 def do_stake(args: Any):
     cli_shared.check_broadcast_args(args)
     cli_shared.prepare_nonce_in_args(args)
+    cli_shared.prepare_chain_id_in_args(args)
     validators.prepare_args_for_stake(args)
     tx = do_prepare_transaction(args)
 
@@ -110,6 +111,7 @@ def do_stake(args: Any):
 def do_unstake(args: Any):
     cli_shared.check_broadcast_args(args)
     cli_shared.prepare_nonce_in_args(args)
+    cli_shared.prepare_chain_id_in_args(args)
     validators.prepare_args_for_unstake(args)
     tx = do_prepare_transaction(args)
 
@@ -119,6 +121,7 @@ def do_unstake(args: Any):
 def do_unjail(args: Any):
     cli_shared.check_broadcast_args(args)
     cli_shared.prepare_nonce_in_args(args)
+    cli_shared.prepare_chain_id_in_args(args)
     validators.prepare_args_for_unjail(args)
     tx = do_prepare_transaction(args)
 
@@ -128,6 +131,7 @@ def do_unjail(args: Any):
 def do_unbond(args: Any):
     cli_shared.check_broadcast_args(args)
     cli_shared.prepare_nonce_in_args(args)
+    cli_shared.prepare_chain_id_in_args(args)
     validators.prepare_args_for_unbond(args)
     tx = do_prepare_transaction(args)
 
@@ -137,6 +141,7 @@ def do_unbond(args: Any):
 def change_reward_address(args: Any):
     cli_shared.check_broadcast_args(args)
     cli_shared.prepare_nonce_in_args(args)
+    cli_shared.prepare_chain_id_in_args(args)
     validators.prepare_args_for_change_reward_address(args)
     tx = do_prepare_transaction(args)
 
@@ -146,6 +151,7 @@ def change_reward_address(args: Any):
 def do_claim(args: Any):
     cli_shared.check_broadcast_args(args)
     cli_shared.prepare_nonce_in_args(args)
+    cli_shared.prepare_chain_id_in_args(args)
     validators.prepare_args_for_claim(args)
     tx = do_prepare_transaction(args)
 
@@ -155,6 +161,7 @@ def do_claim(args: Any):
 def do_unstake_nodes(args: Any):
     cli_shared.check_broadcast_args(args)
     cli_shared.prepare_nonce_in_args(args)
+    cli_shared.prepare_chain_id_in_args(args)
     validators.prepare_args_for_unstake_nodes(args)
     tx = do_prepare_transaction(args)
 
@@ -164,6 +171,7 @@ def do_unstake_nodes(args: Any):
 def do_unstake_tokens(args: Any):
     cli_shared.check_broadcast_args(args)
     cli_shared.prepare_nonce_in_args(args)
+    cli_shared.prepare_chain_id_in_args(args)
     validators.prepare_args_for_unstake_tokens(args)
     tx = do_prepare_transaction(args)
 
@@ -173,6 +181,7 @@ def do_unstake_tokens(args: Any):
 def do_unbond_nodes(args: Any):
     cli_shared.check_broadcast_args(args)
     cli_shared.prepare_nonce_in_args(args)
+    cli_shared.prepare_chain_id_in_args(args)
     validators.prepare_args_for_unbond_nodes(args)
     tx = do_prepare_transaction(args)
 
@@ -182,6 +191,7 @@ def do_unbond_nodes(args: Any):
 def do_unbond_tokens(args: Any):
     cli_shared.check_broadcast_args(args)
     cli_shared.prepare_nonce_in_args(args)
+    cli_shared.prepare_chain_id_in_args(args)
     validators.prepare_args_for_unbond_tokens(args)
     tx = do_prepare_transaction(args)
 
@@ -191,6 +201,7 @@ def do_unbond_tokens(args: Any):
 def do_clean_registered_data(args: Any):
     cli_shared.check_broadcast_args(args)
     cli_shared.prepare_nonce_in_args(args)
+    cli_shared.prepare_chain_id_in_args(args)
     validators.prepare_args_for_clean_registered_data(args)
     tx = do_prepare_transaction(args)
 
@@ -200,6 +211,7 @@ def do_clean_registered_data(args: Any):
 def do_restake_unstaked_nodes(args: Any):
     cli_shared.check_broadcast_args(args)
     cli_shared.prepare_nonce_in_args(args)
+    cli_shared.prepare_chain_id_in_args(args)
     validators.prepare_args_for_restake_unstaked_nodes(args)
     tx = do_prepare_transaction(args)
 
