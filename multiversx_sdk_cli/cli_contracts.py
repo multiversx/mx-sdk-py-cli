@@ -44,7 +44,7 @@ def setup_parser(args: List[str], subparsers: Any) -> Any:
     sub.set_defaults(func=build)
 
     sub = cli_shared.add_command_subparser(subparsers, "contract", "clean", "Clean a Smart Contract project.")
-    sub.add_argument("--path", default=os.getcwd(), help="🗀 the project directory (default: current directory)")
+    sub.add_argument("--path", default=os.getcwd(), help="the project directory (default: current directory)")
     sub.set_defaults(func=clean)
 
     sub = cli_shared.add_command_subparser(subparsers, "contract", "test", "Run scenarios (tests).")
@@ -173,7 +173,7 @@ def _add_project_arg(sub: Any):
 
 
 def _add_build_options_sc_meta(sub: Any):
-    sub.add_argument("--path", default=os.getcwd(), help="🗀 the project directory (default: current directory)")
+    sub.add_argument("--path", default=os.getcwd(), help="the project directory (default: current directory)")
     sub.add_argument("--no-wasm-opt", action="store_true", default=False,
                      help="do not optimize wasm files after the build (default: %(default)s)")
     sub.add_argument("--wasm-symbols", action="store_true", default=False,
