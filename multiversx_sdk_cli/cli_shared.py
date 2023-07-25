@@ -185,7 +185,7 @@ def prepare_chain_id_in_args(args: Any):
         fetched_chain_id = proxy.get_network_config().chain_id
 
         if args.chain != fetched_chain_id:
-            show_warning("The chain ID you have provided does not match the chain ID you got from the proxy. Will use the value from the proxy.")
+            show_warning(f"The chain ID you have provided does not match the chain ID you got from the proxy. Will use the proxy's value: '{fetched_chain_id}'")
             args.chain = fetched_chain_id
             return
         # if the CLI provided chain ID is correct, we do not patch the arguments
