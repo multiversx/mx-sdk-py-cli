@@ -1,6 +1,5 @@
 import logging
 import subprocess
-from os import path
 from pathlib import Path
 from typing import Any, Dict, List, Set, cast
 
@@ -17,9 +16,17 @@ class ProjectRust(Project):
         self.cargo_file = self.get_cargo_file()
 
     def clean(self):
-        super().clean()
-        utils.remove_folder(path.join(self.directory, "wasm", "target"))
-        utils.remove_folder(path.join(self.directory, "meta", "target"))
+        env = self.get_env()
+
+        args = [
+            "sc-meta",
+            "all",
+            "clean",
+            "--path",
+            self.directory
+        ]
+
+        subprocess.check_call(args, env=env)
 
     def get_cargo_file(self):
         cargo_path = self.path / 'Cargo.toml'

@@ -1,6 +1,6 @@
 import logging
 from pathlib import Path
-from typing import Any, Dict, List
+from typing import Any, List
 
 from multiversx_sdk_cli import dependencies, errors, guards, utils
 from multiversx_sdk_cli.projects import shared
