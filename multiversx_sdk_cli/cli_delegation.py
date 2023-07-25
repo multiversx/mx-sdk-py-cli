@@ -1,8 +1,10 @@
 from typing import Any, List
 
+from multiversx_sdk_network_providers.proxy_network_provider import \
+    ProxyNetworkProvider
+
 from multiversx_sdk_cli import cli_shared, errors, utils
 from multiversx_sdk_cli.delegation import staking_provider
-from multiversx_sdk_network_providers.proxy_network_provider import ProxyNetworkProvider
 from multiversx_sdk_cli.transactions import do_prepare_transaction
 
 
@@ -141,6 +143,7 @@ def do_create_delegation_contract(args: Any):
     cli_shared.check_guardian_and_options_args(args)
     cli_shared.check_broadcast_args(args)
     cli_shared.prepare_nonce_in_args(args)
+    cli_shared.prepare_chain_id_in_args(args)
     staking_provider.prepare_args_for_create_new_staking_contract(args)
     tx = do_prepare_transaction(args)
 
@@ -165,6 +168,7 @@ def add_new_nodes(args: Any):
     cli_shared.check_guardian_and_options_args(args)
     cli_shared.check_broadcast_args(args)
     cli_shared.prepare_nonce_in_args(args)
+    cli_shared.prepare_chain_id_in_args(args)
     staking_provider.prepare_args_for_add_nodes(args)
     tx = do_prepare_transaction(args)
 
@@ -175,6 +179,7 @@ def remove_nodes(args: Any):
     cli_shared.check_guardian_and_options_args(args)
     cli_shared.check_broadcast_args(args)
     cli_shared.prepare_nonce_in_args(args)
+    cli_shared.prepare_chain_id_in_args(args)
     staking_provider.prepare_args_for_remove_nodes(args)
     tx = do_prepare_transaction(args)
 
@@ -185,6 +190,7 @@ def stake_nodes(args: Any):
     cli_shared.check_guardian_and_options_args(args)
     cli_shared.check_broadcast_args(args)
     cli_shared.prepare_nonce_in_args(args)
+    cli_shared.prepare_chain_id_in_args(args)
     staking_provider.prepare_args_for_stake_nodes(args)
     tx = do_prepare_transaction(args)
 
@@ -195,6 +201,7 @@ def unbond_nodes(args: Any):
     cli_shared.check_guardian_and_options_args(args)
     cli_shared.check_broadcast_args(args)
     cli_shared.prepare_nonce_in_args(args)
+    cli_shared.prepare_chain_id_in_args(args)
     staking_provider.prepare_args_for_unbond_nodes(args)
     tx = do_prepare_transaction(args)
 
@@ -205,6 +212,7 @@ def unstake_nodes(args: Any):
     cli_shared.check_guardian_and_options_args(args)
     cli_shared.check_broadcast_args(args)
     cli_shared.prepare_nonce_in_args(args)
+    cli_shared.prepare_chain_id_in_args(args)
     staking_provider.prepare_args_for_unstake_nodes(args)
     tx = do_prepare_transaction(args)
 
@@ -215,6 +223,7 @@ def unjail_nodes(args: Any):
     cli_shared.check_guardian_and_options_args(args)
     cli_shared.check_broadcast_args(args)
     cli_shared.prepare_nonce_in_args(args)
+    cli_shared.prepare_chain_id_in_args(args)
     staking_provider.prepare_args_for_unjail_nodes(args)
     tx = do_prepare_transaction(args)
 
@@ -225,6 +234,7 @@ def change_service_fee(args: Any):
     cli_shared.check_guardian_and_options_args(args)
     cli_shared.check_broadcast_args(args)
     cli_shared.prepare_nonce_in_args(args)
+    cli_shared.prepare_chain_id_in_args(args)
     staking_provider.prepare_args_change_service_fee(args)
     tx = do_prepare_transaction(args)
 
@@ -235,6 +245,7 @@ def modify_delegation_cap(args: Any):
     cli_shared.check_guardian_and_options_args(args)
     cli_shared.check_broadcast_args(args)
     cli_shared.prepare_nonce_in_args(args)
+    cli_shared.prepare_chain_id_in_args(args)
     staking_provider.prepare_args_modify_delegation_cap(args)
     tx = do_prepare_transaction(args)
 
@@ -245,6 +256,7 @@ def automatic_activation(args: Any):
     cli_shared.check_guardian_and_options_args(args)
     cli_shared.check_broadcast_args(args)
     cli_shared.prepare_nonce_in_args(args)
+    cli_shared.prepare_chain_id_in_args(args)
     staking_provider.prepare_args_automatic_activation(args)
     tx = do_prepare_transaction(args)
 
@@ -255,6 +267,7 @@ def redelegate_cap(args: Any):
     cli_shared.check_guardian_and_options_args(args)
     cli_shared.check_broadcast_args(args)
     cli_shared.prepare_nonce_in_args(args)
+    cli_shared.prepare_chain_id_in_args(args)
     staking_provider.prepare_args_redelegate_cap(args)
     tx = do_prepare_transaction(args)
 
@@ -265,6 +278,7 @@ def set_metadata(args: Any):
     cli_shared.check_guardian_and_options_args(args)
     cli_shared.check_broadcast_args(args)
     cli_shared.prepare_nonce_in_args(args)
+    cli_shared.prepare_chain_id_in_args(args)
     staking_provider.prepare_args_set_metadata(args)
     tx = do_prepare_transaction(args)
 

@@ -5,6 +5,7 @@ from typing import Any, Dict, List
 import semver
 
 from multiversx_sdk_cli import errors, utils
+from multiversx_sdk_cli.ux import show_warning
 
 SDK_PATH = Path("~/multiversx-sdk").expanduser().resolve()
 LOCAL_CONFIG_PATH = Path("mxpy.json").resolve()
@@ -29,18 +30,6 @@ class MetaChainSystemSCsCost:
     DELEGATION_OPS = 1000000
     UNSTAKE_TOKENS = 5000000
     UNBOND_TOKENS = 5000000
-
-
-def get_proxy() -> str:
-    return get_value("proxy")
-
-
-def get_chain_id() -> str:
-    return get_value("chainID")
-
-
-def get_tx_version() -> int:
-    return int(get_value("txVersion"))
 
 
 def get_dependency_resolution(key: str) -> str:
@@ -113,7 +102,7 @@ def create_new_config(name: str, template: str):
     data = read_file()
     _guard_config_unique(data, name)
     new_config = {}
-    if template is not None and template != "":
+    if template:
         _guard_valid_config_name(data, template)
         new_config = data["configurations"][template]
 
@@ -156,9 +145,6 @@ def _guard_valid_config_deletion(name: str):
 
 def get_defaults() -> Dict[str, Any]:
     return {
-        "proxy": "https://testnet-gateway.multiversx.com",
-        "chainID": "T",
-        "txVersion": "2",
         "dependencies.vmtools.tag": "latest",
         "dependencies.mx_sdk_rs.tag": "latest",
         "dependencies.vmtools.urlTemplate.linux": "https://github.com/multiversx/mx-chain-vm-go/archive/{TAG}.tar.gz",
@@ -222,13 +208,23 @@ def add_config_args(argv: List[str]) -> List[str]:
     except KeyError:
         return argv
 
+    check_for_deprecated_args(config_args)
+
     final_args = determine_final_args(argv, config_args)
     print(f"Found extra arguments in mxpy.json. Final arguments: {final_args}")
     return final_args
 
 
+def check_for_deprecated_args(args: List[str]) -> None:
+    if "chainID" in args:
+        show_warning("Providing `chainID` in the configuration file is deprecated. It will not be used. Please remove it!")
+
+    if "txVersion" in args:
+        show_warning("Providing `txVersion` in the configuration file is deprecated. It will not be used. Please remove it!")
+
+
 def determine_final_args(argv: List[str], config_args: Dict[str, Any]) -> List[str]:
-    extra_args = []
+    extra_args: List[str] = []
     for key, value in config_args.items():
         key_arg = f'--{key}'
         # arguments from the command line override the config

@@ -1,12 +1,14 @@
 from pathlib import Path
 from typing import Any, List
 
+from multiversx_sdk_network_providers.proxy_network_provider import \
+    ProxyNetworkProvider
+
 from multiversx_sdk_cli import cli_shared, utils
 from multiversx_sdk_cli.cli_output import CLIOutputBuilder
-from multiversx_sdk_network_providers.proxy_network_provider import ProxyNetworkProvider
+from multiversx_sdk_cli.cosign_transaction import cosign_transaction
 from multiversx_sdk_cli.errors import NoWalletProvided
 from multiversx_sdk_cli.transactions import Transaction, do_prepare_transaction
-from multiversx_sdk_cli.cosign_transaction import cosign_transaction
 
 
 def setup_parser(args: List[str], subparsers: Any) -> Any:
@@ -65,6 +67,7 @@ def create_transaction(args: Any):
     cli_shared.check_guardian_and_options_args(args)
     cli_shared.check_broadcast_args(args)
     cli_shared.prepare_nonce_in_args(args)
+    cli_shared.prepare_chain_id_in_args(args)
 
     if args.data_file:
         args.data = Path(args.data_file).read_text()
