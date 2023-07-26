@@ -4,6 +4,8 @@ import sys
 from argparse import ArgumentParser
 from typing import Any, List
 
+from rich.logging import RichHandler
+
 import multiversx_sdk_cli.cli_accounts
 import multiversx_sdk_cli.cli_block
 import multiversx_sdk_cli.cli_config
@@ -37,16 +39,14 @@ def main(cli_args: List[str] = sys.argv[1:]):
 
 
 def _do_main(cli_args: List[str]):
-    logging.basicConfig(level=logging.INFO)
-
     argv_with_config_args = config.add_config_args(cli_args)
     parser = setup_parser(argv_with_config_args)
     args = parser.parse_args(argv_with_config_args)
 
     if args.verbose:
-        logging.basicConfig(level=logging.DEBUG, force=True)
+        logging.basicConfig(level="DEBUG", force=True, format='%(name)s: %(message)s', handlers=[RichHandler(show_time=False, rich_tracebacks=True)])
     else:
-        logging.basicConfig(level=logging.INFO, force=True)
+        logging.basicConfig(level="INFO", format='%(name)s: %(message)s', handlers=[RichHandler(show_time=False, rich_tracebacks=True)])
 
     if not hasattr(args, "func"):
         parser.print_help()
