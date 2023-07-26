@@ -205,15 +205,14 @@ options:
   --ledger-account-index LEDGER_ACCOUNT_INDEX     🔐 the index of the account when using Ledger
   --ledger-address-index LEDGER_ADDRESS_INDEX     🔐 the index of the address when using Ledger
   --sender-username SENDER_USERNAME               🖄 the username of the sender
-  --proxy PROXY                                   🔗 the URL of the proxy (default: https://testnet-
-                                                  gateway.multiversx.com)
+  --proxy PROXY                                   🔗 the URL of the proxy
   --nonce NONCE                                   # the nonce for the transaction
   --recall-nonce                                  ⭮ whether to recall the nonce when creating the transaction (default:
                                                   False)
   --gas-price GAS_PRICE                           ⛽ the gas price (default: 1000000000)
   --gas-limit GAS_LIMIT                           ⛽ the gas limit
   --value VALUE                                   the value to transfer (default: 0)
-  --chain CHAIN                                   the chain identifier (default: T)
+  --chain CHAIN                                   the chain identifier
   --version VERSION                               the transaction version (default: 2)
   --guardian GUARDIAN                             the address of the guradian
   --guardian-service-url GUARDIAN_SERVICE_URL     the url of the guardian service
@@ -290,15 +289,14 @@ options:
   --ledger-account-index LEDGER_ACCOUNT_INDEX     🔐 the index of the account when using Ledger
   --ledger-address-index LEDGER_ADDRESS_INDEX     🔐 the index of the address when using Ledger
   --sender-username SENDER_USERNAME               🖄 the username of the sender
-  --proxy PROXY                                   🔗 the URL of the proxy (default: https://testnet-
-                                                  gateway.multiversx.com)
+  --proxy PROXY                                   🔗 the URL of the proxy
   --nonce NONCE                                   # the nonce for the transaction
   --recall-nonce                                  ⭮ whether to recall the nonce when creating the transaction (default:
                                                   False)
   --gas-price GAS_PRICE                           ⛽ the gas price (default: 1000000000)
   --gas-limit GAS_LIMIT                           ⛽ the gas limit
   --value VALUE                                   the value to transfer (default: 0)
-  --chain CHAIN                                   the chain identifier (default: T)
+  --chain CHAIN                                   the chain identifier
   --version VERSION                               the transaction version (default: 2)
   --guardian GUARDIAN                             the address of the guradian
   --guardian-service-url GUARDIAN_SERVICE_URL     the url of the guardian service
@@ -382,15 +380,14 @@ options:
   --ledger-account-index LEDGER_ACCOUNT_INDEX     🔐 the index of the account when using Ledger
   --ledger-address-index LEDGER_ADDRESS_INDEX     🔐 the index of the address when using Ledger
   --sender-username SENDER_USERNAME               🖄 the username of the sender
-  --proxy PROXY                                   🔗 the URL of the proxy (default: https://testnet-
-                                                  gateway.multiversx.com)
+  --proxy PROXY                                   🔗 the URL of the proxy
   --nonce NONCE                                   # the nonce for the transaction
   --recall-nonce                                  ⭮ whether to recall the nonce when creating the transaction (default:
                                                   False)
   --gas-price GAS_PRICE                           ⛽ the gas price (default: 1000000000)
   --gas-limit GAS_LIMIT                           ⛽ the gas limit
   --value VALUE                                   the value to transfer (default: 0)
-  --chain CHAIN                                   the chain identifier (default: T)
+  --chain CHAIN                                   the chain identifier
   --version VERSION                               the transaction version (default: 2)
   --guardian GUARDIAN                             the address of the guradian
   --guardian-service-url GUARDIAN_SERVICE_URL     the url of the guardian service
@@ -430,7 +427,7 @@ positional arguments:
 
 options:
   -h, --help                             show this help message and exit
-  --proxy PROXY                          🔗 the URL of the proxy (default: https://testnet-gateway.multiversx.com)
+  --proxy PROXY                          🔗 the URL of the proxy
   --function FUNCTION                    the function to call
   --arguments ARGUMENTS [ARGUMENTS ...]  arguments for the contract transaction, as [number, bech32-address, ascii
                                          string, boolean] or hex-encoded. E.g. --arguments 42 0x64 1000 0xabba
@@ -536,7 +533,7 @@ options:
   --gas-limit GAS_LIMIT                           ⛽ the gas limit
   --value VALUE                                   the value to transfer (default: 0)
   --data DATA                                     the payload, or 'memo' of the transaction (default: )
-  --chain CHAIN                                   the chain identifier (default: T)
+  --chain CHAIN                                   the chain identifier
   --version VERSION                               the transaction version (default: 2)
   --guardian GUARDIAN                             the address of the guradian
   --guardian-service-url GUARDIAN_SERVICE_URL     the url of the guardian service
@@ -547,8 +544,7 @@ options:
   --send                                          ✓ whether to broadcast the transaction (default: False)
   --simulate                                      whether to simulate the transaction (default: False)
   --relay                                         whether to relay the transaction (default: False)
-  --proxy PROXY                                   🔗 the URL of the proxy (default: https://testnet-
-                                                  gateway.multiversx.com)
+  --proxy PROXY                                   🔗 the URL of the proxy
   --guardian-pem GUARDIAN_PEM                     🔑 the PEM file, if keyfile not provided
   --guardian-pem-index GUARDIAN_PEM_INDEX         🔑 the index in the PEM file (default: 0)
   --guardian-keyfile GUARDIAN_KEYFILE             🔑 a JSON keyfile, if PEM not provided
@@ -590,7 +586,7 @@ options:
   -h, --help         show this help message and exit
   --infile INFILE    input file (a previously saved transaction)
   --outfile OUTFILE  where to save the output (the hash) (default: stdout)
-  --proxy PROXY      🔗 the URL of the proxy (default: https://testnet-gateway.multiversx.com)
+  --proxy PROXY      🔗 the URL of the proxy
 
 ```
 ### Transactions.Get
@@ -618,7 +614,7 @@ options:
   --hash HASH                the hash
   --sender SENDER            the sender address
   --with-results             will also return the results of transaction
-  --proxy PROXY              🔗 the URL of the proxy (default: https://testnet-gateway.multiversx.com)
+  --proxy PROXY              🔗 the URL of the proxy
   --omit-fields OMIT_FIELDS  omit fields in the output payload (default: [])
 
 ```
@@ -649,7 +645,7 @@ Get hyperblock
 
 options:
   -h, --help     show this help message and exit
-  --proxy PROXY  🔗 the URL of the proxy (default: https://testnet-gateway.multiversx.com)
+  --proxy PROXY  🔗 the URL of the proxy
   --key KEY      the hash or the nonce of the hyperblock
 
 ```
@@ -696,8 +692,7 @@ Stake value into the Network
 
 options:
   -h, --help                                      show this help message and exit
-  --proxy PROXY                                   🔗 the URL of the proxy (default: https://testnet-
-                                                  gateway.multiversx.com)
+  --proxy PROXY                                   🔗 the URL of the proxy
   --pem PEM                                       🔑 the PEM file, if keyfile not provided
   --pem-index PEM_INDEX                           🔑 the index in the PEM file (default: 0)
   --keyfile KEYFILE                               🔑 a JSON keyfile, if PEM not provided
@@ -713,7 +708,7 @@ options:
   --gas-limit GAS_LIMIT                           ⛽ the gas limit
   --estimate-gas                                  ⛽ whether to estimate the gas limit (default: 0)
   --value VALUE                                   the value to transfer (default: 0)
-  --chain CHAIN                                   the chain identifier (default: T)
+  --chain CHAIN                                   the chain identifier
   --version VERSION                               the transaction version (default: 2)
   --guardian GUARDIAN                             the address of the guradian
   --guardian-service-url GUARDIAN_SERVICE_URL     the url of the guardian service
@@ -747,8 +742,7 @@ Unstake value
 
 options:
   -h, --help                                      show this help message and exit
-  --proxy PROXY                                   🔗 the URL of the proxy (default: https://testnet-
-                                                  gateway.multiversx.com)
+  --proxy PROXY                                   🔗 the URL of the proxy
   --pem PEM                                       🔑 the PEM file, if keyfile not provided
   --pem-index PEM_INDEX                           🔑 the index in the PEM file (default: 0)
   --keyfile KEYFILE                               🔑 a JSON keyfile, if PEM not provided
@@ -764,7 +758,7 @@ options:
   --gas-limit GAS_LIMIT                           ⛽ the gas limit
   --estimate-gas                                  ⛽ whether to estimate the gas limit (default: 0)
   --value VALUE                                   the value to transfer (default: 0)
-  --chain CHAIN                                   the chain identifier (default: T)
+  --chain CHAIN                                   the chain identifier
   --version VERSION                               the transaction version (default: 2)
   --guardian GUARDIAN                             the address of the guradian
   --guardian-service-url GUARDIAN_SERVICE_URL     the url of the guardian service
@@ -796,8 +790,7 @@ Unjail a Validator Node
 
 options:
   -h, --help                                      show this help message and exit
-  --proxy PROXY                                   🔗 the URL of the proxy (default: https://testnet-
-                                                  gateway.multiversx.com)
+  --proxy PROXY                                   🔗 the URL of the proxy
   --pem PEM                                       🔑 the PEM file, if keyfile not provided
   --pem-index PEM_INDEX                           🔑 the index in the PEM file (default: 0)
   --keyfile KEYFILE                               🔑 a JSON keyfile, if PEM not provided
@@ -813,7 +806,7 @@ options:
   --gas-limit GAS_LIMIT                           ⛽ the gas limit
   --estimate-gas                                  ⛽ whether to estimate the gas limit (default: 0)
   --value VALUE                                   the value to transfer (default: 0)
-  --chain CHAIN                                   the chain identifier (default: T)
+  --chain CHAIN                                   the chain identifier
   --version VERSION                               the transaction version (default: 2)
   --guardian GUARDIAN                             the address of the guradian
   --guardian-service-url GUARDIAN_SERVICE_URL     the url of the guardian service
@@ -845,8 +838,7 @@ Unbond tokens for a bls key
 
 options:
   -h, --help                                      show this help message and exit
-  --proxy PROXY                                   🔗 the URL of the proxy (default: https://testnet-
-                                                  gateway.multiversx.com)
+  --proxy PROXY                                   🔗 the URL of the proxy
   --pem PEM                                       🔑 the PEM file, if keyfile not provided
   --pem-index PEM_INDEX                           🔑 the index in the PEM file (default: 0)
   --keyfile KEYFILE                               🔑 a JSON keyfile, if PEM not provided
@@ -862,7 +854,7 @@ options:
   --gas-limit GAS_LIMIT                           ⛽ the gas limit
   --estimate-gas                                  ⛽ whether to estimate the gas limit (default: 0)
   --value VALUE                                   the value to transfer (default: 0)
-  --chain CHAIN                                   the chain identifier (default: T)
+  --chain CHAIN                                   the chain identifier
   --version VERSION                               the transaction version (default: 2)
   --guardian GUARDIAN                             the address of the guradian
   --guardian-service-url GUARDIAN_SERVICE_URL     the url of the guardian service
@@ -894,8 +886,7 @@ Change the reward address
 
 options:
   -h, --help                                      show this help message and exit
-  --proxy PROXY                                   🔗 the URL of the proxy (default: https://testnet-
-                                                  gateway.multiversx.com)
+  --proxy PROXY                                   🔗 the URL of the proxy
   --pem PEM                                       🔑 the PEM file, if keyfile not provided
   --pem-index PEM_INDEX                           🔑 the index in the PEM file (default: 0)
   --keyfile KEYFILE                               🔑 a JSON keyfile, if PEM not provided
@@ -911,7 +902,7 @@ options:
   --gas-limit GAS_LIMIT                           ⛽ the gas limit
   --estimate-gas                                  ⛽ whether to estimate the gas limit (default: 0)
   --value VALUE                                   the value to transfer (default: 0)
-  --chain CHAIN                                   the chain identifier (default: T)
+  --chain CHAIN                                   the chain identifier
   --version VERSION                               the transaction version (default: 2)
   --guardian GUARDIAN                             the address of the guradian
   --guardian-service-url GUARDIAN_SERVICE_URL     the url of the guardian service
@@ -943,8 +934,7 @@ Claim rewards
 
 options:
   -h, --help                                      show this help message and exit
-  --proxy PROXY                                   🔗 the URL of the proxy (default: https://testnet-
-                                                  gateway.multiversx.com)
+  --proxy PROXY                                   🔗 the URL of the proxy
   --pem PEM                                       🔑 the PEM file, if keyfile not provided
   --pem-index PEM_INDEX                           🔑 the index in the PEM file (default: 0)
   --keyfile KEYFILE                               🔑 a JSON keyfile, if PEM not provided
@@ -960,7 +950,7 @@ options:
   --gas-limit GAS_LIMIT                           ⛽ the gas limit
   --estimate-gas                                  ⛽ whether to estimate the gas limit (default: 0)
   --value VALUE                                   the value to transfer (default: 0)
-  --chain CHAIN                                   the chain identifier (default: T)
+  --chain CHAIN                                   the chain identifier
   --version VERSION                               the transaction version (default: 2)
   --guardian GUARDIAN                             the address of the guradian
   --guardian-service-url GUARDIAN_SERVICE_URL     the url of the guardian service
@@ -1012,7 +1002,7 @@ Query account details (nonce, balance etc.)
 
 options:
   -h, --help                 show this help message and exit
-  --proxy PROXY              🔗 the URL of the proxy (default: https://testnet-gateway.multiversx.com)
+  --proxy PROXY              🔗 the URL of the proxy
   --address ADDRESS          🖄 the address to query
   --balance                  whether to only fetch the balance
   --nonce                    whether to only fetch the nonce
@@ -1257,7 +1247,7 @@ Get the number of shards.
 
 options:
   -h, --help     show this help message and exit
-  --proxy PROXY  🔗 the URL of the proxy (default: https://testnet-gateway.multiversx.com)
+  --proxy PROXY  🔗 the URL of the proxy
 
 ```
 ### Network.BlockNonce
@@ -1271,7 +1261,7 @@ Get the latest block nonce, by shard.
 
 options:
   -h, --help     show this help message and exit
-  --proxy PROXY  🔗 the URL of the proxy (default: https://testnet-gateway.multiversx.com)
+  --proxy PROXY  🔗 the URL of the proxy
   --shard SHARD  the shard ID (use 4294967295 for metachain)
 
 ```
@@ -1286,7 +1276,7 @@ Get the chain identifier.
 
 options:
   -h, --help     show this help message and exit
-  --proxy PROXY  🔗 the URL of the proxy (default: https://testnet-gateway.multiversx.com)
+  --proxy PROXY  🔗 the URL of the proxy
 
 ```
 ## Group **Dependencies**
