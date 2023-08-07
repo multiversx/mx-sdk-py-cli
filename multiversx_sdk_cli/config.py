@@ -157,7 +157,7 @@ def get_defaults() -> Dict[str, Any]:
         "dependencies.rust.resolution": "SDK",
         "dependencies.rust.tag": "nightly",
         "dependencies.golang.resolution": "SDK",
-        "dependencies.golang.tag": "go1.18.4",
+        "dependencies.golang.tag": "go1.20.5",
         "dependencies.golang.urlTemplate.linux": "https://golang.org/dl/{TAG}.linux-amd64.tar.gz",
         "dependencies.golang.urlTemplate.osx": "https://golang.org/dl/{TAG}.darwin-amd64.tar.gz",
         "dependencies.golang.urlTemplate.windows": "https://golang.org/dl/{TAG}.windows-amd64.zip",
