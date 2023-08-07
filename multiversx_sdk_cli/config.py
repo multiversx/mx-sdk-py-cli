@@ -216,6 +216,9 @@ def add_config_args(argv: List[str]) -> List[str]:
 
 
 def check_for_deprecated_args(args: List[str]) -> None:
+    if "proxy" in args:
+        show_warning("Providing `proxy` in the configuration file is deprecated. It will not be used. Please remove it!")
+
     if "chainID" in args:
         show_warning("Providing `chainID` in the configuration file is deprecated. It will not be used. Please remove it!")
 
