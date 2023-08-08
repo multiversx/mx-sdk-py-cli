@@ -296,7 +296,7 @@ def convert_args_object_to_args_list(args: Any) -> List[str]:
     args_dict: Dict[str, Any] = arguments.__dict__
 
     # delete the function key because we don't need to pass it along
-    args_dict.pop("func")
+    args_dict.pop("func", None)
 
     args_list: List[str] = []
     for key, val in args_dict.items():

@@ -1,9 +1,10 @@
 import logging
 from pathlib import Path
 
-from multiversx_sdk_cli import dependencies, myprocess, utils
+from multiversx_sdk_cli import config, dependencies, myprocess, utils
 from multiversx_sdk_cli.errors import BadFile
-from multiversx_sdk_cli.projects.report.features.report_option import ReportFeature
+from multiversx_sdk_cli.projects.report.features.report_option import \
+    ReportFeature
 
 logger = logging.getLogger("projects.report.options.twiggy_paths_check")
 
@@ -26,9 +27,22 @@ class TwiggyPathsCheck(ReportFeature):
         return True
 
 
+def ensure_twiggy_is_installed():
+    module = dependencies.get_module_by_key("twiggy")
+    default_tag: str = config.get_dependency_tag(module.key)
+
+    installed = module.is_installed(default_tag)
+
+    if not installed:
+        logger.warning("twiggy is not installed! Installing twiggy...")
+        dependencies.install_module("twiggy")
+
+
 def run_twiggy_paths(wasm_path: Path) -> Path:
     rust = dependencies.get_module_by_key("rust")
     debug_wasm_path = _get_debug_wasm_path(wasm_path)
+
+    ensure_twiggy_is_installed()
     twiggy_paths_args = ["twiggy", "paths", str(debug_wasm_path)]
     output = myprocess.run_process(twiggy_paths_args, env=rust.get_env(), cwd=debug_wasm_path.parent, dump_to_stdout=False)
     output_path = _get_twiggy_paths_path(wasm_path)
