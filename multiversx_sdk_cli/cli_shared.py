@@ -173,6 +173,9 @@ def prepare_guardian_account(args: Any):
 
 
 def prepare_nonce_in_args(args: Any):
+    if args.recall_nonce and not args.proxy:
+        raise ArgumentsNotProvidedError("When using `--recall-nonce`, `--proxy` must be provided, as well")
+
     if args.recall_nonce:
         account = prepare_account(args)
         account.sync_nonce(ProxyNetworkProvider(args.proxy))
