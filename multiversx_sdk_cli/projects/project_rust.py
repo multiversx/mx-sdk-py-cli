@@ -128,7 +128,7 @@ class ProjectRust(Project):
         return dependencies.get_module_by_key("rust").get_env()
 
     def build_wasm_with_debug_symbols(self, build_options: Dict[str, Any]):
-        cwd = self.get_meta_folder().parent
+        cwd = self.path
         env = self.get_env()
         target_dir: str = build_options.get("target-dir", "")
         target_dir = self._ensure_cargo_target_dir(target_dir)

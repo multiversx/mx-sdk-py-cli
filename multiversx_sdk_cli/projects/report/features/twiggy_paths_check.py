@@ -27,24 +27,14 @@ class TwiggyPathsCheck(ReportFeature):
         return True
 
 
-def ensure_twiggy_is_installed():
-    module = dependencies.get_module_by_key("twiggy")
-    default_tag: str = config.get_dependency_tag(module.key)
-
-    installed = module.is_installed(default_tag)
-
-    if not installed:
-        logger.warning("twiggy is not installed! Installing twiggy...")
-        dependencies.install_module("twiggy")
-
-
 def run_twiggy_paths(wasm_path: Path) -> Path:
     rust = dependencies.get_module_by_key("rust")
     debug_wasm_path = _get_debug_wasm_path(wasm_path)
 
-    ensure_twiggy_is_installed()
+    dependencies.install_module("twiggy")
     twiggy_paths_args = ["twiggy", "paths", str(debug_wasm_path)]
     output = myprocess.run_process(twiggy_paths_args, env=rust.get_env(), cwd=debug_wasm_path.parent, dump_to_stdout=False)
+
     output_path = _get_twiggy_paths_path(wasm_path)
     utils.write_file(output_path, output)
     logger.info(f"Twiggy paths output path: {output_path}")

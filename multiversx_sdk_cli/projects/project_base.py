@@ -32,9 +32,6 @@ class Project(IProject):
         self._do_after_build_core()
         return contract_paths
 
-    def get_option(self, option_name: str) -> Any:
-        return self.options.get(option_name, None)
-
     def clean(self):
         utils.remove_folder(self.get_output_folder())
 

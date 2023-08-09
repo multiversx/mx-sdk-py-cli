@@ -29,8 +29,7 @@ def _build_report(args: Any, build_options: Dict[str, Any]) -> None:
     project_paths = get_project_paths_recursively(base_path)
     options = get_default_report_features()
 
-    args_copy = copy.deepcopy(args)
-    _prepare_args_for_build(args_copy)
+    args_copy = _prepare_args_for_build(args)
     build_args = cli_shared.convert_args_object_to_args_list(args_copy)
 
     report_creator = ReportCreator(options, skip_build=args.skip_build, skip_twiggy=args.skip_twiggy, build_options=build_options, build_args=build_args)
@@ -39,9 +38,13 @@ def _build_report(args: Any, build_options: Dict[str, Any]) -> None:
 
 
 def _prepare_args_for_build(args: Any):
-    arguments: Dict[str, Any] = args.__dict__
+    args_copy = copy.deepcopy(args)
+
+    arguments: Dict[str, Any] = args_copy.__dict__
     arguments.pop("output_format", None)
     arguments.pop("output_file", None)
+
+    return args_copy
 
 
 def _compare_reports(args: Any, merge_report_paths: List[Path]) -> None:
