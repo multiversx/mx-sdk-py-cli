@@ -155,7 +155,7 @@ def get_defaults() -> Dict[str, Any]:
         "dependencies.llvm.urlTemplate.linux": "https://ide.elrond.com/vendor-llvm/{TAG}/linux-amd64.tar.gz?t=19feb",
         "dependencies.llvm.urlTemplate.osx": "https://ide.elrond.com/vendor-llvm/{TAG}/darwin-amd64.tar.gz?t=19feb",
         "dependencies.rust.resolution": "SDK",
-        "dependencies.rust.tag": "nightly",
+        "dependencies.rust.tag": "nightly-2023-04-24",
         "dependencies.golang.resolution": "SDK",
         "dependencies.golang.tag": "go1.20.5",
         "dependencies.golang.urlTemplate.linux": "https://golang.org/dl/{TAG}.linux-amd64.tar.gz",
