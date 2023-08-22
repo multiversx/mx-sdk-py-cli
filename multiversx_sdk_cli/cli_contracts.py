@@ -1,7 +1,7 @@
 import logging
 import os
 from pathlib import Path
-from typing import Any, Dict, List
+from typing import Any, List
 
 from multiversx_sdk_core import Address, Transaction
 from multiversx_sdk_network_providers.proxy_network_provider import \
@@ -56,13 +56,12 @@ def setup_parser(args: List[str], subparsers: Any) -> Any:
     sub.set_defaults(func=run_tests)
 
     sub = cli_shared.add_command_subparser(subparsers, "contract", "report", "Print a detailed report of the smart contracts.")
-    _add_project_arg(sub)
     sub.add_argument("--skip-build", action="store_true", default=False, help="skips the step of building of the wasm contracts")
     sub.add_argument("--skip-twiggy", action="store_true", default=False, help="skips the steps of building the debug wasm files and running twiggy")
     sub.add_argument("--output-format", type=str, default="text-markdown", choices=["github-markdown", "text-markdown", "json"], help="report output format (default: %(default)s)")
     sub.add_argument("--output-file", type=Path, help="if specified, the output is written to a file, otherwise it's written to the standard output")
     sub.add_argument("--compare", type=Path, nargs='+', metavar=("report-1.json", "report-2.json"), help="create a comparison from two or more reports")
-    _add_build_options_args(sub)
+    _add_build_options_sc_meta(sub)
     sub.set_defaults(func=do_report)
 
     output_description = CLIOutputBuilder.describe(with_contract=True, with_transaction_on_network=True, with_simulation=True)
@@ -128,12 +127,9 @@ def setup_parser(args: List[str], subparsers: Any) -> Any:
     _add_arguments_arg(sub)
     sub.set_defaults(func=query)
 
-    sub = cli_shared.add_command_subparser(
-        subparsers,
-        "contract",
-        "verify",
-        "Verify the authenticity of the code of a deployed Smart Contract",
-    )
+    sub = cli_shared.add_command_subparser(subparsers, "contract", "verify",
+                                           "Verify the authenticity of the code of a deployed Smart Contract",
+                                           )
 
     sub.add_argument(
         "--packaged-src", required=True, help="JSON file containing the source code of the contract"
@@ -278,22 +274,9 @@ def build(args: Any):
         projects.build_project(project, arg_list)
 
 
-def _prepare_build_options(args: Any) -> Dict[str, Any]:
-    return {
-        "debug": args.debug,
-        "optimized": not args.no_optimization,
-        "no-wasm-opt": args.no_wasm_opt,
-        "verbose": args.verbose,
-        "cargo-target-dir": args.cargo_target_dir,
-        "wasm-symbols": args.wasm_symbols,
-        "wasm-name": args.wasm_name,
-        "wasm-suffix": args.wasm_suffix
-    }
-
-
 def do_report(args: Any):
-    build_options: Dict[str, Any] = _prepare_build_options(args)
-    projects.do_report(args, build_options)
+    args_dict = args.__dict__
+    projects.do_report(args, args_dict)
 
 
 def run_tests(args: Any):
@@ -479,7 +462,7 @@ def do_reproducible_build(args: Any):
 
     utils.ensure_folder(output_path)
 
-    options = _prepare_build_options(args)
+    options = args.__dict__
     no_wasm_opt = options.get("no-wasm-opt", True)
 
     if not is_docker_installed():
