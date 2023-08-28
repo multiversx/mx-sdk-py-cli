@@ -83,11 +83,6 @@ generate() {
     command "Localnet.Start" "localnet start"
     command "Localnet.Clean" "localnet clean"
 
-    group "Network" "network"
-    command "Network.NumShards" "network num-shards"
-    command "Network.BlockNonce" "network block-nonce"
-    command "Network.Chain" "network chain"
-
     group "Dependencies" "deps"
     command "Dependencies.Install" "deps install"
     command "Dependencies.Check" "deps check"
