@@ -16,7 +16,7 @@ def test_contract_new():
         f"{parent}/testdata-out/SANDBOX",
         "myadder-rs"
     ])
-    assert Path.is_dir(Path(f"{parent}/testdata-out/SANDBOX/myadder-rs"))
+    assert Path.is_dir(Path(parent) / "testdata-out" / "SANDBOX" / "myadder-rs")
 
 
 def test_contract_new_with_bad_code():
@@ -31,7 +31,7 @@ def test_contract_new_with_bad_code():
         "myadder-rs-bad-src"
     ])
 
-    assert Path.is_dir(Path(f"{parent}/testdata-out/SANDBOX/myadder-rs-bad-src"))
+    assert Path.is_dir(Path(Path(parent) / "testdata-out" / "SANDBOX" / "myadder-rs-bad-src"))
     replace_variable_with_unknown_variable()
 
 
@@ -57,7 +57,7 @@ def test_contract_build():
         f"{parent}/testdata-out/SANDBOX/myadder-rs"
     ])
 
-    assert Path.is_file(Path(f"{parent}/testdata-out/SANDBOX/myadder-rs/output/myadder-rs.wasm"))
+    assert Path.is_file(Path(Path(parent) / "testdata-out" / "SANDBOX" / "myadder-rs" / "output" / "myadder-rs.wasm"))
 
 
 def test_bad_contract_build(capsys: Any):
