@@ -46,7 +46,6 @@ jobs:
       shell: bash
       run: |
         export PYTHONPATH=.
-        python3 -m unittest discover -s multiversx_sdk_cli/tests
         pytest .
     - name: Run CLI tests
       shell: bash

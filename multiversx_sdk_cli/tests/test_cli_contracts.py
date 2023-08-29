@@ -6,6 +6,49 @@ from multiversx_sdk_cli.cli import main
 parent = Path(__file__).parent
 
 
+def test_contract_new():
+    main([
+        "contract",
+        "new",
+        "--template",
+        "adder",
+        "--directory",
+        f"{parent}/testdata-out/SANDBOX",
+        "myadder-rs"
+    ])
+    assert Path.is_dir(Path(f"{parent}/testdata-out/SANDBOX/myadder-rs"))
+
+
+def test_contract_new_with_bad_code():
+    # we change the contract code so the build would fail so we can catch the error
+    main([
+        "contract",
+        "new",
+        "--template",
+        "adder",
+        "--directory",
+        f"{parent}/testdata-out/SANDBOX",
+        "myadder-rs-bad-src"
+    ])
+
+    assert Path.is_dir(Path(f"{parent}/testdata-out/SANDBOX/myadder-rs-bad-src"))
+    replace_variable_with_unknown_variable()
+
+
+def replace_variable_with_unknown_variable():
+    # this is done in order to replace the value added in the adder contract witha unknown variable
+    with open(f"{parent}/testdata-out/SANDBOX/myadder-rs-bad-src/src/adder.rs", "r") as f:
+        contract_lines = f.readlines()
+
+    for index, line in reversed(list(enumerate(contract_lines))):
+        if "value" in line:
+            contract_lines[index] = line.replace("value", "unknown_variable")
+            break
+
+    with open(f"{parent}/testdata-out/SANDBOX/myadder-rs-bad-src/src/adder.rs", "w") as f:
+        f.writelines(contract_lines)
+
+
 def test_contract_build():
     main([
         "contract",
