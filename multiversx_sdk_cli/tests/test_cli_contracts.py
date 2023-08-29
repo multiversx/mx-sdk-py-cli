@@ -1,6 +1,8 @@
 from pathlib import Path
 from typing import Any
 
+import pytest
+
 from multiversx_sdk_cli.cli import main
 
 parent = Path(__file__).parent
@@ -49,6 +51,7 @@ def replace_variable_with_unknown_variable():
         f.writelines(contract_lines)
 
 
+@pytest.mark.skip_on_windows
 def test_contract_build():
     main([
         "contract",
@@ -60,6 +63,7 @@ def test_contract_build():
     assert Path.is_file(Path(Path(parent) / "testdata-out" / "SANDBOX" / "adder" / "output" / "adder.wasm"))
 
 
+@pytest.mark.skip_on_windows
 def test_bad_contract_build(capsys: Any):
     ERROR = "Build error: error code = 101, see output."
 
