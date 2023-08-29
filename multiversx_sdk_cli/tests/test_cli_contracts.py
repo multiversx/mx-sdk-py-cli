@@ -14,9 +14,9 @@ def test_contract_new():
         "adder",
         "--directory",
         f"{parent}/testdata-out/SANDBOX",
-        "myadder-rs"
+        "adder"
     ])
-    assert Path.is_dir(Path(parent) / "testdata-out" / "SANDBOX" / "myadder-rs")
+    assert Path.is_dir(parent / "testdata-out" / "SANDBOX" / "adder")
 
 
 def test_contract_new_with_bad_code():
@@ -28,16 +28,16 @@ def test_contract_new_with_bad_code():
         "adder",
         "--directory",
         f"{parent}/testdata-out/SANDBOX",
-        "myadder-rs-bad-src"
+        "adder-bad-src"
     ])
 
-    assert Path.is_dir(Path(Path(parent) / "testdata-out" / "SANDBOX" / "myadder-rs-bad-src"))
+    assert Path.is_dir(parent / "testdata-out" / "SANDBOX" / "adder-bad-src")
     replace_variable_with_unknown_variable()
 
 
 def replace_variable_with_unknown_variable():
     # this is done in order to replace the value added in the adder contract witha unknown variable
-    with open(f"{parent}/testdata-out/SANDBOX/myadder-rs-bad-src/src/adder.rs", "r") as f:
+    with open(parent / "testdata-out" / "SANDBOX" / "adder-bad-src" / "src" / "adder.rs", "r") as f:
         contract_lines = f.readlines()
 
     for index, line in reversed(list(enumerate(contract_lines))):
@@ -45,7 +45,7 @@ def replace_variable_with_unknown_variable():
             contract_lines[index] = line.replace("value", "unknown_variable")
             break
 
-    with open(f"{parent}/testdata-out/SANDBOX/myadder-rs-bad-src/src/adder.rs", "w") as f:
+    with open(parent / "testdata-out" / "SANDBOX" / "adder-bad-src" / "src" / "adder.rs", "w") as f:
         f.writelines(contract_lines)
 
 
@@ -54,10 +54,10 @@ def test_contract_build():
         "contract",
         "build",
         "--path",
-        f"{parent}/testdata-out/SANDBOX/myadder-rs"
+        f"{parent}/testdata-out/SANDBOX/adder"
     ])
 
-    assert Path.is_file(Path(Path(parent) / "testdata-out" / "SANDBOX" / "myadder-rs" / "output" / "myadder-rs.wasm"))
+    assert Path.is_file(Path(Path(parent) / "testdata-out" / "SANDBOX" / "adder" / "output" / "adder.wasm"))
 
 
 def test_bad_contract_build(capsys: Any):
@@ -67,7 +67,7 @@ def test_bad_contract_build(capsys: Any):
         "contract",
         "build",
         "--path",
-        f"{parent}/testdata-out/SANDBOX/myadder-rs-bad-src"
+        f"{parent}/testdata-out/SANDBOX/adder-bad-src"
     ])
 
     out, _ = capsys.readouterr()
