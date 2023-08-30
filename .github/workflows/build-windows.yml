@@ -46,8 +46,7 @@ jobs:
       shell: bash
       run: |
         export PYTHONPATH=.
-        python3 -m unittest discover -s multiversx_sdk_cli/tests
-        pytest .
+        pytest -m "not skip_on_windows" .
     - name: Run CLI tests
       shell: bash
       run: |

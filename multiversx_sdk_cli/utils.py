@@ -239,15 +239,6 @@ def query_latest_release_tag(repo: str) -> str:
     return latest_release_tag
 
 
-# https://code.visualstudio.com/docs/python/debugging
-def breakpoint():
-    import debugpy
-    debugpy.listen(5678)
-    print("Waiting for debugger attach")
-    debugpy.wait_for_client()
-    debugpy.breakpoint()
-
-
 def log_explorer(chain: str, name: str, path: str, details: str):
     networks = {
         "1": ("MultiversX Mainnet Explorer", "https://explorer.multiversx.com"),

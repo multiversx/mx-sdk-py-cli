@@ -43,13 +43,7 @@ class ProjectRust(Project):
         if not meta:
             raise errors.NotSupportedProject("The project does not have a meta crate")
 
-        try:
-            # The meta crate handles the build process, ABI generation and
-            # allows contract developers to add extra
-            # preparation steps before building.
-            self.run_meta()
-        except subprocess.CalledProcessError as err:
-            raise errors.BuildError(err.output)
+        self.run_meta()
 
     def prepare_build_wasm_args(self, args: List[str]):
         args.extend([
@@ -76,9 +70,10 @@ class ProjectRust(Project):
 
         args.extend(self.forwarded_args)
 
-        return_code = subprocess.check_call(args, env=env)
-        if return_code != 0:
-            raise errors.BuildError(f"error code = {return_code}, see output")
+        try:
+            subprocess.check_call(args, env=env)
+        except subprocess.CalledProcessError as err:
+            raise errors.BuildError(f"error code = {err.returncode}, see output")
 
     def _ensure_cargo_target_dir(self, target_dir: str):
         default_target_dir = str(workstation.get_tools_folder() / DEFAULT_CARGO_TARGET_DIR_NAME)
@@ -143,9 +138,10 @@ class ProjectRust(Project):
             "--target-dir", target_dir
         ]
 
-        return_code = subprocess.check_call(args, env=env, cwd=cwd)
-        if return_code != 0:
-            raise errors.BuildError(f"error code = {return_code}, see output")
+        try:
+            subprocess.check_call(args, env=env, cwd=cwd)
+        except subprocess.CalledProcessError as err:
+            raise errors.BuildError(f"error code = {err.returncode}, see output")
 
 
 class CargoFile:

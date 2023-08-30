@@ -1,10 +1,88 @@
 from pathlib import Path
+from typing import Any
+
+import pytest
 
 from multiversx_sdk_cli.cli import main
 
+parent = Path(__file__).parent
+
+
+def test_contract_new():
+    main([
+        "contract",
+        "new",
+        "--template",
+        "adder",
+        "--directory",
+        f"{parent}/testdata-out/SANDBOX",
+        "adder"
+    ])
+    assert Path.is_dir(parent / "testdata-out" / "SANDBOX" / "adder")
+
+
+def test_contract_new_with_bad_code():
+    # we change the contract code so the build would fail so we can catch the error
+    main([
+        "contract",
+        "new",
+        "--template",
+        "adder",
+        "--directory",
+        f"{parent}/testdata-out/SANDBOX",
+        "adder-bad-src"
+    ])
+
+    assert Path.is_dir(parent / "testdata-out" / "SANDBOX" / "adder-bad-src")
+    replace_variable_with_unknown_variable()
+
+
+def replace_variable_with_unknown_variable():
+    # this is done in order to replace the value added in the adder contract witha unknown variable
+    with open(parent / "testdata-out" / "SANDBOX" / "adder-bad-src" / "src" / "adder.rs", "r") as f:
+        contract_lines = f.readlines()
+
+    for index, line in reversed(list(enumerate(contract_lines))):
+        if "value" in line:
+            contract_lines[index] = line.replace("value", "unknown_variable")
+            break
+
+    with open(parent / "testdata-out" / "SANDBOX" / "adder-bad-src" / "src" / "adder.rs", "w") as f:
+        f.writelines(contract_lines)
+
+
+@pytest.mark.skip_on_windows
+def test_contract_build():
+    main([
+        "contract",
+        "build",
+        "--path",
+        f"{parent}/testdata-out/SANDBOX/adder"
+    ])
+
+    assert Path.is_file(Path(Path(parent) / "testdata-out" / "SANDBOX" / "adder" / "output" / "adder.wasm"))
+
+
+@pytest.mark.skip_on_windows
+def test_bad_contract_build(capsys: Any):
+    ERROR = "Build error: error code = 101, see output."
+
+    main([
+        "contract",
+        "build",
+        "--path",
+        f"{parent}/testdata-out/SANDBOX/adder-bad-src"
+    ])
+
+    out, _ = capsys.readouterr()
+
+    if ERROR in out:
+        assert True
+    else:
+        assert False
+
 
 def test_contract_deploy():
-    parent = Path(__file__).parent
     output_file = parent / "testdata-out" / "deploy.json"
 
     main(
@@ -32,7 +110,6 @@ def test_contract_deploy():
 
 
 def test_contract_upgrade():
-    parent = Path(__file__).parent
     output_file = parent / "testdata-out" / "upgrade.json"
     contract_address = "erd1qqqqqqqqqqqqqpgq5l9jl0j0gnqmm7hn82zaydwux3s5xuwkyq8srt5vsy"
 
@@ -62,7 +139,6 @@ def test_contract_upgrade():
 
 
 def test_contract_call():
-    parent = Path(__file__).parent
     output_file = parent / "testdata-out" / "call.json"
     contract_address = "erd1qqqqqqqqqqqqqpgq5l9jl0j0gnqmm7hn82zaydwux3s5xuwkyq8srt5vsy"
 
