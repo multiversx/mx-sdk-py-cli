@@ -20,14 +20,16 @@ def main():
     parser.add_argument("--exact-version", help="the exact version of mxpy to install")
     parser.add_argument("--from-branch", help="use a branch of multiversx/mx-sdk-py-cli")
     parser.add_argument("--not-interactive", action="store_true", default=False)
+    parser.add_argument("--verbose", action="store_true", default=False)
     parser.set_defaults(modify_path=True)
     args = parser.parse_args()
 
     exact_version = args.exact_version
     from_branch = args.from_branch
     interactive = not args.not_interactive
+    verbose = args.verbose
 
-    logging.basicConfig(level=logging.INFO)
+    logging.basicConfig(level=logging.DEBUG) if verbose else logging.basicConfig(level=logging.INFO)
 
     if get_operating_system() == "windows":
         print("""
@@ -45,7 +47,8 @@ Windows support is limited and experimental.
     # In case of a fresh install:
     sdk_path.mkdir(parents=True, exist_ok=True)
     create_venv()
-    install_mxpy(exact_version, from_branch)
+    logger.info("Installing the necessary dependecies...")
+    install_mxpy(exact_version, from_branch, verbose)
 
     run_post_install_checks()
 
@@ -151,7 +154,7 @@ def get_mxpy_venv_path():
     return sdk_path / "mxpy-venv"
 
 
-def install_mxpy(exact_version: str, from_branch: str):
+def install_mxpy(exact_version: str, from_branch: str, verbose: bool):
     logger.debug("Installing mxpy in virtual environment...")
 
     if from_branch:
@@ -161,14 +164,14 @@ def install_mxpy(exact_version: str, from_branch: str):
 
     venv_path = get_mxpy_venv_path()
 
-    return_code = run_in_venv(["python3", "-m", "pip", "install", "--upgrade", "pip"], venv_path)
+    return_code = run_in_venv(["python3", "-m", "pip", "install", "--upgrade", "pip"], venv_path, verbose)
     if return_code != 0:
         raise InstallError("Could not upgrade pip.")
-    return_code = run_in_venv(["pip3", "install", "--no-cache-dir", package_to_install], venv_path)
+    return_code = run_in_venv(["pip3", "install", "--no-cache-dir", package_to_install], venv_path, verbose)
     if return_code != 0:
         raise InstallError("Could not install mxpy.")
 
-    logger.info("Creating mxpy shortcut...")
+    logger.debug("Creating mxpy shortcut...")
 
     shortcut_path = sdk_path / "mxpy"
 
@@ -202,7 +205,7 @@ def get_mxpy_shortcut_content():
 """
 
 
-def run_in_venv(args: List[str], venv_path: Path):
+def run_in_venv(args: List[str], venv_path: Path, verbose: bool):
     env = os.environ.copy()
 
     if "PYTHONHOME" in env:
@@ -211,7 +214,11 @@ def run_in_venv(args: List[str], venv_path: Path):
     env["PATH"] = str(venv_path / "bin") + ":" + env["PATH"]
     env["VIRTUAL_ENV"] = str(venv_path)
 
-    process = subprocess.Popen(args, env=env)
+    if verbose:
+        process = subprocess.Popen(args, env=env)
+    else:
+        process = subprocess.Popen(args, env=env, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
+
     return process.wait()
 
 
@@ -219,8 +226,16 @@ def run_post_install_checks():
     multiversx_sdk_path = Path("~/multiversx-sdk").expanduser()
 
     logger.debug("Running post-install checks...")
-    print("~/multiversx-sdk exists", "OK" if multiversx_sdk_path.exists() else "NOK")
-    print("~/multiversx-sdk/mxpy shortcut created", "OK" if (multiversx_sdk_path / "mxpy").exists() else "NOK")
+
+    if multiversx_sdk_path.exists():
+        logger.debug("~/multiversx-sdk exists  OK")
+    else:
+        logger.debug("~/multiversx-sdk exists  NOK")
+
+    if (multiversx_sdk_path / "mxpy").exists():
+        logger.debug("~/multiversx-sdk/mxpy shortcut created  OK")
+    else:
+        logger.debug("~/multiversx-sdk/mxpy shortcut created  NOK")
 
 
 def guide_system_path_integration():
@@ -230,14 +245,14 @@ def guide_system_path_integration():
     if operating_system == "windows":
         print(f"""
 ###############################################################################
-On Windows, for the "mxpy" command shortcut to be available, you need to add the directory "{sdk_path}" to the system PATH.
+On Windows, for the "mxpy" command shortcut to be available, you NEED to add the directory "{sdk_path}" to the system PATH.
 
 You can do this by following these steps:
 
 https://superuser.com/questions/949560/how-do-i-set-system-environment-variables-in-windows-10
 
 ###############################################################################
-Do you understand the above?
+Do you UNDERSTAND the above?
 ###############################################################################
 """)
         confirm_continuation(interactive)
@@ -255,7 +270,7 @@ No shell profile files have been found.
 
 The "mxpy" command shortcut will not be available until you add the directory "{sdk_path}" to the system PATH.
 ###############################################################################
-Do you understand the above?
+Do you UNDERSTAND the above?
 """)
         confirm_continuation(interactive)
         return
@@ -279,7 +294,7 @@ Your shell profile files:
 The entry (entries) to remove: 
     {old_export_directive}
 ###############################################################################
-Make sure you understand the above before proceeding further.
+Make sure you UNDERSTAND the above before proceeding further.
 ###############################################################################
 """)
         confirm_continuation(interactive)
@@ -290,7 +305,7 @@ Make sure you understand the above before proceeding further.
 ###############################################################################
 It seems that the path "~/multiversx-sdk" is already configured in shell profile.
 
-To confirm this, check the shell profile (now or after the installer script ends). 
+To confirm this, CHECK the shell profile (now or after the installer script ends). 
 
 Your shell profile files:
 {profile_files_formatted}
@@ -298,7 +313,7 @@ Your shell profile files:
 The entry to check (it should be present): 
     {new_export_directive}.
 ###############################################################################
-Make sure you understand the above before proceeding further.
+Make sure you UNDERSTAND the above before proceeding further.
 ###############################################################################
 """)
         confirm_continuation(interactive)
