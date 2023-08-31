@@ -27,7 +27,7 @@ def main():
     from_branch = args.from_branch
     interactive = not args.not_interactive
 
-    logging.basicConfig(level=logging.DEBUG)
+    logging.basicConfig(level=logging.INFO)
 
     if get_operating_system() == "windows":
         print("""
@@ -54,7 +54,7 @@ Windows support is limited and experimental.
 
 
 def guard_non_root_user():
-    logger.info("Checking user (should not be root).")
+    logger.debug("Checking user (should not be root).")
 
     operating_system = get_operating_system()
 
@@ -67,8 +67,8 @@ def guard_non_root_user():
 def guard_python_version():
     python_version = (sys.version_info.major, sys.version_info.minor, sys.version_info.micro)
 
-    logger.info("Checking Python version.")
-    logger.info(f"Python version: {format_version(python_version)}")
+    logger.debug("Checking Python version.")
+    logger.debug(f"Python version: {format_version(python_version)}")
     if python_version < MIN_REQUIRED_PYTHON_VERSION:
         raise InstallError(f"You need Python {format_version(MIN_REQUIRED_PYTHON_VERSION)} or later.")
 
@@ -123,13 +123,13 @@ def create_venv():
     venv_folder = get_mxpy_venv_path()
     venv_folder.mkdir(parents=True, exist_ok=True)
 
-    logger.info(f"Creating virtual environment in: {venv_folder}.")
+    logger.debug(f"Creating virtual environment in: {venv_folder}.")
     import venv
     builder = venv.EnvBuilder(with_pip=True, symlinks=True)
     builder.clear_directory(venv_folder)
     builder.create(venv_folder)
 
-    logger.info(f"Virtual environment has been created in: {venv_folder}.")
+    logger.debug(f"Virtual environment has been created in: {venv_folder}.")
 
 
 def require_python_venv_tools():
@@ -138,7 +138,7 @@ def require_python_venv_tools():
     try:
         import ensurepip
         import venv
-        logger.info(f"Packages found: {ensurepip}, {venv}.")
+        logger.debug(f"Packages found: {ensurepip}, {venv}.")
     except ModuleNotFoundError:
         if operating_system == "linux":
             python_venv = f"python{sys.version_info.major}.{sys.version_info.minor}-venv"
@@ -152,7 +152,7 @@ def get_mxpy_venv_path():
 
 
 def install_mxpy(exact_version: str, from_branch: str):
-    logger.info("Installing mxpy in virtual environment...")
+    logger.debug("Installing mxpy in virtual environment...")
 
     if from_branch:
         package_to_install = f"https://github.com/multiversx/mx-sdk-py-cli/archive/refs/heads/{from_branch}.zip"
@@ -174,9 +174,9 @@ def install_mxpy(exact_version: str, from_branch: str):
 
     try:
         shortcut_path.unlink()
-        logger.info(f"Removed existing shortcut: {shortcut_path}")
+        logger.debug(f"Removed existing shortcut: {shortcut_path}")
     except FileNotFoundError:
-        logger.info(f"Shortcut does not exist yet: {shortcut_path}")
+        logger.debug(f"Shortcut does not exist yet: {shortcut_path}")
         pass
 
     shortcut_content = get_mxpy_shortcut_content()
@@ -218,7 +218,7 @@ def run_in_venv(args: List[str], venv_path: Path):
 def run_post_install_checks():
     multiversx_sdk_path = Path("~/multiversx-sdk").expanduser()
 
-    logger.info("Running post-install checks...")
+    logger.debug("Running post-install checks...")
     print("~/multiversx-sdk exists", "OK" if multiversx_sdk_path.exists() else "NOK")
     print("~/multiversx-sdk/mxpy shortcut created", "OK" if (multiversx_sdk_path / "mxpy").exists() else "NOK")
 
