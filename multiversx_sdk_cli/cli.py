@@ -7,7 +7,6 @@ from typing import Any, List
 from rich.logging import RichHandler
 
 import multiversx_sdk_cli.cli_accounts
-import multiversx_sdk_cli.cli_block
 import multiversx_sdk_cli.cli_config
 import multiversx_sdk_cli.cli_contracts
 import multiversx_sdk_cli.cli_data
@@ -88,7 +87,6 @@ https://docs.multiversx.com/sdk-and-tools/mxpy.
     commands.append(multiversx_sdk_cli.cli_wallet.setup_parser(args, subparsers))
     commands.append(multiversx_sdk_cli.cli_deps.setup_parser(subparsers))
     commands.append(multiversx_sdk_cli.cli_config.setup_parser(subparsers))
-    commands.append(multiversx_sdk_cli.cli_block.setup_parser(subparsers))
     commands.append(multiversx_sdk_cli.cli_localnet.setup_parser(args, subparsers))
     commands.append(multiversx_sdk_cli.cli_data.setup_parser(subparsers))
     commands.append(multiversx_sdk_cli.cli_delegation.setup_parser(args, subparsers))
