@@ -55,9 +55,6 @@ generate() {
     command "Transactions.Send" "tx send"
     command "Transactions.Get" "tx get"
 
-    group "Hyperblocks" "hyperblock"
-    command "Hyperblock.Get" "hyperblock get"
-
     group "Validator" "validator"
     command "Validator.Stake" "validator stake"
     command "Validator.Unstake" "validator unstake"

@@ -20,7 +20,7 @@ https://docs.multiversx.com/sdk-and-tools/mxpy.
         
 
 COMMAND GROUPS:
-  {contract,tx,validator,account,ledger,wallet,deps,config,hyperblock,localnet,data,staking-provider,dns}
+  {contract,tx,validator,account,ledger,wallet,deps,config,localnet,data,staking-provider,dns}
 
 TOP-LEVEL OPTIONS:
   -h, --help            show this help message and exit
@@ -38,7 +38,6 @@ ledger                         Get Ledger App addresses and version
 wallet                         Create wallet, derive secret key from mnemonic, bech32 address helpers etc.
 deps                           Manage dependencies or multiversx-sdk modules
 config                         Configure multiversx-sdk (default values etc.)
-hyperblock                     Get Hyperblock from the Network
 localnet                       Set up, start and control localnets
 data                           Data manipulation omnitool
 staking-provider               Staking provider omnitool
@@ -622,37 +621,6 @@ options:
   --with-results             will also return the results of transaction
   --proxy PROXY              🔗 the URL of the proxy
   --omit-fields OMIT_FIELDS  omit fields in the output payload (default: [])
-
-```
-## Group **Hyperblocks**
-
-
-```
-$ mxpy hyperblock --help
-usage: mxpy hyperblock COMMAND [-h] ...
-
-Get Hyperblock from the Network
-
-COMMANDS:
-  {get}
-
-OPTIONS:
-  -h, --help  show this help message and exit
-
-```
-### Hyperblock.Get
-
-
-```
-$ mxpy hyperblock get --help
-usage: mxpy hyperblock get [-h] ...
-
-Get hyperblock
-
-options:
-  -h, --help     show this help message and exit
-  --proxy PROXY  🔗 the URL of the proxy
-  --key KEY      the hash or the nonce of the hyperblock
 
 ```
 ## Group **Validator**
