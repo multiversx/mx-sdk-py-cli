@@ -29,7 +29,8 @@ def main():
     interactive = not args.not_interactive
     verbose = args.verbose
 
-    logging.basicConfig(level=logging.DEBUG) if verbose else logging.basicConfig(level=logging.INFO)
+    log_level = logging.DEBUG if verbose else logging.INFO
+    logging.basicConfig(level=log_level)
 
     if get_operating_system() == "windows":
         print("""
@@ -47,7 +48,7 @@ Windows support is limited and experimental.
     # In case of a fresh install:
     sdk_path.mkdir(parents=True, exist_ok=True)
     create_venv()
-    logger.info("Installing the necessary dependecies...")
+    logger.info("Installing the necessary dependencies...")
     install_mxpy(exact_version, from_branch, verbose)
 
     run_post_install_checks()
@@ -230,12 +231,12 @@ def run_post_install_checks():
     if multiversx_sdk_path.exists():
         logger.debug("~/multiversx-sdk exists  OK")
     else:
-        logger.debug("~/multiversx-sdk exists  NOK")
+        logger.warning("~/multiversx-sdk exists  NOK")
 
     if (multiversx_sdk_path / "mxpy").exists():
         logger.debug("~/multiversx-sdk/mxpy shortcut created  OK")
     else:
-        logger.debug("~/multiversx-sdk/mxpy shortcut created  NOK")
+        logger.warning("~/multiversx-sdk/mxpy shortcut created  NOK")
 
 
 def guide_system_path_integration():
@@ -245,7 +246,7 @@ def guide_system_path_integration():
     if operating_system == "windows":
         print(f"""
 ###############################################################################
-On Windows, for the "mxpy" command shortcut to be available, you NEED to add the directory "{sdk_path}" to the system PATH.
+On Windows, for the "mxpy" command shortcut to be available, you MUST ADD the directory "{sdk_path}" to the system PATH.
 
 You can do this by following these steps:
 
