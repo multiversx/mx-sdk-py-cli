@@ -13,7 +13,6 @@ testAll() {
         source ./test_cli_validators.sh && testAll
         source ./test_cli_tx.sh && testAll
         source ./test_cli_config.sh && testAll
-        source ./test_cli_network.sh && testAll
     fi
     popd
 }

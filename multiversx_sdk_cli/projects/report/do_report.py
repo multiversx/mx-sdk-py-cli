@@ -1,14 +1,17 @@
+import copy
 import logging
 from pathlib import Path
 from typing import Any, Dict, List
-from multiversx_sdk_cli import utils
 
+from multiversx_sdk_cli import cli_shared, utils
 from multiversx_sdk_cli.projects.core import get_project_paths_recursively
-from multiversx_sdk_cli.projects.report.data.report import Report, merge_list_of_reports
-from multiversx_sdk_cli.projects.report.format.format_options import FormatOptions
-from multiversx_sdk_cli.projects.report.features.features import get_default_report_features
+from multiversx_sdk_cli.projects.report.data.report import (
+    Report, merge_list_of_reports)
+from multiversx_sdk_cli.projects.report.features.features import \
+    get_default_report_features
+from multiversx_sdk_cli.projects.report.format.format_options import \
+    FormatOptions
 from multiversx_sdk_cli.projects.report.report_creator import ReportCreator
-
 
 logger = logging.getLogger("report")
 
@@ -22,12 +25,26 @@ def do_report(args: Any, build_options: Any) -> None:
 
 
 def _build_report(args: Any, build_options: Dict[str, Any]) -> None:
-    base_path = Path(args.project)
+    base_path = Path(args.path)
     project_paths = get_project_paths_recursively(base_path)
     options = get_default_report_features()
-    report_creator = ReportCreator(options, skip_build=args.skip_build, skip_twiggy=args.skip_twiggy, build_options=build_options)
+
+    args_copy = _prepare_args_for_build(args)
+    build_args = cli_shared.convert_args_object_to_args_list(args_copy)
+
+    report_creator = ReportCreator(options, skip_build=args.skip_build, skip_twiggy=args.skip_twiggy, build_options=build_options, build_args=build_args)
     report = report_creator.create_report(base_path, project_paths)
     _finalize_report(report, args)
+
+
+def _prepare_args_for_build(args: Any):
+    args_copy = copy.deepcopy(args)
+
+    arguments: Dict[str, Any] = args_copy.__dict__
+    arguments.pop("output_format", None)
+    arguments.pop("output_file", None)
+
+    return args_copy
 
 
 def _compare_reports(args: Any, merge_report_paths: List[Path]) -> None:

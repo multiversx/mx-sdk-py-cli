@@ -20,7 +20,7 @@ https://docs.multiversx.com/sdk-and-tools/mxpy.
         
 
 COMMAND GROUPS:
-  {contract,tx,validator,account,ledger,wallet,network,deps,config,hyperblock,localnet,data,staking-provider,dns}
+  {contract,tx,validator,account,ledger,wallet,deps,config,localnet,data,staking-provider,dns}
 
 TOP-LEVEL OPTIONS:
   -h, --help            show this help message and exit
@@ -36,10 +36,8 @@ validator                      Stake, UnStake, UnBond, Unjail and other actions 
 account                        Get Account data (nonce, balance) from the Network
 ledger                         Get Ledger App addresses and version
 wallet                         Create wallet, derive secret key from mnemonic, bech32 address helpers etc.
-network                        Get Network parameters, such as number of shards, chain identifier etc.
 deps                           Manage dependencies or multiversx-sdk modules
 config                         Configure multiversx-sdk (default values etc.)
-hyperblock                     Get Hyperblock from the Network
 localnet                       Set up, start and control localnets
 data                           Data manipulation omnitool
 staking-provider               Staking provider omnitool
@@ -118,21 +116,25 @@ usage: mxpy contract build [-h] ...
 
 Build a Smart Contract project using the appropriate buildchain.
 
-positional arguments:
-  project                              🗀 the project directory (default: current directory)
-
 options:
-  -h, --help                           show this help message and exit
-  -r, --recursive                      locate projects recursively
-  --debug                              set debug flag (default: False)
-  --no-optimization                    bypass optimizations (for clang) (default: False)
-  --no-wasm-opt                        do not optimize wasm files after the build (default: False)
-  --cargo-target-dir CARGO_TARGET_DIR  for rust projects, forward the parameter to Cargo
-  --wasm-symbols                       for rust projects, does not strip the symbols from the wasm output. Useful for
-                                       analysing the bytecode. Creates larger wasm files. Avoid in production (default:
-                                       False)
-  --wasm-name WASM_NAME                for rust projects, optionally specify the name of the wasm bytecode output file
-  --wasm-suffix WASM_SUFFIX            for rust projects, optionally specify the suffix of the wasm bytecode output file
+  -h, --help                 show this help message and exit
+  --path PATH                the project directory (default: current directory)
+  --no-wasm-opt              do not optimize wasm files after the build (default: False)
+  --wasm-symbols             for rust projects, does not strip the symbols from the wasm output. Useful for analysing
+                             the bytecode. Creates larger wasm files. Avoid in production (default: False)
+  --wasm-name WASM_NAME      for rust projects, optionally specify the name of the wasm bytecode output file
+  --wasm-suffix WASM_SUFFIX  for rust projects, optionally specify the suffix of the wasm bytecode output file
+  --target-dir TARGET_DIR    for rust projects, forward the parameter to Cargo
+  --wat                      also generate a WAT file when building
+  --mir                      also emit MIR files when building
+  --llvm-ir                  also emit LL (LLVM) files when building
+  --ignore IGNORE            ignore all directories with these names. [default: target]
+  --no-imports               skips extracting the EI imports after building the contracts
+  --no-abi-git-version       skips loading the Git version into the ABI
+  --twiggy-top               generate a twiggy top report after building
+  --twiggy-paths             generate a twiggy paths report after building
+  --twiggy-monos             generate a twiggy monos report after building
+  --twiggy-dominators        generate a twiggy dominators report after building
 
 ```
 ### Contract.Clean
@@ -144,12 +146,9 @@ usage: mxpy contract clean [-h] ...
 
 Clean a Smart Contract project.
 
-positional arguments:
-  project          🗀 the project directory (default: current directory)
-
 options:
-  -h, --help       show this help message and exit
-  -r, --recursive  locate projects recursively
+  -h, --help   show this help message and exit
+  --path PATH  the project directory (default: current directory)
 
 ```
 ### Contract.Deploy
@@ -443,9 +442,6 @@ usage: mxpy contract report [-h] ...
 
 Print a detailed report of the smart contracts.
 
-positional arguments:
-  project                                         🗀 the project directory (default: current directory)
-
 options:
   -h, --help                                      show this help message and exit
   --skip-build                                    skips the step of building of the wasm contracts
@@ -455,10 +451,8 @@ options:
   --output-file OUTPUT_FILE                       if specified, the output is written to a file, otherwise it's written
                                                   to the standard output
   --compare report-1.json [report-2.json ...]     create a comparison from two or more reports
-  --debug                                         set debug flag (default: False)
-  --no-optimization                               bypass optimizations (for clang) (default: False)
+  --path PATH                                     the project directory (default: current directory)
   --no-wasm-opt                                   do not optimize wasm files after the build (default: False)
-  --cargo-target-dir CARGO_TARGET_DIR             for rust projects, forward the parameter to Cargo
   --wasm-symbols                                  for rust projects, does not strip the symbols from the wasm output.
                                                   Useful for analysing the bytecode. Creates larger wasm files. Avoid in
                                                   production (default: False)
@@ -466,6 +460,17 @@ options:
                                                   output file
   --wasm-suffix WASM_SUFFIX                       for rust projects, optionally specify the suffix of the wasm bytecode
                                                   output file
+  --target-dir TARGET_DIR                         for rust projects, forward the parameter to Cargo
+  --wat                                           also generate a WAT file when building
+  --mir                                           also emit MIR files when building
+  --llvm-ir                                       also emit LL (LLVM) files when building
+  --ignore IGNORE                                 ignore all directories with these names. [default: target]
+  --no-imports                                    skips extracting the EI imports after building the contracts
+  --no-abi-git-version                            skips loading the Git version into the ABI
+  --twiggy-top                                    generate a twiggy top report after building
+  --twiggy-paths                                  generate a twiggy paths report after building
+  --twiggy-monos                                  generate a twiggy monos report after building
+  --twiggy-dominators                             generate a twiggy dominators report after building
 
 ```
 ## Group **Transactions**
@@ -616,37 +621,6 @@ options:
   --with-results             will also return the results of transaction
   --proxy PROXY              🔗 the URL of the proxy
   --omit-fields OMIT_FIELDS  omit fields in the output payload (default: [])
-
-```
-## Group **Hyperblocks**
-
-
-```
-$ mxpy hyperblock --help
-usage: mxpy hyperblock COMMAND [-h] ...
-
-Get Hyperblock from the Network
-
-COMMANDS:
-  {get}
-
-OPTIONS:
-  -h, --help  show this help message and exit
-
-```
-### Hyperblock.Get
-
-
-```
-$ mxpy hyperblock get --help
-usage: mxpy hyperblock get [-h] ...
-
-Get hyperblock
-
-options:
-  -h, --help     show this help message and exit
-  --proxy PROXY  🔗 the URL of the proxy
-  --key KEY      the hash or the nonce of the hyperblock
 
 ```
 ## Group **Validator**
@@ -1020,7 +994,7 @@ usage: mxpy wallet COMMAND [-h] ...
 Create wallet, derive secret key from mnemonic, bech32 address helpers etc.
 
 COMMANDS:
-  {new,convert,bech32,pem-address,pem-address-hex}
+  {new,convert,bech32}
 
 OPTIONS:
   -h, --help            show this help message and exit
@@ -1031,8 +1005,6 @@ COMMANDS summary
 new                            Create a new wallet and print its mnemonic; optionally save as password-protected JSON (recommended) or PEM (not recommended)
 convert                        Convert a wallet from one format to another
 bech32                         Helper for encoding and decoding bech32 addresses
-pem-address                    Get the public address out of a PEM file as bech32
-pem-address-hex                Get the public address out of a PEM file as hex
 
 ```
 ### Wallet.New
@@ -1211,72 +1183,6 @@ Erase the currently configured localnet (must be already stopped)
 options:
   -h, --help               show this help message and exit
   --configfile CONFIGFILE  An optional configuration file describing the localnet
-
-```
-## Group **Network**
-
-
-```
-$ mxpy network --help
-usage: mxpy network COMMAND [-h] ...
-
-Get Network parameters, such as number of shards, chain identifier etc.
-
-COMMANDS:
-  {num-shards,block-nonce,chain}
-
-OPTIONS:
-  -h, --help            show this help message and exit
-
-----------------
-COMMANDS summary
-----------------
-num-shards                     Get the number of shards.
-block-nonce                    Get the latest block nonce, by shard.
-chain                          Get the chain identifier.
-
-```
-### Network.NumShards
-
-
-```
-$ mxpy network num-shards --help
-usage: mxpy network num-shards [-h] ...
-
-Get the number of shards.
-
-options:
-  -h, --help     show this help message and exit
-  --proxy PROXY  🔗 the URL of the proxy
-
-```
-### Network.BlockNonce
-
-
-```
-$ mxpy network block-nonce --help
-usage: mxpy network block-nonce [-h] ...
-
-Get the latest block nonce, by shard.
-
-options:
-  -h, --help     show this help message and exit
-  --proxy PROXY  🔗 the URL of the proxy
-  --shard SHARD  the shard ID (use 4294967295 for metachain)
-
-```
-### Network.Chain
-
-
-```
-$ mxpy network chain --help
-usage: mxpy network chain [-h] ...
-
-Get the chain identifier.
-
-options:
-  -h, --help     show this help message and exit
-  --proxy PROXY  🔗 the URL of the proxy
 
 ```
 ## Group **Dependencies**

@@ -4,8 +4,9 @@ import sys
 from argparse import ArgumentParser
 from typing import Any, List
 
+from rich.logging import RichHandler
+
 import multiversx_sdk_cli.cli_accounts
-import multiversx_sdk_cli.cli_block
 import multiversx_sdk_cli.cli_config
 import multiversx_sdk_cli.cli_contracts
 import multiversx_sdk_cli.cli_data
@@ -14,7 +15,6 @@ import multiversx_sdk_cli.cli_deps
 import multiversx_sdk_cli.cli_dns
 import multiversx_sdk_cli.cli_ledger
 import multiversx_sdk_cli.cli_localnet
-import multiversx_sdk_cli.cli_network
 import multiversx_sdk_cli.cli_transactions
 import multiversx_sdk_cli.cli_validators
 import multiversx_sdk_cli.cli_wallet
@@ -38,16 +38,14 @@ def main(cli_args: List[str] = sys.argv[1:]):
 
 
 def _do_main(cli_args: List[str]):
-    logging.basicConfig(level=logging.INFO)
-
     argv_with_config_args = config.add_config_args(cli_args)
     parser = setup_parser(argv_with_config_args)
     args = parser.parse_args(argv_with_config_args)
 
     if args.verbose:
-        logging.basicConfig(level=logging.DEBUG, force=True)
+        logging.basicConfig(level="DEBUG", force=True, format='%(name)s: %(message)s', handlers=[RichHandler(show_time=False, rich_tracebacks=True)])
     else:
-        logging.basicConfig(level=logging.INFO, force=True)
+        logging.basicConfig(level="INFO", format='%(name)s: %(message)s', handlers=[RichHandler(show_time=False, rich_tracebacks=True)])
 
     if not hasattr(args, "func"):
         parser.print_help()
@@ -87,10 +85,8 @@ https://docs.multiversx.com/sdk-and-tools/mxpy.
     commands.append(multiversx_sdk_cli.cli_accounts.setup_parser(subparsers))
     commands.append(multiversx_sdk_cli.cli_ledger.setup_parser(subparsers))
     commands.append(multiversx_sdk_cli.cli_wallet.setup_parser(args, subparsers))
-    commands.append(multiversx_sdk_cli.cli_network.setup_parser(subparsers))
     commands.append(multiversx_sdk_cli.cli_deps.setup_parser(subparsers))
     commands.append(multiversx_sdk_cli.cli_config.setup_parser(subparsers))
-    commands.append(multiversx_sdk_cli.cli_block.setup_parser(subparsers))
     commands.append(multiversx_sdk_cli.cli_localnet.setup_parser(args, subparsers))
     commands.append(multiversx_sdk_cli.cli_data.setup_parser(subparsers))
     commands.append(multiversx_sdk_cli.cli_delegation.setup_parser(args, subparsers))

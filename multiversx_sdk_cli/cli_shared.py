@@ -1,9 +1,11 @@
 import argparse
 import ast
+import copy
 import sys
 from argparse import FileType
-from typing import Any, List, Text, cast
+from typing import Any, Dict, List, Text, cast
 
+from multiversx_sdk_core import Address
 from multiversx_sdk_network_providers.proxy_network_provider import \
     ProxyNetworkProvider
 
@@ -15,9 +17,10 @@ from multiversx_sdk_cli.cli_password import (load_guardian_password,
 from multiversx_sdk_cli.constants import (DEFAULT_TX_VERSION,
                                           TRANSACTION_OPTIONS_TX_GUARDED)
 from multiversx_sdk_cli.errors import ArgumentsNotProvidedError
+from multiversx_sdk_cli.interfaces import ITransaction
 from multiversx_sdk_cli.ledger.ledger_functions import do_get_ledger_address
 from multiversx_sdk_cli.simulation import Simulator
-from multiversx_sdk_cli.transactions import Transaction
+from multiversx_sdk_cli.transactions import send_and_wait_for_result
 from multiversx_sdk_cli.ux import show_warning
 
 
@@ -147,7 +150,7 @@ def prepare_account(args: Any):
         account = Account(key_file=args.keyfile, password=password)
     elif args.ledger:
         address = do_get_ledger_address(account_index=args.ledger_account_index, address_index=args.ledger_address_index)
-        account = Account(address=address)
+        account = Account(address=Address.from_bech32(address))
     else:
         raise errors.NoWalletProvided()
 
@@ -162,7 +165,7 @@ def prepare_guardian_account(args: Any):
         account = Account(key_file=args.guardian_keyfile, password=password)
     elif args.guardian_ledger:
         address = do_get_ledger_address(account_index=args.guardian_ledger_account_index, address_index=args.guardian_ledger_address_index)
-        account = Account(address=address)
+        account = Account(Address.from_bech32(address))
     else:
         raise errors.NoWalletProvided()
 
@@ -245,7 +248,7 @@ def check_options_for_guarded_tx(options: int):
         raise errors.BadUsage("Invalid guarded transaction's options. The second least significant bit must be set.")
 
 
-def send_or_simulate(tx: Transaction, args: Any, dump_output: bool = True) -> CLIOutputBuilder:
+def send_or_simulate(tx: ITransaction, args: Any, dump_output: bool = True) -> CLIOutputBuilder:
     proxy = ProxyNetworkProvider(args.proxy)
 
     is_set_wait_result = hasattr(args, "wait_result") and args.wait_result
@@ -262,10 +265,11 @@ def send_or_simulate(tx: Transaction, args: Any, dump_output: bool = True) -> CL
 
     try:
         if send_wait_result:
-            transaction_on_network = tx.send_wait_result(proxy, args.timeout)
+            transaction_on_network = send_and_wait_for_result(tx, proxy, args.timeout)
             output_builder.set_awaited_transaction(transaction_on_network)
         elif send_only:
-            tx.send(proxy)
+            hash = proxy.send_transaction(tx)
+            output_builder.set_emitted_transaction_hash(hash)
         elif simulate:
             simulation = Simulator(proxy).run(tx)
             output_builder.set_simulation_results(simulation)
@@ -288,3 +292,24 @@ def check_if_sign_method_required(args: List[str], checked_method: str) -> bool:
             return False
 
     return True
+
+
+def convert_args_object_to_args_list(args: Any) -> List[str]:
+    arguments = copy.deepcopy(args)
+    args_dict: Dict[str, Any] = arguments.__dict__
+
+    # delete the function key because we don't need to pass it along
+    args_dict.pop("func", None)
+
+    args_list: List[str] = []
+    for key, val in args_dict.items():
+        modified_key = "--" + key.replace("_", "-")
+
+        if isinstance(val, bool) and val:
+            args_list.extend([modified_key])
+            continue
+
+        if val:
+            args_list.extend([modified_key, val])
+
+    return args_list

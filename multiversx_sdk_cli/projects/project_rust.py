@@ -1,6 +1,5 @@
 import logging
 import subprocess
-from os import path
 from pathlib import Path
 from typing import Any, Dict, List, Set, cast
 
@@ -17,9 +16,17 @@ class ProjectRust(Project):
         self.cargo_file = self.get_cargo_file()
 
     def clean(self):
-        super().clean()
-        utils.remove_folder(path.join(self.directory, "wasm", "target"))
-        utils.remove_folder(path.join(self.directory, "meta", "target"))
+        env = self.get_env()
+
+        args = [
+            "sc-meta",
+            "all",
+            "clean",
+            "--path",
+            self.directory
+        ]
+
+        subprocess.check_call(args, env=env)
 
     def get_cargo_file(self):
         cargo_path = self.path / 'Cargo.toml'
@@ -36,13 +43,7 @@ class ProjectRust(Project):
         if not meta:
             raise errors.NotSupportedProject("The project does not have a meta crate")
 
-        try:
-            # The meta crate handles the build process, ABI generation and
-            # allows contract developers to add extra
-            # preparation steps before building.
-            self.run_meta()
-        except subprocess.CalledProcessError as err:
-            raise errors.BuildError(err.output)
+        self.run_meta()
 
     def prepare_build_wasm_args(self, args: List[str]):
         args.extend([
@@ -53,7 +54,6 @@ class ProjectRust(Project):
         ])
 
     def run_meta(self):
-        cwd = self.get_meta_folder()
         env = self.get_env()
 
         with_wasm_opt = not self.options.get("no-wasm-opt")
@@ -62,38 +62,18 @@ class ProjectRust(Project):
             wasm_opt = dependencies.get_module_by_key("wasm-opt")
             env = merge_env(env, wasm_opt.get_env())
 
-        # run the meta executable with the arguments `build --target=...`
         args = [
-            "cargo",
-            "run",
-            "build",
+            "sc-meta",
+            "all",
+            "build"
         ]
 
-        self.prepare_build_wasm_args(args)
-        self.decorate_cargo_args(args)
+        args.extend(self.forwarded_args)
 
-        return_code = subprocess.check_call(args, env=env, cwd=cwd)
-        if return_code != 0:
-            raise errors.BuildError(f"error code = {return_code}, see output")
-
-    def decorate_cargo_args(self, args: List[str]):
-        target_dir: str = self.options.get("cargo-target-dir", "")
-        target_dir = self._ensure_cargo_target_dir(target_dir)
-        no_wasm_opt = self.options.get("no-wasm-opt")
-        wasm_symbols = self.options.get("wasm-symbols")
-        wasm_name = self.options.get("wasm-name")
-        wasm_suffix = self.options.get("wasm-suffix")
-
-        args.extend(["--target-dir", target_dir])
-
-        if no_wasm_opt:
-            args.extend(["--no-wasm-opt"])
-        if wasm_symbols:
-            args.extend(["--wasm-symbols"])
-        if wasm_name:
-            args.extend(["--wasm-name", wasm_name])
-        if wasm_suffix:
-            args.extend(["--wasm-suffix", wasm_suffix])
+        try:
+            subprocess.check_call(args, env=env)
+        except subprocess.CalledProcessError as err:
+            raise errors.BuildError(f"error code = {err.returncode}, see output")
 
     def _ensure_cargo_target_dir(self, target_dir: str):
         default_target_dir = str(workstation.get_tools_folder() / DEFAULT_CARGO_TARGET_DIR_NAME)
@@ -143,14 +123,14 @@ class ProjectRust(Project):
         return dependencies.get_module_by_key("rust").get_env()
 
     def build_wasm_with_debug_symbols(self, build_options: Dict[str, Any]):
-        cwd = self.get_meta_folder()
+        cwd = self.path
         env = self.get_env()
-        target_dir: str = build_options.get("cargo-target-dir", "")
+        target_dir: str = build_options.get("target-dir", "")
         target_dir = self._ensure_cargo_target_dir(target_dir)
 
         args = [
-            "cargo",
-            "run",
+            "sc-meta",
+            "all",
             "build",
             "--wasm-symbols",
             "--wasm-suffix", "dbg",
@@ -158,9 +138,10 @@ class ProjectRust(Project):
             "--target-dir", target_dir
         ]
 
-        return_code = subprocess.check_call(args, env=env, cwd=cwd)
-        if return_code != 0:
-            raise errors.BuildError(f"error code = {return_code}, see output")
+        try:
+            subprocess.check_call(args, env=env, cwd=cwd)
+        except subprocess.CalledProcessError as err:
+            raise errors.BuildError(f"error code = {err.returncode}, see output")
 
 
 class CargoFile:

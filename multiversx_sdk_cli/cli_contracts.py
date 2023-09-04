@@ -1,13 +1,14 @@
 import logging
 import os
 from pathlib import Path
-from typing import Any, Dict, List
+from typing import Any, List
 
+from multiversx_sdk_core import Address, Transaction
 from multiversx_sdk_network_providers.proxy_network_provider import \
     ProxyNetworkProvider
 
 from multiversx_sdk_cli import cli_shared, errors, projects, utils
-from multiversx_sdk_cli.accounts import Account, Address, LedgerAccount
+from multiversx_sdk_cli.accounts import Account, LedgerAccount
 from multiversx_sdk_cli.cli_output import CLIOutputBuilder
 from multiversx_sdk_cli.cli_password import load_password
 from multiversx_sdk_cli.contract_verification import \
@@ -17,7 +18,6 @@ from multiversx_sdk_cli.cosign_transaction import cosign_transaction
 from multiversx_sdk_cli.docker import is_docker_installed, run_docker
 from multiversx_sdk_cli.errors import DockerMissingError, NoWalletProvided
 from multiversx_sdk_cli.projects.core import get_project_paths_recursively
-from multiversx_sdk_cli.transactions import Transaction
 
 logger = logging.getLogger("cli.contracts")
 
@@ -40,14 +40,11 @@ def setup_parser(args: List[str], subparsers: Any) -> Any:
 
     sub = cli_shared.add_command_subparser(subparsers, "contract", "build",
                                            "Build a Smart Contract project using the appropriate buildchain.")
-    _add_project_arg(sub)
-    _add_recursive_arg(sub)
-    _add_build_options_args(sub)
+    _add_build_options_sc_meta(sub)
     sub.set_defaults(func=build)
 
     sub = cli_shared.add_command_subparser(subparsers, "contract", "clean", "Clean a Smart Contract project.")
-    _add_project_arg(sub)
-    _add_recursive_arg(sub)
+    sub.add_argument("--path", default=os.getcwd(), help="the project directory (default: current directory)")
     sub.set_defaults(func=clean)
 
     sub = cli_shared.add_command_subparser(subparsers, "contract", "test", "Run scenarios (tests).")
@@ -59,13 +56,12 @@ def setup_parser(args: List[str], subparsers: Any) -> Any:
     sub.set_defaults(func=run_tests)
 
     sub = cli_shared.add_command_subparser(subparsers, "contract", "report", "Print a detailed report of the smart contracts.")
-    _add_project_arg(sub)
     sub.add_argument("--skip-build", action="store_true", default=False, help="skips the step of building of the wasm contracts")
     sub.add_argument("--skip-twiggy", action="store_true", default=False, help="skips the steps of building the debug wasm files and running twiggy")
     sub.add_argument("--output-format", type=str, default="text-markdown", choices=["github-markdown", "text-markdown", "json"], help="report output format (default: %(default)s)")
     sub.add_argument("--output-file", type=Path, help="if specified, the output is written to a file, otherwise it's written to the standard output")
     sub.add_argument("--compare", type=Path, nargs='+', metavar=("report-1.json", "report-2.json"), help="create a comparison from two or more reports")
-    _add_build_options_args(sub)
+    _add_build_options_sc_meta(sub)
     sub.set_defaults(func=do_report)
 
     output_description = CLIOutputBuilder.describe(with_contract=True, with_transaction_on_network=True, with_simulation=True)
@@ -131,12 +127,9 @@ def setup_parser(args: List[str], subparsers: Any) -> Any:
     _add_arguments_arg(sub)
     sub.set_defaults(func=query)
 
-    sub = cli_shared.add_command_subparser(
-        subparsers,
-        "contract",
-        "verify",
-        "Verify the authenticity of the code of a deployed Smart Contract",
-    )
+    sub = cli_shared.add_command_subparser(subparsers, "contract", "verify",
+                                           "Verify the authenticity of the code of a deployed Smart Contract",
+                                           )
 
     sub.add_argument(
         "--packaged-src", required=True, help="JSON file containing the source code of the contract"
@@ -173,6 +166,29 @@ def setup_parser(args: List[str], subparsers: Any) -> Any:
 def _add_project_arg(sub: Any):
     sub.add_argument("project", nargs='?', default=os.getcwd(),
                      help="🗀 the project directory (default: current directory)")
+
+
+def _add_build_options_sc_meta(sub: Any):
+    sub.add_argument("--path", default=os.getcwd(), help="the project directory (default: current directory)")
+    sub.add_argument("--no-wasm-opt", action="store_true", default=False,
+                     help="do not optimize wasm files after the build (default: %(default)s)")
+    sub.add_argument("--wasm-symbols", action="store_true", default=False,
+                     help="for rust projects, does not strip the symbols from the wasm output. Useful for analysing the bytecode. Creates larger wasm files. Avoid in production (default: %(default)s)")
+    sub.add_argument("--wasm-name", type=str,
+                     help="for rust projects, optionally specify the name of the wasm bytecode output file")
+    sub.add_argument("--wasm-suffix", type=str,
+                     help="for rust projects, optionally specify the suffix of the wasm bytecode output file")
+    sub.add_argument("--target-dir", type=str, help="for rust projects, forward the parameter to Cargo")
+    sub.add_argument("--wat", action="store_true", help="also generate a WAT file when building", default=False)
+    sub.add_argument("--mir", action="store_true", help="also emit MIR files when building", default=False)
+    sub.add_argument("--llvm-ir", action="store_true", help="also emit LL (LLVM) files when building", default=False)
+    sub.add_argument("--ignore", help="ignore all directories with these names. [default: target]")
+    sub.add_argument("--no-imports", action="store_true", default=False, help="skips extracting the EI imports after building the contracts")
+    sub.add_argument("--no-abi-git-version", action="store_true", default=False, help="skips loading the Git version into the ABI")
+    sub.add_argument("--twiggy-top", action="store_true", default=False, help="generate a twiggy top report after building")
+    sub.add_argument("--twiggy-paths", action="store_true", default=False, help="generate a twiggy paths report after building")
+    sub.add_argument("--twiggy-monos", action="store_true", default=False, help="generate a twiggy monos report after building")
+    sub.add_argument("--twiggy-dominators", action="store_true", default=False, help="generate a twiggy dominators report after building")
 
 
 def _add_build_options_args(sub: Any):
@@ -246,35 +262,21 @@ def get_project_paths(args: Any) -> List[Path]:
 
 
 def clean(args: Any):
-    project_paths = get_project_paths(args)
-    for project in project_paths:
-        projects.clean_project(project)
+    project_path = args.path
+    projects.clean_project(Path(project_path))
 
 
 def build(args: Any):
-    project_paths = get_project_paths(args)
-    options: Dict[str, Any] = _prepare_build_options(args)
+    project_paths = [Path(args.path)]
+    arg_list = cli_shared.convert_args_object_to_args_list(args)
 
     for project in project_paths:
-        projects.build_project(project, options)
-
-
-def _prepare_build_options(args: Any) -> Dict[str, Any]:
-    return {
-        "debug": args.debug,
-        "optimized": not args.no_optimization,
-        "no-wasm-opt": args.no_wasm_opt,
-        "verbose": args.verbose,
-        "cargo-target-dir": args.cargo_target_dir,
-        "wasm-symbols": args.wasm_symbols,
-        "wasm-name": args.wasm_name,
-        "wasm-suffix": args.wasm_suffix
-    }
+        projects.build_project(project, arg_list)
 
 
 def do_report(args: Any):
-    build_options: Dict[str, Any] = _prepare_build_options(args)
-    projects.do_report(args, build_options)
+    args_dict = args.__dict__
+    projects.do_report(args, args_dict)
 
 
 def run_tests(args: Any):
@@ -301,8 +303,8 @@ def deploy(args: Any):
     tx = contract.deploy(sender, arguments, gas_price, gas_limit, value, args.chain, version, args.guardian, args.options)
     tx = _sign_guarded_tx(args, tx)
 
-    logger.info("Contract address: %s", contract.address)
-    utils.log_explorer_contract_address(args.chain, contract.address)
+    logger.info("Contract address: %s", contract.address.bech32())
+    utils.log_explorer_contract_address(args.chain, contract.address.bech32())
 
     _send_or_simulate(tx, contract, args)
 
@@ -354,20 +356,15 @@ def _prepare_signer(args: Any) -> Account:
 
 
 def _sign_guarded_tx(args: Any, tx: Transaction) -> Transaction:
-    signature = tx.signature
-    tx.signature = ""
-
     try:
         guardian_account = cli_shared.prepare_guardian_account(args)
     except NoWalletProvided:
         guardian_account = None
 
     if guardian_account:
-        tx.guardianSignature = guardian_account.sign_transaction(tx)
+        tx.guardian_signature = bytes.fromhex(guardian_account.sign_transaction(tx))
     elif args.guardian:
         tx = cosign_transaction(tx, args.guardian_service_url, args.guardian_2fa_code)  # type: ignore
-
-    tx.signature = signature
 
     return tx
 
@@ -385,7 +382,7 @@ def call(args: Any):
     value = args.value
     version = args.version
 
-    contract = SmartContract(contract_address)
+    contract = SmartContract(Address.from_bech32(contract_address))
     sender = _prepare_sender(args)
     cli_shared.prepare_chain_id_in_args(args)
 
@@ -407,7 +404,7 @@ def upgrade(args: Any):
     version = args.version
 
     contract = _prepare_contract(args)
-    contract.address = Address(contract_address)
+    contract.address = Address.from_bech32(contract_address)
     sender = _prepare_sender(args)
     cli_shared.prepare_chain_id_in_args(args)
 
@@ -424,7 +421,7 @@ def query(args: Any):
     function = args.function
     arguments = args.arguments
 
-    contract = SmartContract(contract_address)
+    contract = SmartContract(address=Address.from_bech32(contract_address))
     result = contract.query(ProxyNetworkProvider(args.proxy), function, arguments)
     utils.dump_out_json(result)
 
@@ -436,7 +433,7 @@ def _send_or_simulate(tx: Transaction, contract: SmartContract, args: Any):
 
 
 def verify(args: Any) -> None:
-    contract = Address(args.contract)
+    contract = Address.from_bech32(args.contract)
     verifier_url = args.verifier_url
 
     packaged_src = Path(args.packaged_src).expanduser().resolve()
@@ -465,7 +462,7 @@ def do_reproducible_build(args: Any):
 
     utils.ensure_folder(output_path)
 
-    options = _prepare_build_options(args)
+    options = args.__dict__
     no_wasm_opt = options.get("no-wasm-opt", True)
 
     if not is_docker_installed():

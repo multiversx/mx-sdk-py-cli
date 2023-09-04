@@ -8,3 +8,6 @@ TRANSACTION_OPTIONS_TX_GUARDED = 0b0010
 ONE_YEAR_IN_SECONDS = 60 * 60 * 24 * 365
 
 DEFAULT_TX_VERSION = 2
+
+DEFAULT_HRP = "erd"
+ADDRESS_ZERO_BECH32 = "erd1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq6gq4hu"

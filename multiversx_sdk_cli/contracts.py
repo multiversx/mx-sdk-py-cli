@@ -1,19 +1,19 @@
 import base64
 import logging
-from typing import Any, List, Optional, Tuple, Protocol, Sequence
+from typing import Any, List, Optional, Protocol, Sequence, Tuple
 
-from Cryptodome.Hash import keccak
+from multiversx_sdk_core import Transaction, TransactionPayload
+from multiversx_sdk_core.address import Address, compute_contract_address
+from multiversx_sdk_network_providers.interface import IAddress, IContractQuery
 
 from multiversx_sdk_cli import config, constants, errors
-from multiversx_sdk_cli.accounts import Account, Address
-from multiversx_sdk_cli.transactions import Transaction
+from multiversx_sdk_cli.accounts import Account, EmptyAddress
+from multiversx_sdk_cli.constants import ADDRESS_ZERO_BECH32, DEFAULT_HRP
 from multiversx_sdk_cli.utils import Object
-from multiversx_sdk_network_providers.interface import IContractQuery
 
 logger = logging.getLogger("contracts")
 
 HEX_PREFIX = "0x"
-ERD_BECH32_PREFIX = "erd"
 FALSE_STR_LOWER = "false"
 TRUE_STR_LOWER = "true"
 STR_PREFIX = "str:"
@@ -32,14 +32,14 @@ class QueryResult(Object):
 
 
 class ContractQuery(IContractQuery):
-    def __init__(self, address: Address, function: str, value: int, arguments: List[bytes], caller: Optional[Address] = None):
+    def __init__(self, address: IAddress, function: str, value: int, arguments: List[bytes], caller: Optional[IAddress] = None):
         self.contract = address
         self.function = function
         self.caller = caller
         self.value = value
         self.encoded_arguments = [item.hex() for item in arguments]
 
-    def get_contract(self) -> Address:
+    def get_contract(self) -> IAddress:
         return self.contract
 
     def get_function(self) -> str:
@@ -48,7 +48,7 @@ class ContractQuery(IContractQuery):
     def get_encoded_arguments(self) -> Sequence[str]:
         return self.encoded_arguments
 
-    def get_caller(self) -> Optional[Address]:
+    def get_caller(self) -> Optional[IAddress]:
         return self.caller
 
     def get_value(self) -> int:
@@ -62,54 +62,46 @@ class IContractQueryResponse(Protocol):
 
 
 class SmartContract:
-    def __init__(self, address: Optional[Address] = None, bytecode=None, metadata=None):
-        self.address = Address(address)
+    def __init__(self, address: Optional[IAddress] = EmptyAddress(), bytecode=None, metadata=None):
+        self.address = address
         self.bytecode = bytecode
         self.metadata = metadata or CodeMetadata()
 
     def deploy(self, owner: Account, arguments: List[Any], gas_price: int, gas_limit: int, value: int, chain: str, version: int, guardian: str, options: int) -> Transaction:
         self.owner = owner
-        self.compute_address()
+        self.address = compute_contract_address(self.owner.address, self.owner.nonce, DEFAULT_HRP)
 
         arguments = arguments or []
         gas_price = int(gas_price)
         gas_limit = int(gas_limit)
         value = value or 0
 
-        tx = Transaction()
-        tx.nonce = owner.nonce
-        tx.value = str(value)
-        tx.sender = owner.address.bech32()
-        tx.receiver = Address.zero().bech32()
-        tx.gasPrice = gas_price
-        tx.gasLimit = gas_limit
-        tx.data = self.prepare_deploy_transaction_data(arguments)
-        tx.chainID = chain
-        tx.version = version
-        tx.guardian = guardian
-        tx.options = options
+        tx = Transaction(
+            chain_id=chain,
+            sender=owner.address,
+            receiver=Address.from_bech32(ADDRESS_ZERO_BECH32),
+            gas_limit=gas_limit,
+            gas_price=gas_price,
+            nonce=owner.nonce,
+            value=value,
+            data=self.prepare_deploy_transaction_data(arguments),
+            version=version,
+            options=options
+        )
 
-        tx.sign(owner)
+        if guardian:
+            tx.guardian = Address.from_bech32(guardian)
+
+        tx.signature = bytes.fromhex(owner.sign_transaction(tx))
         return tx
 
-    def prepare_deploy_transaction_data(self, arguments: List[Any]):
+    def prepare_deploy_transaction_data(self, arguments: List[Any]) -> TransactionPayload:
         tx_data = f"{self.bytecode}@{constants.VM_TYPE_WASM_VM}@{self.metadata.to_hex()}"
 
         for arg in arguments:
             tx_data += f"@{_prepare_argument(arg)}"
 
-        return tx_data
-
-    def compute_address(self):
-        """
-        8 bytes of zero + 2 bytes for VM type + 20 bytes of hash(owner) + 2 bytes of shard(owner)
-        """
-        owner_bytes = self.owner.address.pubkey()
-        nonce_bytes = self.owner.nonce.to_bytes(8, byteorder="little")
-        bytes_to_hash = owner_bytes + nonce_bytes
-        address = keccak.new(digest_bits=256).update(bytes_to_hash).digest()
-        address = bytes([0] * 8) + bytes([5, 0]) + address[10:30] + owner_bytes[30:]
-        self.address = Address(address)
+        return TransactionPayload.from_str(tx_data)
 
     def execute(self, caller: Account, function: str, arguments: List[str], gas_price: int, gas_limit: int, value: int, chain: str, version: int, guardian: str, options: int) -> Transaction:
         self.caller = caller
@@ -118,30 +110,34 @@ class SmartContract:
         gas_price = int(gas_price)
         gas_limit = int(gas_limit)
         value = value or 0
+        receiver = self.address if self.address else EmptyAddress()
 
-        tx = Transaction()
-        tx.nonce = caller.nonce
-        tx.value = str(value)
-        tx.sender = caller.address.bech32()
-        tx.receiver = self.address.bech32()
-        tx.gasPrice = gas_price
-        tx.gasLimit = gas_limit
-        tx.data = self.prepare_execute_transaction_data(function, arguments)
-        tx.chainID = chain
-        tx.version = version
-        tx.guardian = guardian
-        tx.options = options
+        tx = Transaction(
+            chain_id=chain,
+            sender=caller.address,
+            receiver=receiver,
+            gas_limit=gas_limit,
+            gas_price=gas_price,
+            nonce=caller.nonce,
+            value=value,
+            data=self.prepare_execute_transaction_data(function, arguments),
+            version=version,
+            options=options
+        )
 
-        tx.sign(caller)
+        if guardian:
+            tx.guardian = Address.from_bech32(guardian)
+
+        tx.signature = bytes.fromhex(caller.sign_transaction(tx))
         return tx
 
-    def prepare_execute_transaction_data(self, function: str, arguments: List[Any]):
+    def prepare_execute_transaction_data(self, function: str, arguments: List[Any]) -> TransactionPayload:
         tx_data = function
 
         for arg in arguments:
             tx_data += f"@{_prepare_argument(arg)}"
 
-        return tx_data
+        return TransactionPayload.from_str(tx_data)
 
     def upgrade(self, owner: Account, arguments: List[Any], gas_price: int, gas_limit: int, value: int, chain: str, version: int, guardian: str, options: int) -> Transaction:
         self.owner = owner
@@ -150,30 +146,34 @@ class SmartContract:
         gas_price = int(gas_price or config.DEFAULT_GAS_PRICE)
         gas_limit = int(gas_limit)
         value = value or 0
+        receiver = self.address if self.address else EmptyAddress()
 
-        tx = Transaction()
-        tx.nonce = owner.nonce
-        tx.value = str(value)
-        tx.sender = owner.address.bech32()
-        tx.receiver = self.address.bech32()
-        tx.gasPrice = gas_price
-        tx.gasLimit = gas_limit
-        tx.data = self.prepare_upgrade_transaction_data(arguments)
-        tx.chainID = chain
-        tx.version = version
-        tx.guardian = guardian
-        tx.options = options
+        tx = Transaction(
+            chain_id=chain,
+            sender=owner.address,
+            receiver=receiver,
+            gas_limit=gas_limit,
+            gas_price=gas_price,
+            nonce=owner.nonce,
+            value=value,
+            data=self.prepare_upgrade_transaction_data(arguments),
+            version=version,
+            options=options
+        )
 
-        tx.sign(owner)
+        if guardian:
+            tx.guardian = Address.from_bech32(guardian)
+
+        tx.signature = bytes.fromhex(owner.sign_transaction(tx))
         return tx
 
-    def prepare_upgrade_transaction_data(self, arguments: List[Any]):
+    def prepare_upgrade_transaction_data(self, arguments: List[Any]) -> TransactionPayload:
         tx_data = f"upgradeContract@{self.bytecode}@{self.metadata.to_hex()}"
 
         for arg in arguments:
             tx_data += f"@{_prepare_argument(arg)}"
 
-        return tx_data
+        return TransactionPayload.from_str(tx_data)
 
     def query(
         self,
@@ -243,8 +243,8 @@ def _to_hex(arg: str):
 
     if arg.isnumeric():
         return _prepare_decimal(arg)
-    elif arg.startswith(ERD_BECH32_PREFIX):
-        addr = Address(arg)
+    elif arg.startswith(DEFAULT_HRP):
+        addr = Address.from_bech32(arg)
         return _prepare_hexadecimal(f"{HEX_PREFIX}{addr.hex()}")
     elif arg.lower() == FALSE_STR_LOWER or arg.lower() == TRUE_STR_LOWER:
         as_str = f"{HEX_PREFIX}01" if arg.lower() == TRUE_STR_LOWER else f"{HEX_PREFIX}00"

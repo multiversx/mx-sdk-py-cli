@@ -5,12 +5,13 @@ import sys
 from pathlib import Path
 from typing import Any, List, Optional, Tuple
 
+from multiversx_sdk_core import Address
 from multiversx_sdk_wallet import UserSecretKey, UserWallet
 from multiversx_sdk_wallet.mnemonic import Mnemonic
 from multiversx_sdk_wallet.user_pem import UserPEM
 
 from multiversx_sdk_cli import cli_shared
-from multiversx_sdk_cli.accounts import Account, Address
+from multiversx_sdk_cli.constants import DEFAULT_HRP
 from multiversx_sdk_cli.errors import KnownError
 
 logger = logging.getLogger("cli.wallet")
@@ -43,7 +44,7 @@ def setup_parser(args: List[str], subparsers: Any) -> Any:
     )
     sub.add_argument("--format", choices=WALLET_FORMATS, help="the format of the generated wallet file (default: %(default)s)", default=None)
     sub.add_argument("--outfile", help="the output path and base file name for the generated wallet files (default: %(default)s)", type=str)
-    sub.add_argument("--address-hrp", help=f"the human-readable part of the address, when format is {WALLET_FORMAT_KEYSTORE_SECRET_KEY} or {WALLET_FORMAT_PEM} (default: %(default)s)", type=str, default="erd")
+    sub.add_argument("--address-hrp", help=f"the human-readable part of the address, when format is {WALLET_FORMAT_KEYSTORE_SECRET_KEY} or {WALLET_FORMAT_PEM} (default: %(default)s)", type=str, default=DEFAULT_HRP)
     sub.set_defaults(func=wallet_new)
 
     sub = cli_shared.add_command_subparser(
@@ -57,7 +58,7 @@ def setup_parser(args: List[str], subparsers: Any) -> Any:
     sub.add_argument("--in-format", required=True, choices=WALLET_FORMATS, help="the format of the input file")
     sub.add_argument("--out-format", required=True, choices=WALLET_FORMATS, help="the format of the output file")
     sub.add_argument("--address-index", help=f"the address index, if input format is {WALLET_FORMAT_RAW_MNEMONIC}, {WALLET_FORMAT_KEYSTORE_MNEMONIC} or {WALLET_FORMAT_PEM} (with multiple entries) and the output format is {WALLET_FORMAT_KEYSTORE_SECRET_KEY} or {WALLET_FORMAT_PEM}", type=int, default=0)
-    sub.add_argument("--address-hrp", help=f"the human-readable part of the address, when the output format is {WALLET_FORMAT_KEYSTORE_SECRET_KEY} or {WALLET_FORMAT_PEM} (default: %(default)s)", type=str, default="erd")
+    sub.add_argument("--address-hrp", help=f"the human-readable part of the address, when the output format is {WALLET_FORMAT_KEYSTORE_SECRET_KEY} or {WALLET_FORMAT_PEM} (default: %(default)s)", type=str, default=DEFAULT_HRP)
     sub.set_defaults(func=convert_wallet)
 
     sub = cli_shared.add_command_subparser(
@@ -71,26 +72,6 @@ def setup_parser(args: List[str], subparsers: Any) -> Any:
     group.add_argument("--encode", action="store_true", help="whether to encode")
     group.add_argument("--decode", action="store_true", help="whether to decode")
     sub.set_defaults(func=do_bech32)
-
-    sub = cli_shared.add_command_subparser(
-        subparsers,
-        "wallet",
-        "pem-address",
-        "Get the public address out of a PEM file as bech32"
-    )
-    sub.add_argument("pem", help="path to the PEM file")
-    sub.add_argument("--pem-index", default=0, help="🔑 the index in the PEM file (default: %(default)s)")
-    sub.set_defaults(func=pem_address)
-
-    sub = cli_shared.add_command_subparser(
-        subparsers,
-        "wallet",
-        "pem-address-hex",
-        "Get the public address out of a PEM file as hex"
-    )
-    sub.add_argument("pem", help="path to the PEM file")
-    sub.add_argument("--pem-index", default=0, help="🔑 the index in the PEM file (default: %(default)s)")
-    sub.set_defaults(func=pem_address_hex)
 
     parser.epilog = cli_shared.build_group_epilog(subparsers)
     return subparsers
@@ -234,18 +215,13 @@ def _create_wallet_content(
 def do_bech32(args: Any):
     encode = args.encode
     value = args.value
-    address = Address(value)
 
-    result = address.bech32() if encode else address.hex()
+    if encode:
+        address = Address.from_hex(value, DEFAULT_HRP)
+        result = address.bech32()
+    else:
+        address = Address.from_bech32(value)
+        result = address.hex()
+
     print(result)
     return result
-
-
-def pem_address(args: Any):
-    account = Account(pem_file=args.pem, pem_index=args.pem_index)
-    print(account.address)
-
-
-def pem_address_hex(args: Any):
-    account = Account(pem_file=args.pem, pem_index=args.pem_index)
-    print(account.address.hex())

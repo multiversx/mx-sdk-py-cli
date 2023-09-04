@@ -55,9 +55,6 @@ generate() {
     command "Transactions.Send" "tx send"
     command "Transactions.Get" "tx get"
 
-    group "Hyperblocks" "hyperblock"
-    command "Hyperblock.Get" "hyperblock get"
-
     group "Validator" "validator"
     command "Validator.Stake" "validator stake"
     command "Validator.Unstake" "validator unstake"
@@ -82,11 +79,6 @@ generate() {
     command "Localnet.Config" "localnet config"
     command "Localnet.Start" "localnet start"
     command "Localnet.Clean" "localnet clean"
-
-    group "Network" "network"
-    command "Network.NumShards" "network num-shards"
-    command "Network.BlockNonce" "network block-nonce"
-    command "Network.Chain" "network chain"
 
     group "Dependencies" "deps"
     command "Dependencies.Install" "deps install"

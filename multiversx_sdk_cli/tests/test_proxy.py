@@ -1,3 +1,4 @@
+from multiversx_sdk_core import Address
 from multiversx_sdk_network_providers.proxy_network_provider import \
     ProxyNetworkProvider
 
@@ -22,42 +23,8 @@ def test_get_account():
         assert False
 
 
-def test_get_hyperblock_by_nonce():
-    result = main(
-        [
-            "hyperblock",
-            "get",
-            "--key",
-            "4312144",
-            "--proxy",
-            "https://devnet-api.multiversx.com",
-        ]
-    )
-    if not result:
-        assert True
-    else:
-        assert False
-
-
-def test_get_hyperblock_by_hash():
-    result = main(
-        [
-            "hyperblock",
-            "get",
-            "--key",
-            "756cb9c0a2d16b0fe9027a21c845a4f4eb1f1331630632669c88250128b40440",
-            "--proxy",
-            "https://devnet-api.multiversx.com",
-        ]
-    )
-    if not result:
-        assert True
-    else:
-        assert False
-
-
 def test_sync_nonce():
-    account = Account("erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th")
+    account = Account(address=Address.from_bech32("erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th"))
     proxy = ProxyNetworkProvider("https://devnet-api.multiversx.com")
     account.sync_nonce(proxy)
 
@@ -76,56 +43,6 @@ def test_query_contract():
             "https://devnet-api.multiversx.com",
         ]
     )
-    if not result:
-        assert True
-    else:
-        assert False
-
-
-def test_get_num_shards():
-    result = main(
-        [
-            "network",
-            "num-shards",
-            "--proxy",
-            "https://testnet-api.multiversx.com"
-        ]
-    )
-
-    if not result:
-        assert True
-    else:
-        assert False
-
-
-def test_get_last_block_nonce():
-    result = main(
-        [
-            "network",
-            "block-nonce",
-            "--shard",
-            "4294967295",
-            "--proxy",
-            "https://testnet-api.multiversx.com"
-        ]
-    )
-
-    if not result:
-        assert True
-    else:
-        assert False
-
-
-def test_get_chain_id():
-    result = main(
-        [
-            "network",
-            "chain",
-            "--proxy",
-            "https://testnet-api.multiversx.com"
-        ]
-    )
-
     if not result:
         assert True
     else:

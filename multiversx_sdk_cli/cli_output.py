@@ -1,10 +1,11 @@
-from collections import OrderedDict
 import json
-from typing import Any, Dict, List, Union
 import logging
-from multiversx_sdk_cli import utils
+from collections import OrderedDict
+from typing import Any, Dict, List, Optional, Union
 
-from multiversx_sdk_cli.accounts import Address
+from multiversx_sdk_core import Address
+
+from multiversx_sdk_cli import utils
 from multiversx_sdk_cli.interfaces import ITransaction
 from multiversx_sdk_cli.utils import ISerializable
 
@@ -13,12 +14,17 @@ logger = logging.getLogger("cli.output")
 
 class CLIOutputBuilder:
     def __init__(self) -> None:
+        self.emitted_transaction_hash: Optional[str] = None
         self.emitted_transaction: Union[ITransaction, None] = None
         self.emitted_transaction_omitted_fields: List[str] = []
         self.contract_address: Union[Address, None] = None
         self.transaction_on_network: Union[ISerializable, None] = None
         self.transaction_on_network_omitted_fields: List[str] = []
         self.simulation_results: Union[ISerializable, None] = None
+
+    def set_emitted_transaction_hash(self, hash: str):
+        self.emitted_transaction_hash = hash
+        return self
 
     def set_emitted_transaction(self, emitted_transaction: ITransaction, omitted_fields: List[str] = []):
         self.emitted_transaction = emitted_transaction
@@ -46,8 +52,8 @@ class CLIOutputBuilder:
 
         if self.emitted_transaction:
             emitted_transaction_dict = self.emitted_transaction.to_dictionary()
-            emitted_transaction_hash = self.emitted_transaction.get_hash() or ""
-            emitted_transaction_data = self.emitted_transaction.get_data() or ""
+            emitted_transaction_hash = self.emitted_transaction_hash or ""
+            emitted_transaction_data = str(self.emitted_transaction.data)
             utils.omit_fields(emitted_transaction_dict, self.emitted_transaction_omitted_fields)
 
             output["emittedTransaction"] = emitted_transaction_dict

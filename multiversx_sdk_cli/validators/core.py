@@ -2,12 +2,12 @@ import logging
 from pathlib import Path
 from typing import Any, List, Tuple, Union
 
-from multiversx_sdk_core import ArbitraryMessage
+from multiversx_sdk_core import Address, ArbitraryMessage
 from multiversx_sdk_wallet.validator_pem import ValidatorPEM
 from multiversx_sdk_wallet.validator_signer import ValidatorSigner
 
 from multiversx_sdk_cli import utils
-from multiversx_sdk_cli.accounts import Account, Address
+from multiversx_sdk_cli.accounts import Account
 from multiversx_sdk_cli.cli_password import load_password
 from multiversx_sdk_cli.config import (GAS_PER_DATA_BYTE, MIN_GAS_LIMIT,
                                        MetaChainSystemSCsCost)
@@ -34,7 +34,7 @@ def prepare_args_for_stake(args: Any):
         raise BadUsage("cannot initialize node operator")
 
     validators_file_path = Path(args.validators_file)
-    reward_address = Address(args.reward_address) if args.reward_address else None
+    reward_address = Address.from_bech32(args.reward_address) if args.reward_address else None
 
     data, gas_limit = prepare_transaction_data_for_stake(node_operator.address, validators_file_path, reward_address)
     args.data = data
@@ -71,9 +71,9 @@ def prepare_transaction_data_for_stake(node_operator_address: Address, validator
         call_arguments.append(f"0x{reward_address.hex()}")
 
     data = SmartContract().prepare_execute_transaction_data("stake", call_arguments)
-    gas_limit = estimate_system_sc_call(data, MetaChainSystemSCsCost.STAKE, num_of_nodes)
+    gas_limit = estimate_system_sc_call(str(data), MetaChainSystemSCsCost.STAKE, num_of_nodes)
 
-    return data, gas_limit
+    return str(data), gas_limit
 
 
 def prepare_args_for_top_up(args: Any):
@@ -112,7 +112,7 @@ def prepare_args_for_unjail(args: Any):
 
 
 def prepare_args_for_change_reward_address(args: Any):
-    reward_address = Address(args.reward_address)
+    reward_address = Address.from_bech32(args.reward_address)
     args.data = 'changeRewardAddress@' + reward_address.hex()
     args.receiver = VALIDATORS_SMART_CONTRACT_ADDRESS
 

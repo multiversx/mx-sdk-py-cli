@@ -1,11 +1,11 @@
 import logging
 from typing import Any
 
+from multiversx_sdk_core import Address
 from multiversx_sdk_network_providers.proxy_network_provider import \
     ProxyNetworkProvider
 
 from multiversx_sdk_cli import cli_shared, utils
-from multiversx_sdk_cli.accounts import Address
 
 logger = logging.getLogger("cli.accounts")
 
@@ -36,7 +36,7 @@ def get_account(args: Any):
     proxy_url = args.proxy
     address = args.address
     proxy = ProxyNetworkProvider(proxy_url)
-    account = proxy.get_account(Address(address))
+    account = proxy.get_account(Address.from_bech32(address))
 
     if args.balance:
         print(account.balance)

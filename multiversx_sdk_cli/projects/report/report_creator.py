@@ -3,27 +3,32 @@ import itertools
 import operator
 from pathlib import Path
 from typing import Any, Dict, Iterable, List, Tuple
+
 from multiversx_sdk_cli import guards
-from multiversx_sdk_cli.projects.report.data.folder_report import FolderReport
-from multiversx_sdk_cli.projects.report.data.extracted_feature import ExtractedFeature
-from multiversx_sdk_cli.projects.report.data.report import Report
-from multiversx_sdk_cli.projects.report.data.wasm_report import WasmReport
-from multiversx_sdk_cli.projects.report.data.project_report import ProjectReport
 from multiversx_sdk_cli.projects.core import load_project
 from multiversx_sdk_cli.projects.project_base import remove_suffix
 from multiversx_sdk_cli.projects.project_rust import ProjectRust
-
-from multiversx_sdk_cli.projects.report.features.report_option import ReportFeature
-from multiversx_sdk_cli.projects.report.features.twiggy_paths_check import run_twiggy_paths
+from multiversx_sdk_cli.projects.report.data.extracted_feature import \
+    ExtractedFeature
+from multiversx_sdk_cli.projects.report.data.folder_report import FolderReport
+from multiversx_sdk_cli.projects.report.data.project_report import \
+    ProjectReport
+from multiversx_sdk_cli.projects.report.data.report import Report
+from multiversx_sdk_cli.projects.report.data.wasm_report import WasmReport
+from multiversx_sdk_cli.projects.report.features.report_option import \
+    ReportFeature
+from multiversx_sdk_cli.projects.report.features.twiggy_paths_check import \
+    run_twiggy_paths
 
 
 class ReportCreator:
-    def __init__(self, options: List[ReportFeature], skip_build: bool, skip_twiggy: bool, build_options: Dict[str, Any]) -> None:
+    def __init__(self, options: List[ReportFeature], skip_build: bool, skip_twiggy: bool, build_options: Dict[str, Any], build_args: List[str]) -> None:
         self.report_features = options
         self.skip_build = skip_build
         self.skip_twiggy = skip_twiggy
         self.require_twiggy_paths = any(report_feature.requires_twiggy_paths() for report_feature in self.report_features)
         self.build_options = build_options
+        self.build_args = build_args
 
     def create_report(self, base_path: Path, project_paths: List[Path]) -> Report:
         base_path = base_path.resolve()
@@ -47,7 +52,7 @@ class ReportCreator:
         project = load_project(project_path)
 
         if not self.skip_build:
-            project.build(self.build_options)
+            project.build(self.build_args, self.build_options)
 
         twiggy_requirements_met = False
         should_build_twiggy = self.require_twiggy_paths and not self.skip_twiggy

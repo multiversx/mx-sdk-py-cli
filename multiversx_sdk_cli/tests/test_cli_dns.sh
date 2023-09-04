@@ -76,32 +76,32 @@ testRegistrationOffline() {
 }
 
 testTransactionsWithUsernamesOffline() {
-    ${CLI} --verbose tx new --pem=${TestUser} --receiver=${TestUser2} \
+    ${CLI} --verbose tx new --pem=${TestUser} --receiver="erd1ssmsc9022udc8pdw7wk3hxw74jr900xg28vwpz3z60gep66fasasl2nkm4" \
         --value="1${DENOMINATION}" --nonce=42 --gas-limit=50000 --gas-price=2000000000 --chain=${CHAIN_ID} \
         --outfile=${SANDBOX}/txA.txt || return 1
     assertFileExists ${SANDBOX}/txA.txt || return 1
 
-    ${CLI} --verbose tx new --pem=${TestUser} --receiver=${TestUser2} --receiver-username="testuser2" \
+    ${CLI} --verbose tx new --pem=${TestUser} --receiver="erd1ssmsc9022udc8pdw7wk3hxw74jr900xg28vwpz3z60gep66fasasl2nkm4" --receiver-username="testuser2" \
         --value="1${DENOMINATION}" --nonce=43 --gas-limit=50000 --gas-price=2000000000 --chain=${CHAIN_ID} \
         --outfile=${SANDBOX}/txB.txt || return 1
     assertFileExists ${SANDBOX}/txB.txt || return 1
 
-    ${CLI} --verbose tx new --pem=${TestUser} --receiver=${TestUser2} --receiver-username="testuser2foo" \
+    ${CLI} --verbose tx new --pem=${TestUser} --receiver="erd1ssmsc9022udc8pdw7wk3hxw74jr900xg28vwpz3z60gep66fasasl2nkm4" --receiver-username="testuser2foo" \
         --value="1${DENOMINATION}" --nonce=44 --gas-limit=50000 --gas-price=2000000000 --chain=${CHAIN_ID} \
         --outfile=${SANDBOX}/txC.txt || return 1
     assertFileExists ${SANDBOX}/txC.txt || return 1
 
-    ${CLI} --verbose tx new --pem=${TestUser} --sender-username="testuser" --receiver=${TestUser2} --receiver-username="testuser2" \
+    ${CLI} --verbose tx new --pem=${TestUser} --sender-username="testuser" --receiver="erd1ssmsc9022udc8pdw7wk3hxw74jr900xg28vwpz3z60gep66fasasl2nkm4" --receiver-username="testuser2" \
         --value="1${DENOMINATION}" --nonce=45 --gas-limit=50000 --gas-price=2000000000 --chain=${CHAIN_ID} \
         --outfile=${SANDBOX}/txD.txt || return 1
     assertFileExists ${SANDBOX}/txD.txt || return 1
 
-    ${CLI} --verbose tx new --pem=${TestUser} --sender-username="testuser" --receiver=${TestUser2} \
+    ${CLI} --verbose tx new --pem=${TestUser} --sender-username="testuser" --receiver="erd1ssmsc9022udc8pdw7wk3hxw74jr900xg28vwpz3z60gep66fasasl2nkm4" \
         --value="1${DENOMINATION}" --nonce=46 --gas-limit=50000 --gas-price=2000000000 --chain=${CHAIN_ID} \
         --outfile=${SANDBOX}/txF.txt || return 1
     assertFileExists ${SANDBOX}/txF.txt || return 1
 
-    ${CLI} --verbose tx new --pem=${TestUser} --sender-username="testuserfoo" --receiver=${TestUser2} \
+    ${CLI} --verbose tx new --pem=${TestUser} --sender-username="testuserfoo" --receiver="erd1ssmsc9022udc8pdw7wk3hxw74jr900xg28vwpz3z60gep66fasasl2nkm4" \
         --value="1${DENOMINATION}" --nonce=47 --gas-limit=50000 --gas-price=2000000000 --chain=${CHAIN_ID} \
         --outfile=${SANDBOX}/txG.txt || return 1
     assertFileExists ${SANDBOX}/txG.txt || return 1

@@ -1,0 +1,16 @@
+{
+    "python.testing.pytestArgs": [
+        "multiversx_sdk_cli"
+    ],
+    "python.testing.pytestEnabled": true,
+    "editor.formatOnSave": true,
+    "[python]": {
+        "editor.defaultFormatter": "ms-python.autopep8"
+    },
+    "python.formatting.provider": "autopep8",
+    "editor.codeActionsOnSave": {
+        "source.organizeImports": true
+    },
+    "files.insertFinalNewline": true,
+    "python.languageServer": "Pylance"
+}
