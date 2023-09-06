@@ -217,6 +217,28 @@ def test_wallet_bech32_decode(capsys: Any):
     assert out == "0139472eff6886771a982f3083da5d421f24c29181e63888228dc81ca60d69e1"
 
 
+def test_wallet_convert_pem_to_bech32_address(capsys: Any):
+    infile = testdata_path / "alice.pem"
+
+    main([
+        "wallet", "convert", "--infile", str(infile), "--in-format", "pem", "--out-format", "bech32_address"
+    ])
+
+    out = _read_stdout(capsys).strip("Output:\n\n")
+    assert out == "erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th"
+
+
+def test_wallet_convert_pem_to_pubkey(capsys: Any):
+    infile = testdata_path / "alice.pem"
+
+    main([
+        "wallet", "convert", "--infile", str(infile), "--in-format", "pem", "--out-format", "public_key"
+    ])
+
+    out = _read_stdout(capsys).strip("Output:\n\n")
+    assert out == "0139472eff6886771a982f3083da5d421f24c29181e63888228dc81ca60d69e1"
+
+
 def _read_stdout_mnemonic(capsys: Any) -> str:
     return _read_stdout(capsys).replace("Mnemonic:", "").strip()
 
