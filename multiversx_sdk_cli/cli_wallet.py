@@ -30,9 +30,7 @@ WALLET_FORMATS = [
     WALLET_FORMAT_PEM,
 ]
 
-WALLET_FORMATS_AND_ADDRESSES: List[str] = []
-WALLET_FORMATS_AND_ADDRESSES.extend(WALLET_FORMATS)
-WALLET_FORMATS_AND_ADDRESSES.extend([WALLET_FORMAT_BECH32_ADDRESS, WALLET_FORMAT_PUBLIC_KEY])
+WALLET_FORMATS_AND_ADDRESSES = [*WALLET_FORMATS, WALLET_FORMAT_BECH32_ADDRESS, WALLET_FORMAT_PUBLIC_KEY]
 
 
 def setup_parser(args: List[str], subparsers: Any) -> Any:
@@ -231,8 +229,7 @@ def _create_wallet_content(
         assert secret_key is not None
 
         pubkey = secret_key.generate_public_key()
-        address = pubkey.to_address(address_hrp)
-        return address.hex()  # type: ignore
+        return pubkey.hex()
 
     raise KnownError(f"Cannot create wallet, unknown output format: <{out_format}>. Make sure to use one of following: {WALLET_FORMATS}.")
 
