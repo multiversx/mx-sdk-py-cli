@@ -20,12 +20,17 @@ WALLET_FORMAT_RAW_MNEMONIC = "raw-mnemonic"
 WALLET_FORMAT_KEYSTORE_MNEMONIC = "keystore-mnemonic"
 WALLET_FORMAT_KEYSTORE_SECRET_KEY = "keystore-secret-key"
 WALLET_FORMAT_PEM = "pem"
+WALLET_FORMAT_ADDRESS_BECH32 = "address-bech32"
+WALLET_FORMAT_ADDRESS_HEX = "address-hex"
+
 WALLET_FORMATS = [
     WALLET_FORMAT_RAW_MNEMONIC,
     WALLET_FORMAT_KEYSTORE_MNEMONIC,
     WALLET_FORMAT_KEYSTORE_SECRET_KEY,
     WALLET_FORMAT_PEM,
 ]
+
+WALLET_FORMATS_AND_ADDRESSES = [*WALLET_FORMATS, WALLET_FORMAT_ADDRESS_BECH32, WALLET_FORMAT_ADDRESS_HEX]
 
 
 def setup_parser(args: List[str], subparsers: Any) -> Any:
@@ -56,7 +61,7 @@ def setup_parser(args: List[str], subparsers: Any) -> Any:
     sub.add_argument("--infile", help="path to the input file")
     sub.add_argument("--outfile", help="path to the output file")
     sub.add_argument("--in-format", required=True, choices=WALLET_FORMATS, help="the format of the input file")
-    sub.add_argument("--out-format", required=True, choices=WALLET_FORMATS, help="the format of the output file")
+    sub.add_argument("--out-format", required=True, choices=WALLET_FORMATS_AND_ADDRESSES, help="the format of the output file")
     sub.add_argument("--address-index", help=f"the address index, if input format is {WALLET_FORMAT_RAW_MNEMONIC}, {WALLET_FORMAT_KEYSTORE_MNEMONIC} or {WALLET_FORMAT_PEM} (with multiple entries) and the output format is {WALLET_FORMAT_KEYSTORE_SECRET_KEY} or {WALLET_FORMAT_PEM}", type=int, default=0)
     sub.add_argument("--address-hrp", help=f"the human-readable part of the address, when the output format is {WALLET_FORMAT_KEYSTORE_SECRET_KEY} or {WALLET_FORMAT_PEM} (default: %(default)s)", type=str, default=DEFAULT_HRP)
     sub.set_defaults(func=convert_wallet)
@@ -208,6 +213,23 @@ def _create_wallet_content(
         address = pubkey.to_address(address_hrp)
         pem = UserPEM(address.bech32(), secret_key)
         return pem.to_text()
+
+    if out_format == WALLET_FORMAT_ADDRESS_BECH32:
+        if mnemonic:
+            secret_key = mnemonic.derive_key(address_index)
+        assert secret_key is not None
+
+        pubkey = secret_key.generate_public_key()
+        address = pubkey.to_address(address_hrp)
+        return address.bech32()
+
+    if out_format == WALLET_FORMAT_ADDRESS_HEX:
+        if mnemonic:
+            secret_key = mnemonic.derive_key(address_index)
+        assert secret_key is not None
+
+        pubkey = secret_key.generate_public_key()
+        return pubkey.hex()
 
     raise KnownError(f"Cannot create wallet, unknown output format: <{out_format}>. Make sure to use one of following: {WALLET_FORMATS}.")
 
