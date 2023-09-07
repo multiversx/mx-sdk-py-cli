@@ -221,7 +221,7 @@ def test_wallet_convert_pem_to_bech32_address(capsys: Any):
     infile = testdata_path / "alice.pem"
 
     main([
-        "wallet", "convert", "--infile", str(infile), "--in-format", "pem", "--out-format", "bech32-address"
+        "wallet", "convert", "--infile", str(infile), "--in-format", "pem", "--out-format", "address-bech32"
     ])
 
     out = _read_stdout(capsys).strip("Output:\n\n")
@@ -232,7 +232,7 @@ def test_wallet_convert_pem_to_pubkey(capsys: Any):
     infile = testdata_path / "alice.pem"
 
     main([
-        "wallet", "convert", "--infile", str(infile), "--in-format", "pem", "--out-format", "public-key"
+        "wallet", "convert", "--infile", str(infile), "--in-format", "pem", "--out-format", "address-hex"
     ])
 
     out = _read_stdout(capsys).strip("Output:\n\n")

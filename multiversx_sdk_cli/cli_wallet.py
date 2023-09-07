@@ -20,8 +20,8 @@ WALLET_FORMAT_RAW_MNEMONIC = "raw-mnemonic"
 WALLET_FORMAT_KEYSTORE_MNEMONIC = "keystore-mnemonic"
 WALLET_FORMAT_KEYSTORE_SECRET_KEY = "keystore-secret-key"
 WALLET_FORMAT_PEM = "pem"
-WALLET_FORMAT_BECH32_ADDRESS = "bech32-address"
-WALLET_FORMAT_PUBLIC_KEY = "public-key"
+WALLET_FORMAT_ADDRESS_BECH32 = "address-bech32"
+WALLET_FORMAT_ADDRESS_HEX = "address-hex"
 
 WALLET_FORMATS = [
     WALLET_FORMAT_RAW_MNEMONIC,
@@ -30,7 +30,7 @@ WALLET_FORMATS = [
     WALLET_FORMAT_PEM,
 ]
 
-WALLET_FORMATS_AND_ADDRESSES = [*WALLET_FORMATS, WALLET_FORMAT_BECH32_ADDRESS, WALLET_FORMAT_PUBLIC_KEY]
+WALLET_FORMATS_AND_ADDRESSES = [*WALLET_FORMATS, WALLET_FORMAT_ADDRESS_BECH32, WALLET_FORMAT_ADDRESS_HEX]
 
 
 def setup_parser(args: List[str], subparsers: Any) -> Any:
@@ -214,7 +214,7 @@ def _create_wallet_content(
         pem = UserPEM(address.bech32(), secret_key)
         return pem.to_text()
 
-    if out_format == WALLET_FORMAT_BECH32_ADDRESS:
+    if out_format == WALLET_FORMAT_ADDRESS_BECH32:
         if mnemonic:
             secret_key = mnemonic.derive_key(address_index)
         assert secret_key is not None
@@ -223,7 +223,7 @@ def _create_wallet_content(
         address = pubkey.to_address(address_hrp)
         return address.bech32()
 
-    if out_format == WALLET_FORMAT_PUBLIC_KEY:
+    if out_format == WALLET_FORMAT_ADDRESS_HEX:
         if mnemonic:
             secret_key = mnemonic.derive_key(address_index)
         assert secret_key is not None
