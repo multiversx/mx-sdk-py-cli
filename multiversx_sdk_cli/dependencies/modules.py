@@ -317,26 +317,8 @@ class Rust(DependencyModule):
         tools_folder = workstation.get_tools_folder()
         return tools_folder / "vendor-rust"
 
-    def get_env(self):
-        return os.environ
-        directory = self.get_directory("")
-        resolution = self.get_resolution()
-
-        if resolution == DependencyResolution.Host:
-            return {
-                "PATH": os.environ.get("PATH", ""),
-                "RUSTUP_HOME": os.environ.get("RUSTUP_HOME", ""),
-                "CARGO_HOME": os.environ.get("CARGO_HOME", "")
-            }
-        if resolution == DependencyResolution.SDK:
-            return {
-                # At this moment, cc (build-essential) is sometimes required by the meta crate (e.g. for reports)
-                "PATH": f"{path.join(directory, 'bin')}:{os.environ['PATH']}",
-                "RUSTUP_HOME": str(directory),
-                "CARGO_HOME": str(directory)
-            }
-
-        raise errors.BadDependencyResolution(self.key, resolution)
+    def get_env(self) -> Dict[str, str]:
+        return dict(os.environ)
 
     def _get_env_for_is_installed_in_sdk(self) -> Dict[str, str]:
         directory = self.get_directory("")
