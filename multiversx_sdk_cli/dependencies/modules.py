@@ -318,6 +318,7 @@ class Rust(DependencyModule):
         return tools_folder / "vendor-rust"
 
     def get_env(self):
+        return os.environ
         directory = self.get_directory("")
         resolution = self.get_resolution()
 
