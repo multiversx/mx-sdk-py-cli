@@ -269,12 +269,12 @@ class Rust(DependencyModule):
             toolchain = "nightly"
 
         args = [str(installer_path), "--verbose", "--default-toolchain", toolchain, "--profile",
-                "minimal", "--target", "wasm32-unknown-unknown", "--no-modify-path", "-y"]
-        output = myprocess.run_process(args, env=self.get_env_for_install())
+                "minimal", "--target", "wasm32-unknown-unknown", "-y"]
+        output = myprocess.run_process(args)
 
         if output:
             sc_meta_args = ["cargo", "install", "multiversx-sc-meta"]
-            myprocess.run_process(sc_meta_args, env=self.get_env_for_install())
+            myprocess.run_process(sc_meta_args)
 
     def _get_installer_url(self) -> str:
         if workstation.is_windows():
@@ -347,14 +347,7 @@ class Rust(DependencyModule):
         }
 
     def get_env_for_install(self):
-        directory = self.get_directory("")
-
-        env = {
-            # For installation, wget (or curl) and cc (build-essential) are also required.
-            "PATH": f"{path.join(directory, 'bin')}:{os.environ['PATH']}",
-            "RUSTUP_HOME": str(directory),
-            "CARGO_HOME": str(directory)
-        }
+        env: Dict[str, str] = {}
 
         if workstation.is_windows():
             env["RUSTUP_USE_HYPER"] = "1"
