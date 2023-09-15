@@ -294,24 +294,12 @@ class Rust(DependencyModule):
             shutil.rmtree(directory)
 
     def is_installed(self, tag: str) -> bool:
-        resolution = self.get_resolution()
+        which_rustc = shutil.which("rustc")
+        which_cargo = shutil.which("cargo")
+        logger.info(f"which rustc: {which_rustc}")
+        logger.info(f"which cargo: {which_cargo}")
 
-        if resolution == DependencyResolution.Host:
-            which_rustc = shutil.which("rustc")
-            which_cargo = shutil.which("cargo")
-            logger.info(f"which rustc: {which_rustc}")
-            logger.info(f"which cargo: {which_cargo}")
-
-            return which_rustc is not None and which_cargo is not None
-        if resolution == DependencyResolution.SDK:
-            try:
-                env = self._get_env_for_is_installed_in_sdk()
-                myprocess.run_process(["rustc", "--version"], env=env)
-                return True
-            except Exception:
-                return False
-
-        raise errors.BadDependencyResolution(self.key, resolution)
+        return which_rustc is not None and which_cargo is not None
 
     def get_directory(self, tag: str) -> Path:
         tools_folder = workstation.get_tools_folder()
@@ -319,23 +307,6 @@ class Rust(DependencyModule):
 
     def get_env(self) -> Dict[str, str]:
         return dict(os.environ)
-
-    def _get_env_for_is_installed_in_sdk(self) -> Dict[str, str]:
-        directory = self.get_directory("")
-
-        return {
-            "PATH": str(directory / "bin"),
-            "RUSTUP_HOME": str(directory),
-            "CARGO_HOME": str(directory)
-        }
-
-    def get_env_for_install(self):
-        env: Dict[str, str] = {}
-
-        if workstation.is_windows():
-            env["RUSTUP_USE_HYPER"] = "1"
-
-        return env
 
     def get_latest_release(self) -> str:
         raise errors.UnsupportedConfigurationValue("Rust tag must either be explicit, empty or 'nightly'")
