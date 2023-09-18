@@ -145,7 +145,7 @@ def _guard_valid_config_deletion(name: str):
 
 def get_defaults() -> Dict[str, Any]:
     return {
-        "dependencies.vmtools.tag": "latest",
+        "dependencies.vmtools.tag": "1.4.60",
         "dependencies.mx_sdk_rs.tag": "latest",
         "dependencies.vmtools.urlTemplate.linux": "https://github.com/multiversx/mx-chain-vm-go/archive/{TAG}.tar.gz",
         "dependencies.vmtools.urlTemplate.osx": "https://github.com/multiversx/mx-chain-vm-go/archive/{TAG}.tar.gz",
