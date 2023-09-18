@@ -38,7 +38,7 @@ def test_contract_new_with_bad_code():
 
 
 def replace_variable_with_unknown_variable():
-    # this is done in order to replace the value added in the adder contract witha unknown variable
+    # this is done in order to replace the value added in the adder contract with a unknown variable
     with open(parent / "testdata-out" / "SANDBOX" / "adder-bad-src" / "src" / "adder.rs", "r") as f:
         contract_lines = f.readlines()
 
