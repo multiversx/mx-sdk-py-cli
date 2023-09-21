@@ -296,6 +296,8 @@ class Rust(DependencyModule):
     def is_installed(self, tag: str) -> bool:
         which_rustc = shutil.which("rustc")
         which_cargo = shutil.which("cargo")
+        print(which_rustc)
+        print(which_cargo)
         logger.info(f"which rustc: {which_rustc}")
         logger.info(f"which cargo: {which_cargo}")
 
