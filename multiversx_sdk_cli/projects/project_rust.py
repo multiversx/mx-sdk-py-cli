@@ -1,4 +1,5 @@
 import logging
+import shutil
 import subprocess
 from pathlib import Path
 from typing import Any, Dict, List, Set, cast
@@ -53,7 +54,14 @@ class ProjectRust(Project):
             self.get_output_folder()
         ])
 
+    def check_if_sc_meta_is_installed(self):
+        which_sc_meta = shutil.which("sc-meta")
+
+        if which_sc_meta is None:
+            raise errors.KnownError("'sc-meta' is not installed. Run 'cargo install multiversx-sc-meta' then try again.")
+
     def run_meta(self):
+        self.check_if_sc_meta_is_installed()
         env = self.get_env()
 
         with_wasm_opt = not self.options.get("no-wasm-opt")
@@ -123,6 +131,8 @@ class ProjectRust(Project):
         return dependencies.get_module_by_key("rust").get_env()
 
     def build_wasm_with_debug_symbols(self, build_options: Dict[str, Any]):
+        self.check_if_sc_meta_is_installed()
+
         cwd = self.path
         env = self.get_env()
         target_dir: str = build_options.get("target-dir", "")

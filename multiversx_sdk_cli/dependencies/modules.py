@@ -270,11 +270,8 @@ class Rust(DependencyModule):
 
         args = [str(installer_path), "--verbose", "--default-toolchain", toolchain, "--profile",
                 "minimal", "--target", "wasm32-unknown-unknown", "-y"]
-        output = myprocess.run_process(args)
 
-        if output:
-            sc_meta_args = ["cargo", "install", "multiversx-sc-meta"]
-            myprocess.run_process(sc_meta_args)
+        myprocess.run_process(args)
 
     def _get_installer_url(self) -> str:
         if workstation.is_windows():
