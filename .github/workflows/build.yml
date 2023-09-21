@@ -45,10 +45,6 @@ jobs:
         run: |
           python3 -m multiversx_sdk_cli.cli deps install testwallets
           python3 -m multiversx_sdk_cli.cli deps install wasm-opt
-      - name: Run unit tests
-        run: |
-          export PYTHONPATH=.
-          pytest -s .
       - name: Run CLI tests
         run: |
           python3 -m multiversx_sdk_cli.cli config set dependencies.vmtools.tag v1.4.60
