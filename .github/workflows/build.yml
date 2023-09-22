@@ -49,7 +49,6 @@ jobs:
       - name: Run unit tests
         run: |
           export PYTHONPATH=.
-          echo $PATH
           pytest .
       - name: Run CLI tests
         run: |
