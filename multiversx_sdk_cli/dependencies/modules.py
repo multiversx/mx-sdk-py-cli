@@ -9,6 +9,7 @@ from multiversx_sdk_cli import (config, dependencies, downloader, errors,
                                 myprocess, utils, workstation)
 from multiversx_sdk_cli.dependencies.resolution import (
     DependencyResolution, get_dependency_resolution)
+from multiversx_sdk_cli.ux import show_warning
 
 logger = logging.getLogger("modules")
 
@@ -34,7 +35,6 @@ class DependencyModule:
             logger.info("Already exists. Skip install.")
             return
 
-        self._guard_cannot_install_on_host()
         self.uninstall(tag)
         self._do_install(tag)
 
@@ -65,10 +65,6 @@ class DependencyModule:
 
     def get_resolution(self) -> DependencyResolution:
         return get_dependency_resolution(self.key)
-
-    def _guard_cannot_install_on_host(self):
-        if self.get_resolution() == DependencyResolution.Host:
-            raise errors.KnownError(f"Installation of {self.key} on the host machine is not supported. Perhaps set 'dependencies.{self.key}.resolution' to 'SDK' in config?")
 
 
 class StandaloneModule(DependencyModule):
@@ -256,6 +252,28 @@ class GolangModule(StandaloneModule):
 
 
 class Rust(DependencyModule):
+    def is_installed(self, tag: str) -> bool:
+        which_rustc = shutil.which("rustc")
+        which_cargo = shutil.which("cargo")
+        logger.info(f"which rustc: {which_rustc}")
+        logger.info(f"which cargo: {which_cargo}")
+
+        return which_rustc is not None and which_cargo is not None
+
+    def install(self, tag: str, overwrite: bool) -> None:
+        # Fallback to default tag if not provided
+        tag = tag or config.get_dependency_tag(self.key)
+
+        logger.info(f"install: key={self.key}, tag={tag}, overwrite={overwrite}")
+
+        if overwrite:
+            logger.info("Overwriting the current rust version...")
+        elif self._is_installed_and_set_to_nightly():
+            return
+
+        self._do_install(tag)
+        self._post_install(tag)
+
     def _do_install(self, tag: str) -> None:
         installer_url = self._get_installer_url()
         installer_path = self._get_installer_path()
@@ -290,13 +308,30 @@ class Rust(DependencyModule):
         if os.path.isdir(directory):
             shutil.rmtree(directory)
 
-    def is_installed(self, tag: str) -> bool:
-        which_rustc = shutil.which("rustc")
-        which_cargo = shutil.which("cargo")
-        logger.info(f"which rustc: {which_rustc}")
-        logger.info(f"which cargo: {which_cargo}")
+    def _is_installed_and_set_to_nightly(self) -> bool:
+        # the method parameter is not used in this specific module
+        is_rust_installed = self.is_installed("")
 
-        return which_rustc is not None and which_cargo is not None
+        if not is_rust_installed:
+            return is_rust_installed
+        else:
+            if self._is_the_correct_rust_version_installed():
+                return True
+            else:
+                return False
+
+    def _is_the_correct_rust_version_installed(self) -> bool:
+        args = ["mxpy", "deps", "check", "rust"]
+        already_installed_rust_version = myprocess.run_process(args)
+
+        module = dependencies.get_module_by_key("rust")
+        default_tag: str = config.get_dependency_tag(module.key)
+
+        if default_tag in already_installed_rust_version:
+            return True
+
+        show_warning("The rust version you have installed does not match the version we recommand. If you'd like to overwrite your current version please run `mxpy deps install rust --overwrite`.")
+        return False
 
     def get_directory(self, tag: str) -> Path:
         tools_folder = workstation.get_tools_folder()
