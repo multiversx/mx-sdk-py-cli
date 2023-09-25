@@ -16,7 +16,7 @@ PROXY="${PROXY:-http://localhost:7950}"
 CHAIN_ID="${CHAIN_ID:-localnet}"
 TestUser=./testdata/testUser.pem
 TestUser2=./testdata/testUser2.pem
-RUST_VERSION="nightly-2023-04-24"
+RUST_VERSION="nightly-2023-05-26"
 
 cleanSandbox() {
     rm -rf ${SANDBOX}
