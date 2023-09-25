@@ -41,8 +41,9 @@ def check(args: Any):
     module = dependencies.get_module_by_key(name)
     default_tag: str = config.get_dependency_tag(module.key)
     tag_to_check = tag or default_tag
+    resolution: str = config.get_dependency_resolution(module.key)
 
-    logger.info(f"Checking dependency: module = {module.key}, tag = {tag_to_check}; default tag = {default_tag}")
+    logger.info(f"Checking dependency: module = {module.key}, tag = {tag_to_check}; default tag = {default_tag}, resolution = {resolution}")
 
     installed = module.is_installed(tag_to_check)
     if installed:
