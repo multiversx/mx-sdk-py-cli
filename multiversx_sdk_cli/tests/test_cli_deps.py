@@ -41,6 +41,7 @@ def test_check_sc_meta():
         assert False
 
 
+@pytest.mark.skip_on_windows
 def test_deps_check_vmtools():
     return_code = main(["deps", "check", "vmtools"])
     if return_code:
