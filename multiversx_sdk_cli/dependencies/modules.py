@@ -255,10 +255,17 @@ class Rust(DependencyModule):
     def is_installed(self, tag: str) -> bool:
         which_rustc = shutil.which("rustc")
         which_cargo = shutil.which("cargo")
+        which_sc_meta = shutil.which("sc-meta")
+        which_wasm_opt = shutil.which("wasm-opt")
+        which_twiggy = shutil.which("twiggy")
         logger.info(f"which rustc: {which_rustc}")
         logger.info(f"which cargo: {which_cargo}")
+        logger.info(f"which sc-meta: {which_sc_meta}")
+        logger.info(f"which wasm-opt: {which_wasm_opt}")
+        logger.info(f"which twiggy: {which_twiggy}")
 
-        return which_rustc is not None and which_cargo is not None
+        dependencies = [which_rustc, which_cargo, which_sc_meta, which_wasm_opt, which_twiggy]
+        return all(dependency is not None for dependency in dependencies)
 
     def install(self, tag: str, overwrite: bool) -> None:
         # Fallback to default tag if not provided
@@ -273,7 +280,8 @@ class Rust(DependencyModule):
 
         self._do_install(tag)
         self._install_sc_meta()
-        self._post_install(tag)
+        self._install_wasm_opt()
+        self._install_twiggy()
 
     def _do_install(self, tag: str) -> None:
         installer_url = self._get_installer_url()
@@ -293,8 +301,24 @@ class Rust(DependencyModule):
         myprocess.run_process(args)
 
     def _install_sc_meta(self):
-        logger.info("Installing multiversx-sc-meta")
+        logger.info("Installing multiversx-sc-meta.")
         args = ["cargo", "install", "multiversx-sc-meta"]
+        myprocess.run_process(args)
+
+    def _install_wasm_opt(self):
+        logger.info("Installing wasm-opt. This may take a while.")
+        tag = config.get_dependency_tag("wasm-opt")
+        args = ["cargo", "install", "wasm-opt", "--version", tag]
+        myprocess.run_process(args)
+
+    def _install_twiggy(self):
+        logger.info("Installing twiggy.")
+        default_tag = config.get_dependency_tag("twiggy")
+        args = ["cargo", "install", "twiggy"]
+
+        if default_tag != "latest":
+            args.extend(["--version", default_tag])
+
         myprocess.run_process(args)
 
     def _get_installer_url(self) -> str:
@@ -340,30 +364,6 @@ class Rust(DependencyModule):
         raise errors.UnsupportedConfigurationValue("Rust tag must either be explicit, empty or 'nightly'")
 
 
-class CargoModule(DependencyModule):
-    def _do_install(self, tag: str) -> None:
-        self._run_command_with_rust_env(["cargo", "install", self.key])
-
-    def is_installed(self, tag: str) -> bool:
-        rust = dependencies.get_module_by_key("rust")
-        output = myprocess.run_process(["cargo", "install", "--list"], rust.get_env())
-        for line in output.splitlines():
-            if self.key == line.strip():
-                return True
-        return False
-
-    def uninstall(self, tag: str):
-        if self.is_installed(tag):
-            self._run_command_with_rust_env(["cargo", "uninstall", self.key])
-
-    def get_latest_release(self) -> str:
-        return "latest"
-
-    def _run_command_with_rust_env(self, args: List[str]) -> str:
-        rust = dependencies.get_module_by_key("rust")
-        return myprocess.run_process(args, rust.get_env())
-
-
 class TestWalletsModule(StandaloneModule):
     def __init__(self, key: str):
         super().__init__(key, [])
@@ -375,48 +375,3 @@ class TestWalletsModule(StandaloneModule):
         target = self.get_source_directory(tag)
         link = path.join(self.get_parent_directory(), "latest")
         utils.symlink(str(target), link)
-
-
-class WasmOptModule(StandaloneModule):
-    def __init__(self, key: str):
-        super().__init__(key, [])
-        self.organisation = "WebAssembly"
-        self.repo_name = "binaryen"
-
-    def _post_install(self, tag: str):
-        # Bit of cleanup, we don't need the rest of the binaries.
-        bin_to_remove = list(self._get_bin_directory(tag).glob("*"))
-        bin_to_remove = [file for file in bin_to_remove if file.name != "wasm-opt"]
-        lib_to_remove = list((self.get_source_directory(tag) / "lib").glob("*"))
-        lib_to_remove = [file for file in lib_to_remove if file.suffix != ".dylib"]
-
-        for file in bin_to_remove + lib_to_remove:
-            file.unlink()
-
-    def _get_bin_directory(self, tag: str) -> Path:
-        return self.get_source_directory(tag) / "bin"
-
-    def is_installed(self, tag: str) -> bool:
-        resolution = self.get_resolution()
-        tag = tag or config.get_dependency_tag(self.key)
-        bin_file = self._get_bin_directory(tag) / "wasm-opt"
-
-        if resolution == DependencyResolution.Host:
-            which_wasm_opt = shutil.which("wasm-opt")
-            logger.info(f"which wasm-opt: {which_wasm_opt}")
-
-            return shutil.which("wasm-opt") is not None
-        if resolution == DependencyResolution.SDK:
-            return bin_file.exists()
-        raise errors.BadDependencyResolution(self.key, resolution)
-
-    def get_env(self):
-        tag = config.get_dependency_tag(self.key)
-        bin_directory = self._get_bin_directory(tag)
-
-        return {
-            "PATH": f"{bin_directory}:{os.environ['PATH']}",
-        }
-
-    def get_latest_release(self) -> str:
-        raise errors.UnsupportedConfigurationValue("wasm-opt tag must either be explicit")
