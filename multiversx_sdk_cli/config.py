@@ -150,10 +150,6 @@ def get_defaults() -> Dict[str, Any]:
         "dependencies.vmtools.urlTemplate.linux": "https://github.com/multiversx/mx-chain-vm-go/archive/{TAG}.tar.gz",
         "dependencies.vmtools.urlTemplate.osx": "https://github.com/multiversx/mx-chain-vm-go/archive/{TAG}.tar.gz",
         "dependencies.vmtools.urlTemplate.windows": "https://github.com/multiversx/mx-chain-vm-go/archive/{TAG}.tar.gz",
-        "dependencies.llvm.tag": "v9-19feb",
-        # ide.elrond.com will be removed, TBD if clang will still be downloaded
-        "dependencies.llvm.urlTemplate.linux": "https://ide.elrond.com/vendor-llvm/{TAG}/linux-amd64.tar.gz?t=19feb",
-        "dependencies.llvm.urlTemplate.osx": "https://ide.elrond.com/vendor-llvm/{TAG}/darwin-amd64.tar.gz?t=19feb",
         "dependencies.rust.tag": "nightly-2023-05-26",
         "dependencies.golang.resolution": "SDK",
         "dependencies.golang.tag": "go1.20.7",

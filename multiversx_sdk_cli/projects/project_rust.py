@@ -58,7 +58,7 @@ class ProjectRust(Project):
         which_sc_meta = shutil.which("sc-meta")
 
         if which_sc_meta is None:
-            raise errors.KnownError("'sc-meta' is not installed. Run 'cargo install multiversx-sc-meta' then try again.")
+            raise errors.KnownError("'sc-meta' is not installed. Install it manually or simply run `mxpy deps install rust --overwrite` then try again.")
 
     def run_meta(self):
         self.check_if_sc_meta_is_installed()

@@ -22,9 +22,9 @@ class DependencyModule:
     def get_directory(self, tag: str) -> Path:
         raise NotImplementedError()
 
-    def install(self, tag: str, overwrite: bool) -> None:
-        # Fallback to default tag if not provided
-        tag = tag or config.get_dependency_tag(self.key)
+    def install(self, overwrite: bool) -> None:
+        # We install the default tag
+        tag = config.get_dependency_tag(self.key)
 
         if tag == 'latest':
             tag = self.get_latest_release()
@@ -267,10 +267,11 @@ class Rust(DependencyModule):
         dependencies = [which_rustc, which_cargo, which_sc_meta, which_wasm_opt, which_twiggy]
         return all(dependency is not None for dependency in dependencies)
 
-    def install(self, tag: str, overwrite: bool) -> None:
-        # Fallback to default tag if not provided
-        tag = tag or config.get_dependency_tag(self.key)
+    def install(self, overwrite: bool) -> None:
+        module = dependencies.get_module_by_key("rust")
+        tag: str = config.get_dependency_tag(module.key)
 
+        show_warning(f"We recommend using rust {tag}. If you'd like to overwrite your current version please run `mxpy deps install rust --overwrite`.")
         logger.info(f"install: key={self.key}, tag={tag}, overwrite={overwrite}")
 
         if overwrite:
@@ -343,15 +344,8 @@ class Rust(DependencyModule):
         is_rust_installed = self.is_installed("")
 
         if not is_rust_installed:
-            return is_rust_installed
-        else:
-            self._recommend_default_rust_version()
-            return True
-
-    def _recommend_default_rust_version(self):
-        module = dependencies.get_module_by_key("rust")
-        default_tag: str = config.get_dependency_tag(module.key)
-        show_warning(f"We recommend using rust {default_tag}. If you'd like to overwrite your current version please run `mxpy deps install rust --overwrite`.")
+            return False
+        return True
 
     def get_directory(self, tag: str) -> Path:
         tools_folder = workstation.get_tools_folder()
