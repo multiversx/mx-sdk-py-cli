@@ -21,6 +21,7 @@ from multiversx_sdk_cli.interfaces import ITransaction
 from multiversx_sdk_cli.ledger.ledger_functions import do_get_ledger_address
 from multiversx_sdk_cli.simulation import Simulator
 from multiversx_sdk_cli.transactions import send_and_wait_for_result
+from multiversx_sdk_cli.utils import log_explorer_transaction
 from multiversx_sdk_cli.ux import show_warning
 
 
@@ -274,8 +275,16 @@ def send_or_simulate(tx: ITransaction, args: Any, dump_output: bool = True) -> C
             simulation = Simulator(proxy).run(tx)
             output_builder.set_simulation_results(simulation)
     finally:
+        output_transaction = output_builder.build()
+
         if dump_output:
-            utils.dump_out_json(output_builder.build(), outfile=outfile)
+            utils.dump_out_json(output_transaction, outfile=outfile)
+
+        if send_only:
+            log_explorer_transaction(
+                chain=output_transaction["emittedTransaction"]["chainID"],
+                transaction_hash=output_transaction["emittedTransactionHash"]
+            )
 
     return output_builder
 

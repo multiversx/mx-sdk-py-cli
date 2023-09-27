@@ -463,7 +463,7 @@ def do_reproducible_build(args: Any):
     utils.ensure_folder(output_path)
 
     options = args.__dict__
-    no_wasm_opt = options.get("no-wasm-opt", True)
+    no_wasm_opt = options.get("no_wasm_opt", False)
 
     if not is_docker_installed():
         raise DockerMissingError()
