@@ -66,7 +66,6 @@ class ProjectRust(Project):
 
         with_wasm_opt = not self.options.get("no-wasm-opt")
         if with_wasm_opt:
-            check_wasm_opt_installed()
             wasm_opt = dependencies.get_module_by_key("wasm-opt")
             env = merge_env(env, wasm_opt.get_env())
 
@@ -263,18 +262,3 @@ def merge_env(first: Dict[str, str], second: Dict[str, str]) -> Dict[str, str]:
         values = paths_of(first, key).union(paths_of(second, key))
         merged[key] = ":".join(sorted(values))
     return merged
-
-
-def check_wasm_opt_installed() -> None:
-    wasm_opt = dependencies.get_module_by_key("wasm-opt")
-    if not wasm_opt.is_installed(""):
-        logger.warn("""
-    Skipping optimization because wasm-opt is not installed.
-
-    To install it run:
-        mxpy deps install wasm-opt
-
-    Alternatively, pass the "--no-wasm-opt" argument in order to skip the optimization step.
-        """)
-    else:
-        logger.info("wasm-opt is installed.")

@@ -42,6 +42,15 @@ def test_check_sc_meta():
 
 
 @pytest.mark.skip_on_windows
+def test_check_wasm_opt():
+    which_wasm_opt = shutil.which("wasm-opt")
+    if which_wasm_opt:
+        assert True
+    elif which_wasm_opt is None:
+        assert False
+
+
+@pytest.mark.skip_on_windows
 def test_deps_check_vmtools():
     return_code = main(["deps", "check", "vmtools"])
     if return_code:

@@ -42,6 +42,7 @@ def check(args: Any):
     default_tag: str = config.get_dependency_tag(module.key)
     tag_to_check = tag or default_tag
     resolution: str = config.get_dependency_resolution(module.key)
+    resolution = resolution if resolution else "HOST"
 
     logger.info(f"Checking dependency: module = {module.key}, tag = {tag_to_check}; default tag = {default_tag}, resolution = {resolution}")
 
