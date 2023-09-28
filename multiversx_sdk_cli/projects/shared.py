@@ -48,8 +48,7 @@ def check_clang_and_cpp_dependencies_installed() -> None:
     if is_installed is False:
         message = """
 `clang` is not installed. Please install it manually, then try again.
-How to install on Ubuntu: https://linux.how2shout.com/how-to-install-clang-on-ubuntu-linux/
-How to install on MacOS: https://www.incredibuild.com/integrations/clang
+Check out the cookbook: https://docs.multiversx.com/sdk-and-tools/sdk-py/mxpy-cli
 For more details check out this page: https://clang.llvm.org/get_started.html"""
 
         show_critical_error(message)
