@@ -64,11 +64,6 @@ class ProjectRust(Project):
         self.check_if_sc_meta_is_installed()
         env = self.get_env()
 
-        with_wasm_opt = not self.options.get("no-wasm-opt")
-        if with_wasm_opt:
-            wasm_opt = dependencies.get_module_by_key("wasm-opt")
-            env = merge_env(env, wasm_opt.get_env())
-
         args = [
             "sc-meta",
             "all",

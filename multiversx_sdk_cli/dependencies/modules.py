@@ -299,6 +299,7 @@ class Rust(DependencyModule):
         args = [str(installer_path), "--verbose", "--default-toolchain", toolchain, "--profile",
                 "minimal", "--target", "wasm32-unknown-unknown", "-y"]
 
+        logger.info("Installing rust.")
         myprocess.run_process(args)
 
     def _install_sc_meta(self):

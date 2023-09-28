@@ -60,7 +60,7 @@ def test_contract_build():
         f"{parent}/testdata-out/SANDBOX/adder"
     ])
 
-    assert Path.is_file(Path(Path(parent) / "testdata-out" / "SANDBOX" / "adder" / "output" / "adder.wasm"))
+    assert Path.is_file(parent / "testdata-out" / "SANDBOX" / "adder" / "output" / "adder.wasm")
 
 
 @pytest.mark.skip_on_windows
