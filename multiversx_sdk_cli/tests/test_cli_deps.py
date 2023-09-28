@@ -45,7 +45,4 @@ def test_deps_install_vmtools():
 @pytest.mark.skip_on_windows
 def test_deps_check_vmtools():
     return_code = main(["deps", "check", "vmtools"])
-    if return_code:
-        assert False
-    else:
-        assert True
+    assert True if return_code == 0 else False
