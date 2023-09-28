@@ -276,15 +276,15 @@ class Rust(DependencyModule):
 
         if overwrite:
             logger.info("Overwriting the current rust version...")
-        elif self._is_installed_and_set_to_nightly():
+        elif self.is_installed(""):
             return
 
-        self._do_install(tag)
+        self._install_rust(tag)
         self._install_sc_meta()
         self._install_wasm_opt()
         self._install_twiggy()
 
-    def _do_install(self, tag: str) -> None:
+    def _install_rust(self, tag: str) -> None:
         installer_url = self._get_installer_url()
         installer_path = self._get_installer_path()
 
@@ -304,7 +304,12 @@ class Rust(DependencyModule):
 
     def _install_sc_meta(self):
         logger.info("Installing multiversx-sc-meta.")
+        tag = config.get_dependency_tag("sc-meta")
         args = ["cargo", "install", "multiversx-sc-meta"]
+
+        if tag != "latest":
+            args.extend(["--version", tag])
+
         myprocess.run_process(args)
 
     def _install_wasm_opt(self):
@@ -315,11 +320,11 @@ class Rust(DependencyModule):
 
     def _install_twiggy(self):
         logger.info("Installing twiggy.")
-        default_tag = config.get_dependency_tag("twiggy")
+        tag = config.get_dependency_tag("twiggy")
         args = ["cargo", "install", "twiggy"]
 
-        if default_tag != "latest":
-            args.extend(["--version", default_tag])
+        if tag != "latest":
+            args.extend(["--version", tag])
 
         myprocess.run_process(args)
 
@@ -339,14 +344,6 @@ class Rust(DependencyModule):
         directory = self.get_directory("")
         if os.path.isdir(directory):
             shutil.rmtree(directory)
-
-    def _is_installed_and_set_to_nightly(self) -> bool:
-        # the method parameter is not used in this specific module
-        is_rust_installed = self.is_installed("")
-
-        if not is_rust_installed:
-            return False
-        return True
 
     def get_directory(self, tag: str) -> Path:
         tools_folder = workstation.get_tools_folder()

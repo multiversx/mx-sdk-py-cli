@@ -157,6 +157,7 @@ def get_defaults() -> Dict[str, Any]:
         "dependencies.golang.urlTemplate.osx": "https://golang.org/dl/{TAG}.darwin-amd64.tar.gz",
         "dependencies.golang.urlTemplate.windows": "https://golang.org/dl/{TAG}.windows-amd64.zip",
         "dependencies.twiggy.tag": "latest",
+        "dependencies.sc-meta.tag": "latest",
         "dependencies.testwallets.tag": "latest",
         "dependencies.testwallets.urlTemplate.linux": "https://github.com/multiversx/mx-sdk-testwallets/archive/{TAG}.tar.gz",
         "dependencies.testwallets.urlTemplate.osx": "https://github.com/multiversx/mx-sdk-testwallets/archive/{TAG}.tar.gz",

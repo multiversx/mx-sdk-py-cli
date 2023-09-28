@@ -1,11 +1,11 @@
 import logging
-import shutil
 import subprocess
 from pathlib import Path
 from typing import Any, Dict, List, Set, cast
 
 from multiversx_sdk_cli import dependencies, errors, utils, workstation
 from multiversx_sdk_cli.constants import DEFAULT_CARGO_TARGET_DIR_NAME
+from multiversx_sdk_cli.dependencies.modules import Rust
 from multiversx_sdk_cli.projects.project_base import Project
 
 logger = logging.getLogger("ProjectRust")
@@ -54,14 +54,7 @@ class ProjectRust(Project):
             self.get_output_folder()
         ])
 
-    def check_if_sc_meta_is_installed(self):
-        which_sc_meta = shutil.which("sc-meta")
-
-        if which_sc_meta is None:
-            raise errors.KnownError("'sc-meta' is not installed. Install it manually or simply run `mxpy deps install rust --overwrite` then try again.")
-
     def run_meta(self):
-        self.check_if_sc_meta_is_installed()
         env = self.get_env()
 
         args = [
@@ -125,7 +118,8 @@ class ProjectRust(Project):
         return dependencies.get_module_by_key("rust").get_env()
 
     def build_wasm_with_debug_symbols(self, build_options: Dict[str, Any]):
-        self.check_if_sc_meta_is_installed()
+        rust_module = Rust("rust")
+        rust_module.install(overwrite=False)
 
         cwd = self.path
         env = self.get_env()

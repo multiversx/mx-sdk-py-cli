@@ -1,6 +1,5 @@
 import logging
 import subprocess
-import sys
 from os import path
 from pathlib import Path
 from typing import List
@@ -8,7 +7,7 @@ from typing import List
 from multiversx_sdk_cli import dependencies, errors, myprocess, utils
 from multiversx_sdk_cli.projects.project_base import Project, rename_wasm_files
 from multiversx_sdk_cli.projects.shared import \
-    are_clang_and_cpp_dependencies_installed
+    check_clang_and_cpp_dependencies_installed
 
 logger = logging.getLogger('ProjectClang')
 
@@ -29,9 +28,7 @@ class ProjectClang(Project):
         self.file_output = self.unit.with_suffix('.wasm')
 
         try:
-            is_installed = are_clang_and_cpp_dependencies_installed()
-            if not is_installed:
-                sys.exit(1)
+            check_clang_and_cpp_dependencies_installed()
 
             self.do_clang()
             self.do_llvm_link()
