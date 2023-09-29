@@ -9,12 +9,16 @@ testTrivialCommands() {
 
 testCreateContracts() {
     echo "testCreateContracts"
-    ${CLI} contract new --template adder --directory ${SANDBOX} myadder-rs || return 1
-    ${CLI} contract new --template factorial --directory ${SANDBOX} myfactorial-rs || return 1
-    ${CLI} contract new --template crypto-bubbles --directory ${SANDBOX} mybubbles-rs || return 1
-    ${CLI} contract new --template lottery-esdt --directory ${SANDBOX} mylottery-rs || return 1
-    ${CLI} contract new --template crowdfunding-esdt --directory ${SANDBOX} myfunding-rs || return 1
-    ${CLI} contract new --template multisig --directory ${SANDBOX} multisig-rs || return 1
+    ${CLI} contract new --template adder --path ${SANDBOX} || return 1
+    ${CLI} contract new --template crypto-zombies --path ${SANDBOX} || return 1
+    ${CLI} contract new --template empty --path ${SANDBOX} || return 1
+
+    # uncomment when other contract templates are available in sc-meta
+    # ${CLI} contract new --template factorial --path ${SANDBOX} myfactorial-rs || return 1
+    # ${CLI} contract new --template crypto-bubbles --path ${SANDBOX} mybubbles-rs || return 1
+    # ${CLI} contract new --template lottery-esdt --path ${SANDBOX} mylottery-rs || return 1
+    # ${CLI} contract new --template crowdfunding-esdt --path ${SANDBOX} myfunding-rs || return 1
+    # ${CLI} contract new --template multisig --path ${SANDBOX} multisig-rs || return 1
 }
 
 testBuildContracts() {
@@ -24,77 +28,98 @@ testBuildContracts() {
     export TARGET_DIR=$(pwd)/${SANDBOX}/TARGET
     mkdir -p ${TARGET_DIR}
 
-    ${CLI} contract build --path=${SANDBOX}/myadder-rs --target-dir=${TARGET_DIR} || return 1
-    assertFileExists ${SANDBOX}/myadder-rs/output/myadder-rs.wasm || return 1
-    assertFileExists ${SANDBOX}/myadder-rs/output/myadder-rs.abi.json || return 1
+    ${CLI} contract build --path=${SANDBOX}/adder --target-dir=${TARGET_DIR} || return 1
+    assertFileExists ${SANDBOX}/adder/output/adder.wasm || return 1
+    assertFileExists ${SANDBOX}/adder/output/adder.abi.json || return 1
 
-    ${CLI} contract build --path=${SANDBOX}/myfactorial-rs --target-dir=${TARGET_DIR} || return 1
-    assertFileExists ${SANDBOX}/myfactorial-rs/output/myfactorial-rs.wasm || return 1
-    assertFileExists ${SANDBOX}/myfactorial-rs/output/myfactorial-rs.abi.json || return 1
+    ${CLI} contract build --path=${SANDBOX}/crypto-zombies --target-dir=${TARGET_DIR} || return 1
+    assertFileExists ${SANDBOX}/crypto-zombies/output/crypto-zombies.wasm || return 1
+    assertFileExists ${SANDBOX}/crypto-zombies/output/crypto-zombies.abi.json || return 1
 
-    ${CLI} contract build --path=${SANDBOX}/mybubbles-rs --target-dir=${TARGET_DIR} || return 1
-    assertFileExists ${SANDBOX}/mybubbles-rs/output/mybubbles-rs.wasm || return 1
-    assertFileExists ${SANDBOX}/mybubbles-rs/output/mybubbles-rs.abi.json || return 1
+    ${CLI} contract build --path=${SANDBOX}/empty --target-dir=${TARGET_DIR} || return 1
+    assertFileExists ${SANDBOX}/empty/output/empty.wasm || return 1
+    assertFileExists ${SANDBOX}/empty/output/empty.abi.json || return 1
 
-    ${CLI} contract build --path=${SANDBOX}/mylottery-rs --target-dir=${TARGET_DIR} || return 1
-    assertFileExists ${SANDBOX}/mylottery-rs/output/mylottery-rs.wasm || return 1
-    assertFileExists ${SANDBOX}/mylottery-rs/output/mylottery-rs.abi.json || return 1
+    # uncomment when other contract templates are available in sc-meta
+    # ${CLI} contract build --path=${SANDBOX}/myfactorial-rs --target-dir=${TARGET_DIR} || return 1
+    # assertFileExists ${SANDBOX}/myfactorial-rs/output/myfactorial-rs.wasm || return 1
+    # assertFileExists ${SANDBOX}/myfactorial-rs/output/myfactorial-rs.abi.json || return 1
 
-    ${CLI} contract build --path=${SANDBOX}/myfunding-rs --target-dir=${TARGET_DIR} || return 1
-    assertFileExists ${SANDBOX}/myfunding-rs/output/myfunding-rs.wasm || return 1
-    assertFileExists ${SANDBOX}/myfunding-rs/output/myfunding-rs.abi.json || return 1
+    # ${CLI} contract build --path=${SANDBOX}/mybubbles-rs --target-dir=${TARGET_DIR} || return 1
+    # assertFileExists ${SANDBOX}/mybubbles-rs/output/mybubbles-rs.wasm || return 1
+    # assertFileExists ${SANDBOX}/mybubbles-rs/output/mybubbles-rs.abi.json || return 1
+
+    # ${CLI} contract build --path=${SANDBOX}/mylottery-rs --target-dir=${TARGET_DIR} || return 1
+    # assertFileExists ${SANDBOX}/mylottery-rs/output/mylottery-rs.wasm || return 1
+    # assertFileExists ${SANDBOX}/mylottery-rs/output/mylottery-rs.abi.json || return 1
+
+    # ${CLI} contract build --path=${SANDBOX}/myfunding-rs --target-dir=${TARGET_DIR} || return 1
+    # assertFileExists ${SANDBOX}/myfunding-rs/output/myfunding-rs.wasm || return 1
+    # assertFileExists ${SANDBOX}/myfunding-rs/output/myfunding-rs.abi.json || return 1
 }
 
 testRunScenarios() {
     echo "testRunScenarios"
-    ${CLI} --verbose contract test --directory="scenarios" ${SANDBOX}/myadder-rs || return 1
-    ${CLI} --verbose contract test --directory="scenarios" ${SANDBOX}/mybubbles-rs || return 1
-    ${CLI} --verbose contract test --directory="scenarios" ${SANDBOX}/mylottery-rs || return 1
-    ${CLI} --verbose contract test --directory="scenarios" --recursive ${SANDBOX}/myfunding-rs || return 1
+    ${CLI} --verbose contract test --directory="scenarios" ${SANDBOX}/adder || return 1
+    ${CLI} --verbose contract test --directory="scenarios" ${SANDBOX}/empty || return 1
+    # ${CLI} --verbose contract test --directory="scenarios" --recursive ${SANDBOX}/myfunding-rs || return 1
 }
 
 testWasmName() {
     echo "testWasmName"
    
-    ${CLI} contract clean --path ${SANDBOX}/myadder-rs
-    assertFileDoesNotExist ${SANDBOX}/myadder-rs/output/myadder-2-rs.wasm || return 1
-    ${CLI} contract build --path=${SANDBOX}/myadder-rs --target-dir=${TARGET_DIR} --wasm-name myadder-2-rs || return 1
-    assertFileExists ${SANDBOX}/myadder-rs/output/myadder-2-rs.wasm || return 1
-    assertFileExists ${SANDBOX}/myadder-rs/output/myadder-rs.abi.json || return 1
+    ${CLI} contract clean --path ${SANDBOX}/adder
+    assertFileDoesNotExist ${SANDBOX}/adder/output/adder-2.wasm || return 1
+    ${CLI} contract build --path=${SANDBOX}/adder --target-dir=${TARGET_DIR} --wasm-name adder-2 || return 1
+    assertFileExists ${SANDBOX}/adder/output/adder-2.wasm || return 1
+    assertFileExists ${SANDBOX}/adder/output/adder.abi.json || return 1
 }
 
 testCleanContracts() {
     echo "testCleanContracts"
 
-    assertFileExists ${SANDBOX}/myadder-rs/output/myadder-rs.wasm || return 1
-    assertFileExists ${SANDBOX}/myadder-rs/output/myadder-rs.abi.json || return 1
-    ${CLI} contract clean --path ${SANDBOX}/myadder-rs || return 1
-    assertFileDoesNotExist ${SANDBOX}/myadder-rs/output/myadder-rs.wasm || return 1
-    assertFileDoesNotExist ${SANDBOX}/myadder-rs/output/myadder-rs.abi.json || return 1
+    assertFileExists ${SANDBOX}/adder/output/adder.wasm || return 1
+    assertFileExists ${SANDBOX}/adder/output/adder.abi.json || return 1
+    ${CLI} contract clean --path ${SANDBOX}/adder || return 1
+    assertFileDoesNotExist ${SANDBOX}/adder/output/adder.wasm || return 1
+    assertFileDoesNotExist ${SANDBOX}/adder/output/adder.abi.json || return 1
 
-    assertFileExists ${SANDBOX}/myfactorial-rs/output/myfactorial-rs.wasm || return 1
-    assertFileExists ${SANDBOX}/myfactorial-rs/output/myfactorial-rs.abi.json || return 1
-    ${CLI} contract clean --path ${SANDBOX}/myfactorial-rs || return 1
-    assertFileDoesNotExist ${SANDBOX}/myfactorial-rs/output/myfactorial-rs.wasm || return 1
-    assertFileDoesNotExist ${SANDBOX}/myfactorial-rs/output/myfactorial-rs.abi.json || return 1
+    assertFileExists ${SANDBOX}/crypto-zombies/output/crypto-zombies.wasm || return 1
+    assertFileExists ${SANDBOX}/crypto-zombies/output/crypto-zombies.abi.json || return 1
+    ${CLI} contract clean --path ${SANDBOX}/crypto-zombies || return 1
+    assertFileDoesNotExist ${SANDBOX}/crypto-zombies/output/crypto-zombies.wasm || return 1
+    assertFileDoesNotExist ${SANDBOX}/crypto-zombies/output/crypto-zombies.abi.json || return 1
 
-    assertFileExists ${SANDBOX}/mybubbles-rs/output/mybubbles-rs.wasm || return 1
-    assertFileExists ${SANDBOX}/mybubbles-rs/output/mybubbles-rs.abi.json || return 1
-    ${CLI} contract clean --path ${SANDBOX}/mybubbles-rs || return 1
-    assertFileDoesNotExist ${SANDBOX}/mybubbles-rs/output/mybubbles-rs.wasm || return 1
-    assertFileDoesNotExist ${SANDBOX}/mybubbles-rs/output/mybubbles-rs.abi.json || return 1
+    assertFileExists ${SANDBOX}/empty/output/empty.wasm || return 1
+    assertFileExists ${SANDBOX}/empty/output/empty.abi.json || return 1
+    ${CLI} contract clean --path ${SANDBOX}/empty || return 1
+    assertFileDoesNotExist ${SANDBOX}/empty/output/empty.wasm || return 1
+    assertFileDoesNotExist ${SANDBOX}/empty/output/empty.abi.json || return 1
 
-    assertFileExists ${SANDBOX}/mylottery-rs/output/mylottery-rs.wasm || return 1
-    assertFileExists ${SANDBOX}/mylottery-rs/output/mylottery-rs.abi.json || return 1
-    ${CLI} contract clean --path ${SANDBOX}/mylottery-rs || return 1
-    assertFileDoesNotExist ${SANDBOX}/mylottery-rs/output/mylottery-rs.wasm || return 1
-    assertFileDoesNotExist ${SANDBOX}/mylottery-rs/output/mylottery-rs.abi.json || return 1
+    # uncomment when other contract templates are available in sc-meta
+    # assertFileExists ${SANDBOX}/myfactorial-rs/output/myfactorial-rs.wasm || return 1
+    # assertFileExists ${SANDBOX}/myfactorial-rs/output/myfactorial-rs.abi.json || return 1
+    # ${CLI} contract clean --path ${SANDBOX}/myfactorial-rs || return 1
+    # assertFileDoesNotExist ${SANDBOX}/myfactorial-rs/output/myfactorial-rs.wasm || return 1
+    # assertFileDoesNotExist ${SANDBOX}/myfactorial-rs/output/myfactorial-rs.abi.json || return 1
 
-    assertFileExists ${SANDBOX}/myfunding-rs/output/myfunding-rs.wasm || return 1
-    assertFileExists ${SANDBOX}/myfunding-rs/output/myfunding-rs.abi.json || return 1
-    ${CLI} contract clean --path ${SANDBOX}/myfunding-rs || return 1
-    assertFileDoesNotExist ${SANDBOX}/myfunding-rs/output/myfunding-rs.wasm || return 1
-    assertFileDoesNotExist ${SANDBOX}/myfunding-rs/output/myfunding-rs.abi.json || return 1
+    # assertFileExists ${SANDBOX}/mybubbles-rs/output/mybubbles-rs.wasm || return 1
+    # assertFileExists ${SANDBOX}/mybubbles-rs/output/mybubbles-rs.abi.json || return 1
+    # ${CLI} contract clean --path ${SANDBOX}/mybubbles-rs || return 1
+    # assertFileDoesNotExist ${SANDBOX}/mybubbles-rs/output/mybubbles-rs.wasm || return 1
+    # assertFileDoesNotExist ${SANDBOX}/mybubbles-rs/output/mybubbles-rs.abi.json || return 1
+
+    # assertFileExists ${SANDBOX}/mylottery-rs/output/mylottery-rs.wasm || return 1
+    # assertFileExists ${SANDBOX}/mylottery-rs/output/mylottery-rs.abi.json || return 1
+    # ${CLI} contract clean --path ${SANDBOX}/mylottery-rs || return 1
+    # assertFileDoesNotExist ${SANDBOX}/mylottery-rs/output/mylottery-rs.wasm || return 1
+    # assertFileDoesNotExist ${SANDBOX}/mylottery-rs/output/mylottery-rs.abi.json || return 1
+
+    # assertFileExists ${SANDBOX}/myfunding-rs/output/myfunding-rs.wasm || return 1
+    # assertFileExists ${SANDBOX}/myfunding-rs/output/myfunding-rs.abi.json || return 1
+    # ${CLI} contract clean --path ${SANDBOX}/myfunding-rs || return 1
+    # assertFileDoesNotExist ${SANDBOX}/myfunding-rs/output/myfunding-rs.wasm || return 1
+    # assertFileDoesNotExist ${SANDBOX}/myfunding-rs/output/myfunding-rs.abi.json || return 1
 }
 
 testVerifyContract(){
