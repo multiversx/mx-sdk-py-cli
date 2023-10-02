@@ -9,6 +9,7 @@ from multiversx_sdk_cli import (config, dependencies, downloader, errors,
                                 myprocess, utils, workstation)
 from multiversx_sdk_cli.dependencies.resolution import (
     DependencyResolution, get_dependency_resolution)
+from multiversx_sdk_cli.ux import show_warning
 
 logger = logging.getLogger("modules")
 
@@ -21,9 +22,9 @@ class DependencyModule:
     def get_directory(self, tag: str) -> Path:
         raise NotImplementedError()
 
-    def install(self, tag: str, overwrite: bool) -> None:
-        # Fallback to default tag if not provided
-        tag = tag or config.get_dependency_tag(self.key)
+    def install(self, overwrite: bool) -> None:
+        # We install the default tag
+        tag = config.get_dependency_tag(self.key)
 
         if tag == 'latest':
             tag = self.get_latest_release()
@@ -34,7 +35,6 @@ class DependencyModule:
             logger.info("Already exists. Skip install.")
             return
 
-        self._guard_cannot_install_on_host()
         self.uninstall(tag)
         self._do_install(tag)
 
@@ -65,10 +65,6 @@ class DependencyModule:
 
     def get_resolution(self) -> DependencyResolution:
         return get_dependency_resolution(self.key)
-
-    def _guard_cannot_install_on_host(self):
-        if self.get_resolution() == DependencyResolution.Host:
-            raise errors.KnownError(f"Installation of {self.key} on the host machine is not supported. Perhaps set 'dependencies.{self.key}.resolution' to 'SDK' in config?")
 
 
 class StandaloneModule(DependencyModule):
@@ -256,7 +252,39 @@ class GolangModule(StandaloneModule):
 
 
 class Rust(DependencyModule):
-    def _do_install(self, tag: str) -> None:
+    def is_installed(self, tag: str) -> bool:
+        which_rustc = shutil.which("rustc")
+        which_cargo = shutil.which("cargo")
+        which_sc_meta = shutil.which("sc-meta")
+        which_wasm_opt = shutil.which("wasm-opt")
+        which_twiggy = shutil.which("twiggy")
+        logger.info(f"which rustc: {which_rustc}")
+        logger.info(f"which cargo: {which_cargo}")
+        logger.info(f"which sc-meta: {which_sc_meta}")
+        logger.info(f"which wasm-opt: {which_wasm_opt}")
+        logger.info(f"which twiggy: {which_twiggy}")
+
+        dependencies = [which_rustc, which_cargo, which_sc_meta, which_wasm_opt, which_twiggy]
+        return all(dependency is not None for dependency in dependencies)
+
+    def install(self, overwrite: bool) -> None:
+        module = dependencies.get_module_by_key("rust")
+        tag: str = config.get_dependency_tag(module.key)
+
+        show_warning(f"We recommend using rust {tag}. If you'd like to overwrite your current version please run `mxpy deps install rust --overwrite`.")
+        logger.info(f"install: key={self.key}, tag={tag}, overwrite={overwrite}")
+
+        if overwrite:
+            logger.info("Overwriting the current rust version...")
+        elif self.is_installed(""):
+            return
+
+        self._install_rust(tag)
+        self._install_sc_meta()
+        self._install_wasm_opt()
+        self._install_twiggy()
+
+    def _install_rust(self, tag: str) -> None:
         installer_url = self._get_installer_url()
         installer_path = self._get_installer_path()
 
@@ -269,12 +297,36 @@ class Rust(DependencyModule):
             toolchain = "nightly"
 
         args = [str(installer_path), "--verbose", "--default-toolchain", toolchain, "--profile",
-                "minimal", "--target", "wasm32-unknown-unknown", "--no-modify-path", "-y"]
-        output = myprocess.run_process(args, env=self.get_env_for_install())
+                "minimal", "--target", "wasm32-unknown-unknown", "-y"]
 
-        if output:
-            sc_meta_args = ["cargo", "install", "multiversx-sc-meta"]
-            myprocess.run_process(sc_meta_args, env=self.get_env_for_install())
+        logger.info("Installing rust.")
+        myprocess.run_process(args)
+
+    def _install_sc_meta(self):
+        logger.info("Installing multiversx-sc-meta.")
+        tag = config.get_dependency_tag("sc-meta")
+        args = ["cargo", "install", "multiversx-sc-meta"]
+
+        if tag != "latest":
+            args.extend(["--version", tag])
+
+        myprocess.run_process(args)
+
+    def _install_wasm_opt(self):
+        logger.info("Installing wasm-opt. This may take a while.")
+        tag = config.get_dependency_tag("wasm-opt")
+        args = ["cargo", "install", "wasm-opt", "--version", tag]
+        myprocess.run_process(args)
+
+    def _install_twiggy(self):
+        logger.info("Installing twiggy.")
+        tag = config.get_dependency_tag("twiggy")
+        args = ["cargo", "install", "twiggy"]
+
+        if tag != "latest":
+            args.extend(["--version", tag])
+
+        myprocess.run_process(args)
 
     def _get_installer_url(self) -> str:
         if workstation.is_windows():
@@ -293,100 +345,15 @@ class Rust(DependencyModule):
         if os.path.isdir(directory):
             shutil.rmtree(directory)
 
-    def is_installed(self, tag: str) -> bool:
-        resolution = self.get_resolution()
-
-        if resolution == DependencyResolution.Host:
-            which_rustc = shutil.which("rustc")
-            which_cargo = shutil.which("cargo")
-            logger.info(f"which rustc: {which_rustc}")
-            logger.info(f"which cargo: {which_cargo}")
-
-            return which_rustc is not None and which_cargo is not None
-        if resolution == DependencyResolution.SDK:
-            try:
-                env = self._get_env_for_is_installed_in_sdk()
-                myprocess.run_process(["rustc", "--version"], env=env)
-                return True
-            except Exception:
-                return False
-
-        raise errors.BadDependencyResolution(self.key, resolution)
-
     def get_directory(self, tag: str) -> Path:
         tools_folder = workstation.get_tools_folder()
         return tools_folder / "vendor-rust"
 
-    def get_env(self):
-        directory = self.get_directory("")
-        resolution = self.get_resolution()
-
-        if resolution == DependencyResolution.Host:
-            return {
-                "PATH": os.environ.get("PATH", ""),
-                "RUSTUP_HOME": os.environ.get("RUSTUP_HOME", ""),
-                "CARGO_HOME": os.environ.get("CARGO_HOME", "")
-            }
-        if resolution == DependencyResolution.SDK:
-            return {
-                # At this moment, cc (build-essential) is sometimes required by the meta crate (e.g. for reports)
-                "PATH": f"{path.join(directory, 'bin')}:{os.environ['PATH']}",
-                "RUSTUP_HOME": str(directory),
-                "CARGO_HOME": str(directory)
-            }
-
-        raise errors.BadDependencyResolution(self.key, resolution)
-
-    def _get_env_for_is_installed_in_sdk(self) -> Dict[str, str]:
-        directory = self.get_directory("")
-
-        return {
-            "PATH": str(directory / "bin"),
-            "RUSTUP_HOME": str(directory),
-            "CARGO_HOME": str(directory)
-        }
-
-    def get_env_for_install(self):
-        directory = self.get_directory("")
-
-        env = {
-            # For installation, wget (or curl) and cc (build-essential) are also required.
-            "PATH": f"{path.join(directory, 'bin')}:{os.environ['PATH']}",
-            "RUSTUP_HOME": str(directory),
-            "CARGO_HOME": str(directory)
-        }
-
-        if workstation.is_windows():
-            env["RUSTUP_USE_HYPER"] = "1"
-
-        return env
+    def get_env(self) -> Dict[str, str]:
+        return dict(os.environ)
 
     def get_latest_release(self) -> str:
         raise errors.UnsupportedConfigurationValue("Rust tag must either be explicit, empty or 'nightly'")
-
-
-class CargoModule(DependencyModule):
-    def _do_install(self, tag: str) -> None:
-        self._run_command_with_rust_env(["cargo", "install", self.key])
-
-    def is_installed(self, tag: str) -> bool:
-        rust = dependencies.get_module_by_key("rust")
-        output = myprocess.run_process(["cargo", "install", "--list"], rust.get_env())
-        for line in output.splitlines():
-            if self.key == line.strip():
-                return True
-        return False
-
-    def uninstall(self, tag: str):
-        if self.is_installed(tag):
-            self._run_command_with_rust_env(["cargo", "uninstall", self.key])
-
-    def get_latest_release(self) -> str:
-        return "latest"
-
-    def _run_command_with_rust_env(self, args: List[str]) -> str:
-        rust = dependencies.get_module_by_key("rust")
-        return myprocess.run_process(args, rust.get_env())
 
 
 class TestWalletsModule(StandaloneModule):
@@ -400,48 +367,3 @@ class TestWalletsModule(StandaloneModule):
         target = self.get_source_directory(tag)
         link = path.join(self.get_parent_directory(), "latest")
         utils.symlink(str(target), link)
-
-
-class WasmOptModule(StandaloneModule):
-    def __init__(self, key: str):
-        super().__init__(key, [])
-        self.organisation = "WebAssembly"
-        self.repo_name = "binaryen"
-
-    def _post_install(self, tag: str):
-        # Bit of cleanup, we don't need the rest of the binaries.
-        bin_to_remove = list(self._get_bin_directory(tag).glob("*"))
-        bin_to_remove = [file for file in bin_to_remove if file.name != "wasm-opt"]
-        lib_to_remove = list((self.get_source_directory(tag) / "lib").glob("*"))
-        lib_to_remove = [file for file in lib_to_remove if file.suffix != ".dylib"]
-
-        for file in bin_to_remove + lib_to_remove:
-            file.unlink()
-
-    def _get_bin_directory(self, tag: str) -> Path:
-        return self.get_source_directory(tag) / "bin"
-
-    def is_installed(self, tag: str) -> bool:
-        resolution = self.get_resolution()
-        tag = tag or config.get_dependency_tag(self.key)
-        bin_file = self._get_bin_directory(tag) / "wasm-opt"
-
-        if resolution == DependencyResolution.Host:
-            which_wasm_opt = shutil.which("wasm-opt")
-            logger.info(f"which wasm-opt: {which_wasm_opt}")
-
-            return shutil.which("wasm-opt") is not None
-        if resolution == DependencyResolution.SDK:
-            return bin_file.exists()
-        raise errors.BadDependencyResolution(self.key, resolution)
-
-    def get_env(self):
-        tag = config.get_dependency_tag(self.key)
-        bin_directory = self._get_bin_directory(tag)
-
-        return {
-            "PATH": f"{bin_directory}:{os.environ['PATH']}",
-        }
-
-    def get_latest_release(self) -> str:
-        raise errors.UnsupportedConfigurationValue("wasm-opt tag must either be explicit")

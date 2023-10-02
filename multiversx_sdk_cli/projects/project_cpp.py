@@ -1,12 +1,14 @@
 import logging
 import os
-from pathlib import Path
 import subprocess
 from os import path
+from pathlib import Path
 from typing import List
 
 from multiversx_sdk_cli import dependencies, errors, myprocess, utils
 from multiversx_sdk_cli.projects.project_base import Project, rename_wasm_files
+from multiversx_sdk_cli.projects.shared import \
+    check_clang_and_cpp_dependencies_installed
 
 logger = logging.getLogger("ProjectCpp")
 
@@ -23,6 +25,8 @@ class ProjectCpp(Project):
         self.file_export = self.unit.with_suffix(".export")
 
         try:
+            check_clang_and_cpp_dependencies_installed()
+
             self._do_clang()
             self._do_llc()
             self._do_wasm()
@@ -87,7 +91,7 @@ class ProjectCpp(Project):
         os.remove(source_file.with_suffix(".wasm"))
         os.remove(source_file.with_suffix(".ll"))
         os.remove(source_file.with_suffix(".o"))
-        
+
         paths = rename_wasm_files([output_wasm_file], self.options.get("wasm-name"))
         return paths
 
@@ -95,7 +99,7 @@ class ProjectCpp(Project):
         return dependencies.get_module_directory("llvm")
 
     def get_dependencies(self):
-        return ["llvm"]
+        return [""]
 
 
 class CppBuildConfiguration:

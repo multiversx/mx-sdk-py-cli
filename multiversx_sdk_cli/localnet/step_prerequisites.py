@@ -16,7 +16,7 @@ def fetch_prerequisites(configfile: Path):
 
     config = ConfigRoot.from_file(configfile)
 
-    dependencies.install_module("testwallets", tag="", overwrite=True)
+    dependencies.install_module("testwallets", overwrite=True)
 
     if config.software.mx_chain_go.resolution == SoftwareResolution.Remote:
         download_software_component(config.software.mx_chain_go)

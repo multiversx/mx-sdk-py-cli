@@ -3,20 +3,22 @@ from pathlib import Path
 from typing import Dict, List
 
 from multiversx_sdk_cli import config, errors
-from multiversx_sdk_cli.dependencies.modules import (CargoModule, TestWalletsModule, VMToolsModule,
-                                                     DependencyModule, GolangModule, Rust, StandaloneModule, WasmOptModule)
+from multiversx_sdk_cli.dependencies.modules import (DependencyModule,
+                                                     GolangModule, Rust,
+                                                     TestWalletsModule,
+                                                     VMToolsModule)
 
 logger = logging.getLogger("install")
 
 
-def install_module(key: str, tag: str = "", overwrite: bool = False):
+def install_module(key: str, overwrite: bool = False):
     if key == 'all':
-        modules = _get_implicitly_installable_deps()
+        modules = _get_all_deps()
     else:
         modules = [get_module_by_key(key)]
 
     for module in modules:
-        module.install(tag, overwrite)
+        module.install(overwrite)
 
 
 def get_module_directory(key: str) -> Path:
@@ -46,26 +48,10 @@ def get_deps_dict() -> Dict[str, DependencyModule]:
 
 
 def _get_all_deps() -> List[DependencyModule]:
-    return _get_explicitly_installable_deps() + _get_implicitly_installable_deps()
-
-
-def _get_explicitly_installable_deps() -> List[DependencyModule]:
     return [
-        StandaloneModule(key="llvm", aliases=["clang", "cpp"]),
         Rust(key="rust"),
-        GolangModule(key="golang")
-    ]
-
-
-def _get_implicitly_installable_deps() -> List[DependencyModule]:
-    # See: https://github.com/multiversx/mx-sdk-py-cli/pull/55
-
-    return [
+        GolangModule(key="golang"),
         VMToolsModule(key="vmtools"),
-        StandaloneModule(key="mx_chain_go", repo_name="mx-chain-go", organisation="multiversx"),
-        StandaloneModule(key="mx_chain_proxy_go", repo_name="mx-chain-proxy-go", organisation="multiversx"),
-        WasmOptModule(key="wasm-opt"),
-        CargoModule(key="twiggy"),
         TestWalletsModule(key="testwallets")
     ]
 

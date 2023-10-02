@@ -5,6 +5,7 @@ from typing import Any, Dict, List, Set, cast
 
 from multiversx_sdk_cli import dependencies, errors, utils, workstation
 from multiversx_sdk_cli.constants import DEFAULT_CARGO_TARGET_DIR_NAME
+from multiversx_sdk_cli.dependencies.modules import Rust
 from multiversx_sdk_cli.projects.project_base import Project
 
 logger = logging.getLogger("ProjectRust")
@@ -55,12 +56,6 @@ class ProjectRust(Project):
 
     def run_meta(self):
         env = self.get_env()
-
-        with_wasm_opt = not self.options.get("no-wasm-opt")
-        if with_wasm_opt:
-            check_wasm_opt_installed()
-            wasm_opt = dependencies.get_module_by_key("wasm-opt")
-            env = merge_env(env, wasm_opt.get_env())
 
         args = [
             "sc-meta",
@@ -123,6 +118,9 @@ class ProjectRust(Project):
         return dependencies.get_module_by_key("rust").get_env()
 
     def build_wasm_with_debug_symbols(self, build_options: Dict[str, Any]):
+        rust_module = Rust("rust")
+        rust_module.install(overwrite=False)
+
         cwd = self.path
         env = self.get_env()
         target_dir: str = build_options.get("target-dir", "")
@@ -253,18 +251,3 @@ def merge_env(first: Dict[str, str], second: Dict[str, str]) -> Dict[str, str]:
         values = paths_of(first, key).union(paths_of(second, key))
         merged[key] = ":".join(sorted(values))
     return merged
-
-
-def check_wasm_opt_installed() -> None:
-    wasm_opt = dependencies.get_module_by_key("wasm-opt")
-    if not wasm_opt.is_installed(""):
-        logger.warn("""
-    Skipping optimization because wasm-opt is not installed.
-
-    To install it run:
-        mxpy deps install wasm-opt
-
-    Alternatively, pass the "--no-wasm-opt" argument in order to skip the optimization step.
-        """)
-    else:
-        logger.info("wasm-opt is installed.")
