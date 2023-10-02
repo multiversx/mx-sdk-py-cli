@@ -21,17 +21,17 @@ class Contract:
         self.path = path
 
     def get_contract_templates(self) -> str:
-        self._check_if_dependencies_installed()
+        self._ensure_dependencies_installed()
         args = self._prepare_args_to_list_templates()
         templates = myprocess.run_process(args=args, dump_to_stdout=False)
         return templates
 
     def create_from_template(self) -> None:
-        self._check_if_dependencies_installed()
+        self._ensure_dependencies_installed()
         args = self._prepare_args_to_create_new_contract_from_template()
         myprocess.run_process(args)
 
-    def _check_if_dependencies_installed(self):
+    def _ensure_dependencies_installed(self):
         logger.info("Checking if the necessarry dependencies are installed.")
         install_module("rust")
 
