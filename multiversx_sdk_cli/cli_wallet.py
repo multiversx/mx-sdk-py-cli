@@ -78,6 +78,15 @@ def setup_parser(args: List[str], subparsers: Any) -> Any:
     group.add_argument("--decode", action="store_true", help="whether to decode")
     sub.set_defaults(func=do_bech32)
 
+    sub = cli_shared.add_command_subparser(
+        subparsers,
+        "wallet",
+        "sign-message",
+        "Sign a message"
+    )
+    sub.add_argument("--message", required=True, help="the message you want to sign")
+    sub.set_defaults(func=sign_message)
+
     parser.epilog = cli_shared.build_group_epilog(subparsers)
     return subparsers
 
@@ -247,3 +256,7 @@ def do_bech32(args: Any):
 
     print(result)
     return result
+
+
+def sign_message(args: Any):
+    pass
