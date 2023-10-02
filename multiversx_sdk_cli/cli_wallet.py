@@ -10,9 +10,10 @@ from multiversx_sdk_wallet import UserSecretKey, UserWallet
 from multiversx_sdk_wallet.mnemonic import Mnemonic
 from multiversx_sdk_wallet.user_pem import UserPEM
 
-from multiversx_sdk_cli import cli_shared
+from multiversx_sdk_cli import cli_shared, utils
 from multiversx_sdk_cli.constants import DEFAULT_HRP
 from multiversx_sdk_cli.errors import KnownError
+from multiversx_sdk_cli.message import SignableMessage
 
 logger = logging.getLogger("cli.wallet")
 
@@ -85,6 +86,7 @@ def setup_parser(args: List[str], subparsers: Any) -> Any:
         "Sign a message"
     )
     sub.add_argument("--message", required=True, help="the message you want to sign")
+    cli_shared.add_wallet_args(args, sub)
     sub.set_defaults(func=sign_message)
 
     parser.epilog = cli_shared.build_group_epilog(subparsers)
@@ -259,4 +261,8 @@ def do_bech32(args: Any):
 
 
 def sign_message(args: Any):
-    pass
+    message: str = args.message
+    account = cli_shared.prepare_account(args)
+    signable_message = SignableMessage(message, account)
+    signable_message.sign()
+    utils.dump_out_json(signable_message.to_dictionary())
