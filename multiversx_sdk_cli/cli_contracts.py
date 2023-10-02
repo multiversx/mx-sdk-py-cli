@@ -39,7 +39,7 @@ def setup_parser(args: List[str], subparsers: Any) -> Any:
 
     sub = cli_shared.add_command_subparser(subparsers, "contract", "templates",
                                            "List the available Smart Contract templates.")
-    sub.add_argument("--tag", help="the sc-meta framework version reffered to")
+    sub.add_argument("--tag", help="the sc-meta framework version referred to")
     sub.set_defaults(func=list_templates)
 
     sub = cli_shared.add_command_subparser(subparsers, "contract", "build",
