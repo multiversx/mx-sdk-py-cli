@@ -15,6 +15,6 @@ class SignableMessage:
     def to_dictionary(self) -> Dict[str, str]:
         return {
             "address": self.account.address.bech32(),
-            "message": "0x" + self.message.encode().hex(),
+            "message": self.message,
             "signature": "0x" + self.signature.hex()
         }
