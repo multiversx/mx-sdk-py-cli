@@ -20,7 +20,6 @@ def setup_parser(subparsers: Any) -> Any:
 
     sub = cli_shared.add_command_subparser(subparsers, "deps", "check", "Check whether a dependency is installed.")
     sub.add_argument("name", choices=choices, help="the dependency to check")
-    sub.add_argument("--tag", help="the tag or version to check")
     sub.set_defaults(func=check)
 
     parser.epilog = cli_shared.build_group_epilog(subparsers)
@@ -35,18 +34,16 @@ def install(args: Any):
 
 def check(args: Any):
     name: str = args.name
-    tag: str = args.tag
     module = dependencies.get_module_by_key(name)
-    default_tag: str = config.get_dependency_tag(module.key)
-    tag_to_check = tag or default_tag
+    tag_to_check: str = config.get_dependency_tag(module.key)
     resolution: str = config.get_dependency_resolution(module.key)
     resolution = resolution if resolution else "HOST"
 
-    logger.info(f"Checking dependency: module = {module.key}, tag = {tag_to_check}; default tag = {default_tag}, resolution = {resolution}")
+    logger.info(f"Checking dependency: module = {module.key}, tag = {tag_to_check}, resolution = {resolution}")
 
     installed = module.is_installed(tag_to_check)
     if installed:
-        logger.info(f"[{name} {tag_to_check}] is installed. Default version (tag) is [{default_tag}].")
+        logger.info(f"[{name} {tag_to_check}] is installed.")
         return
 
     raise errors.DependencyMissing(name, tag_to_check)
