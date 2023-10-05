@@ -13,7 +13,7 @@ from multiversx_sdk_wallet.user_pem import UserPEM
 from multiversx_sdk_cli import cli_shared, utils
 from multiversx_sdk_cli.constants import DEFAULT_HRP
 from multiversx_sdk_cli.errors import KnownError
-from multiversx_sdk_cli.message import SignedMessage, sign_message
+from multiversx_sdk_cli.sign_verify import SignedMessage, sign_message
 from multiversx_sdk_cli.ux import show_critical_error, show_message
 
 logger = logging.getLogger("cli.wallet")
