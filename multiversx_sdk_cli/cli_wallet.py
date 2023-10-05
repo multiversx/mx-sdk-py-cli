@@ -5,15 +5,15 @@ import sys
 from pathlib import Path
 from typing import Any, List, Optional, Tuple
 
-from multiversx_sdk_core import Address, MessageV1
-from multiversx_sdk_wallet import UserSecretKey, UserVerifier, UserWallet
+from multiversx_sdk_core import Address
+from multiversx_sdk_wallet import UserSecretKey, UserWallet
 from multiversx_sdk_wallet.mnemonic import Mnemonic
 from multiversx_sdk_wallet.user_pem import UserPEM
 
 from multiversx_sdk_cli import cli_shared, utils
 from multiversx_sdk_cli.constants import DEFAULT_HRP
 from multiversx_sdk_cli.errors import KnownError
-from multiversx_sdk_cli.message import SignableMessage
+from multiversx_sdk_cli.message import SignedMessage, sign_message
 from multiversx_sdk_cli.ux import show_critical_error, show_message
 
 logger = logging.getLogger("cli.wallet")
@@ -88,7 +88,7 @@ def setup_parser(args: List[str], subparsers: Any) -> Any:
     )
     sub.add_argument("--message", required=True, help="the message you want to sign")
     cli_shared.add_wallet_args(args, sub)
-    sub.set_defaults(func=sign_message)
+    sub.set_defaults(func=sign_user_message)
 
     sub = cli_shared.add_command_subparser(
         subparsers,
@@ -96,7 +96,7 @@ def setup_parser(args: List[str], subparsers: Any) -> Any:
         "verify-message",
         "Verify a previously message"
     )
-    sub.add_argument("--bech32-address", required=True, help="the bech32 address of the signer")
+    sub.add_argument("--address", required=True, help="the bech32 address of the signer")
     sub.add_argument("--message", required=True, help="the previously signed message(readable text, as it was signed)")
     sub.add_argument("--signature", required=True, help="the signature in hex format")
     sub.set_defaults(func=verify_signed_message)
@@ -272,29 +272,21 @@ def do_bech32(args: Any):
     return result
 
 
-def sign_message(args: Any):
+def sign_user_message(args: Any):
     message: str = args.message
     account = cli_shared.prepare_account(args)
-    signable_message = SignableMessage(message, account)
-    signable_message.sign()
-    utils.dump_out_json(signable_message.to_dictionary())
+    signed_message = sign_message(message, account)
+    utils.dump_out_json(signed_message.to_dictionary())
 
 
 def verify_signed_message(args: Any):
-    bech32_address = args.bech32_address
-    verifier = UserVerifier.from_address(Address.from_bech32(bech32_address))
-
+    bech32_address = args.address
     message: str = args.message
-    verifiable_message = MessageV1.from_string(message)
-
     signature: str = args.signature
-    if signature.startswith("0x"):
-        signature = signature[2:]
 
-    verifiable_message.signature = bytes.fromhex(signature)
-    is_signed = verifier.verify(verifiable_message)
-
+    signed_message = SignedMessage(bech32_address, message, signature)
+    is_signed = signed_message.verify_signature()
     if is_signed:
-        show_message(f"""The message "{message}" was signed by {bech32_address}""")
+        show_message(f"""SUCCESS: The message "{message}" was signed by {bech32_address}""")
     else:
-        show_critical_error(f"""The message "{message}" was NOT signed by {bech32_address}""")
+        show_critical_error(f"""FAILED: The message "{message}" was NOT signed by {bech32_address}""")
