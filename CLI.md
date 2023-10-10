@@ -1006,7 +1006,7 @@ new                            Create a new wallet and print its mnemonic; optio
 convert                        Convert a wallet from one format to another
 bech32                         Helper for encoding and decoding bech32 addresses
 sign-message                   Sign a message
-verify-message                 Verify a previously message
+verify-message                 Verify a previously signed message
 
 ```
 ### Wallet.New
@@ -1099,13 +1099,13 @@ options:
 $ mxpy wallet verify-message --help
 usage: mxpy wallet verify-message [-h] ...
 
-Verify a previously message
+Verify a previously signed message
 
 options:
-  -h, --help                       show this help message and exit
-  --bech32-address BECH32_ADDRESS  the bech32 address of the signer
-  --message MESSAGE                the previously signed message(readable text, as it was signed)
-  --signature SIGNATURE            the signature in hex format
+  -h, --help             show this help message and exit
+  --address ADDRESS      the bech32 address of the signer
+  --message MESSAGE      the previously signed message(readable text, as it was signed)
+  --signature SIGNATURE  the signature in hex format
 
 ```
 ## Group **Localnet**
