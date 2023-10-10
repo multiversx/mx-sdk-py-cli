@@ -94,7 +94,7 @@ def setup_parser(args: List[str], subparsers: Any) -> Any:
         subparsers,
         "wallet",
         "verify-message",
-        "Verify a previously message"
+        "Verify a previously signed message"
     )
     sub.add_argument("--address", required=True, help="the bech32 address of the signer")
     sub.add_argument("--message", required=True, help="the previously signed message(readable text, as it was signed)")
