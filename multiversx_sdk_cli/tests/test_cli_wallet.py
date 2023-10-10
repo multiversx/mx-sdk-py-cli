@@ -262,7 +262,7 @@ def test_verify_previously_signed_message(capsys: Any):
     return_code = main([
         "wallet",
         "verify-message",
-        "--bech32-address",
+        "--address",
         address,
         "--message",
         message,
@@ -272,7 +272,7 @@ def test_verify_previously_signed_message(capsys: Any):
     assert False if return_code else True
 
     out = _read_stdout(capsys)
-    text = """The message "test" was signed by erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th""".split()
+    text = """SUCCESS: The message "test" was signed by erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th""".split()
     assert all(word in out for word in text)
 
 
@@ -284,7 +284,7 @@ def test_verify_not_signed_message(capsys: Any):
     return_code = main([
         "wallet",
         "verify-message",
-        "--bech32-address",
+        "--address",
         address,
         "--message",
         message,
@@ -294,7 +294,7 @@ def test_verify_not_signed_message(capsys: Any):
     assert False if return_code else True
 
     out = _read_stdout(capsys)
-    text = """The message "this message is not signed" was NOT signed by erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th""".split()
+    text = """FAILED: The message "this message is not signed" was NOT signed by erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th""".split()
     assert all(word in out for word in text)
 
 
