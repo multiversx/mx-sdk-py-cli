@@ -239,6 +239,65 @@ def test_wallet_convert_pem_to_pubkey(capsys: Any):
     assert out == "0139472eff6886771a982f3083da5d421f24c29181e63888228dc81ca60d69e1"
 
 
+def test_wallet_sign_message(capsys: Any):
+    message = "test"
+    pem = testdata_path / "alice.pem"
+
+    return_code = main(["wallet", "sign-message", "--message", message, "--pem", str(pem)])
+    out = json.loads(_read_stdout(capsys))
+
+    assert False if return_code else True
+    assert out == {
+        "address": "erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th",
+        "message": "test",
+        "signature": "0x7aff43cd6e3d880a65033bf0a1b16274854fd7dfa9fe5faa7fa9a665ee851afd4c449310f5f1697d348e42d1819eaef69080e33e7652d7393521ed50d7427a0e"
+    }
+
+
+def test_verify_previously_signed_message(capsys: Any):
+    message = "test"
+    address = "erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th"
+    signature = "0x7aff43cd6e3d880a65033bf0a1b16274854fd7dfa9fe5faa7fa9a665ee851afd4c449310f5f1697d348e42d1819eaef69080e33e7652d7393521ed50d7427a0e"
+
+    return_code = main([
+        "wallet",
+        "verify-message",
+        "--address",
+        address,
+        "--message",
+        message,
+        "--signature",
+        signature
+    ])
+    assert False if return_code else True
+
+    out = _read_stdout(capsys)
+    text = """SUCCESS: The message "test" was signed by erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th""".split()
+    assert all(word in out for word in text)
+
+
+def test_verify_not_signed_message(capsys: Any):
+    message = "this message is not signed"
+    address = "erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th"
+    signature = "0x7aff43cd6e3d880a65033bf0a1b16274854fd7dfa9fe5faa7fa9a665ee851afd4c449310f5f1697d348e42d1819eaef69080e33e7652d7393521ed50d7427a0e"
+
+    return_code = main([
+        "wallet",
+        "verify-message",
+        "--address",
+        address,
+        "--message",
+        message,
+        "--signature",
+        signature
+    ])
+    assert False if return_code else True
+
+    out = _read_stdout(capsys)
+    text = """FAILED: The message "this message is not signed" was NOT signed by erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th""".split()
+    assert all(word in out for word in text)
+
+
 def _read_stdout_mnemonic(capsys: Any) -> str:
     return _read_stdout(capsys).replace("Mnemonic:", "").strip()
 
