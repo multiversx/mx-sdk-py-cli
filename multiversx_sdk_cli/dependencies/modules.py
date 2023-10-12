@@ -129,7 +129,7 @@ class StandaloneModule(DependencyModule):
         platform = workstation.get_platform()
 
         url = config.get_dependency_url(self.key, tag, platform)
-        if url is None:
+        if not url:
             raise errors.PlatformNotSupported(self.key, platform)
 
         url = url.replace("{TAG}", tag)

@@ -70,6 +70,8 @@ generate() {
     command "Wallet.New" "wallet new"
     command "Wallet.Convert" "wallet convert"
     command "Wallet.Bech32" "wallet bech32"
+    command "Wallet.SignMessage" "wallet sign-message"
+    command "Wallet.VerifyMessage" "wallet verify-message"
 
     group "Localnet" "localnet"
     command "Localnet.Setup" "localnet setup"
