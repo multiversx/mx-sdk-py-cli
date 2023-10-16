@@ -64,7 +64,7 @@ COMMANDS summary
 ----------------
 new                            Create a new Smart Contract project based on a template.
 templates                      List the available Smart Contract templates.
-build                          Build a Smart Contract project using the appropriate buildchain.
+build                          Build a Smart Contract project.
 clean                          Clean a Smart Contract project.
 test                           Run scenarios (tests).
 report                         Print a detailed report of the smart contracts.
@@ -114,7 +114,7 @@ options:
 $ mxpy contract build --help
 usage: mxpy contract build [-h] ...
 
-Build a Smart Contract project using the appropriate buildchain.
+Build a Smart Contract project.
 
 options:
   -h, --help                 show this help message and exit
