@@ -43,7 +43,7 @@ def setup_parser(args: List[str], subparsers: Any) -> Any:
     sub.set_defaults(func=list_templates)
 
     sub = cli_shared.add_command_subparser(subparsers, "contract", "build",
-                                           "Build a Smart Contract project using the appropriate buildchain.")
+                                           "Build a Smart Contract project.")
     _add_build_options_sc_meta(sub)
     sub.set_defaults(func=build)
 
