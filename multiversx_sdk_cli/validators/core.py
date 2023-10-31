@@ -2,7 +2,7 @@ import logging
 from pathlib import Path
 from typing import Any, List, Tuple, Union
 
-from multiversx_sdk_core import Address, ArbitraryMessage
+from multiversx_sdk_core import Address
 from multiversx_sdk_wallet.validator_pem import ValidatorPEM
 from multiversx_sdk_wallet.validator_signer import ValidatorSigner
 
@@ -60,9 +60,7 @@ def prepare_transaction_data_for_stake(node_operator_address: Address, validator
         pem_file = ValidatorPEM.from_file(validator_pem)
 
         validator_signer = ValidatorSigner(pem_file.secret_key)
-        message = ArbitraryMessage(bytes.fromhex(node_operator_address.hex()))
-
-        signed_message = validator_signer.sign(message).hex()
+        signed_message = validator_signer.sign(node_operator_address.pubkey).hex()
 
         call_arguments.append(f"0x{pem_file.secret_key.generate_public_key().hex()}")
         call_arguments.append(f"0x{signed_message}")
