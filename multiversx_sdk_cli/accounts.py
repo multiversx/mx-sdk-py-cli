@@ -69,12 +69,12 @@ class Account(AccountBase):
 
     def sign_transaction(self, transaction: ITransaction) -> str:
         assert self.signer is not None
-        return self.signer.sign(transaction).hex()
+        return self.signer.sign(transaction.serialize_for_signing()).hex()
 
     def sign_message(self, data: bytes) -> str:
         assert self.signer is not None
         message = MessageV1(data)
-        signature = self.signer.sign(message)
+        signature = self.signer.sign(message.serialize_for_signing())
 
         logger.debug(f"Account.sign_message(): raw_data_to_sign = {data.hex()}, message_data_to_sign = {message.serialize_for_signing().hex()}, signature = {signature.hex()}")
         return signature.hex()

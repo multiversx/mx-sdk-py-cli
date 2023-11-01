@@ -1,0 +1,8 @@
+changelog:
+  exclude:
+    labels:
+      - ignore-for-release-notes
+  categories:
+    - title: What's Changed
+      labels:
+        - "*"

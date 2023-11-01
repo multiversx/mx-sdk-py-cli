@@ -23,7 +23,7 @@ class SignedMessage:
         verifier = UserVerifier.from_address(Address.from_bech32(self.address))
         verifiable_message = MessageV1.from_string(self.message)
         verifiable_message.signature = bytes.fromhex(self.signature)
-        is_signed = verifier.verify(verifiable_message)
+        is_signed = verifier.verify(verifiable_message.serialize_for_signing(), verifiable_message.signature)
         return is_signed
 
     def to_dictionary(self) -> Dict[str, str]:

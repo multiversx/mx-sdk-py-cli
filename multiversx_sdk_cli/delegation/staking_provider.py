@@ -2,7 +2,7 @@ import binascii
 from pathlib import Path
 from typing import Any
 
-from multiversx_sdk_core import Address, ArbitraryMessage
+from multiversx_sdk_core import Address
 from multiversx_sdk_wallet.validator_pem import ValidatorPEM
 from multiversx_sdk_wallet.validator_signer import ValidatorSigner
 
@@ -52,9 +52,7 @@ def prepare_args_for_add_nodes(args: Any):
         pem_file = ValidatorPEM.from_file(validator_pem)
 
         validator_signer = ValidatorSigner(pem_file.secret_key)
-        message = ArbitraryMessage(bytes.fromhex(account.address.hex()))
-
-        signed_message = validator_signer.sign(message).hex()
+        signed_message = validator_signer.sign(account.address.pubkey).hex()
 
         add_nodes_data += f"@{pem_file.secret_key.generate_public_key().hex()}@{signed_message}"
 
