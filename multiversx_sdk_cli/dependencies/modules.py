@@ -200,6 +200,11 @@ class VMToolsModule(StandaloneModule):
     def get_env(self) -> Dict[str, str]:
         return dict()
 
+    def get_source_directory(self, tag: str) -> Path:
+        directory = self.get_directory(tag)
+        first_subdirectory = next(directory.iterdir())
+        return first_subdirectory
+
 
 class GolangModule(StandaloneModule):
     def _post_install(self, tag: str):
