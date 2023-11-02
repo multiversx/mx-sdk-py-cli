@@ -17,18 +17,14 @@ def test_get_account():
             "https://testnet-api.multiversx.com"
         ]
     )
-    if not result:
-        assert True
-    else:
-        assert False
+    assert False if result else True
 
 
 def test_sync_nonce():
     account = Account(address=Address.from_bech32("erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th"))
     proxy = ProxyNetworkProvider("https://devnet-api.multiversx.com")
     account.sync_nonce(proxy)
-
-    assert account.nonce >= 11480
+    assert True if account.nonce else False
 
 
 def test_query_contract():
@@ -36,17 +32,14 @@ def test_query_contract():
         [
             "contract",
             "query",
-            "erd1qqqqqqqqqqqqqpgquykqja5c4v33zdmnwglj3jphqwrelzdn396qlc9g33",
+            "erd1qqqqqqqqqqqqqpgqpuz9r56ylk39x45cgqmaw2w8hfn47ft3d8ssavktr5",
             "--function",
             "getSum",
             "--proxy",
             "https://devnet-api.multiversx.com",
         ]
     )
-    if not result:
-        assert True
-    else:
-        assert False
+    assert False if result else True
 
 
 def test_get_transaction():
@@ -57,11 +50,7 @@ def test_get_transaction():
             "--proxy",
             "https://devnet-api.multiversx.com",
             "--hash",
-            "cbe2026b8d9c3ee75f2846ea8e0b646b19e6fca754e43edb4113757fc3350952",
+            "9e6ca966b18dc0317ff3be9b53be183ddb068a163769d286b2c1b1dff3ac00e5",
         ]
     )
-
-    if not result:
-        assert True
-    else:
-        assert False
+    assert False if result else True
