@@ -1,6 +1,6 @@
 toml>=0.10.2
 types-toml
-requests~=2.24.0
+requests~=2.31.0
 types-requests
 prettytable
 types-prettytable
@@ -9,6 +9,6 @@ semver
 requests-cache
 rich==13.3.4
 
-multiversx-sdk-core>=0.6.0,<0.7.0
-multiversx-sdk-network-providers>=0.11.0,<0.12.0
-multiversx-sdk-wallet>=0.8.0,<0.9.0
+multiversx-sdk-core==0.7.1
+multiversx-sdk-network-providers==0.12.0
+multiversx-sdk-wallet==0.8.2

@@ -137,7 +137,7 @@ def wallet_new(args: Any):
         secret_key = mnemonic.derive_key()
         pubkey = secret_key.generate_public_key()
         address = pubkey.to_address(address_hrp)
-        pem_file = UserPEM(address.bech32(), secret_key)
+        pem_file = UserPEM(address.to_bech32(), secret_key)
         pem_file.save(outfile)
     else:
         raise KnownError(f"Unknown format: {format}")
@@ -234,7 +234,7 @@ def _create_wallet_content(
 
         pubkey = secret_key.generate_public_key()
         address = pubkey.to_address(address_hrp)
-        pem = UserPEM(address.bech32(), secret_key)
+        pem = UserPEM(address.to_bech32(), secret_key)
         return pem.to_text()
 
     if out_format == WALLET_FORMAT_ADDRESS_BECH32:
@@ -244,7 +244,7 @@ def _create_wallet_content(
 
         pubkey = secret_key.generate_public_key()
         address = pubkey.to_address(address_hrp)
-        return address.bech32()
+        return address.to_bech32()
 
     if out_format == WALLET_FORMAT_ADDRESS_HEX:
         if mnemonic:
@@ -262,11 +262,11 @@ def do_bech32(args: Any):
     value = args.value
 
     if encode:
-        address = Address.from_hex(value, DEFAULT_HRP)
-        result = address.bech32()
+        address = Address.new_from_hex(value, DEFAULT_HRP)
+        result = address.to_bech32()
     else:
-        address = Address.from_bech32(value)
-        result = address.hex()
+        address = Address.new_from_bech32(value)
+        result = address.to_hex()
 
     print(result)
     return result

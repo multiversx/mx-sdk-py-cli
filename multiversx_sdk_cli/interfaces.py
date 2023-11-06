@@ -2,10 +2,10 @@ from typing import Any, Dict, Protocol
 
 
 class IAddress(Protocol):
-    def hex(self) -> str:
+    def to_hex(self) -> str:
         ...
 
-    def bech32(self) -> str:
+    def to_bech32(self) -> str:
         ...
 
 

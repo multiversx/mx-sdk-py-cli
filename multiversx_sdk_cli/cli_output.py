@@ -61,7 +61,7 @@ class CLIOutputBuilder:
             output["emittedTransactionHash"] = emitted_transaction_hash
 
         if self.contract_address:
-            contract_address = self.contract_address.bech32()
+            contract_address = self.contract_address.to_bech32()
             output["contractAddress"] = contract_address
 
         if self.transaction_on_network:

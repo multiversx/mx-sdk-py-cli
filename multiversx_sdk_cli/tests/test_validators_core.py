@@ -9,7 +9,7 @@ TESTDATA_FOLDER = Path(__file__).parent.joinpath("testdata")
 
 
 def test_prepare_transaction_data_for_stake():
-    node_operator_address = Address.from_bech32("erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th")
+    node_operator_address = Address.new_from_bech32("erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th")
     validators_file_path = TESTDATA_FOLDER / "validators.json"
     data, gas_limit = prepare_transaction_data_for_stake(node_operator_address, validators_file_path, node_operator_address)
 

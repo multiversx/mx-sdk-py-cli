@@ -34,7 +34,7 @@ def prepare_args_for_stake(args: Any):
         raise BadUsage("cannot initialize node operator")
 
     validators_file_path = Path(args.validators_file)
-    reward_address = Address.from_bech32(args.reward_address) if args.reward_address else None
+    reward_address = Address.new_from_bech32(args.reward_address) if args.reward_address else None
 
     data, gas_limit = prepare_transaction_data_for_stake(node_operator.address, validators_file_path, reward_address)
     args.data = data
@@ -66,7 +66,7 @@ def prepare_transaction_data_for_stake(node_operator_address: Address, validator
         call_arguments.append(f"0x{signed_message}")
 
     if reward_address:
-        call_arguments.append(f"0x{reward_address.hex()}")
+        call_arguments.append(f"0x{reward_address.to_hex()}")
 
     data = SmartContract().prepare_execute_transaction_data("stake", call_arguments)
     gas_limit = estimate_system_sc_call(str(data), MetaChainSystemSCsCost.STAKE, num_of_nodes)
@@ -110,7 +110,7 @@ def prepare_args_for_unjail(args: Any):
 
 
 def prepare_args_for_change_reward_address(args: Any):
-    reward_address = Address.from_bech32(args.reward_address)
+    reward_address = Address.new_from_bech32(args.reward_address)
     args.data = 'changeRewardAddress@' + reward_address.hex()
     args.receiver = VALIDATORS_SMART_CONTRACT_ADDRESS
 

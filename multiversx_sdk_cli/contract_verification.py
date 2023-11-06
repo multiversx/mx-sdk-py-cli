@@ -54,7 +54,7 @@ class ContractVerificationPayload:
 
     def serialize(self) -> str:
         payload = {
-            "contract": self.contract.bech32(),
+            "contract": self.contract.to_bech32(),
             "dockerImage": self.docker_image,
             "sourceCode": self.source_code,
             "contractVariant": self.contract_variant
@@ -103,7 +103,7 @@ def trigger_contract_verification(
 
 def _create_request_signature(account: Account, contract_address: Address, request_payload: bytes) -> bytes:
     hashed_payload: str = hashlib.sha256(request_payload).hexdigest()
-    raw_data_to_sign = f"{contract_address.bech32()}{hashed_payload}"
+    raw_data_to_sign = f"{contract_address.to_bech32()}{hashed_payload}"
 
     signature_hex = account.sign_message(raw_data_to_sign.encode())
     signature = bytes.fromhex(signature_hex)

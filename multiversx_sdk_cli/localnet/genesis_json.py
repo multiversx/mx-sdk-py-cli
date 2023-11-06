@@ -45,7 +45,7 @@ def build(config: ConfigRoot) -> List[Any]:
 def _build_validator_entry(nickname: str, account: Account, value: int) -> Dict[str, Any]:
     return {
         "nickname": nickname,
-        "address": account.address.bech32(),
+        "address": account.address.to_bech32(),
         "supply": str(value),
         "balance": "0",
         "stakingvalue": str(value),
@@ -59,12 +59,12 @@ def _build_validator_entry(nickname: str, account: Account, value: int) -> Dict[
 def _build_user_entry(nickname: str, account: Account, value: int, delegated_value: int, delegation_address: Address) -> Dict[str, Any]:
     return {
         "nickname": nickname,
-        "address": account.address.bech32(),
+        "address": account.address.to_bech32(),
         "supply": str(value),
         "balance": str(value - delegated_value),
         "stakingvalue": "0",
         "delegation": {
-            "address": delegation_address.bech32(),
+            "address": delegation_address.to_bech32(),
             "value": str(delegated_value)
         }
     }
