@@ -69,21 +69,21 @@ def do_prepare_transaction(args: Any) -> Transaction:
 
     tx = Transaction(
         chain_id=args.chain,
-        sender=account.address,
-        receiver=Address.from_bech32(args.receiver),
+        sender=account.address.to_bech32(),
+        receiver=args.receiver,
         gas_limit=int(args.gas_limit),
         sender_username=getattr(args, "sender_username", ""),
         receiver_username=getattr(args, "receiver_username", ""),
         gas_price=int(args.gas_price),
-        data=TransactionPayload.from_str(args.data),
+        data=TransactionPayload.from_str(args.data).data,
         nonce=int(args.nonce),
-        value=int(args.value),
+        amount=int(args.value),
         version=int(args.version),
         options=int(args.options)
     )
 
     if args.guardian:
-        tx.guardian = Address.from_bech32(args.guardian)
+        tx.guardian = args.guardian
 
     tx.signature = bytes.fromhex(account.sign_transaction(tx))
     tx = sign_tx_by_guardian(args, tx)
@@ -148,12 +148,12 @@ def _send_transaction_and_wait_for_result(proxy: INetworkProvider, payload: ITra
 
 
 def tx_to_dictionary_as_inner(tx: Transaction) -> Dict[str, Any]:
-    dictionary = tx.to_dictionary()
-    dictionary["receiver"] = base64.b64encode(bytes.fromhex(tx.receiver.hex())).decode()  # type: ignore
-    dictionary["sender"] = base64.b64encode(bytes.fromhex(tx.sender.hex())).decode()  # type: ignore
-    dictionary["chainID"] = base64.b64encode(tx.chainID.encode()).decode()
+    dictionary = tx.__dict__
+    dictionary["receiver"] = base64.b64encode(Address.new_from_bech32(tx.receiver).get_public_key()).decode()
+    dictionary["sender"] = base64.b64encode(Address.new_from_bech32(tx.sender).get_public_key()).decode()
+    dictionary["chainID"] = base64.b64encode(tx.chain_id.encode()).decode()
     dictionary["signature"] = base64.b64encode(bytes(bytearray(tx.signature))).decode()
-    dictionary["value"] = tx.value
+    dictionary["value"] = tx.amount
 
     return dictionary
 
@@ -179,21 +179,21 @@ def load_transaction_from_file(f: TextIO) -> Transaction:
 
     loaded_tx = Transaction(
         chain_id=instance.chainID,
-        sender=Address.from_bech32(instance.sender),
-        receiver=Address.from_bech32(instance.receiver),
+        sender=instance.sender,
+        receiver=instance.receiver,
         sender_username=decode_field_value(instance.senderUsername),
         receiver_username=decode_field_value(instance.receiverUsername),
         gas_limit=instance.gasLimit,
         gas_price=instance.gasPrice,
-        value=int(instance.value),
-        data=TransactionPayload.from_encoded_str(instance.data),
+        amount=int(instance.value),
+        data=TransactionPayload.from_encoded_str(instance.data).data,
         version=instance.version,
         options=instance.options,
         nonce=instance.nonce
     )
 
     if instance.guardian:
-        loaded_tx.guardian = Address.from_bech32(instance.guardian)
+        loaded_tx.guardian = instance.guardian
 
     if instance.signature:
         loaded_tx.signature = bytes.fromhex(instance.signature)

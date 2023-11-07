@@ -1,3 +1,4 @@
+import base64
 import json
 import logging
 import os
@@ -40,9 +41,12 @@ class Object(ISerializable):
 
 class BasicEncoder(json.JSONEncoder):
     def default(self, o: Any):
+        if isinstance(o, bytes):
+            # Encode bytes as a base64 string
+            return base64.b64encode(o).decode('utf-8')
         if isinstance(o, ISerializable):
             return o.to_dictionary()
-        return json.JSONEncoder.default(self, o)
+        return super().default(o)
 
 
 def omit_fields(data: Any, fields: List[str] = []):

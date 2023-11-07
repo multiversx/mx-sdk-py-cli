@@ -2,7 +2,8 @@ import logging
 from pathlib import Path
 from typing import Any, Optional, Protocol
 
-from multiversx_sdk_core import Address, Message, MessageComputer
+from multiversx_sdk_core import (Address, Message, MessageComputer,
+                                 TransactionComputer)
 from multiversx_sdk_network_providers.accounts import AccountOnNetwork
 from multiversx_sdk_wallet import UserSigner
 
@@ -69,7 +70,9 @@ class Account(AccountBase):
 
     def sign_transaction(self, transaction: ITransaction) -> str:
         assert self.signer is not None
-        return self.signer.sign(transaction.serialize_for_signing()).hex()
+
+        transaction_computer = TransactionComputer()
+        return self.signer.sign(transaction_computer.compute_bytes_for_signing(transaction)).hex()
 
     def sign_message(self, data: bytes) -> str:
         assert self.signer is not None
@@ -95,8 +98,10 @@ class LedgerAccount(Account):
             transaction.version = TX_HASH_SIGN_VERSION
             transaction.options = TX_HASH_SIGN_OPTIONS
 
+        transaction_computer = TransactionComputer()
+
         signature = do_sign_transaction_with_ledger(
-            transaction.serialize_for_signing(),
+            transaction_computer.compute_bytes_for_signing(transaction),
             account_index=self.account_index,
             address_index=self.address_index,
             sign_using_hash=should_use_hash_signing

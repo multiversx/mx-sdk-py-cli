@@ -9,7 +9,7 @@ from multiversx_sdk_cli.interfaces import ITransaction
 def cosign_transaction(transaction: ITransaction, service_url: str, guardian_code: str) -> ITransaction:
     payload = {
         "code": f"{guardian_code}",
-        "transaction": transaction.to_dictionary()
+        "transaction": transaction.__dict__
     }
 
     url = f"{service_url}/sign-transaction"

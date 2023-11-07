@@ -51,12 +51,15 @@ class CLIOutputBuilder:
         output: Dict[str, Any] = OrderedDict()
 
         if self.emitted_transaction:
-            emitted_transaction_dict = self.emitted_transaction.to_dictionary()
+            emitted_transaction_dict = self.emitted_transaction.__dict__
             emitted_transaction_hash = self.emitted_transaction_hash or ""
-            emitted_transaction_data = str(self.emitted_transaction.data)
+            emitted_transaction_data = self.emitted_transaction.data.decode()
             utils.omit_fields(emitted_transaction_dict, self.emitted_transaction_omitted_fields)
 
             output["emittedTransaction"] = emitted_transaction_dict
+            signature: bytes = output["emittedTransaction"]["signature"]
+            output["emittedTransaction"]["signature"] = signature.hex() if type(signature) is not str else signature
+
             output["emittedTransactionData"] = emitted_transaction_data
             output["emittedTransactionHash"] = emitted_transaction_hash
 

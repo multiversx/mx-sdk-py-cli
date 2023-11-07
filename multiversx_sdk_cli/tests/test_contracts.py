@@ -35,7 +35,7 @@ def test_compute_address():
     assert contract.address.bech32() == "erd1qqqqqqqqqqqqqpgqhdjjyq8dr7v5yq9tv6v5vt9tfvd00vg7h40q6779zn"
 
     contract.owner.nonce = 1
-    contract.address = address_computer.compute_contract_address(contract.owner.address, contract.owner.nonce DEFAULT_HRP)
+    contract.address = address_computer.compute_contract_address(contract.owner.address, contract.owner.nonce)
     assert contract.address.hex() == "000000000000000005006e4f90488e27342f9a46e1809452c85ee7186566bd5e"
     assert contract.address.bech32() == "erd1qqqqqqqqqqqqqpgqde8eqjywyu6zlxjxuxqfg5kgtmn3setxh40qen8egy"
 

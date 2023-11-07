@@ -79,19 +79,19 @@ class SmartContract:
 
         tx = Transaction(
             chain_id=chain,
-            sender=owner.address,
-            receiver=Address.new_from_bech32(ADDRESS_ZERO_BECH32),
+            sender=owner.address.to_bech32(),
+            receiver=ADDRESS_ZERO_BECH32,
             gas_limit=gas_limit,
             gas_price=gas_price,
             nonce=owner.nonce,
-            value=value,
-            data=self.prepare_deploy_transaction_data(arguments),
+            amount=value,
+            data=self.prepare_deploy_transaction_data(arguments).data,
             version=version,
             options=options
         )
 
         if guardian:
-            tx.guardian = Address.from_bech32(guardian)
+            tx.guardian = guardian
 
         tx.signature = bytes.fromhex(owner.sign_transaction(tx))
         return tx
@@ -115,19 +115,19 @@ class SmartContract:
 
         tx = Transaction(
             chain_id=chain,
-            sender=caller.address,
-            receiver=receiver,
+            sender=caller.address.to_bech32(),
+            receiver=receiver.to_bech32(),
             gas_limit=gas_limit,
             gas_price=gas_price,
             nonce=caller.nonce,
-            value=value,
-            data=self.prepare_execute_transaction_data(function, arguments),
+            amount=value,
+            data=self.prepare_execute_transaction_data(function, arguments).data,
             version=version,
             options=options
         )
 
         if guardian:
-            tx.guardian = Address.from_bech32(guardian)
+            tx.guardian = guardian
 
         tx.signature = bytes.fromhex(caller.sign_transaction(tx))
         return tx
@@ -151,19 +151,19 @@ class SmartContract:
 
         tx = Transaction(
             chain_id=chain,
-            sender=owner.address,
-            receiver=receiver,
+            sender=owner.address.to_bech32(),
+            receiver=receiver.to_bech32(),
             gas_limit=gas_limit,
             gas_price=gas_price,
             nonce=owner.nonce,
-            value=value,
-            data=self.prepare_upgrade_transaction_data(arguments),
+            amount=value,
+            data=self.prepare_upgrade_transaction_data(arguments).data,
             version=version,
             options=options
         )
 
         if guardian:
-            tx.guardian = Address.from_bech32(guardian)
+            tx.guardian = guardian
 
         tx.signature = bytes.fromhex(owner.sign_transaction(tx))
         return tx
