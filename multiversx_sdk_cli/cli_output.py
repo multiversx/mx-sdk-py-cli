@@ -4,6 +4,8 @@ from collections import OrderedDict
 from typing import Any, Dict, List, Optional, Union
 
 from multiversx_sdk_core import Address
+from multiversx_sdk_network_providers.transactions import \
+    transaction_to_dictionary
 
 from multiversx_sdk_cli import utils
 from multiversx_sdk_cli.interfaces import ITransaction
@@ -51,15 +53,12 @@ class CLIOutputBuilder:
         output: Dict[str, Any] = OrderedDict()
 
         if self.emitted_transaction:
-            emitted_transaction_dict = self.emitted_transaction.__dict__
+            emitted_transaction_dict = transaction_to_dictionary(self.emitted_transaction)
             emitted_transaction_hash = self.emitted_transaction_hash or ""
             emitted_transaction_data = self.emitted_transaction.data.decode()
             utils.omit_fields(emitted_transaction_dict, self.emitted_transaction_omitted_fields)
 
             output["emittedTransaction"] = emitted_transaction_dict
-            signature: bytes = output["emittedTransaction"]["signature"]
-            output["emittedTransaction"]["signature"] = signature.hex() if type(signature) is not str else signature
-
             output["emittedTransactionData"] = emitted_transaction_data
             output["emittedTransactionHash"] = emitted_transaction_hash
 

@@ -75,7 +75,7 @@ def do_prepare_transaction(args: Any) -> Transaction:
         sender_username=getattr(args, "sender_username", ""),
         receiver_username=getattr(args, "receiver_username", ""),
         gas_price=int(args.gas_price),
-        data=TransactionPayload.from_str(args.data).data,
+        data=str(args.data).encode(),
         nonce=int(args.nonce),
         amount=int(args.value),
         version=int(args.version),
