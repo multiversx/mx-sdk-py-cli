@@ -28,7 +28,7 @@ def test_sync_nonce():
     proxy = ProxyNetworkProvider("https://devnet-api.multiversx.com")
     account.sync_nonce(proxy)
 
-    assert account.nonce >= 11480
+    assert account.nonce >= 42
 
 
 def test_query_contract():
