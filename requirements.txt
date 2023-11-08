@@ -9,6 +9,6 @@ semver
 requests-cache
 rich==13.3.4
 
-multiversx-sdk-core==0.7.1
-multiversx-sdk-network-providers==0.12.1
-multiversx-sdk-wallet==0.8.2
+multiversx-sdk-core<0.8.0
+multiversx-sdk-network-providers<0.13.0
+multiversx-sdk-wallet<0.9.0

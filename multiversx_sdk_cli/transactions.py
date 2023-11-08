@@ -147,7 +147,7 @@ def _send_transaction_and_wait_for_result(proxy: INetworkProvider, payload: ITra
     raise errors.KnownError("Took too long to get transaction.")
 
 
-def tx_to_dictionary_as_inner(tx: Transaction) -> Dict[str, Any]:
+def tx_to_dictionary_as_inner_for_relayed_V1(tx: Transaction) -> Dict[str, Any]:
     dictionary: Dict[str, Any] = {}
 
     dictionary["nonce"] = tx.nonce
@@ -186,7 +186,7 @@ def _dict_to_json(dictionary: Dict[str, Any]) -> bytes:
 
 
 def compute_relayed_v1_data(tx: Transaction) -> str:
-    inner_dictionary = tx_to_dictionary_as_inner(tx)
+    inner_dictionary = tx_to_dictionary_as_inner_for_relayed_V1(tx)
     serialized = _dict_to_json(inner_dictionary)
     serialized_hex = serialized.hex()
     return f"relayedTx@{serialized_hex}"
