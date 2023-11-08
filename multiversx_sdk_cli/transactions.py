@@ -148,12 +148,34 @@ def _send_transaction_and_wait_for_result(proxy: INetworkProvider, payload: ITra
 
 
 def tx_to_dictionary_as_inner(tx: Transaction) -> Dict[str, Any]:
-    dictionary = tx.__dict__
-    dictionary["receiver"] = base64.b64encode(Address.new_from_bech32(tx.receiver).get_public_key()).decode()
+    dictionary: Dict[str, Any] = {}
+
+    dictionary["nonce"] = tx.nonce
     dictionary["sender"] = base64.b64encode(Address.new_from_bech32(tx.sender).get_public_key()).decode()
-    dictionary["chainID"] = base64.b64encode(tx.chain_id.encode()).decode()
-    dictionary["signature"] = base64.b64encode(bytes(bytearray(tx.signature))).decode()
+    dictionary["receiver"] = base64.b64encode(Address.new_from_bech32(tx.receiver).get_public_key()).decode()
     dictionary["value"] = tx.amount
+    dictionary["gasPrice"] = tx.gas_price
+    dictionary["gasLimit"] = tx.gas_limit
+    dictionary["data"] = base64.b64encode(tx.data).decode()
+    dictionary["signature"] = base64.b64encode(tx.signature).decode()
+    dictionary["chainID"] = base64.b64encode(tx.chain_id.encode()).decode()
+    dictionary["version"] = tx.version
+
+    if tx.options:
+        dictionary["options"] = tx.options
+
+    if tx.guardian:
+        guardian = Address.new_from_bech32(tx.guardian).to_hex()
+        dictionary["guardian"] = base64.b64encode(bytes.fromhex(guardian)).decode()
+
+    if tx.guardian_signature:
+        dictionary["guardianSignature"] = base64.b64encode(tx.guardian_signature).decode()
+
+    if tx.sender_username:
+        dictionary["sndUserName"] = base64.b64encode(tx.sender_username.encode()).decode()
+
+    if tx.receiver_username:
+        dictionary[f"rcvUserName"] = base64.b64encode(tx.receiver_username.encode()).decode()
 
     return dictionary
 
