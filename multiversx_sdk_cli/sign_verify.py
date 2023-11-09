@@ -1,6 +1,6 @@
 from typing import Dict
 
-from multiversx_sdk_core import Address, MessageV1
+from multiversx_sdk_core import Address, Message, MessageComputer
 from multiversx_sdk_wallet import UserVerifier
 
 from multiversx_sdk_cli.accounts import Account
@@ -20,10 +20,12 @@ class SignedMessage:
         self.signature = signature
 
     def verify_signature(self) -> bool:
-        verifier = UserVerifier.from_address(Address.from_bech32(self.address))
-        verifiable_message = MessageV1.from_string(self.message)
+        verifiable_message = Message(self.message.encode())
         verifiable_message.signature = bytes.fromhex(self.signature)
-        is_signed = verifier.verify(verifiable_message.serialize_for_signing(), verifiable_message.signature)
+        message_computer = MessageComputer()
+
+        verifier = UserVerifier.from_address(Address.from_bech32(self.address))
+        is_signed = verifier.verify(message_computer.compute_bytes_for_signing(verifiable_message), verifiable_message.signature)
         return is_signed
 
     def to_dictionary(self) -> Dict[str, str]:

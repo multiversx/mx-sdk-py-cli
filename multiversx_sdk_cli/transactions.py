@@ -69,21 +69,21 @@ def do_prepare_transaction(args: Any) -> Transaction:
 
     tx = Transaction(
         chain_id=args.chain,
-        sender=account.address,
-        receiver=Address.from_bech32(args.receiver),
+        sender=account.address.to_bech32(),
+        receiver=args.receiver,
         gas_limit=int(args.gas_limit),
         sender_username=getattr(args, "sender_username", ""),
         receiver_username=getattr(args, "receiver_username", ""),
         gas_price=int(args.gas_price),
-        data=TransactionPayload.from_str(args.data),
+        data=str(args.data).encode(),
         nonce=int(args.nonce),
-        value=int(args.value),
+        amount=int(args.value),
         version=int(args.version),
         options=int(args.options)
     )
 
     if args.guardian:
-        tx.guardian = Address.from_bech32(args.guardian)
+        tx.guardian = args.guardian
 
     tx.signature = bytes.fromhex(account.sign_transaction(tx))
     tx = sign_tx_by_guardian(args, tx)
@@ -147,13 +147,35 @@ def _send_transaction_and_wait_for_result(proxy: INetworkProvider, payload: ITra
     raise errors.KnownError("Took too long to get transaction.")
 
 
-def tx_to_dictionary_as_inner(tx: Transaction) -> Dict[str, Any]:
-    dictionary = tx.to_dictionary()
-    dictionary["receiver"] = base64.b64encode(bytes.fromhex(tx.receiver.hex())).decode()  # type: ignore
-    dictionary["sender"] = base64.b64encode(bytes.fromhex(tx.sender.hex())).decode()  # type: ignore
-    dictionary["chainID"] = base64.b64encode(tx.chainID.encode()).decode()
-    dictionary["signature"] = base64.b64encode(bytes(bytearray(tx.signature))).decode()
-    dictionary["value"] = tx.value
+def tx_to_dictionary_as_inner_for_relayed_V1(tx: Transaction) -> Dict[str, Any]:
+    dictionary: Dict[str, Any] = {}
+
+    dictionary["nonce"] = tx.nonce
+    dictionary["sender"] = base64.b64encode(Address.new_from_bech32(tx.sender).get_public_key()).decode()
+    dictionary["receiver"] = base64.b64encode(Address.new_from_bech32(tx.receiver).get_public_key()).decode()
+    dictionary["value"] = tx.amount
+    dictionary["gasPrice"] = tx.gas_price
+    dictionary["gasLimit"] = tx.gas_limit
+    dictionary["data"] = base64.b64encode(tx.data).decode()
+    dictionary["signature"] = base64.b64encode(tx.signature).decode()
+    dictionary["chainID"] = base64.b64encode(tx.chain_id.encode()).decode()
+    dictionary["version"] = tx.version
+
+    if tx.options:
+        dictionary["options"] = tx.options
+
+    if tx.guardian:
+        guardian = Address.new_from_bech32(tx.guardian).to_hex()
+        dictionary["guardian"] = base64.b64encode(bytes.fromhex(guardian)).decode()
+
+    if tx.guardian_signature:
+        dictionary["guardianSignature"] = base64.b64encode(tx.guardian_signature).decode()
+
+    if tx.sender_username:
+        dictionary["sndUserName"] = base64.b64encode(tx.sender_username.encode()).decode()
+
+    if tx.receiver_username:
+        dictionary[f"rcvUserName"] = base64.b64encode(tx.receiver_username.encode()).decode()
 
     return dictionary
 
@@ -164,7 +186,7 @@ def _dict_to_json(dictionary: Dict[str, Any]) -> bytes:
 
 
 def compute_relayed_v1_data(tx: Transaction) -> str:
-    inner_dictionary = tx_to_dictionary_as_inner(tx)
+    inner_dictionary = tx_to_dictionary_as_inner_for_relayed_V1(tx)
     serialized = _dict_to_json(inner_dictionary)
     serialized_hex = serialized.hex()
     return f"relayedTx@{serialized_hex}"
@@ -179,21 +201,21 @@ def load_transaction_from_file(f: TextIO) -> Transaction:
 
     loaded_tx = Transaction(
         chain_id=instance.chainID,
-        sender=Address.from_bech32(instance.sender),
-        receiver=Address.from_bech32(instance.receiver),
+        sender=instance.sender,
+        receiver=instance.receiver,
         sender_username=decode_field_value(instance.senderUsername),
         receiver_username=decode_field_value(instance.receiverUsername),
         gas_limit=instance.gasLimit,
         gas_price=instance.gasPrice,
-        value=int(instance.value),
-        data=TransactionPayload.from_encoded_str(instance.data),
+        amount=int(instance.value),
+        data=TransactionPayload.from_encoded_str(instance.data).data,
         version=instance.version,
         options=instance.options,
         nonce=instance.nonce
     )
 
     if instance.guardian:
-        loaded_tx.guardian = Address.from_bech32(instance.guardian)
+        loaded_tx.guardian = instance.guardian
 
     if instance.signature:
         loaded_tx.signature = bytes.fromhex(instance.signature)

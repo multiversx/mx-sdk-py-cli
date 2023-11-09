@@ -2,39 +2,29 @@ from typing import Any, Dict, Protocol
 
 
 class IAddress(Protocol):
-    def hex(self) -> str:
+    def to_hex(self) -> str:
         ...
 
-    def bech32(self) -> str:
+    def to_bech32(self) -> str:
         ...
-
-
-ITransactionOptions = int
-ITransactionVersion = int
-ISignature = bytes
-
-
-class ITransactionPayload(Protocol):
-    data: bytes
-    def encoded(self) -> str: ...
-    def length(self) -> int: ...
 
 
 class ITransaction(Protocol):
-    version: ITransactionVersion
-    options: ITransactionOptions
-    signature: ISignature
-    guardian_signature: ISignature
-
-    @property
-    def data(self) -> ITransactionPayload:
-        ...
-
-    def serialize_for_signing(self) -> bytes:
-        ...
-
-    def to_dictionary(self, with_signature: bool = True) -> Dict[str, Any]:
-        ...
+    sender: str
+    receiver: str
+    gas_limit: int
+    chain_id: str
+    nonce: int
+    amount: int
+    sender_username: str
+    receiver_username: str
+    gas_price: int
+    data: bytes
+    version: int
+    options: int
+    guardian: str
+    signature: bytes
+    guardian_signature: bytes
 
 
 class IAccount(Protocol):

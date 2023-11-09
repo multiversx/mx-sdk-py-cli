@@ -312,8 +312,8 @@ def deploy(args: Any):
     tx = contract.deploy(sender, arguments, gas_price, gas_limit, value, args.chain, version, args.guardian, args.options)
     tx = _sign_guarded_tx(args, tx)
 
-    logger.info("Contract address: %s", contract.address.bech32())
-    utils.log_explorer_contract_address(args.chain, contract.address.bech32())
+    logger.info("Contract address: %s", contract.address.to_bech32())
+    utils.log_explorer_contract_address(args.chain, contract.address.to_bech32())
 
     _send_or_simulate(tx, contract, args)
 

@@ -151,7 +151,7 @@ def prepare_account(args: Any):
         account = Account(key_file=args.keyfile, password=password)
     elif args.ledger:
         address = do_get_ledger_address(account_index=args.ledger_account_index, address_index=args.ledger_address_index)
-        account = Account(address=Address.from_bech32(address))
+        account = Account(address=Address.new_from_bech32(address))
     else:
         raise errors.NoWalletProvided()
 
@@ -166,7 +166,7 @@ def prepare_guardian_account(args: Any):
         account = Account(key_file=args.guardian_keyfile, password=password)
     elif args.guardian_ledger:
         address = do_get_ledger_address(account_index=args.guardian_ledger_account_index, address_index=args.guardian_ledger_address_index)
-        account = Account(Address.from_bech32(address))
+        account = Account(Address.new_from_bech32(address))
     else:
         raise errors.NoWalletProvided()
 
