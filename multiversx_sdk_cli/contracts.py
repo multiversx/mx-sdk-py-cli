@@ -9,7 +9,7 @@ from multiversx_sdk_core.transaction_factories import \
     SmartContractTransactionsFactory
 from multiversx_sdk_network_providers.interface import IAddress, IContractQuery
 
-from multiversx_sdk_cli import config, constants, errors
+from multiversx_sdk_cli import config, errors
 from multiversx_sdk_cli.accounts import Account, EmptyAddress
 from multiversx_sdk_cli.constants import DEFAULT_HRP
 from multiversx_sdk_cli.utils import Object
@@ -107,40 +107,25 @@ class SmartContract:
 
         return tx
 
-    def prepare_deploy_transaction_data(self, arguments: List[Any]) -> TransactionPayload:
-        tx_data = f"{self.bytecode}@{constants.VM_TYPE_WASM_VM}@{self.metadata.to_hex()}"
+    def get_execute_transaction(self, owner: Account, args: Any) -> Transaction:
+        contract_address = Address.new_from_bech32(args.contract)
+        arguments = args.arguments or []
 
-        for arg in arguments:
-            tx_data += f"@{_prepare_argument(arg)}"
-
-        return TransactionPayload.from_str(tx_data)
-
-    def execute(self, caller: Account, function: str, arguments: List[str], gas_price: int, gas_limit: int, value: int, chain: str, version: int, guardian: str, options: int) -> Transaction:
-        self.caller = caller
-
-        arguments = arguments or []
-        gas_price = int(gas_price)
-        gas_limit = int(gas_limit)
-        value = value or 0
-        receiver = self.address if self.address else EmptyAddress()
-
-        tx = Transaction(
-            chain_id=chain,
-            sender=caller.address.to_bech32(),
-            receiver=receiver.to_bech32(),
-            gas_limit=gas_limit,
-            gas_price=gas_price,
-            nonce=caller.nonce,
-            amount=value,
-            data=self.prepare_execute_transaction_data(function, arguments).data,
-            version=version,
-            options=options
+        tx = self._factory.create_transaction_for_execute(
+            sender=owner.address,
+            contract=contract_address,
+            function=args.function,
+            gas_limit=int(args.gas_limit),
+            arguments=arguments,
+            native_transfer_amount=int(args.value),
+            token_transfers=[]
         )
+        tx.nonce = owner.nonce
+        tx.version = int(args.version)
+        tx.options = int(args.options)
+        tx.guardian = args.guardian
+        tx.signature = bytes.fromhex(owner.sign_transaction(tx))
 
-        if guardian:
-            tx.guardian = guardian
-
-        tx.signature = bytes.fromhex(caller.sign_transaction(tx))
         return tx
 
     def prepare_execute_transaction_data(self, function: str, arguments: List[Any]) -> TransactionPayload:

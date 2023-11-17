@@ -386,22 +386,17 @@ def call(args: Any):
     cli_shared.check_guardian_and_options_args(args)
     cli_shared.check_broadcast_args(args)
 
-    contract_address = args.contract
-    function = args.function
-    arguments = args.arguments
-    gas_price = args.gas_price
-    gas_limit = args.gas_limit
-    value = args.value
-    version = args.version
-
-    contract = SmartContract(Address.from_bech32(contract_address))
     sender = _prepare_sender(args)
     cli_shared.prepare_chain_id_in_args(args)
 
-    tx = contract.execute(sender, function, arguments, gas_price, gas_limit, value, args.chain, version, args.guardian, args.options)
+    config = TransactionsFactoryConfig(args.chain)
+    contract = SmartContract(config, TokenComputer())
+    contract_address = Address.new_from_bech32(args.contract)
+
+    tx = contract.get_execute_transaction(sender, args)
     tx = _sign_guarded_tx(args, tx)
 
-    _send_or_simulate(tx, contract, args)
+    _send_or_simulate(tx, contract_address, args)
 
 
 def upgrade(args: Any):
