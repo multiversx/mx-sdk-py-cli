@@ -11,3 +11,5 @@ DEFAULT_TX_VERSION = 2
 
 DEFAULT_HRP = "erd"
 ADDRESS_ZERO_BECH32 = "erd1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq6gq4hu"
+
+NUMBER_OF_SHARDS = 3

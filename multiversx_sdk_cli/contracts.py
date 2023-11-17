@@ -1,14 +1,17 @@
 import base64
 import logging
+from pathlib import Path
 from typing import Any, List, Optional, Protocol, Sequence, Tuple
 
 from multiversx_sdk_core import Transaction, TransactionPayload
-from multiversx_sdk_core.address import Address, AddressComputer
+from multiversx_sdk_core.address import Address
+from multiversx_sdk_core.transaction_factories import \
+    SmartContractTransactionsFactory
 from multiversx_sdk_network_providers.interface import IAddress, IContractQuery
 
 from multiversx_sdk_cli import config, constants, errors
 from multiversx_sdk_cli.accounts import Account, EmptyAddress
-from multiversx_sdk_cli.constants import ADDRESS_ZERO_BECH32, DEFAULT_HRP
+from multiversx_sdk_cli.constants import DEFAULT_HRP
 from multiversx_sdk_cli.utils import Object
 
 logger = logging.getLogger("contracts")
@@ -61,39 +64,47 @@ class IContractQueryResponse(Protocol):
     return_message: str
 
 
+class IConfig(Protocol):
+    chain_id: str
+    min_gas_limit: int
+    gas_limit_per_byte: int
+
+
+class IToken(Protocol):
+    identifier: str
+    nonce: int
+
+
+class ITokenComputer(Protocol):
+    def is_fungible(self, token: IToken) -> bool:
+        ...
+
+    def extract_identifier_from_extended_identifier(self, identifier: str) -> str:
+        ...
+
+
 class SmartContract:
-    def __init__(self, address: Optional[IAddress] = EmptyAddress(), bytecode=None, metadata=None):
-        self.address = address
-        self.bytecode = bytecode
-        self.metadata = metadata or CodeMetadata()
+    def __init__(self, config: IConfig, token_computer: ITokenComputer):
+        self._factory = SmartContractTransactionsFactory(config, token_computer)
 
-    def deploy(self, owner: Account, arguments: List[Any], gas_price: int, gas_limit: int, value: int, chain: str, version: int, guardian: str, options: int) -> Transaction:
-        self.owner = owner
-        address_computer = AddressComputer(number_of_shards=3)
-        self.address = address_computer.compute_contract_address(self.owner.address, self.owner.nonce)
-
-        arguments = arguments or []
-        gas_price = int(gas_price)
-        gas_limit = int(gas_limit)
-        value = value or 0
-
-        tx = Transaction(
-            chain_id=chain,
-            sender=owner.address.to_bech32(),
-            receiver=ADDRESS_ZERO_BECH32,
-            gas_limit=gas_limit,
-            gas_price=gas_price,
-            nonce=owner.nonce,
-            amount=value,
-            data=self.prepare_deploy_transaction_data(arguments).data,
-            version=version,
-            options=options
+    def get_deploy_transaction(self, owner: Account, args: Any) -> Transaction:
+        tx = self._factory.create_transaction_for_deploy(
+            sender=owner.address,
+            bytecode=Path(args.bytecode),
+            gas_limit=int(args.gas_limit),
+            arguments=args.arguments,
+            native_transfer_amount=int(args.value),
+            is_upgradeable=args.metadata_upgradeable,
+            is_readable=args.metadata_readable,
+            is_payable=args.metadata_payable,
+            is_payable_by_sc=args.metadata_payable_by_sc
         )
-
-        if guardian:
-            tx.guardian = guardian
-
+        tx.nonce = owner.nonce
+        tx.version = int(args.version)
+        tx.options = int(args.options)
+        tx.guardian = args.guardian
         tx.signature = bytes.fromhex(owner.sign_transaction(tx))
+
         return tx
 
     def prepare_deploy_transaction_data(self, arguments: List[Any]) -> TransactionPayload:
@@ -294,21 +305,3 @@ def sum_flag_values(flag_value_pairs: List[Tuple[int, bool]]) -> int:
         if flag:
             value_sum += value
     return value_sum
-
-
-class CodeMetadata:
-    def __init__(self, upgradeable: bool = True, readable: bool = True, payable: bool = False, payable_by_sc: bool = False):
-        self.upgradeable = upgradeable
-        self.readable = readable
-        self.payable = payable
-        self.payable_by_sc = payable_by_sc
-
-    def to_hex(self):
-        flag_value_pairs = [
-            (0x01_00, self.upgradeable),
-            (0x04_00, self.readable),
-            (0x00_02, self.payable),
-            (0x00_04, self.payable_by_sc)
-        ]
-        metadata_value = sum_flag_values(flag_value_pairs)
-        return f"{metadata_value:04X}"
