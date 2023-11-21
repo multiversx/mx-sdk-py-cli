@@ -93,9 +93,9 @@ def add_tx_args(args: List[str], sub: Any, with_nonce: bool = True, with_receive
 
 
 def add_guardian_args(sub: Any):
-    sub.add_argument("--guardian", type=str, help="the address of the guradian")
-    sub.add_argument("--guardian-service-url", type=str, help="the url of the guardian service")
-    sub.add_argument("--guardian-2fa-code", type=str, help="the 2fa code for the guardian")
+    sub.add_argument("--guardian", type=str, help="the address of the guradian", default="")
+    sub.add_argument("--guardian-service-url", type=str, help="the url of the guardian service", default="")
+    sub.add_argument("--guardian-2fa-code", type=str, help="the 2fa code for the guardian", default="")
 
 
 def add_wallet_args(args: List[str], sub: Any):

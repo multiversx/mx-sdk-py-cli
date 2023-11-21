@@ -3,14 +3,12 @@ from pathlib import Path
 
 import pytest
 from Cryptodome.Hash import keccak
-from multiversx_sdk_core.address import Address, AddressComputer
+from multiversx_sdk_core.address import Address
 
 from multiversx_sdk_cli import errors
 from multiversx_sdk_cli.accounts import Account
-from multiversx_sdk_cli.constants import DEFAULT_HRP
 from multiversx_sdk_cli.contract_verification import _create_request_signature
-from multiversx_sdk_cli.contracts import (SmartContract,
-                                          _interpret_as_number_if_safely,
+from multiversx_sdk_cli.contracts import (_interpret_as_number_if_safely,
                                           _prepare_argument)
 
 logging.basicConfig(level=logging.INFO)
@@ -21,23 +19,6 @@ testdata_folder = Path(__file__).parent / "testdata"
 def test_playground_keccak():
     hexhash = keccak.new(digest_bits=256).update(b"").hexdigest()
     assert hexhash == "c5d2460186f7233c927e7db2dcc703c0e500b653ca82273b7bfad8045d85a470"
-
-
-def test_compute_address():
-    address_computer = AddressComputer()
-    contract = SmartContract()
-    contract.owner = Account(address=Address.from_hex("93ee6143cdc10ce79f15b2a6c2ad38e9b6021c72a1779051f47154fd54cfbd5e", DEFAULT_HRP))
-
-    contract.owner.nonce = 0
-    contract.address = address_computer.compute_contract_address(contract.owner.address, contract.owner.nonce)
-    assert contract.address
-    assert contract.address.hex() == "00000000000000000500bb652200ed1f994200ab6699462cab4b1af7b11ebd5e"
-    assert contract.address.bech32() == "erd1qqqqqqqqqqqqqpgqhdjjyq8dr7v5yq9tv6v5vt9tfvd00vg7h40q6779zn"
-
-    contract.owner.nonce = 1
-    contract.address = address_computer.compute_contract_address(contract.owner.address, contract.owner.nonce)
-    assert contract.address.hex() == "000000000000000005006e4f90488e27342f9a46e1809452c85ee7186566bd5e"
-    assert contract.address.bech32() == "erd1qqqqqqqqqqqqqpgqde8eqjywyu6zlxjxuxqfg5kgtmn3setxh40qen8egy"
 
 
 def test_prepare_argument():

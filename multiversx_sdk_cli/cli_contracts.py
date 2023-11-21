@@ -16,7 +16,7 @@ from multiversx_sdk_cli.cli_password import load_password
 from multiversx_sdk_cli.constants import NUMBER_OF_SHARDS
 from multiversx_sdk_cli.contract_verification import \
     trigger_contract_verification
-from multiversx_sdk_cli.contracts import SmartContract
+from multiversx_sdk_cli.contracts import SmartContract, query_contract
 from multiversx_sdk_cli.cosign_transaction import cosign_transaction
 from multiversx_sdk_cli.docker import is_docker_installed, run_docker
 from multiversx_sdk_cli.errors import DockerMissingError, NoWalletProvided
@@ -321,15 +321,6 @@ def deploy(args: Any):
     _send_or_simulate(tx, contract_address, args)
 
 
-def _prepare_contract(args: Any) -> SmartContract:
-    bytecode = utils.read_binary_file(Path(args.bytecode)).hex()
-
-    metadata = CodeMetadata(upgradeable=args.metadata_upgradeable, readable=args.metadata_readable,
-                            payable=args.metadata_payable, payable_by_sc=args.metadata_payable_by_sc)
-    contract = SmartContract(bytecode=bytecode, metadata=metadata)
-    return contract
-
-
 def _prepare_sender(args: Any) -> Account:
     sender: Account
     if args.ledger:
@@ -386,8 +377,8 @@ def call(args: Any):
     cli_shared.check_guardian_and_options_args(args)
     cli_shared.check_broadcast_args(args)
 
-    sender = _prepare_sender(args)
     cli_shared.prepare_chain_id_in_args(args)
+    sender = _prepare_sender(args)
 
     config = TransactionsFactoryConfig(args.chain)
     contract = SmartContract(config, TokenComputer())
@@ -401,35 +392,36 @@ def call(args: Any):
 
 def upgrade(args: Any):
     logger.debug("upgrade")
+    cli_shared.check_guardian_and_options_args(args)
     cli_shared.check_broadcast_args(args)
 
-    contract_address = args.contract
-    arguments = args.arguments
-    gas_price = args.gas_price
-    gas_limit = args.gas_limit
-    value = args.value
-    version = args.version
-
-    contract = _prepare_contract(args)
-    contract.address = Address.from_bech32(contract_address)
-    sender = _prepare_sender(args)
     cli_shared.prepare_chain_id_in_args(args)
+    sender = _prepare_sender(args)
 
-    tx = contract.upgrade(sender, arguments, gas_price, gas_limit, value, args.chain, version, args.guardian, args.options)
+    config = TransactionsFactoryConfig(args.chain)
+    contract = SmartContract(config, TokenComputer())
+    contract_address = Address.new_from_bech32(args.contract)
+
+    tx = contract.get_upgrade_transaction(sender, args)
     tx = _sign_guarded_tx(args, tx)
 
-    _send_or_simulate(tx, contract, args)
+    _send_or_simulate(tx, contract_address, args)
 
 
 def query(args: Any):
     logger.debug("query")
 
-    contract_address = args.contract
-    function = args.function
-    arguments = args.arguments
+    # workaround so we can use the function bellow
+    args.chain = ""
+    cli_shared.prepare_chain_id_in_args(args)
 
-    contract = SmartContract(address=Address.from_bech32(contract_address))
-    result = contract.query(ProxyNetworkProvider(args.proxy), function, arguments)
+    contract_address = Address.new_from_bech32(args.contract)
+
+    proxy = ProxyNetworkProvider(args.proxy)
+    function = args.function
+    arguments = args.arguments or []
+
+    result = query_contract(contract_address, proxy, function, arguments)
     utils.dump_out_json(result)
 
 

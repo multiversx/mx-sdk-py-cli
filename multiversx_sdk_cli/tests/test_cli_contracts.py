@@ -1,3 +1,4 @@
+import json
 from pathlib import Path
 from typing import Any
 
@@ -165,3 +166,90 @@ def test_contract_call():
         ]
     )
     assert Path.is_file(output_file) == True
+
+
+def test_contract_flow(capsys: Any):
+    alice = f"{parent}/testdata/alice.pem"
+    adder = f"{parent}/testdata/adder.wasm"
+
+    main([
+        "contract", "deploy",
+        "--bytecode", adder,
+        "--pem", alice,
+        "--recall-nonce",
+        "--gas-limit", "5000000",
+        "--proxy", "https://testnet-api.multiversx.com",
+        "--arguments", "0",
+        "--send", "--wait-result"
+    ])
+    contract = get_contract_address(capsys)
+
+    # Clear the captured content
+    capsys.readouterr()
+
+    main([
+        "contract", "query",
+        contract,
+        "--function", "getSum",
+        "--proxy", "https://testnet-api.multiversx.com"
+    ])
+    response = get_query_response(capsys)
+    assert response == ""
+
+    # Clear the captured content
+    capsys.readouterr()
+
+    main([
+        "contract", "call",
+        contract,
+        "--pem", alice,
+        "--function", "add",
+        "--recall-nonce",
+        "--gas-limit", "5000000",
+        "--proxy", "https://testnet-api.multiversx.com",
+        "--arguments", "7",
+        "--send", "--wait-result"
+    ])
+
+    # Clear the captured content
+    capsys.readouterr()
+
+    main([
+        "contract", "query",
+        contract,
+        "--function", "getSum",
+        "--proxy", "https://testnet-api.multiversx.com"
+    ])
+    response = get_query_response(capsys)
+    assert response["number"] == 7
+
+    # Clear the captured content
+    capsys.readouterr()
+
+    main([
+        "contract", "upgrade",
+        contract,
+        "--bytecode", adder,
+        "--pem", alice,
+        "--recall-nonce",
+        "--gas-limit", "5000000",
+        "--proxy", "https://testnet-api.multiversx.com",
+        "--arguments", "0",
+        "--send", "--wait-result"
+    ])
+
+
+def _read_stdout(capsys: Any) -> str:
+    return capsys.readouterr().out.strip()
+
+
+def get_contract_address(capsys: Any):
+    out = _read_stdout(capsys)
+    output = json.loads(out)
+    return output["contractAddress"]
+
+
+def get_query_response(capsys: Any):
+    out = _read_stdout(capsys).replace("\n", "").replace(" ", "")
+    print(out)
+    return json.loads(out)[0]
