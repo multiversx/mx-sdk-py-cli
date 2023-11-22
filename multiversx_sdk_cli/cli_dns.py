@@ -74,7 +74,7 @@ def _add_name_arg(sub: Any):
 
 def dns_resolve(args: Any):
     addr = resolve(args.name, ProxyNetworkProvider(args.proxy))
-    if addr.hex() != Address.from_bech32(ADDRESS_ZERO_BECH32).hex():
+    if addr.hex() != Address.new_from_bech32(ADDRESS_ZERO_BECH32).hex():
         print(addr.bech32())
 
 

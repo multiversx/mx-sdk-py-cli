@@ -42,7 +42,7 @@ class BasicEncoder(json.JSONEncoder):
     def default(self, o: Any):
         if isinstance(o, ISerializable):
             return o.to_dictionary()
-        return json.JSONEncoder.default(self, o)
+        return super().default(o)
 
 
 def omit_fields(data: Any, fields: List[str] = []):

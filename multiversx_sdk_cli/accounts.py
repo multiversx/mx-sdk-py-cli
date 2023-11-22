@@ -2,7 +2,8 @@ import logging
 from pathlib import Path
 from typing import Any, Optional, Protocol
 
-from multiversx_sdk_core import Address, MessageV1
+from multiversx_sdk_core import (Address, Message, MessageComputer,
+                                 TransactionComputer)
 from multiversx_sdk_network_providers.accounts import AccountOnNetwork
 from multiversx_sdk_wallet import UserSigner
 
@@ -25,10 +26,10 @@ class INetworkProvider(Protocol):
 
 
 class EmptyAddress(IAddress):
-    def hex(self) -> str:
+    def to_hex(self) -> str:
         return ""
 
-    def bech32(self) -> str:
+    def to_bech32(self) -> str:
         return ""
 
 
@@ -69,14 +70,17 @@ class Account(AccountBase):
 
     def sign_transaction(self, transaction: ITransaction) -> str:
         assert self.signer is not None
-        return self.signer.sign(transaction).hex()
+
+        transaction_computer = TransactionComputer()
+        return self.signer.sign(transaction_computer.compute_bytes_for_signing(transaction)).hex()
 
     def sign_message(self, data: bytes) -> str:
         assert self.signer is not None
-        message = MessageV1(data)
-        signature = self.signer.sign(message)
+        message = Message(data)
+        message_computer = MessageComputer()
+        signature = self.signer.sign(message_computer.compute_bytes_for_signing(message))
 
-        logger.debug(f"Account.sign_message(): raw_data_to_sign = {data.hex()}, message_data_to_sign = {message.serialize_for_signing().hex()}, signature = {signature.hex()}")
+        logger.debug(f"Account.sign_message(): raw_data_to_sign = {data.hex()}, message_data_to_sign = {message_computer.compute_bytes_for_signing(message).hex()}, signature = {signature.hex()}")
         return signature.hex()
 
 
@@ -85,7 +89,7 @@ class LedgerAccount(Account):
         super().__init__()
         self.account_index = account_index
         self.address_index = address_index
-        self.address = Address.from_bech32(do_get_ledger_address(account_index=account_index, address_index=address_index))
+        self.address = Address.new_from_bech32(do_get_ledger_address(account_index=account_index, address_index=address_index))
 
     def sign_transaction(self, transaction: ITransaction) -> str:
         ledger_version = do_get_ledger_version()
@@ -94,8 +98,10 @@ class LedgerAccount(Account):
             transaction.version = TX_HASH_SIGN_VERSION
             transaction.options = TX_HASH_SIGN_OPTIONS
 
+        transaction_computer = TransactionComputer()
+
         signature = do_sign_transaction_with_ledger(
-            transaction.serialize_for_signing(),
+            transaction_computer.compute_bytes_for_signing(transaction),
             account_index=self.account_index,
             address_index=self.address_index,
             sign_using_hash=should_use_hash_signing

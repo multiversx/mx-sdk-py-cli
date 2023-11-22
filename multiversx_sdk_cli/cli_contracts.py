@@ -18,6 +18,8 @@ from multiversx_sdk_cli.cosign_transaction import cosign_transaction
 from multiversx_sdk_cli.docker import is_docker_installed, run_docker
 from multiversx_sdk_cli.errors import DockerMissingError, NoWalletProvided
 from multiversx_sdk_cli.projects.core import get_project_paths_recursively
+from multiversx_sdk_cli.projects.templates import Contract
+from multiversx_sdk_cli.ux import show_message
 
 logger = logging.getLogger("cli.contracts")
 
@@ -28,18 +30,20 @@ def setup_parser(args: List[str], subparsers: Any) -> Any:
 
     sub = cli_shared.add_command_subparser(subparsers, "contract", "new",
                                            "Create a new Smart Contract project based on a template.")
-    sub.add_argument("name")
+    sub.add_argument("--name", help="The name of the contract. If missing, the name of the template will be used.")
     sub.add_argument("--template", required=True, help="the template to use")
-    sub.add_argument("--directory", type=str, default=os.getcwd(),
-                     help="🗀 the parent directory of the project (default: current directory)")
+    sub.add_argument("--tag", help="the framework version on which the contract should be created")
+    sub.add_argument("--path", type=str, default=os.getcwd(),
+                     help="the parent directory of the project (default: current directory)")
     sub.set_defaults(func=create)
 
     sub = cli_shared.add_command_subparser(subparsers, "contract", "templates",
                                            "List the available Smart Contract templates.")
+    sub.add_argument("--tag", help="the sc-meta framework version referred to")
     sub.set_defaults(func=list_templates)
 
     sub = cli_shared.add_command_subparser(subparsers, "contract", "build",
-                                           "Build a Smart Contract project using the appropriate buildchain.")
+                                           "Build a Smart Contract project.")
     _add_build_options_sc_meta(sub)
     sub.set_defaults(func=build)
 
@@ -242,15 +246,20 @@ def _add_metadata_arg(sub: Any):
 
 
 def list_templates(args: Any):
-    projects.list_project_templates()
+    tag = args.tag
+    contract = Contract(tag)
+    templates = contract.get_contract_templates()
+    show_message(templates)
 
 
 def create(args: Any):
     name = args.name
     template = args.template
-    directory = Path(args.directory)
+    tag = args.tag
+    path = Path(args.path)
 
-    projects.create_from_template(name, template, directory)
+    contract = Contract(tag, name, template, path)
+    contract.create_from_template()
 
 
 def get_project_paths(args: Any) -> List[Path]:
@@ -303,8 +312,8 @@ def deploy(args: Any):
     tx = contract.deploy(sender, arguments, gas_price, gas_limit, value, args.chain, version, args.guardian, args.options)
     tx = _sign_guarded_tx(args, tx)
 
-    logger.info("Contract address: %s", contract.address.bech32())
-    utils.log_explorer_contract_address(args.chain, contract.address.bech32())
+    logger.info("Contract address: %s", contract.address.to_bech32())
+    utils.log_explorer_contract_address(args.chain, contract.address.to_bech32())
 
     _send_or_simulate(tx, contract, args)
 

@@ -159,7 +159,7 @@ def get_contract_address_by_deploy_tx_hash(args: Any):
     transaction_events = transaction.logs.events
     if len(transaction_events) == 1:
         contract_address = transaction_events[0].address
-        print(contract_address.bech32())
+        print(contract_address.to_bech32())
     else:
         raise errors.ProgrammingError("Tx has more than one event. Make sure it's a staking provider SC Deploy transaction.")
 

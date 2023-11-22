@@ -2,15 +2,12 @@ import logging
 from pathlib import Path
 from typing import Any, List
 
-from multiversx_sdk_cli import dependencies, errors, guards, utils
+from multiversx_sdk_cli import dependencies, errors, guards
 from multiversx_sdk_cli.projects import shared
 from multiversx_sdk_cli.projects.constants import (OLD_PROJECT_CONFIG_FILENAME,
                                                    PROJECT_CONFIG_FILENAME)
 from multiversx_sdk_cli.projects.project_base import Project
-from multiversx_sdk_cli.projects.project_clang import ProjectClang
-from multiversx_sdk_cli.projects.project_cpp import ProjectCpp
 from multiversx_sdk_cli.projects.project_rust import ProjectRust
-from multiversx_sdk_cli.projects.project_sol import ProjectSol
 
 logger = logging.getLogger("projects.core")
 
@@ -18,12 +15,6 @@ logger = logging.getLogger("projects.core")
 def load_project(directory: Path) -> Project:
     guards.is_directory(directory)
 
-    if shared.is_source_clang(directory):
-        return ProjectClang(directory)
-    if shared.is_source_cpp(directory):
-        return ProjectCpp(directory)
-    if shared.is_source_sol(directory):
-        return ProjectSol(directory)
     if shared.is_source_rust(directory):
         return ProjectRust(directory)
     else:
@@ -35,7 +26,6 @@ def build_project(directory: Path, args: List[str]):
 
     logger.info("build_project.directory: %s", directory)
 
-    guards.is_directory(directory)
     project = load_project(directory)
     outputs = project.build(args)
     logger.info("Build ran.")
@@ -63,23 +53,6 @@ def run_tests(project_path: Path, args: Any):
     guards.is_directory(project_path)
     project = load_project(project_path)
     project.run_tests(directory, wildcard)
-
-
-def get_projects_in_workspace(workspace: Path) -> List[Project]:
-    guards.is_directory(workspace)
-    subfolders = utils.get_subfolders(workspace)
-    projects = []
-
-    for folder in subfolders:
-        project_directory = workspace / folder
-
-        try:
-            project = load_project(project_directory)
-            projects.append(project)
-        except Exception:
-            pass
-
-    return projects
 
 
 def get_project_paths_recursively(base_path: Path) -> List[Path]:

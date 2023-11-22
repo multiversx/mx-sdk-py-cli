@@ -1,16 +1,7 @@
+import logging
 from pathlib import Path
 
-
-def is_source_clang(directory: Path) -> bool:
-    return _directory_contains_file(directory, ".c")
-
-
-def is_source_cpp(directory: Path) -> bool:
-    return _directory_contains_file(directory, ".cpp")
-
-
-def is_source_sol(directory: Path) -> bool:
-    return _directory_contains_file(directory, ".sol")
+logger = logging.getLogger("projects.shared")
 
 
 def is_source_rust(directory: Path) -> bool:

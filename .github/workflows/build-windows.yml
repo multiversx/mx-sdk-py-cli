@@ -5,54 +5,54 @@ name: build
 
 on:
   pull_request:
-    branches: [ main, feat/* ]
+    branches: [main, feat/*]
   workflow_dispatch:
 
 jobs:
   build:
     name: Build and Test mxpy for ${{ matrix.os }}, python ${{ matrix.python-version }}
-    
+
     runs-on: ${{ matrix.os }}
 
     strategy:
       matrix:
         os: [windows-2019]
-        python-version: [3.8]
+        python-version: [3.11]
 
     steps:
-    - uses: actions/checkout@v2
-    - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v2
-      with:
-        python-version: ${{ matrix.python-version }}
-    - name: Install dependencies
-      shell: bash
-      run: |
-        python3 -m pip install --upgrade pip
-        pip3 install -r requirements.txt
-        pip3 install pytest
-    - name: Set github_api_token
-      shell: bash
-      run: |
-        mkdir ~/multiversx-sdk
-        export PYTHONPATH=.
-        python3 -m multiversx_sdk_cli.cli config new test
-        python3 -m multiversx_sdk_cli.cli config set github_api_token ${{ secrets.GITHUB_TOKEN }}
-    - name: Setup test dependencies
-      shell: bash
-      run: |
-        python3 -m multiversx_sdk_cli.cli deps install testwallets
-    - name: Run unit tests
-      shell: bash
-      run: |
-        export PYTHONPATH=.
-        pytest -m "not skip_on_windows" .
-    - name: Run CLI tests
-      shell: bash
-      run: |
-        export PROXY=https://testnet-gateway.multiversx.com
-        export CHAIN_ID=T
-        cd ./multiversx_sdk_cli/tests
-        source ./test_cli_tx.sh && testAll || return 1
-        source ./test_cli_dns.sh && testOffline || return 1
-        source ./test_cli_validators.sh && testAll || return 1
+      - uses: actions/checkout@v2
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install dependencies
+        shell: bash
+        run: |
+          python3 -m pip install --upgrade pip
+          pip3 install -r requirements.txt
+          pip3 install pytest
+      - name: Set github_api_token
+        shell: bash
+        run: |
+          mkdir ~/multiversx-sdk
+          export PYTHONPATH=.
+          python3 -m multiversx_sdk_cli.cli config new test
+          python3 -m multiversx_sdk_cli.cli config set github_api_token ${{ secrets.GITHUB_TOKEN }}
+      - name: Setup test dependencies
+        shell: bash
+        run: |
+          python3 -m multiversx_sdk_cli.cli deps install testwallets
+      - name: Run unit tests
+        shell: bash
+        run: |
+          export PYTHONPATH=.
+          pytest -m "not skip_on_windows" .
+      - name: Run CLI tests
+        shell: bash
+        run: |
+          export PROXY=https://testnet-gateway.multiversx.com
+          export CHAIN_ID=T
+          cd ./multiversx_sdk_cli/tests
+          source ./test_cli_tx.sh && testAll || return 1
+          source ./test_cli_dns.sh && testOffline || return 1
+          source ./test_cli_validators.sh && testAll || return 1

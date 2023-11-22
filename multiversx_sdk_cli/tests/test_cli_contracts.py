@@ -14,9 +14,8 @@ def test_contract_new():
         "new",
         "--template",
         "adder",
-        "--directory",
-        f"{parent}/testdata-out/SANDBOX",
-        "adder"
+        "--path",
+        f"{parent}/testdata-out/SANDBOX"
     ])
     assert Path.is_dir(parent / "testdata-out" / "SANDBOX" / "adder")
 
@@ -28,18 +27,19 @@ def test_contract_new_with_bad_code():
         "new",
         "--template",
         "adder",
-        "--directory",
+        "--path",
         f"{parent}/testdata-out/SANDBOX",
+        "--name",
         "adder-bad-src"
     ])
 
     assert Path.is_dir(parent / "testdata-out" / "SANDBOX" / "adder-bad-src")
-    replace_variable_with_unknown_variable()
+    replace_variable_with_unknown_variable_for_adder()
 
 
-def replace_variable_with_unknown_variable():
-    # this is done in order to replace the value added in the adder contract witha unknown variable
-    with open(parent / "testdata-out" / "SANDBOX" / "adder-bad-src" / "src" / "adder.rs", "r") as f:
+def replace_variable_with_unknown_variable_for_adder():
+    # this is done in order to replace the value added in the adder contract with a unknown variable
+    with open(parent / "testdata-out" / "SANDBOX" / "adder-bad-src" / "src" / "adder_bad_src.rs", "r") as f:
         contract_lines = f.readlines()
 
     for index, line in reversed(list(enumerate(contract_lines))):
@@ -47,7 +47,7 @@ def replace_variable_with_unknown_variable():
             contract_lines[index] = line.replace("value", "unknown_variable")
             break
 
-    with open(parent / "testdata-out" / "SANDBOX" / "adder-bad-src" / "src" / "adder.rs", "w") as f:
+    with open(parent / "testdata-out" / "SANDBOX" / "adder-bad-src" / "src" / "adder_bad_src.rs", "w") as f:
         f.writelines(contract_lines)
 
 
@@ -60,7 +60,7 @@ def test_contract_build():
         f"{parent}/testdata-out/SANDBOX/adder"
     ])
 
-    assert Path.is_file(Path(Path(parent) / "testdata-out" / "SANDBOX" / "adder" / "output" / "adder.wasm"))
+    assert Path.is_file(parent / "testdata-out" / "SANDBOX" / "adder" / "output" / "adder.wasm")
 
 
 @pytest.mark.skip_on_windows

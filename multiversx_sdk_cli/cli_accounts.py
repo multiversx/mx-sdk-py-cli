@@ -36,7 +36,7 @@ def get_account(args: Any):
     proxy_url = args.proxy
     address = args.address
     proxy = ProxyNetworkProvider(proxy_url)
-    account = proxy.get_account(Address.from_bech32(address))
+    account = proxy.get_account(Address.new_from_bech32(address))
 
     if args.balance:
         print(account.balance)

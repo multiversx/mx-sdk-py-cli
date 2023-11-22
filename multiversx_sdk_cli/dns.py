@@ -1,14 +1,14 @@
 from typing import Any, List, Protocol
 
 from Cryptodome.Hash import keccak
-from multiversx_sdk_core.address import Address, compute_contract_address
+from multiversx_sdk_core.address import Address, AddressComputer
 
 from multiversx_sdk_cli import cli_shared, utils
 from multiversx_sdk_cli.accounts import Account
 from multiversx_sdk_cli.constants import ADDRESS_ZERO_BECH32, DEFAULT_HRP
 from multiversx_sdk_cli.contracts import SmartContract
-from multiversx_sdk_cli.transactions import (do_prepare_transaction,
-                                             tx_to_dictionary_as_inner)
+from multiversx_sdk_cli.transactions import (
+    do_prepare_transaction, tx_to_dictionary_as_inner_for_relayed_V1)
 
 MaxNumShards = 256
 ShardIdentiferLen = 2
@@ -50,7 +50,7 @@ def register(args: Any):
     tx = do_prepare_transaction(args)
 
     if hasattr(args, "relay") and args.relay:
-        args.outfile.write(tx_to_dictionary_as_inner(tx))
+        args.outfile.write(tx_to_dictionary_as_inner_for_relayed_V1(tx))
         return
 
     cli_shared.send_or_simulate(tx, args)
@@ -96,12 +96,9 @@ def compute_dns_address_for_shard_id(shard_id: int) -> Address:
     deployer_pubkey = deployer_pubkey_prefix + bytes([0, shard_id])
     deployer = Account(address=Address(deployer_pubkey, DEFAULT_HRP))
     deployer.nonce = 0
-    # Workaround: In order to compute the address of a contract, one has to create an instance of the class "SmartContract".
-    # This might change in the future.
-    contract = SmartContract()
-    contract.owner = deployer
-    contract.address = compute_contract_address(contract.owner.address, contract.owner.nonce, DEFAULT_HRP)
-    return contract.address
+    address_computer = AddressComputer(number_of_shards=3)
+    contract_address = address_computer.compute_contract_address(deployer.address, deployer.nonce)
+    return contract_address
 
 
 def dns_register_data(name: str) -> str:

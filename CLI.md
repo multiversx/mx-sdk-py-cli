@@ -64,7 +64,7 @@ COMMANDS summary
 ----------------
 new                            Create a new Smart Contract project based on a template.
 templates                      List the available Smart Contract templates.
-build                          Build a Smart Contract project using the appropriate buildchain.
+build                          Build a Smart Contract project.
 clean                          Clean a Smart Contract project.
 test                           Run scenarios (tests).
 report                         Print a detailed report of the smart contracts.
@@ -85,13 +85,12 @@ usage: mxpy contract new [-h] ...
 
 Create a new Smart Contract project based on a template.
 
-positional arguments:
-  name
-
 options:
-  -h, --help             show this help message and exit
-  --template TEMPLATE    the template to use
-  --directory DIRECTORY  🗀 the parent directory of the project (default: current directory)
+  -h, --help           show this help message and exit
+  --name NAME          The name of the contract. If missing, the name of the template will be used.
+  --template TEMPLATE  the template to use
+  --tag TAG            the framework version on which the contract should be created
+  --path PATH          the parent directory of the project (default: current directory)
 
 ```
 ### Contract.Templates
@@ -105,6 +104,7 @@ List the available Smart Contract templates.
 
 options:
   -h, --help  show this help message and exit
+  --tag TAG   the sc-meta framework version referred to
 
 ```
 ### Contract.Build
@@ -114,7 +114,7 @@ options:
 $ mxpy contract build --help
 usage: mxpy contract build [-h] ...
 
-Build a Smart Contract project using the appropriate buildchain.
+Build a Smart Contract project.
 
 options:
   -h, --help                 show this help message and exit
@@ -994,7 +994,7 @@ usage: mxpy wallet COMMAND [-h] ...
 Create wallet, derive secret key from mnemonic, bech32 address helpers etc.
 
 COMMANDS:
-  {new,convert,bech32}
+  {new,convert,bech32,sign-message,verify-message}
 
 OPTIONS:
   -h, --help            show this help message and exit
@@ -1005,6 +1005,8 @@ COMMANDS summary
 new                            Create a new wallet and print its mnemonic; optionally save as password-protected JSON (recommended) or PEM (not recommended)
 convert                        Convert a wallet from one format to another
 bech32                         Helper for encoding and decoding bech32 addresses
+sign-message                   Sign a message
+verify-message                 Verify a previously signed message
 
 ```
 ### Wallet.New
@@ -1041,7 +1043,7 @@ options:
   --outfile OUTFILE                               path to the output file
   --in-format {raw-mnemonic,keystore-mnemonic,keystore-secret-key,pem}
                                                   the format of the input file
-  --out-format {raw-mnemonic,keystore-mnemonic,keystore-secret-key,pem}
+  --out-format {raw-mnemonic,keystore-mnemonic,keystore-secret-key,pem,address-bech32,address-hex}
                                                   the format of the output file
   --address-index ADDRESS_INDEX                   the address index, if input format is raw-mnemonic, keystore-mnemonic
                                                   or pem (with multiple entries) and the output format is keystore-
@@ -1066,6 +1068,44 @@ options:
   -h, --help  show this help message and exit
   --encode    whether to encode
   --decode    whether to decode
+
+```
+### Wallet.SignMessage
+
+
+```
+$ mxpy wallet sign-message --help
+usage: mxpy wallet sign-message [-h] ...
+
+Sign a message
+
+options:
+  -h, --help                                   show this help message and exit
+  --message MESSAGE                            the message you want to sign
+  --pem PEM                                    🔑 the PEM file, if keyfile not provided
+  --pem-index PEM_INDEX                        🔑 the index in the PEM file (default: 0)
+  --keyfile KEYFILE                            🔑 a JSON keyfile, if PEM not provided
+  --passfile PASSFILE                          🔑 a file containing keyfile's password, if keyfile provided
+  --ledger                                     🔐 bool flag for signing transaction using ledger
+  --ledger-account-index LEDGER_ACCOUNT_INDEX  🔐 the index of the account when using Ledger
+  --ledger-address-index LEDGER_ADDRESS_INDEX  🔐 the index of the address when using Ledger
+  --sender-username SENDER_USERNAME            🖄 the username of the sender
+
+```
+### Wallet.VerifyMessage
+
+
+```
+$ mxpy wallet verify-message --help
+usage: mxpy wallet verify-message [-h] ...
+
+Verify a previously signed message
+
+options:
+  -h, --help             show this help message and exit
+  --address ADDRESS      the bech32 address of the signer
+  --message MESSAGE      the previously signed message(readable text, as it was signed)
+  --signature SIGNATURE  the signature in hex format
 
 ```
 ## Group **Localnet**
@@ -1217,13 +1257,11 @@ usage: mxpy deps install [-h] ...
 Install dependencies or multiversx-sdk modules.
 
 positional arguments:
-  {all,llvm,clang,cpp,rust,golang,vmtools,mx_chain_go,mx_chain_proxy_go,wasm-opt,twiggy,testwallets}
-                                                  the dependency to install
+  {all,rust,golang,vmtools,testwallets}  the dependency to install
 
 options:
-  -h, --help                                      show this help message and exit
-  --overwrite                                     whether to overwrite an existing installation
-  --tag TAG                                       the tag or version to install
+  -h, --help                             show this help message and exit
+  --overwrite                            whether to overwrite an existing installation
 
 ```
 ### Dependencies.Check
@@ -1236,12 +1274,10 @@ usage: mxpy deps check [-h] ...
 Check whether a dependency is installed.
 
 positional arguments:
-  {all,llvm,clang,cpp,rust,golang,vmtools,mx_chain_go,mx_chain_proxy_go,wasm-opt,twiggy,testwallets}
-                                                  the dependency to check
+  {all,rust,golang,vmtools,testwallets}  the dependency to check
 
 options:
-  -h, --help                                      show this help message and exit
-  --tag TAG                                       the tag or version to check
+  -h, --help                             show this help message and exit
 
 ```
 ## Group **Configuration**

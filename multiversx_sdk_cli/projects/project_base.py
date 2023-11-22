@@ -38,6 +38,8 @@ class Project(IProject):
     def _ensure_dependencies_installed(self):
         module_keys = self.get_dependencies()
         for module_key in module_keys:
+            if module_key == "":
+                continue
             dependencies.install_module(module_key)
 
     def get_dependencies(self) -> List[str]:

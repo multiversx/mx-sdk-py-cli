@@ -10,9 +10,11 @@ from multiversx_sdk_wallet import UserSecretKey, UserWallet
 from multiversx_sdk_wallet.mnemonic import Mnemonic
 from multiversx_sdk_wallet.user_pem import UserPEM
 
-from multiversx_sdk_cli import cli_shared
+from multiversx_sdk_cli import cli_shared, utils
 from multiversx_sdk_cli.constants import DEFAULT_HRP
 from multiversx_sdk_cli.errors import KnownError
+from multiversx_sdk_cli.sign_verify import SignedMessage, sign_message
+from multiversx_sdk_cli.ux import show_critical_error, show_message
 
 logger = logging.getLogger("cli.wallet")
 
@@ -78,6 +80,27 @@ def setup_parser(args: List[str], subparsers: Any) -> Any:
     group.add_argument("--decode", action="store_true", help="whether to decode")
     sub.set_defaults(func=do_bech32)
 
+    sub = cli_shared.add_command_subparser(
+        subparsers,
+        "wallet",
+        "sign-message",
+        "Sign a message"
+    )
+    sub.add_argument("--message", required=True, help="the message you want to sign")
+    cli_shared.add_wallet_args(args, sub)
+    sub.set_defaults(func=sign_user_message)
+
+    sub = cli_shared.add_command_subparser(
+        subparsers,
+        "wallet",
+        "verify-message",
+        "Verify a previously signed message"
+    )
+    sub.add_argument("--address", required=True, help="the bech32 address of the signer")
+    sub.add_argument("--message", required=True, help="the previously signed message(readable text, as it was signed)")
+    sub.add_argument("--signature", required=True, help="the signature in hex format")
+    sub.set_defaults(func=verify_signed_message)
+
     parser.epilog = cli_shared.build_group_epilog(subparsers)
     return subparsers
 
@@ -114,7 +137,7 @@ def wallet_new(args: Any):
         secret_key = mnemonic.derive_key()
         pubkey = secret_key.generate_public_key()
         address = pubkey.to_address(address_hrp)
-        pem_file = UserPEM(address.bech32(), secret_key)
+        pem_file = UserPEM(address.to_bech32(), secret_key)
         pem_file.save(outfile)
     else:
         raise KnownError(f"Unknown format: {format}")
@@ -211,7 +234,7 @@ def _create_wallet_content(
 
         pubkey = secret_key.generate_public_key()
         address = pubkey.to_address(address_hrp)
-        pem = UserPEM(address.bech32(), secret_key)
+        pem = UserPEM(address.to_bech32(), secret_key)
         return pem.to_text()
 
     if out_format == WALLET_FORMAT_ADDRESS_BECH32:
@@ -221,7 +244,7 @@ def _create_wallet_content(
 
         pubkey = secret_key.generate_public_key()
         address = pubkey.to_address(address_hrp)
-        return address.bech32()
+        return address.to_bech32()
 
     if out_format == WALLET_FORMAT_ADDRESS_HEX:
         if mnemonic:
@@ -239,11 +262,31 @@ def do_bech32(args: Any):
     value = args.value
 
     if encode:
-        address = Address.from_hex(value, DEFAULT_HRP)
-        result = address.bech32()
+        address = Address.new_from_hex(value, DEFAULT_HRP)
+        result = address.to_bech32()
     else:
-        address = Address.from_bech32(value)
-        result = address.hex()
+        address = Address.new_from_bech32(value)
+        result = address.to_hex()
 
     print(result)
     return result
+
+
+def sign_user_message(args: Any):
+    message: str = args.message
+    account = cli_shared.prepare_account(args)
+    signed_message = sign_message(message, account)
+    utils.dump_out_json(signed_message.to_dictionary())
+
+
+def verify_signed_message(args: Any):
+    bech32_address = args.address
+    message: str = args.message
+    signature: str = args.signature
+
+    signed_message = SignedMessage(bech32_address, message, signature)
+    is_signed = signed_message.verify_signature()
+    if is_signed:
+        show_message(f"""SUCCESS: The message "{message}" was signed by {bech32_address}""")
+    else:
+        show_critical_error(f"""FAILED: The message "{message}" was NOT signed by {bech32_address}""")
