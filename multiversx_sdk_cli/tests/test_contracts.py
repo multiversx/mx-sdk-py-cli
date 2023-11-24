@@ -9,7 +9,8 @@ from multiversx_sdk_cli import errors
 from multiversx_sdk_cli.accounts import Account
 from multiversx_sdk_cli.contract_verification import _create_request_signature
 from multiversx_sdk_cli.contracts import (_interpret_as_number_if_safely,
-                                          _prepare_argument)
+                                          _prepare_argument,
+                                          prepare_args_for_factory)
 
 logging.basicConfig(level=logging.INFO)
 
@@ -66,3 +67,19 @@ def test_interpret_as_number_if_safely():
     assert _interpret_as_number_if_safely("") == 0
     assert _interpret_as_number_if_safely("0x5") == 5
     assert _interpret_as_number_if_safely("FF") == 255
+
+
+def test_prepare_args_for_factories():
+    args = [
+        "0x5", "123", "false", "true",
+        "str:test-string",
+        "erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th"
+    ]
+
+    arguments = prepare_args_for_factory(args)
+    assert arguments[0] == b"\x05"
+    assert arguments[1] == 123
+    assert arguments[2] == False
+    assert arguments[3] == True
+    assert arguments[4] == "test-string"
+    assert arguments[5].to_bech32() == "erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th"

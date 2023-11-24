@@ -164,7 +164,7 @@ def query_contract(
     function: str,
     arguments: List[Any],
     value: int = 0,
-    caller: Optional[Address] = None
+    caller: Optional[IAddress] = None
 ) -> List[Any]:
     response_data = query_detailed(contract_address, proxy, function, arguments, value, caller)
     return_data = response_data.return_data
@@ -172,7 +172,7 @@ def query_contract(
 
 
 def query_detailed(contract_address: IAddress, proxy: INetworkProvider, function: str, arguments: List[Any],
-                   value: int = 0, caller: Optional[Address] = None) -> Any:
+                   value: int = 0, caller: Optional[IAddress] = None) -> Any:
     arguments = arguments or []
     # Temporary workaround, until we use sdk-core's serializer.
     prepared_arguments = [bytes.fromhex(_prepare_argument(arg)) for arg in arguments]
