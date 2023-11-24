@@ -102,7 +102,7 @@ class SmartContract:
             is_payable=args.metadata_payable,
             is_payable_by_sc=args.metadata_payable_by_sc
         )
-        tx.nonce = owner.nonce
+        tx.nonce = int(args.nonce)
         tx.version = int(args.version)
         tx.options = int(args.options)
         tx.guardian = args.guardian
@@ -124,7 +124,7 @@ class SmartContract:
             native_transfer_amount=int(args.value),
             token_transfers=[]
         )
-        tx.nonce = caller.nonce
+        tx.nonce = int(args.nonce)
         tx.version = int(args.version)
         tx.options = int(args.options)
         tx.guardian = args.guardian
@@ -149,7 +149,7 @@ class SmartContract:
             is_payable=args.metadata_payable,
             is_payable_by_sc=args.metadata_payable_by_sc
         )
-        tx.nonce = owner.nonce
+        tx.nonce = int(args.nonce)
         tx.version = int(args.version)
         tx.options = int(args.options)
         tx.guardian = args.guardian
