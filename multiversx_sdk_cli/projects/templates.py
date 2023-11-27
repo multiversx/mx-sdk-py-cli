@@ -1,6 +1,6 @@
 import logging
 from pathlib import Path
-from typing import Union
+from typing import List, Union
 
 from multiversx_sdk_cli import myprocess
 from multiversx_sdk_cli.dependencies.install import install_module
@@ -35,7 +35,7 @@ class Contract:
         logger.info("Checking if the necessarry dependencies are installed.")
         install_module("rust")
 
-    def _prepare_args_to_list_templates(self) -> list[str]:
+    def _prepare_args_to_list_templates(self) -> List[str]:
         args = ["sc-meta", "templates"]
 
         if self.tag:
@@ -43,7 +43,7 @@ class Contract:
 
         return args
 
-    def _prepare_args_to_create_new_contract_from_template(self) -> list[str]:
+    def _prepare_args_to_create_new_contract_from_template(self) -> List[str]:
         args = ["sc-meta", "new", "--template", self.template, "--path", str(self.path)]
 
         if self.name:
