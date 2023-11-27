@@ -3,7 +3,7 @@ import logging
 from pathlib import Path
 from typing import Any, List, Optional, Protocol, Sequence
 
-from multiversx_sdk_core import Transaction, TransactionPayload
+from multiversx_sdk_core import TokenComputer, Transaction, TransactionPayload
 from multiversx_sdk_core.address import Address
 from multiversx_sdk_core.transaction_factories import \
     SmartContractTransactionsFactory
@@ -70,22 +70,9 @@ class IConfig(Protocol):
     gas_limit_per_byte: int
 
 
-class IToken(Protocol):
-    identifier: str
-    nonce: int
-
-
-class ITokenComputer(Protocol):
-    def is_fungible(self, token: IToken) -> bool:
-        ...
-
-    def extract_identifier_from_extended_identifier(self, identifier: str) -> str:
-        ...
-
-
 class SmartContract:
-    def __init__(self, config: IConfig, token_computer: ITokenComputer):
-        self._factory = SmartContractTransactionsFactory(config, token_computer)
+    def __init__(self, config: IConfig):
+        self._factory = SmartContractTransactionsFactory(config, TokenComputer())
 
     def get_deploy_transaction(self, owner: Account, args: Any) -> Transaction:
         arguments = args.arguments or []
@@ -175,9 +162,10 @@ def query_detailed(contract_address: IAddress, proxy: INetworkProvider, function
                    value: int = 0, caller: Optional[IAddress] = None) -> Any:
     arguments = arguments or []
     # Temporary workaround, until we use sdk-core's serializer.
-    prepared_arguments = [bytes.fromhex(_prepare_argument(arg)) for arg in arguments]
+    arguments_hex = [_prepare_argument(arg) for arg in arguments]
+    prepared_arguments_bytes = [bytes.fromhex(arg) for arg in arguments_hex]
 
-    query = ContractQuery(contract_address, function, value, prepared_arguments, caller)
+    query = ContractQuery(contract_address, function, value, prepared_arguments_bytes, caller)
 
     response = proxy.query_contract(query)
     # Temporary workaround, until we add "isSuccess" on the response class.
@@ -252,6 +240,7 @@ def hex_to_bytes(arg: str):
     return bytes.fromhex(argument)
 
 
+# only used for contract queries and stake operations
 def _prepare_argument(argument: Any):
     as_str = str(argument)
     as_hex = _to_hex(as_str)
