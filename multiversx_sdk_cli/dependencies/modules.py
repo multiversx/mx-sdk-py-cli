@@ -273,7 +273,7 @@ class Rust(DependencyModule):
         return all(dependency is not None for dependency in dependencies)
 
     def install(self, overwrite: bool) -> None:
-        self._check_install_env()
+        self._check_install_env(apply_correction=overwrite)
 
         module = dependencies.get_module_by_key("rust")
         tag: str = config.get_dependency_tag(module.key)
@@ -292,7 +292,7 @@ class Rust(DependencyModule):
         self._install_wasm_opt()
         self._install_twiggy()
 
-    def _check_install_env(self):
+    def _check_install_env(self, apply_correction: bool = True):
         """
         See https://rust-lang.github.io/rustup/installation/index.html#choosing-where-to-install.
         """
@@ -302,9 +302,18 @@ class Rust(DependencyModule):
         if current_cargo_home:
             show_warning(f"""CARGO_HOME variable is set to: {current_cargo_home}.
 This may cause problems with the installation.""")
+
+            if apply_correction:
+                show_warning(f"CARGO_HOME will be temporarily unset.")
+                os.environ["CARGO_HOME"] = ""
+
         if current_rustup_home:
             show_warning(f"""RUSTUP_HOME variable is set to: {current_rustup_home}.
 This may cause problems with the installation of rust.""")
+
+            if apply_correction:
+                show_warning(f"RUSTUP_HOME will be temporarily unset.")
+                os.environ["RUSTUP_HOME"] = ""
 
     def _install_rust(self, tag: str) -> None:
         installer_url = self._get_installer_url()
