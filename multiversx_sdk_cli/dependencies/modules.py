@@ -273,10 +273,13 @@ class Rust(DependencyModule):
         return all(dependency is not None for dependency in dependencies)
 
     def install(self, overwrite: bool) -> None:
+        self._check_install_env()
+
         module = dependencies.get_module_by_key("rust")
         tag: str = config.get_dependency_tag(module.key)
 
-        show_warning(f"We recommend using rust {tag}. If you'd like to overwrite your current version please run `mxpy deps install rust --overwrite`.")
+        if not overwrite:
+            show_warning(f"We recommend using rust {tag}. If you'd like to overwrite your current version please run `mxpy deps install rust --overwrite`.")
         logger.info(f"install: key={self.key}, tag={tag}, overwrite={overwrite}")
 
         if overwrite:
@@ -288,6 +291,18 @@ class Rust(DependencyModule):
         self._install_sc_meta()
         self._install_wasm_opt()
         self._install_twiggy()
+
+    def _check_install_env(self):
+        current_cargo_home = os.environ.get("CARGO_HOME", None)
+        current_rustup_home = os.environ.get("RUSTUP_HOME", None)
+
+        # https://rust-lang.github.io/rustup/installation/index.html#choosing-where-to-install
+        if current_cargo_home:
+            show_warning(f"""CARGO_HOME variable is set to: {current_cargo_home}.
+This may cause problems with the installation.""")
+        if current_rustup_home:
+            show_warning(f"""RUSTUP_HOME variable is set to: {current_rustup_home}.
+This may cause problems with the installation of rust.""")
 
     def _install_rust(self, tag: str) -> None:
         installer_url = self._get_installer_url()
