@@ -293,10 +293,12 @@ class Rust(DependencyModule):
         self._install_twiggy()
 
     def _check_install_env(self):
+        """
+        See https://rust-lang.github.io/rustup/installation/index.html#choosing-where-to-install.
+        """
+
         current_cargo_home = os.environ.get("CARGO_HOME", None)
         current_rustup_home = os.environ.get("RUSTUP_HOME", None)
-
-        # https://rust-lang.github.io/rustup/installation/index.html#choosing-where-to-install
         if current_cargo_home:
             show_warning(f"""CARGO_HOME variable is set to: {current_cargo_home}.
 This may cause problems with the installation.""")
