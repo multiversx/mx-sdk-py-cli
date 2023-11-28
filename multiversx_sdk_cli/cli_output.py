@@ -3,12 +3,11 @@ import logging
 from collections import OrderedDict
 from typing import Any, Dict, List, Optional, Union
 
-from multiversx_sdk_core import Address
 from multiversx_sdk_network_providers.transactions import \
     transaction_to_dictionary
 
 from multiversx_sdk_cli import utils
-from multiversx_sdk_cli.interfaces import ITransaction
+from multiversx_sdk_cli.interfaces import IAddress, ITransaction
 from multiversx_sdk_cli.utils import ISerializable
 
 logger = logging.getLogger("cli.output")
@@ -19,7 +18,7 @@ class CLIOutputBuilder:
         self.emitted_transaction_hash: Optional[str] = None
         self.emitted_transaction: Union[ITransaction, None] = None
         self.emitted_transaction_omitted_fields: List[str] = []
-        self.contract_address: Union[Address, None] = None
+        self.contract_address: Union[IAddress, None] = None
         self.transaction_on_network: Union[ISerializable, None] = None
         self.transaction_on_network_omitted_fields: List[str] = []
         self.simulation_results: Union[ISerializable, None] = None
@@ -33,7 +32,7 @@ class CLIOutputBuilder:
         self.emitted_transaction_omitted_fields = omitted_fields
         return self
 
-    def set_contract_address(self, contract_address: Address):
+    def set_contract_address(self, contract_address: IAddress):
         self.contract_address = contract_address
         return self
 

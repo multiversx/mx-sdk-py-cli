@@ -1,12 +1,12 @@
 from typing import Any, List, Protocol
 
 from Cryptodome.Hash import keccak
-from multiversx_sdk_core.address import Address, AddressComputer
+from multiversx_sdk_core import Address, AddressComputer
 
 from multiversx_sdk_cli import cli_shared, utils
 from multiversx_sdk_cli.accounts import Account
 from multiversx_sdk_cli.constants import ADDRESS_ZERO_BECH32, DEFAULT_HRP
-from multiversx_sdk_cli.contracts import SmartContract
+from multiversx_sdk_cli.contracts import query_contract
 from multiversx_sdk_cli.transactions import (
     do_prepare_transaction, tx_to_dictionary_as_inner_for_relayed_V1)
 
@@ -23,8 +23,8 @@ class INetworkProvider(Protocol):
 def resolve(name: str, proxy: INetworkProvider) -> Address:
     name_arg = "0x{}".format(str.encode(name).hex())
     dns_address = dns_address_for_name(name)
-    contract = SmartContract(dns_address)
-    result = contract.query(proxy, "resolve", [name_arg])
+
+    result = query_contract(dns_address, proxy, "resolve", [name_arg])
     if len(result) == 0:
         return Address.from_bech32(ADDRESS_ZERO_BECH32)
     return Address.from_hex(result[0].hex, DEFAULT_HRP)
@@ -33,8 +33,8 @@ def resolve(name: str, proxy: INetworkProvider) -> Address:
 def validate_name(name: str, shard_id: int, proxy: INetworkProvider):
     name_arg = "0x{}".format(str.encode(name).hex())
     dns_address = compute_dns_address_for_shard_id(shard_id)
-    contract = SmartContract(dns_address)
-    contract.query(proxy, "validateName", [name_arg])
+
+    query_contract(dns_address, proxy, "validateName", [name_arg])
 
 
 def register(args: Any):
@@ -69,8 +69,7 @@ def name_hash(name: str) -> bytes:
 
 def registration_cost(shard_id: int, proxy: INetworkProvider) -> int:
     dns_address = compute_dns_address_for_shard_id(shard_id)
-    contract = SmartContract(dns_address)
-    result = contract.query(proxy, "getRegistrationCost", [])
+    result = query_contract(dns_address, proxy, "getRegistrationCost", [])
     if len(result[0]) == 0:
         return 0
     else:
@@ -79,8 +78,7 @@ def registration_cost(shard_id: int, proxy: INetworkProvider) -> int:
 
 def version(shard_id: int, proxy: INetworkProvider) -> str:
     dns_address = compute_dns_address_for_shard_id(shard_id)
-    contract = SmartContract(dns_address)
-    result = contract.query(proxy, "version", [])
+    result = query_contract(dns_address, proxy, "version", [])
     return bytearray.fromhex(result[0].hex).decode()
 
 

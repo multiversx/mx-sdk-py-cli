@@ -11,7 +11,7 @@ from multiversx_sdk_cli.accounts import Account
 from multiversx_sdk_cli.cli_password import load_password
 from multiversx_sdk_cli.config import (GAS_PER_DATA_BYTE, MIN_GAS_LIMIT,
                                        MetaChainSystemSCsCost)
-from multiversx_sdk_cli.contracts import SmartContract
+from multiversx_sdk_cli.contracts import prepare_execute_transaction_data
 from multiversx_sdk_cli.errors import BadUsage
 from multiversx_sdk_cli.validators.validators_file import ValidatorsFile
 
@@ -68,7 +68,7 @@ def prepare_transaction_data_for_stake(node_operator_address: Address, validator
     if reward_address:
         call_arguments.append(f"0x{reward_address.to_hex()}")
 
-    data = SmartContract().prepare_execute_transaction_data("stake", call_arguments)
+    data = prepare_execute_transaction_data("stake", call_arguments)
     gas_limit = estimate_system_sc_call(str(data), MetaChainSystemSCsCost.STAKE, num_of_nodes)
 
     return str(data), gas_limit
