@@ -3,8 +3,7 @@ import os
 from pathlib import Path
 from typing import Any, List
 
-from multiversx_sdk_core import (Address, AddressComputer, TokenComputer,
-                                 Transaction)
+from multiversx_sdk_core import Address, AddressComputer, Transaction
 from multiversx_sdk_core.transaction_factories import TransactionsFactoryConfig
 from multiversx_sdk_network_providers.proxy_network_provider import \
     ProxyNetworkProvider
@@ -305,7 +304,7 @@ def deploy(args: Any):
 
     sender = cli_shared.prepare_account(args)
     config = TransactionsFactoryConfig(args.chain)
-    contract = SmartContract(config, TokenComputer())
+    contract = SmartContract(config)
 
     address_computer = AddressComputer(NUMBER_OF_SHARDS)
     contract_address = address_computer.compute_contract_address(deployer=sender.address, deployment_nonce=args.nonce)
@@ -342,7 +341,7 @@ def call(args: Any):
 
     sender = cli_shared.prepare_account(args)
     config = TransactionsFactoryConfig(args.chain)
-    contract = SmartContract(config, TokenComputer())
+    contract = SmartContract(config)
     contract_address = Address.new_from_bech32(args.contract)
 
     tx = contract.get_execute_transaction(sender, args)
@@ -360,7 +359,7 @@ def upgrade(args: Any):
 
     sender = cli_shared.prepare_account(args)
     config = TransactionsFactoryConfig(args.chain)
-    contract = SmartContract(config, TokenComputer())
+    contract = SmartContract(config)
     contract_address = Address.new_from_bech32(args.contract)
 
     tx = contract.get_upgrade_transaction(sender, args)
