@@ -3,7 +3,8 @@ import logging
 from pathlib import Path
 from typing import Any, List, Optional, Protocol, Sequence
 
-from multiversx_sdk_core import TokenComputer, Transaction, TransactionPayload
+from multiversx_sdk_core import (Token, TokenComputer, TokenTransfer,
+                                 Transaction, TransactionPayload)
 from multiversx_sdk_core.address import Address
 from multiversx_sdk_core.transaction_factories import \
     SmartContractTransactionsFactory
@@ -102,14 +103,18 @@ class SmartContract:
         arguments = args.arguments or []
         arguments = prepare_args_for_factory(arguments)
 
+        value = int(args.value)
+        transfers = args.token_transfers
+        token_transfers = self._prepare_token_transfers(transfers)
+
         tx = self._factory.create_transaction_for_execute(
             sender=caller.address,
             contract=contract_address,
             function=args.function,
             gas_limit=int(args.gas_limit),
             arguments=arguments,
-            native_transfer_amount=int(args.value),
-            token_transfers=[]
+            native_transfer_amount=value,
+            token_transfers=token_transfers
         )
         tx.nonce = int(args.nonce)
         tx.version = int(args.version)
@@ -143,6 +148,21 @@ class SmartContract:
         tx.signature = bytes.fromhex(owner.sign_transaction(tx))
 
         return tx
+
+    def _prepare_token_transfers(self, transfers: List[str]) -> List[TokenTransfer]:
+        token_computer = TokenComputer()
+        token_transfers: List[TokenTransfer] = []
+
+        for i in range(len(transfers) - 1):
+            identifier = transfers[i]
+            amount = int(transfers[i + 1])
+            nonce = token_computer.extract_nonce_from_extended_identifier(identifier)
+
+            token = Token(identifier, nonce)
+            transfer = TokenTransfer(token, amount)
+            token_transfers.append(transfer)
+
+        return token_transfers
 
 
 def query_contract(
