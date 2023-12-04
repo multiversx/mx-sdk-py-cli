@@ -252,7 +252,7 @@ def test_contract_deploy_without_required_arguments():
         "--arguments", "0",
         "--send", "--wait-result"
     ])
-    assert True if return_code else False
+    assert return_code
 
 
 def _read_stdout(capsys: Any) -> str:

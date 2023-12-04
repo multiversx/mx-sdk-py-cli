@@ -309,7 +309,7 @@ def deploy(args: Any):
     address_computer = AddressComputer(NUMBER_OF_SHARDS)
     contract_address = address_computer.compute_contract_address(deployer=sender.address, deployment_nonce=args.nonce)
 
-    tx = contract.get_deploy_transaction(sender, args)
+    tx = contract.prepare_deploy_transaction(sender, args)
     tx = _sign_guarded_tx(args, tx)
 
     logger.info("Contract address: %s", contract_address.to_bech32())
@@ -344,7 +344,7 @@ def call(args: Any):
     contract = SmartContract(config)
     contract_address = Address.new_from_bech32(args.contract)
 
-    tx = contract.get_execute_transaction(sender, args)
+    tx = contract.prepare_execute_transaction(sender, args)
     tx = _sign_guarded_tx(args, tx)
 
     _send_or_simulate(tx, contract_address, args)
@@ -362,7 +362,7 @@ def upgrade(args: Any):
     contract = SmartContract(config)
     contract_address = Address.new_from_bech32(args.contract)
 
-    tx = contract.get_upgrade_transaction(sender, args)
+    tx = contract.prepare_upgrade_transaction(sender, args)
     tx = _sign_guarded_tx(args, tx)
 
     _send_or_simulate(tx, contract_address, args)

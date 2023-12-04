@@ -1,15 +1,14 @@
 from pathlib import Path
 from typing import Any, List, Protocol, Tuple
 
-from multiversx_sdk_core import Address, Transaction
+from multiversx_sdk_core import Address
 from multiversx_sdk_core.transaction_factories import \
     DelegationTransactionsFactory
 from multiversx_sdk_wallet import ValidatorPublicKey
-from multiversx_sdk_wallet.validator_pem import ValidatorPEM
-from multiversx_sdk_wallet.validator_signer import ValidatorSigner
 
 from multiversx_sdk_cli.accounts import Account
 from multiversx_sdk_cli.cli_password import load_password
+from multiversx_sdk_cli.errors import BadUsage
 from multiversx_sdk_cli.interfaces import IAddress, ITransaction
 from multiversx_sdk_cli.validators.validators_file import ValidatorsFile
 
@@ -42,7 +41,7 @@ class DelegationOperations:
     def __init__(self, config: IConfig) -> None:
         self._factory = DelegationTransactionsFactory(config)
 
-    def get_transaction_for_new_delegation_contract(self, owner: IAccount, args: Any) -> ITransaction:
+    def prepare_transaction_for_new_delegation_contract(self, owner: IAccount, args: Any) -> ITransaction:
         tx = self._factory.create_transaction_for_new_delegation_contract(
             sender=owner.address,
             total_delegation_cap=int(args.total_delegation_cap),
@@ -60,7 +59,7 @@ class DelegationOperations:
 
         return tx
 
-    def get_transaction_for_adding_nodes(self, owner: IAccount, args: Any) -> ITransaction:
+    def prepare_transaction_for_adding_nodes(self, owner: IAccount, args: Any) -> ITransaction:
         delegation_contract = Address.new_from_bech32(args.delegation_contract)
         public_keys, signed_messages = self._get_public_keys_and_signed_messages(args)
 
@@ -81,7 +80,7 @@ class DelegationOperations:
 
         return tx
 
-    def get_transaction_for_removing_nodes(self, owner: IAccount, args: Any) -> ITransaction:
+    def prepare_transaction_for_removing_nodes(self, owner: IAccount, args: Any) -> ITransaction:
         delegation_contract = Address.new_from_bech32(args.delegation_contract)
         public_keys = self._parse_public_bls_keys(args.bls_keys)
 
@@ -101,7 +100,7 @@ class DelegationOperations:
 
         return tx
 
-    def get_transaction_for_staking_nodes(self, owner: IAccount, args: Any) -> ITransaction:
+    def prepare_transaction_for_staking_nodes(self, owner: IAccount, args: Any) -> ITransaction:
         delegation_contract = Address.new_from_bech32(args.delegation_contract)
         public_keys = self._parse_public_bls_keys(args.bls_keys)
 
@@ -121,7 +120,7 @@ class DelegationOperations:
 
         return tx
 
-    def get_transaction_for_unbonding_nodes(self, owner: IAccount, args: Any) -> ITransaction:
+    def prepare_transaction_for_unbonding_nodes(self, owner: IAccount, args: Any) -> ITransaction:
         delegation_contract = Address.new_from_bech32(args.delegation_contract)
         public_keys = self._parse_public_bls_keys(args.bls_keys)
 
@@ -141,7 +140,7 @@ class DelegationOperations:
 
         return tx
 
-    def get_transaction_for_unstaking_nodes(self, owner: IAccount, args: Any) -> ITransaction:
+    def prepare_transaction_for_unstaking_nodes(self, owner: IAccount, args: Any) -> ITransaction:
         delegation_contract = Address.new_from_bech32(args.delegation_contract)
         public_keys = self._parse_public_bls_keys(args.bls_keys)
 
@@ -161,7 +160,7 @@ class DelegationOperations:
 
         return tx
 
-    def get_transaction_for_unjailing_nodes(self, owner: IAccount, args: Any) -> ITransaction:
+    def prepare_transaction_for_unjailing_nodes(self, owner: IAccount, args: Any) -> ITransaction:
         delegation_contract = Address.new_from_bech32(args.delegation_contract)
         public_keys = self._parse_public_bls_keys(args.bls_keys)
 
@@ -181,7 +180,7 @@ class DelegationOperations:
 
         return tx
 
-    def get_transaction_for_changing_service_fee(self, owner: IAccount, args: Any) -> ITransaction:
+    def prepare_transaction_for_changing_service_fee(self, owner: IAccount, args: Any) -> ITransaction:
         delegation_contract = Address.new_from_bech32(args.delegation_contract)
 
         tx = self._factory.create_transaction_for_changing_service_fee(
@@ -200,7 +199,7 @@ class DelegationOperations:
 
         return tx
 
-    def get_transaction_for_modifying_delegation_cap(self, owner: IAccount, args: Any) -> ITransaction:
+    def prepare_transaction_for_modifying_delegation_cap(self, owner: IAccount, args: Any) -> ITransaction:
         delegation_contract = Address.new_from_bech32(args.delegation_contract)
 
         tx = self._factory.create_transaction_for_modifying_delegation_cap(
@@ -219,10 +218,9 @@ class DelegationOperations:
 
         return tx
 
-    def get_transaction_for_automatic_activation(self, owner: IAccount, args: Any) -> ITransaction:
+    def prepare_transaction_for_automatic_activation(self, owner: IAccount, args: Any) -> ITransaction:
         delegation_contract = Address.new_from_bech32(args.delegation_contract)
 
-        tx = self.__get_empty_transaction()
         if args.set:
             tx = self._factory.create_transaction_for_setting_automatic_activation(
                 sender=owner.address,
@@ -233,6 +231,8 @@ class DelegationOperations:
                 sender=owner.address,
                 delegation_contract=delegation_contract
             )
+        else:
+            raise BadUsage("Either `--set` or `--unset` should be provided")
 
         tx.nonce = int(args.nonce)
         tx.version = int(args.version)
@@ -245,10 +245,9 @@ class DelegationOperations:
 
         return tx
 
-    def get_transaction_for_redelegate_cap(self, owner: IAccount, args: Any) -> ITransaction:
+    def prepare_transaction_for_redelegate_cap(self, owner: IAccount, args: Any) -> ITransaction:
         delegation_contract = Address.new_from_bech32(args.delegation_contract)
 
-        tx = self.__get_empty_transaction()
         if args.set:
             tx = self._factory.create_transaction_for_setting_cap_check_on_redelegate_rewards(
                 sender=owner.address,
@@ -259,6 +258,8 @@ class DelegationOperations:
                 sender=owner.address,
                 delegation_contract=delegation_contract
             )
+        else:
+            raise BadUsage("Either `--set` or `--unset` should be provided")
 
         tx.nonce = int(args.nonce)
         tx.version = int(args.version)
@@ -271,7 +272,7 @@ class DelegationOperations:
 
         return tx
 
-    def get_transaction_for_setting_metadata(self, owner: IAccount, args: Any) -> ITransaction:
+    def prepare_transaction_for_setting_metadata(self, owner: IAccount, args: Any) -> ITransaction:
         delegation_contract = Address.new_from_bech32(args.delegation_contract)
 
         tx = self._factory.create_transaction_for_setting_metadata(
@@ -304,27 +305,21 @@ class DelegationOperations:
     def _get_public_keys_and_signed_messages(self, args: Any) -> Tuple[List[ValidatorPublicKey], List[bytes]]:
         validators_file_path = Path(args.validators_file).expanduser()
         validators_file = ValidatorsFile(validators_file_path)
+        signers = validators_file.load_signers()
 
-        pubkey = self._get_pubkey_for_signing(args)
+        pubkey = self._get_pubkey_to_be_signed(args)
 
         public_keys: List[ValidatorPublicKey] = []
         signed_messages: List[bytes] = []
-        for validator in validators_file.get_validators_list():
-            # Get path of "pemFile", make it absolute
-            validator_pem = Path(validator.get("pemFile")).expanduser()
-            validator_pem = validator_pem if validator_pem.is_absolute() else validators_file_path.parent / validator_pem
+        for signer in signers:
+            signed_message = signer.sign(pubkey)
 
-            pem_file = ValidatorPEM.from_file(validator_pem)
-
-            validator_signer = ValidatorSigner(pem_file.secret_key)
-            signed_message = validator_signer.sign(pubkey)
-
-            public_keys.append(pem_file.secret_key.generate_public_key())
+            public_keys.append(signer.secret_key.generate_public_key())
             signed_messages.append(signed_message)
 
         return public_keys, signed_messages
 
-    def _get_pubkey_for_signing(self, args: Any) -> bytes:
+    def _get_pubkey_to_be_signed(self, args: Any) -> bytes:
         account = Account()
         if args.using_delegation_manager:
             account = Account(address=Address.new_from_bech32(args.delegation_contract))
@@ -335,13 +330,3 @@ class DelegationOperations:
             account = Account(key_file=args.keyfile, password=password)
 
         return account.address.get_public_key()
-
-    def __get_empty_transaction(self) -> Transaction:
-        # I've done this to get rid of the warning "tx possibly unbound"
-        # the if-elif statement should always execute because the args are required for the argparser
-        return Transaction(
-            sender="",
-            receiver="",
-            gas_limit=0,
-            chain_id=""
-        )
