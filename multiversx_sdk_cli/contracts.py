@@ -105,7 +105,7 @@ class SmartContract:
 
         value = int(args.value)
         transfers = args.token_transfers
-        token_transfers = self._prepare_token_transfers(transfers)
+        token_transfers = self._prepare_token_transfers(transfers) if transfers else []
 
         tx = self._factory.create_transaction_for_execute(
             sender=caller.address,
@@ -153,7 +153,7 @@ class SmartContract:
         token_computer = TokenComputer()
         token_transfers: List[TokenTransfer] = []
 
-        for i in range(len(transfers) - 1):
+        for i in range(0, len(transfers) - 1, 2):
             identifier = transfers[i]
             amount = int(transfers[i + 1])
             nonce = token_computer.extract_nonce_from_extended_identifier(identifier)

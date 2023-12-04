@@ -168,6 +168,43 @@ def test_contract_call():
     assert Path.is_file(output_file) == True
 
 
+def test_contract_transfer_and_execute(capsys: Any):
+    contract_address = "erd1qqqqqqqqqqqqqpgqv7sl6ws5dgwe5m04xtg0dvqyu2efz5a6d8ssxn4k9q"
+    first_token = "NFT-123456-02"
+    second_token = "ESDT-987654"
+
+    main([
+        "contract", "call", contract_address,
+        "--pem", f"{parent}/testdata/testUser.pem",
+        "--proxy", "https://devnet-api.multiversx.com",
+        "--chain", "D",
+        "--recall-nonce",
+        "--gas-limit", "5000000",
+        "--function", "add",
+        "--arguments", "5",
+        "--token-transfers", first_token, "1"
+    ])
+    data = get_transaction_data(capsys)
+    assert data == "ESDTNFTTransfer@4e46542d313233343536@02@01@0000000000000000050067a1fd3a146a1d9a6df532d0f6b004e2b29153ba69e1@616464@05"
+
+    # Clear the captured content
+    capsys.readouterr()
+
+    main([
+        "contract", "call", contract_address,
+        "--pem", f"{parent}/testdata/testUser.pem",
+        "--proxy", "https://devnet-api.multiversx.com",
+        "--chain", "D",
+        "--recall-nonce",
+        "--gas-limit", "5000000",
+        "--function", "add",
+        "--arguments", "5",
+        "--token-transfers", first_token, "1", second_token, "100"
+    ])
+    data = get_transaction_data(capsys)
+    assert data == "MultiESDTNFTTransfer@0000000000000000050067a1fd3a146a1d9a6df532d0f6b004e2b29153ba69e1@02@4e46542d313233343536@02@01@455344542d393837363534@@64@616464@05"
+
+
 def test_contract_flow(capsys: Any):
     alice = f"{parent}/testdata/alice.pem"
     adder = f"{parent}/testdata/adder.wasm"
@@ -268,3 +305,9 @@ def get_contract_address(capsys: Any):
 def get_query_response(capsys: Any):
     out = _read_stdout(capsys).replace("\n", "").replace(" ", "")
     return json.loads(out)[0]
+
+
+def get_transaction_data(capsys: Any):
+    out = _read_stdout(capsys)
+    output = json.loads(out)
+    return output["emittedTransactionData"]
