@@ -189,6 +189,21 @@ def install_mxpy(exact_version: str, from_branch: str, verbose: bool):
     st = os.stat(shortcut_path)
     os.chmod(shortcut_path, st.st_mode | stat.S_IEXEC)
 
+    update_shortcut_path = sdk_path / "mxpy-update"
+
+    try:
+        update_shortcut_path.unlink()
+        logger.debug(f"Removed existing shortcut: {update_shortcut_path}")
+    except FileNotFoundError:
+        logger.debug(f"Shortcut does not exist yet: {update_shortcut_path}")
+        pass
+
+    update_shortcut_content = get_mxpy_update_shortcut_content()
+    update_shortcut_path.write_text(update_shortcut_content)
+
+    st = os.stat(update_shortcut_path)
+    os.chmod(update_shortcut_path, st.st_mode | stat.S_IEXEC)
+
     logger.info("You have successfully installed mxpy.")
 
 
@@ -203,6 +218,19 @@ def get_mxpy_shortcut_content():
 
     return f"""#!/bin/sh
 . "{venv_path / 'bin' / 'activate'}" && python3 -m multiversx_sdk_cli.cli "$@" && deactivate
+"""
+
+
+def get_mxpy_update_shortcut_content():
+    # operating_system = get_operating_system()
+
+    #     if operating_system == "windows":
+    #         return f"""#!/bin/sh
+    # . "{venv_path / 'Scripts' / 'activate'}" && python3 -m multiversx_sdk_cli.cli "$@" && deactivate
+    # """
+
+    return f"""#!/bin/sh
+wget -O ~/mxpy-up.py https://raw.githubusercontent.com/multiversx/mx-sdk-py-cli/main/mxpy-up.py && python3 mxpy-up.py "$@"
 """
 
 
