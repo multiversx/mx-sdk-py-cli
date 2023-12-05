@@ -230,7 +230,7 @@ def get_mxpy_update_shortcut_content():
     # """
 
     return f"""#!/bin/sh
-wget -O ~/mxpy-up.py https://raw.githubusercontent.com/multiversx/mx-sdk-py-cli/main/mxpy-up.py && python3 mxpy-up.py "$@"
+wget -O ~/mxpy-up.py https://raw.githubusercontent.com/multiversx/mx-sdk-py-cli/main/mxpy-up.py && python3 ~/mxpy-up.py "$@"
 """
 
 
