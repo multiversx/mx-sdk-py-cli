@@ -74,7 +74,7 @@ class SmartContract:
     def __init__(self, config: IConfig):
         self._factory = SmartContractTransactionsFactory(config, TokenComputer())
 
-    def get_deploy_transaction(self, owner: Account, args: Any) -> Transaction:
+    def prepare_deploy_transaction(self, owner: Account, args: Any) -> Transaction:
         arguments = args.arguments or []
         arguments = prepare_args_for_factory(arguments)
 
@@ -89,7 +89,7 @@ class SmartContract:
             is_payable=args.metadata_payable,
             is_payable_by_sc=args.metadata_payable_by_sc
         )
-        tx.nonce = owner.nonce
+        tx.nonce = int(args.nonce)
         tx.version = int(args.version)
         tx.options = int(args.options)
         tx.guardian = args.guardian
@@ -97,7 +97,7 @@ class SmartContract:
 
         return tx
 
-    def get_execute_transaction(self, caller: Account, args: Any) -> Transaction:
+    def prepare_execute_transaction(self, caller: Account, args: Any) -> Transaction:
         contract_address = Address.new_from_bech32(args.contract)
         arguments = args.arguments or []
         arguments = prepare_args_for_factory(arguments)
@@ -111,7 +111,7 @@ class SmartContract:
             native_transfer_amount=int(args.value),
             token_transfers=[]
         )
-        tx.nonce = caller.nonce
+        tx.nonce = int(args.nonce)
         tx.version = int(args.version)
         tx.options = int(args.options)
         tx.guardian = args.guardian
@@ -119,7 +119,7 @@ class SmartContract:
 
         return tx
 
-    def get_upgrade_transaction(self, owner: Account, args: Any):
+    def prepare_upgrade_transaction(self, owner: Account, args: Any):
         contract_address = Address.new_from_bech32(args.contract)
         arguments = args.arguments or []
         arguments = prepare_args_for_factory(arguments)
@@ -136,7 +136,7 @@ class SmartContract:
             is_payable=args.metadata_payable,
             is_payable_by_sc=args.metadata_payable_by_sc
         )
-        tx.nonce = owner.nonce
+        tx.nonce = int(args.nonce)
         tx.version = int(args.version)
         tx.options = int(args.options)
         tx.guardian = args.guardian

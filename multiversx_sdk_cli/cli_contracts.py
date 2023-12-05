@@ -8,10 +8,8 @@ from multiversx_sdk_core.transaction_factories import TransactionsFactoryConfig
 from multiversx_sdk_network_providers.proxy_network_provider import \
     ProxyNetworkProvider
 
-from multiversx_sdk_cli import cli_shared, errors, projects, utils
-from multiversx_sdk_cli.accounts import Account, LedgerAccount
+from multiversx_sdk_cli import cli_shared, projects, utils
 from multiversx_sdk_cli.cli_output import CLIOutputBuilder
-from multiversx_sdk_cli.cli_password import load_password
 from multiversx_sdk_cli.constants import NUMBER_OF_SHARDS
 from multiversx_sdk_cli.contract_verification import \
     trigger_contract_verification
@@ -301,60 +299,23 @@ def deploy(args: Any):
     logger.debug("deploy")
     cli_shared.check_guardian_and_options_args(args)
     cli_shared.check_broadcast_args(args)
-
-    sender = _prepare_sender(args)
     cli_shared.prepare_chain_id_in_args(args)
+    cli_shared.prepare_nonce_in_args(args)
 
+    sender = cli_shared.prepare_account(args)
     config = TransactionsFactoryConfig(args.chain)
     contract = SmartContract(config)
 
     address_computer = AddressComputer(NUMBER_OF_SHARDS)
-    contract_address = address_computer.compute_contract_address(deployer=sender.address, deployment_nonce=sender.nonce)
+    contract_address = address_computer.compute_contract_address(deployer=sender.address, deployment_nonce=args.nonce)
 
-    tx = contract.get_deploy_transaction(sender, args)
+    tx = contract.prepare_deploy_transaction(sender, args)
     tx = _sign_guarded_tx(args, tx)
 
     logger.info("Contract address: %s", contract_address.to_bech32())
     utils.log_explorer_contract_address(args.chain, contract_address.to_bech32())
 
     _send_or_simulate(tx, contract_address, args)
-
-
-def _prepare_sender(args: Any) -> Account:
-    sender: Account
-    if args.ledger:
-        sender = LedgerAccount(account_index=args.ledger_account_index, address_index=args.ledger_address_index)
-    elif args.pem:
-        sender = Account(pem_file=args.pem, pem_index=args.pem_index)
-    elif args.keyfile:
-        password = load_password(args)
-        sender = Account(key_file=args.keyfile, password=password)
-    else:
-        raise errors.NoWalletProvided()
-
-    sender.nonce = args.nonce
-    if args.recall_nonce:
-        sender.sync_nonce(ProxyNetworkProvider(args.proxy))
-
-    return sender
-
-
-def _prepare_signer(args: Any) -> Account:
-    sender: Account
-    if args.ledger:
-        sender = LedgerAccount(
-            account_index=args.ledger_account_index,
-            address_index=args.ledger_address_index,
-        )
-    elif args.pem:
-        sender = Account(pem_file=args.pem, pem_index=args.pem_index)
-    elif args.keyfile:
-        password = load_password(args)
-        sender = Account(key_file=args.keyfile, password=password)
-    else:
-        raise errors.NoWalletProvided()
-
-    return sender
 
 
 def _sign_guarded_tx(args: Any, tx: Transaction) -> Transaction:
@@ -375,15 +336,15 @@ def call(args: Any):
     logger.debug("call")
     cli_shared.check_guardian_and_options_args(args)
     cli_shared.check_broadcast_args(args)
-
     cli_shared.prepare_chain_id_in_args(args)
-    sender = _prepare_sender(args)
+    cli_shared.prepare_nonce_in_args(args)
 
+    sender = cli_shared.prepare_account(args)
     config = TransactionsFactoryConfig(args.chain)
     contract = SmartContract(config)
     contract_address = Address.new_from_bech32(args.contract)
 
-    tx = contract.get_execute_transaction(sender, args)
+    tx = contract.prepare_execute_transaction(sender, args)
     tx = _sign_guarded_tx(args, tx)
 
     _send_or_simulate(tx, contract_address, args)
@@ -393,15 +354,15 @@ def upgrade(args: Any):
     logger.debug("upgrade")
     cli_shared.check_guardian_and_options_args(args)
     cli_shared.check_broadcast_args(args)
-
     cli_shared.prepare_chain_id_in_args(args)
-    sender = _prepare_sender(args)
+    cli_shared.prepare_nonce_in_args(args)
 
+    sender = cli_shared.prepare_account(args)
     config = TransactionsFactoryConfig(args.chain)
     contract = SmartContract(config)
     contract_address = Address.new_from_bech32(args.contract)
 
-    tx = contract.get_upgrade_transaction(sender, args)
+    tx = contract.prepare_upgrade_transaction(sender, args)
     tx = _sign_guarded_tx(args, tx)
 
     _send_or_simulate(tx, contract_address, args)
@@ -436,7 +397,7 @@ def verify(args: Any) -> None:
 
     packaged_src = Path(args.packaged_src).expanduser().resolve()
 
-    owner = _prepare_signer(args)
+    owner = cli_shared.prepare_account(args)
     docker_image = args.docker_image
     contract_variant = args.contract_variant
 

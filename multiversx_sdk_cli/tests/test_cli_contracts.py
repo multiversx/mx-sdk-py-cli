@@ -239,6 +239,22 @@ def test_contract_flow(capsys: Any):
     ])
 
 
+def test_contract_deploy_without_required_arguments():
+    alice = f"{parent}/testdata/alice.pem"
+    adder = f"{parent}/testdata/adder.wasm"
+
+    return_code = main([
+        "contract", "deploy",
+        "--bytecode", adder,
+        "--pem", alice,
+        "--recall-nonce",
+        "--gas-limit", "5000000",
+        "--arguments", "0",
+        "--send", "--wait-result"
+    ])
+    assert return_code
+
+
 def _read_stdout(capsys: Any) -> str:
     return capsys.readouterr().out.strip()
 
@@ -251,5 +267,4 @@ def get_contract_address(capsys: Any):
 
 def get_query_response(capsys: Any):
     out = _read_stdout(capsys).replace("\n", "").replace(" ", "")
-    print(out)
     return json.loads(out)[0]
