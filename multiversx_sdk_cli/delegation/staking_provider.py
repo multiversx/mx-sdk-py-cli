@@ -6,7 +6,7 @@ from multiversx_sdk_core.transaction_factories import \
     DelegationTransactionsFactory
 from multiversx_sdk_wallet import ValidatorPublicKey
 
-from multiversx_sdk_cli.accounts import Account
+from multiversx_sdk_cli.accounts import Account, LedgerAccount
 from multiversx_sdk_cli.cli_password import load_password
 from multiversx_sdk_cli.errors import BadUsage
 from multiversx_sdk_cli.interfaces import IAddress, ITransaction
@@ -328,5 +328,7 @@ class DelegationOperations:
         elif args.keyfile:
             password = load_password(args)
             account = Account(key_file=args.keyfile, password=password)
+        elif args.ledger:
+            account = LedgerAccount(account_index=args.ledger_account_index, address_index=args.ledger_address_index)
 
         return account.address.get_public_key()
