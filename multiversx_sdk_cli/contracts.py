@@ -75,7 +75,7 @@ class SmartContract:
     def __init__(self, config: IConfig):
         self._factory = SmartContractTransactionsFactory(config, TokenComputer())
 
-    def get_deploy_transaction(self, owner: Account, args: Any) -> Transaction:
+    def prepare_deploy_transaction(self, owner: Account, args: Any) -> Transaction:
         arguments = args.arguments or []
         arguments = prepare_args_for_factory(arguments)
 
@@ -98,7 +98,7 @@ class SmartContract:
 
         return tx
 
-    def get_execute_transaction(self, caller: Account, args: Any) -> Transaction:
+    def prepare_execute_transaction(self, caller: Account, args: Any) -> Transaction:
         contract_address = Address.new_from_bech32(args.contract)
         arguments = args.arguments or []
         arguments = prepare_args_for_factory(arguments)
@@ -124,7 +124,7 @@ class SmartContract:
 
         return tx
 
-    def get_upgrade_transaction(self, owner: Account, args: Any):
+    def prepare_upgrade_transaction(self, owner: Account, args: Any):
         contract_address = Address.new_from_bech32(args.contract)
         arguments = args.arguments or []
         arguments = prepare_args_for_factory(arguments)

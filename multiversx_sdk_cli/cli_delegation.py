@@ -149,7 +149,7 @@ def do_create_delegation_contract(args: Any):
     config = TransactionsFactoryConfig(args.chain)
     delegation = DelegationOperations(config)
 
-    tx = delegation.get_transaction_for_new_delegation_contract(sender, args)
+    tx = delegation.prepare_transaction_for_new_delegation_contract(sender, args)
     cli_shared.send_or_simulate(tx, args)
 
 
@@ -177,7 +177,7 @@ def add_new_nodes(args: Any):
     config = TransactionsFactoryConfig(args.chain)
     delegation = DelegationOperations(config)
 
-    tx = delegation.get_transaction_for_adding_nodes(sender, args)
+    tx = delegation.prepare_transaction_for_adding_nodes(sender, args)
     cli_shared.send_or_simulate(tx, args)
 
 
@@ -191,7 +191,7 @@ def remove_nodes(args: Any):
     config = TransactionsFactoryConfig(args.chain)
     delegation = DelegationOperations(config)
 
-    tx = delegation.get_transaction_for_removing_nodes(sender, args)
+    tx = delegation.prepare_transaction_for_removing_nodes(sender, args)
     cli_shared.send_or_simulate(tx, args)
 
 
@@ -205,7 +205,7 @@ def stake_nodes(args: Any):
     config = TransactionsFactoryConfig(args.chain)
     delegation = DelegationOperations(config)
 
-    tx = delegation.get_transaction_for_staking_nodes(sender, args)
+    tx = delegation.prepare_transaction_for_staking_nodes(sender, args)
     cli_shared.send_or_simulate(tx, args)
 
 
@@ -219,7 +219,7 @@ def unbond_nodes(args: Any):
     config = TransactionsFactoryConfig(args.chain)
     delegation = DelegationOperations(config)
 
-    tx = delegation.get_transaction_for_unbonding_nodes(sender, args)
+    tx = delegation.prepare_transaction_for_unbonding_nodes(sender, args)
     cli_shared.send_or_simulate(tx, args)
 
 
@@ -233,7 +233,7 @@ def unstake_nodes(args: Any):
     config = TransactionsFactoryConfig(args.chain)
     delegation = DelegationOperations(config)
 
-    tx = delegation.get_transaction_for_unstaking_nodes(sender, args)
+    tx = delegation.prepare_transaction_for_unstaking_nodes(sender, args)
     cli_shared.send_or_simulate(tx, args)
 
 
@@ -247,7 +247,7 @@ def unjail_nodes(args: Any):
     config = TransactionsFactoryConfig(args.chain)
     delegation = DelegationOperations(config)
 
-    tx = delegation.get_transaction_for_unjailing_nodes(sender, args)
+    tx = delegation.prepare_transaction_for_unjailing_nodes(sender, args)
     cli_shared.send_or_simulate(tx, args)
 
 
@@ -261,7 +261,7 @@ def change_service_fee(args: Any):
     config = TransactionsFactoryConfig(args.chain)
     delegation = DelegationOperations(config)
 
-    tx = delegation.get_transaction_for_changing_service_fee(sender, args)
+    tx = delegation.prepare_transaction_for_changing_service_fee(sender, args)
     cli_shared.send_or_simulate(tx, args)
 
 
@@ -275,7 +275,7 @@ def modify_delegation_cap(args: Any):
     config = TransactionsFactoryConfig(args.chain)
     delegation = DelegationOperations(config)
 
-    tx = delegation.get_transaction_for_modifying_delegation_cap(sender, args)
+    tx = delegation.prepare_transaction_for_modifying_delegation_cap(sender, args)
     cli_shared.send_or_simulate(tx, args)
 
 
@@ -289,7 +289,7 @@ def automatic_activation(args: Any):
     config = TransactionsFactoryConfig(args.chain)
     delegation = DelegationOperations(config)
 
-    tx = delegation.get_transaction_for_automatic_activation(sender, args)
+    tx = delegation.prepare_transaction_for_automatic_activation(sender, args)
     cli_shared.send_or_simulate(tx, args)
 
 
@@ -303,7 +303,7 @@ def redelegate_cap(args: Any):
     config = TransactionsFactoryConfig(args.chain)
     delegation = DelegationOperations(config)
 
-    tx = delegation.get_transaction_for_redelegate_cap(sender, args)
+    tx = delegation.prepare_transaction_for_redelegate_cap(sender, args)
     cli_shared.send_or_simulate(tx, args)
 
 
@@ -317,5 +317,5 @@ def set_metadata(args: Any):
     config = TransactionsFactoryConfig(args.chain)
     delegation = DelegationOperations(config)
 
-    tx = delegation.get_transaction_for_setting_metadata(sender, args)
+    tx = delegation.prepare_transaction_for_setting_metadata(sender, args)
     cli_shared.send_or_simulate(tx, args)
