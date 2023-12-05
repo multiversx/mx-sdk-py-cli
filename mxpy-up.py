@@ -222,12 +222,12 @@ def get_mxpy_shortcut_content():
 
 
 def get_mxpy_update_shortcut_content():
-    # operating_system = get_operating_system()
+    operating_system = get_operating_system()
 
-    #     if operating_system == "windows":
-    #         return f"""#!/bin/sh
-    # . "{venv_path / 'Scripts' / 'activate'}" && python3 -m multiversx_sdk_cli.cli "$@" && deactivate
-    # """
+    if operating_system == "windows":
+        return f"""#!/bin/sh
+curl.exe --output mxpy-up.py --url https://raw.githubusercontent.com/multiversx/mx-sdk-py-cli/main/mxpy-up.py && python mxpy-up.py %*
+"""
 
     return f"""#!/bin/sh
 wget -O ~/mxpy-up.py https://raw.githubusercontent.com/multiversx/mx-sdk-py-cli/main/mxpy-up.py && python3 ~/mxpy-up.py "$@"
