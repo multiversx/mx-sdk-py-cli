@@ -31,6 +31,6 @@ jobs:
           mxpy --version
       - name: Auto-Update
         run: |
-          . ~/.profile
+          export PATH="~/multiversx-sdk:${PATH}"
           mxpy-update
           mxpy --version
