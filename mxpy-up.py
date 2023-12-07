@@ -230,7 +230,7 @@ curl.exe --output mxpy-up.py --url https://raw.githubusercontent.com/multiversx/
 """
 
     return f"""#!/bin/sh
-wget -O ~/mxpy-up.py https://raw.githubusercontent.com/multiversx/mx-sdk-py-cli/mxpy-update/mxpy-up.py && python3 ~/mxpy-up.py "$@"
+wget -O mxpy-up.py https://raw.githubusercontent.com/multiversx/mx-sdk-py-cli/mxpy-update/mxpy-up.py && python3 mxpy-up.py "$@"
 """
 
 

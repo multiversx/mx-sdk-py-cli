@@ -25,6 +25,7 @@ jobs:
         run: |
           wget -O mxpy-up.py https://raw.githubusercontent.com/multiversx/mx-sdk-py-cli/$BRANCH_NAME/mxpy-up.py
           python3 mxpy-up.py --exact-version=9.0.0 --not-interactive
+          cat mxpy-up.py
       - name: Smoke test
         run: |
           export PATH="~/multiversx-sdk:${PATH}"
