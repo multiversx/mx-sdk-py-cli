@@ -226,7 +226,9 @@ def get_mxpy_update_shortcut_content():
 
     if operating_system == "windows":
         return f"""#!/bin/sh
-curl.exe --output mxpy-up.py --url https://raw.githubusercontent.com/multiversx/mx-sdk-py-cli/mxpy-update/mxpy-up.py && python mxpy-up.py --not-interactive %*
+set "python_script=%~dp0mxpy-up.py"
+curl.exe --output "%python_script%" --url https://raw.githubusercontent.com/multiversx/mx-sdk-py-cli/mxpy-update/mxpy-up.py
+python "%python_script%" --not-interactive %*
 """
 
     return f"""#!/bin/sh
