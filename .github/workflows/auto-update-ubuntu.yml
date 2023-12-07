@@ -23,8 +23,6 @@ jobs:
           python-version: ${{ matrix.python-version }}
       - name: Install
         run: |
-          echo "cd:"
-          echo %cd%
           wget -O mxpy-up.py https://raw.githubusercontent.com/multiversx/mx-sdk-py-cli/$BRANCH_NAME/mxpy-up.py
           python3 mxpy-up.py --exact-version=9.0.0 --not-interactive
       - name: Smoke test
@@ -33,7 +31,6 @@ jobs:
           mxpy --version
       - name: Auto-Update
         run: |
-          echo %cd%
           export PATH="~/multiversx-sdk:${PATH}"
           mxpy-update
           mxpy --version
