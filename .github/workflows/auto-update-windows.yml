@@ -35,6 +35,8 @@ jobs:
         shell: bash
         run: |
           export PATH="~/multiversx-sdk:${PATH}"
-          chmod +x mxpy-update
+          user=$(whoami)
+          echo $user
+          chmod +x C:\\Users\\${user}\\multiversx-sdk\\mxpy-update
           mxpy-update
           mxpy --version
