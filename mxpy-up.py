@@ -190,10 +190,7 @@ def install_mxpy(exact_version: str, from_branch: str, verbose: bool):
     st = os.stat(shortcut_path)
     os.chmod(shortcut_path, st.st_mode | stat.S_IEXEC)
 
-    if operating_system == "windows":
-        update_shortcut_path = sdk_path / "mxpy-update.exe"
-    else:
-        update_shortcut_path = sdk_path / "mxpy-update"
+    update_shortcut_path = sdk_path / "mxpy-update"
 
     try:
         update_shortcut_path.unlink()
@@ -225,12 +222,6 @@ def get_mxpy_shortcut_content(operating_system: str):
 
 
 def get_mxpy_update_shortcut_content(operating_system: str):
-    if operating_system == "windows":
-        return f"""#!/bin/sh
-curl.exe --output mxpy-up.py --url https://raw.githubusercontent.com/multiversx/mx-sdk-py-cli/mxpy-update/mxpy-up.py
-python mxpy-up.py --not-interactive
-"""
-
     return f"""#!/bin/sh
 wget -O mxpy-up.py https://raw.githubusercontent.com/multiversx/mx-sdk-py-cli/mxpy-update/mxpy-up.py && python3 mxpy-up.py --not-interactive "$@"
 """
