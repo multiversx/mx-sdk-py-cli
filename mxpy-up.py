@@ -183,13 +183,17 @@ def install_mxpy(exact_version: str, from_branch: str, verbose: bool):
         logger.debug(f"Shortcut does not exist yet: {shortcut_path}")
         pass
 
-    shortcut_content = get_mxpy_shortcut_content()
+    operating_system = get_operating_system()
+    shortcut_content = get_mxpy_shortcut_content(operating_system)
     shortcut_path.write_text(shortcut_content)
 
     st = os.stat(shortcut_path)
     os.chmod(shortcut_path, st.st_mode | stat.S_IEXEC)
 
-    update_shortcut_path = sdk_path / "mxpy-update"
+    if operating_system == "windows":
+        update_shortcut_path = sdk_path / "mxpy-update.exe"
+    else:
+        update_shortcut_path = sdk_path / "mxpy-update"
 
     try:
         update_shortcut_path.unlink()
@@ -198,7 +202,7 @@ def install_mxpy(exact_version: str, from_branch: str, verbose: bool):
         logger.debug(f"Shortcut does not exist yet: {update_shortcut_path}")
         pass
 
-    update_shortcut_content = get_mxpy_update_shortcut_content()
+    update_shortcut_content = get_mxpy_update_shortcut_content(operating_system)
     update_shortcut_path.write_text(update_shortcut_content)
 
     st = os.stat(update_shortcut_path)
@@ -207,8 +211,7 @@ def install_mxpy(exact_version: str, from_branch: str, verbose: bool):
     logger.info("You have successfully installed mxpy.")
 
 
-def get_mxpy_shortcut_content():
-    operating_system = get_operating_system()
+def get_mxpy_shortcut_content(operating_system: str):
     venv_path = get_mxpy_venv_path()
 
     if operating_system == "windows":
@@ -221,9 +224,7 @@ def get_mxpy_shortcut_content():
 """
 
 
-def get_mxpy_update_shortcut_content():
-    operating_system = get_operating_system()
-
+def get_mxpy_update_shortcut_content(operating_system: str):
     if operating_system == "windows":
         return f"""#!/bin/sh
 curl.exe --output mxpy-up.py --url https://raw.githubusercontent.com/multiversx/mx-sdk-py-cli/mxpy-update/mxpy-up.py
