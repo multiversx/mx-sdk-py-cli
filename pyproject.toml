@@ -43,3 +43,6 @@ exclude = [
 
 [project.urls]
 "Homepage" = "https://github.com/multiversx/mx-sdk-py-cli"
+
+[project.scripts]
+cli-name = "multiversx_sdk_cli.cli:main"
