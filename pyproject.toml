@@ -44,5 +44,5 @@ exclude = [
 [project.urls]
 "Homepage" = "https://github.com/multiversx/mx-sdk-py-cli"
 
-[tool.hatch.entrypoint]
+[tool.hatch.entrypoints]
 console_scripts = ["multiversx-sdk-cli = multiversx_sdk_cli.cli:main"]
