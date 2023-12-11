@@ -32,6 +32,9 @@ dependencies = [
   "multiversx-sdk-core>=0.7.0,<0.8.0"
 ]
 
+[project.scripts]
+mxpy = "multiversx_sdk_cli.cli:main"
+
 [tool.hatch.build]
 include = [
   "multiversx_sdk_cli/**"
@@ -43,6 +46,3 @@ exclude = [
 
 [project.urls]
 "Homepage" = "https://github.com/multiversx/mx-sdk-py-cli"
-
-[tool.hatch.entrypoints]
-console_scripts = ["mxpy = multiversx_sdk_cli.cli:main"]
