@@ -1,14 +1,18 @@
 import base64
 import logging
-from typing import Any, List, Optional, Protocol, Sequence, Tuple
+from pathlib import Path
+from typing import Any, List, Optional, Protocol, Sequence
 
-from multiversx_sdk_core import Transaction, TransactionPayload
-from multiversx_sdk_core.address import Address, AddressComputer
+from multiversx_sdk_core import (Token, TokenComputer, TokenTransfer,
+                                 Transaction, TransactionPayload)
+from multiversx_sdk_core.address import Address
+from multiversx_sdk_core.transaction_factories import \
+    SmartContractTransactionsFactory
 from multiversx_sdk_network_providers.interface import IAddress, IContractQuery
 
-from multiversx_sdk_cli import config, constants, errors
-from multiversx_sdk_cli.accounts import Account, EmptyAddress
-from multiversx_sdk_cli.constants import ADDRESS_ZERO_BECH32, DEFAULT_HRP
+from multiversx_sdk_cli import errors
+from multiversx_sdk_cli.accounts import Account
+from multiversx_sdk_cli.constants import DEFAULT_HRP
 from multiversx_sdk_cli.utils import Object
 
 logger = logging.getLogger("contracts")
@@ -61,161 +65,149 @@ class IContractQueryResponse(Protocol):
     return_message: str
 
 
+class IConfig(Protocol):
+    chain_id: str
+    min_gas_limit: int
+    gas_limit_per_byte: int
+
+
 class SmartContract:
-    def __init__(self, address: Optional[IAddress] = EmptyAddress(), bytecode=None, metadata=None):
-        self.address = address
-        self.bytecode = bytecode
-        self.metadata = metadata or CodeMetadata()
+    def __init__(self, config: IConfig):
+        self._factory = SmartContractTransactionsFactory(config, TokenComputer())
 
-    def deploy(self, owner: Account, arguments: List[Any], gas_price: int, gas_limit: int, value: int, chain: str, version: int, guardian: str, options: int) -> Transaction:
-        self.owner = owner
-        address_computer = AddressComputer(number_of_shards=3)
-        self.address = address_computer.compute_contract_address(self.owner.address, self.owner.nonce)
+    def prepare_deploy_transaction(self, owner: Account, args: Any) -> Transaction:
+        arguments = args.arguments or []
+        arguments = prepare_args_for_factory(arguments)
 
-        arguments = arguments or []
-        gas_price = int(gas_price)
-        gas_limit = int(gas_limit)
-        value = value or 0
-
-        tx = Transaction(
-            chain_id=chain,
-            sender=owner.address.to_bech32(),
-            receiver=ADDRESS_ZERO_BECH32,
-            gas_limit=gas_limit,
-            gas_price=gas_price,
-            nonce=owner.nonce,
-            amount=value,
-            data=self.prepare_deploy_transaction_data(arguments).data,
-            version=version,
-            options=options
+        tx = self._factory.create_transaction_for_deploy(
+            sender=owner.address,
+            bytecode=Path(args.bytecode),
+            gas_limit=int(args.gas_limit),
+            arguments=arguments,
+            native_transfer_amount=int(args.value),
+            is_upgradeable=args.metadata_upgradeable,
+            is_readable=args.metadata_readable,
+            is_payable=args.metadata_payable,
+            is_payable_by_sc=args.metadata_payable_by_sc
         )
-
-        if guardian:
-            tx.guardian = guardian
-
+        tx.nonce = int(args.nonce)
+        tx.version = int(args.version)
+        tx.options = int(args.options)
+        tx.guardian = args.guardian
         tx.signature = bytes.fromhex(owner.sign_transaction(tx))
+
         return tx
 
-    def prepare_deploy_transaction_data(self, arguments: List[Any]) -> TransactionPayload:
-        tx_data = f"{self.bytecode}@{constants.VM_TYPE_WASM_VM}@{self.metadata.to_hex()}"
+    def prepare_execute_transaction(self, caller: Account, args: Any) -> Transaction:
+        contract_address = Address.new_from_bech32(args.contract)
+        arguments = args.arguments or []
+        arguments = prepare_args_for_factory(arguments)
 
-        for arg in arguments:
-            tx_data += f"@{_prepare_argument(arg)}"
+        value = int(args.value)
+        transfers = args.token_transfers
+        token_transfers = self._prepare_token_transfers(transfers) if transfers else []
 
-        return TransactionPayload.from_str(tx_data)
-
-    def execute(self, caller: Account, function: str, arguments: List[str], gas_price: int, gas_limit: int, value: int, chain: str, version: int, guardian: str, options: int) -> Transaction:
-        self.caller = caller
-
-        arguments = arguments or []
-        gas_price = int(gas_price)
-        gas_limit = int(gas_limit)
-        value = value or 0
-        receiver = self.address if self.address else EmptyAddress()
-
-        tx = Transaction(
-            chain_id=chain,
-            sender=caller.address.to_bech32(),
-            receiver=receiver.to_bech32(),
-            gas_limit=gas_limit,
-            gas_price=gas_price,
-            nonce=caller.nonce,
-            amount=value,
-            data=self.prepare_execute_transaction_data(function, arguments).data,
-            version=version,
-            options=options
+        tx = self._factory.create_transaction_for_execute(
+            sender=caller.address,
+            contract=contract_address,
+            function=args.function,
+            gas_limit=int(args.gas_limit),
+            arguments=arguments,
+            native_transfer_amount=value,
+            token_transfers=token_transfers
         )
-
-        if guardian:
-            tx.guardian = guardian
-
+        tx.nonce = int(args.nonce)
+        tx.version = int(args.version)
+        tx.options = int(args.options)
+        tx.guardian = args.guardian
         tx.signature = bytes.fromhex(caller.sign_transaction(tx))
+
         return tx
 
-    def prepare_execute_transaction_data(self, function: str, arguments: List[Any]) -> TransactionPayload:
-        tx_data = function
+    def prepare_upgrade_transaction(self, owner: Account, args: Any):
+        contract_address = Address.new_from_bech32(args.contract)
+        arguments = args.arguments or []
+        arguments = prepare_args_for_factory(arguments)
 
-        for arg in arguments:
-            tx_data += f"@{_prepare_argument(arg)}"
-
-        return TransactionPayload.from_str(tx_data)
-
-    def upgrade(self, owner: Account, arguments: List[Any], gas_price: int, gas_limit: int, value: int, chain: str, version: int, guardian: str, options: int) -> Transaction:
-        self.owner = owner
-
-        arguments = arguments or []
-        gas_price = int(gas_price or config.DEFAULT_GAS_PRICE)
-        gas_limit = int(gas_limit)
-        value = value or 0
-        receiver = self.address if self.address else EmptyAddress()
-
-        tx = Transaction(
-            chain_id=chain,
-            sender=owner.address.to_bech32(),
-            receiver=receiver.to_bech32(),
-            gas_limit=gas_limit,
-            gas_price=gas_price,
-            nonce=owner.nonce,
-            amount=value,
-            data=self.prepare_upgrade_transaction_data(arguments).data,
-            version=version,
-            options=options
+        tx = self._factory.create_transaction_for_upgrade(
+            sender=owner.address,
+            contract=contract_address,
+            bytecode=Path(args.bytecode),
+            gas_limit=int(args.gas_limit),
+            arguments=arguments,
+            native_transfer_amount=int(args.value),
+            is_upgradeable=args.metadata_upgradeable,
+            is_readable=args.metadata_readable,
+            is_payable=args.metadata_payable,
+            is_payable_by_sc=args.metadata_payable_by_sc
         )
-
-        if guardian:
-            tx.guardian = guardian
-
+        tx.nonce = int(args.nonce)
+        tx.version = int(args.version)
+        tx.options = int(args.options)
+        tx.guardian = args.guardian
         tx.signature = bytes.fromhex(owner.sign_transaction(tx))
+
         return tx
 
-    def prepare_upgrade_transaction_data(self, arguments: List[Any]) -> TransactionPayload:
-        tx_data = f"upgradeContract@{self.bytecode}@{self.metadata.to_hex()}"
+    def _prepare_token_transfers(self, transfers: List[str]) -> List[TokenTransfer]:
+        token_computer = TokenComputer()
+        token_transfers: List[TokenTransfer] = []
 
-        for arg in arguments:
-            tx_data += f"@{_prepare_argument(arg)}"
+        for i in range(0, len(transfers) - 1, 2):
+            identifier = transfers[i]
+            amount = int(transfers[i + 1])
+            nonce = token_computer.extract_nonce_from_extended_identifier(identifier)
 
-        return TransactionPayload.from_str(tx_data)
+            token = Token(identifier, nonce)
+            transfer = TokenTransfer(token, amount)
+            token_transfers.append(transfer)
 
-    def query(
-        self,
-        proxy: INetworkProvider,
-        function: str,
-        arguments: List[Any],
-        value: int = 0,
-        caller: Optional[Address] = None
-    ) -> List[Any]:
-        response_data = self.query_detailed(proxy, function, arguments, value, caller)
-        return_data = response_data.return_data
-        return [self._interpret_return_data(data) for data in return_data]
+        return token_transfers
 
-    def query_detailed(self, proxy: INetworkProvider, function: str, arguments: List[Any],
-                       value: int = 0, caller: Optional[Address] = None) -> Any:
-        arguments = arguments or []
-        # Temporary workaround, until we use sdk-core's serializer.
-        prepared_arguments = [bytes.fromhex(_prepare_argument(arg)) for arg in arguments]
 
-        query = ContractQuery(self.address, function, value, prepared_arguments, caller)
+def query_contract(
+    contract_address: IAddress,
+    proxy: INetworkProvider,
+    function: str,
+    arguments: List[Any],
+    value: int = 0,
+    caller: Optional[IAddress] = None
+) -> List[Any]:
+    response_data = query_detailed(contract_address, proxy, function, arguments, value, caller)
+    return_data = response_data.return_data
+    return [_interpret_return_data(data) for data in return_data]
 
-        response = proxy.query_contract(query)
-        # Temporary workaround, until we add "isSuccess" on the response class.
-        if response.return_code != "ok":
-            raise RuntimeError(f"Query failed: {response.return_message}")
-        return response
 
-    def _interpret_return_data(self, data: str) -> Any:
-        if not data:
-            return data
+def query_detailed(contract_address: IAddress, proxy: INetworkProvider, function: str, arguments: List[Any],
+                   value: int = 0, caller: Optional[IAddress] = None) -> Any:
+    arguments = arguments or []
+    # Temporary workaround, until we use sdk-core's serializer.
+    arguments_hex = [_prepare_argument(arg) for arg in arguments]
+    prepared_arguments_bytes = [bytes.fromhex(arg) for arg in arguments_hex]
 
-        try:
-            as_bytes = base64.b64decode(data)
-            as_hex = as_bytes.hex()
-            as_number = _interpret_as_number_if_safely(as_hex)
+    query = ContractQuery(contract_address, function, value, prepared_arguments_bytes, caller)
 
-            result = QueryResult(data, as_hex, as_number)
-            return result
-        except Exception:
-            logger.warn(f"Cannot interpret return data: {data}")
-            return None
+    response = proxy.query_contract(query)
+    # Temporary workaround, until we add "isSuccess" on the response class.
+    if response.return_code != "ok":
+        raise RuntimeError(f"Query failed: {response.return_message}")
+    return response
+
+
+def _interpret_return_data(data: str) -> Any:
+    if not data:
+        return data
+
+    try:
+        as_bytes = base64.b64decode(data)
+        as_hex = as_bytes.hex()
+        as_number = _interpret_as_number_if_safely(as_hex)
+
+        result = QueryResult(data, as_hex, as_number)
+        return result
+    except Exception:
+        logger.warn(f"Cannot interpret return data: {data}")
+        return None
 
 
 def _interpret_as_number_if_safely(as_hex: str) -> Optional[int]:
@@ -232,6 +224,43 @@ def _interpret_as_number_if_safely(as_hex: str) -> Optional[int]:
         return None
 
 
+def prepare_execute_transaction_data(function: str, arguments: List[Any]) -> TransactionPayload:
+    tx_data = function
+
+    for arg in arguments:
+        tx_data += f"@{_prepare_argument(arg)}"
+
+    return TransactionPayload.from_str(tx_data)
+
+
+def prepare_args_for_factory(arguments: List[str]) -> List[Any]:
+    args: List[Any] = []
+
+    for arg in arguments:
+        if arg.startswith(HEX_PREFIX):
+            args.append(hex_to_bytes(arg))
+        elif arg.isnumeric():
+            args.append(int(arg))
+        elif arg.startswith(DEFAULT_HRP):
+            args.append(Address.new_from_bech32(arg))
+        elif arg.lower() == FALSE_STR_LOWER:
+            args.append(False)
+        elif arg.lower() == TRUE_STR_LOWER:
+            args.append(True)
+        elif arg.startswith(STR_PREFIX):
+            args.append(arg[len(STR_PREFIX):])
+
+    return args
+
+
+def hex_to_bytes(arg: str):
+    argument = arg[len(HEX_PREFIX):]
+    argument = argument.upper()
+    argument = ensure_even_length(argument)
+    return bytes.fromhex(argument)
+
+
+# only used for contract queries and stake operations
 def _prepare_argument(argument: Any):
     as_str = str(argument)
     as_hex = _to_hex(as_str)
@@ -286,29 +315,3 @@ def ensure_even_length(string: str) -> str:
     if len(string) % 2 == 1:
         return '0' + string
     return string
-
-
-def sum_flag_values(flag_value_pairs: List[Tuple[int, bool]]) -> int:
-    value_sum = 0
-    for value, flag in flag_value_pairs:
-        if flag:
-            value_sum += value
-    return value_sum
-
-
-class CodeMetadata:
-    def __init__(self, upgradeable: bool = True, readable: bool = True, payable: bool = False, payable_by_sc: bool = False):
-        self.upgradeable = upgradeable
-        self.readable = readable
-        self.payable = payable
-        self.payable_by_sc = payable_by_sc
-
-    def to_hex(self):
-        flag_value_pairs = [
-            (0x01_00, self.upgradeable),
-            (0x04_00, self.readable),
-            (0x00_02, self.payable),
-            (0x00_04, self.payable_by_sc)
-        ]
-        metadata_value = sum_flag_values(flag_value_pairs)
-        return f"{metadata_value:04X}"

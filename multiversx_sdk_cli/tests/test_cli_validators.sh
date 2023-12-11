@@ -9,7 +9,7 @@ testAll() {
     echo "Stake with recall nonce"
     ${CLI} --verbose validator stake --pem="${USERS}/alice.pem" --value="2500${DENOMINATION}" --validators-file=./testdata/validators.json --reward-address=${REWARD_ADDRESS} --chain=${CHAIN_ID} --proxy=${PROXY} --estimate-gas --recall-nonce --send || return 1
     echo "Stake with provided nonce"
-    ${CLI} --verbose validator stake --pem="${USERS}/bob.pem" --value="2500${DENOMINATION}" --validators-file=./testdata/validators.json --reward-address=${REWARD_ADDRESS} --chain=${CHAIN_ID} --proxy=${PROXY} --estimate-gas --nonce=300 --send || return 1
+    ${CLI} --verbose validator stake --pem="${USERS}/bob.pem" --value="2500${DENOMINATION}" --validators-file=./testdata/validators.json --reward-address=${REWARD_ADDRESS} --chain=${CHAIN_ID} --proxy=${PROXY} --estimate-gas --nonce=300 || return 1
 
 
     echo "Stake with topUP"

@@ -10,7 +10,7 @@ from multiversx_sdk_network_providers.proxy_network_provider import \
     ProxyNetworkProvider
 
 from multiversx_sdk_cli import config, errors, utils
-from multiversx_sdk_cli.accounts import Account
+from multiversx_sdk_cli.accounts import Account, LedgerAccount
 from multiversx_sdk_cli.cli_output import CLIOutputBuilder
 from multiversx_sdk_cli.cli_password import (load_guardian_password,
                                              load_password)
@@ -93,9 +93,9 @@ def add_tx_args(args: List[str], sub: Any, with_nonce: bool = True, with_receive
 
 
 def add_guardian_args(sub: Any):
-    sub.add_argument("--guardian", type=str, help="the address of the guradian")
-    sub.add_argument("--guardian-service-url", type=str, help="the url of the guardian service")
-    sub.add_argument("--guardian-2fa-code", type=str, help="the 2fa code for the guardian")
+    sub.add_argument("--guardian", type=str, help="the address of the guradian", default="")
+    sub.add_argument("--guardian-service-url", type=str, help="the url of the guardian service", default="")
+    sub.add_argument("--guardian-2fa-code", type=str, help="the 2fa code for the guardian", default="")
 
 
 def add_wallet_args(args: List[str], sub: Any):
@@ -150,8 +150,7 @@ def prepare_account(args: Any):
         password = load_password(args)
         account = Account(key_file=args.keyfile, password=password)
     elif args.ledger:
-        address = do_get_ledger_address(account_index=args.ledger_account_index, address_index=args.ledger_address_index)
-        account = Account(address=Address.new_from_bech32(address))
+        account = LedgerAccount(account_index=args.ledger_account_index, address_index=args.ledger_address_index)
     else:
         raise errors.NoWalletProvided()
 
