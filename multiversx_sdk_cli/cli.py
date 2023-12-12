@@ -2,6 +2,7 @@ import argparse
 import logging
 import sys
 from argparse import ArgumentParser
+from pathlib import Path
 from typing import Any, List
 
 from rich.logging import RichHandler
@@ -38,6 +39,7 @@ def main(cli_args: List[str] = sys.argv[1:]):
 
 
 def _do_main(cli_args: List[str]):
+    ensure_multiversx_sdk_directory_exists()
     argv_with_config_args = config.add_config_args(cli_args)
     parser = setup_parser(argv_with_config_args)
     args = parser.parse_args(argv_with_config_args)
@@ -51,6 +53,11 @@ def _do_main(cli_args: List[str]):
         parser.print_help()
     else:
         args.func(args)
+
+
+def ensure_multiversx_sdk_directory_exists() -> None:
+    sdk_path = Path("~/multiversx-sdk").expanduser().resolve()
+    sdk_path.mkdir(parents=True, exist_ok=True)
 
 
 def setup_parser(args: List[str]):
