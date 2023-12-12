@@ -249,6 +249,8 @@ def determine_final_args(argv: List[str], config_args: Dict[str, Any]) -> List[s
 def get_dependency_directory(key: str, tag: str) -> Path:
     parent_directory = get_dependency_parent_directory(key)
     if tag == 'latest':
+        if not parent_directory.is_dir():
+            return parent_directory / tag
         tag = get_latest_semver_from_directory(parent_directory)
 
     return parent_directory / tag
