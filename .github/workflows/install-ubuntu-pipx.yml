@@ -28,7 +28,7 @@ jobs:
           pipx ensurepath
       - name: Install mxpy
         run: |
-          pipx install multiversx-sdk-cli
+          pipx install git+https://github.com/multiversx/mx-sdk-py-cli@$BRANCH_NAME
       - name: Smoke test
         run: |
           mxpy --version
