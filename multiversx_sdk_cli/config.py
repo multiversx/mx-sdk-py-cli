@@ -167,6 +167,12 @@ def get_defaults() -> Dict[str, Any]:
     }
 
 
+def get_deprecated_entries_in_config_file():
+    default_config_keys = set(get_defaults().keys())
+    current_config_keys = set(get_active().keys())
+    return current_config_keys - default_config_keys
+
+
 def resolve_config_path() -> Path:
     if os.path.isfile(LOCAL_CONFIG_PATH):
         return LOCAL_CONFIG_PATH
