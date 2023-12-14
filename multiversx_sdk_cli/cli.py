@@ -109,12 +109,12 @@ def verify_deprecated_entries_in_config_file():
     deprecated_keys = config.get_deprecated_entries_in_config_file()
     if len(deprecated_keys) == 0:
         return
-    else:
-        message = "The following entries are deprecated. Please remove them from the `mxpy.json` config file. \n"
-        for entry in deprecated_keys:
-            message += f"{entry} \n"
 
-        ux.show_warning(message)
+    message = "The following entries are deprecated. Please remove them from the `mxpy.json` config file. \n"
+    for entry in deprecated_keys:
+        message += f"{entry} \n"
+
+    ux.show_warning(message)
 
 
 if __name__ == "__main__":
