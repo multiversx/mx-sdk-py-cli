@@ -48,6 +48,8 @@ def _do_main(cli_args: List[str]):
     else:
         logging.basicConfig(level="INFO", format='%(name)s: %(message)s', handlers=[RichHandler(show_time=False, rich_tracebacks=True)])
 
+    verify_deprecated_entries_in_config_file()
+
     if not hasattr(args, "func"):
         parser.print_help()
     else:
@@ -102,6 +104,18 @@ COMMAND GROUPS summary
         parser.epilog += (f"{choice.ljust(30)} {sub.description}\n")
 
     return parser
+
+
+def verify_deprecated_entries_in_config_file():
+    deprecated_keys = config.get_deprecated_entries_in_config_file()
+    if len(deprecated_keys) == 0:
+        return
+
+    message = "The following entries are deprecated. Please remove them from the `mxpy.json` config file. \n"
+    for entry in deprecated_keys:
+        message += f"{entry} \n"
+
+    ux.show_warning(message)
 
 
 if __name__ == "__main__":
