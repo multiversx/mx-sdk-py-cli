@@ -3,7 +3,7 @@ from pathlib import Path
 from typing import List, Union
 
 from multiversx_sdk_cli import myprocess
-from multiversx_sdk_cli.dependencies.install import install_module
+from multiversx_sdk_cli.dependency_checker import check_if_rust_is_installed
 
 logger = logging.getLogger("projects.templates")
 
@@ -33,7 +33,7 @@ class Contract:
 
     def _ensure_dependencies_installed(self):
         logger.info("Checking if the necessarry dependencies are installed.")
-        install_module("rust")
+        check_if_rust_is_installed()
 
     def _prepare_args_to_list_templates(self) -> List[str]:
         args = ["sc-meta", "templates"]
