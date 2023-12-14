@@ -1,0 +1,33 @@
+name: Install mxpy using pipx (MacOS)
+
+on:
+  pull_request:
+    branches: [main, feat/*]
+  workflow_dispatch:
+
+env:
+  BRANCH_NAME: ${{ github.head_ref || github.ref_name }}
+
+jobs:
+  install:
+    runs-on: macos-latest
+
+    strategy:
+      matrix:
+        python-version: [3.11]
+
+    steps:
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install pipx
+        run: |
+          brew install pipx
+          pipx ensurepath
+      - name: Install mxpy
+        run: |
+          pipx install git+https://github.com/multiversx/mx-sdk-py-cli@$BRANCH_NAME
+      - name: Smoke test
+        run: |
+          mxpy --version

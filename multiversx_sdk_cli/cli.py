@@ -19,7 +19,7 @@ import multiversx_sdk_cli.cli_transactions
 import multiversx_sdk_cli.cli_validators
 import multiversx_sdk_cli.cli_wallet
 import multiversx_sdk_cli.version
-from multiversx_sdk_cli import config, errors, ux
+from multiversx_sdk_cli import config, errors, utils, ux
 
 logger = logging.getLogger("cli")
 
@@ -38,6 +38,7 @@ def main(cli_args: List[str] = sys.argv[1:]):
 
 
 def _do_main(cli_args: List[str]):
+    utils.ensure_folder(config.SDK_PATH)
     argv_with_config_args = config.add_config_args(cli_args)
     parser = setup_parser(argv_with_config_args)
     args = parser.parse_args(argv_with_config_args)

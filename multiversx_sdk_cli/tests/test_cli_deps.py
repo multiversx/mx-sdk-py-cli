@@ -41,3 +41,13 @@ def test_deps_install_vmtools():
 def test_deps_check_vmtools():
     return_code = main(["deps", "check", "vmtools"])
     assert return_code == 0
+
+
+def test_deps_install_testwallets():
+    return_code = main(["deps", "install", "testwallets"])
+    assert return_code == 0
+
+
+def test_deps_check_testwallets():
+    return_code = main(["deps", "check", "testwallets"])
+    assert return_code == 0
