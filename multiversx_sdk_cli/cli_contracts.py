@@ -15,6 +15,7 @@ from multiversx_sdk_cli.contract_verification import \
     trigger_contract_verification
 from multiversx_sdk_cli.contracts import SmartContract, query_contract
 from multiversx_sdk_cli.cosign_transaction import cosign_transaction
+from multiversx_sdk_cli.dependency_checker import check_if_rust_is_installed
 from multiversx_sdk_cli.docker import is_docker_installed, run_docker
 from multiversx_sdk_cli.errors import DockerMissingError, NoWalletProvided
 from multiversx_sdk_cli.interfaces import IAddress
@@ -279,11 +280,13 @@ def get_project_paths(args: Any) -> List[Path]:
 
 
 def clean(args: Any):
+    check_if_rust_is_installed()
     project_path = args.path
     projects.clean_project(Path(project_path))
 
 
 def build(args: Any):
+    check_if_rust_is_installed()
     project_paths = [Path(args.path)]
     arg_list = cli_shared.convert_args_object_to_args_list(args)
 
@@ -292,11 +295,13 @@ def build(args: Any):
 
 
 def do_report(args: Any):
+    check_if_rust_is_installed()
     args_dict = args.__dict__
     projects.do_report(args, args_dict)
 
 
 def run_tests(args: Any):
+    check_if_rust_is_installed()
     project_paths = get_project_paths(args)
     for project in project_paths:
         projects.run_tests(project, args)
