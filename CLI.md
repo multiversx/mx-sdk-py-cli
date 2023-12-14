@@ -305,6 +305,9 @@ options:
   --arguments ARGUMENTS [ARGUMENTS ...]           arguments for the contract transaction, as [number, bech32-address,
                                                   ascii string, boolean] or hex-encoded. E.g. --arguments 42 0x64 1000
                                                   0xabba str:TOK-a1c2ef true erd1[..]
+  --token-transfers TOKEN_TRANSFERS [TOKEN_TRANSFERS ...]
+                                                  token transfers for transfer & execute, as [token, amount] E.g.
+                                                  --token-transfers NFT-123456-0a 1 ESDT-987654 100000000
   --wait-result                                   signal to wait for the transaction result - only valid if --send is
                                                   set
   --timeout TIMEOUT                               max num of seconds to wait for result - only valid if --wait-result is
