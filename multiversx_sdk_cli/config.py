@@ -150,7 +150,7 @@ def get_defaults() -> Dict[str, Any]:
         "dependencies.vmtools.urlTemplate.linux": "https://github.com/multiversx/mx-chain-vm-go/archive/{TAG}.tar.gz",
         "dependencies.vmtools.urlTemplate.osx": "https://github.com/multiversx/mx-chain-vm-go/archive/{TAG}.tar.gz",
         "dependencies.vmtools.urlTemplate.windows": "https://github.com/multiversx/mx-chain-vm-go/archive/{TAG}.tar.gz",
-        "dependencies.rust.tag": "nightly-2023-05-26",
+        "dependencies.rust.tag": "nightly-2023-12-11",
         "dependencies.golang.resolution": "SDK",
         "dependencies.golang.tag": "go1.20.7",
         "dependencies.golang.urlTemplate.linux": "https://golang.org/dl/{TAG}.linux-amd64.tar.gz",
