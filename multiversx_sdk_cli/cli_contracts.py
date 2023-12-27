@@ -159,6 +159,7 @@ def setup_parser(args: List[str], subparsers: Any) -> Any:
     _add_build_options_args(sub)
     sub.add_argument("--docker-image", required=True, type=str,
                      help="the docker image tag used to build the contract")
+    sub.add_argument("--package-whole-project-src", action="store_true", default=False, help="include all project files in *.source.json (default: %(default)s)")
     sub.add_argument("--contract", type=str, help="relative path of the contract in the project")
     sub.add_argument("--no-docker-interactive", action="store_true", default=False)
     sub.add_argument("--no-docker-tty", action="store_true", default=False)
@@ -423,6 +424,7 @@ def do_reproducible_build(args: Any):
     project_path = args.project
     docker_image = args.docker_image
     contract_path = args.contract
+    package_whole_project_src = args.package_whole_project_src
     docker_interactive = not args.no_docker_interactive
     docker_tty = not args.no_docker_tty
     no_default_platform = args.no_default_platform
@@ -440,7 +442,17 @@ def do_reproducible_build(args: Any):
         raise DockerMissingError()
 
     logger.info("Starting the docker run...")
-    run_docker(docker_image, project_path, contract_path, output_path, no_wasm_opt, docker_interactive, docker_tty, no_default_platform)
+    run_docker(
+        docker_image,
+        project_path,
+        package_whole_project_src,
+        contract_path,
+        output_path,
+        no_wasm_opt,
+        docker_interactive,
+        docker_tty,
+        no_default_platform
+    )
 
     logger.info("Docker build ran successfully!")
     logger.info(f"Inspect summary of generated artifacts here: {artifacts_path}")

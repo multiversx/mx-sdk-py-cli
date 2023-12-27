@@ -25,6 +25,7 @@ def is_docker_installed():
 def run_docker(
         image: str,
         project_path: Path,
+        package_whole_project_src: bool,
         contract: str,
         output_path: Path,
         no_wasm_opt: bool,
@@ -55,6 +56,9 @@ def run_docker(
 
     if project_path:
         entrypoint_args.extend(["--project", "project"])
+
+    if package_whole_project_src:
+        entrypoint_args.append("--package-whole-project-src")
 
     if no_wasm_opt:
         entrypoint_args.append("--no-wasm-opt")
