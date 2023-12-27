@@ -49,6 +49,7 @@ generate() {
     command "Contract.Upgrade" "contract upgrade"
     command "Contract.Query" "contract query"
     command "Contract.Report" "contract report"
+    command "Contract.ReproducibleBuild" "contract reproducible-build"
 
     group "Transactions" "tx"
     command "Transactions.New" "tx new"

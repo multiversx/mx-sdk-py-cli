@@ -476,6 +476,37 @@ options:
   --twiggy-dominators                             generate a twiggy dominators report after building
 
 ```
+### Contract.ReproducibleBuild
+
+
+```
+$ mxpy contract reproducible-build --help
+usage: mxpy contract reproducible-build [-h] ...
+
+Build a Smart Contract and get the same output as a previously built Smart Contract
+
+positional arguments:
+  project                              🗀 the project directory (default: current directory)
+
+options:
+  -h, --help                           show this help message and exit
+  --debug                              set debug flag (default: False)
+  --no-optimization                    bypass optimizations (for clang) (default: False)
+  --no-wasm-opt                        do not optimize wasm files after the build (default: False)
+  --cargo-target-dir CARGO_TARGET_DIR  for rust projects, forward the parameter to Cargo
+  --wasm-symbols                       for rust projects, does not strip the symbols from the wasm output. Useful for
+                                       analysing the bytecode. Creates larger wasm files. Avoid in production (default:
+                                       False)
+  --wasm-name WASM_NAME                for rust projects, optionally specify the name of the wasm bytecode output file
+  --wasm-suffix WASM_SUFFIX            for rust projects, optionally specify the suffix of the wasm bytecode output file
+  --docker-image DOCKER_IMAGE          the docker image tag used to build the contract
+  --package-whole-project-src          include all project files in *.source.json (default: False)
+  --contract CONTRACT                  relative path of the contract in the project
+  --no-docker-interactive
+  --no-docker-tty
+  --no-default-platform                do not set DOCKER_DEFAULT_PLATFORM environment variable to 'linux/amd64'
+
+```
 ## Group **Transactions**
 
 
