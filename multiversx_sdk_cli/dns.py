@@ -7,8 +7,8 @@ from multiversx_sdk_cli import cli_shared, utils
 from multiversx_sdk_cli.accounts import Account
 from multiversx_sdk_cli.constants import ADDRESS_ZERO_BECH32, DEFAULT_HRP
 from multiversx_sdk_cli.contracts import query_contract
-from multiversx_sdk_cli.transactions import (
-    do_prepare_transaction, tx_to_dictionary_as_inner_for_relayed_V1)
+from multiversx_sdk_cli.transactions import (compute_relayed_v1_data,
+                                             do_prepare_transaction)
 
 MaxNumShards = 256
 ShardIdentiferLen = 2
@@ -50,7 +50,7 @@ def register(args: Any):
     tx = do_prepare_transaction(args)
 
     if hasattr(args, "relay") and args.relay:
-        args.outfile.write(tx_to_dictionary_as_inner_for_relayed_V1(tx))
+        args.outfile.write(compute_relayed_v1_data(tx))
         return
 
     cli_shared.send_or_simulate(tx, args)
