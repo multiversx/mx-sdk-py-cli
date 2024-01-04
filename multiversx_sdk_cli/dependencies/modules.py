@@ -336,7 +336,7 @@ This may cause problems with the installation of rust.""")
     def _install_sc_meta(self):
         logger.info("Installing multiversx-sc-meta.")
         tag = config.get_dependency_tag("sc-meta")
-        args = ["cargo", "install", "multiversx-sc-meta"]
+        args = ["cargo", "install", "multiversx-sc-meta", "--locked"]
 
         if tag != "latest":
             args.extend(["--version", tag])
