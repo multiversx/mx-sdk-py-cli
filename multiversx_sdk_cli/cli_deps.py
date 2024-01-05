@@ -3,6 +3,7 @@ from typing import Any
 
 from multiversx_sdk_cli import cli_shared, config, dependencies, errors
 from multiversx_sdk_cli.dependencies.install import get_deps_dict
+from multiversx_sdk_cli.dependencies.modules import DependencyModule
 
 logger = logging.getLogger("cli.deps")
 
@@ -34,7 +35,17 @@ def install(args: Any):
 
 def check(args: Any):
     name: str = args.name
-    module = dependencies.get_module_by_key(name)
+    if name == "all":
+        all_dependencies = dependencies.get_all_deps()
+
+        for dependency in all_dependencies:
+            check_module_is_installed(dependency)
+    else:
+        module = dependencies.get_module_by_key(name)
+        check_module_is_installed(module)
+
+
+def check_module_is_installed(module: DependencyModule) -> None:
     tag_to_check: str = config.get_dependency_tag(module.key)
     resolution: str = config.get_dependency_resolution(module.key)
     resolution = resolution if resolution else "HOST"
@@ -43,7 +54,7 @@ def check(args: Any):
 
     installed = module.is_installed(tag_to_check)
     if installed:
-        logger.info(f"[{name} {tag_to_check}] is installed.")
+        logger.info(f"[{module.key} {tag_to_check}] is installed.")
         return
 
-    raise errors.DependencyMissing(name, tag_to_check)
+    raise errors.DependencyMissing(module.key, tag_to_check)
