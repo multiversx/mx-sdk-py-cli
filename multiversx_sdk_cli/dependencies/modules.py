@@ -26,9 +26,6 @@ class DependencyModule:
         # We install the default tag
         tag = config.get_dependency_tag(self.key)
 
-        if tag == 'latest':
-            tag = self.get_latest_release()
-
         logger.info(f"install: key={self.key}, tag={tag}, overwrite={overwrite}")
 
         if self._should_skip(tag, overwrite):
@@ -58,9 +55,6 @@ class DependencyModule:
         raise NotImplementedError()
 
     def get_env(self) -> Dict[str, str]:
-        raise NotImplementedError()
-
-    def get_latest_release(self) -> str:
         raise NotImplementedError()
 
     def get_resolution(self) -> DependencyResolution:
@@ -134,14 +128,6 @@ class StandaloneModule(DependencyModule):
 
         url = url.replace("{TAG}", tag)
         return url
-
-    def get_latest_release(self) -> str:
-        if self.repo_name is None or self.organisation is None:
-            raise ValueError(f'{self.key}: repo_name or organisation not specified')
-
-        org_repo = f'{self.organisation}/{self.repo_name}'
-        tag = utils.query_latest_release_tag(org_repo)
-        return tag
 
     def _get_archive_path(self, tag: str) -> Path:
         tools_folder = Path(workstation.get_tools_folder())
@@ -252,9 +238,6 @@ class GolangModule(StandaloneModule):
     def get_gopath(self) -> Path:
         return self.get_parent_directory() / "GOPATH"
 
-    def get_latest_release(self) -> str:
-        raise errors.UnsupportedConfigurationValue("Golang tag must always be explicit, not latest")
-
 
 class Rust(DependencyModule):
     def is_installed(self, tag: str) -> bool:
@@ -338,7 +321,7 @@ This may cause problems with the installation of rust.""")
         tag = config.get_dependency_tag("sc-meta")
         args = ["cargo", "install", "multiversx-sc-meta", "--locked"]
 
-        if tag != "latest":
+        if tag != "":
             args.extend(["--version", tag])
 
         myprocess.run_process(args)
@@ -354,7 +337,7 @@ This may cause problems with the installation of rust.""")
         tag = config.get_dependency_tag("twiggy")
         args = ["cargo", "install", "twiggy"]
 
-        if tag != "latest":
+        if tag != "":
             args.extend(["--version", tag])
 
         myprocess.run_process(args)
@@ -382,9 +365,6 @@ This may cause problems with the installation of rust.""")
 
     def get_env(self) -> Dict[str, str]:
         return dict(os.environ)
-
-    def get_latest_release(self) -> str:
-        raise errors.UnsupportedConfigurationValue("Rust tag must either be explicit, empty or 'nightly'")
 
 
 class TestWalletsModule(StandaloneModule):
