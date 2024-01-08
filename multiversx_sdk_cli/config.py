@@ -150,7 +150,7 @@ def get_defaults() -> Dict[str, Any]:
         "dependencies.vmtools.urlTemplate.linux": "https://github.com/multiversx/mx-chain-vm-go/archive/{TAG}.tar.gz",
         "dependencies.vmtools.urlTemplate.osx": "https://github.com/multiversx/mx-chain-vm-go/archive/{TAG}.tar.gz",
         "dependencies.vmtools.urlTemplate.windows": "https://github.com/multiversx/mx-chain-vm-go/archive/{TAG}.tar.gz",
-        "dependencies.rust.tag": "nightly-2023-05-26",
+        "dependencies.rust.tag": "nightly-2023-12-11",
         "dependencies.golang.resolution": "SDK",
         "dependencies.golang.tag": "go1.20.7",
         "dependencies.golang.urlTemplate.linux": "https://golang.org/dl/{TAG}.linux-amd64.tar.gz",
@@ -165,6 +165,12 @@ def get_defaults() -> Dict[str, Any]:
         "dependencies.wasm-opt.tag": "0.112.0",
         "github_api_token": "",
     }
+
+
+def get_deprecated_entries_in_config_file():
+    default_config_keys = set(get_defaults().keys())
+    current_config_keys = set(get_active().keys())
+    return current_config_keys - default_config_keys
 
 
 def resolve_config_path() -> Path:
@@ -249,6 +255,8 @@ def determine_final_args(argv: List[str], config_args: Dict[str, Any]) -> List[s
 def get_dependency_directory(key: str, tag: str) -> Path:
     parent_directory = get_dependency_parent_directory(key)
     if tag == 'latest':
+        if not parent_directory.is_dir():
+            return parent_directory / tag
         tag = get_latest_semver_from_directory(parent_directory)
 
     return parent_directory / tag
