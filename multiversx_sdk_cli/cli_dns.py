@@ -74,8 +74,8 @@ def _add_name_arg(sub: Any):
 
 def dns_resolve(args: Any):
     addr = resolve(args.name, ProxyNetworkProvider(args.proxy))
-    if addr.hex() != Address.new_from_bech32(ADDRESS_ZERO_BECH32).hex():
-        print(addr.bech32())
+    if addr.to_hex() != Address.new_from_bech32(ADDRESS_ZERO_BECH32).to_hex():
+        print(addr.to_bech32())
 
 
 def dns_validate_name(args: Any):
@@ -89,13 +89,13 @@ def get_name_hash(args: Any):
 def get_dns_address_for_name(args: Any):
     name = args.name
     dns_address = dns_address_for_name(name)
-    print(dns_address)
+    print(dns_address.to_bech32())
 
 
 def get_dns_address_for_name_hex(args: Any):
     name = args.name
     dns_address = dns_address_for_name(name)
-    print(dns_address.hex())
+    print(dns_address.to_hex())
 
 
 def get_registration_cost(args: Any):
@@ -109,7 +109,7 @@ def get_version(args: Any):
         for shard_id in range(0, 256):
             address = compute_dns_address_for_shard_id(shard_id)
             v = version(shard_id, proxy)
-            t.add_row([shard_id, address, address.hex(), v])
+            t.add_row([shard_id, address.to_bech32(), address.to_hex(), v])
         print(t)
     else:
         shard_id = int(args.shard_id)
@@ -120,5 +120,5 @@ def print_dns_addresses_table(args: Any):
     t = PrettyTable(['Shard ID', 'Contract address (bech32)', 'Contract address (hex)'])
     for shard_id in range(0, 256):
         address = compute_dns_address_for_shard_id(shard_id)
-        t.add_row([shard_id, address, address.hex()])
+        t.add_row([shard_id, address.to_bech32(), address.to_hex()])
     print(t)
