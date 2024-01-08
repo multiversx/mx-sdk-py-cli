@@ -4,6 +4,7 @@ from typing import Any, List, Tuple
 from multiversx_sdk_cli import cli_shared, config, dependencies, errors
 from multiversx_sdk_cli.dependencies.install import get_deps_dict
 from multiversx_sdk_cli.dependencies.modules import DependencyModule
+from multiversx_sdk_cli.myprocess import run_process
 
 logger = logging.getLogger("cli.deps")
 
@@ -50,7 +51,25 @@ def check(args: Any):
         if len(missing_dependencies):
             raise errors.DependenciesMissing(missing_dependencies)
         return
+    if name == "rust":
+        module = dependencies.get_module_by_key(name)
+        tag_to_check: str = config.get_dependency_tag(module.key)
 
+        is_installed = check_module_is_installed(module, tag_to_check)
+        if is_installed:
+            actual_rust = _get_actual_installed_rust_version()
+
+            if tag_to_check in actual_rust:
+                logger.info(f"[{module.key} {tag_to_check}] is installed.")
+                return
+            if "command not found" in actual_rust:
+                logger.warning("You have installed Rust without using `rustup`.")
+                return
+            else:
+                logger.warning(f"The Rust version you have installed does not match the recommended version.\nInstalled [{actual_rust}], expected [{tag_to_check}].")
+                return
+
+        raise errors.DependencyMissing(module.key, tag_to_check)
     else:
         module = dependencies.get_module_by_key(name)
         tag_to_check: str = config.get_dependency_tag(module.key)
@@ -71,3 +90,9 @@ def check_module_is_installed(module: DependencyModule, tag_to_check: str) -> bo
 
     installed = module.is_installed(tag_to_check)
     return installed
+
+
+def _get_actual_installed_rust_version() -> str:
+    args = ["rustup", "default"]
+    output = run_process(args, dump_to_stdout=False)
+    return output.rstrip("\n")
