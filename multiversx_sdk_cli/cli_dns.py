@@ -120,5 +120,5 @@ def print_dns_addresses_table(args: Any):
     t = PrettyTable(['Shard ID', 'Contract address (bech32)', 'Contract address (hex)'])
     for shard_id in range(0, 256):
         address = compute_dns_address_for_shard_id(shard_id)
-        t.add_row([shard_id, address, address.hex()])
+        t.add_row([shard_id, address.to_bech32(), address.hex()])
     print(t)
