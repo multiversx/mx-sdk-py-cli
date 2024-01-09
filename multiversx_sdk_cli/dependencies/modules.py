@@ -260,7 +260,7 @@ class Rust(DependencyModule):
 
             if tag in actual_version_installed:
                 logger.info(f"[{self.key} {tag}] is installed.")
-            elif "Command 'rustup' not found" in actual_version_installed:
+            elif "not found" in actual_version_installed:
                 show_warning("You have installed Rust without using `rustup`.")
             else:
                 show_warning(f"The Rust version you have installed does not match the recommended version.\nInstalled [{actual_version_installed}], expected [{tag}].")
