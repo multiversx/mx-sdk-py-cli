@@ -253,7 +253,24 @@ class Rust(DependencyModule):
         logger.info(f"which twiggy: {which_twiggy}")
 
         dependencies = [which_rustc, which_cargo, which_sc_meta, which_wasm_opt, which_twiggy]
-        return all(dependency is not None for dependency in dependencies)
+        installed = all(dependency is not None for dependency in dependencies)
+
+        if installed:
+            actual_version_installed = self._get_actual_installed_version()
+
+            if tag in actual_version_installed:
+                logger.info(f"[{self.key} {tag}] is installed.")
+            elif "Command 'rustup' not found" in actual_version_installed:
+                show_warning("You have installed Rust without using `rustup`.")
+            else:
+                show_warning(f"The Rust version you have installed does not match the recommended version.\nInstalled [{actual_version_installed}], expected [{tag}].")
+
+        return installed
+
+    def _get_actual_installed_version(self) -> str:
+        args = ["rustup", "default"]
+        output = myprocess.run_process(args, dump_to_stdout=False)
+        return output.strip()
 
     def install(self, overwrite: bool) -> None:
         self._check_install_env(apply_correction=overwrite)
@@ -321,7 +338,7 @@ This may cause problems with the installation of rust.""")
         tag = config.get_dependency_tag("sc-meta")
         args = ["cargo", "install", "multiversx-sc-meta", "--locked"]
 
-        if tag != "":
+        if tag:
             args.extend(["--version", tag])
 
         myprocess.run_process(args)
@@ -337,7 +354,7 @@ This may cause problems with the installation of rust.""")
         tag = config.get_dependency_tag("twiggy")
         args = ["cargo", "install", "twiggy"]
 
-        if tag != "":
+        if tag:
             args.extend(["--version", tag])
 
         myprocess.run_process(args)
