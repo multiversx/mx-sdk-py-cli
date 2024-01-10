@@ -30,7 +30,7 @@ class INetworkProvider(Protocol):
     def send_transaction(self, transaction: ITransaction) -> str:
         ...
 
-    def send_transactions(self, transactions: Sequence[ITransaction]) -> Tuple[int, str]:
+    def send_transactions(self, transactions: Sequence[ITransaction]) -> Tuple[int, Dict[str, str]]:
         ...
 
     def get_transaction(self, tx_hash: str, with_process_status: Optional[bool] = False) -> ITransactionOnNetwork:
