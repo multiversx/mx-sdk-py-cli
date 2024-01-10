@@ -8,11 +8,12 @@ from multiversx_sdk_core import (Token, TokenComputer, TokenTransfer,
 from multiversx_sdk_core.address import Address
 from multiversx_sdk_core.transaction_factories import \
     SmartContractTransactionsFactory
-from multiversx_sdk_network_providers.interface import IAddress, IContractQuery
+from multiversx_sdk_network_providers.interface import IContractQuery
 
 from multiversx_sdk_cli import errors
 from multiversx_sdk_cli.accounts import Account
 from multiversx_sdk_cli.constants import DEFAULT_HRP
+from multiversx_sdk_cli.interfaces import IAddress
 from multiversx_sdk_cli.utils import Object
 
 logger = logging.getLogger("contracts")
@@ -75,76 +76,103 @@ class SmartContract:
     def __init__(self, config: IConfig):
         self._factory = SmartContractTransactionsFactory(config, TokenComputer())
 
-    def prepare_deploy_transaction(self, owner: Account, args: Any) -> Transaction:
-        arguments = args.arguments or []
-        arguments = prepare_args_for_factory(arguments)
-
+    def prepare_deploy_transaction(self,
+                                   owner: Account,
+                                   bytecode: Path,
+                                   arguments: List[str],
+                                   upgradeable: bool,
+                                   readable: bool,
+                                   payable: bool,
+                                   payable_by_sc: bool,
+                                   gas_limit: int,
+                                   value: int,
+                                   nonce: int,
+                                   version: int,
+                                   options: int,
+                                   guardian: str) -> Transaction:
         tx = self._factory.create_transaction_for_deploy(
             sender=owner.address,
-            bytecode=Path(args.bytecode),
-            gas_limit=int(args.gas_limit),
-            arguments=arguments,
-            native_transfer_amount=int(args.value),
-            is_upgradeable=args.metadata_upgradeable,
-            is_readable=args.metadata_readable,
-            is_payable=args.metadata_payable,
-            is_payable_by_sc=args.metadata_payable_by_sc
+            bytecode=bytecode,
+            gas_limit=gas_limit,
+            arguments=prepare_args_for_factory(arguments),
+            native_transfer_amount=value,
+            is_upgradeable=upgradeable,
+            is_readable=readable,
+            is_payable=payable,
+            is_payable_by_sc=payable_by_sc
         )
-        tx.nonce = int(args.nonce)
-        tx.version = int(args.version)
-        tx.options = int(args.options)
-        tx.guardian = args.guardian
+        tx.nonce = nonce
+        tx.version = version
+        tx.options = options
+        tx.guardian = guardian
         tx.signature = bytes.fromhex(owner.sign_transaction(tx))
 
         return tx
 
-    def prepare_execute_transaction(self, caller: Account, args: Any) -> Transaction:
-        contract_address = Address.new_from_bech32(args.contract)
-        arguments = args.arguments or []
-        arguments = prepare_args_for_factory(arguments)
-
-        value = int(args.value)
-        transfers = args.token_transfers
+    def prepare_execute_transaction(self,
+                                    caller: Account,
+                                    contract: Address,
+                                    function: str,
+                                    arguments: List[str],
+                                    gas_limit: int,
+                                    value: int,
+                                    transfers: List[str],
+                                    nonce: int,
+                                    version: int,
+                                    options: int,
+                                    guardian: str) -> Transaction:
         token_transfers = self._prepare_token_transfers(transfers) if transfers else []
 
         tx = self._factory.create_transaction_for_execute(
             sender=caller.address,
-            contract=contract_address,
-            function=args.function,
-            gas_limit=int(args.gas_limit),
-            arguments=arguments,
+            contract=contract,
+            function=function,
+            gas_limit=gas_limit,
+            arguments=prepare_args_for_factory(arguments),
             native_transfer_amount=value,
             token_transfers=token_transfers
         )
-        tx.nonce = int(args.nonce)
-        tx.version = int(args.version)
-        tx.options = int(args.options)
-        tx.guardian = args.guardian
+        tx.nonce = nonce
+        tx.version = version
+        tx.options = options
+        tx.guardian = guardian
         tx.signature = bytes.fromhex(caller.sign_transaction(tx))
 
         return tx
 
-    def prepare_upgrade_transaction(self, owner: Account, args: Any):
-        contract_address = Address.new_from_bech32(args.contract)
-        arguments = args.arguments or []
+    def prepare_upgrade_transaction(self,
+                                    owner: Account,
+                                    contract: IAddress,
+                                    bytecode: Path,
+                                    arguments: List[str],
+                                    upgradeable: bool,
+                                    readable: bool,
+                                    payable: bool,
+                                    payable_by_sc: bool,
+                                    gas_limit: int,
+                                    value: int,
+                                    nonce: int,
+                                    version: int,
+                                    options: int,
+                                    guardian: str) -> Transaction:
         arguments = prepare_args_for_factory(arguments)
 
         tx = self._factory.create_transaction_for_upgrade(
             sender=owner.address,
-            contract=contract_address,
-            bytecode=Path(args.bytecode),
-            gas_limit=int(args.gas_limit),
+            contract=contract,
+            bytecode=bytecode,
+            gas_limit=gas_limit,
             arguments=arguments,
-            native_transfer_amount=int(args.value),
-            is_upgradeable=args.metadata_upgradeable,
-            is_readable=args.metadata_readable,
-            is_payable=args.metadata_payable,
-            is_payable_by_sc=args.metadata_payable_by_sc
+            native_transfer_amount=value,
+            is_upgradeable=upgradeable,
+            is_readable=readable,
+            is_payable=payable,
+            is_payable_by_sc=payable_by_sc
         )
-        tx.nonce = int(args.nonce)
-        tx.version = int(args.version)
-        tx.options = int(args.options)
-        tx.guardian = args.guardian
+        tx.nonce = nonce
+        tx.version = version
+        tx.options = options
+        tx.guardian = guardian
         tx.signature = bytes.fromhex(owner.sign_transaction(tx))
 
         return tx
