@@ -1,6 +1,7 @@
 import logging
 from typing import Any, List
 
+from multiversx_sdk_core import Address
 from multiversx_sdk_core.transaction_factories.transactions_factory_config import \
     TransactionsFactoryConfig
 
@@ -10,6 +11,9 @@ from multiversx_sdk_cli.errors import BadUsage
 from multiversx_sdk_cli.transactions import compute_relayed_v1_data
 
 logger = logging.getLogger("cli.multisig")
+
+MULTISIG_SIGN_ACTION_FUNCTION = "sign"
+MULTISIG_PERFORM_ACTION_FUNCTION = "performAction"
 
 
 def setup_parser(args: List[str], subparsers: Any) -> Any:
@@ -62,17 +66,28 @@ def sign_action(args: Any):
     cli_shared.prepare_chain_id_in_args(args)
     cli_shared.prepare_nonce_in_args(args)
 
-    sender = cli_shared.prepare_account(args)
-
     config = TransactionsFactoryConfig(args.chain)
     contract = SmartContract(config)
+
+    sender = cli_shared.prepare_account(args)
+    contract_address = Address.new_from_bech32(args.multisig)
 
     action_id = args.action_id
     if action_id == "all":
         raise BadUsage("`all` is not supported at the moment. Please use a specific action id")
 
-    mapped_args = _map_args_to_contract_call_args(args, "sign")
-    tx = contract.prepare_execute_transaction(sender, mapped_args)
+    tx = contract.prepare_execute_transaction(
+        caller=sender,
+        contract=contract_address,
+        function=MULTISIG_SIGN_ACTION_FUNCTION,
+        arguments=args.action_id,
+        gas_limit=int(args.gas_limit),
+        value=int(args.value),
+        transfers=None,
+        nonce=int(args.nonce),
+        version=int(args.version),
+        options=int(args.options),
+        guardian=args.guardian)
 
     if hasattr(args, "relay") and args.relay:
         args.outfile.write(compute_relayed_v1_data(tx))
@@ -89,40 +104,31 @@ def perform_action(args: Any):
     cli_shared.prepare_chain_id_in_args(args)
     cli_shared.prepare_nonce_in_args(args)
 
-    sender = cli_shared.prepare_account(args)
-
     config = TransactionsFactoryConfig(args.chain)
     contract = SmartContract(config)
+
+    sender = cli_shared.prepare_account(args)
+    contract_address = Address.new_from_bech32(args.multisig)
 
     action_id = args.action_id
     if action_id == "all":
         raise BadUsage("`all` is not supported at the moment. Please use a specific action id")
 
-    mapped_args = _map_args_to_contract_call_args(args, "performAction")
-    tx = contract.prepare_execute_transaction(sender, mapped_args)
+    tx = contract.prepare_execute_transaction(
+        caller=sender,
+        contract=contract_address,
+        function=MULTISIG_PERFORM_ACTION_FUNCTION,
+        arguments=args.action_id,
+        gas_limit=int(args.gas_limit),
+        value=int(args.value),
+        transfers=None,
+        nonce=int(args.nonce),
+        version=int(args.version),
+        options=int(args.options),
+        guardian=args.guardian)
 
     if hasattr(args, "relay") and args.relay:
         args.outfile.write(compute_relayed_v1_data(tx))
         return
 
     cli_shared.send_or_simulate(tx, args)
-
-
-class PlainObject:
-    pass
-
-
-def _map_args_to_contract_call_args(args: Any, function: str) -> Any:
-    obj = PlainObject()
-    obj.contract = args.multisig
-    obj.function = function
-    obj.arguments = args.action_id
-    obj.value = args.value
-    obj.token_transfers = None
-    obj.gas_limit = args.gas_limit
-    obj.nonce = args.nonce
-    obj.version = args.version
-    obj.options = args.options
-    obj.guardian = args.guardian
-
-    return obj

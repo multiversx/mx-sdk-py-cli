@@ -113,7 +113,7 @@ class SmartContract:
 
     def prepare_execute_transaction(self,
                                     caller: Account,
-                                    contract: Address,
+                                    contract: IAddress,
                                     function: str,
                                     arguments: Union[List[str], None],
                                     gas_limit: int,
