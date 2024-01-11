@@ -227,7 +227,7 @@ def _add_contract_arg(sub: Any):
 
 
 def _add_function_arg(sub: Any):
-    sub.add_argument("--function", required=True, help="the function to call")
+    sub.add_argument("--function", required=True, type=str, help="the function to call")
 
 
 def _add_arguments_arg(sub: Any):
@@ -321,7 +321,20 @@ def deploy(args: Any):
     address_computer = AddressComputer(NUMBER_OF_SHARDS)
     contract_address = address_computer.compute_contract_address(deployer=sender.address, deployment_nonce=args.nonce)
 
-    tx = contract.prepare_deploy_transaction(sender, args)
+    tx = contract.prepare_deploy_transaction(
+        owner=sender,
+        bytecode=Path(args.bytecode),
+        arguments=args.arguments,
+        upgradeable=args.metadata_upgradeable,
+        readable=args.metadata_readable,
+        payable=args.metadata_payable,
+        payable_by_sc=args.metadata_payable_by_sc,
+        gas_limit=int(args.gas_limit),
+        value=int(args.value),
+        nonce=int(args.nonce),
+        version=int(args.version),
+        options=int(args.options),
+        guardian=args.guardian)
     tx = _sign_guarded_tx(args, tx)
 
     logger.info("Contract address: %s", contract_address.to_bech32())
@@ -356,7 +369,18 @@ def call(args: Any):
     contract = SmartContract(config)
     contract_address = Address.new_from_bech32(args.contract)
 
-    tx = contract.prepare_execute_transaction(sender, args)
+    tx = contract.prepare_execute_transaction(
+        caller=sender,
+        contract=contract_address,
+        function=args.function,
+        arguments=args.arguments,
+        gas_limit=int(args.gas_limit),
+        value=int(args.value),
+        transfers=args.token_transfers,
+        nonce=int(args.nonce),
+        version=int(args.version),
+        options=int(args.options),
+        guardian=args.guardian)
     tx = _sign_guarded_tx(args, tx)
 
     _send_or_simulate(tx, contract_address, args)
@@ -374,7 +398,21 @@ def upgrade(args: Any):
     contract = SmartContract(config)
     contract_address = Address.new_from_bech32(args.contract)
 
-    tx = contract.prepare_upgrade_transaction(sender, args)
+    tx = contract.prepare_upgrade_transaction(
+        owner=sender,
+        contract=contract_address,
+        bytecode=Path(args.bytecode),
+        arguments=args.arguments,
+        upgradeable=args.metadata_upgradeable,
+        readable=args.metadata_readable,
+        payable=args.metadata_payable,
+        payable_by_sc=args.metadata_payable_by_sc,
+        gas_limit=int(args.gas_limit),
+        value=int(args.value),
+        nonce=int(args.nonce),
+        version=int(args.version),
+        options=int(args.options),
+        guardian=args.guardian)
     tx = _sign_guarded_tx(args, tx)
 
     _send_or_simulate(tx, contract_address, args)
