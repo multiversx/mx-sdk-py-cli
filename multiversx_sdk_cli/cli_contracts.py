@@ -227,7 +227,7 @@ def _add_contract_arg(sub: Any):
 
 
 def _add_function_arg(sub: Any):
-    sub.add_argument("--function", required=True, help="the function to call")
+    sub.add_argument("--function", required=True, type=str, help="the function to call")
 
 
 def _add_arguments_arg(sub: Any):

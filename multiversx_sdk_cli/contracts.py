@@ -1,7 +1,7 @@
 import base64
 import logging
 from pathlib import Path
-from typing import Any, List, Optional, Protocol, Sequence
+from typing import Any, List, Optional, Protocol, Sequence, Union
 
 from multiversx_sdk_core import (Token, TokenComputer, TokenTransfer,
                                  Transaction, TransactionPayload)
@@ -79,7 +79,7 @@ class SmartContract:
     def prepare_deploy_transaction(self,
                                    owner: Account,
                                    bytecode: Path,
-                                   arguments: List[str],
+                                   arguments: Union[List[str], None],
                                    upgradeable: bool,
                                    readable: bool,
                                    payable: bool,
@@ -90,11 +90,13 @@ class SmartContract:
                                    version: int,
                                    options: int,
                                    guardian: str) -> Transaction:
+        args = prepare_args_for_factory(arguments) if arguments else []
+
         tx = self._factory.create_transaction_for_deploy(
             sender=owner.address,
             bytecode=bytecode,
             gas_limit=gas_limit,
-            arguments=prepare_args_for_factory(arguments),
+            arguments=args,
             native_transfer_amount=value,
             is_upgradeable=upgradeable,
             is_readable=readable,
@@ -113,22 +115,23 @@ class SmartContract:
                                     caller: Account,
                                     contract: Address,
                                     function: str,
-                                    arguments: List[str],
+                                    arguments: Union[List[str], None],
                                     gas_limit: int,
                                     value: int,
-                                    transfers: List[str],
+                                    transfers: Union[List[str], None],
                                     nonce: int,
                                     version: int,
                                     options: int,
                                     guardian: str) -> Transaction:
         token_transfers = self._prepare_token_transfers(transfers) if transfers else []
+        args = prepare_args_for_factory(arguments) if arguments else []
 
         tx = self._factory.create_transaction_for_execute(
             sender=caller.address,
             contract=contract,
             function=function,
             gas_limit=gas_limit,
-            arguments=prepare_args_for_factory(arguments),
+            arguments=args,
             native_transfer_amount=value,
             token_transfers=token_transfers
         )
@@ -144,7 +147,7 @@ class SmartContract:
                                     owner: Account,
                                     contract: IAddress,
                                     bytecode: Path,
-                                    arguments: List[str],
+                                    arguments: Union[List[str], None],
                                     upgradeable: bool,
                                     readable: bool,
                                     payable: bool,
@@ -155,14 +158,14 @@ class SmartContract:
                                     version: int,
                                     options: int,
                                     guardian: str) -> Transaction:
-        arguments = prepare_args_for_factory(arguments)
+        args = prepare_args_for_factory(arguments) if arguments else []
 
         tx = self._factory.create_transaction_for_upgrade(
             sender=owner.address,
             contract=contract,
             bytecode=bytecode,
             gas_limit=gas_limit,
-            arguments=arguments,
+            arguments=args,
             native_transfer_amount=value,
             is_upgradeable=upgradeable,
             is_readable=readable,
