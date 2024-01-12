@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Union
 
 from multiversx_sdk_core import (Address, TokenComputer, TokenTransfer,
                                  Transaction)
@@ -80,6 +80,34 @@ def prepare_transaction_for_custom_token_transfer(sender: Account,
     tx.data = data_field.encode()
     tx.signature = bytes.fromhex(sender.sign_transaction(tx))
     return tx
+
+
+def prepare_transaction_for_depositing_funds(sender: Account,
+                                             multisig: str,
+                                             chain_id: str,
+                                             value: int,
+                                             transfers: Union[List[str], None],
+                                             gas_limit: int,
+                                             nonce: int,
+                                             version: int,
+                                             options: int,
+                                             guardian: str):
+    config = TransactionsFactoryConfig(chain_id)
+    contract = SmartContract(config)
+
+    return contract.prepare_execute_transaction(
+        caller=sender,
+        contract=Address.from_bech32(multisig),
+        function="deposit",
+        arguments=None,
+        gas_limit=gas_limit,
+        value=value,
+        transfers=transfers,
+        nonce=nonce,
+        version=version,
+        options=options,
+        guardian=guardian
+    )
 
 
 def _prepare_data_parts_for_multisig_transfer(receiver: Address, token_transfers: List[TokenTransfer]):

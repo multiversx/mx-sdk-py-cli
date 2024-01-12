@@ -59,6 +59,99 @@ def test_perform_action(capsys: Any):
     assert chain_id == "T"
 
 
+def test_deposit_egld(capsys: Any):
+    return_code = main([
+        "multisig", "deposit",
+        "--multisig", "erd1qqqqqqqqqqqqqpgqpg4q7ye5p9uv9m4zdzj69h8ezuqjj78krawq9zqz30",
+        "--pem", str(alice),
+        "--nonce", "1449",
+        "--chain", "T",
+        "--gas-limit", "10000000",
+        "--value", "50000000000000000"
+    ])
+    assert False if return_code else True
+
+    transaction = get_transaction(capsys)
+
+    data_field: str = transaction["data"]
+    data = base64.b64decode(data_field.encode()).decode()
+    assert data == "deposit"
+
+    receiver = transaction["receiver"]
+    assert receiver == "erd1qqqqqqqqqqqqqpgqpg4q7ye5p9uv9m4zdzj69h8ezuqjj78krawq9zqz30"
+
+    chain_id = transaction["chainID"]
+    assert chain_id == "T"
+
+    value = int(transaction["value"])
+    assert value == 50000000000000000
+
+    signature = transaction["signature"]
+    assert signature == "ba823e12c7eba1cb8e7c41f7f4042d54742a8162114875150e0f9d1e3535fdb74e7a89adfbda4360cd9f02de531facaf2a60a8f53ae48765ff2c7ae685f61704"
+
+
+def test_deposit_esdt(capsys: Any):
+    return_code = main([
+        "multisig", "deposit",
+        "--multisig", "erd1qqqqqqqqqqqqqpgqpg4q7ye5p9uv9m4zdzj69h8ezuqjj78krawq9zqz30",
+        "--pem", str(alice),
+        "--nonce", "1525",
+        "--chain", "T",
+        "--gas-limit", "10000000",
+        "--token-transfers", "TST-267761", "1000"
+    ])
+    assert False if return_code else True
+
+    transaction = get_transaction(capsys)
+
+    data_field: str = transaction["data"]
+    data = base64.b64decode(data_field.encode()).decode()
+    assert data == "ESDTTransfer@5453542d323637373631@03e8@6465706f736974"
+
+    receiver = transaction["receiver"]
+    assert receiver == "erd1qqqqqqqqqqqqqpgqpg4q7ye5p9uv9m4zdzj69h8ezuqjj78krawq9zqz30"
+
+    chain_id = transaction["chainID"]
+    assert chain_id == "T"
+
+    value = int(transaction["value"])
+    assert value == 0
+
+    signature = transaction["signature"]
+    assert signature == "4bb4421783ba2b19060d6d7b84bcdda484f475a52eab6eb44679af2cac1dfae0c10552efd84ef7bdae028a40bc656f30e52984aa4f90581700377e44c4d4810b"
+
+
+def test_deposit_multi_esdt(capsys: Any):
+    return_code = main([
+        "multisig", "deposit",
+        "--multisig", "erd1qqqqqqqqqqqqqpgqpg4q7ye5p9uv9m4zdzj69h8ezuqjj78krawq9zqz30",
+        "--pem", str(alice),
+        "--nonce", "1531",
+        "--chain", "T",
+        "--gas-limit", "10000000",
+        "--token-transfers", "TST-267761", "1700", "ZZZ-9ee87d", "1200"
+    ])
+    assert False if return_code else True
+
+    transaction = get_transaction(capsys)
+
+    data_field: str = transaction["data"]
+    data = base64.b64decode(data_field.encode()).decode()
+    assert data == "MultiESDTNFTTransfer@000000000000000005000a2a0f13340978c2eea268a5a2dcf917012978f61f5c@02@5453542d323637373631@@06a4@5a5a5a2d396565383764@@04b0@6465706f736974"
+
+    receiver = transaction["receiver"]
+    assert receiver == "erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th"
+
+    chain_id = transaction["chainID"]
+    assert chain_id == "T"
+
+    value = int(transaction["value"])
+    assert value == 0
+
+    signature = transaction["signature"]
+    assert signature == "034e8644e4363640224c20556b9a3abb3aef36d59697754a44e9d0cbe26e31de8bd78d4529b5c5a3b74a7e51a14f0f62e10f01386318b005f384c69e885c960c"
+
+
 def test_propose_egld_transfer(capsys: Any):
     return_code = main([
         "tx", "new",
