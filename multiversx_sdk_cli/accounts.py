@@ -12,10 +12,9 @@ from multiversx_sdk_cli.interfaces import IAccount, IAddress, ITransaction
 from multiversx_sdk_cli.ledger.config import compare_versions
 from multiversx_sdk_cli.ledger.ledger_app_handler import \
     SIGN_USING_HASH_VERSION
-from multiversx_sdk_cli.ledger.ledger_functions import (
-    TX_HASH_SIGN_OPTIONS, TX_HASH_SIGN_VERSION, do_get_ledger_address,
-    do_get_ledger_version, do_sign_message_with_ledger,
-    do_sign_transaction_with_ledger)
+from multiversx_sdk_cli.ledger.ledger_functions import (TX_HASH_SIGN_OPTIONS,
+                                                        TX_HASH_SIGN_VERSION,
+                                                        LedgerFacade)
 
 logger = logging.getLogger("accounts")
 
@@ -87,12 +86,19 @@ class Account(AccountBase):
 class LedgerAccount(Account):
     def __init__(self, account_index: int = 0, address_index: int = 0) -> None:
         super().__init__()
+
+        ledger = LedgerFacade()
+        ledger_address = ledger.do_get_ledger_address(account_index=account_index, address_index=address_index)
+
+        self.ledger = ledger
         self.account_index = account_index
         self.address_index = address_index
-        self.address = Address.new_from_bech32(do_get_ledger_address(account_index=account_index, address_index=address_index))
+
+        # This is to satisfy the interface of "Account" (design workaround, can be improved).
+        self.address = Address.new_from_bech32(ledger_address)
 
     def sign_transaction(self, transaction: ITransaction) -> str:
-        ledger_version = do_get_ledger_version()
+        ledger_version = self.ledger.do_get_ledger_version()
         should_use_hash_signing = compare_versions(ledger_version, SIGN_USING_HASH_VERSION) >= 0
         if should_use_hash_signing:
             transaction.version = TX_HASH_SIGN_VERSION
@@ -100,7 +106,7 @@ class LedgerAccount(Account):
 
         transaction_computer = TransactionComputer()
 
-        signature = do_sign_transaction_with_ledger(
+        signature = self.ledger.do_sign_transaction_with_ledger(
             transaction_computer.compute_bytes_for_signing(transaction),
             account_index=self.account_index,
             address_index=self.address_index,
@@ -115,7 +121,7 @@ class LedgerAccount(Account):
         message_data_to_sign: bytes = message_length + data
         logger.debug(f"LedgerAccount.sign_message(): raw_data_to_sign = {data.hex()}, message_data_to_sign = {message_data_to_sign.hex()}")
 
-        signature = do_sign_message_with_ledger(
+        signature = self.ledger.do_sign_message_with_ledger(
             message_data_to_sign,
             account_index=self.account_index,
             address_index=self.address_index

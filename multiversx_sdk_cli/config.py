@@ -52,13 +52,17 @@ def get_dependency_url(key: str, tag: str, platform: str) -> str:
     return url_template.replace("{TAG}", tag)
 
 
+def is_ledger_debug_enabled() -> bool:
+    return get_value_bool("ledger.debug")
+
+
 def get_value(name: str) -> str:
     _guard_valid_name(name)
     data = get_active()
     default_value = get_defaults()[name]
     value = data.get(name, default_value)
-    assert isinstance(value, str)
-    return value
+    value_as_string = str(value)
+    return value_as_string
 
 
 def set_value(name: str, value: Any):
@@ -69,6 +73,11 @@ def set_value(name: str, value: Any):
     data["configurations"].setdefault(active_config, {})
     data["configurations"][active_config][name] = value
     write_file(data)
+
+
+def get_value_bool(name: str) -> bool:
+    value = get_value(name)
+    return value.lower() in ["true", "1", "yes"]
 
 
 def delete_value(name: str):
@@ -164,6 +173,7 @@ def get_defaults() -> Dict[str, Any]:
         "dependencies.testwallets.urlTemplate.windows": "https://github.com/multiversx/mx-sdk-testwallets/archive/{TAG}.tar.gz",
         "dependencies.wasm-opt.tag": "0.112.0",
         "github_api_token": "",
+        "ledger.debug": False,
     }
 
 

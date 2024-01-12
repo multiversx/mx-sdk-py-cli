@@ -1,5 +1,6 @@
 import logging
 
+from multiversx_sdk_cli import config
 from multiversx_sdk_cli.ledger.ledger_app_handler import LedgerApp
 
 TX_HASH_SIGN_VERSION = 2
@@ -8,48 +9,51 @@ TX_HASH_SIGN_OPTIONS = 1
 logger = logging.getLogger("ledger")
 
 
-def do_sign_transaction_with_ledger(
-        tx_payload: bytes,
-        account_index: int,
-        address_index: int,
-        sign_using_hash: bool
-) -> str:
-    ledger_handler = LedgerApp()
-    ledger_handler.set_address(account_index=account_index, address_index=address_index)
+class LedgerFacade:
+    def __init__(self):
+        self.debug = config.is_ledger_debug_enabled()
 
-    logger.info("Ledger: please confirm the transaction on the device")
-    signature = ledger_handler.sign_transaction(tx_payload, sign_using_hash)
-    ledger_handler.close()
+    def do_sign_transaction_with_ledger(
+            self,
+            tx_payload: bytes,
+            account_index: int,
+            address_index: int,
+            sign_using_hash: bool
+    ) -> str:
+        app = LedgerApp(debug=self.debug)
+        app.set_address(account_index=account_index, address_index=address_index)
 
-    return signature
+        logger.info("Ledger: please confirm the transaction on the device")
+        signature = app.sign_transaction(tx_payload, sign_using_hash)
+        app.close()
 
+        return signature
 
-def do_sign_message_with_ledger(
-        message_payload: bytes,
-        account_index: int,
-        address_index: int
-) -> str:
-    ledger_handler = LedgerApp()
-    ledger_handler.set_address(account_index=account_index, address_index=address_index)
+    def do_sign_message_with_ledger(
+            self,
+            message_payload: bytes,
+            account_index: int,
+            address_index: int
+    ) -> str:
+        app = LedgerApp(debug=self.debug)
+        app.set_address(account_index=account_index, address_index=address_index)
 
-    logger.info("Ledger: please confirm the message on the device")
-    signature = ledger_handler.sign_message(message_payload)
-    ledger_handler.close()
+        logger.info("Ledger: please confirm the message on the device")
+        signature = app.sign_message(message_payload)
+        app.close()
 
-    return signature
+        return signature
 
+    def do_get_ledger_address(self, account_index: int, address_index: int) -> str:
+        app = LedgerApp(debug=self.debug)
+        address = app.get_address(account_index=account_index, address_index=address_index)
+        app.close()
 
-def do_get_ledger_address(account_index: int, address_index: int) -> str:
-    ledger_handler = LedgerApp()
-    ledger_address = ledger_handler.get_address(account_index=account_index, address_index=address_index)
-    ledger_handler.close()
+        return address
 
-    return ledger_address
+    def do_get_ledger_version(self) -> str:
+        app = LedgerApp(debug=self.debug)
+        version = app.get_version()
+        app.close()
 
-
-def do_get_ledger_version() -> str:
-    ledger_handler = LedgerApp()
-    ledger_version = ledger_handler.get_version()
-    ledger_handler.close()
-
-    return ledger_version
+        return version

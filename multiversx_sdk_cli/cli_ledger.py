@@ -1,7 +1,7 @@
 import logging
 from typing import Any
 
-from multiversx_sdk_cli import cli_shared
+from multiversx_sdk_cli import cli_shared, config
 from multiversx_sdk_cli.ledger.ledger_app_handler import LedgerApp
 
 logger = logging.getLogger("cli.ledger")
@@ -22,7 +22,7 @@ def setup_parser(subparsers: Any) -> Any:
 
 
 def print_addresses(args: Any):
-    ledger_app = LedgerApp()
+    ledger_app = LedgerApp(debug=config.is_ledger_debug_enabled())
     for i in range(args.num_addresses):
         address = ledger_app.get_address(0, i)
         print('account index = %d | address index = %d | address: %s' % (0, i, address))
@@ -30,6 +30,6 @@ def print_addresses(args: Any):
 
 
 def print_version(args: Any):
-    ledger_app = LedgerApp()
+    ledger_app = LedgerApp(debug=config.is_ledger_debug_enabled())
     print("MultiversX App version: " + ledger_app.get_version())
     ledger_app.close()
