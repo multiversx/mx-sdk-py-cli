@@ -37,8 +37,6 @@ def setup_parser(subparsers: Any) -> Any:
 
 
 def parse(args: Any):
-    logger.warning("Always review --expression parameters before executing this command!")
-
     file = Path(args.file).expanduser()
     expression: str = args.expression
     suffix = file.suffix
