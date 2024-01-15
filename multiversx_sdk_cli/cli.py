@@ -68,7 +68,10 @@ mxpy is part of the multiversx-sdk and consists of Command Line Tools and Python
 for interacting with the Blockchain (in general) and with Smart Contracts (in particular).
 
 mxpy targets a broad audience of users and developers.
-https://docs.multiversx.com/sdk-and-tools/mxpy.
+
+See:
+ - https://docs.multiversx.com/sdk-and-tools/sdk-py
+ - https://docs.multiversx.com/sdk-and-tools/sdk-py/mxpy-cli
         """,
         formatter_class=argparse.RawDescriptionHelpFormatter
     )
