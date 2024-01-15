@@ -308,7 +308,7 @@ def _to_hex(arg: str):
     if arg.isnumeric():
         return _prepare_decimal(arg)
     elif arg.startswith(DEFAULT_HRP):
-        addr = Address.from_bech32(arg)
+        addr = Address.new_from_bech32(arg)
         return _prepare_hexadecimal(f"{HEX_PREFIX}{addr.hex()}")
     elif arg.lower() == FALSE_STR_LOWER or arg.lower() == TRUE_STR_LOWER:
         as_str = f"{HEX_PREFIX}01" if arg.lower() == TRUE_STR_LOWER else f"{HEX_PREFIX}00"

@@ -17,8 +17,11 @@ from multiversx_sdk_cli.contracts import SmartContract, query_contract
 from multiversx_sdk_cli.cosign_transaction import cosign_transaction
 from multiversx_sdk_cli.dependency_checker import check_if_rust_is_installed
 from multiversx_sdk_cli.docker import is_docker_installed, run_docker
-from multiversx_sdk_cli.errors import DockerMissingError, NoWalletProvided
+from multiversx_sdk_cli.errors import (BadUsage, DockerMissingError,
+                                       NoWalletProvided)
 from multiversx_sdk_cli.interfaces import IAddress
+from multiversx_sdk_cli.multisig import \
+    prepare_transaction_for_deploying_contract
 from multiversx_sdk_cli.projects.core import get_project_paths_recursively
 from multiversx_sdk_cli.projects.templates import Contract
 from multiversx_sdk_cli.ux import show_message
@@ -85,6 +88,8 @@ def setup_parser(args: List[str], subparsers: Any) -> Any:
                                                     " - only valid if --wait-result is set")
     cli_shared.add_broadcast_args(sub)
     cli_shared.add_guardian_wallet_args(args, sub)
+    cli_shared.add_multisig_address_arg(sub)
+    cli_shared.add_contract_address_for_multisig_deploy(sub)
 
     sub.set_defaults(func=deploy)
 
@@ -315,20 +320,43 @@ def deploy(args: Any):
     address_computer = AddressComputer(NUMBER_OF_SHARDS)
     contract_address = address_computer.compute_contract_address(deployer=sender.address, deployment_nonce=args.nonce)
 
-    tx = contract.prepare_deploy_transaction(
-        owner=sender,
-        bytecode=Path(args.bytecode),
-        arguments=args.arguments,
-        upgradeable=args.metadata_upgradeable,
-        readable=args.metadata_readable,
-        payable=args.metadata_payable,
-        payable_by_sc=args.metadata_payable_by_sc,
-        gas_limit=int(args.gas_limit),
-        value=int(args.value),
-        nonce=int(args.nonce),
-        version=int(args.version),
-        options=int(args.options),
-        guardian=args.guardian)
+    if args.multisig:
+        if not args.deployed_contract:
+            raise BadUsage("`--deployed-contract` needs to be provided when proposing a deploy action for the multisig contract")
+
+        tx = prepare_transaction_for_deploying_contract(
+            sender=sender,
+            multisig=args.multisig,
+            deployed_contract=args.deployed_contract,
+            arguments=args.arguments,
+            upgradeable=args.metadata_upgradeable,
+            readable=args.metadata_readable,
+            payable=args.metadata_payable,
+            payable_by_sc=args.metadata_payable_by_sc,
+            chain_id=args.chain,
+            value=int(args.value),
+            gas_limit=int(args.gas_limit),
+            nonce=int(args.nonce),
+            version=int(args.version),
+            options=int(args.options),
+            guardian=args.guardian
+        )
+    else:
+        tx = contract.prepare_deploy_transaction(
+            owner=sender,
+            bytecode=Path(args.bytecode),
+            arguments=args.arguments,
+            upgradeable=args.metadata_upgradeable,
+            readable=args.metadata_readable,
+            payable=args.metadata_payable,
+            payable_by_sc=args.metadata_payable_by_sc,
+            gas_limit=int(args.gas_limit),
+            value=int(args.value),
+            nonce=int(args.nonce),
+            version=int(args.version),
+            options=int(args.options),
+            guardian=args.guardian)
+
     tx = _sign_guarded_tx(args, tx)
 
     logger.info("Contract address: %s", contract_address.to_bech32())
@@ -436,7 +464,7 @@ def _send_or_simulate(tx: Transaction, contract_address: IAddress, args: Any):
 
 
 def verify(args: Any) -> None:
-    contract = Address.from_bech32(args.contract)
+    contract = Address.new_from_bech32(args.contract)
     verifier_url = args.verifier_url
 
     packaged_src = Path(args.packaged_src).expanduser().resolve()

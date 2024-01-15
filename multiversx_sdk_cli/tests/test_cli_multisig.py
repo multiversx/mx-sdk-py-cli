@@ -16,8 +16,8 @@ def test_sign_action(capsys: Any):
         "--action-id", "2",
         "--pem", str(alice),
         "--nonce", "1289",
-        "--gas-limit", "10000000",
-        "--proxy", "https://testnet-api.multiversx.com"
+        "--chain", "T",
+        "--gas-limit", "10000000"
     ])
     assert False if return_code else True
 
@@ -34,6 +34,31 @@ def test_sign_action(capsys: Any):
     assert chain_id == "T"
 
 
+def test_unsign_action(capsys: Any):
+    return_code = main([
+        "multisig", "unsign",
+        "--multisig", "erd1qqqqqqqqqqqqqpgqpg4q7ye5p9uv9m4zdzj69h8ezuqjj78krawq9zqz30",
+        "--action-id", "2",
+        "--pem", str(alice),
+        "--nonce", "1289",
+        "--chain", "T",
+        "--gas-limit", "10000000"
+    ])
+    assert False if return_code else True
+
+    transaction = get_transaction(capsys)
+
+    data_field: str = transaction["data"]
+    data = base64.b64decode(data_field.encode()).decode()
+    assert data == "unsign@02"
+
+    receiver = transaction["receiver"]
+    assert receiver == "erd1qqqqqqqqqqqqqpgqpg4q7ye5p9uv9m4zdzj69h8ezuqjj78krawq9zqz30"
+
+    chain_id = transaction["chainID"]
+    assert chain_id == "T"
+
+
 def test_perform_action(capsys: Any):
     return_code = main([
         "multisig", "perform-action",
@@ -41,8 +66,8 @@ def test_perform_action(capsys: Any):
         "--action-id", "2",
         "--pem", str(alice),
         "--nonce", "1290",
-        "--gas-limit", "10000000",
-        "--proxy", "https://testnet-api.multiversx.com"
+        "--chain", "T",
+        "--gas-limit", "10000000"
     ])
     assert False if return_code else True
 
@@ -51,6 +76,31 @@ def test_perform_action(capsys: Any):
     data_field: str = transaction["data"]
     data = base64.b64decode(data_field.encode()).decode()
     assert data == "performAction@02"
+
+    receiver = transaction["receiver"]
+    assert receiver == "erd1qqqqqqqqqqqqqpgqpg4q7ye5p9uv9m4zdzj69h8ezuqjj78krawq9zqz30"
+
+    chain_id = transaction["chainID"]
+    assert chain_id == "T"
+
+
+def test_discard_action(capsys: Any):
+    return_code = main([
+        "multisig", "discard-action",
+        "--multisig", "erd1qqqqqqqqqqqqqpgqpg4q7ye5p9uv9m4zdzj69h8ezuqjj78krawq9zqz30",
+        "--action-id", "15",
+        "--pem", str(alice),
+        "--nonce", "55",
+        "--chain", "T",
+        "--gas-limit", "10000000"
+    ])
+    assert False if return_code else True
+
+    transaction = get_transaction(capsys)
+
+    data_field: str = transaction["data"]
+    data = base64.b64decode(data_field.encode()).decode()
+    assert data == "discardAction@0f"
 
     receiver = transaction["receiver"]
     assert receiver == "erd1qqqqqqqqqqqqqpgqpg4q7ye5p9uv9m4zdzj69h8ezuqjj78krawq9zqz30"

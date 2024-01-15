@@ -1,14 +1,19 @@
-from typing import List, Union
+from typing import Any, List, Union
 
-from multiversx_sdk_core import (Address, TokenComputer, TokenTransfer,
-                                 Transaction)
+from multiversx_sdk_core import (Address, CodeMetadata, TokenComputer,
+                                 TokenTransfer, Transaction)
+from multiversx_sdk_core.serializer import arg_to_string, args_to_strings
 from multiversx_sdk_core.transaction_factories.token_transfers_data_builder import \
     TokenTransfersDataBuilder
 from multiversx_sdk_core.transaction_factories.transactions_factory_config import \
     TransactionsFactoryConfig
 
 from multiversx_sdk_cli.accounts import Account
-from multiversx_sdk_cli.contracts import SmartContract
+from multiversx_sdk_cli.contracts import (SmartContract,
+                                          prepare_args_for_factory)
+from multiversx_sdk_cli.interfaces import IAddress
+
+MULTISIG_DEPLOY_FUNCTION = "proposeSCDeployFromSource"
 
 
 def prepare_transaction_for_egld_transfer(sender: Account,
@@ -26,7 +31,7 @@ def prepare_transaction_for_egld_transfer(sender: Account,
 
     return contract.prepare_execute_transaction(
         caller=sender,
-        contract=Address.from_bech32(multisig),
+        contract=Address.new_from_bech32(multisig),
         function="proposeTransferExecute",
         arguments=[f"{receiver}", f"{value}"],
         gas_limit=gas_limit,
@@ -52,9 +57,9 @@ def prepare_transaction_for_custom_token_transfer(sender: Account,
     contract = SmartContract(config)
 
     token_transfers = contract.prepare_token_transfers(transfers)
-    transfer_receiver = Address.from_bech32(receiver)
+    transfer_receiver = Address.new_from_bech32(receiver)
     transfer_data_parts = _prepare_data_parts_for_multisig_transfer(transfer_receiver, token_transfers)
-    multisig_contract = Address.from_bech32(multisig)
+    multisig_contract = Address.new_from_bech32(multisig)
 
     arguments: List[str] = [transfer_receiver.to_hex(), "00"]
     if transfer_data_parts[0] != "ESDTTransfer":
@@ -91,13 +96,13 @@ def prepare_transaction_for_depositing_funds(sender: Account,
                                              nonce: int,
                                              version: int,
                                              options: int,
-                                             guardian: str):
+                                             guardian: str) -> Transaction:
     config = TransactionsFactoryConfig(chain_id)
     contract = SmartContract(config)
 
     return contract.prepare_execute_transaction(
         caller=sender,
-        contract=Address.from_bech32(multisig),
+        contract=Address.new_from_bech32(multisig),
         function="deposit",
         arguments=None,
         gas_limit=gas_limit,
@@ -106,8 +111,64 @@ def prepare_transaction_for_depositing_funds(sender: Account,
         nonce=nonce,
         version=version,
         options=options,
+        guardian=guardian)
+
+
+def prepare_transaction_for_deploying_contract(sender: Account,
+                                               multisig: str,
+                                               deployed_contract: str,
+                                               arguments: Union[List[str], None],
+                                               upgradeable: bool,
+                                               readable: bool,
+                                               payable: bool,
+                                               payable_by_sc: bool,
+                                               chain_id: str,
+                                               value: int,
+                                               gas_limit: int,
+                                               nonce: int,
+                                               version: int,
+                                               options: int,
+                                               guardian: str) -> Transaction:
+    # convert the args to proper type instead of strings
+    prepared_arguments = prepare_args_for_factory(arguments) if arguments else []
+    metadata = CodeMetadata(upgradeable, readable, payable, payable_by_sc)
+    contract = Address.new_from_bech32(deployed_contract)
+
+    data = _prepare_data_field_for_deploy_transaction(amount=value,
+                                                      deployed_contract=contract,
+                                                      metadata=metadata,
+                                                      arguments=prepared_arguments)
+    tx = Transaction(
+        sender=sender.address.to_bech32(),
+        receiver=multisig,
+        gas_limit=gas_limit,
+        chain_id=chain_id,
+        nonce=nonce,
+        amount=0,
+        data=data,
+        version=version,
+        options=options,
         guardian=guardian
     )
+    tx.signature = bytes.fromhex(sender.sign_transaction(tx))
+
+    return tx
+
+
+def _prepare_data_field_for_deploy_transaction(amount: int,
+                                               deployed_contract: IAddress,
+                                               metadata: CodeMetadata,
+                                               arguments: List[Any]) -> bytes:
+    data_parts = [
+        MULTISIG_DEPLOY_FUNCTION,
+        arg_to_string(amount),
+        deployed_contract.to_hex(),
+        str(metadata)
+    ]
+    data_parts.extend(args_to_strings(arguments))
+    payload = _build_data_payload(data_parts)
+
+    return payload.encode()
 
 
 def _prepare_data_parts_for_multisig_transfer(receiver: Address, token_transfers: List[TokenTransfer]):

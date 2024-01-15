@@ -147,12 +147,16 @@ def add_multisig_address_arg(sub: Any):
     sub.add_argument("--multisig", help="the address of the multisig contract")
 
 
+def add_contract_address_for_multisig_deploy(sub: Any):
+    sub.add_argument("--deployed-contract", help="the address of the already deployed contract to be deployed by the multisig")
+
+
 def add_multisig_view_address_arg(sub: Any):
     sub.add_argument("--multisig-view", help="the address of the multisig-view contract")
 
 
-def add_sign_multisig_action_arg(sub: Any):
-    sub.add_argument("--action-id", help="an integer representing the ID of the action; cand also be `all`")
+def add_multisig_action_arg(sub: Any):
+    sub.add_argument("--action-id", help="an integer representing the ID of the action; can also be `all`")
 
 
 def parse_omit_fields_arg(args: Any) -> List[str]:
