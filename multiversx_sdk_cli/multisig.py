@@ -14,6 +14,7 @@ from multiversx_sdk_cli.contracts import (SmartContract,
 from multiversx_sdk_cli.interfaces import IAddress
 
 MULTISIG_DEPLOY_FUNCTION = "proposeSCDeployFromSource"
+MULTISIG_UPGRADE_FUNCTION = "proposeSCUpgradeFromSource"
 
 
 def prepare_transaction_for_egld_transfer(sender: Account,
@@ -115,8 +116,8 @@ def prepare_transaction_for_depositing_funds(sender: Account,
 
 
 def prepare_transaction_for_deploying_contract(sender: Account,
-                                               multisig: str,
-                                               deployed_contract: str,
+                                               multisig: IAddress,
+                                               deployed_contract: IAddress,
                                                arguments: Union[List[str], None],
                                                upgradeable: bool,
                                                readable: bool,
@@ -132,15 +133,14 @@ def prepare_transaction_for_deploying_contract(sender: Account,
     # convert the args to proper type instead of strings
     prepared_arguments = prepare_args_for_factory(arguments) if arguments else []
     metadata = CodeMetadata(upgradeable, readable, payable, payable_by_sc)
-    contract = Address.new_from_bech32(deployed_contract)
 
     data = _prepare_data_field_for_deploy_transaction(amount=value,
-                                                      deployed_contract=contract,
+                                                      deployed_contract=deployed_contract,
                                                       metadata=metadata,
                                                       arguments=prepared_arguments)
     tx = Transaction(
         sender=sender.address.to_bech32(),
-        receiver=multisig,
+        receiver=multisig.to_bech32(),
         gas_limit=gas_limit,
         chain_id=chain_id,
         nonce=nonce,
@@ -153,6 +153,66 @@ def prepare_transaction_for_deploying_contract(sender: Account,
     tx.signature = bytes.fromhex(sender.sign_transaction(tx))
 
     return tx
+
+
+def prepare_transaction_upgrading_contract(sender: Account,
+                                           contract_address: IAddress,
+                                           multisig: IAddress,
+                                           upgraded_contract: IAddress,
+                                           arguments: Union[List[str], None],
+                                           upgradeable: bool,
+                                           readable: bool,
+                                           payable: bool,
+                                           payable_by_sc: bool,
+                                           chain_id: str,
+                                           value: int,
+                                           gas_limit: int,
+                                           nonce: int,
+                                           version: int,
+                                           options: int,
+                                           guardian: str) -> Transaction:
+    # convert the args to proper type instead of strings
+    prepared_arguments = prepare_args_for_factory(arguments) if arguments else []
+    metadata = CodeMetadata(upgradeable, readable, payable, payable_by_sc)
+
+    data = _prepare_data_field_for_upgrade_transaction(contract_address=contract_address,
+                                                       amount=value,
+                                                       upgraded_contract=upgraded_contract,
+                                                       metadata=metadata,
+                                                       arguments=prepared_arguments)
+    tx = Transaction(
+        sender=sender.address.to_bech32(),
+        receiver=multisig.to_bech32(),
+        gas_limit=gas_limit,
+        chain_id=chain_id,
+        nonce=nonce,
+        amount=0,
+        data=data,
+        version=version,
+        options=options,
+        guardian=guardian
+    )
+    tx.signature = bytes.fromhex(sender.sign_transaction(tx))
+
+    return tx
+
+
+def _prepare_data_field_for_upgrade_transaction(contract_address: IAddress,
+                                                amount: int,
+                                                upgraded_contract: IAddress,
+                                                metadata: CodeMetadata,
+                                                arguments: List[Any]) -> bytes:
+    data_parts = [
+        MULTISIG_UPGRADE_FUNCTION,
+        contract_address.to_hex(),
+        arg_to_string(amount),
+        upgraded_contract.to_hex(),
+        str(metadata)
+    ]
+    data_parts.extend(args_to_strings(arguments))
+    payload = _build_data_payload(data_parts)
+
+    return payload.encode()
 
 
 def _prepare_data_field_for_deploy_transaction(amount: int,

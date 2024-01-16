@@ -298,6 +298,65 @@ def test_propose_multi_esdt_nft_transfer(capsys: Any):
     assert signature == "563fc6eefe9469cf90191462cfe21ab25ae7291c1c411cd4b3778717c827045eabc58b689308e8ee45676a8e49cf75c2856a83e41e93dad5c4acb5ccb65c5b04"
 
 
+def test_propose_contract_deploy_from_source(capsys: Any):
+    return_code = main([
+        "contract", "deploy",
+        "--pem", str(alice),
+        "--nonce", "60",
+        "--chain", "T",
+        "--proxy", "https://testnet-api.multiversx.com",
+        "--gas-limit", "100000000",
+        "--multisig", "erd1qqqqqqqqqqqqqpgqpg4q7ye5p9uv9m4zdzj69h8ezuqjj78krawq9zqz30",
+        "--deployed-contract", "erd1qqqqqqqqqqqqqpgq8z2zzyu30f4607hth0tfj5m3vpjvwrvvrawqw09jem",
+        "--arguments", "0"
+    ])
+    assert False if return_code else True
+
+    transaction = get_transaction(capsys)
+
+    data_field: str = transaction["data"]
+    data = base64.b64decode(data_field.encode()).decode()
+    assert data == "proposeSCDeployFromSource@@0000000000000000050038942113917a6ba7faebbbd69953716064c70d8c1f5c@0500@"
+
+    receiver = transaction["receiver"]
+    assert receiver == "erd1qqqqqqqqqqqqqpgqpg4q7ye5p9uv9m4zdzj69h8ezuqjj78krawq9zqz30"
+
+    chain_id = transaction["chainID"]
+    assert chain_id == "T"
+
+    value = int(transaction["value"])
+    assert value == 0
+
+
+def test_propose_contract_upgrade_from_source(capsys: Any):
+    return_code = main([
+        "contract", "upgrade", "erd1qqqqqqqqqqqqqpgqz0kha878srg82eznjhdyvgarwycwjgs6rawq02lh6j",
+        "--pem", str(alice),
+        "--nonce", "6241",
+        "--chain", "T",
+        "--gas-limit", "100000000",
+        "--multisig", "erd1qqqqqqqqqqqqqpgqpg4q7ye5p9uv9m4zdzj69h8ezuqjj78krawq9zqz30",
+        "--upgraded-contract", "erd1qqqqqqqqqqqqqpgq8z2zzyu30f4607hth0tfj5m3vpjvwrvvrawqw09jem",
+        "--arguments", "0"
+    ])
+    assert False if return_code else True
+
+    transaction = get_transaction(capsys)
+
+    data_field: str = transaction["data"]
+    data = base64.b64decode(data_field.encode()).decode()
+    assert data == "proposeSCUpgradeFromSource@0000000000000000050013ed7e9fc780d075645395da4623a37130e9221a1f5c@@0000000000000000050038942113917a6ba7faebbbd69953716064c70d8c1f5c@0500@"
+
+    receiver = transaction["receiver"]
+    assert receiver == "erd1qqqqqqqqqqqqqpgqpg4q7ye5p9uv9m4zdzj69h8ezuqjj78krawq9zqz30"
+
+    chain_id = transaction["chainID"]
+    assert chain_id == "T"
+
+    value = int(transaction["value"])
+    assert value == 0
+
+
 def get_transaction(capsys: Any) -> Dict[str, Any]:
     out = _read_stdout(capsys)
     output = json.loads(out)
