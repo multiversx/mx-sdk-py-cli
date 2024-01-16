@@ -21,6 +21,7 @@ from multiversx_sdk_cli.errors import (BadUsage, DockerMissingError,
                                        NoWalletProvided)
 from multiversx_sdk_cli.interfaces import IAddress
 from multiversx_sdk_cli.multisig import (
+    prepare_transaction_for_contract_call,
     prepare_transaction_for_deploying_contract,
     prepare_transaction_upgrading_contract)
 from multiversx_sdk_cli.projects.core import get_project_paths_recursively
@@ -110,6 +111,7 @@ def setup_parser(args: List[str], subparsers: Any) -> Any:
                                                     " - only valid if --wait-result is set")
     cli_shared.add_broadcast_args(sub, relay=True)
     cli_shared.add_guardian_wallet_args(args, sub)
+    cli_shared.add_multisig_address_arg(sub)
 
     sub.set_defaults(func=call)
 
@@ -409,24 +411,41 @@ def call(args: Any):
     cli_shared.prepare_nonce_in_args(args)
 
     sender = cli_shared.prepare_account(args)
-    config = TransactionsFactoryConfig(args.chain)
-    contract = SmartContract(config)
     contract_address = Address.new_from_bech32(args.contract)
 
-    tx = contract.prepare_execute_transaction(
-        caller=sender,
-        contract=contract_address,
-        function=args.function,
-        arguments=args.arguments,
-        gas_limit=int(args.gas_limit),
-        value=int(args.value),
-        transfers=args.token_transfers,
-        nonce=int(args.nonce),
-        version=int(args.version),
-        options=int(args.options),
-        guardian=args.guardian)
-    tx = _sign_guarded_tx(args, tx)
+    if args.multisig:
+        tx = prepare_transaction_for_contract_call(
+            sender=sender,
+            contract_address=contract_address,
+            function=args.function,
+            arguments=args.arguments,
+            multisig=Address.new_from_bech32(args.multisig),
+            value=int(args.value),
+            transfers=args.token_transfers,
+            gas_limit=int(args.gas_limit),
+            chain_id=args.chain,
+            nonce=int(args.nonce),
+            version=int(args.version),
+            options=int(args.options),
+            guardian=args.guardian)
+    else:
+        config = TransactionsFactoryConfig(args.chain)
+        contract = SmartContract(config)
 
+        tx = contract.prepare_execute_transaction(
+            caller=sender,
+            contract=contract_address,
+            function=args.function,
+            arguments=args.arguments,
+            gas_limit=int(args.gas_limit),
+            value=int(args.value),
+            transfers=args.token_transfers,
+            nonce=int(args.nonce),
+            version=int(args.version),
+            options=int(args.options),
+            guardian=args.guardian)
+
+    tx = _sign_guarded_tx(args, tx)
     _send_or_simulate(tx, contract_address, args)
 
 

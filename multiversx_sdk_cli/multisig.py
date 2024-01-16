@@ -11,8 +11,12 @@ from multiversx_sdk_core.transaction_factories.transactions_factory_config impor
 from multiversx_sdk_cli.accounts import Account
 from multiversx_sdk_cli.contracts import (SmartContract,
                                           prepare_args_for_factory)
+from multiversx_sdk_cli.errors import BadUsage
 from multiversx_sdk_cli.interfaces import IAddress
 
+MULTISIG_DEPOSIT_FUNCTION = "deposit"
+MULTISIG_TRANSFER_AND_EXECUTE = "proposeTransferExecute"
+MULTISIG_ASYNC_CALL = "proposeAsyncCall"
 MULTISIG_DEPLOY_FUNCTION = "proposeSCDeployFromSource"
 MULTISIG_UPGRADE_FUNCTION = "proposeSCUpgradeFromSource"
 
@@ -33,7 +37,7 @@ def prepare_transaction_for_egld_transfer(sender: Account,
     return contract.prepare_execute_transaction(
         caller=sender,
         contract=Address.new_from_bech32(multisig),
-        function="proposeTransferExecute",
+        function=MULTISIG_TRANSFER_AND_EXECUTE,
         arguments=[f"{receiver}", f"{value}"],
         gas_limit=gas_limit,
         value=0,
@@ -66,13 +70,13 @@ def prepare_transaction_for_custom_token_transfer(sender: Account,
     if transfer_data_parts[0] != "ESDTTransfer":
         arguments[0] = multisig_contract.to_hex()
 
-    transfer_data_parts[0] = transfer_data_parts[0].encode().hex()
+    transfer_data_parts[0] = arg_to_string(transfer_data_parts[0])
     arguments.extend(transfer_data_parts)
 
     tx = contract.prepare_execute_transaction(
         caller=sender,
         contract=multisig_contract,
-        function="proposeAsyncCall",
+        function=MULTISIG_ASYNC_CALL,
         arguments=None,
         gas_limit=gas_limit,
         value=0,
@@ -104,7 +108,7 @@ def prepare_transaction_for_depositing_funds(sender: Account,
     return contract.prepare_execute_transaction(
         caller=sender,
         contract=Address.new_from_bech32(multisig),
-        function="deposit",
+        function=MULTISIG_DEPOSIT_FUNCTION,
         arguments=None,
         gas_limit=gas_limit,
         value=value,
@@ -197,6 +201,79 @@ def prepare_transaction_upgrading_contract(sender: Account,
     return tx
 
 
+def prepare_transaction_for_contract_call(sender: Account,
+                                          contract_address: IAddress,
+                                          function: str,
+                                          arguments: Union[List[str], None],
+                                          multisig: IAddress,
+                                          value: int,
+                                          transfers: Union[List[str], None],
+                                          gas_limit: int,
+                                          chain_id: str,
+                                          nonce: int,
+                                          version: int,
+                                          options: int,
+                                          guardian: str) -> Transaction:
+    if value and transfers:
+        raise BadUsage("Can't send both native and custom tokens")
+
+    config = TransactionsFactoryConfig(chain_id)
+    contract = SmartContract(config)
+
+    token_transfers = contract.prepare_token_transfers(transfers) if transfers else []
+    prepared_args = prepare_args_for_factory(arguments) if arguments else []
+
+    data_field = _prepare_data_field_for_contract_call(contract_address=contract_address,
+                                                       multisig=multisig,
+                                                       function=function,
+                                                       arguments=prepared_args,
+                                                       value=value,
+                                                       token_transfers=token_transfers)
+    tx = Transaction(
+        sender=sender.address.to_bech32(),
+        receiver=multisig.to_bech32(),
+        gas_limit=gas_limit,
+        chain_id=chain_id,
+        nonce=nonce,
+        amount=0,
+        data=data_field,
+        version=version,
+        options=options,
+        guardian=guardian
+    )
+    tx.signature = bytes.fromhex(sender.sign_transaction(tx))
+
+    return tx
+
+
+def _prepare_data_field_for_contract_call(contract_address: IAddress,
+                                          multisig: IAddress,
+                                          function: str,
+                                          arguments: List[Any],
+                                          value: int,
+                                          token_transfers: List[TokenTransfer]):
+    data_parts = [
+        MULTISIG_ASYNC_CALL,
+        contract_address.to_hex(),
+        arg_to_string(value)
+    ]
+
+    transfer_data_parts = _prepare_data_parts_for_multisig_transfer(receiver=contract_address, token_transfers=token_transfers)
+
+    if transfer_data_parts:
+        if transfer_data_parts[0] != "ESDTTransfer":
+            data_parts[1] = multisig.to_hex()
+
+        transfer_data_parts[0] = arg_to_string(transfer_data_parts[0])
+        data_parts.extend(transfer_data_parts)
+
+    data_parts.append(arg_to_string(function))
+    data_parts.extend(args_to_strings(arguments))
+
+    data_field = _build_data_payload(data_parts)
+    return data_field.encode()
+
+
 def _prepare_data_field_for_upgrade_transaction(contract_address: IAddress,
                                                 amount: int,
                                                 upgraded_contract: IAddress,
@@ -231,7 +308,7 @@ def _prepare_data_field_for_deploy_transaction(amount: int,
     return payload.encode()
 
 
-def _prepare_data_parts_for_multisig_transfer(receiver: Address, token_transfers: List[TokenTransfer]):
+def _prepare_data_parts_for_multisig_transfer(receiver: IAddress, token_transfers: List[TokenTransfer]) -> List[str]:
     token_computer = TokenComputer()
     data_builder = TokenTransfersDataBuilder(token_computer)
     data_parts: List[str] = []

@@ -357,6 +357,155 @@ def test_propose_contract_upgrade_from_source(capsys: Any):
     assert value == 0
 
 
+def test_propose_contract_call_no_transfer(capsys: Any):
+    return_code = main([
+        "contract", "call", "erd1qqqqqqqqqqqqqpgq8z2zzyu30f4607hth0tfj5m3vpjvwrvvrawqw09jem",
+        "--pem", str(alice),
+        "--nonce", "9550",
+        "--chain", "T",
+        "--gas-limit", "100000000",
+        "--function", "add",
+        "--arguments", "10",
+        "--multisig", "erd1qqqqqqqqqqqqqpgqpg4q7ye5p9uv9m4zdzj69h8ezuqjj78krawq9zqz30"
+    ])
+    assert False if return_code else True
+
+    transaction = get_transaction(capsys)
+
+    data_field: str = transaction["data"]
+    data = base64.b64decode(data_field.encode()).decode()
+    assert data == "proposeAsyncCall@0000000000000000050038942113917a6ba7faebbbd69953716064c70d8c1f5c@@616464@0a"
+
+    receiver = transaction["receiver"]
+    assert receiver == "erd1qqqqqqqqqqqqqpgqpg4q7ye5p9uv9m4zdzj69h8ezuqjj78krawq9zqz30"
+
+    chain_id = transaction["chainID"]
+    assert chain_id == "T"
+
+    value = int(transaction["value"])
+    assert value == 0
+
+
+def test_propose_contract_call_with_egld_transfer(capsys: Any):
+    return_code = main([
+        "contract", "call", "erd1qqqqqqqqqqqqqpgq8z2zzyu30f4607hth0tfj5m3vpjvwrvvrawqw09jem",
+        "--pem", str(alice),
+        "--nonce", "9552",
+        "--chain", "T",
+        "--value", "1000000000000000",
+        "--gas-limit", "100000000",
+        "--function", "add",
+        "--arguments", "10",
+        "--multisig", "erd1qqqqqqqqqqqqqpgqpg4q7ye5p9uv9m4zdzj69h8ezuqjj78krawq9zqz30"
+    ])
+    assert False if return_code else True
+
+    transaction = get_transaction(capsys)
+
+    data_field: str = transaction["data"]
+    data = base64.b64decode(data_field.encode()).decode()
+    assert data == "proposeAsyncCall@0000000000000000050038942113917a6ba7faebbbd69953716064c70d8c1f5c@038d7ea4c68000@616464@0a"
+
+    receiver = transaction["receiver"]
+    assert receiver == "erd1qqqqqqqqqqqqqpgqpg4q7ye5p9uv9m4zdzj69h8ezuqjj78krawq9zqz30"
+
+    chain_id = transaction["chainID"]
+    assert chain_id == "T"
+
+    value = int(transaction["value"])
+    assert value == 0
+
+
+def test_propose_contract_call_with_esdt_transfer(capsys: Any):
+    return_code = main([
+        "contract", "call", "erd1qqqqqqqqqqqqqpgq8z2zzyu30f4607hth0tfj5m3vpjvwrvvrawqw09jem",
+        "--pem", str(alice),
+        "--nonce", "9553",
+        "--chain", "T",
+        "--token-transfers", "ZZZ-9ee87d", "1000",
+        "--gas-limit", "100000000",
+        "--function", "add",
+        "--arguments", "10",
+        "--multisig", "erd1qqqqqqqqqqqqqpgqpg4q7ye5p9uv9m4zdzj69h8ezuqjj78krawq9zqz30"
+    ])
+    assert False if return_code else True
+
+    transaction = get_transaction(capsys)
+
+    data_field: str = transaction["data"]
+    data = base64.b64decode(data_field.encode()).decode()
+    assert data == "proposeAsyncCall@0000000000000000050038942113917a6ba7faebbbd69953716064c70d8c1f5c@@455344545472616e73666572@5a5a5a2d396565383764@03e8@616464@0a"
+
+    receiver = transaction["receiver"]
+    assert receiver == "erd1qqqqqqqqqqqqqpgqpg4q7ye5p9uv9m4zdzj69h8ezuqjj78krawq9zqz30"
+
+    chain_id = transaction["chainID"]
+    assert chain_id == "T"
+
+    value = int(transaction["value"])
+    assert value == 0
+
+
+def test_propose_contract_call_with_multi_esdt_transfer(capsys: Any):
+    return_code = main([
+        "contract", "call", "erd1qqqqqqqqqqqqqpgq8z2zzyu30f4607hth0tfj5m3vpjvwrvvrawqw09jem",
+        "--pem", str(alice),
+        "--nonce", "9554",
+        "--chain", "T",
+        "--token-transfers", "ZZZ-9ee87d", "1300", "TST-267761", "600",
+        "--gas-limit", "100000000",
+        "--function", "add",
+        "--arguments", "10",
+        "--multisig", "erd1qqqqqqqqqqqqqpgqpg4q7ye5p9uv9m4zdzj69h8ezuqjj78krawq9zqz30"
+    ])
+    assert False if return_code else True
+
+    transaction = get_transaction(capsys)
+
+    data_field: str = transaction["data"]
+    data = base64.b64decode(data_field.encode()).decode()
+    assert data == "proposeAsyncCall@000000000000000005000a2a0f13340978c2eea268a5a2dcf917012978f61f5c@@4d756c7469455344544e46545472616e73666572@0000000000000000050038942113917a6ba7faebbbd69953716064c70d8c1f5c@02@5a5a5a2d396565383764@@0514@5453542d323637373631@@0258@616464@0a"
+
+    receiver = transaction["receiver"]
+    assert receiver == "erd1qqqqqqqqqqqqqpgqpg4q7ye5p9uv9m4zdzj69h8ezuqjj78krawq9zqz30"
+
+    chain_id = transaction["chainID"]
+    assert chain_id == "T"
+
+    value = int(transaction["value"])
+    assert value == 0
+
+
+def test_propose_contract_call_with_multi_esdt_nft_transfer(capsys: Any):
+    return_code = main([
+        "contract", "call", "erd1qqqqqqqqqqqqqpgq8z2zzyu30f4607hth0tfj5m3vpjvwrvvrawqw09jem",
+        "--pem", str(alice),
+        "--nonce", "9555",
+        "--chain", "T",
+        "--token-transfers", "ZZZ-9ee87d", "700", "METATEST-e05d11-01", "1500",
+        "--gas-limit", "100000000",
+        "--function", "add",
+        "--arguments", "10",
+        "--multisig", "erd1qqqqqqqqqqqqqpgqpg4q7ye5p9uv9m4zdzj69h8ezuqjj78krawq9zqz30"
+    ])
+    assert False if return_code else True
+
+    transaction = get_transaction(capsys)
+
+    data_field: str = transaction["data"]
+    data = base64.b64decode(data_field.encode()).decode()
+    assert data == "proposeAsyncCall@000000000000000005000a2a0f13340978c2eea268a5a2dcf917012978f61f5c@@4d756c7469455344544e46545472616e73666572@0000000000000000050038942113917a6ba7faebbbd69953716064c70d8c1f5c@02@5a5a5a2d396565383764@@02bc@4d455441544553542d653035643131@01@05dc@616464@0a"
+
+    receiver = transaction["receiver"]
+    assert receiver == "erd1qqqqqqqqqqqqqpgqpg4q7ye5p9uv9m4zdzj69h8ezuqjj78krawq9zqz30"
+
+    chain_id = transaction["chainID"]
+    assert chain_id == "T"
+
+    value = int(transaction["value"])
+    assert value == 0
+
+
 def get_transaction(capsys: Any) -> Dict[str, Any]:
     out = _read_stdout(capsys)
     output = json.loads(out)
