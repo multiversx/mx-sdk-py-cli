@@ -506,6 +506,118 @@ def test_propose_contract_call_with_multi_esdt_nft_transfer(capsys: Any):
     assert value == 0
 
 
+def test_propose_add_board_member(capsys: Any):
+    return_code = main([
+        "multisig", "add-board-member",
+        "--multisig", "erd1qqqqqqqqqqqqqpgqpg4q7ye5p9uv9m4zdzj69h8ezuqjj78krawq9zqz30",
+        "--proposed-member", "erd1fggp5ru0jhcjrp5rjqyqrnvhr3sz3v2e0fm3ktknvlg7mcyan54qzccnan",
+        "--pem", str(alice),
+        "--nonce", "12243",
+        "--chain", "T",
+        "--gas-limit", "10000000"
+    ])
+    assert False if return_code else True
+
+    transaction = get_transaction(capsys)
+
+    data_field: str = transaction["data"]
+    data = base64.b64decode(data_field.encode()).decode()
+    assert data == "proposeAddBoardMember@4a101a0f8f95f1218683900801cd971c6028b1597a771b2ed367d1ede09d9d2a"
+
+    receiver = transaction["receiver"]
+    assert receiver == "erd1qqqqqqqqqqqqqpgqpg4q7ye5p9uv9m4zdzj69h8ezuqjj78krawq9zqz30"
+
+    chain_id = transaction["chainID"]
+    assert chain_id == "T"
+
+    value = int(transaction["value"])
+    assert value == 0
+
+
+def test_propose_add_proposer(capsys: Any):
+    return_code = main([
+        "multisig", "add-proposer",
+        "--multisig", "erd1qqqqqqqqqqqqqpgqpg4q7ye5p9uv9m4zdzj69h8ezuqjj78krawq9zqz30",
+        "--proposed-member", "erd1fggp5ru0jhcjrp5rjqyqrnvhr3sz3v2e0fm3ktknvlg7mcyan54qzccnan",
+        "--pem", str(alice),
+        "--nonce", "12244",
+        "--chain", "T",
+        "--gas-limit", "10000000"
+    ])
+    assert False if return_code else True
+
+    transaction = get_transaction(capsys)
+
+    data_field: str = transaction["data"]
+    data = base64.b64decode(data_field.encode()).decode()
+    assert data == "proposeAddProposer@4a101a0f8f95f1218683900801cd971c6028b1597a771b2ed367d1ede09d9d2a"
+
+    receiver = transaction["receiver"]
+    assert receiver == "erd1qqqqqqqqqqqqqpgqpg4q7ye5p9uv9m4zdzj69h8ezuqjj78krawq9zqz30"
+
+    chain_id = transaction["chainID"]
+    assert chain_id == "T"
+
+    value = int(transaction["value"])
+    assert value == 0
+
+
+def test_propose_remove_user(capsys: Any):
+    return_code = main([
+        "multisig", "remove-user",
+        "--multisig", "erd1qqqqqqqqqqqqqpgqpg4q7ye5p9uv9m4zdzj69h8ezuqjj78krawq9zqz30",
+        "--proposed-member", "erd1fggp5ru0jhcjrp5rjqyqrnvhr3sz3v2e0fm3ktknvlg7mcyan54qzccnan",
+        "--pem", str(alice),
+        "--nonce", "12245",
+        "--chain", "T",
+        "--gas-limit", "10000000"
+    ])
+    assert False if return_code else True
+
+    transaction = get_transaction(capsys)
+
+    data_field: str = transaction["data"]
+    data = base64.b64decode(data_field.encode()).decode()
+    assert data == "proposeRemoveUser@4a101a0f8f95f1218683900801cd971c6028b1597a771b2ed367d1ede09d9d2a"
+
+    receiver = transaction["receiver"]
+    assert receiver == "erd1qqqqqqqqqqqqqpgqpg4q7ye5p9uv9m4zdzj69h8ezuqjj78krawq9zqz30"
+
+    chain_id = transaction["chainID"]
+    assert chain_id == "T"
+
+    value = int(transaction["value"])
+    assert value == 0
+
+
+def test_propose_change_quorum_size(capsys: Any):
+    return_code = main([
+        "multisig", "quorum",
+        "--multisig", "erd1qqqqqqqqqqqqqpgqpg4q7ye5p9uv9m4zdzj69h8ezuqjj78krawq9zqz30",
+        "--quorum-size", "2",
+        "--pem", str(alice),
+        "--nonce", "12247",
+        "--chain", "T",
+        "--gas-limit", "10000000"
+    ])
+    assert False if return_code else True
+
+    transaction = get_transaction(capsys)
+
+    data_field: str = transaction["data"]
+    data = base64.b64decode(data_field.encode()).decode()
+    assert data == "proposeChangeQuorum@02"
+
+    receiver = transaction["receiver"]
+    assert receiver == "erd1qqqqqqqqqqqqqpgqpg4q7ye5p9uv9m4zdzj69h8ezuqjj78krawq9zqz30"
+
+    chain_id = transaction["chainID"]
+    assert chain_id == "T"
+
+    value = int(transaction["value"])
+    assert value == 0
+
+
 def get_transaction(capsys: Any) -> Dict[str, Any]:
     out = _read_stdout(capsys)
     output = json.loads(out)
