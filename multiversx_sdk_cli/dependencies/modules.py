@@ -333,6 +333,9 @@ This may cause problems with the installation of rust.""")
         logger.info("Installing rust.")
         myprocess.run_process(args)
 
+        args = ["source", "~/.cargo/env"]
+        myprocess.run_process(args)
+
     def _install_sc_meta(self):
         logger.info("Installing multiversx-sc-meta.")
         tag = config.get_dependency_tag("sc-meta")
