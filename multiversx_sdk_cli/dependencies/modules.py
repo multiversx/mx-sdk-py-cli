@@ -333,9 +333,6 @@ This may cause problems with the installation of rust.""")
         logger.info("Installing rust.")
         myprocess.run_process(args)
 
-        args = ["source", "~/.cargo/env"]
-        myprocess.run_process(args)
-
     def _install_sc_meta(self):
         logger.info("Installing multiversx-sc-meta.")
         tag = config.get_dependency_tag("sc-meta")
@@ -344,13 +341,13 @@ This may cause problems with the installation of rust.""")
         if tag:
             args.extend(["--version", tag])
 
-        myprocess.run_process(args)
+        myprocess.run_process(args, env=self.get_cargo_env())
 
     def _install_wasm_opt(self):
         logger.info("Installing wasm-opt. This may take a while.")
         tag = config.get_dependency_tag("wasm-opt")
         args = ["cargo", "install", "wasm-opt", "--version", tag]
-        myprocess.run_process(args)
+        myprocess.run_process(args, env=self.get_cargo_env())
 
     def _install_twiggy(self):
         logger.info("Installing twiggy.")
@@ -360,7 +357,7 @@ This may cause problems with the installation of rust.""")
         if tag:
             args.extend(["--version", tag])
 
-        myprocess.run_process(args)
+        myprocess.run_process(args, env=self.get_cargo_env())
 
     def _get_installer_url(self) -> str:
         if workstation.is_windows():
@@ -385,6 +382,13 @@ This may cause problems with the installation of rust.""")
 
     def get_env(self) -> Dict[str, str]:
         return dict(os.environ)
+
+    def get_cargo_env(self) -> Dict[str, str]:
+        env = self.get_env()
+        cargo = Path("~/.cargo/bin").expanduser()
+        path = env["PATH"]
+        env["PATH"] = f"{str(cargo)}:{path}"
+        return env
 
 
 class TestWalletsModule(StandaloneModule):
