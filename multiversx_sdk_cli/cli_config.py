@@ -113,6 +113,6 @@ def delete_config(args: Any):
 
 def confirm_continuation(file: Path):
     answer = input(f"The file `{str(file)}` will be deleted. Do you want to continue? (y/n)")
-    if answer.lower() not in ["y", "yes"]:
+    if answer.lower().strip() not in ["y", "yes"]:
         print("Confirmation not given. Stopping...")
         exit(1)
