@@ -1,5 +1,7 @@
 import logging
+import os
 import sys
+from pathlib import Path
 from typing import Any
 
 from multiversx_sdk_cli import cli_shared, config, utils
@@ -39,6 +41,9 @@ def setup_parser(subparsers: Any) -> Any:
 
     sub = cli_shared.add_command_subparser(subparsers, "config", "list", "List available configs")
     sub.set_defaults(func=list_configs)
+
+    sub = cli_shared.add_command_subparser(subparsers, "config", "reset", "Deletes the config file. Default config will be used.")
+    sub.set_defaults(func=delete_config)
 
     parser.epilog = cli_shared.build_group_epilog(subparsers)
     return subparsers
@@ -93,3 +98,21 @@ def list_configs(args: Any):
         if config_name == data.get("active", "default"):
             config_name += "*"
         print(config_name)
+
+
+def delete_config(args: Any):
+    config_file = config.resolve_config_path()
+    if not config_file.is_file():
+        logger.info(f"Config file not found. Aborting...")
+        return
+
+    confirm_continuation(config_file)
+    os.remove(config_file)
+    logger.info("Successfully deleted the config file")
+
+
+def confirm_continuation(file: Path):
+    answer = input(f"The file `{str(file)}` will be deleted. Do you want to continue? (y/n)")
+    if answer.lower() not in ["y", "yes"]:
+        print("Confirmation not given. Stopping...")
+        exit(1)
