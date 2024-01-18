@@ -1,7 +1,7 @@
 import logging
 from pathlib import Path
 
-from multiversx_sdk_cli import config, dependencies, myprocess, utils
+from multiversx_sdk_cli import dependencies, myprocess, utils
 from multiversx_sdk_cli.errors import BadFile
 from multiversx_sdk_cli.projects.report.features.report_option import \
     ReportFeature

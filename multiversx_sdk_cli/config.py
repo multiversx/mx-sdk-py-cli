@@ -2,8 +2,6 @@ import os
 from pathlib import Path
 from typing import Any, Dict, List
 
-import semver
-
 from multiversx_sdk_cli import errors, utils
 from multiversx_sdk_cli.ux import show_warning
 
@@ -146,7 +144,6 @@ def _guard_valid_config_deletion(name: str):
 def get_defaults() -> Dict[str, Any]:
     return {
         "dependencies.vmtools.tag": "v1.4.60",
-        "dependencies.mx_sdk_rs.tag": "latest",
         "dependencies.vmtools.urlTemplate.linux": "https://github.com/multiversx/mx-chain-vm-go/archive/{TAG}.tar.gz",
         "dependencies.vmtools.urlTemplate.osx": "https://github.com/multiversx/mx-chain-vm-go/archive/{TAG}.tar.gz",
         "dependencies.vmtools.urlTemplate.windows": "https://github.com/multiversx/mx-chain-vm-go/archive/{TAG}.tar.gz",
@@ -156,9 +153,9 @@ def get_defaults() -> Dict[str, Any]:
         "dependencies.golang.urlTemplate.linux": "https://golang.org/dl/{TAG}.linux-amd64.tar.gz",
         "dependencies.golang.urlTemplate.osx": "https://golang.org/dl/{TAG}.darwin-amd64.tar.gz",
         "dependencies.golang.urlTemplate.windows": "https://golang.org/dl/{TAG}.windows-amd64.zip",
-        "dependencies.twiggy.tag": "latest",
-        "dependencies.sc-meta.tag": "latest",
-        "dependencies.testwallets.tag": "latest",
+        "dependencies.twiggy.tag": "",
+        "dependencies.sc-meta.tag": "",
+        "dependencies.testwallets.tag": "v1.0.0",
         "dependencies.testwallets.urlTemplate.linux": "https://github.com/multiversx/mx-sdk-testwallets/archive/{TAG}.tar.gz",
         "dependencies.testwallets.urlTemplate.osx": "https://github.com/multiversx/mx-sdk-testwallets/archive/{TAG}.tar.gz",
         "dependencies.testwallets.urlTemplate.windows": "https://github.com/multiversx/mx-sdk-testwallets/archive/{TAG}.tar.gz",
@@ -254,42 +251,8 @@ def determine_final_args(argv: List[str], config_args: Dict[str, Any]) -> List[s
 
 def get_dependency_directory(key: str, tag: str) -> Path:
     parent_directory = get_dependency_parent_directory(key)
-    if tag == 'latest':
-        if not parent_directory.is_dir():
-            return parent_directory / tag
-        tag = get_latest_semver_from_directory(parent_directory)
-
     return parent_directory / tag
 
 
 def get_dependency_parent_directory(key: str) -> Path:
     return SDK_PATH / key
-
-
-def get_latest_semver_from_directory(directory: Path) -> str:
-    subdirs = [subdir.name for subdir in directory.iterdir()]
-    try:
-        return get_latest_semver(subdirs)
-    except IndexError:
-        raise Exception(f'no versions found in {directory}')
-
-
-def get_latest_semver(versions: List[str]) -> str:
-    semantic_versions = parse_strings_to_semver(versions)
-    latest_version = sorted(semantic_versions).pop()
-    return 'v' + str(latest_version)
-
-
-def parse_strings_to_semver(version_strings: List[str]) -> List[semver.VersionInfo]:
-    versions = []
-    for version_string in version_strings:
-        try:
-            # Omit the 'v' prefix of the version string
-            version_string = version_string[1:]
-            version = semver.VersionInfo.parse(version_string)
-        except ValueError:
-            continue
-
-        versions.append(version)
-
-    return versions
