@@ -15,11 +15,11 @@ def test_create_new_delegation_contract(capsys: Any):
     main([
         "staking-provider", "create-new-delegation-contract",
         "--pem", str(alice),
-        "--recall-nonce", "--estimate-gas",
+        "--nonce", "7", "--estimate-gas",
         "--value", "1250000000000000000000",
         "--total-delegation-cap", "10000000000000000000000",
         "--service-fee", "100",
-        "--proxy", "https://testnet-api.multiversx.com"
+        "--chain", "T"
     ])
     tx = get_transaction(capsys)
     data = tx["emittedTransactionData"]
@@ -41,8 +41,8 @@ def test_add_nodes(capsys: Any):
         "--validators-file", str(validators_file),
         "--delegation-contract", "erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqthllllsy5r6rh",
         "--pem", str(alice),
-        "--proxy", "https://testnet-api.multiversx.com",
-        "--recall-nonce", "--estimate-gas"
+        "--chain", "T",
+        "--nonce", "7", "--estimate-gas"
     ])
     tx = get_transaction(capsys)
     data = tx["emittedTransactionData"]
@@ -59,8 +59,8 @@ def test_remove_nodes(capsys: Any):
         "--bls-keys", f"{first_bls_key},{second_bls_key}",
         "--delegation-contract", "erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqthllllsy5r6rh",
         "--pem", str(alice),
-        "--proxy", "https://testnet-api.multiversx.com",
-        "--recall-nonce", "--estimate-gas"
+        "--chain", "T",
+        "--nonce", "7", "--estimate-gas"
     ])
     tx = get_transaction(capsys)
     data = tx["emittedTransactionData"]
@@ -78,8 +78,8 @@ def test_stake_nodes(capsys: Any):
         "--bls-keys", f"{first_bls_key},{second_bls_key}",
         "--delegation-contract", "erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqthllllsy5r6rh",
         "--pem", str(alice),
-        "--proxy", "https://testnet-api.multiversx.com",
-        "--recall-nonce", "--estimate-gas"
+        "--chain", "T",
+        "--nonce", "7", "--estimate-gas"
     ])
     tx = get_transaction(capsys)
     data = tx["emittedTransactionData"]
@@ -97,8 +97,8 @@ def test_unbond_nodes(capsys: Any):
         "--bls-keys", f"{first_bls_key},{second_bls_key}",
         "--delegation-contract", "erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqthllllsy5r6rh",
         "--pem", str(alice),
-        "--proxy", "https://testnet-api.multiversx.com",
-        "--recall-nonce", "--estimate-gas"
+        "--chain", "T",
+        "--nonce", "7", "--estimate-gas"
     ])
     tx = get_transaction(capsys)
     data = tx["emittedTransactionData"]
@@ -116,8 +116,8 @@ def test_unstake_nodes(capsys: Any):
         "--bls-keys", f"{first_bls_key},{second_bls_key}",
         "--delegation-contract", "erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqthllllsy5r6rh",
         "--pem", str(alice),
-        "--proxy", "https://testnet-api.multiversx.com",
-        "--recall-nonce", "--estimate-gas"
+        "--chain", "T",
+        "--nonce", "7", "--estimate-gas"
     ])
     tx = get_transaction(capsys)
     data = tx["emittedTransactionData"]
@@ -135,8 +135,8 @@ def test_unjail_nodes(capsys: Any):
         "--bls-keys", f"{first_bls_key},{second_bls_key}",
         "--delegation-contract", "erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqthllllsy5r6rh",
         "--pem", str(alice),
-        "--proxy", "https://testnet-api.multiversx.com",
-        "--recall-nonce", "--estimate-gas"
+        "--chain", "T",
+        "--nonce", "7", "--estimate-gas"
     ])
     tx = get_transaction(capsys)
     data = tx["emittedTransactionData"]
@@ -154,8 +154,8 @@ def test_change_service_fee(capsys: Any):
         "--service-fee", "100",
         "--delegation-contract", "erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqthllllsy5r6rh",
         "--pem", str(alice),
-        "--proxy", "https://testnet-api.multiversx.com",
-        "--recall-nonce", "--estimate-gas"
+        "--chain", "T",
+        "--nonce", "7", "--estimate-gas"
     ])
     tx = get_transaction(capsys)
     data = tx["emittedTransactionData"]
@@ -173,8 +173,8 @@ def test_modify_delegation_cap(capsys: Any):
         "--delegation-cap", "10000000000000000000000",
         "--delegation-contract", "erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqthllllsy5r6rh",
         "--pem", str(alice),
-        "--proxy", "https://testnet-api.multiversx.com",
-        "--recall-nonce", "--estimate-gas"
+        "--chain", "T",
+        "--nonce", "7", "--estimate-gas"
     ])
     tx = get_transaction(capsys)
     data = tx["emittedTransactionData"]
@@ -192,8 +192,8 @@ def test_automatic_activation(capsys: Any):
         "--set",
         "--delegation-contract", "erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqthllllsy5r6rh",
         "--pem", str(alice),
-        "--proxy", "https://testnet-api.multiversx.com",
-        "--recall-nonce", "--estimate-gas"
+        "--nonce", "7", "--estimate-gas",
+        "--chain", "T"
     ])
     tx = get_transaction(capsys)
     data = tx["emittedTransactionData"]
@@ -204,13 +204,16 @@ def test_automatic_activation(capsys: Any):
     assert transaction["receiver"] == "erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqthllllsy5r6rh"
     assert transaction["gasLimit"] == 11096500
 
+    # Clear the captured content
+    capsys.readouterr()
+
     main([
         "staking-provider", "automatic-activation",
         "--unset",
         "--delegation-contract", "erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqthllllsy5r6rh",
         "--pem", str(alice),
-        "--proxy", "https://testnet-api.multiversx.com",
-        "--recall-nonce", "--estimate-gas"
+        "--nonce", "7", "--estimate-gas",
+        "--chain", "T"
     ])
     tx = get_transaction(capsys)
     data = tx["emittedTransactionData"]
@@ -228,8 +231,8 @@ def test_redelegate_cap(capsys: Any):
         "--set",
         "--delegation-contract", "erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqthllllsy5r6rh",
         "--pem", str(alice),
-        "--proxy", "https://testnet-api.multiversx.com",
-        "--recall-nonce", "--estimate-gas"
+        "--nonce", "7", "--estimate-gas",
+        "--chain", "T"
     ])
     tx = get_transaction(capsys)
     data = tx["emittedTransactionData"]
@@ -240,13 +243,16 @@ def test_redelegate_cap(capsys: Any):
     assert transaction["receiver"] == "erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqthllllsy5r6rh"
     assert transaction["gasLimit"] == 11108500
 
+    # Clear the captured content
+    capsys.readouterr()
+
     main([
         "staking-provider", "redelegate-cap",
         "--unset",
         "--delegation-contract", "erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqthllllsy5r6rh",
         "--pem", str(alice),
-        "--proxy", "https://testnet-api.multiversx.com",
-        "--recall-nonce", "--estimate-gas"
+        "--nonce", "7", "--estimate-gas",
+        "--chain", "T"
     ])
     tx = get_transaction(capsys)
     data = tx["emittedTransactionData"]
@@ -266,8 +272,8 @@ def test_set_metadata(capsys: Any):
         "--identifier", "TEST",
         "--delegation-contract", "erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqthllllsy5r6rh",
         "--pem", str(alice),
-        "--proxy", "https://testnet-api.multiversx.com",
-        "--recall-nonce", "--estimate-gas"
+        "--nonce", "7", "--estimate-gas",
+        "--chain", "T"
     ])
     tx = get_transaction(capsys)
     data = tx["emittedTransactionData"]
