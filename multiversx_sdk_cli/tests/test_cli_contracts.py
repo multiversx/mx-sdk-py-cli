@@ -176,9 +176,8 @@ def test_contract_transfer_and_execute(capsys: Any):
     main([
         "contract", "call", contract_address,
         "--pem", f"{parent}/testdata/testUser.pem",
-        "--proxy", "https://devnet-api.multiversx.com",
         "--chain", "D",
-        "--recall-nonce",
+        "--nonce", "7",
         "--gas-limit", "5000000",
         "--function", "add",
         "--arguments", "5",
@@ -193,9 +192,8 @@ def test_contract_transfer_and_execute(capsys: Any):
     main([
         "contract", "call", contract_address,
         "--pem", f"{parent}/testdata/testUser.pem",
-        "--proxy", "https://devnet-api.multiversx.com",
         "--chain", "D",
-        "--recall-nonce",
+        "--nonce", "77",
         "--gas-limit", "5000000",
         "--function", "add",
         "--arguments", "5",
