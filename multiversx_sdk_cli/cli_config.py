@@ -1,10 +1,10 @@
 import logging
 import os
 import sys
-from pathlib import Path
 from typing import Any
 
 from multiversx_sdk_cli import cli_shared, config, utils
+from multiversx_sdk_cli.ux import confirm_continuation
 
 logger = logging.getLogger("cli.config")
 
@@ -106,13 +106,6 @@ def delete_config(args: Any):
         logger.info(f"Config file not found. Aborting...")
         return
 
-    confirm_continuation(config_file)
+    confirm_continuation(f"The file `{str(config_file)}` will be deleted. Do you want to continue? (y/n)")
     os.remove(config_file)
     logger.info("Successfully deleted the config file")
-
-
-def confirm_continuation(file: Path):
-    answer = input(f"The file `{str(file)}` will be deleted. Do you want to continue? (y/n)")
-    if answer.lower().strip() not in ["y", "yes"]:
-        print("Confirmation not given. Stopping...")
-        exit(1)
