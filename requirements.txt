@@ -4,7 +4,7 @@ requests~=2.31.0
 types-requests
 prettytable
 types-prettytable
-ledgercomm[hid]
+ledgercomm[hid] @ git+https://github.com/LedgerHQ/ledgercomm@v1.2.1
 semver
 requests-cache
 rich==13.3.4

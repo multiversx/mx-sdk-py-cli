@@ -18,7 +18,7 @@ from multiversx_sdk_cli.constants import (DEFAULT_TX_VERSION,
                                           TRANSACTION_OPTIONS_TX_GUARDED)
 from multiversx_sdk_cli.errors import ArgumentsNotProvidedError
 from multiversx_sdk_cli.interfaces import ITransaction
-from multiversx_sdk_cli.ledger.ledger_functions import do_get_ledger_address
+from multiversx_sdk_cli.ledger.ledger_functions import LedgerFacade
 from multiversx_sdk_cli.simulation import Simulator
 from multiversx_sdk_cli.transactions import send_and_wait_for_result
 from multiversx_sdk_cli.utils import log_explorer_transaction
@@ -164,7 +164,8 @@ def prepare_guardian_account(args: Any):
         password = load_guardian_password(args)
         account = Account(key_file=args.guardian_keyfile, password=password)
     elif args.guardian_ledger:
-        address = do_get_ledger_address(account_index=args.guardian_ledger_account_index, address_index=args.guardian_ledger_address_index)
+        ledger = LedgerFacade()
+        address = ledger.do_get_ledger_address(account_index=args.guardian_ledger_account_index, address_index=args.guardian_ledger_address_index)
         account = Account(Address.new_from_bech32(address))
     else:
         raise errors.NoWalletProvided()

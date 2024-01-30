@@ -13,7 +13,7 @@ from multiversx_sdk_cli.cli_password import (load_guardian_password,
 from multiversx_sdk_cli.cosign_transaction import cosign_transaction
 from multiversx_sdk_cli.errors import NoWalletProvided
 from multiversx_sdk_cli.interfaces import ITransaction
-from multiversx_sdk_cli.ledger.ledger_functions import do_get_ledger_address
+from multiversx_sdk_cli.ledger.ledger_functions import LedgerFacade
 
 logger = logging.getLogger("transactions")
 
@@ -113,7 +113,8 @@ def get_guardian_account_from_args(args: Any):
         password = load_guardian_password(args)
         account = Account(key_file=args.guardian_keyfile, password=password)
     elif args.guardian_ledger:
-        address = do_get_ledger_address(account_index=args.guardian_ledger_account_index, address_index=args.guardian_ledger_address_index)
+        ledger = LedgerFacade()
+        address = ledger.do_get_ledger_address(account_index=args.guardian_ledger_account_index, address_index=args.guardian_ledger_address_index)
         account = Account(address=Address.from_bech32(address))
     else:
         raise errors.NoWalletProvided()
