@@ -46,7 +46,6 @@ jobs:
           pytest .
       - name: Run CLI tests
         run: |
-          python3 -m multiversx_sdk_cli.cli config set dependencies.vmtools.tag v1.4.60
           cd ./multiversx_sdk_cli/tests
           source ./test_cli_contracts.sh && testAll || return 1
           source ./test_cli_dns.sh && testOffline || return 1
