@@ -1,6 +1,6 @@
 
 from pathlib import Path
-from typing import Any, Union
+from typing import Any, List, Tuple, Union
 
 
 class KnownError(Exception):
@@ -49,6 +49,16 @@ class DependencyMissing(KnownError):
         super().__init__(f"Dependency missing: {name} {tag}")
 
 
+class DependenciesMissing(KnownError):
+    def __init__(self, dependencies: List[Tuple[str, str]]):
+        message = "Dependencies missing: \n"
+
+        for dependency in dependencies:
+            message += f"{dependency[0]} {dependency[1]}\n"
+
+        super().__init__(message.rstrip("\n"))
+
+
 class UnknownDependency(KnownError):
     def __init__(self, name: str):
         super().__init__(f"Unknown dependency: {name}")
@@ -80,8 +90,8 @@ class PlatformNotSupported(KnownError):
 
 
 class BuildError(KnownError):
-    def __init__(self, message, inner=None):
-        super().__init__(f"Build error: {message}.", inner)
+    def __init__(self, message: str):
+        super().__init__(f"Build error: {message}.")
 
 
 class UnknownArgumentFormat(KnownError):

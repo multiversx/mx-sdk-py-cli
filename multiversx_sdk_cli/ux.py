@@ -13,3 +13,10 @@ def show_critical_error(message: str):
 
 def show_warning(message: str):
     print(Panel(f"[yellow]{escape(message)}"))
+
+
+def confirm_continuation(message: str):
+    answer = input(message)
+    if answer.lower().strip() not in ["y", "yes"]:
+        print("Confirmation not given. Stopping...")
+        exit(1)

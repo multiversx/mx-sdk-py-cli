@@ -16,7 +16,10 @@ mxpy is part of the multiversx-sdk and consists of Command Line Tools and Python
 for interacting with the Blockchain (in general) and with Smart Contracts (in particular).
 
 mxpy targets a broad audience of users and developers.
-https://docs.multiversx.com/sdk-and-tools/mxpy.
+
+See:
+ - https://docs.multiversx.com/sdk-and-tools/sdk-py
+ - https://docs.multiversx.com/sdk-and-tools/sdk-py/mxpy-cli
         
 
 COMMAND GROUPS:
@@ -1293,7 +1296,7 @@ usage: mxpy config COMMAND [-h] ...
 Configure multiversx-sdk (default values etc.)
 
 COMMANDS:
-  {dump,get,set,delete,new,switch,list}
+  {dump,get,set,delete,new,switch,list,reset}
 
 OPTIONS:
   -h, --help            show this help message and exit
@@ -1308,6 +1311,7 @@ delete                         Deletes a configuration value.
 new                            Creates a new configuration.
 switch                         Switch to a different config
 list                           List available configs
+reset                          Deletes the config file. Default config will be used.
 
 ```
 ### Configuration.Dump
@@ -1398,6 +1402,19 @@ $ mxpy config list --help
 usage: mxpy config list [-h] ...
 
 List available configs
+
+options:
+  -h, --help  show this help message and exit
+
+```
+### Configuration.Reset
+
+
+```
+$ mxpy config reset --help
+usage: mxpy config reset [-h] ...
+
+Deletes the config file. Default config will be used.
 
 options:
   -h, --help  show this help message and exit

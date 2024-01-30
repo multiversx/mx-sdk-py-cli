@@ -93,6 +93,7 @@ generate() {
     command "Configuration.New" "config new"
     command "Configuration.Switch" "config switch"
     command "Configuration.List" "config list"
+    command "Configuration.Reset" "config reset"
 
     group "Data" "data"
     command "Data.Dump" "data parse"

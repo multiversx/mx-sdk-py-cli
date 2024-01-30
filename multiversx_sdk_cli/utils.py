@@ -218,27 +218,6 @@ def parse_keys(bls_public_keys):
     return parsed_keys, len(keys)
 
 
-def query_latest_release_tag(repo: str) -> str:
-    """
-    Queries the Github API to retrieve the latest released tag of the specified
-    repository. The repository must be of the form 'organisation/project'.
-    """
-    url = f'https://api.github.com/repos/{repo}/releases/latest'
-
-    github_api_token = multiversx_sdk_cli.config.get_value('github_api_token')
-    headers = dict()
-    if github_api_token != '':
-        headers['Authorization'] = f'token {github_api_token}'
-
-    session = requests_cache.CachedSession('mxpy_requests_cache', use_cache_dir=True, cache_control=True)
-    response = session.get(url, headers=headers)
-    response.raise_for_status()
-
-    release = response.json()
-    latest_release_tag: str = release['tag_name']
-    return latest_release_tag
-
-
 def log_explorer(chain: str, name: str, path: str, details: str):
     networks = {
         "1": ("MultiversX Mainnet Explorer", "https://explorer.multiversx.com"),

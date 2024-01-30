@@ -26,9 +26,6 @@ class DependencyModule:
         # We install the default tag
         tag = config.get_dependency_tag(self.key)
 
-        if tag == 'latest':
-            tag = self.get_latest_release()
-
         logger.info(f"install: key={self.key}, tag={tag}, overwrite={overwrite}")
 
         if self._should_skip(tag, overwrite):
@@ -58,9 +55,6 @@ class DependencyModule:
         raise NotImplementedError()
 
     def get_env(self) -> Dict[str, str]:
-        raise NotImplementedError()
-
-    def get_latest_release(self) -> str:
         raise NotImplementedError()
 
     def get_resolution(self) -> DependencyResolution:
@@ -134,14 +128,6 @@ class StandaloneModule(DependencyModule):
 
         url = url.replace("{TAG}", tag)
         return url
-
-    def get_latest_release(self) -> str:
-        if self.repo_name is None or self.organisation is None:
-            raise ValueError(f'{self.key}: repo_name or organisation not specified')
-
-        org_repo = f'{self.organisation}/{self.repo_name}'
-        tag = utils.query_latest_release_tag(org_repo)
-        return tag
 
     def _get_archive_path(self, tag: str) -> Path:
         tools_folder = Path(workstation.get_tools_folder())
@@ -252,9 +238,6 @@ class GolangModule(StandaloneModule):
     def get_gopath(self) -> Path:
         return self.get_parent_directory() / "GOPATH"
 
-    def get_latest_release(self) -> str:
-        raise errors.UnsupportedConfigurationValue("Golang tag must always be explicit, not latest")
-
 
 class Rust(DependencyModule):
     def is_installed(self, tag: str) -> bool:
@@ -270,7 +253,24 @@ class Rust(DependencyModule):
         logger.info(f"which twiggy: {which_twiggy}")
 
         dependencies = [which_rustc, which_cargo, which_sc_meta, which_wasm_opt, which_twiggy]
-        return all(dependency is not None for dependency in dependencies)
+        installed = all(dependency is not None for dependency in dependencies)
+
+        if installed:
+            actual_version_installed = self._get_actual_installed_version()
+
+            if tag in actual_version_installed:
+                logger.info(f"[{self.key} {tag}] is installed.")
+            elif "not found" in actual_version_installed:
+                show_warning("You have installed Rust without using `rustup`.")
+            else:
+                show_warning(f"The Rust version you have installed does not match the recommended version.\nInstalled [{actual_version_installed}], expected [{tag}].")
+
+        return installed
+
+    def _get_actual_installed_version(self) -> str:
+        args = ["rustup", "default"]
+        output = myprocess.run_process(args, dump_to_stdout=False)
+        return output.strip()
 
     def install(self, overwrite: bool) -> None:
         self._check_install_env(apply_correction=overwrite)
@@ -338,26 +338,26 @@ This may cause problems with the installation of rust.""")
         tag = config.get_dependency_tag("sc-meta")
         args = ["cargo", "install", "multiversx-sc-meta", "--locked"]
 
-        if tag != "latest":
+        if tag:
             args.extend(["--version", tag])
 
-        myprocess.run_process(args)
+        myprocess.run_process(args, env=self.get_cargo_env())
 
     def _install_wasm_opt(self):
         logger.info("Installing wasm-opt. This may take a while.")
         tag = config.get_dependency_tag("wasm-opt")
         args = ["cargo", "install", "wasm-opt", "--version", tag]
-        myprocess.run_process(args)
+        myprocess.run_process(args, env=self.get_cargo_env())
 
     def _install_twiggy(self):
         logger.info("Installing twiggy.")
         tag = config.get_dependency_tag("twiggy")
         args = ["cargo", "install", "twiggy"]
 
-        if tag != "latest":
+        if tag:
             args.extend(["--version", tag])
 
-        myprocess.run_process(args)
+        myprocess.run_process(args, env=self.get_cargo_env())
 
     def _get_installer_url(self) -> str:
         if workstation.is_windows():
@@ -383,8 +383,12 @@ This may cause problems with the installation of rust.""")
     def get_env(self) -> Dict[str, str]:
         return dict(os.environ)
 
-    def get_latest_release(self) -> str:
-        raise errors.UnsupportedConfigurationValue("Rust tag must either be explicit, empty or 'nightly'")
+    def get_cargo_env(self) -> Dict[str, str]:
+        env = self.get_env()
+        cargo = Path("~/.cargo/bin").expanduser()
+        path = env["PATH"]
+        env["PATH"] = f"{str(cargo)}:{path}"
+        return env
 
 
 class TestWalletsModule(StandaloneModule):

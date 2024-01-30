@@ -13,7 +13,7 @@ logger = logging.getLogger("install")
 
 def install_module(key: str, overwrite: bool = False):
     if key == 'all':
-        modules = _get_all_deps()
+        modules = get_all_deps()
     else:
         modules = [get_module_by_key(key)]
 
@@ -29,7 +29,7 @@ def get_module_directory(key: str) -> Path:
 
 
 def get_module_by_key(key: str) -> DependencyModule:
-    matches = [module for module in _get_all_deps() if module.key == key or key in module.aliases]
+    matches = [module for module in get_all_deps() if module.key == key or key in module.aliases]
     if len(matches) != 1:
         raise errors.UnknownDependency(key)
 
@@ -39,7 +39,7 @@ def get_module_by_key(key: str) -> DependencyModule:
 def get_deps_dict() -> Dict[str, DependencyModule]:
     deps: Dict[str, DependencyModule] = dict()
 
-    for module in _get_all_deps():
+    for module in get_all_deps():
         deps[module.key] = module
         for alias in module.aliases:
             deps[alias] = module
@@ -47,7 +47,7 @@ def get_deps_dict() -> Dict[str, DependencyModule]:
     return deps
 
 
-def _get_all_deps() -> List[DependencyModule]:
+def get_all_deps() -> List[DependencyModule]:
     return [
         Rust(key="rust"),
         GolangModule(key="golang"),
