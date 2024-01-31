@@ -41,14 +41,10 @@ def main(cli_args: List[str] = sys.argv[1:]):
 
 def _do_main(cli_args: List[str]):
     utils.ensure_folder(config.SDK_PATH)
-    # argv_with_config_args = config.add_config_args(cli_args)
-    # parser = setup_parser(argv_with_config_args)
-    # argcomplete.autocomplete(parser)
-    # args = parser.parse_args(argv_with_config_args)
-
-    parser = setup_parser(cli_args)
+    argv_with_config_args = config.add_config_args(cli_args)
+    parser = setup_parser(argv_with_config_args)
     argcomplete.autocomplete(parser)
-    args = parser.parse_args(cli_args)
+    args = parser.parse_args(argv_with_config_args)
 
     if args.verbose:
         logging.basicConfig(level="DEBUG", force=True, format='%(name)s: %(message)s', handlers=[RichHandler(show_time=False, rich_tracebacks=True)])
