@@ -30,7 +30,7 @@ dependencies = [
   "multiversx-sdk-network-providers>=0.12.0,<0.13.0",
   "multiversx-sdk-wallet>=0.8.0,<0.9.0,",
   "multiversx-sdk-core>=0.7.0,<0.8.0",
-  "argcomplete"
+  "argcomplete==3.2.2"
 ]
 
 [project.scripts]
