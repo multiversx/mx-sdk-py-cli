@@ -22,22 +22,14 @@ def build(configfile: Path, software_components: List[str]):
 
         cmd_node = config.software.mx_chain_go.get_cmd_node_folder()
         _do_build(cmd_node, golang_env)
-
-        wasmer_path = golang.get_gopath() / "pkg" / "mod" / _get_wasm_vm_package(config) / "wasmer"
-        wasmer2_path = golang.get_gopath() / "pkg" / "mod" / _get_wasm_vm_package(config) / "wasmer2"
-        libraries.copy_libraries(wasmer_path, cmd_node)
-        libraries.copy_libraries(wasmer2_path, cmd_node)
+        _copy_wasmer_libs(config, cmd_node)
 
     if "seednode" in software_components:
         logger.info("Building seednode...")
 
         cmd_seednode = config.software.mx_chain_go.get_cmd_seednode_folder()
         _do_build(cmd_seednode, golang_env)
-
-        wasmer_path = golang.get_gopath() / "pkg" / "mod" / _get_wasm_vm_package(config) / "wasmer"
-        wasmer2_path = golang.get_gopath() / "pkg" / "mod" / _get_wasm_vm_package(config) / "wasmer2"
-        libraries.copy_libraries(wasmer_path, cmd_seednode)
-        libraries.copy_libraries(wasmer2_path, cmd_seednode)
+        _copy_wasmer_libs(config, cmd_seednode)
 
     if "proxy" in software_components:
         logger.info("Building proxy...")
@@ -52,7 +44,18 @@ def _do_build(cwd: Path, env: Dict[str, str]):
         raise KnownError(f"error code = {return_code}, see output")
 
 
-def _get_wasm_vm_package(config: ConfigRoot) -> str:
+def _copy_wasmer_libs(config: ConfigRoot, destination: Path):
+    golang = dependencies.get_golang()
+    vm_go_folder_name = _get_chain_vm_go_folder_name(config)
+    vm_go_path = golang.get_gopath() / "pkg" / "mod" / vm_go_folder_name
+    wasmer_path = vm_go_path / "wasmer"
+    wasmer2_path = vm_go_path / "wasmer2"
+
+    libraries.copy_libraries(wasmer_path, destination)
+    libraries.copy_libraries(wasmer2_path, destination)
+
+
+def _get_chain_vm_go_folder_name(config: ConfigRoot) -> str:
     go_mod = config.software.mx_chain_go.get_path_within_source(Path("go.mod"))
     lines = utils.read_lines(go_mod)
     line = [line for line in lines if "github.com/multiversx/mx-chain-vm-go" in line][0]
