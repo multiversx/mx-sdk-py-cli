@@ -18,6 +18,10 @@ def is_windows():
     return get_platform() == "windows"
 
 
+def is_osx():
+    return get_platform() == "osx"
+
+
 def get_platform():
     platforms = {
         "linux": "linux",
