@@ -1,9 +1,11 @@
+# PYTHON_ARGCOMPLETE_OK
 import argparse
 import logging
 import sys
 from argparse import ArgumentParser
 from typing import Any, List
 
+import argcomplete
 from rich.logging import RichHandler
 
 import multiversx_sdk_cli.cli_accounts
@@ -41,6 +43,7 @@ def _do_main(cli_args: List[str]):
     utils.ensure_folder(config.SDK_PATH)
     argv_with_config_args = config.add_config_args(cli_args)
     parser = setup_parser(argv_with_config_args)
+    argcomplete.autocomplete(parser)
     args = parser.parse_args(argv_with_config_args)
 
     if args.verbose:
