@@ -69,19 +69,19 @@ def _fix_link_between_cmd_and_shared_libraries(cmd_path: Path):
     if not workstation.is_osx():
         return
 
-    cmd_folder = cmd_path.parent.resolve()
-    libs = list(cmd_folder.glob("*.dylib"))
-    libs = [shared_lib.resolve() for shared_lib in libs]
+    # cmd_folder = cmd_path.parent.resolve()
+    # libs = list(cmd_folder.glob("*.dylib"))
+    # libs = [shared_lib.resolve() for shared_lib in libs]
 
-    for shared_lib in libs:
-        logger.debug(f"Patching {shared_lib}")
+    # for shared_lib in libs:
+    #     logger.debug(f"Patching {shared_lib}")
 
-        subprocess.check_call([
-            "install_name_tool",
-            "-id",
-            f"@rpath/{shared_lib.name}",
-            shared_lib
-        ])
+    #     # subprocess.check_call([
+    #     #     "install_name_tool",
+    #     #     "-id",
+    #     #     f"@rpath/{shared_lib.name}",
+    #     #     shared_lib
+    #     # ])
 
     # Also patch the executable
     subprocess.check_call([
