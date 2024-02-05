@@ -57,7 +57,7 @@ usage: mxpy contract COMMAND [-h] ...
 Build, deploy, upgrade and interact with Smart Contracts
 
 COMMANDS:
-  {new,templates,build,clean,test,report,deploy,call,upgrade,query,verify,reproducible-build}
+  {new,templates,build,clean,report,deploy,call,upgrade,query,verify,reproducible-build}
 
 OPTIONS:
   -h, --help            show this help message and exit
@@ -69,7 +69,6 @@ new                            Create a new Smart Contract project based on a te
 templates                      List the available Smart Contract templates.
 build                          Build a Smart Contract project.
 clean                          Clean a Smart Contract project.
-test                           Run scenarios (tests).
 report                         Print a detailed report of the smart contracts.
 deploy                         Deploy a Smart Contract.
 call                           Interact with a Smart Contract (execute function).
@@ -1263,11 +1262,11 @@ usage: mxpy deps install [-h] ...
 Install dependencies or multiversx-sdk modules.
 
 positional arguments:
-  {all,rust,golang,vmtools,testwallets}  the dependency to install
+  {all,rust,golang,testwallets}  the dependency to install
 
 options:
-  -h, --help                             show this help message and exit
-  --overwrite                            whether to overwrite an existing installation
+  -h, --help                     show this help message and exit
+  --overwrite                    whether to overwrite an existing installation
 
 ```
 ### Dependencies.Check
@@ -1280,10 +1279,10 @@ usage: mxpy deps check [-h] ...
 Check whether a dependency is installed.
 
 positional arguments:
-  {all,rust,golang,vmtools,testwallets}  the dependency to check
+  {all,rust,golang,testwallets}  the dependency to check
 
 options:
-  -h, --help                             show this help message and exit
+  -h, --help                     show this help message and exit
 
 ```
 ## Group **Configuration**

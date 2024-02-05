@@ -1,8 +1,8 @@
 import logging
 from pathlib import Path
-from typing import Any, List
+from typing import List
 
-from multiversx_sdk_cli import dependencies, errors, guards
+from multiversx_sdk_cli import errors, guards
 from multiversx_sdk_cli.projects import shared
 from multiversx_sdk_cli.projects.constants import (OLD_PROJECT_CONFIG_FILENAME,
                                                    PROJECT_CONFIG_FILENAME)
@@ -40,19 +40,6 @@ def clean_project(directory: Path):
     project = load_project(directory)
     project.clean()
     logger.info("Project cleaned.")
-
-
-def run_tests(project_path: Path, args: Any):
-    directory = Path(args.directory)
-    wildcard = args.wildcard
-
-    logger.info("run_tests.project: %s", project_path)
-
-    dependencies.install_module("vmtools")
-
-    guards.is_directory(project_path)
-    project = load_project(project_path)
-    project.run_tests(directory, wildcard)
 
 
 def get_project_paths_recursively(base_path: Path) -> List[Path]:

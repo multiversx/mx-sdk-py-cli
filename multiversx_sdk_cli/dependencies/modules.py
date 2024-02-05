@@ -135,59 +135,6 @@ class StandaloneModule(DependencyModule):
         return archive
 
 
-class VMToolsModule(StandaloneModule):
-    def __init__(self, key: str, aliases: List[str] = []):
-        super().__init__(key, aliases)
-        self.repo_name = 'mx-chain-vm-go'
-        self.organisation = 'multiversx'
-
-    def _post_install(self, tag: str):
-        dependencies.install_module('golang')
-
-        self.build_binary(tag, 'test')
-        self.make_binary_symlink_in_parent_folder(tag, 'test', 'run-scenarios')
-        self.copy_libwasmer_in_parent_directory(tag)
-
-    def build_binary(self, tag: str, binary_name: str):
-        source_folder = self.binary_source_folder(tag, binary_name)
-        golang = dependencies.get_module_by_key("golang")
-        golang_env = golang.get_env()
-        myprocess.run_process(['go', 'build'], cwd=source_folder, env=golang_env)
-
-    def binary_source_folder(self, tag: str, binary_name: str):
-        directory = self.get_source_directory(tag)
-        return directory / 'cmd' / binary_name
-
-    def make_binary_symlink_in_parent_folder(self, tag: str, binary_name: str, symlink_name: str):
-        source_folder = self.binary_source_folder(tag, binary_name)
-        binary = source_folder / binary_name
-
-        parent = self.get_parent_directory()
-        symlink = parent / symlink_name
-
-        symlink.unlink(missing_ok=True)
-        symlink.symlink_to(binary)
-
-    def copy_libwasmer_in_parent_directory(self, tag: str):
-        libwasmer_directory = self.get_source_directory(tag) / 'wasmer'
-        cmd_test_directory = self.get_source_directory(tag) / 'cmd' / 'test'
-        parent_directory = self.get_parent_directory()
-        for f in libwasmer_directory.iterdir():
-            if f.suffix in ['.dylib', '.so', '.dll']:
-                # Copy the dynamic library near the "run-scenarios" symlink
-                shutil.copy(f, parent_directory)
-                # Though, also copy the dynamic library near the target executable (seems to be necessary on MacOS)
-                shutil.copy(f, cmd_test_directory)
-
-    def get_env(self) -> Dict[str, str]:
-        return dict()
-
-    def get_source_directory(self, tag: str) -> Path:
-        directory = self.get_directory(tag)
-        first_subdirectory = next(directory.iterdir())
-        return first_subdirectory
-
-
 class GolangModule(StandaloneModule):
     def _post_install(self, tag: str):
         parent_directory = self.get_parent_directory()

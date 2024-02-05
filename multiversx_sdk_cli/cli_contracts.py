@@ -53,14 +53,6 @@ def setup_parser(args: List[str], subparsers: Any) -> Any:
     sub.add_argument("--path", default=os.getcwd(), help="the project directory (default: current directory)")
     sub.set_defaults(func=clean)
 
-    sub = cli_shared.add_command_subparser(subparsers, "contract", "test", "Run scenarios (tests).")
-    _add_project_arg(sub)
-    sub.add_argument("--directory", default="scenarios",
-                     help="🗀 the directory containing the tests (default: %(default)s)")
-    sub.add_argument("--wildcard", required=False, help="wildcard to match only specific test files")
-    _add_recursive_arg(sub)
-    sub.set_defaults(func=run_tests)
-
     sub = cli_shared.add_command_subparser(subparsers, "contract", "report", "Print a detailed report of the smart contracts.")
     sub.add_argument("--skip-build", action="store_true", default=False, help="skips the step of building of the wasm contracts")
     sub.add_argument("--skip-twiggy", action="store_true", default=False, help="skips the steps of building the debug wasm files and running twiggy")
@@ -213,10 +205,6 @@ def _add_build_options_args(sub: Any):
                      help="for rust projects, optionally specify the suffix of the wasm bytecode output file")
 
 
-def _add_recursive_arg(sub: Any):
-    sub.add_argument("-r", "--recursive", dest="recursive", action="store_true", help="locate projects recursively")
-
-
 def _add_bytecode_arg(sub: Any):
     sub.add_argument("--bytecode", type=str, required=True,
                      help="the file containing the WASM bytecode")
@@ -298,13 +286,6 @@ def do_report(args: Any):
     check_if_rust_is_installed()
     args_dict = args.__dict__
     projects.do_report(args, args_dict)
-
-
-def run_tests(args: Any):
-    check_if_rust_is_installed()
-    project_paths = get_project_paths(args)
-    for project in project_paths:
-        projects.run_tests(project, args)
 
 
 def deploy(args: Any):
