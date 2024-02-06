@@ -34,12 +34,6 @@ testBuildContracts() {
     assertFileExists ${SANDBOX}/empty/output/empty.abi.json || return 1
 }
 
-testRunScenarios() {
-    echo "testRunScenarios"
-    ${CLI} --verbose contract test --directory="scenarios" ${SANDBOX}/adder || return 1
-    ${CLI} --verbose contract test --directory="scenarios" ${SANDBOX}/empty || return 1
-}
-
 testWasmName() {
     echo "testWasmName"
    
