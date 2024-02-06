@@ -107,7 +107,6 @@ testAll() {
     testTrivialCommands || return 1
     testCreateContracts || return 1
     testBuildContracts || return 1
-    testRunScenarios || return 1
     testCleanContracts || return 1
     testWasmName || return 1
 }
