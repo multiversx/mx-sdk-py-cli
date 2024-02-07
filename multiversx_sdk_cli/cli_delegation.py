@@ -221,7 +221,7 @@ def _check_if_either_bls_keys_or_validators_file_are_provided(args: Any):
     validators_file = args.validators_file
 
     if not bls_keys and not validators_file:
-        raise errors.BadUsage("No bls keys or validators file provided")
+        raise errors.BadUsage("No bls keys or validators file provided. Use either `--bls-keys` or `--validators-file`")
 
 
 def unbond_nodes(args: Any):
