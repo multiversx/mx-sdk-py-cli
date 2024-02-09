@@ -5,8 +5,7 @@ from typing import Dict, List
 from multiversx_sdk_cli import config, errors
 from multiversx_sdk_cli.dependencies.modules import (DependencyModule,
                                                      GolangModule, Rust,
-                                                     TestWalletsModule,
-                                                     VMToolsModule)
+                                                     TestWalletsModule)
 
 logger = logging.getLogger("install")
 
@@ -51,7 +50,6 @@ def get_all_deps() -> List[DependencyModule]:
     return [
         Rust(key="rust"),
         GolangModule(key="golang"),
-        VMToolsModule(key="vmtools"),
         TestWalletsModule(key="testwallets")
     ]
 

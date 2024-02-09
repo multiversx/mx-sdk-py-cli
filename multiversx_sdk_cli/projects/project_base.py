@@ -1,13 +1,11 @@
-import glob
 import logging
 import shutil
 from abc import abstractmethod
 from os import path
 from pathlib import Path
-from typing import Any, Dict, List, Union, cast, final
+from typing import Any, Dict, List, Union, final
 
 from multiversx_sdk_cli import dependencies, errors, myprocess, utils
-from multiversx_sdk_cli.dependencies.modules import StandaloneModule
 from multiversx_sdk_cli.projects.constants import PROJECT_CONFIG_FILENAME
 from multiversx_sdk_cli.projects.interfaces import IProject
 from multiversx_sdk_cli.projects.migrations import migrate_project_config_file
@@ -129,23 +127,22 @@ class Project(IProject):
     def default_config(self) -> Dict[str, Any]:
         return dict()
 
-    def run_tests(self, tests_directory: Path, wildcard: str = ""):
-        vmtools = cast(StandaloneModule, dependencies.get_module_by_key("vmtools"))
-        tool_env = vmtools.get_env()
-        tool = path.join(vmtools.get_parent_directory(), "run-scenarios")
-        test_folder = self.directory / tests_directory
+    def run_tests(self, args: Any):
+        command = ["sc-meta", "test"]
 
-        if not wildcard:
-            args = [tool, str(test_folder)]
-            myprocess.run_process(args, env=tool_env)
-        else:
-            pattern = test_folder / wildcard
-            test_files = glob.glob(str(pattern))
+        if args.path:
+            command.extend(["--path", str(args.path)])
 
-            for test_file in test_files:
-                print("Run test for:", test_file)
-                args = [tool, test_file]
-                myprocess.run_process(args, env=tool_env)
+        if args.go:
+            command.append("--go")
+
+        if args.scen:
+            command.append("--scen")
+
+        if args.nocapture:
+            command.append("--nocapture")
+
+        myprocess.run_process(command)
 
 
 def glob_files(folder: Path, pattern: str) -> List[Path]:

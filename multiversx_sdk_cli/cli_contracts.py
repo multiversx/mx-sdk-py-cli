@@ -53,12 +53,13 @@ def setup_parser(args: List[str], subparsers: Any) -> Any:
     sub.add_argument("--path", default=os.getcwd(), help="the project directory (default: current directory)")
     sub.set_defaults(func=clean)
 
-    sub = cli_shared.add_command_subparser(subparsers, "contract", "test", "Run scenarios (tests).")
-    _add_project_arg(sub)
-    sub.add_argument("--directory", default="scenarios",
-                     help="🗀 the directory containing the tests (default: %(default)s)")
-    sub.add_argument("--wildcard", required=False, help="wildcard to match only specific test files")
-    _add_recursive_arg(sub)
+    sub = cli_shared.add_command_subparser(subparsers, "contract", "test", "Run tests.")
+    sub.add_argument("--path", default=os.getcwd(),
+                     help="the directory of the contract (default: %(default)s)")
+    sub.add_argument("--go", action="store_true",
+                     help="this arg runs rust and go tests (default: false)")
+    sub.add_argument("--scen", action="store_true", help="this arg runs scenarios (default: false). If `--scen` and `--go` are both specified, scen overrides the go argument")
+    sub.add_argument("--nocapture", action="store_true", help="this arg prints the entire output of the vm (default: false)")
     sub.set_defaults(func=run_tests)
 
     sub = cli_shared.add_command_subparser(subparsers, "contract", "report", "Print a detailed report of the smart contracts.")
@@ -172,7 +173,7 @@ def setup_parser(args: List[str], subparsers: Any) -> Any:
 
 def _add_project_arg(sub: Any):
     sub.add_argument("project", nargs='?', default=os.getcwd(),
-                     help="🗀 the project directory (default: current directory)")
+                     help="the project directory (default: current directory)")
 
 
 def _add_build_options_sc_meta(sub: Any):
@@ -302,9 +303,7 @@ def do_report(args: Any):
 
 def run_tests(args: Any):
     check_if_rust_is_installed()
-    project_paths = get_project_paths(args)
-    for project in project_paths:
-        projects.run_tests(project, args)
+    projects.run_tests(args)
 
 
 def deploy(args: Any):

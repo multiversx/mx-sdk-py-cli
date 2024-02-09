@@ -42,17 +42,14 @@ def clean_project(directory: Path):
     logger.info("Project cleaned.")
 
 
-def run_tests(project_path: Path, args: Any):
-    directory = Path(args.directory)
-    wildcard = args.wildcard
+def run_tests(args: Any):
+    directory = Path(args.path)
 
-    logger.info("run_tests.project: %s", project_path)
+    logger.info("run_tests.project: %s", directory)
 
-    dependencies.install_module("vmtools")
-
-    guards.is_directory(project_path)
-    project = load_project(project_path)
-    project.run_tests(directory, wildcard)
+    guards.is_directory(directory)
+    project = load_project(directory)
+    project.run_tests(args)
 
 
 def get_project_paths_recursively(base_path: Path) -> List[Path]:
