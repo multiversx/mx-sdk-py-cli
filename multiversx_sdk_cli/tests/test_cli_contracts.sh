@@ -36,8 +36,8 @@ testBuildContracts() {
 
 testRunScenarios() {
     echo "testRunScenarios"
-    ${CLI} --verbose contract test --directory="scenarios" ${SANDBOX}/adder || return 1
-    ${CLI} --verbose contract test --directory="scenarios" ${SANDBOX}/empty || return 1
+    ${CLI} --verbose contract test --path=${SANDBOX}/adder || return 1
+    ${CLI} --verbose contract test --path=${SANDBOX}/empty || return 1
 }
 
 testWasmName() {
