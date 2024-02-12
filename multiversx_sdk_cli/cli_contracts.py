@@ -214,10 +214,6 @@ def _add_build_options_args(sub: Any):
                      help="for rust projects, optionally specify the suffix of the wasm bytecode output file")
 
 
-def _add_recursive_arg(sub: Any):
-    sub.add_argument("-r", "--recursive", dest="recursive", action="store_true", help="locate projects recursively")
-
-
 def _add_bytecode_arg(sub: Any):
     sub.add_argument("--bytecode", type=str, required=True,
                      help="the file containing the WASM bytecode")
