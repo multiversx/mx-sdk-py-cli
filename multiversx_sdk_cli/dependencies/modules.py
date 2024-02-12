@@ -1,5 +1,6 @@
 import logging
 import os
+import platform
 import shutil
 from os import path
 from pathlib import Path
@@ -311,6 +312,11 @@ This may cause problems with the installation of rust.""")
 
     def _install_sc_meta_deps(self):
         # this is needed for sc-meta to run the tests
+        # if os is Windows skip insallation
+        os = platform.system().lower()
+        if os == "windows":
+            return
+
         logger.info("Installing sc-meta dependencies.")
         args = ["sc-meta", "install", "all"]
         myprocess.run_process(args)
