@@ -131,7 +131,7 @@ class Project(IProject):
         command = ["sc-meta", "test"]
 
         if args.path:
-            command.extend(["--path", str(args.path)])
+            command.extend(["--path", str(Path(args.path).expanduser())])
 
         if args.go:
             command.append("--go")
