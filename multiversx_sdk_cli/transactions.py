@@ -2,17 +2,16 @@ import base64
 import json
 import logging
 import time
-from typing import Any, Dict, Optional, Protocol, Sequence, TextIO, Tuple
+from typing import Any, Dict, Optional, Protocol, TextIO
 
 from multiversx_sdk_core import Address, Transaction, TransactionPayload
-from multiversx_sdk_network_providers import GenericError
 
 from multiversx_sdk_cli import errors
 from multiversx_sdk_cli.accounts import Account, LedgerAccount
 from multiversx_sdk_cli.cli_password import (load_guardian_password,
                                              load_password)
 from multiversx_sdk_cli.cosign_transaction import cosign_transaction
-from multiversx_sdk_cli.errors import NoWalletProvided, ProxyError
+from multiversx_sdk_cli.errors import NoWalletProvided
 from multiversx_sdk_cli.interfaces import ITransaction
 from multiversx_sdk_cli.ledger.ledger_functions import do_get_ledger_address
 
@@ -29,9 +28,6 @@ class ITransactionOnNetwork(Protocol):
 
 class INetworkProvider(Protocol):
     def send_transaction(self, transaction: ITransaction) -> str:
-        ...
-
-    def send_transactions(self, transactions: Sequence[ITransaction]) -> Tuple[int, Dict[str, str]]:
         ...
 
     def get_transaction(self, tx_hash: str, with_process_status: Optional[bool] = False) -> ITransactionOnNetwork:
@@ -133,15 +129,7 @@ def send_and_wait_for_result(transaction: ITransaction, proxy: INetworkProvider,
 def _send_transaction_and_wait_for_result(proxy: INetworkProvider, payload: ITransaction, num_seconds_timeout: int = 100) -> ITransactionOnNetwork:
     AWAIT_TRANSACTION_PERIOD = 5
 
-    try:
-        tx_hash = proxy.send_transaction(payload)
-    except GenericError as ge:
-        url = ge.url
-        message = ge.data["error"]
-        data = ge.data["data"]
-        code = ge.data["code"]
-        raise ProxyError(message, url, data, code)
-
+    tx_hash = proxy.send_transaction(payload)
     num_periods_to_wait = int(num_seconds_timeout / AWAIT_TRANSACTION_PERIOD)
 
     for _ in range(0, num_periods_to_wait):

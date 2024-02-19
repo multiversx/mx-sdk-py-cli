@@ -1,14 +1,11 @@
 from pathlib import Path
 from typing import Any, List
 
-from multiversx_sdk_network_providers import GenericError
-from multiversx_sdk_network_providers.proxy_network_provider import \
-    ProxyNetworkProvider
-
 from multiversx_sdk_cli import cli_shared, utils
 from multiversx_sdk_cli.cli_output import CLIOutputBuilder
 from multiversx_sdk_cli.cosign_transaction import cosign_transaction
-from multiversx_sdk_cli.errors import NoWalletProvided, ProxyError
+from multiversx_sdk_cli.custom_network_provider import CustomNetworkProvider
+from multiversx_sdk_cli.errors import NoWalletProvided
 from multiversx_sdk_cli.transactions import (compute_relayed_v1_data,
                                              do_prepare_transaction,
                                              load_transaction_from_file)
@@ -89,26 +86,19 @@ def send_transaction(args: Any):
 
     tx = load_transaction_from_file(args.infile)
     output = CLIOutputBuilder()
-    proxy = ProxyNetworkProvider(args.proxy)
+    proxy = CustomNetworkProvider(args.proxy)
 
-    try:
-        tx_hash = proxy.send_transaction(tx)
-        output.set_emitted_transaction_hash(tx_hash)
-    except GenericError as ge:
-        url = ge.url
-        message = ge.data["error"]
-        data = ge.data["data"]
-        code = ge.data["code"]
-        raise ProxyError(message, url, data, code)
-    finally:
-        output = output.set_emitted_transaction(tx).build()
-        utils.dump_out_json(output, outfile=args.outfile)
+    tx_hash = proxy.send_transaction(tx)
+    output.set_emitted_transaction_hash(tx_hash)
+
+    output = output.set_emitted_transaction(tx).build()
+    utils.dump_out_json(output, outfile=args.outfile)
 
 
 def get_transaction(args: Any):
     args = utils.as_object(args)
     omit_fields = cli_shared.parse_omit_fields_arg(args)
-    proxy = ProxyNetworkProvider(args.proxy)
+    proxy = CustomNetworkProvider(args.proxy)
 
     transaction = proxy.get_transaction(args.hash, True)
     output = CLIOutputBuilder().set_transaction_on_network(transaction, omit_fields).build()

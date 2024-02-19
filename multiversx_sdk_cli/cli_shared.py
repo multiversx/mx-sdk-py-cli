@@ -6,7 +6,6 @@ from argparse import FileType
 from typing import Any, Dict, List, Text, cast
 
 from multiversx_sdk_core import Address
-from multiversx_sdk_network_providers import GenericError
 from multiversx_sdk_network_providers.proxy_network_provider import \
     ProxyNetworkProvider
 
@@ -17,7 +16,8 @@ from multiversx_sdk_cli.cli_password import (load_guardian_password,
                                              load_password)
 from multiversx_sdk_cli.constants import (DEFAULT_TX_VERSION,
                                           TRANSACTION_OPTIONS_TX_GUARDED)
-from multiversx_sdk_cli.errors import ArgumentsNotProvidedError, ProxyError
+from multiversx_sdk_cli.custom_network_provider import CustomNetworkProvider
+from multiversx_sdk_cli.errors import ArgumentsNotProvidedError
 from multiversx_sdk_cli.interfaces import ITransaction
 from multiversx_sdk_cli.ledger.ledger_functions import do_get_ledger_address
 from multiversx_sdk_cli.simulation import Simulator
@@ -250,7 +250,7 @@ def check_options_for_guarded_tx(options: int):
 
 
 def send_or_simulate(tx: ITransaction, args: Any, dump_output: bool = True) -> CLIOutputBuilder:
-    proxy = ProxyNetworkProvider(args.proxy)
+    proxy = CustomNetworkProvider(args.proxy)
 
     is_set_wait_result = hasattr(args, "wait_result") and args.wait_result
     is_set_send = hasattr(args, "send") and args.send
@@ -269,15 +269,8 @@ def send_or_simulate(tx: ITransaction, args: Any, dump_output: bool = True) -> C
             transaction_on_network = send_and_wait_for_result(tx, proxy, args.timeout)
             output_builder.set_awaited_transaction(transaction_on_network)
         elif send_only:
-            try:
-                hash = proxy.send_transaction(tx)
-                output_builder.set_emitted_transaction_hash(hash)
-            except GenericError as ge:
-                url = ge.url
-                message = ge.data["error"]
-                data = ge.data["data"]
-                code = ge.data["code"]
-                raise ProxyError(message, url, data, code)
+            hash = proxy.send_transaction(tx)
+            output_builder.set_emitted_transaction_hash(hash)
         elif simulate:
             simulation = Simulator(proxy).run(tx)
             output_builder.set_simulation_results(simulation)
