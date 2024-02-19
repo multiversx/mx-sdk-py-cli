@@ -112,6 +112,7 @@ def wallet_new(args: Any):
 
     mnemonic = Mnemonic.generate()
     print(f"Mnemonic: {mnemonic.get_text()}")
+    print(f"Wallet address: {mnemonic.derive_key().generate_public_key().to_address(address_hrp).to_bech32()}")
 
     if format is None:
         return
