@@ -88,11 +88,12 @@ def send_transaction(args: Any):
     output = CLIOutputBuilder()
     proxy = CustomNetworkProvider(args.proxy)
 
-    tx_hash = proxy.send_transaction(tx)
-    output.set_emitted_transaction_hash(tx_hash)
-
-    output = output.set_emitted_transaction(tx).build()
-    utils.dump_out_json(output, outfile=args.outfile)
+    try:
+        tx_hash = proxy.send_transaction(tx)
+        output.set_emitted_transaction_hash(tx_hash)
+    finally:
+        output = output.set_emitted_transaction(tx).build()
+        utils.dump_out_json(output, outfile=args.outfile)
 
 
 def get_transaction(args: Any):
