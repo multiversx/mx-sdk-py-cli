@@ -198,3 +198,13 @@ class GuardianServiceError(KnownError):
 class ArgumentsNotProvidedError(KnownError):
     def __init__(self, message: str):
         super().__init__(message)
+
+
+class ProxyError(KnownError):
+    def __init__(self, message: str, url: str, data: str, code: str):
+        inner = {
+            "url": url,
+            "data": data,
+            "code": code
+        }
+        super().__init__(message, inner)

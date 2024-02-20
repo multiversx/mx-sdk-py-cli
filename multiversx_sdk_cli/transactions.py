@@ -2,7 +2,7 @@ import base64
 import json
 import logging
 import time
-from typing import Any, Dict, Optional, Protocol, Sequence, TextIO, Tuple
+from typing import Any, Dict, Optional, Protocol, TextIO
 
 from multiversx_sdk_core import Address, Transaction, TransactionPayload
 
@@ -28,9 +28,6 @@ class ITransactionOnNetwork(Protocol):
 
 class INetworkProvider(Protocol):
     def send_transaction(self, transaction: ITransaction) -> str:
-        ...
-
-    def send_transactions(self, transactions: Sequence[ITransaction]) -> Tuple[int, str]:
         ...
 
     def get_transaction(self, tx_hash: str, with_process_status: Optional[bool] = False) -> ITransactionOnNetwork:
