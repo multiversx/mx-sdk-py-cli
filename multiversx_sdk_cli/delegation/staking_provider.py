@@ -52,10 +52,11 @@ class DelegationOperations:
         tx.version = int(args.version)
         tx.options = int(args.options)
         tx.guardian = args.guardian
-        tx.signature = bytes.fromhex(owner.sign_transaction(tx))
 
         if args.gas_limit:
             tx.gas_limit = int(args.gas_limit)
+
+        tx.signature = bytes.fromhex(owner.sign_transaction(tx))
 
         return tx
 
@@ -73,10 +74,11 @@ class DelegationOperations:
         tx.version = int(args.version)
         tx.options = int(args.options)
         tx.guardian = args.guardian
-        tx.signature = bytes.fromhex(owner.sign_transaction(tx))
 
         if args.gas_limit:
             tx.gas_limit = int(args.gas_limit)
+
+        tx.signature = bytes.fromhex(owner.sign_transaction(tx))
 
         return tx
 
@@ -94,10 +96,11 @@ class DelegationOperations:
         tx.version = int(args.version)
         tx.options = int(args.options)
         tx.guardian = args.guardian
-        tx.signature = bytes.fromhex(owner.sign_transaction(tx))
 
         if args.gas_limit:
             tx.gas_limit = int(args.gas_limit)
+
+        tx.signature = bytes.fromhex(owner.sign_transaction(tx))
 
         return tx
 
@@ -115,10 +118,11 @@ class DelegationOperations:
         tx.version = int(args.version)
         tx.options = int(args.options)
         tx.guardian = args.guardian
-        tx.signature = bytes.fromhex(owner.sign_transaction(tx))
 
         if args.gas_limit:
             tx.gas_limit = int(args.gas_limit)
+
+        tx.signature = bytes.fromhex(owner.sign_transaction(tx))
 
         return tx
 
@@ -136,10 +140,11 @@ class DelegationOperations:
         tx.version = int(args.version)
         tx.options = int(args.options)
         tx.guardian = args.guardian
-        tx.signature = bytes.fromhex(owner.sign_transaction(tx))
 
         if args.gas_limit:
             tx.gas_limit = int(args.gas_limit)
+
+        tx.signature = bytes.fromhex(owner.sign_transaction(tx))
 
         return tx
 
@@ -157,10 +162,11 @@ class DelegationOperations:
         tx.version = int(args.version)
         tx.options = int(args.options)
         tx.guardian = args.guardian
-        tx.signature = bytes.fromhex(owner.sign_transaction(tx))
 
         if args.gas_limit:
             tx.gas_limit = int(args.gas_limit)
+
+        tx.signature = bytes.fromhex(owner.sign_transaction(tx))
 
         return tx
 
@@ -178,10 +184,11 @@ class DelegationOperations:
         tx.version = int(args.version)
         tx.options = int(args.options)
         tx.guardian = args.guardian
-        tx.signature = bytes.fromhex(owner.sign_transaction(tx))
 
         if args.gas_limit:
             tx.gas_limit = int(args.gas_limit)
+
+        tx.signature = bytes.fromhex(owner.sign_transaction(tx))
 
         return tx
 
@@ -197,10 +204,11 @@ class DelegationOperations:
         tx.version = int(args.version)
         tx.options = int(args.options)
         tx.guardian = args.guardian
-        tx.signature = bytes.fromhex(owner.sign_transaction(tx))
 
         if args.gas_limit:
             tx.gas_limit = int(args.gas_limit)
+
+        tx.signature = bytes.fromhex(owner.sign_transaction(tx))
 
         return tx
 
@@ -216,10 +224,11 @@ class DelegationOperations:
         tx.version = int(args.version)
         tx.options = int(args.options)
         tx.guardian = args.guardian
-        tx.signature = bytes.fromhex(owner.sign_transaction(tx))
 
         if args.gas_limit:
             tx.gas_limit = int(args.gas_limit)
+
+        tx.signature = bytes.fromhex(owner.sign_transaction(tx))
 
         return tx
 
@@ -243,10 +252,11 @@ class DelegationOperations:
         tx.version = int(args.version)
         tx.options = int(args.options)
         tx.guardian = args.guardian
-        tx.signature = bytes.fromhex(owner.sign_transaction(tx))
 
         if args.gas_limit:
             tx.gas_limit = int(args.gas_limit)
+
+        tx.signature = bytes.fromhex(owner.sign_transaction(tx))
 
         return tx
 
@@ -270,10 +280,11 @@ class DelegationOperations:
         tx.version = int(args.version)
         tx.options = int(args.options)
         tx.guardian = args.guardian
-        tx.signature = bytes.fromhex(owner.sign_transaction(tx))
 
         if args.gas_limit:
             tx.gas_limit = int(args.gas_limit)
+
+        tx.signature = bytes.fromhex(owner.sign_transaction(tx))
 
         return tx
 
@@ -291,10 +302,11 @@ class DelegationOperations:
         tx.version = int(args.version)
         tx.options = int(args.options)
         tx.guardian = args.guardian
-        tx.signature = bytes.fromhex(owner.sign_transaction(tx))
 
         if args.gas_limit:
             tx.gas_limit = int(args.gas_limit)
+
+        tx.signature = bytes.fromhex(owner.sign_transaction(tx))
 
         return tx
 
