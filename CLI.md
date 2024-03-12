@@ -23,7 +23,7 @@ See:
         
 
 COMMAND GROUPS:
-  {contract,tx,validator,account,ledger,wallet,deps,config,localnet,data,staking-provider,dns}
+  {contract,tx,validator,account,ledger,wallet,deps,config,localnet,data,staking-provider,dns,faucet}
 
 TOP-LEVEL OPTIONS:
   -h, --help            show this help message and exit
@@ -45,6 +45,7 @@ localnet                       Set up, start and control localnets
 data                           Data manipulation omnitool
 staking-provider               Staking provider omnitool
 dns                            Operations related to the Domain Name Service
+faucet                         Get xEGLD on Devnet or Testnet
 
 ```
 ## Group **Contract**
@@ -1093,6 +1094,7 @@ Remove nodes must be called by the contract owner
 options:
   -h, --help                                      show this help message and exit
   --bls-keys BLS_KEYS                             a list with the bls keys of the nodes
+  --validators-file VALIDATORS_FILE               a JSON file describing the Nodes
   --delegation-contract DELEGATION_CONTRACT       address of the delegation contract
   --proxy PROXY                                   🔗 the URL of the proxy
   --pem PEM                                       🔑 the PEM file, if keyfile not provided
@@ -1142,6 +1144,7 @@ Stake nodes must be called by the contract owner
 options:
   -h, --help                                      show this help message and exit
   --bls-keys BLS_KEYS                             a list with the bls keys of the nodes
+  --validators-file VALIDATORS_FILE               a JSON file describing the Nodes
   --delegation-contract DELEGATION_CONTRACT       address of the delegation contract
   --proxy PROXY                                   🔗 the URL of the proxy
   --pem PEM                                       🔑 the PEM file, if keyfile not provided
@@ -1191,6 +1194,7 @@ Unbond nodes must be called by the contract owner
 options:
   -h, --help                                      show this help message and exit
   --bls-keys BLS_KEYS                             a list with the bls keys of the nodes
+  --validators-file VALIDATORS_FILE               a JSON file describing the Nodes
   --delegation-contract DELEGATION_CONTRACT       address of the delegation contract
   --proxy PROXY                                   🔗 the URL of the proxy
   --pem PEM                                       🔑 the PEM file, if keyfile not provided
@@ -1240,6 +1244,7 @@ Unstake nodes must be called by the contract owner
 options:
   -h, --help                                      show this help message and exit
   --bls-keys BLS_KEYS                             a list with the bls keys of the nodes
+  --validators-file VALIDATORS_FILE               a JSON file describing the Nodes
   --delegation-contract DELEGATION_CONTRACT       address of the delegation contract
   --proxy PROXY                                   🔗 the URL of the proxy
   --pem PEM                                       🔑 the PEM file, if keyfile not provided
@@ -1289,6 +1294,7 @@ Unjail nodes must be called by the contract owner
 options:
   -h, --help                                      show this help message and exit
   --bls-keys BLS_KEYS                             a list with the bls keys of the nodes
+  --validators-file VALIDATORS_FILE               a JSON file describing the Nodes
   --delegation-contract DELEGATION_CONTRACT       address of the delegation contract
   --proxy PROXY                                   🔗 the URL of the proxy
   --pem PEM                                       🔑 the PEM file, if keyfile not provided
@@ -2114,5 +2120,48 @@ options:
   --key KEY              the key
   --partition PARTITION  the storage partition (default: *)
   --use-global           use the global storage (default: False)
+
+```
+## Group **Faucet**
+
+
+```
+$ mxpy faucet --help
+usage: mxpy faucet COMMAND [-h] ...
+
+Get xEGLD on Devnet or Testnet
+
+COMMANDS:
+  {request}
+
+OPTIONS:
+  -h, --help  show this help message and exit
+
+----------------
+COMMANDS summary
+----------------
+request                        Request xEGLD.
+
+```
+### Faucet.Request
+
+
+```
+$ mxpy faucet request --help
+usage: mxpy faucet request [-h] ...
+
+Request xEGLD.
+
+options:
+  -h, --help                                   show this help message and exit
+  --pem PEM                                    🔑 the PEM file, if keyfile not provided
+  --pem-index PEM_INDEX                        🔑 the index in the PEM file (default: 0)
+  --keyfile KEYFILE                            🔑 a JSON keyfile, if PEM not provided
+  --passfile PASSFILE                          🔑 a file containing keyfile's password, if keyfile provided
+  --ledger                                     🔐 bool flag for signing transaction using ledger
+  --ledger-account-index LEDGER_ACCOUNT_INDEX  🔐 the index of the account when using Ledger
+  --ledger-address-index LEDGER_ADDRESS_INDEX  🔐 the index of the address when using Ledger
+  --sender-username SENDER_USERNAME            🖄 the username of the sender
+  --chain CHAIN                                the chain identifier
 
 ```
