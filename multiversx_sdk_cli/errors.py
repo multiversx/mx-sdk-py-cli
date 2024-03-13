@@ -208,3 +208,8 @@ class ProxyError(KnownError):
             "code": code
         }
         super().__init__(message, inner)
+
+
+class NativeAuthClientError(KnownError):
+    def __init__(self, message: str):
+        super().__init__(message)

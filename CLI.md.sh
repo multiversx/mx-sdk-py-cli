@@ -114,6 +114,9 @@ generate() {
     command "Data.Dump" "data parse"
     command "Data.Store" "data store"
     command "Data.Load" "data load"
+
+    group "Faucet" "faucet"
+    command "Faucet.Request" "faucet request"
 }
 
 generate
