@@ -6,13 +6,17 @@ import requests
 
 from multiversx_sdk_cli.errors import NativeAuthClientError
 
+NUMBER_OF_SECONDS_IN_A_MINUTE = 60
+NUMBER_OF_MINUTES_IN_AN_HOUR = 60
+NUMBER_OF_HOURS_IN_A_DAY = 24
+
 
 class NativeAuthClientConfig:
     def __init__(
             self,
             origin: str = '',
             api_url: str = "https://api.multiversx.com",
-            expiry_seconds: int = 60 * 60 * 24,
+            expiry_seconds: int = NUMBER_OF_SECONDS_IN_A_MINUTE * NUMBER_OF_MINUTES_IN_AN_HOUR * NUMBER_OF_HOURS_IN_A_DAY,
             block_hash_shard: Optional[int] = None,
             gateway_url: Optional[str] = None,
             extra_request_headers: Optional[Dict[str, str]] = None
