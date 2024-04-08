@@ -32,11 +32,11 @@ def test_query_contract():
         [
             "contract",
             "query",
-            "erd1qqqqqqqqqqqqqpgq8z2zzyu30f4607hth0tfj5m3vpjvwrvvrawqw09jem",
+            "erd1qqqqqqqqqqqqqpgq6qr0w0zzyysklfneh32eqp2cf383zc89d8sstnkl60",
             "--function",
             "getSum",
             "--proxy",
-            "https://testnet-api.multiversx.com",
+            "https://devnet-api.multiversx.com",
         ]
     )
     assert False if result else True
