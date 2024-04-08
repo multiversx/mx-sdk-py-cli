@@ -48,9 +48,9 @@ def test_get_transaction():
             "tx",
             "get",
             "--proxy",
-            "https://testnet-api.multiversx.com",
+            "https://devnet-api.multiversx.com",
             "--hash",
-            "bf63fdd7d74cbc78f1ec0fbad05f156984a5c995b782e1947352210dd80c5164",
+            "06f381ee88ed27ba08a35f995f17dceb737e1a99c5c4da0c247bbe7aa1d18551",
         ]
     )
     assert False if result else True
