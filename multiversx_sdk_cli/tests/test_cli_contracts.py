@@ -301,7 +301,7 @@ def test_contract_commands_argument_parameter():
         "--nonce", "7",
         "--chain", "D",
         "--gas-limit", "5000000",
-        "--arguments", "invalidargument",
+        "--arguments", "foobar",
     ])
     assert return_code
 
@@ -312,7 +312,7 @@ def test_contract_commands_argument_parameter():
         "--nonce", "7",
         "--chain", "D",
         "--gas-limit", "5000000",
-        "--arguments", "str:invalidargument",
+        "--arguments", "str:foobar",
     ])
     assert not return_code
 
