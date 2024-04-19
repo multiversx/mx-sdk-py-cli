@@ -280,6 +280,8 @@ def prepare_args_for_factory(arguments: List[str]) -> List[Any]:
             args.append(True)
         elif arg.startswith(STR_PREFIX):
             args.append(arg[len(STR_PREFIX):])
+        else:
+            raise errors.BadUserInput(f"Unknown argument type for argument: `{arg}`. Use `mxpy contract <sub-command> --help` to check all supported arguments")
 
     return args
 
