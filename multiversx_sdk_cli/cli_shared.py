@@ -246,7 +246,7 @@ def should_sign_with_guardian_key(args: Any) -> bool:
 
 def check_options_for_guarded_tx(options: int):
     if not options & TRANSACTION_OPTIONS_TX_GUARDED == TRANSACTION_OPTIONS_TX_GUARDED:
-        raise errors.BadUsage("Invalid guarded transaction's options. The second least significant bit must be set.")
+        raise errors.BadUsage("Invalid guarded transaction's options. The second least significant bit must be set")
 
 
 def send_or_simulate(tx: ITransaction, args: Any, dump_output: bool = True) -> CLIOutputBuilder:
