@@ -7,10 +7,16 @@ ConfigDict = Dict[str, Any]
 
 
 def patch_config(data: ConfigDict, config: ConfigRoot):
-    general_settings: ConfigDict = dict()
-    general_settings['ChainID'] = CHAIN_ID
+    data['GeneralSettings']['ChainID'] = CHAIN_ID
 
-    data['GeneralSettings'].update(general_settings)
+    # "--operation-mode=historical-balances" is not available for nodes,
+    # since << validator cannot be a full archive node >>,
+    # but we attempt to set the "deep-history" mode as follows:
+    data['DbLookupExtensions']['Enabled'] = True
+    data['GeneralSettings']['StartInEpochEnabled'] = False
+    data['StateTriesConfig']['AccountsStatePruningEnabled'] = False
+    data['StoragePruning']['ObserverCleanOldEpochsData'] = False
+    data['StoragePruning']['AccountsTrieCleanOldEpochsData'] = False
 
     # Make epochs shorter
     epoch_start_config: ConfigDict = dict()

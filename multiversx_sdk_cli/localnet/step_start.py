@@ -75,8 +75,7 @@ async def do_start(configfile: Path, stop_after_seconds: int):
             "--log-save",
             f"--log-level={loglevel}",
             "--log-logger-name",
-            f"--rest-api-interface={validator.api_interface()}",
-            "--operation-mode=historical-balances"
+            f"--rest-api-interface={validator.api_interface()}"
         ], cwd=validator.folder, delay=NODES_START_DELAY))
 
     # Proxy
