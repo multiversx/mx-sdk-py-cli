@@ -41,7 +41,8 @@ def setup_parser(args: List[str], subparsers: Any) -> Any:
     # remove nodes
     sub = cli_shared.add_command_subparser(subparsers, "staking-provider", "remove-nodes",
                                            "Remove nodes must be called by the contract owner")
-    sub.add_argument("--bls-keys", required=True, help="a list with the bls keys of the nodes")
+    sub.add_argument("--bls-keys", help="a list with the bls keys of the nodes")
+    sub.add_argument("--validators-file", help="a JSON file describing the Nodes")
     sub.add_argument("--delegation-contract", required=True, help="address of the delegation contract")
     _add_common_arguments(args, sub)
     sub.set_defaults(func=remove_nodes)
@@ -49,7 +50,8 @@ def setup_parser(args: List[str], subparsers: Any) -> Any:
     # stake nodes
     sub = cli_shared.add_command_subparser(subparsers, "staking-provider", "stake-nodes",
                                            "Stake nodes must be called by the contract owner")
-    sub.add_argument("--bls-keys", required=True, help="a list with the bls keys of the nodes")
+    sub.add_argument("--bls-keys", help="a list with the bls keys of the nodes")
+    sub.add_argument("--validators-file", help="a JSON file describing the Nodes")
     sub.add_argument("--delegation-contract", required=True, help="address of the delegation contract")
     _add_common_arguments(args, sub)
     sub.set_defaults(func=stake_nodes)
@@ -57,7 +59,8 @@ def setup_parser(args: List[str], subparsers: Any) -> Any:
     # unbond nodes
     sub = cli_shared.add_command_subparser(subparsers, "staking-provider", "unbond-nodes",
                                            "Unbond nodes must be called by the contract owner")
-    sub.add_argument("--bls-keys", required=True, help="a list with the bls keys of the nodes")
+    sub.add_argument("--bls-keys", help="a list with the bls keys of the nodes")
+    sub.add_argument("--validators-file", help="a JSON file describing the Nodes")
     sub.add_argument("--delegation-contract", required=True, help="address of the delegation contract")
     _add_common_arguments(args, sub)
     sub.set_defaults(func=unbond_nodes)
@@ -65,7 +68,8 @@ def setup_parser(args: List[str], subparsers: Any) -> Any:
     # unstake nodes
     sub = cli_shared.add_command_subparser(subparsers, "staking-provider", "unstake-nodes",
                                            "Unstake nodes must be called by the contract owner")
-    sub.add_argument("--bls-keys", required=True, help="a list with the bls keys of the nodes")
+    sub.add_argument("--bls-keys", help="a list with the bls keys of the nodes")
+    sub.add_argument("--validators-file", help="a JSON file describing the Nodes")
     sub.add_argument("--delegation-contract", required=True, help="address of the delegation contract")
     _add_common_arguments(args, sub)
     sub.set_defaults(func=unstake_nodes)
@@ -73,7 +77,8 @@ def setup_parser(args: List[str], subparsers: Any) -> Any:
     # unjail nodes
     sub = cli_shared.add_command_subparser(subparsers, "staking-provider", "unjail-nodes",
                                            "Unjail nodes must be called by the contract owner")
-    sub.add_argument("--bls-keys", required=True, help="a list with the bls keys of the nodes")
+    sub.add_argument("--bls-keys", help="a list with the bls keys of the nodes")
+    sub.add_argument("--validators-file", help="a JSON file describing the Nodes")
     sub.add_argument("--delegation-contract", required=True, help="address of the delegation contract")
     _add_common_arguments(args, sub)
     sub.set_defaults(func=unjail_nodes)
@@ -182,6 +187,7 @@ def add_new_nodes(args: Any):
 
 
 def remove_nodes(args: Any):
+    _check_if_either_bls_keys_or_validators_file_are_provided(args)
     cli_shared.check_guardian_and_options_args(args)
     cli_shared.check_broadcast_args(args)
     cli_shared.prepare_chain_id_in_args(args)
@@ -196,6 +202,7 @@ def remove_nodes(args: Any):
 
 
 def stake_nodes(args: Any):
+    _check_if_either_bls_keys_or_validators_file_are_provided(args)
     cli_shared.check_guardian_and_options_args(args)
     cli_shared.check_broadcast_args(args)
     cli_shared.prepare_chain_id_in_args(args)
@@ -209,7 +216,16 @@ def stake_nodes(args: Any):
     cli_shared.send_or_simulate(tx, args)
 
 
+def _check_if_either_bls_keys_or_validators_file_are_provided(args: Any):
+    bls_keys = args.bls_keys
+    validators_file = args.validators_file
+
+    if not bls_keys and not validators_file:
+        raise errors.BadUsage("No bls keys or validators file provided. Use either `--bls-keys` or `--validators-file`")
+
+
 def unbond_nodes(args: Any):
+    _check_if_either_bls_keys_or_validators_file_are_provided(args)
     cli_shared.check_guardian_and_options_args(args)
     cli_shared.check_broadcast_args(args)
     cli_shared.prepare_chain_id_in_args(args)
@@ -224,6 +240,7 @@ def unbond_nodes(args: Any):
 
 
 def unstake_nodes(args: Any):
+    _check_if_either_bls_keys_or_validators_file_are_provided(args)
     cli_shared.check_guardian_and_options_args(args)
     cli_shared.check_broadcast_args(args)
     cli_shared.prepare_chain_id_in_args(args)
@@ -238,6 +255,7 @@ def unstake_nodes(args: Any):
 
 
 def unjail_nodes(args: Any):
+    _check_if_either_bls_keys_or_validators_file_are_provided(args)
     cli_shared.check_guardian_and_options_args(args)
     cli_shared.check_broadcast_args(args)
     cli_shared.prepare_chain_id_in_args(args)

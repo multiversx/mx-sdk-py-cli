@@ -429,7 +429,7 @@ def query(args: Any):
 
     proxy = ProxyNetworkProvider(args.proxy)
     function = args.function
-    arguments = args.arguments or []
+    arguments: List[Any] = args.arguments or []
 
     result = query_contract(contract_address, proxy, function, arguments)
     utils.dump_out_json(result)

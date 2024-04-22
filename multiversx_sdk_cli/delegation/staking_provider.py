@@ -52,10 +52,11 @@ class DelegationOperations:
         tx.version = int(args.version)
         tx.options = int(args.options)
         tx.guardian = args.guardian
-        tx.signature = bytes.fromhex(owner.sign_transaction(tx))
 
         if args.gas_limit:
             tx.gas_limit = int(args.gas_limit)
+
+        tx.signature = bytes.fromhex(owner.sign_transaction(tx))
 
         return tx
 
@@ -73,16 +74,18 @@ class DelegationOperations:
         tx.version = int(args.version)
         tx.options = int(args.options)
         tx.guardian = args.guardian
-        tx.signature = bytes.fromhex(owner.sign_transaction(tx))
 
         if args.gas_limit:
             tx.gas_limit = int(args.gas_limit)
+
+        tx.signature = bytes.fromhex(owner.sign_transaction(tx))
 
         return tx
 
     def prepare_transaction_for_removing_nodes(self, owner: IAccount, args: Any) -> ITransaction:
         delegation_contract = Address.new_from_bech32(args.delegation_contract)
-        public_keys = self._parse_public_bls_keys(args.bls_keys)
+
+        public_keys = self._load_validators_public_keys(args)
 
         tx = self._factory.create_transaction_for_removing_nodes(
             sender=owner.address,
@@ -93,16 +96,18 @@ class DelegationOperations:
         tx.version = int(args.version)
         tx.options = int(args.options)
         tx.guardian = args.guardian
-        tx.signature = bytes.fromhex(owner.sign_transaction(tx))
 
         if args.gas_limit:
             tx.gas_limit = int(args.gas_limit)
+
+        tx.signature = bytes.fromhex(owner.sign_transaction(tx))
 
         return tx
 
     def prepare_transaction_for_staking_nodes(self, owner: IAccount, args: Any) -> ITransaction:
         delegation_contract = Address.new_from_bech32(args.delegation_contract)
-        public_keys = self._parse_public_bls_keys(args.bls_keys)
+
+        public_keys = self._load_validators_public_keys(args)
 
         tx = self._factory.create_transaction_for_staking_nodes(
             sender=owner.address,
@@ -113,16 +118,18 @@ class DelegationOperations:
         tx.version = int(args.version)
         tx.options = int(args.options)
         tx.guardian = args.guardian
-        tx.signature = bytes.fromhex(owner.sign_transaction(tx))
 
         if args.gas_limit:
             tx.gas_limit = int(args.gas_limit)
+
+        tx.signature = bytes.fromhex(owner.sign_transaction(tx))
 
         return tx
 
     def prepare_transaction_for_unbonding_nodes(self, owner: IAccount, args: Any) -> ITransaction:
         delegation_contract = Address.new_from_bech32(args.delegation_contract)
-        public_keys = self._parse_public_bls_keys(args.bls_keys)
+
+        public_keys = self._load_validators_public_keys(args)
 
         tx = self._factory.create_transaction_for_unbonding_nodes(
             sender=owner.address,
@@ -133,16 +140,18 @@ class DelegationOperations:
         tx.version = int(args.version)
         tx.options = int(args.options)
         tx.guardian = args.guardian
-        tx.signature = bytes.fromhex(owner.sign_transaction(tx))
 
         if args.gas_limit:
             tx.gas_limit = int(args.gas_limit)
+
+        tx.signature = bytes.fromhex(owner.sign_transaction(tx))
 
         return tx
 
     def prepare_transaction_for_unstaking_nodes(self, owner: IAccount, args: Any) -> ITransaction:
         delegation_contract = Address.new_from_bech32(args.delegation_contract)
-        public_keys = self._parse_public_bls_keys(args.bls_keys)
+
+        public_keys = self._load_validators_public_keys(args)
 
         tx = self._factory.create_transaction_for_unstaking_nodes(
             sender=owner.address,
@@ -153,16 +162,18 @@ class DelegationOperations:
         tx.version = int(args.version)
         tx.options = int(args.options)
         tx.guardian = args.guardian
-        tx.signature = bytes.fromhex(owner.sign_transaction(tx))
 
         if args.gas_limit:
             tx.gas_limit = int(args.gas_limit)
+
+        tx.signature = bytes.fromhex(owner.sign_transaction(tx))
 
         return tx
 
     def prepare_transaction_for_unjailing_nodes(self, owner: IAccount, args: Any) -> ITransaction:
         delegation_contract = Address.new_from_bech32(args.delegation_contract)
-        public_keys = self._parse_public_bls_keys(args.bls_keys)
+
+        public_keys = self._load_validators_public_keys(args)
 
         tx = self._factory.create_transaction_for_unjailing_nodes(
             sender=owner.address,
@@ -173,10 +184,11 @@ class DelegationOperations:
         tx.version = int(args.version)
         tx.options = int(args.options)
         tx.guardian = args.guardian
-        tx.signature = bytes.fromhex(owner.sign_transaction(tx))
 
         if args.gas_limit:
             tx.gas_limit = int(args.gas_limit)
+
+        tx.signature = bytes.fromhex(owner.sign_transaction(tx))
 
         return tx
 
@@ -192,10 +204,11 @@ class DelegationOperations:
         tx.version = int(args.version)
         tx.options = int(args.options)
         tx.guardian = args.guardian
-        tx.signature = bytes.fromhex(owner.sign_transaction(tx))
 
         if args.gas_limit:
             tx.gas_limit = int(args.gas_limit)
+
+        tx.signature = bytes.fromhex(owner.sign_transaction(tx))
 
         return tx
 
@@ -211,10 +224,11 @@ class DelegationOperations:
         tx.version = int(args.version)
         tx.options = int(args.options)
         tx.guardian = args.guardian
-        tx.signature = bytes.fromhex(owner.sign_transaction(tx))
 
         if args.gas_limit:
             tx.gas_limit = int(args.gas_limit)
+
+        tx.signature = bytes.fromhex(owner.sign_transaction(tx))
 
         return tx
 
@@ -238,10 +252,11 @@ class DelegationOperations:
         tx.version = int(args.version)
         tx.options = int(args.options)
         tx.guardian = args.guardian
-        tx.signature = bytes.fromhex(owner.sign_transaction(tx))
 
         if args.gas_limit:
             tx.gas_limit = int(args.gas_limit)
+
+        tx.signature = bytes.fromhex(owner.sign_transaction(tx))
 
         return tx
 
@@ -265,10 +280,11 @@ class DelegationOperations:
         tx.version = int(args.version)
         tx.options = int(args.options)
         tx.guardian = args.guardian
-        tx.signature = bytes.fromhex(owner.sign_transaction(tx))
 
         if args.gas_limit:
             tx.gas_limit = int(args.gas_limit)
+
+        tx.signature = bytes.fromhex(owner.sign_transaction(tx))
 
         return tx
 
@@ -286,12 +302,21 @@ class DelegationOperations:
         tx.version = int(args.version)
         tx.options = int(args.options)
         tx.guardian = args.guardian
-        tx.signature = bytes.fromhex(owner.sign_transaction(tx))
 
         if args.gas_limit:
             tx.gas_limit = int(args.gas_limit)
 
+        tx.signature = bytes.fromhex(owner.sign_transaction(tx))
+
         return tx
+
+    def _load_validators_public_keys(self, args: Any) -> List[ValidatorPublicKey]:
+        if args.bls_keys:
+            return self._parse_public_bls_keys(args.bls_keys)
+
+        validators_file_path = Path(args.validators_file).expanduser()
+        validators_file = ValidatorsFile(validators_file_path)
+        return validators_file.load_public_keys()
 
     def _parse_public_bls_keys(self, public_bls_keys: str) -> List[ValidatorPublicKey]:
         keys = public_bls_keys.split(",")

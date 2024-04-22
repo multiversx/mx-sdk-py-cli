@@ -290,6 +290,33 @@ def test_contract_deploy_without_required_arguments():
     assert return_code
 
 
+def test_contract_commands_argument_parameter():
+    alice = f"{parent}/testdata/alice.pem"
+    adder = f"{parent}/testdata/adder.wasm"
+
+    return_code = main([
+        "contract", "deploy",
+        "--bytecode", adder,
+        "--pem", alice,
+        "--nonce", "7",
+        "--chain", "D",
+        "--gas-limit", "5000000",
+        "--arguments", "foobar",
+    ])
+    assert return_code
+
+    return_code = main([
+        "contract", "deploy",
+        "--bytecode", adder,
+        "--pem", alice,
+        "--nonce", "7",
+        "--chain", "D",
+        "--gas-limit", "5000000",
+        "--arguments", "str:foobar",
+    ])
+    assert not return_code
+
+
 def _read_stdout(capsys: Any) -> str:
     return capsys.readouterr().out.strip()
 
