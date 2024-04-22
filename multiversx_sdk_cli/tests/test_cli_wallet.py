@@ -367,7 +367,8 @@ def test_sign_and_verify_message_with_multi_address_pem(capsys: Any):
 
 
 def _read_stdout_mnemonic(capsys: Any) -> str:
-    return _read_stdout(capsys).replace("Mnemonic:", "").strip()
+    lines = _read_stdout(capsys).split("\n")
+    return lines[0].replace("Mnemonic:", "").strip()
 
 
 def _read_stdout(capsys: Any) -> str:

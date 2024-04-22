@@ -15,7 +15,7 @@ class ITransaction(Protocol):
     gas_limit: int
     chain_id: str
     nonce: int
-    amount: int
+    value: int
     sender_username: str
     receiver_username: str
     gas_price: int

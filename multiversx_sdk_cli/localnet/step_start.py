@@ -135,7 +135,7 @@ async def run(args: List[str], cwd: Path, delay: int = 0):
     if workstation.is_linux():
         env["LD_LIBRARY_PATH"] = str(cwd)
     else:
-        # For MacOS, libwasmer is directly found near the binary (no workaround needed)
+        # For MacOS, dylibs are directly found near the binary (no workaround needed)
         pass
 
     process = await asyncio.create_subprocess_exec(*args, stdout=asyncio.subprocess.PIPE,

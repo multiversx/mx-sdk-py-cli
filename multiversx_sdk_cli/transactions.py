@@ -2,7 +2,7 @@ import base64
 import json
 import logging
 import time
-from typing import Any, Dict, Optional, Protocol, Sequence, TextIO, Tuple
+from typing import Any, Dict, Optional, Protocol, TextIO
 
 from multiversx_sdk_core import Address, Transaction, TransactionPayload
 
@@ -28,9 +28,6 @@ class ITransactionOnNetwork(Protocol):
 
 class INetworkProvider(Protocol):
     def send_transaction(self, transaction: ITransaction) -> str:
-        ...
-
-    def send_transactions(self, transactions: Sequence[ITransaction]) -> Tuple[int, str]:
         ...
 
     def get_transaction(self, tx_hash: str, with_process_status: Optional[bool] = False) -> ITransactionOnNetwork:
@@ -77,7 +74,7 @@ def do_prepare_transaction(args: Any) -> Transaction:
         gas_price=int(args.gas_price),
         data=str(args.data).encode(),
         nonce=int(args.nonce),
-        amount=int(args.value),
+        value=int(args.value),
         version=int(args.version),
         options=int(args.options)
     )
@@ -153,7 +150,7 @@ def tx_to_dictionary_as_inner_for_relayed_V1(tx: Transaction) -> Dict[str, Any]:
     dictionary["nonce"] = tx.nonce
     dictionary["sender"] = base64.b64encode(Address.new_from_bech32(tx.sender).get_public_key()).decode()
     dictionary["receiver"] = base64.b64encode(Address.new_from_bech32(tx.receiver).get_public_key()).decode()
-    dictionary["value"] = tx.amount
+    dictionary["value"] = tx.value
     dictionary["gasPrice"] = tx.gas_price
     dictionary["gasLimit"] = tx.gas_limit
     dictionary["data"] = base64.b64encode(tx.data).decode()
@@ -207,7 +204,7 @@ def load_transaction_from_file(f: TextIO) -> Transaction:
         receiver_username=decode_field_value(instance.receiverUsername),
         gas_limit=instance.gasLimit,
         gas_price=instance.gasPrice,
-        amount=int(instance.value),
+        value=int(instance.value),
         data=TransactionPayload.from_encoded_str(instance.data).data,
         version=instance.version,
         options=instance.options,

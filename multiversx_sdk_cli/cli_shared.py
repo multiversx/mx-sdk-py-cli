@@ -16,6 +16,7 @@ from multiversx_sdk_cli.cli_password import (load_guardian_password,
                                              load_password)
 from multiversx_sdk_cli.constants import (DEFAULT_TX_VERSION,
                                           TRANSACTION_OPTIONS_TX_GUARDED)
+from multiversx_sdk_cli.custom_network_provider import CustomNetworkProvider
 from multiversx_sdk_cli.errors import ArgumentsNotProvidedError
 from multiversx_sdk_cli.interfaces import ITransaction
 from multiversx_sdk_cli.ledger.ledger_functions import do_get_ledger_address
@@ -245,11 +246,11 @@ def should_sign_with_guardian_key(args: Any) -> bool:
 
 def check_options_for_guarded_tx(options: int):
     if not options & TRANSACTION_OPTIONS_TX_GUARDED == TRANSACTION_OPTIONS_TX_GUARDED:
-        raise errors.BadUsage("Invalid guarded transaction's options. The second least significant bit must be set.")
+        raise errors.BadUsage("Invalid guarded transaction's options. The second least significant bit must be set")
 
 
 def send_or_simulate(tx: ITransaction, args: Any, dump_output: bool = True) -> CLIOutputBuilder:
-    proxy = ProxyNetworkProvider(args.proxy)
+    proxy = CustomNetworkProvider(args.proxy)
 
     is_set_wait_result = hasattr(args, "wait_result") and args.wait_result
     is_set_send = hasattr(args, "send") and args.send
