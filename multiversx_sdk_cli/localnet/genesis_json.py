@@ -37,7 +37,11 @@ def _build_validator_entry(nickname: str, account: Account, value: int) -> Dict[
         "address": account.address.to_bech32(),
         "supply": str(value),
         "balance": "0",
-        "stakingvalue": str(value)
+        "stakingvalue": str(value),
+        "delegation": {
+            "address": "",
+            "value": "0"
+        }
     }
 
 
@@ -47,5 +51,9 @@ def _build_user_entry(nickname: str, account: Account, value: int) -> Dict[str, 
         "address": account.address.to_bech32(),
         "supply": str(value),
         "balance": str(value),
-        "stakingvalue": "0"
+        "stakingvalue": "0",
+        "delegation": {
+            "address": "",
+            "value": "0"
+        }
     }
