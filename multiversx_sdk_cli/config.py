@@ -3,7 +3,6 @@ from pathlib import Path
 from typing import Any, Dict, List
 
 from multiversx_sdk_cli import errors, utils
-from multiversx_sdk_cli.ux import show_warning
 
 SDK_PATH = Path("~/multiversx-sdk").expanduser().resolve()
 LOCAL_CONFIG_PATH = Path("mxpy.json").resolve()

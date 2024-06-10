@@ -3,10 +3,8 @@ import os
 from pathlib import Path
 from typing import Any, List
 
-from multiversx_sdk_core import Address, AddressComputer, Transaction
-from multiversx_sdk_core.transaction_factories import TransactionsFactoryConfig
-from multiversx_sdk_network_providers.proxy_network_provider import \
-    ProxyNetworkProvider
+from multiversx_sdk import (Address, AddressComputer, ProxyNetworkProvider,
+                            Transaction, TransactionsFactoryConfig)
 
 from multiversx_sdk_cli import cli_shared, projects, utils
 from multiversx_sdk_cli.cli_output import CLIOutputBuilder

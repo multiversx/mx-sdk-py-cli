@@ -1,7 +1,6 @@
 from typing import Dict
 
-from multiversx_sdk_core import Address, Message, MessageComputer
-from multiversx_sdk_wallet import UserVerifier
+from multiversx_sdk import Address, Message, MessageComputer, UserVerifier
 
 from multiversx_sdk_cli.accounts import Account
 

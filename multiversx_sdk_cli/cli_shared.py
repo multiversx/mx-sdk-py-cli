@@ -5,9 +5,7 @@ import sys
 from argparse import FileType
 from typing import Any, Dict, List, Text, cast
 
-from multiversx_sdk_core import Address
-from multiversx_sdk_network_providers.proxy_network_provider import \
-    ProxyNetworkProvider
+from multiversx_sdk import Address, ProxyNetworkProvider
 
 from multiversx_sdk_cli import config, errors, utils
 from multiversx_sdk_cli.accounts import Account, LedgerAccount

@@ -1,8 +1,6 @@
 from typing import Any, List
 
-from multiversx_sdk_core.transaction_factories import TransactionsFactoryConfig
-from multiversx_sdk_network_providers.proxy_network_provider import \
-    ProxyNetworkProvider
+from multiversx_sdk import ProxyNetworkProvider, TransactionsFactoryConfig
 
 from multiversx_sdk_cli import cli_shared, errors, utils
 from multiversx_sdk_cli.delegation import DelegationOperations

@@ -3,7 +3,7 @@ from pathlib import Path
 
 import pytest
 from Cryptodome.Hash import keccak
-from multiversx_sdk_core.address import Address
+from multiversx_sdk import Address
 
 from multiversx_sdk_cli import errors
 from multiversx_sdk_cli.accounts import Account

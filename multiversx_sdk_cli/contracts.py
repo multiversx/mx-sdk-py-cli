@@ -3,12 +3,10 @@ import logging
 from pathlib import Path
 from typing import Any, List, Optional, Protocol, Sequence, Union
 
-from multiversx_sdk_core import (Token, TokenComputer, TokenTransfer,
-                                 Transaction, TransactionPayload)
-from multiversx_sdk_core.address import Address
-from multiversx_sdk_core.transaction_factories import \
-    SmartContractTransactionsFactory
-from multiversx_sdk_network_providers.interface import IContractQuery
+from multiversx_sdk import (Address, SmartContractTransactionsFactory, Token,
+                            TokenComputer, TokenTransfer, Transaction,
+                            TransactionPayload)
+from multiversx_sdk.network_providers.interface import IContractQuery
 
 from multiversx_sdk_cli import errors
 from multiversx_sdk_cli.accounts import Account
@@ -70,11 +68,13 @@ class IConfig(Protocol):
     chain_id: str
     min_gas_limit: int
     gas_limit_per_byte: int
+    gas_limit_claim_developer_rewards: int
+    gas_limit_change_owner_address: int
 
 
 class SmartContract:
     def __init__(self, config: IConfig):
-        self._factory = SmartContractTransactionsFactory(config, TokenComputer())
+        self._factory = SmartContractTransactionsFactory(config)
 
     def prepare_deploy_transaction(self,
                                    owner: Account,
