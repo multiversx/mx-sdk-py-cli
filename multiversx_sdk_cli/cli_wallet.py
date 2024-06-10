@@ -5,10 +5,8 @@ import sys
 from pathlib import Path
 from typing import Any, List, Optional, Tuple
 
-from multiversx_sdk_core import Address
-from multiversx_sdk_wallet import UserSecretKey, UserWallet
-from multiversx_sdk_wallet.mnemonic import Mnemonic
-from multiversx_sdk_wallet.user_pem import UserPEM
+from multiversx_sdk import (Address, Mnemonic, UserPEM, UserSecretKey,
+                            UserWallet)
 
 from multiversx_sdk_cli import cli_shared, utils
 from multiversx_sdk_cli.constants import DEFAULT_HRP

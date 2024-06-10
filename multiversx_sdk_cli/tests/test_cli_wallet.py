@@ -3,7 +3,7 @@ import json
 from pathlib import Path
 from typing import Any
 
-from multiversx_sdk_wallet import Mnemonic, UserPEM, UserWallet
+from multiversx_sdk import Mnemonic, UserPEM, UserWallet
 
 from multiversx_sdk_cli.cli import main
 
@@ -376,4 +376,4 @@ def _read_stdout(capsys: Any) -> str:
 
 
 def _mock_getpass(monkeypatch: Any, password: str):
-    monkeypatch.setattr(getpass, "getpass", lambda _: password)
+    monkeypatch.setattr(getpass, "getpass", lambda _: password)  # type: ignore

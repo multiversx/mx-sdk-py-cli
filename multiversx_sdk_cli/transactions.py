@@ -4,7 +4,7 @@ import logging
 import time
 from typing import Any, Dict, Optional, Protocol, TextIO
 
-from multiversx_sdk_core import Address, Transaction, TransactionPayload
+from multiversx_sdk import Address, Transaction, TransactionPayload
 
 from multiversx_sdk_cli import errors
 from multiversx_sdk_cli.accounts import Account, LedgerAccount

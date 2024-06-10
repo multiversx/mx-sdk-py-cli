@@ -1,7 +1,7 @@
 from typing import Any, List, Protocol
 
 from Cryptodome.Hash import keccak
-from multiversx_sdk_core import Address, AddressComputer
+from multiversx_sdk import Address, AddressComputer
 
 from multiversx_sdk_cli import cli_shared, utils
 from multiversx_sdk_cli.accounts import Account

@@ -1,6 +1,4 @@
-from multiversx_sdk_core import Address
-from multiversx_sdk_network_providers.proxy_network_provider import \
-    ProxyNetworkProvider
+from multiversx_sdk import Address, ProxyNetworkProvider
 
 from multiversx_sdk_cli.accounts import Account
 from multiversx_sdk_cli.cli import main

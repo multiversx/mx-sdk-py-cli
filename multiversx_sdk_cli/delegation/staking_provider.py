@@ -1,10 +1,8 @@
 from pathlib import Path
 from typing import Any, List, Protocol, Tuple
 
-from multiversx_sdk_core import Address
-from multiversx_sdk_core.transaction_factories import \
-    DelegationTransactionsFactory
-from multiversx_sdk_wallet import ValidatorPublicKey
+from multiversx_sdk import (Address, DelegationTransactionsFactory,
+                            ValidatorPublicKey)
 
 from multiversx_sdk_cli.accounts import Account, LedgerAccount
 from multiversx_sdk_cli.cli_password import load_password
