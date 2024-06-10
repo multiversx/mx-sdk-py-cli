@@ -184,6 +184,7 @@ class DelegationOperations:
         tx.version = int(args.version)
         tx.options = int(args.options)
         tx.guardian = args.guardian
+        tx.value = args.value
 
         if args.gas_limit:
             tx.gas_limit = int(args.gas_limit)
