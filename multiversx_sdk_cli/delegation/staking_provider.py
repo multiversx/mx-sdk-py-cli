@@ -4,8 +4,6 @@ from typing import Any, List, Protocol, Tuple
 from multiversx_sdk import (Address, DelegationTransactionsFactory,
                             ValidatorPublicKey)
 
-from multiversx_sdk_cli.accounts import Account, LedgerAccount
-from multiversx_sdk_cli.cli_password import load_password
 from multiversx_sdk_cli.errors import BadUsage
 from multiversx_sdk_cli.interfaces import IAddress, ITransaction
 from multiversx_sdk_cli.validators.validators_file import ValidatorsFile
@@ -331,7 +329,7 @@ class DelegationOperations:
         validators_file = ValidatorsFile(validators_file_path)
         signers = validators_file.load_signers()
 
-        pubkey = self._get_pubkey_to_be_signed(args)
+        pubkey = Address.new_from_bech32(args.delegation_contract).get_public_key()
 
         public_keys: List[ValidatorPublicKey] = []
         signed_messages: List[bytes] = []
@@ -342,17 +340,3 @@ class DelegationOperations:
             signed_messages.append(signed_message)
 
         return public_keys, signed_messages
-
-    def _get_pubkey_to_be_signed(self, args: Any) -> bytes:
-        account = Account()
-        if args.using_delegation_manager:
-            account = Account(address=Address.new_from_bech32(args.delegation_contract))
-        elif args.pem:
-            account = Account(pem_file=args.pem)
-        elif args.keyfile:
-            password = load_password(args)
-            account = Account(key_file=args.keyfile, password=password)
-        elif args.ledger:
-            account = LedgerAccount(account_index=args.ledger_account_index, address_index=args.ledger_address_index)
-
-        return account.address.get_public_key()
