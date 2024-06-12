@@ -374,6 +374,25 @@ def test_set_metadata(capsys: Any):
     assert transaction["gasLimit"] == 11131000
 
 
+def test_create_delegation_contract_from_validator(capsys: Any):
+    main([
+        "staking-provider", "make-delegation-contract-from-validator",
+        "--max-cap", "0",
+        "--fee", "3745",
+        "--pem", str(alice),
+        "--nonce", "7", "--estimate-gas",
+        "--chain", "T"
+    ])
+    tx = get_transaction(capsys)
+    data = tx["emittedTransactionData"]
+    transaction = tx["emittedTransaction"]
+
+    assert data == "makeNewContractFromValidatorData@@0ea1"
+    assert transaction["sender"] == "erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th"
+    assert transaction["receiver"] == "erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqylllslmq6y6"
+    assert transaction["gasLimit"] == 510000000
+
+
 def _read_stdout(capsys: Any) -> str:
     return capsys.readouterr().out.strip()
 
