@@ -2,7 +2,8 @@ from pathlib import Path
 from typing import Any, List, Protocol, Tuple
 
 from multiversx_sdk import (Address, DelegationTransactionsFactory,
-                            ValidatorPublicKey)
+                            Transaction, ValidatorPublicKey)
+from multiversx_sdk.core.serializer import args_to_string
 
 from multiversx_sdk_cli.errors import BadUsage
 from multiversx_sdk_cli.interfaces import IAddress, ITransaction
@@ -299,6 +300,31 @@ class DelegationOperations:
         tx.version = int(args.version)
         tx.options = int(args.options)
         tx.guardian = args.guardian
+
+        if args.gas_limit:
+            tx.gas_limit = int(args.gas_limit)
+
+        tx.signature = bytes.fromhex(owner.sign_transaction(tx))
+
+        return tx
+
+    def prepare_transaction_for_creating_delegation_contract_from_validator(self, owner: IAccount, args: Any) -> ITransaction:
+        receiver = "erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqylllslmq6y6"
+        max_cap = int(args.max_cap)
+        fee = int(args.fee)
+        data = "makeNewContractFromValidatorData@" + args_to_string([max_cap, fee])
+
+        tx = Transaction(
+            sender=owner.address.to_bech32(),
+            receiver=receiver,
+            gas_limit=510000000,
+            chain_id=self._factory.config.chain_id,
+            data=data.encode(),
+            nonce=int(args.nonce),
+            version=int(args.version),
+            options=int(args.options),
+            guardian=args.guardian
+        )
 
         if args.gas_limit:
             tx.gas_limit = int(args.gas_limit)

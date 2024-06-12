@@ -131,6 +131,15 @@ def setup_parser(args: List[str], subparsers: Any) -> Any:
     _add_common_arguments(args, sub)
     sub.set_defaults(func=set_metadata)
 
+    # convert validator to delegation contract
+    sub = cli_shared.add_command_subparser(subparsers, "staking-provider", "make-delegation-contract-from-validator",
+                                           "Create a delegation contract from validator data. Must be called by the node operator")
+
+    sub.add_argument("--max-cap", required=True, help="total delegation cap in EGLD, fully denominated. Use value 0 for uncapped")
+    sub.add_argument("--fee", required=True, help=f"service fee as hundredths of percents. (e.g.  a service fee of 37.45 percent is expressed by the integer 3745)")
+    _add_common_arguments(args, sub)
+    sub.set_defaults(func=make_new_contract_from_validator_data)
+
 
 def _add_common_arguments(args: List[str], sub: Any):
     cli_shared.add_proxy_arg(sub)
@@ -333,4 +342,18 @@ def set_metadata(args: Any):
     delegation = DelegationOperations(config)
 
     tx = delegation.prepare_transaction_for_setting_metadata(sender, args)
+    cli_shared.send_or_simulate(tx, args)
+
+
+def make_new_contract_from_validator_data(args: Any):
+    cli_shared.check_guardian_and_options_args(args)
+    cli_shared.check_broadcast_args(args)
+    cli_shared.prepare_chain_id_in_args(args)
+    cli_shared.prepare_nonce_in_args(args)
+
+    sender = cli_shared.prepare_account(args)
+    config = TransactionsFactoryConfig(args.chain)
+    delegation = DelegationOperations(config)
+
+    tx = delegation.prepare_transaction_for_creating_delegation_contract_from_validator(sender, args)
     cli_shared.send_or_simulate(tx, args)
