@@ -393,6 +393,98 @@ def test_create_delegation_contract_from_validator(capsys: Any):
     assert transaction["gasLimit"] == 510000000
 
 
+def test_delegate(capsys: Any):
+    main([
+        "staking-provider", "delegate",
+        "--delegation-contract", "erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqthllllsy5r6rh",
+        "--value", "1000000000000000000",
+        "--pem", str(alice),
+        "--nonce", "7", "--estimate-gas",
+        "--chain", "T"
+    ])
+    tx = get_transaction(capsys)
+    data = tx["emittedTransactionData"]
+    transaction = tx["emittedTransaction"]
+
+    assert data == "delegate"
+    assert transaction["sender"] == "erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th"
+    assert transaction["receiver"] == "erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqthllllsy5r6rh"
+    assert transaction["gasLimit"] == 12000000
+
+
+def test_claim_rewards(capsys: Any):
+    main([
+        "staking-provider", "claim-rewards",
+        "--delegation-contract", "erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqthllllsy5r6rh",
+        "--pem", str(alice),
+        "--nonce", "7", "--estimate-gas",
+        "--chain", "T"
+    ])
+    tx = get_transaction(capsys)
+    data = tx["emittedTransactionData"]
+    transaction = tx["emittedTransaction"]
+
+    assert data == "claimRewards"
+    assert transaction["sender"] == "erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th"
+    assert transaction["receiver"] == "erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqthllllsy5r6rh"
+    assert transaction["gasLimit"] == 6000000
+
+
+def test_redelegate_rewards(capsys: Any):
+    main([
+        "staking-provider", "redelegate-rewards",
+        "--delegation-contract", "erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqthllllsy5r6rh",
+        "--pem", str(alice),
+        "--nonce", "7", "--estimate-gas",
+        "--chain", "T"
+    ])
+    tx = get_transaction(capsys)
+    data = tx["emittedTransactionData"]
+    transaction = tx["emittedTransaction"]
+
+    assert data == "reDelegateRewards"
+    assert transaction["sender"] == "erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th"
+    assert transaction["receiver"] == "erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqthllllsy5r6rh"
+    assert transaction["gasLimit"] == 12000000
+
+
+def test_undelegate(capsys: Any):
+    main([
+        "staking-provider", "undelegate",
+        "--delegation-contract", "erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqthllllsy5r6rh",
+        "--value", "1000000000000000000",
+        "--pem", str(alice),
+        "--nonce", "7", "--estimate-gas",
+        "--chain", "T"
+    ])
+    tx = get_transaction(capsys)
+    data = tx["emittedTransactionData"]
+    transaction = tx["emittedTransaction"]
+
+    assert data == "unDelegate@0de0b6b3a7640000"
+    assert transaction["sender"] == "erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th"
+    assert transaction["receiver"] == "erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqthllllsy5r6rh"
+    assert transaction["gasLimit"] == 12000000
+
+
+def test_withdraw(capsys: Any):
+    main([
+        "staking-provider", "withdraw",
+        "--delegation-contract", "erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqthllllsy5r6rh",
+        "--pem", str(alice),
+        "--nonce", "7", "--estimate-gas",
+        "--chain", "T"
+    ])
+    tx = get_transaction(capsys)
+    data = tx["emittedTransactionData"]
+    transaction = tx["emittedTransaction"]
+
+    assert data == "withdraw"
+    assert transaction["sender"] == "erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th"
+    assert transaction["receiver"] == "erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqthllllsy5r6rh"
+    assert transaction["gasLimit"] == 12000000
+
+
 def _read_stdout(capsys: Any) -> str:
     return capsys.readouterr().out.strip()
 
