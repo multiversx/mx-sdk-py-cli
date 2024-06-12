@@ -190,6 +190,103 @@ class DelegationOperations:
 
         return tx
 
+    def prepare_transaction_for_delegating(self, owner: IAccount, args: Any) -> ITransaction:
+        delegation_contract = Address.new_from_bech32(args.delegation_contract)
+
+        tx = self._factory.create_transaction_for_delegating(
+            sender=owner.address,
+            delegation_contract=delegation_contract,
+            amount=int(args.value)
+        )
+        tx.nonce = int(args.nonce)
+        tx.version = int(args.version)
+        tx.options = int(args.options)
+        tx.guardian = args.guardian
+
+        if args.gas_limit:
+            tx.gas_limit = int(args.gas_limit)
+
+        tx.signature = bytes.fromhex(owner.sign_transaction(tx))
+
+        return tx
+
+    def prepare_transaction_for_claiming_rewards(self, owner: IAccount, args: Any) -> ITransaction:
+        delegation_contract = Address.new_from_bech32(args.delegation_contract)
+
+        tx = self._factory.create_transaction_for_claiming_rewards(
+            sender=owner.address,
+            delegation_contract=delegation_contract
+        )
+        tx.nonce = int(args.nonce)
+        tx.version = int(args.version)
+        tx.options = int(args.options)
+        tx.guardian = args.guardian
+
+        if args.gas_limit:
+            tx.gas_limit = int(args.gas_limit)
+
+        tx.signature = bytes.fromhex(owner.sign_transaction(tx))
+
+        return tx
+
+    def prepare_transaction_for_redelegating_rewards(self, owner: IAccount, args: Any) -> ITransaction:
+        delegation_contract = Address.new_from_bech32(args.delegation_contract)
+
+        tx = self._factory.create_transaction_for_redelegating_rewards(
+            sender=owner.address,
+            delegation_contract=delegation_contract
+        )
+        tx.nonce = int(args.nonce)
+        tx.version = int(args.version)
+        tx.options = int(args.options)
+        tx.guardian = args.guardian
+
+        if args.gas_limit:
+            tx.gas_limit = int(args.gas_limit)
+
+        tx.signature = bytes.fromhex(owner.sign_transaction(tx))
+
+        return tx
+
+    def prepare_transaction_for_undelegating(self, owner: IAccount, args: Any) -> ITransaction:
+        delegation_contract = Address.new_from_bech32(args.delegation_contract)
+
+        tx = self._factory.create_transaction_for_undelegating(
+            sender=owner.address,
+            delegation_contract=delegation_contract,
+            amount=int(args.value)
+        )
+        tx.nonce = int(args.nonce)
+        tx.version = int(args.version)
+        tx.options = int(args.options)
+        tx.guardian = args.guardian
+
+        if args.gas_limit:
+            tx.gas_limit = int(args.gas_limit)
+
+        tx.signature = bytes.fromhex(owner.sign_transaction(tx))
+
+        return tx
+
+    def prepare_transaction_for_withdrawing(self, owner: IAccount, args: Any) -> ITransaction:
+        delegation_contract = Address.new_from_bech32(args.delegation_contract)
+
+        tx = self._factory.create_transaction_for_withdrawing(
+            sender=owner.address,
+            delegation_contract=delegation_contract
+        )
+        tx.nonce = int(args.nonce)
+        tx.version = int(args.version)
+        tx.options = int(args.options)
+        tx.guardian = args.guardian
+
+        if args.gas_limit:
+            tx.gas_limit = int(args.gas_limit)
+
+        tx.signature = bytes.fromhex(owner.sign_transaction(tx))
+
+        return tx
+
     def prepare_transaction_for_changing_service_fee(self, owner: IAccount, args: Any) -> ITransaction:
         delegation_contract = Address.new_from_bech32(args.delegation_contract)
 

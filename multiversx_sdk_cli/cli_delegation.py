@@ -80,6 +80,41 @@ def setup_parser(args: List[str], subparsers: Any) -> Any:
     _add_common_arguments(args, sub)
     sub.set_defaults(func=unjail_nodes)
 
+    # delegate
+    sub = cli_shared.add_command_subparser(subparsers, "staking-provider", "delegate",
+                                           "Delegate funds to a delegation contract")
+    sub.add_argument("--delegation-contract", required=True, help="address of the delegation contract")
+    _add_common_arguments(args, sub)
+    sub.set_defaults(func=delegate)
+
+    # claim rewards
+    sub = cli_shared.add_command_subparser(subparsers, "staking-provider", "claim-rewards",
+                                           "Claim the rewards earned for delegating")
+    sub.add_argument("--delegation-contract", required=True, help="address of the delegation contract")
+    _add_common_arguments(args, sub)
+    sub.set_defaults(func=claim_rewards)
+
+    # redelegate rewards
+    sub = cli_shared.add_command_subparser(subparsers, "staking-provider", "redelegate-rewards",
+                                           "Redelegate the rewards earned for delegating")
+    sub.add_argument("--delegation-contract", required=True, help="address of the delegation contract")
+    _add_common_arguments(args, sub)
+    sub.set_defaults(func=redelegate_rewards)
+
+    # undelegate
+    sub = cli_shared.add_command_subparser(subparsers, "staking-provider", "undelegate",
+                                           "Undelegate funds from a delegation contract")
+    sub.add_argument("--delegation-contract", required=True, help="address of the delegation contract")
+    _add_common_arguments(args, sub)
+    sub.set_defaults(func=undelegate)
+
+    # withdraw
+    sub = cli_shared.add_command_subparser(subparsers, "staking-provider", "withdraw",
+                                           "Withdraw funds from a delegation contract")
+    sub.add_argument("--delegation-contract", required=True, help="address of the delegation contract")
+    _add_common_arguments(args, sub)
+    sub.set_defaults(func=withdraw)
+
     # change service fee
     sub = cli_shared.add_command_subparser(subparsers, "staking-provider", "change-service-fee",
                                            "Change service fee must be called by the contract owner")
@@ -139,6 +174,9 @@ def setup_parser(args: List[str], subparsers: Any) -> Any:
     sub.add_argument("--fee", required=True, help=f"service fee as hundredths of percents. (e.g.  a service fee of 37.45 percent is expressed by the integer 3745)")
     _add_common_arguments(args, sub)
     sub.set_defaults(func=make_new_contract_from_validator_data)
+
+    parser.epilog = cli_shared.build_group_epilog(subparsers)
+    return subparsers
 
 
 def _add_common_arguments(args: List[str], sub: Any):
@@ -272,6 +310,82 @@ def unjail_nodes(args: Any):
     delegation = DelegationOperations(config)
 
     tx = delegation.prepare_transaction_for_unjailing_nodes(sender, args)
+    cli_shared.send_or_simulate(tx, args)
+
+
+def delegate(args: Any):
+    cli_shared.check_guardian_and_options_args(args)
+    cli_shared.check_broadcast_args(args)
+    cli_shared.prepare_chain_id_in_args(args)
+    cli_shared.prepare_nonce_in_args(args)
+
+    if not (int(args.value)):
+        raise errors.BadUrlError("Value not provided. Minimum value to delegate is 1 EGLD")
+
+    sender = cli_shared.prepare_account(args)
+    config = TransactionsFactoryConfig(args.chain)
+    delegation = DelegationOperations(config)
+
+    tx = delegation.prepare_transaction_for_delegating(sender, args)
+    cli_shared.send_or_simulate(tx, args)
+
+
+def claim_rewards(args: Any):
+    cli_shared.check_guardian_and_options_args(args)
+    cli_shared.check_broadcast_args(args)
+    cli_shared.prepare_chain_id_in_args(args)
+    cli_shared.prepare_nonce_in_args(args)
+
+    sender = cli_shared.prepare_account(args)
+    config = TransactionsFactoryConfig(args.chain)
+    delegation = DelegationOperations(config)
+
+    tx = delegation.prepare_transaction_for_claiming_rewards(sender, args)
+    cli_shared.send_or_simulate(tx, args)
+
+
+def redelegate_rewards(args: Any):
+    cli_shared.check_guardian_and_options_args(args)
+    cli_shared.check_broadcast_args(args)
+    cli_shared.prepare_chain_id_in_args(args)
+    cli_shared.prepare_nonce_in_args(args)
+
+    sender = cli_shared.prepare_account(args)
+    config = TransactionsFactoryConfig(args.chain)
+    delegation = DelegationOperations(config)
+
+    tx = delegation.prepare_transaction_for_redelegating_rewards(sender, args)
+    cli_shared.send_or_simulate(tx, args)
+
+
+def undelegate(args: Any):
+    cli_shared.check_guardian_and_options_args(args)
+    cli_shared.check_broadcast_args(args)
+    cli_shared.prepare_chain_id_in_args(args)
+    cli_shared.prepare_nonce_in_args(args)
+
+    if not (int(args.value)):
+        raise errors.BadUrlError("Value not provided. Minimum value to undelegate is 1 EGLD")
+
+    sender = cli_shared.prepare_account(args)
+    config = TransactionsFactoryConfig(args.chain)
+    delegation = DelegationOperations(config)
+
+    tx = delegation.prepare_transaction_for_undelegating(sender, args)
+    cli_shared.send_or_simulate(tx, args)
+
+
+def withdraw(args: Any):
+    cli_shared.check_guardian_and_options_args(args)
+    cli_shared.check_broadcast_args(args)
+    cli_shared.prepare_chain_id_in_args(args)
+    cli_shared.prepare_nonce_in_args(args)
+
+    sender = cli_shared.prepare_account(args)
+    config = TransactionsFactoryConfig(args.chain)
+    delegation = DelegationOperations(config)
+
+    tx = delegation.prepare_transaction_for_withdrawing(sender, args)
     cli_shared.send_or_simulate(tx, args)
 
 
