@@ -188,11 +188,15 @@ def _add_common_arguments(args: List[str], sub: Any):
     cli_shared.add_guardian_wallet_args(args, sub)
 
 
-def do_create_delegation_contract(args: Any):
+def ensure_arguments_are_provided_and_prepared(args: Any):
     cli_shared.check_guardian_and_options_args(args)
     cli_shared.check_broadcast_args(args)
     cli_shared.prepare_chain_id_in_args(args)
     cli_shared.prepare_nonce_in_args(args)
+
+
+def do_create_delegation_contract(args: Any):
+    ensure_arguments_are_provided_and_prepared(args)
 
     sender = cli_shared.prepare_account(args)
     config = TransactionsFactoryConfig(args.chain)
@@ -217,10 +221,7 @@ def get_contract_address_by_deploy_tx_hash(args: Any):
 
 
 def add_new_nodes(args: Any):
-    cli_shared.check_guardian_and_options_args(args)
-    cli_shared.check_broadcast_args(args)
-    cli_shared.prepare_chain_id_in_args(args)
-    cli_shared.prepare_nonce_in_args(args)
+    ensure_arguments_are_provided_and_prepared(args)
 
     sender = cli_shared.prepare_account(args)
     config = TransactionsFactoryConfig(args.chain)
@@ -232,10 +233,7 @@ def add_new_nodes(args: Any):
 
 def remove_nodes(args: Any):
     _check_if_either_bls_keys_or_validators_file_are_provided(args)
-    cli_shared.check_guardian_and_options_args(args)
-    cli_shared.check_broadcast_args(args)
-    cli_shared.prepare_chain_id_in_args(args)
-    cli_shared.prepare_nonce_in_args(args)
+    ensure_arguments_are_provided_and_prepared(args)
 
     sender = cli_shared.prepare_account(args)
     config = TransactionsFactoryConfig(args.chain)
@@ -247,10 +245,7 @@ def remove_nodes(args: Any):
 
 def stake_nodes(args: Any):
     _check_if_either_bls_keys_or_validators_file_are_provided(args)
-    cli_shared.check_guardian_and_options_args(args)
-    cli_shared.check_broadcast_args(args)
-    cli_shared.prepare_chain_id_in_args(args)
-    cli_shared.prepare_nonce_in_args(args)
+    ensure_arguments_are_provided_and_prepared(args)
 
     sender = cli_shared.prepare_account(args)
     config = TransactionsFactoryConfig(args.chain)
@@ -270,10 +265,7 @@ def _check_if_either_bls_keys_or_validators_file_are_provided(args: Any):
 
 def unbond_nodes(args: Any):
     _check_if_either_bls_keys_or_validators_file_are_provided(args)
-    cli_shared.check_guardian_and_options_args(args)
-    cli_shared.check_broadcast_args(args)
-    cli_shared.prepare_chain_id_in_args(args)
-    cli_shared.prepare_nonce_in_args(args)
+    ensure_arguments_are_provided_and_prepared(args)
 
     sender = cli_shared.prepare_account(args)
     config = TransactionsFactoryConfig(args.chain)
@@ -285,10 +277,7 @@ def unbond_nodes(args: Any):
 
 def unstake_nodes(args: Any):
     _check_if_either_bls_keys_or_validators_file_are_provided(args)
-    cli_shared.check_guardian_and_options_args(args)
-    cli_shared.check_broadcast_args(args)
-    cli_shared.prepare_chain_id_in_args(args)
-    cli_shared.prepare_nonce_in_args(args)
+    ensure_arguments_are_provided_and_prepared(args)
 
     sender = cli_shared.prepare_account(args)
     config = TransactionsFactoryConfig(args.chain)
@@ -300,10 +289,7 @@ def unstake_nodes(args: Any):
 
 def unjail_nodes(args: Any):
     _check_if_either_bls_keys_or_validators_file_are_provided(args)
-    cli_shared.check_guardian_and_options_args(args)
-    cli_shared.check_broadcast_args(args)
-    cli_shared.prepare_chain_id_in_args(args)
-    cli_shared.prepare_nonce_in_args(args)
+    ensure_arguments_are_provided_and_prepared(args)
 
     sender = cli_shared.prepare_account(args)
     config = TransactionsFactoryConfig(args.chain)
@@ -314,10 +300,7 @@ def unjail_nodes(args: Any):
 
 
 def delegate(args: Any):
-    cli_shared.check_guardian_and_options_args(args)
-    cli_shared.check_broadcast_args(args)
-    cli_shared.prepare_chain_id_in_args(args)
-    cli_shared.prepare_nonce_in_args(args)
+    ensure_arguments_are_provided_and_prepared(args)
 
     if not (int(args.value)):
         raise errors.BadUrlError("Value not provided. Minimum value to delegate is 1 EGLD")
@@ -331,10 +314,7 @@ def delegate(args: Any):
 
 
 def claim_rewards(args: Any):
-    cli_shared.check_guardian_and_options_args(args)
-    cli_shared.check_broadcast_args(args)
-    cli_shared.prepare_chain_id_in_args(args)
-    cli_shared.prepare_nonce_in_args(args)
+    ensure_arguments_are_provided_and_prepared(args)
 
     sender = cli_shared.prepare_account(args)
     config = TransactionsFactoryConfig(args.chain)
@@ -345,10 +325,7 @@ def claim_rewards(args: Any):
 
 
 def redelegate_rewards(args: Any):
-    cli_shared.check_guardian_and_options_args(args)
-    cli_shared.check_broadcast_args(args)
-    cli_shared.prepare_chain_id_in_args(args)
-    cli_shared.prepare_nonce_in_args(args)
+    ensure_arguments_are_provided_and_prepared(args)
 
     sender = cli_shared.prepare_account(args)
     config = TransactionsFactoryConfig(args.chain)
@@ -359,10 +336,7 @@ def redelegate_rewards(args: Any):
 
 
 def undelegate(args: Any):
-    cli_shared.check_guardian_and_options_args(args)
-    cli_shared.check_broadcast_args(args)
-    cli_shared.prepare_chain_id_in_args(args)
-    cli_shared.prepare_nonce_in_args(args)
+    ensure_arguments_are_provided_and_prepared(args)
 
     if not (int(args.value)):
         raise errors.BadUrlError("Value not provided. Minimum value to undelegate is 1 EGLD")
@@ -376,10 +350,7 @@ def undelegate(args: Any):
 
 
 def withdraw(args: Any):
-    cli_shared.check_guardian_and_options_args(args)
-    cli_shared.check_broadcast_args(args)
-    cli_shared.prepare_chain_id_in_args(args)
-    cli_shared.prepare_nonce_in_args(args)
+    ensure_arguments_are_provided_and_prepared(args)
 
     sender = cli_shared.prepare_account(args)
     config = TransactionsFactoryConfig(args.chain)
@@ -390,10 +361,7 @@ def withdraw(args: Any):
 
 
 def change_service_fee(args: Any):
-    cli_shared.check_guardian_and_options_args(args)
-    cli_shared.check_broadcast_args(args)
-    cli_shared.prepare_chain_id_in_args(args)
-    cli_shared.prepare_nonce_in_args(args)
+    ensure_arguments_are_provided_and_prepared(args)
 
     sender = cli_shared.prepare_account(args)
     config = TransactionsFactoryConfig(args.chain)
@@ -404,10 +372,7 @@ def change_service_fee(args: Any):
 
 
 def modify_delegation_cap(args: Any):
-    cli_shared.check_guardian_and_options_args(args)
-    cli_shared.check_broadcast_args(args)
-    cli_shared.prepare_chain_id_in_args(args)
-    cli_shared.prepare_nonce_in_args(args)
+    ensure_arguments_are_provided_and_prepared(args)
 
     sender = cli_shared.prepare_account(args)
     config = TransactionsFactoryConfig(args.chain)
@@ -418,10 +383,7 @@ def modify_delegation_cap(args: Any):
 
 
 def automatic_activation(args: Any):
-    cli_shared.check_guardian_and_options_args(args)
-    cli_shared.check_broadcast_args(args)
-    cli_shared.prepare_chain_id_in_args(args)
-    cli_shared.prepare_nonce_in_args(args)
+    ensure_arguments_are_provided_and_prepared(args)
 
     sender = cli_shared.prepare_account(args)
     config = TransactionsFactoryConfig(args.chain)
@@ -432,10 +394,7 @@ def automatic_activation(args: Any):
 
 
 def redelegate_cap(args: Any):
-    cli_shared.check_guardian_and_options_args(args)
-    cli_shared.check_broadcast_args(args)
-    cli_shared.prepare_chain_id_in_args(args)
-    cli_shared.prepare_nonce_in_args(args)
+    ensure_arguments_are_provided_and_prepared(args)
 
     sender = cli_shared.prepare_account(args)
     config = TransactionsFactoryConfig(args.chain)
@@ -446,10 +405,7 @@ def redelegate_cap(args: Any):
 
 
 def set_metadata(args: Any):
-    cli_shared.check_guardian_and_options_args(args)
-    cli_shared.check_broadcast_args(args)
-    cli_shared.prepare_chain_id_in_args(args)
-    cli_shared.prepare_nonce_in_args(args)
+    ensure_arguments_are_provided_and_prepared(args)
 
     sender = cli_shared.prepare_account(args)
     config = TransactionsFactoryConfig(args.chain)
@@ -460,10 +416,7 @@ def set_metadata(args: Any):
 
 
 def make_new_contract_from_validator_data(args: Any):
-    cli_shared.check_guardian_and_options_args(args)
-    cli_shared.check_broadcast_args(args)
-    cli_shared.prepare_chain_id_in_args(args)
-    cli_shared.prepare_nonce_in_args(args)
+    ensure_arguments_are_provided_and_prepared(args)
 
     sender = cli_shared.prepare_account(args)
     config = TransactionsFactoryConfig(args.chain)
