@@ -31,7 +31,6 @@ def run_twiggy_paths(wasm_path: Path) -> Path:
     rust = dependencies.get_module_by_key("rust")
     debug_wasm_path = _get_debug_wasm_path(wasm_path)
 
-    dependencies.install_module("twiggy")
     twiggy_paths_args = ["twiggy", "paths", str(debug_wasm_path)]
     output = myprocess.run_process(twiggy_paths_args, env=rust.get_env(), cwd=debug_wasm_path.parent, dump_to_stdout=False)
 

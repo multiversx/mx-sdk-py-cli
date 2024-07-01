@@ -1,6 +1,6 @@
 from typing import Any, Dict, Optional, Protocol
 
-from multiversx_sdk_network_providers import GenericError, ProxyNetworkProvider
+from multiversx_sdk import GenericError, ProxyNetworkProvider
 
 from multiversx_sdk_cli.errors import ProxyError
 from multiversx_sdk_cli.interfaces import ISimulateResponse, ITransaction

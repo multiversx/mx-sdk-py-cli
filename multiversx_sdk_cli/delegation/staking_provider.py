@@ -1,13 +1,10 @@
 from pathlib import Path
 from typing import Any, List, Protocol, Tuple
 
-from multiversx_sdk_core import Address
-from multiversx_sdk_core.transaction_factories import \
-    DelegationTransactionsFactory
-from multiversx_sdk_wallet import ValidatorPublicKey
+from multiversx_sdk import (Address, DelegationTransactionsFactory,
+                            Transaction, ValidatorPublicKey)
+from multiversx_sdk.core.serializer import args_to_string
 
-from multiversx_sdk_cli.accounts import Account, LedgerAccount
-from multiversx_sdk_cli.cli_password import load_password
 from multiversx_sdk_cli.errors import BadUsage
 from multiversx_sdk_cli.interfaces import IAddress, ITransaction
 from multiversx_sdk_cli.validators.validators_file import ValidatorsFile
@@ -184,6 +181,104 @@ class DelegationOperations:
         tx.version = int(args.version)
         tx.options = int(args.options)
         tx.guardian = args.guardian
+        tx.value = args.value
+
+        if args.gas_limit:
+            tx.gas_limit = int(args.gas_limit)
+
+        tx.signature = bytes.fromhex(owner.sign_transaction(tx))
+
+        return tx
+
+    def prepare_transaction_for_delegating(self, owner: IAccount, args: Any) -> ITransaction:
+        delegation_contract = Address.new_from_bech32(args.delegation_contract)
+
+        tx = self._factory.create_transaction_for_delegating(
+            sender=owner.address,
+            delegation_contract=delegation_contract,
+            amount=int(args.value)
+        )
+        tx.nonce = int(args.nonce)
+        tx.version = int(args.version)
+        tx.options = int(args.options)
+        tx.guardian = args.guardian
+
+        if args.gas_limit:
+            tx.gas_limit = int(args.gas_limit)
+
+        tx.signature = bytes.fromhex(owner.sign_transaction(tx))
+
+        return tx
+
+    def prepare_transaction_for_claiming_rewards(self, owner: IAccount, args: Any) -> ITransaction:
+        delegation_contract = Address.new_from_bech32(args.delegation_contract)
+
+        tx = self._factory.create_transaction_for_claiming_rewards(
+            sender=owner.address,
+            delegation_contract=delegation_contract
+        )
+        tx.nonce = int(args.nonce)
+        tx.version = int(args.version)
+        tx.options = int(args.options)
+        tx.guardian = args.guardian
+
+        if args.gas_limit:
+            tx.gas_limit = int(args.gas_limit)
+
+        tx.signature = bytes.fromhex(owner.sign_transaction(tx))
+
+        return tx
+
+    def prepare_transaction_for_redelegating_rewards(self, owner: IAccount, args: Any) -> ITransaction:
+        delegation_contract = Address.new_from_bech32(args.delegation_contract)
+
+        tx = self._factory.create_transaction_for_redelegating_rewards(
+            sender=owner.address,
+            delegation_contract=delegation_contract
+        )
+        tx.nonce = int(args.nonce)
+        tx.version = int(args.version)
+        tx.options = int(args.options)
+        tx.guardian = args.guardian
+
+        if args.gas_limit:
+            tx.gas_limit = int(args.gas_limit)
+
+        tx.signature = bytes.fromhex(owner.sign_transaction(tx))
+
+        return tx
+
+    def prepare_transaction_for_undelegating(self, owner: IAccount, args: Any) -> ITransaction:
+        delegation_contract = Address.new_from_bech32(args.delegation_contract)
+
+        tx = self._factory.create_transaction_for_undelegating(
+            sender=owner.address,
+            delegation_contract=delegation_contract,
+            amount=int(args.value)
+        )
+        tx.nonce = int(args.nonce)
+        tx.version = int(args.version)
+        tx.options = int(args.options)
+        tx.guardian = args.guardian
+
+        if args.gas_limit:
+            tx.gas_limit = int(args.gas_limit)
+
+        tx.signature = bytes.fromhex(owner.sign_transaction(tx))
+
+        return tx
+
+    def prepare_transaction_for_withdrawing(self, owner: IAccount, args: Any) -> ITransaction:
+        delegation_contract = Address.new_from_bech32(args.delegation_contract)
+
+        tx = self._factory.create_transaction_for_withdrawing(
+            sender=owner.address,
+            delegation_contract=delegation_contract
+        )
+        tx.nonce = int(args.nonce)
+        tx.version = int(args.version)
+        tx.options = int(args.options)
+        tx.guardian = args.guardian
 
         if args.gas_limit:
             tx.gas_limit = int(args.gas_limit)
@@ -310,6 +405,31 @@ class DelegationOperations:
 
         return tx
 
+    def prepare_transaction_for_creating_delegation_contract_from_validator(self, owner: IAccount, args: Any) -> ITransaction:
+        receiver = "erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqylllslmq6y6"
+        max_cap = int(args.max_cap)
+        fee = int(args.fee)
+        data = "makeNewContractFromValidatorData@" + args_to_string([max_cap, fee])
+
+        tx = Transaction(
+            sender=owner.address.to_bech32(),
+            receiver=receiver,
+            gas_limit=510000000,
+            chain_id=self._factory.config.chain_id,
+            data=data.encode(),
+            nonce=int(args.nonce),
+            version=int(args.version),
+            options=int(args.options),
+            guardian=args.guardian
+        )
+
+        if args.gas_limit:
+            tx.gas_limit = int(args.gas_limit)
+
+        tx.signature = bytes.fromhex(owner.sign_transaction(tx))
+
+        return tx
+
     def _load_validators_public_keys(self, args: Any) -> List[ValidatorPublicKey]:
         if args.bls_keys:
             return self._parse_public_bls_keys(args.bls_keys)
@@ -332,7 +452,7 @@ class DelegationOperations:
         validators_file = ValidatorsFile(validators_file_path)
         signers = validators_file.load_signers()
 
-        pubkey = self._get_pubkey_to_be_signed(args)
+        pubkey = Address.new_from_bech32(args.delegation_contract).get_public_key()
 
         public_keys: List[ValidatorPublicKey] = []
         signed_messages: List[bytes] = []
@@ -343,17 +463,3 @@ class DelegationOperations:
             signed_messages.append(signed_message)
 
         return public_keys, signed_messages
-
-    def _get_pubkey_to_be_signed(self, args: Any) -> bytes:
-        account = Account()
-        if args.using_delegation_manager:
-            account = Account(address=Address.new_from_bech32(args.delegation_contract))
-        elif args.pem:
-            account = Account(pem_file=args.pem)
-        elif args.keyfile:
-            password = load_password(args)
-            account = Account(key_file=args.keyfile, password=password)
-        elif args.ledger:
-            account = LedgerAccount(account_index=args.ledger_account_index, address_index=args.ledger_address_index)
-
-        return account.address.get_public_key()

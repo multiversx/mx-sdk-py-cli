@@ -3,7 +3,6 @@ from pathlib import Path
 from typing import Any, Dict, List
 
 from multiversx_sdk_cli import errors, utils
-from multiversx_sdk_cli.ux import show_warning
 
 SDK_PATH = Path("~/multiversx-sdk").expanduser().resolve()
 LOCAL_CONFIG_PATH = Path("mxpy.json").resolve()
@@ -147,7 +146,7 @@ def get_defaults() -> Dict[str, Any]:
         "dependencies.vmtools.urlTemplate.linux": "https://github.com/multiversx/mx-chain-vm-go/archive/{TAG}.tar.gz",
         "dependencies.vmtools.urlTemplate.osx": "https://github.com/multiversx/mx-chain-vm-go/archive/{TAG}.tar.gz",
         "dependencies.vmtools.urlTemplate.windows": "https://github.com/multiversx/mx-chain-vm-go/archive/{TAG}.tar.gz",
-        "dependencies.rust.tag": "nightly-2023-12-11",
+        "dependencies.rust.tag": "stable",
         "dependencies.golang.resolution": "SDK",
         "dependencies.golang.tag": "go1.20.7",
         "dependencies.golang.urlTemplate.linux": "https://golang.org/dl/{TAG}.linux-amd64.tar.gz",
@@ -202,22 +201,9 @@ def add_config_args(argv: List[str]) -> List[str]:
     except KeyError:
         return argv
 
-    check_for_deprecated_args(config_args)
-
     final_args = determine_final_args(argv, config_args)
     print(f"Found extra arguments in mxpy.json. Final arguments: {final_args}")
     return final_args
-
-
-def check_for_deprecated_args(args: List[str]) -> None:
-    if "proxy" in args:
-        show_warning("Providing `proxy` in the configuration file is deprecated. It will not be used. Please remove it!")
-
-    if "chainID" in args:
-        show_warning("Providing `chainID` in the configuration file is deprecated. It will not be used. Please remove it!")
-
-    if "txVersion" in args:
-        show_warning("Providing `txVersion` in the configuration file is deprecated. It will not be used. Please remove it!")
 
 
 def determine_final_args(argv: List[str], config_args: Dict[str, Any]) -> List[str]:

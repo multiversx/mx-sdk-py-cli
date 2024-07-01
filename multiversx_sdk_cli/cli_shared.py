@@ -5,9 +5,7 @@ import sys
 from argparse import FileType
 from typing import Any, Dict, List, Text, cast
 
-from multiversx_sdk_core import Address
-from multiversx_sdk_network_providers.proxy_network_provider import \
-    ProxyNetworkProvider
+from multiversx_sdk import Address, ProxyNetworkProvider
 
 from multiversx_sdk_cli import config, errors, utils
 from multiversx_sdk_cli.accounts import Account, LedgerAccount
@@ -246,7 +244,7 @@ def should_sign_with_guardian_key(args: Any) -> bool:
 
 def check_options_for_guarded_tx(options: int):
     if not options & TRANSACTION_OPTIONS_TX_GUARDED == TRANSACTION_OPTIONS_TX_GUARDED:
-        raise errors.BadUsage("Invalid guarded transaction's options. The second least significant bit must be set.")
+        raise errors.BadUsage("Invalid guarded transaction's options. The second least significant bit must be set")
 
 
 def send_or_simulate(tx: ITransaction, args: Any, dump_output: bool = True) -> CLIOutputBuilder:

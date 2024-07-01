@@ -2,9 +2,7 @@ import json
 from pathlib import Path
 from typing import Dict, List
 
-from multiversx_sdk_wallet import ValidatorSigner
-from multiversx_sdk_wallet.validator_keys import ValidatorPublicKey
-from multiversx_sdk_wallet.validator_pem import ValidatorPEM
+from multiversx_sdk import ValidatorPEM, ValidatorPublicKey, ValidatorSigner
 
 from multiversx_sdk_cli import guards
 from multiversx_sdk_cli.errors import CannotReadValidatorsData

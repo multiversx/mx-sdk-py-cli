@@ -2,9 +2,7 @@ import logging
 from pathlib import Path
 from typing import Any, List, Tuple, Union
 
-from multiversx_sdk_core import Address
-from multiversx_sdk_wallet.validator_pem import ValidatorPEM
-from multiversx_sdk_wallet.validator_signer import ValidatorSigner
+from multiversx_sdk import Address, ValidatorPEM, ValidatorSigner
 
 from multiversx_sdk_cli import utils
 from multiversx_sdk_cli.accounts import Account
