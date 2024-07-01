@@ -3,7 +3,7 @@ import webbrowser
 from enum import Enum
 from typing import Any, List, Tuple
 
-from multiversx_sdk_core import Message, MessageComputer
+from multiversx_sdk import Message, MessageComputer
 
 from multiversx_sdk_cli import cli_shared
 from multiversx_sdk_cli.errors import BadUserInput
