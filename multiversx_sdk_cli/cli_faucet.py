@@ -19,8 +19,8 @@ class WebWalletUrls(Enum):
 
 
 class ApiUrls(Enum):
-    DEVNET = "https://devnet-api.multiversx.com"
-    TESTNET = "https://testnet-api.multiversx.com"
+    DEVNET = "https://devnet-extras-api.multiversx.com"
+    TESTNET = "https://testnet-extras-api.multiversx.com"
 
 
 def setup_parser(args: List[str], subparsers: Any) -> Any:
