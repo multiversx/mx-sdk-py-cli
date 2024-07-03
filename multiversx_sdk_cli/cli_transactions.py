@@ -1,3 +1,4 @@
+import logging
 from pathlib import Path
 from typing import Any, List
 
@@ -9,6 +10,8 @@ from multiversx_sdk_cli.errors import NoWalletProvided
 from multiversx_sdk_cli.transactions import (compute_relayed_v1_data,
                                              do_prepare_transaction,
                                              load_transaction_from_file)
+
+logger = logging.getLogger("cli.transactions")
 
 
 def setup_parser(args: List[str], subparsers: Any) -> Any:
@@ -75,6 +78,7 @@ def create_transaction(args: Any):
     tx = do_prepare_transaction(args)
 
     if hasattr(args, "relay") and args.relay:
+        logger.warning("RelayedV1 transactions are deprecated. Please use RelayedV3 instead.")
         args.outfile.write(compute_relayed_v1_data(tx))
         return
 

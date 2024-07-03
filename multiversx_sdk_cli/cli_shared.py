@@ -63,7 +63,15 @@ def add_command_subparser(subparsers: Any, group: str, command: str, description
     )
 
 
-def add_tx_args(args: List[str], sub: Any, with_nonce: bool = True, with_receiver: bool = True, with_data: bool = True, with_estimate_gas: bool = False, with_guardian: bool = False):
+def add_tx_args(
+        args: List[str],
+        sub: Any,
+        with_nonce: bool = True,
+        with_receiver: bool = True,
+        with_data: bool = True,
+        with_estimate_gas: bool = False,
+        with_guardian: bool = False,
+        with_relayed_v3: bool = True):
     if with_nonce:
         sub.add_argument("--nonce", type=int, required=not ("--recall-nonce" in args), help="# the nonce for the transaction")
         sub.add_argument("--recall-nonce", action="store_true", default=False, help="⭮ whether to recall the nonce when creating the transaction (default: %(default)s)")
@@ -87,6 +95,10 @@ def add_tx_args(args: List[str], sub: Any, with_nonce: bool = True, with_receive
 
     if with_guardian:
         add_guardian_args(sub)
+
+    if with_relayed_v3:
+        sub.add_argument("--relayer", help="the address of the relayer")
+        sub.add_argument("--inner-transactions", help="a json file containing the inner transactions; should only be provided when creating the relayer's transaction")
 
     sub.add_argument("--options", type=int, default=0, help="the transaction options (default: 0)")
 
