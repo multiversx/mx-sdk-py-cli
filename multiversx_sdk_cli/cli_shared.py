@@ -99,6 +99,7 @@ def add_tx_args(
     if with_relayed_v3:
         sub.add_argument("--relayer", help="the address of the relayer")
         sub.add_argument("--inner-transactions", help="a json file containing the inner transactions; should only be provided when creating the relayer's transaction")
+        add_inner_transaction_outfile_arg(sub)
 
     sub.add_argument("--options", type=int, default=0, help="the transaction options (default: 0)")
 
@@ -137,6 +138,10 @@ def add_proxy_arg(sub: Any):
 def add_outfile_arg(sub: Any, what: str = ""):
     what = f"({what})" if what else ""
     sub.add_argument("--outfile", type=FileType("w"), default=sys.stdout, help=f"where to save the output {what} (default: stdout)")
+
+
+def add_inner_transaction_outfile_arg(sub: Any):
+    sub.add_argument("--inner-transactions-outfile", type=str, help="where to save the transaction as an inner transaction (default: stdout)")
 
 
 def add_infile_arg(sub: Any, what: str = ""):
