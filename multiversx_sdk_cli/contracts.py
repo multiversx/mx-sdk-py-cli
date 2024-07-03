@@ -6,6 +6,7 @@ from typing import Any, List, Optional, Protocol, Sequence, Union
 from multiversx_sdk import (Address, SmartContractTransactionsFactory, Token,
                             TokenComputer, TokenTransfer, Transaction,
                             TransactionPayload)
+from multiversx_sdk.abi import Abi
 from multiversx_sdk.network_providers.interface import IContractQuery
 
 from multiversx_sdk_cli import errors
@@ -73,8 +74,8 @@ class IConfig(Protocol):
 
 
 class SmartContract:
-    def __init__(self, config: IConfig):
-        self._factory = SmartContractTransactionsFactory(config)
+    def __init__(self, config: IConfig, abi: Optional[Abi] = None):
+        self._factory = SmartContractTransactionsFactory(config, abi)
 
     def prepare_deploy_transaction(self,
                                    owner: Account,

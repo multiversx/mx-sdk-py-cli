@@ -1,3 +1,4 @@
+import json
 import logging
 import os
 from pathlib import Path
@@ -5,6 +6,7 @@ from typing import Any, List
 
 from multiversx_sdk import (Address, AddressComputer, ProxyNetworkProvider,
                             Transaction, TransactionsFactoryConfig)
+from multiversx_sdk.abi import Abi
 
 from multiversx_sdk_cli import cli_shared, projects, utils
 from multiversx_sdk_cli.cli_output import CLIOutputBuilder
@@ -89,6 +91,7 @@ def setup_parser(args: List[str], subparsers: Any) -> Any:
     sub = cli_shared.add_command_subparser(subparsers, "contract", "call",
                                            f"Interact with a Smart Contract (execute function).{output_description}")
     _add_contract_arg(sub)
+    _add_contract_abi_arg(sub)
     cli_shared.add_outfile_arg(sub)
     cli_shared.add_wallet_args(args, sub)
     cli_shared.add_proxy_arg(sub)
@@ -224,6 +227,10 @@ def _add_contract_arg(sub: Any):
     sub.add_argument("contract", help="🖄 the address of the Smart Contract")
 
 
+def _add_contract_abi_arg(sub: Any):
+    sub.add_argument("--abi", help="the ABI of the Smart Contract")
+
+
 def _add_function_arg(sub: Any):
     sub.add_argument("--function", required=True, type=str, help="the function to call")
 
@@ -232,6 +239,8 @@ def _add_arguments_arg(sub: Any):
     sub.add_argument("--arguments", nargs='+',
                      help="arguments for the contract transaction, as [number, bech32-address, ascii string, "
                      "boolean] or hex-encoded. E.g. --arguments 42 0x64 1000 0xabba str:TOK-a1c2ef true erd1[..]")
+    sub.add_argument("--arguments-file", help="a json file containing the arguments. ONLY if abi file is provided. "
+                     "E.g. { 'to': 'erd1...', 'amount': 10000000000 }")
 
 
 def _add_token_transfers_args(sub: Any):
@@ -363,9 +372,19 @@ def call(args: Any):
     cli_shared.prepare_nonce_in_args(args)
 
     sender = cli_shared.prepare_account(args)
+    abi = Abi.load(Path(args.abi)) if args.abi else None
+
     config = TransactionsFactoryConfig(args.chain)
-    contract = SmartContract(config)
+    contract = SmartContract(config, abi)
+
     contract_address = Address.new_from_bech32(args.contract)
+
+    json_args = json.loads(Path(args.arguments_json).expanduser().read_text()) if args.arguments_json else None
+
+    if json_args and args.arguments:
+        raise Exception("Both '--arguments' and '--arguments-json' provided.")
+
+    # check what kind of args were provided and pass them further.
 
     tx = contract.prepare_execute_transaction(
         caller=sender,
