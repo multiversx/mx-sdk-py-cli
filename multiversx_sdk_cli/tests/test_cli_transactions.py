@@ -48,5 +48,44 @@ def test_create_tx_and_sign_by_hash(capsys: Any):
     assert signature == "f0c81f2393b1ec5972c813f817bae8daa00ade91c6f75ea604ab6a4d2797aca4378d783023ff98f1a02717fe4f24240cdfba0b674ee9abb18042203d713bc70a"
 
 
+def test_create_move_balance_transaction(capsys: Any):
+    return_code = main([
+        "tx", "new",
+        "--pem", str(testdata_path / "alice.pem"),
+        "--receiver", "erd1spyavw0956vq68xj8y4tenjpq2wd5a9p2c6j8gsz7ztyrnpxrruqzu66jx",
+        "--nonce", "215",
+        "--gas-limit", "500000",
+        "--value", "1000000000000",
+        "--data", "hello",
+        "--version", "2",
+        "--options", "0",
+        "--chain", "T",
+    ])
+    assert False if return_code else True
+    tx = _read_stdout(capsys)
+    tx_json = json.loads(tx)
+    signature = tx_json["emittedTransaction"]["signature"]
+    assert signature == "e88d846800bab1751e222c4461a310a3882312ef6d75fd8b861a2f3b572837b58f146ff9d60d16e617f53358d6cfa87cbcc65ad624c77003779d474059264901"
+
+
+def test_create_multi_transfer_transaction(capsys: Any):
+    return_code = main([
+        "tx", "new",
+        "--pem", str(testdata_path / "alice.pem"),
+        "--receiver", "erd1spyavw0956vq68xj8y4tenjpq2wd5a9p2c6j8gsz7ztyrnpxrruqzu66jx",
+        "--nonce", "212",
+        "--gas-limit", "5000000",
+        "--token-transfers", "SSSSS-941b91-01", "1", "TEST-738c3d", "1200000000",
+        "--version", "2",
+        "--options", "0",
+        "--chain", "T",
+    ])
+    assert False if return_code else True
+    tx = _read_stdout(capsys)
+    tx_json = json.loads(tx)
+    signature = tx_json["emittedTransaction"]["signature"]
+    assert signature == "575b029d52ff5ffbfb7bab2f04052de88a6f7d022a6ad368459b8af9acaed3717d3f95db09f460649a8f405800838bc2c432496bd03c9039ea166bd32b84660e"
+
+
 def _read_stdout(capsys: Any) -> str:
     return capsys.readouterr().out.strip()

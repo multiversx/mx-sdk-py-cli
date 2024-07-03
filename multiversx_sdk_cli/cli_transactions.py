@@ -20,6 +20,7 @@ def setup_parser(args: List[str], subparsers: Any) -> Any:
 
     sub = cli_shared.add_command_subparser(subparsers, "tx", "new", f"Create a new transaction.{CLIOutputBuilder.describe()}")
     _add_common_arguments(args, sub)
+    _add_token_transfers_args(sub)
     cli_shared.add_outfile_arg(sub, what="signed transaction, hash")
     cli_shared.add_broadcast_args(sub, relay=True)
     cli_shared.add_proxy_arg(sub)
@@ -62,6 +63,12 @@ def _add_common_arguments(args: List[str], sub: Any):
     cli_shared.add_wallet_args(args, sub)
     cli_shared.add_tx_args(args, sub, with_guardian=True)
     sub.add_argument("--data-file", type=str, default=None, help="a file containing transaction data")
+
+
+def _add_token_transfers_args(sub: Any):
+    sub.add_argument("--token-transfers", nargs='+',
+                     help="token transfers for transfer & execute, as [token, amount] "
+                     "E.g. --token-transfers NFT-123456-0a 1 ESDT-987654 100000000")
 
 
 def create_transaction(args: Any):
