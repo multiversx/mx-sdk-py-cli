@@ -43,7 +43,7 @@ def do_prepare_transaction(args: Any) -> Transaction:
 
     native_amount = int(args.value)
     transfers = getattr(args, "token_transfers", [])
-    transfers = prepare_token_transfers(transfers) if transfers else []
+    transfers = prepare_token_transfers(transfers)
 
     config = TransactionsFactoryConfig(args.chain)
     factory = TransferTransactionsFactory(config)
