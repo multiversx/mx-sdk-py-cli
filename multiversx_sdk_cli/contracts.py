@@ -1,7 +1,7 @@
 import base64
 import logging
 from pathlib import Path
-from typing import Any, List, Optional, Protocol, Sequence, Union
+from typing import Any, Dict, List, Optional, Protocol, Sequence, Union, cast
 
 from multiversx_sdk import (Address, SmartContractTransactionsFactory, Token,
                             TokenComputer, TokenTransfer, Transaction,
@@ -75,6 +75,7 @@ class IConfig(Protocol):
 
 class SmartContract:
     def __init__(self, config: IConfig, abi: Optional[Abi] = None):
+        self._abi = abi
         self._factory = SmartContractTransactionsFactory(config, abi)
 
     def prepare_deploy_transaction(self,
@@ -91,7 +92,7 @@ class SmartContract:
                                    version: int,
                                    options: int,
                                    guardian: str) -> Transaction:
-        args = prepare_args_for_factory(arguments) if arguments else []
+        args = self.prepare_args_for_factory("constructor", arguments) if arguments else []
 
         tx = self._factory.create_transaction_for_deploy(
             sender=owner.address,
@@ -116,7 +117,7 @@ class SmartContract:
                                     caller: Account,
                                     contract: Address,
                                     function: str,
-                                    arguments: Union[List[str], None],
+                                    arguments: Any,
                                     gas_limit: int,
                                     value: int,
                                     transfers: Union[List[str], None],
@@ -125,7 +126,7 @@ class SmartContract:
                                     options: int,
                                     guardian: str) -> Transaction:
         token_transfers = self._prepare_token_transfers(transfers) if transfers else []
-        args = prepare_args_for_factory(arguments) if arguments else []
+        args = self.prepare_args_for_factory(function, arguments) if arguments else []
 
         tx = self._factory.create_transaction_for_execute(
             sender=caller.address,
@@ -159,7 +160,7 @@ class SmartContract:
                                     version: int,
                                     options: int,
                                     guardian: str) -> Transaction:
-        args = prepare_args_for_factory(arguments) if arguments else []
+        args = self.prepare_args_for_factory("upgrade_constructor", arguments) if arguments else []
 
         tx = self._factory.create_transaction_for_upgrade(
             sender=owner.address,
@@ -195,6 +196,46 @@ class SmartContract:
             token_transfers.append(transfer)
 
         return token_transfers
+
+    def prepare_args_for_factory(self, endpoint: str, arguments: Any) -> List[Any]:
+        args: List[Any] = []
+
+        if isinstance(arguments, dict):
+            return self._prepare_args_using_abi(endpoint, arguments)
+
+        if isinstance(arguments, list):
+            for arg in arguments:  # type: ignore
+                arg = cast(str, arg)
+                if arg.startswith(HEX_PREFIX):
+                    args.append(hex_to_bytes(arg))
+                elif arg.isnumeric():
+                    args.append(int(arg))
+                elif arg.startswith(DEFAULT_HRP):
+                    args.append(Address.new_from_bech32(arg))
+                elif arg.lower() == FALSE_STR_LOWER:
+                    args.append(False)
+                elif arg.lower() == TRUE_STR_LOWER:
+                    args.append(True)
+                elif arg.startswith(STR_PREFIX):
+                    args.append(arg[len(STR_PREFIX):])
+                else:
+                    raise errors.BadUserInput(f"Unknown argument type for argument: `{arg}`. Use `mxpy contract <sub-command> --help` to check all supported arguments")
+
+        return args
+
+    def _prepare_args_using_abi(self, function: str, arguments: Dict[str, Any]):
+        if not self._abi:
+            raise Exception("Abi file not provided")
+
+        endpoint_definition = [endpoint for endpoint in self._abi.definition.endpoints if endpoint.name == function]
+        if not endpoint_definition:
+            raise Exception(f"Endpoint [{function}] not found")
+        elif len(endpoint_definition) > 1:
+            raise Exception(f"More than one endpoint with name [{function}] found.")
+        else:
+            endpoint_definition = endpoint_definition[0]
+
+        input_parameters_names = [input.name for input in endpoint_definition.inputs]
 
 
 def query_contract(
@@ -263,28 +304,6 @@ def prepare_execute_transaction_data(function: str, arguments: List[Any]) -> Tra
         tx_data += f"@{_prepare_argument(arg)}"
 
     return TransactionPayload.from_str(tx_data)
-
-
-def prepare_args_for_factory(arguments: List[str]) -> List[Any]:
-    args: List[Any] = []
-
-    for arg in arguments:
-        if arg.startswith(HEX_PREFIX):
-            args.append(hex_to_bytes(arg))
-        elif arg.isnumeric():
-            args.append(int(arg))
-        elif arg.startswith(DEFAULT_HRP):
-            args.append(Address.new_from_bech32(arg))
-        elif arg.lower() == FALSE_STR_LOWER:
-            args.append(False)
-        elif arg.lower() == TRUE_STR_LOWER:
-            args.append(True)
-        elif arg.startswith(STR_PREFIX):
-            args.append(arg[len(STR_PREFIX):])
-        else:
-            raise errors.BadUserInput(f"Unknown argument type for argument: `{arg}`. Use `mxpy contract <sub-command> --help` to check all supported arguments")
-
-    return args
 
 
 def hex_to_bytes(arg: str):

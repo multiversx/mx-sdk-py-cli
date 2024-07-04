@@ -228,7 +228,7 @@ def _add_contract_arg(sub: Any):
 
 
 def _add_contract_abi_arg(sub: Any):
-    sub.add_argument("--abi", help="the ABI of the Smart Contract")
+    sub.add_argument("--abi", type=str, help="the ABI of the Smart Contract")
 
 
 def _add_function_arg(sub: Any):
@@ -239,7 +239,7 @@ def _add_arguments_arg(sub: Any):
     sub.add_argument("--arguments", nargs='+',
                      help="arguments for the contract transaction, as [number, bech32-address, ascii string, "
                      "boolean] or hex-encoded. E.g. --arguments 42 0x64 1000 0xabba str:TOK-a1c2ef true erd1[..]")
-    sub.add_argument("--arguments-file", help="a json file containing the arguments. ONLY if abi file is provided. "
+    sub.add_argument("--arguments-file", type=str, help="a json file containing the arguments. ONLY if abi file is provided. "
                      "E.g. { 'to': 'erd1...', 'amount': 10000000000 }")
 
 
@@ -372,25 +372,24 @@ def call(args: Any):
     cli_shared.prepare_nonce_in_args(args)
 
     sender = cli_shared.prepare_account(args)
-    abi = Abi.load(Path(args.abi)) if args.abi else None
 
     config = TransactionsFactoryConfig(args.chain)
+    abi = Abi.load(Path(args.abi)) if args.abi else None
     contract = SmartContract(config, abi)
 
-    contract_address = Address.new_from_bech32(args.contract)
-
-    json_args = json.loads(Path(args.arguments_json).expanduser().read_text()) if args.arguments_json else None
+    json_args = json.loads(Path(args.arguments_file).expanduser().read_text()) if args.arguments_file else None
 
     if json_args and args.arguments:
         raise Exception("Both '--arguments' and '--arguments-json' provided.")
 
-    # check what kind of args were provided and pass them further.
+    arguments = json_args or args.arguments
+    contract_address = Address.new_from_bech32(args.contract)
 
     tx = contract.prepare_execute_transaction(
         caller=sender,
         contract=contract_address,
         function=args.function,
-        arguments=args.arguments,
+        arguments=arguments,
         gas_limit=int(args.gas_limit),
         value=int(args.value),
         transfers=args.token_transfers,
