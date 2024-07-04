@@ -19,10 +19,6 @@ classifiers = [
     "Intended Audience :: Developers"
 ]
 
-
-[tool.hatch.metadata]
-allow-direct-references = true
-
 dependencies = [
   "toml>=0.10.2",
   "requests",
@@ -32,7 +28,7 @@ dependencies = [
   "requests-cache",
   "rich==13.3.4",
   "argcomplete==3.2.2",
-  "multiversx-sdk@git+https://github.com/multiversx/mx-sdk-py@feat/next#egg=multiversx_sdk"
+  "multiversx-sdk==0.11.0b0"
 ]
 
 [project.scripts]
