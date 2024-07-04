@@ -59,8 +59,8 @@ class JSONTransaction:
 
 def do_prepare_transaction(args: Any) -> Transaction:
     account = load_sender_account_from_args(args)
-    transfers = getattr(args, "token_transfers", None)
-    transfers = prepare_token_transfers(transfers) if transfers else None
+    transfers = getattr(args, "token_transfers", [])
+    transfers = prepare_token_transfers(transfers) if transfers else []
 
     config = TransactionsFactoryConfig(args.chain)
     factory = TransferTransactionsFactory(config)
@@ -112,7 +112,7 @@ def load_sender_account_from_args(args: Any) -> Account:
     return account
 
 
-def prepare_token_transfers(transfers: List[Any]):
+def prepare_token_transfers(transfers: List[Any]) -> List[TokenTransfer]:
     token_computer = TokenComputer()
     token_transfers: List[TokenTransfer] = []
 
