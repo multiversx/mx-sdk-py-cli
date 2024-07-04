@@ -59,10 +59,10 @@ def do_prepare_transaction(args: Any) -> Transaction:
             data=str(args.data).encode()
         )
     else:
+        # this is for transactions with no token transfers(egld/esdt); useful for setting the data field
         tx = Transaction(
             sender=account.address.to_bech32(),
             receiver=receiver.to_bech32(),
-            value=native_amount,
             data=str(args.data).encode(),
             gas_limit=int(args.gas_limit),
             chain_id=args.chain

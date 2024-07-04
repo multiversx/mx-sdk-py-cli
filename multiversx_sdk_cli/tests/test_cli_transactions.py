@@ -124,6 +124,20 @@ def test_create_and_append_inner_transaction():
     assert len(inner_txs) == 2
 
 
+def test_create_invalid_relayed_transaction():
+    return_code = main([
+        "tx", "new",
+        "--pem", str(testdata_path / "testUser.pem"),
+        "--receiver", "erd1cqqxak4wun7508e0yj9ng843r6hv4mzd0hhpjpsejkpn9wa9yq8sj7u2u5",
+        "--nonce", "987",
+        "--gas-limit", "5000000",
+        "--inner-transactions", str(testdata_out / "inner_transactions.json"),
+        "--data", "test data",
+        "--chain", "T",
+    ])
+    assert return_code
+
+
 def test_create_relayer_transaction(capsys: Any):
     return_code = main([
         "tx", "new",
