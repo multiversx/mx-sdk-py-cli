@@ -27,7 +27,7 @@ dependencies = [
   "semver",
   "requests-cache",
   "rich==13.3.4",
-  "multiversx-sdk@git+https://github.com/multiversx/mx-sdk-py#egg=multiversx_sdk@feat/next",
+  "multiversx-sdk@git+https://github.com/multiversx/mx-sdk-py@feat/next#egg=multiversx_sdk",
   "argcomplete==3.2.2"
 ]
 
