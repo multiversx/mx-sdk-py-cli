@@ -49,7 +49,6 @@ def do_prepare_transaction(args: Any) -> Transaction:
     factory = TransferTransactionsFactory(config)
     receiver = Address.new_from_bech32(args.receiver)
 
-    # temporary workaround until proper fix in sdk-py
     if native_amount or transfers:
         tx = factory.create_transaction_for_transfer(
             sender=account.address,
@@ -231,7 +230,7 @@ def load_transaction_from_file(f: TextIO) -> Transaction:
 
 
 def load_inner_transactions_from_file(path: Path) -> List[Transaction]:
-    data_json = path.read_bytes()
+    data_json = path.read_text()
     transactions: List[Dict[str, Any]] = json.loads(data_json).get("innerTransactions")
 
     tx_converter = TransactionsConverter()

@@ -64,7 +64,7 @@ def setup_parser(args: List[str], subparsers: Any) -> Any:
 
 def _add_common_arguments(args: List[str], sub: Any):
     cli_shared.add_wallet_args(args, sub)
-    cli_shared.add_tx_args(args, sub, with_guardian=True)
+    cli_shared.add_tx_args(args, sub)
     sub.add_argument("--data-file", type=str, default=None, help="a file containing transaction data")
 
 
