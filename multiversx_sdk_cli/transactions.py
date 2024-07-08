@@ -2,9 +2,12 @@ import base64
 import json
 import logging
 import time
-from typing import Any, Dict, Optional, Protocol, TextIO
+from typing import Any, Dict, List, Optional, Protocol, TextIO
 
-from multiversx_sdk import Address, Transaction, TransactionPayload
+from multiversx_sdk import (Address, Token, TokenComputer, TokenTransfer,
+                            Transaction, TransactionPayload,
+                            TransactionsFactoryConfig,
+                            TransferTransactionsFactory)
 
 from multiversx_sdk_cli import errors
 from multiversx_sdk_cli.accounts import Account, LedgerAccount
@@ -55,6 +58,48 @@ class JSONTransaction:
 
 
 def do_prepare_transaction(args: Any) -> Transaction:
+    account = load_sender_account_from_args(args)
+    transfers = getattr(args, "token_transfers", [])
+    transfers = prepare_token_transfers(transfers) if transfers else []
+
+    config = TransactionsFactoryConfig(args.chain)
+    factory = TransferTransactionsFactory(config)
+    receiver = Address.new_from_bech32(args.receiver)
+
+    # will be replaced with 'create_transaction_for_transfer'
+    if transfers:
+        tx = factory.create_transaction_for_esdt_token_transfer(
+            sender=account.address,
+            receiver=receiver,
+            token_transfers=transfers
+        )
+    else:
+        tx = factory.create_transaction_for_native_token_transfer(
+            sender=account.address,
+            receiver=receiver,
+            native_amount=int(args.value),
+            data=str(args.data)
+        )
+
+    tx.gas_limit = int(args.gas_limit)
+    tx.sender_username = getattr(args, "sender_username", None) or ""
+    tx.receiver_username = getattr(args, "receiver_username", None) or ""
+    tx.gas_price = int(args.gas_price)
+    tx.nonce = int(args.nonce)
+    tx.value = int(args.value)
+    tx.version = int(args.version)
+    tx.options = int(args.options)
+
+    if args.guardian:
+        tx.guardian = args.guardian
+
+    tx.signature = bytes.fromhex(account.sign_transaction(tx))
+    tx = sign_tx_by_guardian(args, tx)
+
+    return tx
+
+
+def load_sender_account_from_args(args: Any) -> Account:
     account = Account()
     if args.ledger:
         account = LedgerAccount(account_index=args.ledger_account_index, address_index=args.ledger_address_index)
@@ -64,28 +109,23 @@ def do_prepare_transaction(args: Any) -> Transaction:
         password = load_password(args)
         account = Account(key_file=args.keyfile, password=password)
 
-    tx = Transaction(
-        chain_id=args.chain,
-        sender=account.address.to_bech32(),
-        receiver=args.receiver,
-        gas_limit=int(args.gas_limit),
-        sender_username=getattr(args, "sender_username", ""),
-        receiver_username=getattr(args, "receiver_username", ""),
-        gas_price=int(args.gas_price),
-        data=str(args.data).encode(),
-        nonce=int(args.nonce),
-        value=int(args.value),
-        version=int(args.version),
-        options=int(args.options)
-    )
+    return account
 
-    if args.guardian:
-        tx.guardian = args.guardian
 
-    tx.signature = bytes.fromhex(account.sign_transaction(tx))
-    tx = sign_tx_by_guardian(args, tx)
+def prepare_token_transfers(transfers: List[Any]) -> List[TokenTransfer]:
+    token_computer = TokenComputer()
+    token_transfers: List[TokenTransfer] = []
 
-    return tx
+    for i in range(0, len(transfers) - 1, 2):
+        identifier = transfers[i]
+        amount = int(transfers[i + 1])
+        nonce = token_computer.extract_nonce_from_extended_identifier(identifier)
+
+        token = Token(identifier, nonce)
+        transfer = TokenTransfer(token, amount)
+        token_transfers.append(transfer)
+
+    return token_transfers
 
 
 def sign_tx_by_guardian(args: Any, tx: Transaction) -> Transaction:
