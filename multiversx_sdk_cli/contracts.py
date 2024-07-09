@@ -1,7 +1,7 @@
 import base64
 import logging
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Protocol, Sequence, Union, cast
+from typing import Any, List, Optional, Protocol, Sequence, Union
 
 from multiversx_sdk import (Address, SmartContractTransactionsFactory, Token,
                             TokenComputer, TokenTransfer, Transaction,
@@ -81,7 +81,8 @@ class SmartContract:
     def prepare_deploy_transaction(self,
                                    owner: Account,
                                    bytecode: Path,
-                                   arguments: Union[List[str], None],
+                                   arguments: Union[List[Any], None],
+                                   args_from_file: bool,
                                    upgradeable: bool,
                                    readable: bool,
                                    payable: bool,
@@ -92,7 +93,9 @@ class SmartContract:
                                    version: int,
                                    options: int,
                                    guardian: str) -> Transaction:
-        args = self.prepare_args_for_factory("constructor", arguments) if arguments else []
+        args = arguments if arguments else []
+        if not args_from_file:
+            args = self.prepare_args_for_factory(args)
 
         tx = self._factory.create_transaction_for_deploy(
             sender=owner.address,
@@ -117,7 +120,8 @@ class SmartContract:
                                     caller: Account,
                                     contract: Address,
                                     function: str,
-                                    arguments: Any,
+                                    arguments: Union[List[Any], None],
+                                    args_from_file: bool,
                                     gas_limit: int,
                                     value: int,
                                     transfers: Union[List[str], None],
@@ -126,7 +130,10 @@ class SmartContract:
                                     options: int,
                                     guardian: str) -> Transaction:
         token_transfers = self._prepare_token_transfers(transfers) if transfers else []
-        args = self.prepare_args_for_factory(function, arguments) if arguments else []
+
+        args = arguments if arguments else []
+        if not args_from_file:
+            args = self.prepare_args_for_factory(args)
 
         tx = self._factory.create_transaction_for_execute(
             sender=caller.address,
@@ -150,6 +157,7 @@ class SmartContract:
                                     contract: IAddress,
                                     bytecode: Path,
                                     arguments: Union[List[str], None],
+                                    args_from_file: bool,
                                     upgradeable: bool,
                                     readable: bool,
                                     payable: bool,
@@ -160,7 +168,11 @@ class SmartContract:
                                     version: int,
                                     options: int,
                                     guardian: str) -> Transaction:
-        args = self.prepare_args_for_factory("upgrade_constructor", arguments) if arguments else []
+        args = self.prepare_args_for_factory(arguments) if arguments else []
+
+        args = arguments if arguments else []
+        if not args_from_file:
+            args = self.prepare_args_for_factory(args)
 
         tx = self._factory.create_transaction_for_upgrade(
             sender=owner.address,
@@ -197,45 +209,26 @@ class SmartContract:
 
         return token_transfers
 
-    def prepare_args_for_factory(self, endpoint: str, arguments: Any) -> List[Any]:
+    def prepare_args_for_factory(self, arguments: List[str]) -> List[Any]:
         args: List[Any] = []
 
-        if isinstance(arguments, dict):
-            return self._prepare_args_using_abi(endpoint, arguments)
-
-        if isinstance(arguments, list):
-            for arg in arguments:  # type: ignore
-                arg = cast(str, arg)
-                if arg.startswith(HEX_PREFIX):
-                    args.append(hex_to_bytes(arg))
-                elif arg.isnumeric():
-                    args.append(int(arg))
-                elif arg.startswith(DEFAULT_HRP):
-                    args.append(Address.new_from_bech32(arg))
-                elif arg.lower() == FALSE_STR_LOWER:
-                    args.append(False)
-                elif arg.lower() == TRUE_STR_LOWER:
-                    args.append(True)
-                elif arg.startswith(STR_PREFIX):
-                    args.append(arg[len(STR_PREFIX):])
-                else:
-                    raise errors.BadUserInput(f"Unknown argument type for argument: `{arg}`. Use `mxpy contract <sub-command> --help` to check all supported arguments")
+        for arg in arguments:
+            if arg.startswith(HEX_PREFIX):
+                args.append(hex_to_bytes(arg))
+            elif arg.isnumeric():
+                args.append(int(arg))
+            elif arg.startswith(DEFAULT_HRP):
+                args.append(Address.new_from_bech32(arg))
+            elif arg.lower() == FALSE_STR_LOWER:
+                args.append(False)
+            elif arg.lower() == TRUE_STR_LOWER:
+                args.append(True)
+            elif arg.startswith(STR_PREFIX):
+                args.append(arg[len(STR_PREFIX):])
+            else:
+                raise errors.BadUserInput(f"Unknown argument type for argument: `{arg}`. Use `mxpy contract <sub-command> --help` to check all supported arguments")
 
         return args
-
-    def _prepare_args_using_abi(self, function: str, arguments: Dict[str, Any]):
-        if not self._abi:
-            raise Exception("Abi file not provided")
-
-        endpoint_definition = [endpoint for endpoint in self._abi.definition.endpoints if endpoint.name == function]
-        if not endpoint_definition:
-            raise Exception(f"Endpoint [{function}] not found")
-        elif len(endpoint_definition) > 1:
-            raise Exception(f"More than one endpoint with name [{function}] found.")
-        else:
-            endpoint_definition = endpoint_definition[0]
-
-        input_parameters_names = [input.name for input in endpoint_definition.inputs]
 
 
 def query_contract(

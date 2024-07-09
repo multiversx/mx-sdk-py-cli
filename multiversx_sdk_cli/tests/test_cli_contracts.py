@@ -317,6 +317,43 @@ def test_contract_commands_argument_parameter():
     assert not return_code
 
 
+def test_contract_deploy_with_abi(capsys: Any):
+    alice = f"{parent}/testdata/alice.pem"
+    multisig = f"{parent}/testdata/multisig.wasm"
+    multisig_abi = f"{parent}/testdata/multisig.abi.json"
+
+    return_code = main([
+        "contract", "deploy",
+        "--bytecode", multisig,
+        "--pem", alice,
+        "--chain", "T",
+        "--nonce", "7",
+        "--gas-limit", "5000000",
+        "--arguments", "2", "erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th", "erd1cqqxak4wun7508e0yj9ng843r6hv4mzd0hhpjpsejkpn9wa9yq8sj7u2u5"
+    ])
+    assert not return_code
+
+    deploy_without_abi_data = get_transaction_data(capsys)
+    # Clear the captured content
+    capsys.readouterr()
+
+    return_code = main([
+        "contract", "deploy",
+        "--bytecode", multisig,
+        "--abi", multisig_abi,
+        "--pem", alice,
+        "--chain", "T",
+        "--nonce", "7",
+        "--gas-limit", "5000000",
+        "--arguments-file", f"{parent}/testdata/deploy_multisig_args.json"
+    ])
+    assert not return_code
+
+    deploy_with_abi_data = get_transaction_data(capsys)
+
+    assert deploy_without_abi_data == deploy_with_abi_data
+
+
 def _read_stdout(capsys: Any) -> str:
     return capsys.readouterr().out.strip()
 
