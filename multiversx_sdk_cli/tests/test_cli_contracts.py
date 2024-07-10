@@ -350,8 +350,49 @@ def test_contract_deploy_with_abi(capsys: Any):
     assert not return_code
 
     deploy_with_abi_data = get_transaction_data(capsys)
-
     assert deploy_without_abi_data == deploy_with_abi_data
+    assert deploy_without_abi_data.endswith("@02@0139472eff6886771a982f3083da5d421f24c29181e63888228dc81ca60d69e1@c0006edaaee4fd479f2f248b341eb11eaecaec4d7dee190619958332bba5200f")
+    assert deploy_with_abi_data.endswith("@02@0139472eff6886771a982f3083da5d421f24c29181e63888228dc81ca60d69e1@c0006edaaee4fd479f2f248b341eb11eaecaec4d7dee190619958332bba5200f")
+
+
+def test_contract_call_with_abi(capsys: Any):
+    alice = f"{parent}/testdata/alice.pem"
+    multisig_abi = f"{parent}/testdata/multisig.abi.json"
+
+    return_code = main([
+        "contract", "call", "erd1qqqqqqqqqqqqqpgqpg2tnjelx3s3dhkksqhjavprtgmt9xt4d8ss9al8m4",
+        "--pem", alice,
+        "--chain", "T",
+        "--nonce", "7",
+        "--gas-limit", "5000000",
+        "--function", "proposeBatch",
+        "--abi", multisig_abi,
+        "--arguments-file", f"{parent}/testdata/call_multisig_propose_batch_args.json"
+    ])
+    assert not return_code
+
+    data = get_transaction_data(capsys)
+    assert data == "proposeBatch@0500000000000000000500ed8e25a94efa837aae0e593112cfbb01b448755069e1000000080de0b6b3a7640000010000000000e4e1c000000003616464000000010000000107"
+
+
+def test_contract_upgrade_with_abi(capsys: Any):
+    alice = f"{parent}/testdata/alice.pem"
+    multisig_abi = f"{parent}/testdata/multisig.abi.json"
+
+    return_code = main([
+        "contract", "call", "erd1qqqqqqqqqqqqqpgqpg2tnjelx3s3dhkksqhjavprtgmt9xt4d8ss9al8m4",
+        "--pem", alice,
+        "--chain", "T",
+        "--nonce", "7",
+        "--gas-limit", "5000000",
+        "--function", "proposeSCUpgradeFromSource",
+        "--abi", multisig_abi,
+        "--arguments-file", f"{parent}/testdata/upgrade_multisig_args.json"
+    ])
+    assert not return_code
+
+    data = get_transaction_data(capsys)
+    assert data == "proposeSCUpgradeFromSource@000000000000000005000a14b9cb3f346116ded6802f2eb0235a36b2997569e1@@00000000000000000500ed8e25a94efa837aae0e593112cfbb01b448755069e1@0500@"
 
 
 def _read_stdout(capsys: Any) -> str:
@@ -369,7 +410,7 @@ def get_query_response(capsys: Any):
     return json.loads(out)[0]
 
 
-def get_transaction_data(capsys: Any):
+def get_transaction_data(capsys: Any) -> str:
     out = _read_stdout(capsys)
     output = json.loads(out)
     return output["emittedTransactionData"]
