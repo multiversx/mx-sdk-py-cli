@@ -168,8 +168,6 @@ class SmartContract:
                                     version: int,
                                     options: int,
                                     guardian: str) -> Transaction:
-        args = self.prepare_args_for_factory(arguments) if arguments else []
-
         args = arguments if arguments else []
         if not args_from_file:
             args = self.prepare_args_for_factory(args)
