@@ -34,7 +34,7 @@ WALLET_FORMATS = [
 WALLET_FORMATS_AND_ADDRESSES = [*WALLET_FORMATS, WALLET_FORMAT_ADDRESS_BECH32, WALLET_FORMAT_ADDRESS_HEX]
 
 MAX_ITERATIONS_FOR_GENERATING_WALLET = 100
-CURRENT_SHARDS = [0, 1, 2]
+CURRENT_SHARDS = [i for i in range(NUMBER_OF_SHARDS)]
 
 
 def setup_parser(args: List[str], subparsers: Any) -> Any:
@@ -115,8 +115,7 @@ def wallet_new(args: Any):
     shard = args.shard
 
     if shard in CURRENT_SHARDS:
-        i = 0
-        while i < MAX_ITERATIONS_FOR_GENERATING_WALLET:
+        for i in range(MAX_ITERATIONS_FOR_GENERATING_WALLET):
             mnemonic = Mnemonic.generate()
             pubkey = mnemonic.derive_key().generate_public_key()
             generated_address_shard = get_shard_of_pubkey(pubkey.buffer, NUMBER_OF_SHARDS)
@@ -124,8 +123,7 @@ def wallet_new(args: Any):
             if shard == generated_address_shard:
                 break
 
-            i += 1
-            if i == 100:
+            if i == 99:
                 raise Exception(f"Couldn't generate wallet in shard {shard}")
     else:
         mnemonic = Mnemonic.generate()
