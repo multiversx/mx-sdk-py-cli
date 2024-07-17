@@ -11,7 +11,8 @@ from multiversx_sdk.core.address import get_shard_of_pubkey
 
 from multiversx_sdk_cli import cli_shared, utils
 from multiversx_sdk_cli.constants import DEFAULT_HRP, NUMBER_OF_SHARDS
-from multiversx_sdk_cli.errors import KnownError
+from multiversx_sdk_cli.errors import (BadUserInput, KnownError,
+                                       WalletGenerationError)
 from multiversx_sdk_cli.sign_verify import SignedMessage, sign_message
 from multiversx_sdk_cli.ux import show_critical_error, show_message
 
@@ -114,17 +115,22 @@ def wallet_new(args: Any):
     address_hrp = args.address_hrp
     shard = args.shard
 
-    if shard in CURRENT_SHARDS:
-        for i in range(MAX_ITERATIONS_FOR_GENERATING_WALLET):
+    if shard:
+        if shard not in CURRENT_SHARDS:
+            raise BadUserInput(f"Wrong shard provided. Choose between {CURRENT_SHARDS}")
+
+        is_wallet_generated = False
+        for _ in range(MAX_ITERATIONS_FOR_GENERATING_WALLET):
             mnemonic = Mnemonic.generate()
             pubkey = mnemonic.derive_key().generate_public_key()
             generated_address_shard = get_shard_of_pubkey(pubkey.buffer, NUMBER_OF_SHARDS)
 
             if shard == generated_address_shard:
+                is_wallet_generated = True
                 break
 
-            if i == 99:
-                raise Exception(f"Couldn't generate wallet in shard {shard}")
+        if not is_wallet_generated:
+            raise WalletGenerationError(f"Couldn't generate wallet in shard {shard}")
     else:
         mnemonic = Mnemonic.generate()
 
