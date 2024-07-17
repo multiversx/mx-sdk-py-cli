@@ -115,7 +115,7 @@ def wallet_new(args: Any):
     address_hrp = args.address_hrp
     shard = args.shard
 
-    if shard:
+    if shard is not None:
         if shard not in CURRENT_SHARDS:
             raise BadUserInput(f"Wrong shard provided. Choose between {CURRENT_SHARDS}")
 
