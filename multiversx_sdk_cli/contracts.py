@@ -203,9 +203,9 @@ class SmartContract:
                        proxy: INetworkProvider,
                        function: str,
                        arguments: List[Any],
-                       args_from_file: bool,) -> List[Any]:
+                       should_prepare_args: bool) -> List[Any]:
         args = arguments if arguments else []
-        if not args_from_file:
+        if should_prepare_args:
             args = self._prepare_args_for_factory(args)
 
         query_runner = QueryRunnerAdapter(proxy)

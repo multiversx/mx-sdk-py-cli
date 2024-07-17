@@ -452,7 +452,7 @@ def query(args: Any):
     abi = Abi.load(Path(args.abi)) if args.abi else None
     contract = SmartContract(config, abi)
 
-    arguments, args_from_file = _get_contract_arguments(args)
+    arguments, should_prepare_args = _get_contract_arguments(args)
     contract_address = Address.new_from_bech32(args.contract)
 
     proxy = ProxyNetworkProvider(args.proxy)
@@ -463,7 +463,7 @@ def query(args: Any):
         proxy=proxy,
         function=function,
         arguments=arguments,
-        args_from_file=args_from_file
+        should_prepare_args=should_prepare_args
     )
 
     utils.dump_out_json(result)
