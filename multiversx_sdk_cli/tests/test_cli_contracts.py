@@ -107,7 +107,7 @@ def test_contract_deploy():
             str(output_file),
         ]
     )
-    assert Path.is_file(output_file) == True
+    assert Path.is_file(output_file)
 
 
 def test_contract_upgrade():
@@ -136,7 +136,7 @@ def test_contract_upgrade():
             str(output_file),
         ]
     )
-    assert Path.is_file(output_file) == True
+    assert Path.is_file(output_file)
 
 
 def test_contract_call():
@@ -165,7 +165,7 @@ def test_contract_call():
             str(output_file),
         ]
     )
-    assert Path.is_file(output_file) == True
+    assert Path.is_file(output_file)
 
 
 def test_contract_transfer_and_execute(capsys: Any):

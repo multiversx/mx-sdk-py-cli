@@ -242,7 +242,7 @@ def _add_arguments_arg(sub: Any):
                      help="arguments for the contract transaction, as [number, bech32-address, ascii string, "
                      "boolean] or hex-encoded. E.g. --arguments 42 0x64 1000 0xabba str:TOK-a1c2ef true erd1[..]")
     sub.add_argument("--arguments-file", type=str, help="a json file containing the arguments. ONLY if abi file is provided. "
-                     "E.g. { 'to': 'erd1...', 'amount': 10000000000 }")
+                     "E.g. [{ 'to': 'erd1...', 'amount': 10000000000 }]")
 
 
 def _add_token_transfers_args(sub: Any):
@@ -328,13 +328,13 @@ def deploy(args: Any):
     abi = Abi.load(Path(args.abi)) if args.abi else None
     contract = SmartContract(config, abi)
 
-    arguments, args_from_file = _get_contract_arguments(args)
+    arguments, should_prepare_args = _get_contract_arguments(args)
 
     tx = contract.prepare_deploy_transaction(
         owner=sender,
         bytecode=Path(args.bytecode),
         arguments=arguments,
-        args_from_file=args_from_file,
+        should_prepare_args=should_prepare_args,
         upgradeable=args.metadata_upgradeable,
         readable=args.metadata_readable,
         payable=args.metadata_payable,
@@ -383,7 +383,7 @@ def call(args: Any):
     abi = Abi.load(Path(args.abi)) if args.abi else None
     contract = SmartContract(config, abi)
 
-    arguments, args_from_file = _get_contract_arguments(args)
+    arguments, should_prepare_args = _get_contract_arguments(args)
     contract_address = Address.new_from_bech32(args.contract)
 
     tx = contract.prepare_execute_transaction(
@@ -391,7 +391,7 @@ def call(args: Any):
         contract=contract_address,
         function=args.function,
         arguments=arguments,
-        args_from_file=args_from_file,
+        should_prepare_args=should_prepare_args,
         gas_limit=int(args.gas_limit),
         value=int(args.value),
         transfers=args.token_transfers,
@@ -416,7 +416,7 @@ def upgrade(args: Any):
     abi = Abi.load(Path(args.abi)) if args.abi else None
     contract = SmartContract(config, abi)
 
-    arguments, args_from_file = _get_contract_arguments(args)
+    arguments, should_prepare_args = _get_contract_arguments(args)
     contract_address = Address.new_from_bech32(args.contract)
 
     tx = contract.prepare_upgrade_transaction(
@@ -424,7 +424,7 @@ def upgrade(args: Any):
         contract=contract_address,
         bytecode=Path(args.bytecode),
         arguments=arguments,
-        args_from_file=args_from_file,
+        should_prepare_args=should_prepare_args,
         upgradeable=args.metadata_upgradeable,
         readable=args.metadata_readable,
         payable=args.metadata_payable,
@@ -461,12 +461,15 @@ def _get_contract_arguments(args: Any) -> Tuple[List[Any], bool]:
     json_args = json.loads(Path(args.arguments_file).expanduser().read_text()) if args.arguments_file else None
 
     if json_args and args.arguments:
-        raise Exception("Both '--arguments' and '--arguments-file' provided.")
+        raise Exception("Provide either '--arguments' or '--arguments-file'.")
 
     if json_args:
-        return json_args, True
+        if not args.abi:
+            raise Exception("Can't use '--arguments-file' without providing the Abi file.")
+
+        return json_args, False
     else:
-        return args.arguments, False
+        return args.arguments, True
 
 
 def _send_or_simulate(tx: Transaction, contract_address: IAddress, args: Any):

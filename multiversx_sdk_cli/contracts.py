@@ -82,7 +82,7 @@ class SmartContract:
                                    owner: Account,
                                    bytecode: Path,
                                    arguments: Union[List[Any], None],
-                                   args_from_file: bool,
+                                   should_prepare_args: bool,
                                    upgradeable: bool,
                                    readable: bool,
                                    payable: bool,
@@ -94,7 +94,7 @@ class SmartContract:
                                    options: int,
                                    guardian: str) -> Transaction:
         args = arguments if arguments else []
-        if not args_from_file:
+        if should_prepare_args:
             args = self.prepare_args_for_factory(args)
 
         tx = self._factory.create_transaction_for_deploy(
@@ -121,7 +121,7 @@ class SmartContract:
                                     contract: Address,
                                     function: str,
                                     arguments: Union[List[Any], None],
-                                    args_from_file: bool,
+                                    should_prepare_args: bool,
                                     gas_limit: int,
                                     value: int,
                                     transfers: Union[List[str], None],
@@ -132,7 +132,7 @@ class SmartContract:
         token_transfers = self._prepare_token_transfers(transfers) if transfers else []
 
         args = arguments if arguments else []
-        if not args_from_file:
+        if should_prepare_args:
             args = self.prepare_args_for_factory(args)
 
         tx = self._factory.create_transaction_for_execute(
@@ -157,7 +157,7 @@ class SmartContract:
                                     contract: IAddress,
                                     bytecode: Path,
                                     arguments: Union[List[str], None],
-                                    args_from_file: bool,
+                                    should_prepare_args: bool,
                                     upgradeable: bool,
                                     readable: bool,
                                     payable: bool,
@@ -169,7 +169,7 @@ class SmartContract:
                                     options: int,
                                     guardian: str) -> Transaction:
         args = arguments if arguments else []
-        if not args_from_file:
+        if should_prepare_args:
             args = self.prepare_args_for_factory(args)
 
         tx = self._factory.create_transaction_for_upgrade(
@@ -279,12 +279,12 @@ def _interpret_as_number_if_safely(as_hex: str) -> Optional[int]:
     Makes sure the string can be safely converted to an int (and then back to a string).
 
     See:
-        - https://stackoverflow.com/questions/73693104/valueerror-exceeds-the-limit-4300-for-integer-string-conversion 
+        - https://stackoverflow.com/questions/73693104/valueerror-exceeds-the-limit-4300-for-integer-string-conversion
         - https://github.com/python/cpython/issues/95778
     """
     try:
         return int(str(int(as_hex or "0", 16)))
-    except:
+    except Exception:
         return None
 
 
