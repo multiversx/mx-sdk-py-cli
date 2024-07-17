@@ -3,7 +3,7 @@ import json
 import logging
 import sys
 from pathlib import Path
-from typing import Any, List, Optional, Tuple
+from typing import Any, List, Optional, Tuple, cast
 
 from multiversx_sdk import (Address, Mnemonic, UserPEM, UserSecretKey,
                             UserWallet)
@@ -133,6 +133,9 @@ def wallet_new(args: Any):
             raise WalletGenerationError(f"Couldn't generate wallet in shard {shard}")
     else:
         mnemonic = Mnemonic.generate()
+
+    # this is done to get rid of the Pylance error: possibly unbound
+    mnemonic = cast(Mnemonic, mnemonic)  # type: ignore
 
     print(f"Mnemonic: {mnemonic.get_text()}")
     print(f"Wallet address: {mnemonic.derive_key().generate_public_key().to_address(address_hrp).to_bech32()}")

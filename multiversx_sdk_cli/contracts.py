@@ -101,7 +101,7 @@ class SmartContract:
                                    guardian: str) -> Transaction:
         args = arguments if arguments else []
         if should_prepare_args:
-            args = self.prepare_args_for_factory(args)
+            args = self._prepare_args_for_factory(args)
 
         tx = self._factory.create_transaction_for_deploy(
             sender=owner.address,
@@ -139,7 +139,7 @@ class SmartContract:
 
         args = arguments if arguments else []
         if should_prepare_args:
-            args = self.prepare_args_for_factory(args)
+            args = self._prepare_args_for_factory(args)
 
         tx = self._factory.create_transaction_for_execute(
             sender=caller.address,
@@ -176,7 +176,7 @@ class SmartContract:
                                     guardian: str) -> Transaction:
         args = arguments if arguments else []
         if should_prepare_args:
-            args = self.prepare_args_for_factory(args)
+            args = self._prepare_args_for_factory(args)
 
         tx = self._factory.create_transaction_for_upgrade(
             sender=owner.address,

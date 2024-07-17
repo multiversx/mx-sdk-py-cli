@@ -229,7 +229,9 @@ def test_contract_flow(capsys: Any):
         "--proxy", "https://testnet-api.multiversx.com"
     ])
     response = get_query_response(capsys)
-    assert response == ""
+    return_data_parts = response["returnDataParts"]
+    assert len(return_data_parts) == 1
+    assert return_data_parts == [""]
 
     # Clear the captured content
     capsys.readouterr()
@@ -256,7 +258,9 @@ def test_contract_flow(capsys: Any):
         "--proxy", "https://testnet-api.multiversx.com"
     ])
     response = get_query_response(capsys)
-    assert response["number"] == 7
+    return_data_parts = response["returnDataParts"]
+    assert len(return_data_parts) == 1
+    assert return_data_parts == ["07"]
 
     # Clear the captured content
     capsys.readouterr()
