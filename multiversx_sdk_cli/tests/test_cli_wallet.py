@@ -3,7 +3,8 @@ import json
 from pathlib import Path
 from typing import Any
 
-from multiversx_sdk import Mnemonic, UserPEM, UserWallet
+from multiversx_sdk import (Address, AddressComputer, Mnemonic, UserPEM,
+                            UserWallet)
 
 from multiversx_sdk_cli.cli import main
 
@@ -15,6 +16,22 @@ def test_wallet_new(capsys: Any):
     main(["wallet", "new"])
     displayed_mnemonic = _read_stdout_mnemonic(capsys)
     assert Mnemonic.is_text_valid(displayed_mnemonic)
+
+
+def test_generate_wallet_in_specific_shard(capsys: Any):
+    address_computer = AddressComputer()
+
+    main(["wallet", "new", "--shard", "0"])
+    address = Address.new_from_bech32(_read_stdout_wallet_address(capsys))
+    assert address_computer.get_shard_of_address(address) == 0
+
+    main(["wallet", "new", "--shard", "1"])
+    address = Address.new_from_bech32(_read_stdout_wallet_address(capsys))
+    assert address_computer.get_shard_of_address(address) == 1
+
+    main(["wallet", "new", "--shard", "2"])
+    address = Address.new_from_bech32(_read_stdout_wallet_address(capsys))
+    assert address_computer.get_shard_of_address(address) == 2
 
 
 def test_wallet_new_and_save_in_pem_format(capsys: Any):
@@ -369,6 +386,11 @@ def test_sign_and_verify_message_with_multi_address_pem(capsys: Any):
 def _read_stdout_mnemonic(capsys: Any) -> str:
     lines = _read_stdout(capsys).split("\n")
     return lines[0].replace("Mnemonic:", "").strip()
+
+
+def _read_stdout_wallet_address(capsys: Any) -> str:
+    lines = _read_stdout(capsys).split("\n")
+    return lines[1].replace("Wallet address:", "").strip()
 
 
 def _read_stdout(capsys: Any) -> str:
