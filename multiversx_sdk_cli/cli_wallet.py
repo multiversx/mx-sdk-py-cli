@@ -123,7 +123,10 @@ def wallet_new(args: Any):
 
             if shard == generated_address_shard:
                 break
-        raise Exception(f"Couldn't generate wallet in shard {shard}")
+
+            i += 1
+            if i == 100:
+                raise Exception(f"Couldn't generate wallet in shard {shard}")
     else:
         mnemonic = Mnemonic.generate()
 
