@@ -7,10 +7,12 @@ from typing import Any, List, Optional, Tuple
 
 from multiversx_sdk import (Address, Mnemonic, UserPEM, UserSecretKey,
                             UserWallet)
+from multiversx_sdk.core.address import get_shard_of_pubkey
 
 from multiversx_sdk_cli import cli_shared, utils
-from multiversx_sdk_cli.constants import DEFAULT_HRP
-from multiversx_sdk_cli.errors import KnownError
+from multiversx_sdk_cli.constants import DEFAULT_HRP, NUMBER_OF_SHARDS
+from multiversx_sdk_cli.errors import (BadUserInput, KnownError,
+                                       WalletGenerationError)
 from multiversx_sdk_cli.sign_verify import SignedMessage, sign_message
 from multiversx_sdk_cli.ux import show_critical_error, show_message
 
@@ -32,6 +34,9 @@ WALLET_FORMATS = [
 
 WALLET_FORMATS_AND_ADDRESSES = [*WALLET_FORMATS, WALLET_FORMAT_ADDRESS_BECH32, WALLET_FORMAT_ADDRESS_HEX]
 
+MAX_ITERATIONS_FOR_GENERATING_WALLET = 100
+CURRENT_SHARDS = [i for i in range(NUMBER_OF_SHARDS)]
+
 
 def setup_parser(args: List[str], subparsers: Any) -> Any:
     parser = cli_shared.add_group_subparser(
@@ -50,6 +55,7 @@ def setup_parser(args: List[str], subparsers: Any) -> Any:
     sub.add_argument("--format", choices=WALLET_FORMATS, help="the format of the generated wallet file (default: %(default)s)", default=None)
     sub.add_argument("--outfile", help="the output path and base file name for the generated wallet files (default: %(default)s)", type=str)
     sub.add_argument("--address-hrp", help=f"the human-readable part of the address, when format is {WALLET_FORMAT_KEYSTORE_SECRET_KEY} or {WALLET_FORMAT_PEM} (default: %(default)s)", type=str, default=DEFAULT_HRP)
+    sub.add_argument("--shard", type=int, help="the shard in which the address will be generated; (default: random)")
     sub.set_defaults(func=wallet_new)
 
     sub = cli_shared.add_command_subparser(
@@ -107,8 +113,27 @@ def wallet_new(args: Any):
     format = args.format
     outfile = args.outfile
     address_hrp = args.address_hrp
+    shard = args.shard
 
-    mnemonic = Mnemonic.generate()
+    if shard is not None:
+        if shard not in CURRENT_SHARDS:
+            raise BadUserInput(f"Wrong shard provided. Choose between {CURRENT_SHARDS}")
+
+        is_wallet_generated = False
+        for _ in range(MAX_ITERATIONS_FOR_GENERATING_WALLET):
+            mnemonic = Mnemonic.generate()
+            pubkey = mnemonic.derive_key().generate_public_key()
+            generated_address_shard = get_shard_of_pubkey(pubkey.buffer, NUMBER_OF_SHARDS)
+
+            if shard == generated_address_shard:
+                is_wallet_generated = True
+                break
+
+        if not is_wallet_generated:
+            raise WalletGenerationError(f"Couldn't generate wallet in shard {shard}")
+    else:
+        mnemonic = Mnemonic.generate()
+
     print(f"Mnemonic: {mnemonic.get_text()}")
     print(f"Wallet address: {mnemonic.derive_key().generate_public_key().to_address(address_hrp).to_bech32()}")
 
@@ -158,7 +183,7 @@ def convert_wallet(args: Any):
     if infile:
         input_text = infile.read_text()
     else:
-        print(f"Insert text below. Press 'Ctrl-D' (Linux / MacOS) or 'Ctrl-Z' (Windows) when done.")
+        print("Insert text below. Press 'Ctrl-D' (Linux / MacOS) or 'Ctrl-Z' (Windows) when done.")
         input_text = sys.stdin.read().strip()
 
     mnemonic, secret_key = _load_wallet(input_text, in_format, address_index)

@@ -88,7 +88,7 @@ class SmartContract:
                                    owner: Account,
                                    bytecode: Path,
                                    arguments: Union[List[Any], None],
-                                   args_from_file: bool,
+                                   should_prepare_args: bool,
                                    upgradeable: bool,
                                    readable: bool,
                                    payable: bool,
@@ -100,8 +100,8 @@ class SmartContract:
                                    options: int,
                                    guardian: str) -> Transaction:
         args = arguments if arguments else []
-        if not args_from_file:
-            args = self._prepare_args_for_factory(args)
+        if should_prepare_args:
+            args = self.prepare_args_for_factory(args)
 
         tx = self._factory.create_transaction_for_deploy(
             sender=owner.address,
@@ -127,7 +127,7 @@ class SmartContract:
                                     contract: Address,
                                     function: str,
                                     arguments: Union[List[Any], None],
-                                    args_from_file: bool,
+                                    should_prepare_args: bool,
                                     gas_limit: int,
                                     value: int,
                                     transfers: Union[List[str], None],
@@ -138,8 +138,8 @@ class SmartContract:
         token_transfers = self._prepare_token_transfers(transfers) if transfers else []
 
         args = arguments if arguments else []
-        if not args_from_file:
-            args = self._prepare_args_for_factory(args)
+        if should_prepare_args:
+            args = self.prepare_args_for_factory(args)
 
         tx = self._factory.create_transaction_for_execute(
             sender=caller.address,
@@ -163,7 +163,7 @@ class SmartContract:
                                     contract: IAddress,
                                     bytecode: Path,
                                     arguments: Union[List[str], None],
-                                    args_from_file: bool,
+                                    should_prepare_args: bool,
                                     upgradeable: bool,
                                     readable: bool,
                                     payable: bool,
@@ -175,8 +175,8 @@ class SmartContract:
                                     options: int,
                                     guardian: str) -> Transaction:
         args = arguments if arguments else []
-        if not args_from_file:
-            args = self._prepare_args_for_factory(args)
+        if should_prepare_args:
+            args = self.prepare_args_for_factory(args)
 
         tx = self._factory.create_transaction_for_upgrade(
             sender=owner.address,
