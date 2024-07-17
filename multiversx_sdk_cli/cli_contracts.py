@@ -1,10 +1,12 @@
+import json
 import logging
 import os
 from pathlib import Path
-from typing import Any, List
+from typing import Any, List, Tuple
 
 from multiversx_sdk import (Address, AddressComputer, ProxyNetworkProvider,
                             Transaction, TransactionsFactoryConfig)
+from multiversx_sdk.abi import Abi
 
 from multiversx_sdk_cli import cli_shared, projects, utils
 from multiversx_sdk_cli.cli_output import CLIOutputBuilder
@@ -71,6 +73,7 @@ def setup_parser(args: List[str], subparsers: Any) -> Any:
     output_description = CLIOutputBuilder.describe(with_contract=True, with_transaction_on_network=True, with_simulation=True)
     sub = cli_shared.add_command_subparser(subparsers, "contract", "deploy", f"Deploy a Smart Contract.{output_description}")
     _add_bytecode_arg(sub)
+    _add_contract_abi_arg(sub)
     _add_metadata_arg(sub)
     cli_shared.add_outfile_arg(sub)
     cli_shared.add_wallet_args(args, sub)
@@ -89,6 +92,7 @@ def setup_parser(args: List[str], subparsers: Any) -> Any:
     sub = cli_shared.add_command_subparser(subparsers, "contract", "call",
                                            f"Interact with a Smart Contract (execute function).{output_description}")
     _add_contract_arg(sub)
+    _add_contract_abi_arg(sub)
     cli_shared.add_outfile_arg(sub)
     cli_shared.add_wallet_args(args, sub)
     cli_shared.add_proxy_arg(sub)
@@ -108,6 +112,7 @@ def setup_parser(args: List[str], subparsers: Any) -> Any:
     sub = cli_shared.add_command_subparser(subparsers, "contract", "upgrade",
                                            f"Upgrade a previously-deployed Smart Contract.{output_description}")
     _add_contract_arg(sub)
+    _add_contract_abi_arg(sub)
     cli_shared.add_outfile_arg(sub)
     _add_bytecode_arg(sub)
     _add_metadata_arg(sub)
@@ -224,6 +229,10 @@ def _add_contract_arg(sub: Any):
     sub.add_argument("contract", help="🖄 the address of the Smart Contract")
 
 
+def _add_contract_abi_arg(sub: Any):
+    sub.add_argument("--abi", type=str, help="the ABI of the Smart Contract")
+
+
 def _add_function_arg(sub: Any):
     sub.add_argument("--function", required=True, type=str, help="the function to call")
 
@@ -232,6 +241,8 @@ def _add_arguments_arg(sub: Any):
     sub.add_argument("--arguments", nargs='+',
                      help="arguments for the contract transaction, as [number, bech32-address, ascii string, "
                      "boolean] or hex-encoded. E.g. --arguments 42 0x64 1000 0xabba str:TOK-a1c2ef true erd1[..]")
+    sub.add_argument("--arguments-file", type=str, help="a json file containing the arguments. ONLY if abi file is provided. "
+                     "E.g. [{ 'to': 'erd1...', 'amount': 10000000000 }]")
 
 
 def _add_token_transfers_args(sub: Any):
@@ -314,15 +325,16 @@ def deploy(args: Any):
 
     sender = cli_shared.prepare_account(args)
     config = TransactionsFactoryConfig(args.chain)
-    contract = SmartContract(config)
+    abi = Abi.load(Path(args.abi)) if args.abi else None
+    contract = SmartContract(config, abi)
 
-    address_computer = AddressComputer(NUMBER_OF_SHARDS)
-    contract_address = address_computer.compute_contract_address(deployer=sender.address, deployment_nonce=args.nonce)
+    arguments, should_prepare_args = _get_contract_arguments(args)
 
     tx = contract.prepare_deploy_transaction(
         owner=sender,
         bytecode=Path(args.bytecode),
-        arguments=args.arguments,
+        arguments=arguments,
+        should_prepare_args=should_prepare_args,
         upgradeable=args.metadata_upgradeable,
         readable=args.metadata_readable,
         payable=args.metadata_payable,
@@ -334,6 +346,9 @@ def deploy(args: Any):
         options=int(args.options),
         guardian=args.guardian)
     tx = _sign_guarded_tx(args, tx)
+
+    address_computer = AddressComputer(NUMBER_OF_SHARDS)
+    contract_address = address_computer.compute_contract_address(deployer=sender.address, deployment_nonce=args.nonce)
 
     logger.info("Contract address: %s", contract_address.to_bech32())
     utils.log_explorer_contract_address(args.chain, contract_address.to_bech32())
@@ -363,15 +378,20 @@ def call(args: Any):
     cli_shared.prepare_nonce_in_args(args)
 
     sender = cli_shared.prepare_account(args)
+
     config = TransactionsFactoryConfig(args.chain)
-    contract = SmartContract(config)
+    abi = Abi.load(Path(args.abi)) if args.abi else None
+    contract = SmartContract(config, abi)
+
+    arguments, should_prepare_args = _get_contract_arguments(args)
     contract_address = Address.new_from_bech32(args.contract)
 
     tx = contract.prepare_execute_transaction(
         caller=sender,
         contract=contract_address,
         function=args.function,
-        arguments=args.arguments,
+        arguments=arguments,
+        should_prepare_args=should_prepare_args,
         gas_limit=int(args.gas_limit),
         value=int(args.value),
         transfers=args.token_transfers,
@@ -393,14 +413,18 @@ def upgrade(args: Any):
 
     sender = cli_shared.prepare_account(args)
     config = TransactionsFactoryConfig(args.chain)
-    contract = SmartContract(config)
+    abi = Abi.load(Path(args.abi)) if args.abi else None
+    contract = SmartContract(config, abi)
+
+    arguments, should_prepare_args = _get_contract_arguments(args)
     contract_address = Address.new_from_bech32(args.contract)
 
     tx = contract.prepare_upgrade_transaction(
         owner=sender,
         contract=contract_address,
         bytecode=Path(args.bytecode),
-        arguments=args.arguments,
+        arguments=arguments,
+        should_prepare_args=should_prepare_args,
         upgradeable=args.metadata_upgradeable,
         readable=args.metadata_readable,
         payable=args.metadata_payable,
@@ -431,6 +455,21 @@ def query(args: Any):
 
     result = query_contract(contract_address, proxy, function, arguments)
     utils.dump_out_json(result)
+
+
+def _get_contract_arguments(args: Any) -> Tuple[List[Any], bool]:
+    json_args = json.loads(Path(args.arguments_file).expanduser().read_text()) if args.arguments_file else None
+
+    if json_args and args.arguments:
+        raise Exception("Provide either '--arguments' or '--arguments-file'.")
+
+    if json_args:
+        if not args.abi:
+            raise Exception("Can't use '--arguments-file' without providing the Abi file.")
+
+        return json_args, False
+    else:
+        return args.arguments, True
 
 
 def _send_or_simulate(tx: Transaction, contract_address: IAddress, args: Any):

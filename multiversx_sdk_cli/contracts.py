@@ -6,6 +6,7 @@ from typing import Any, List, Optional, Protocol, Sequence, Union
 from multiversx_sdk import (Address, SmartContractTransactionsFactory, Token,
                             TokenComputer, TokenTransfer, Transaction,
                             TransactionPayload)
+from multiversx_sdk.abi import Abi
 from multiversx_sdk.network_providers.interface import IContractQuery
 
 from multiversx_sdk_cli import errors
@@ -73,13 +74,15 @@ class IConfig(Protocol):
 
 
 class SmartContract:
-    def __init__(self, config: IConfig):
-        self._factory = SmartContractTransactionsFactory(config)
+    def __init__(self, config: IConfig, abi: Optional[Abi] = None):
+        self._abi = abi
+        self._factory = SmartContractTransactionsFactory(config, abi)
 
     def prepare_deploy_transaction(self,
                                    owner: Account,
                                    bytecode: Path,
-                                   arguments: Union[List[str], None],
+                                   arguments: Union[List[Any], None],
+                                   should_prepare_args: bool,
                                    upgradeable: bool,
                                    readable: bool,
                                    payable: bool,
@@ -90,7 +93,9 @@ class SmartContract:
                                    version: int,
                                    options: int,
                                    guardian: str) -> Transaction:
-        args = prepare_args_for_factory(arguments) if arguments else []
+        args = arguments if arguments else []
+        if should_prepare_args:
+            args = self.prepare_args_for_factory(args)
 
         tx = self._factory.create_transaction_for_deploy(
             sender=owner.address,
@@ -115,7 +120,8 @@ class SmartContract:
                                     caller: Account,
                                     contract: Address,
                                     function: str,
-                                    arguments: Union[List[str], None],
+                                    arguments: Union[List[Any], None],
+                                    should_prepare_args: bool,
                                     gas_limit: int,
                                     value: int,
                                     transfers: Union[List[str], None],
@@ -124,7 +130,10 @@ class SmartContract:
                                     options: int,
                                     guardian: str) -> Transaction:
         token_transfers = self._prepare_token_transfers(transfers) if transfers else []
-        args = prepare_args_for_factory(arguments) if arguments else []
+
+        args = arguments if arguments else []
+        if should_prepare_args:
+            args = self.prepare_args_for_factory(args)
 
         tx = self._factory.create_transaction_for_execute(
             sender=caller.address,
@@ -148,6 +157,7 @@ class SmartContract:
                                     contract: IAddress,
                                     bytecode: Path,
                                     arguments: Union[List[str], None],
+                                    should_prepare_args: bool,
                                     upgradeable: bool,
                                     readable: bool,
                                     payable: bool,
@@ -158,7 +168,9 @@ class SmartContract:
                                     version: int,
                                     options: int,
                                     guardian: str) -> Transaction:
-        args = prepare_args_for_factory(arguments) if arguments else []
+        args = arguments if arguments else []
+        if should_prepare_args:
+            args = self.prepare_args_for_factory(args)
 
         tx = self._factory.create_transaction_for_upgrade(
             sender=owner.address,
@@ -194,6 +206,27 @@ class SmartContract:
             token_transfers.append(transfer)
 
         return token_transfers
+
+    def prepare_args_for_factory(self, arguments: List[str]) -> List[Any]:
+        args: List[Any] = []
+
+        for arg in arguments:
+            if arg.startswith(HEX_PREFIX):
+                args.append(hex_to_bytes(arg))
+            elif arg.isnumeric():
+                args.append(int(arg))
+            elif arg.startswith(DEFAULT_HRP):
+                args.append(Address.new_from_bech32(arg))
+            elif arg.lower() == FALSE_STR_LOWER:
+                args.append(False)
+            elif arg.lower() == TRUE_STR_LOWER:
+                args.append(True)
+            elif arg.startswith(STR_PREFIX):
+                args.append(arg[len(STR_PREFIX):])
+            else:
+                raise errors.BadUserInput(f"Unknown argument type for argument: `{arg}`. Use `mxpy contract <sub-command> --help` to check all supported arguments")
+
+        return args
 
 
 def query_contract(
@@ -246,12 +279,12 @@ def _interpret_as_number_if_safely(as_hex: str) -> Optional[int]:
     Makes sure the string can be safely converted to an int (and then back to a string).
 
     See:
-        - https://stackoverflow.com/questions/73693104/valueerror-exceeds-the-limit-4300-for-integer-string-conversion 
+        - https://stackoverflow.com/questions/73693104/valueerror-exceeds-the-limit-4300-for-integer-string-conversion
         - https://github.com/python/cpython/issues/95778
     """
     try:
         return int(str(int(as_hex or "0", 16)))
-    except:
+    except Exception:
         return None
 
 
@@ -262,28 +295,6 @@ def prepare_execute_transaction_data(function: str, arguments: List[Any]) -> Tra
         tx_data += f"@{_prepare_argument(arg)}"
 
     return TransactionPayload.from_str(tx_data)
-
-
-def prepare_args_for_factory(arguments: List[str]) -> List[Any]:
-    args: List[Any] = []
-
-    for arg in arguments:
-        if arg.startswith(HEX_PREFIX):
-            args.append(hex_to_bytes(arg))
-        elif arg.isnumeric():
-            args.append(int(arg))
-        elif arg.startswith(DEFAULT_HRP):
-            args.append(Address.new_from_bech32(arg))
-        elif arg.lower() == FALSE_STR_LOWER:
-            args.append(False)
-        elif arg.lower() == TRUE_STR_LOWER:
-            args.append(True)
-        elif arg.startswith(STR_PREFIX):
-            args.append(arg[len(STR_PREFIX):])
-        else:
-            raise errors.BadUserInput(f"Unknown argument type for argument: `{arg}`. Use `mxpy contract <sub-command> --help` to check all supported arguments")
-
-    return args
 
 
 def hex_to_bytes(arg: str):
