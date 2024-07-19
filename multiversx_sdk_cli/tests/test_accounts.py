@@ -11,7 +11,7 @@ def test_load_account_from_keystore_without_kind():
     assert account.address.bech32() == "erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th"
 
     with pytest.raises(Exception):
-        _ = Account(key_file=str(alice_json), password="wrong_password")
+        Account(key_file=str(alice_json), password="wrong_password")
 
 
 def test_load_account_from_keystore_with_kind_secret_key():
@@ -20,7 +20,7 @@ def test_load_account_from_keystore_with_kind_secret_key():
     assert account.address.bech32() == "erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th"
 
     with pytest.raises(Exception):
-        _ = Account(key_file=str(keystore_path), password="wrong_password")
+        Account(key_file=str(keystore_path), password="wrong_password")
 
 
 def test_load_account_from_keystore_with_kind_mnemonic():
@@ -29,4 +29,4 @@ def test_load_account_from_keystore_with_kind_mnemonic():
     assert account.address.bech32() == "erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th"
 
     with pytest.raises(Exception):
-        _ = Account(key_file=str(keystore_path), password="wrong_password")
+        Account(key_file=str(keystore_path), password="wrong_password")

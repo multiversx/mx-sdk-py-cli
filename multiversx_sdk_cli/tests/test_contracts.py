@@ -80,7 +80,7 @@ def test_prepare_args_for_factories():
     arguments = sc.prepare_args_for_factory(args)
     assert arguments[0] == b"\x05"
     assert arguments[1] == 123
-    assert arguments[2] == False
-    assert arguments[3] == True
+    assert arguments[2] is False
+    assert arguments[3] is True
     assert arguments[4] == "test-string"
     assert arguments[5].to_bech32() == "erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th"
