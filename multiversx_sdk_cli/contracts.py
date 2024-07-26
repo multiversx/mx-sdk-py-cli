@@ -1,10 +1,9 @@
 import logging
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Protocol, Sequence, Union
+from typing import Any, List, Optional, Protocol, Sequence, Union
 
 from multiversx_sdk import (Address, QueryRunnerAdapter,
                             SmartContractQueriesController,
-                            SmartContractQueryResponse,
                             SmartContractTransactionsFactory, Token,
                             TokenComputer, TokenTransfer, Transaction,
                             TransactionPayload)
@@ -202,7 +201,7 @@ class SmartContract:
                        contract_address: IAddress,
                        proxy: INetworkProvider,
                        function: str,
-                       arguments: List[Any],
+                       arguments: Union[List[Any], None],
                        should_prepare_args: bool) -> List[Any]:
         args = arguments if arguments else []
         if should_prepare_args:
@@ -211,26 +210,16 @@ class SmartContract:
         query_runner = QueryRunnerAdapter(proxy)
         sc_query_controller = SmartContractQueriesController(query_runner, self._abi)
 
-        query = sc_query_controller.create_query(
-            contract=contract_address.to_bech32(),
-            function=function,
-            arguments=args
-        )
+        try:
+            response = sc_query_controller.query(
+                contract=contract_address.to_bech32(),
+                function=function,
+                arguments=args
+            )
+        except Exception as e:
+            raise errors.QueryContractError("Couldn't query contract: ", e)
 
-        response = sc_query_controller.run_query(query)
-
-        if self._abi:
-            return sc_query_controller.parse_query_response(response)
-        else:
-            return [self._query_response_to_dict(response)]
-
-    def _query_response_to_dict(self, response: SmartContractQueryResponse) -> Dict[str, Any]:
-        return {
-            "function": response.function,
-            "returnCode": response.return_code,
-            "returnMessage": response.return_message,
-            "returnDataParts": [part.hex() for part in response.return_data_parts]
-        }
+        return response
 
     def _prepare_token_transfers(self, transfers: List[str]) -> List[TokenTransfer]:
         token_computer = TokenComputer()

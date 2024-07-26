@@ -37,9 +37,13 @@ class Object(ISerializable):
 
 
 class BasicEncoder(json.JSONEncoder):
-    def default(self, o: Any):
+    def default(self, o: Any) -> Any:
         if isinstance(o, ISerializable):
             return o.to_dictionary()
+        if isinstance(o, bytes):
+            return o.hex()
+        if isinstance(o, list):
+            return [self.default(item) for item in o]  # type: ignore
         return super().default(o)
 
 

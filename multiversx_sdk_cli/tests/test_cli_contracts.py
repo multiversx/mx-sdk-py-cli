@@ -223,22 +223,19 @@ def test_contract_flow(capsys: Any):
     capsys.readouterr()
 
     main([
-        "contract", "query",
-        contract,
+        "contract", "query", contract,
         "--function", "getSum",
         "--proxy", "https://testnet-api.multiversx.com"
     ])
     response = get_query_response(capsys)
-    return_data_parts = response["returnDataParts"]
-    assert len(return_data_parts) == 1
-    assert return_data_parts == [""]
+    assert len(response) == 1
+    assert response == [""]
 
     # Clear the captured content
     capsys.readouterr()
 
     main([
-        "contract", "call",
-        contract,
+        "contract", "call", contract,
         "--pem", alice,
         "--function", "add",
         "--recall-nonce",
@@ -252,22 +249,19 @@ def test_contract_flow(capsys: Any):
     capsys.readouterr()
 
     main([
-        "contract", "query",
-        contract,
+        "contract", "query", contract,
         "--function", "getSum",
         "--proxy", "https://testnet-api.multiversx.com"
     ])
     response = get_query_response(capsys)
-    return_data_parts = response["returnDataParts"]
-    assert len(return_data_parts) == 1
-    assert return_data_parts == ["07"]
+    assert len(response) == 1
+    assert response == ["07"]
 
     # Clear the captured content
     capsys.readouterr()
 
     main([
-        "contract", "upgrade",
-        contract,
+        "contract", "upgrade", contract,
         "--bytecode", adder,
         "--pem", alice,
         "--recall-nonce",
@@ -399,6 +393,101 @@ def test_contract_upgrade_with_abi(capsys: Any):
     assert data == "proposeSCUpgradeFromSource@000000000000000005000a14b9cb3f346116ded6802f2eb0235a36b2997569e1@@00000000000000000500ed8e25a94efa837aae0e593112cfbb01b448755069e1@0500@"
 
 
+def test_contract_query(capsys: Any):
+    alice = f"{parent}/testdata/alice.pem"
+    adder = f"{parent}/testdata/adder.wasm"
+    adder_abi = f"{parent}/testdata/adder.abi.json"
+
+    return_code = main([
+        "contract", "deploy",
+        "--bytecode", adder,
+        "--abi", adder_abi,
+        "--pem", alice,
+        "--recall-nonce",
+        "--gas-limit", "5000000",
+        "--proxy", "https://testnet-api.multiversx.com",
+        "--arguments", "0",
+        "--send", "--wait-result"
+    ])
+    assert not return_code
+    contract = get_contract_address(capsys)
+
+    # Clear the captured content
+    capsys.readouterr()
+
+    return_code = main([
+        "contract", "call", contract,
+        "--pem", alice,
+        "--function", "add",
+        "--recall-nonce",
+        "--gas-limit", "5000000",
+        "--proxy", "https://testnet-api.multiversx.com",
+        "--arguments", "14",
+        "--send", "--wait-result"
+    ])
+    assert not return_code
+
+    # Clear the captured content
+    capsys.readouterr()
+
+    # invalid, without abi
+    return_code = main([
+        "contract", "query", contract,
+        "--function", "getSummm",
+        "--proxy", "https://testnet-api.multiversx.com"
+    ])
+    assert return_code
+    output = _read_stdout(capsys)
+    if "invalid function (not found)" in output:
+        assert True
+    else:
+        assert False
+
+    # Clear the captured content
+    capsys.readouterr()
+
+    # invalid, with abi, error is thrown by sdk-py
+    return_code = main([
+        "contract", "query", contract,
+        "--function", "getSummm",
+        "--abi", adder_abi,
+        "--proxy", "https://testnet-api.multiversx.com"
+    ])
+    assert return_code
+    output = _read_stdout(capsys)
+    if "endpoint 'getSummm' not found" in output:
+        assert True
+    else:
+        assert False
+
+    # Clear the captured content
+    capsys.readouterr()
+
+    # query contract, without abi
+    return_code = main([
+        "contract", "query", contract,
+        "--function", "getSum",
+        "--proxy", "https://testnet-api.multiversx.com"
+    ])
+    assert not return_code
+    response = get_query_response(capsys)
+    assert response == ["0e"]
+
+    # Clear the captured content
+    capsys.readouterr()
+
+    # query contract, without abi
+    return_code = main([
+        "contract", "query", contract,
+        "--function", "getSum",
+        "--abi", adder_abi,
+        "--proxy", "https://testnet-api.multiversx.com"
+    ])
+    assert not return_code
+    response = get_query_response(capsys)
+    assert response == [14]
+
+
 def _read_stdout(capsys: Any) -> str:
     return capsys.readouterr().out.strip()
 
@@ -411,7 +500,7 @@ def get_contract_address(capsys: Any):
 
 def get_query_response(capsys: Any):
     out = _read_stdout(capsys).replace("\n", "").replace(" ", "")
-    return json.loads(out)[0]
+    return json.loads(out)
 
 
 def get_transaction_data(capsys: Any) -> str:
