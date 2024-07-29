@@ -444,7 +444,7 @@ def upgrade(args: Any):
 def query(args: Any):
     logger.debug("query")
 
-    # workaround so we can use the function bellow to set chainID
+    # workaround so we can use the function below to set chainID
     args.chain = ""
     cli_shared.prepare_chain_id_in_args(args)
 

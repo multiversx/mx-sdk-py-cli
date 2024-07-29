@@ -1,6 +1,6 @@
 import logging
 from pathlib import Path
-from typing import Any, List, Optional, Protocol, Sequence, Union
+from typing import Any, List, Optional, Protocol, Union
 
 from multiversx_sdk import (Address, QueryRunnerAdapter,
                             SmartContractQueriesController,
@@ -8,13 +8,11 @@ from multiversx_sdk import (Address, QueryRunnerAdapter,
                             TokenComputer, TokenTransfer, Transaction,
                             TransactionPayload)
 from multiversx_sdk.abi import Abi
-from multiversx_sdk.network_providers.interface import IContractQuery
 
 from multiversx_sdk_cli import errors
 from multiversx_sdk_cli.accounts import Account
 from multiversx_sdk_cli.constants import DEFAULT_HRP
 from multiversx_sdk_cli.interfaces import IAddress
-from multiversx_sdk_cli.utils import Object
 
 logger = logging.getLogger("contracts")
 
@@ -27,37 +25,6 @@ STR_PREFIX = "str:"
 class INetworkProvider(Protocol):
     def query_contract(self, query: Any) -> 'IContractQueryResponse':
         ...
-
-
-class QueryResult(Object):
-    def __init__(self, as_base64: str, as_hex: str, as_number: Optional[int]):
-        self.base64 = as_base64
-        self.hex = as_hex
-        self.number = as_number
-
-
-class ContractQuery(IContractQuery):
-    def __init__(self, address: IAddress, function: str, value: int, arguments: List[bytes], caller: Optional[IAddress] = None):
-        self.contract = address
-        self.function = function
-        self.caller = caller
-        self.value = value
-        self.encoded_arguments = [item.hex() for item in arguments]
-
-    def get_contract(self) -> IAddress:
-        return self.contract
-
-    def get_function(self) -> str:
-        return self.function
-
-    def get_encoded_arguments(self) -> Sequence[str]:
-        return self.encoded_arguments
-
-    def get_caller(self) -> Optional[IAddress]:
-        return self.caller
-
-    def get_value(self) -> int:
-        return self.value
 
 
 class IContractQueryResponse(Protocol):
@@ -201,7 +168,7 @@ class SmartContract:
                        contract_address: IAddress,
                        proxy: INetworkProvider,
                        function: str,
-                       arguments: Union[List[Any], None],
+                       arguments: Optional[List[Any]],
                        should_prepare_args: bool) -> List[Any]:
         args = arguments if arguments else []
         if should_prepare_args:

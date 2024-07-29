@@ -28,16 +28,11 @@ def resolve(name: str, proxy: INetworkProvider) -> Address:
     name_arg = "0x{}".format(str.encode(name).hex())
     dns_address = dns_address_for_name(name)
 
-    chain_id = proxy.get_network_config().chain_id
-    config = TransactionsFactoryConfig(chain_id)
-    contract = SmartContract(config)
-
-    response = contract.query_contract(
+    response = _query_contract(
         contract_address=dns_address,
         proxy=proxy,
         function="resolve",
-        arguments=[name_arg],
-        args_from_file=False
+        args=[name_arg]
     )
 
     if len(response) == 0:
@@ -51,17 +46,14 @@ def validate_name(name: str, shard_id: int, proxy: INetworkProvider):
     name_arg = "0x{}".format(str.encode(name).hex())
     dns_address = compute_dns_address_for_shard_id(shard_id)
 
-    chain_id = proxy.get_network_config().chain_id
-    config = TransactionsFactoryConfig(chain_id)
-    contract = SmartContract(config)
-
-    response = contract.query_contract(
+    response = _query_contract(
         contract_address=dns_address,
         proxy=proxy,
         function="validateName",
-        arguments=[name_arg],
-        args_from_file=False
-    )[0]
+        args=[name_arg]
+    )
+
+    response = response[0]
 
     return_code = response["returnCode"]
     if return_code == "ok":
@@ -105,17 +97,14 @@ def name_hash(name: str) -> bytes:
 def registration_cost(shard_id: int, proxy: INetworkProvider) -> int:
     dns_address = compute_dns_address_for_shard_id(shard_id)
 
-    chain_id = proxy.get_network_config().chain_id
-    config = TransactionsFactoryConfig(chain_id)
-    contract = SmartContract(config)
-
-    response = contract.query_contract(
+    response = _query_contract(
         contract_address=dns_address,
         proxy=proxy,
-        function="getRegistrationCost",
-        arguments=[],
-        args_from_file=False
-    )[0]
+        function="versgetRegistrationCostion",
+        args=[]
+    )
+
+    response = response[0]
 
     data = response["returnDataParts"][0]
     if not data:
@@ -127,17 +116,14 @@ def registration_cost(shard_id: int, proxy: INetworkProvider) -> int:
 def version(shard_id: int, proxy: INetworkProvider) -> str:
     dns_address = compute_dns_address_for_shard_id(shard_id)
 
-    chain_id = proxy.get_network_config().chain_id
-    config = TransactionsFactoryConfig(chain_id)
-    contract = SmartContract(config)
-
-    response = contract.query_contract(
+    response = _query_contract(
         contract_address=dns_address,
         proxy=proxy,
         function="version",
-        arguments=[],
-        args_from_file=False
-    )[0]
+        args=[]
+    )
+
+    response = response[0]
     return bytearray.fromhex(response["returnDataParts"][0]).decode()
 
 
@@ -161,3 +147,17 @@ def compute_dns_address_for_shard_id(shard_id: int) -> Address:
 def dns_register_data(name: str) -> str:
     name_enc: bytes = str.encode(name)
     return "register@{}".format(name_enc.hex())
+
+
+def _query_contract(contract_address: Address, proxy: INetworkProvider, function: str, args: List[Any]) -> List[Any]:
+    chain_id = proxy.get_network_config().chain_id
+    config = TransactionsFactoryConfig(chain_id)
+    contract = SmartContract(config)
+
+    return contract.query_contract(
+        contract_address=contract_address,
+        proxy=proxy,
+        function=function,
+        arguments=args,
+        should_prepare_args=False
+    )

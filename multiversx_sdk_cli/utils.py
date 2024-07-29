@@ -42,8 +42,6 @@ class BasicEncoder(json.JSONEncoder):
             return o.to_dictionary()
         if isinstance(o, bytes):
             return o.hex()
-        if isinstance(o, list):
-            return [self.default(item) for item in o]  # type: ignore
         return super().default(o)
 
 

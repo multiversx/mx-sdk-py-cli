@@ -3,7 +3,7 @@ import json
 import logging
 import sys
 from pathlib import Path
-from typing import Any, List, Optional, Tuple, cast
+from typing import Any, List, Optional, Tuple
 
 from multiversx_sdk import (Address, Mnemonic, UserPEM, UserSecretKey,
                             UserWallet)
@@ -115,27 +115,7 @@ def wallet_new(args: Any):
     address_hrp = args.address_hrp
     shard = args.shard
 
-    if shard is not None:
-        if shard not in CURRENT_SHARDS:
-            raise BadUserInput(f"Wrong shard provided. Choose between {CURRENT_SHARDS}")
-
-        is_wallet_generated = False
-        for _ in range(MAX_ITERATIONS_FOR_GENERATING_WALLET):
-            mnemonic = Mnemonic.generate()
-            pubkey = mnemonic.derive_key().generate_public_key()
-            generated_address_shard = get_shard_of_pubkey(pubkey.buffer, NUMBER_OF_SHARDS)
-
-            if shard == generated_address_shard:
-                is_wallet_generated = True
-                break
-
-        if not is_wallet_generated:
-            raise WalletGenerationError(f"Couldn't generate wallet in shard {shard}")
-    else:
-        mnemonic = Mnemonic.generate()
-
-    # this is done to get rid of the Pylance error: possibly unbound
-    mnemonic = cast(Mnemonic, mnemonic)  # type: ignore
+    mnemonic = _generate_mnemonic_with_shard_constraint(shard)
 
     print(f"Mnemonic: {mnemonic.get_text()}")
     print(f"Wallet address: {mnemonic.derive_key().generate_public_key().to_address(address_hrp).to_bech32()}")
@@ -170,6 +150,24 @@ def wallet_new(args: Any):
         raise KnownError(f"Unknown format: {format}")
 
     logger.info(f"Wallet ({format}) saved: {outfile}")
+
+
+def _generate_mnemonic_with_shard_constraint(shard: Optional[int] = None) -> Mnemonic:
+    if shard is not None:
+        if shard not in CURRENT_SHARDS:
+            raise BadUserInput(f"Wrong shard provided. Choose between {CURRENT_SHARDS}")
+
+        for _ in range(MAX_ITERATIONS_FOR_GENERATING_WALLET):
+            mnemonic = Mnemonic.generate()
+            pubkey = mnemonic.derive_key().generate_public_key()
+            generated_address_shard = get_shard_of_pubkey(pubkey.buffer, NUMBER_OF_SHARDS)
+
+            if shard == generated_address_shard:
+                return mnemonic
+
+        raise WalletGenerationError(f"Couldn't generate wallet in shard {shard}")
+
+    return Mnemonic.generate()
 
 
 def convert_wallet(args: Any):
