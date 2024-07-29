@@ -100,7 +100,7 @@ def registration_cost(shard_id: int, proxy: INetworkProvider) -> int:
     response = _query_contract(
         contract_address=dns_address,
         proxy=proxy,
-        function="versgetRegistrationCostion",
+        function="getRegistrationCost",
         args=[]
     )
 
