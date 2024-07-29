@@ -115,7 +115,10 @@ def wallet_new(args: Any):
     address_hrp = args.address_hrp
     shard = args.shard
 
-    mnemonic = _generate_mnemonic_with_shard_constraint(shard)
+    if shard is not None:
+        mnemonic = _generate_mnemonic_with_shard_constraint(shard)
+    else:
+        mnemonic = Mnemonic.generate()
 
     print(f"Mnemonic: {mnemonic.get_text()}")
     print(f"Wallet address: {mnemonic.derive_key().generate_public_key().to_address(address_hrp).to_bech32()}")
@@ -152,22 +155,20 @@ def wallet_new(args: Any):
     logger.info(f"Wallet ({format}) saved: {outfile}")
 
 
-def _generate_mnemonic_with_shard_constraint(shard: Optional[int] = None) -> Mnemonic:
-    if shard is not None:
-        if shard not in CURRENT_SHARDS:
-            raise BadUserInput(f"Wrong shard provided. Choose between {CURRENT_SHARDS}")
+def _generate_mnemonic_with_shard_constraint(shard: int) -> Mnemonic:
 
-        for _ in range(MAX_ITERATIONS_FOR_GENERATING_WALLET):
-            mnemonic = Mnemonic.generate()
-            pubkey = mnemonic.derive_key().generate_public_key()
-            generated_address_shard = get_shard_of_pubkey(pubkey.buffer, NUMBER_OF_SHARDS)
+    if shard not in CURRENT_SHARDS:
+        raise BadUserInput(f"Wrong shard provided. Choose between {CURRENT_SHARDS}")
 
-            if shard == generated_address_shard:
-                return mnemonic
+    for _ in range(MAX_ITERATIONS_FOR_GENERATING_WALLET):
+        mnemonic = Mnemonic.generate()
+        pubkey = mnemonic.derive_key().generate_public_key()
+        generated_address_shard = get_shard_of_pubkey(pubkey.buffer, NUMBER_OF_SHARDS)
 
-        raise WalletGenerationError(f"Couldn't generate wallet in shard {shard}")
+        if shard == generated_address_shard:
+            return mnemonic
 
-    return Mnemonic.generate()
+    raise WalletGenerationError(f"Couldn't generate wallet in shard {shard}")
 
 
 def convert_wallet(args: Any):
