@@ -213,7 +213,7 @@ def test_contract_flow(capsys: Any):
         "--pem", alice,
         "--recall-nonce",
         "--gas-limit", "5000000",
-        "--proxy", "https://testnet-api.multiversx.com",
+        "--proxy", "https://testnet-gateway.multiversx.com",
         "--arguments", "0",
         "--send", "--wait-result"
     ])
@@ -225,7 +225,7 @@ def test_contract_flow(capsys: Any):
     main([
         "contract", "query", contract,
         "--function", "getSum",
-        "--proxy", "https://testnet-api.multiversx.com"
+        "--proxy", "https://testnet-gateway.multiversx.com"
     ])
     response = get_query_response(capsys)
     assert len(response) == 1
@@ -240,7 +240,7 @@ def test_contract_flow(capsys: Any):
         "--function", "add",
         "--recall-nonce",
         "--gas-limit", "5000000",
-        "--proxy", "https://testnet-api.multiversx.com",
+        "--proxy", "https://testnet-gateway.multiversx.com",
         "--arguments", "7",
         "--send", "--wait-result"
     ])
@@ -251,7 +251,7 @@ def test_contract_flow(capsys: Any):
     main([
         "contract", "query", contract,
         "--function", "getSum",
-        "--proxy", "https://testnet-api.multiversx.com"
+        "--proxy", "https://testnet-gateway.multiversx.com"
     ])
     response = get_query_response(capsys)
     assert len(response) == 1
@@ -266,7 +266,7 @@ def test_contract_flow(capsys: Any):
         "--pem", alice,
         "--recall-nonce",
         "--gas-limit", "5000000",
-        "--proxy", "https://testnet-api.multiversx.com",
+        "--proxy", "https://testnet-gateway.multiversx.com",
         "--arguments", "0",
         "--send", "--wait-result"
     ])
