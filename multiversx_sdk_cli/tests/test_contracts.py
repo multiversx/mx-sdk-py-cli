@@ -8,9 +8,7 @@ from multiversx_sdk import Address, TransactionsFactoryConfig
 from multiversx_sdk_cli import errors
 from multiversx_sdk_cli.accounts import Account
 from multiversx_sdk_cli.contract_verification import _create_request_signature
-from multiversx_sdk_cli.contracts import (SmartContract,
-                                          _interpret_as_number_if_safely,
-                                          _prepare_argument)
+from multiversx_sdk_cli.contracts import SmartContract, _prepare_argument
 
 logging.basicConfig(level=logging.INFO)
 
@@ -63,12 +61,6 @@ def test_contract_verification_create_request_signature():
     assert signature.hex() == "30111258cc42ea08e0c6a3e053cc7086a88d614b8b119a244904e9a19896c73295b2fe5c520a1cb07cfe20f687deef9f294a0a05071e85c78a70a448ea5f0605"
 
 
-def test_interpret_as_number_if_safely():
-    assert _interpret_as_number_if_safely("") == 0
-    assert _interpret_as_number_if_safely("0x5") == 5
-    assert _interpret_as_number_if_safely("FF") == 255
-
-
 def test_prepare_args_for_factories():
     sc = SmartContract(TransactionsFactoryConfig("mock"))
     args = [
@@ -77,10 +69,10 @@ def test_prepare_args_for_factories():
         "erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th"
     ]
 
-    arguments = sc.prepare_args_for_factory(args)
+    arguments = sc._prepare_args_for_factory(args)
     assert arguments[0] == b"\x05"
     assert arguments[1] == 123
-    assert arguments[2] == False
-    assert arguments[3] == True
+    assert arguments[2] is False
+    assert arguments[3] is True
     assert arguments[4] == "test-string"
     assert arguments[5].to_bech32() == "erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th"

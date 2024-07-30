@@ -13,7 +13,7 @@ from multiversx_sdk_cli.cli_output import CLIOutputBuilder
 from multiversx_sdk_cli.constants import NUMBER_OF_SHARDS
 from multiversx_sdk_cli.contract_verification import \
     trigger_contract_verification
-from multiversx_sdk_cli.contracts import SmartContract, query_contract
+from multiversx_sdk_cli.contracts import SmartContract
 from multiversx_sdk_cli.cosign_transaction import cosign_transaction
 from multiversx_sdk_cli.dependency_checker import check_if_rust_is_installed
 from multiversx_sdk_cli.docker import is_docker_installed, run_docker
@@ -132,6 +132,7 @@ def setup_parser(args: List[str], subparsers: Any) -> Any:
     sub = cli_shared.add_command_subparser(subparsers, "contract", "query",
                                            "Query a Smart Contract (call a pure function)")
     _add_contract_arg(sub)
+    _add_contract_abi_arg(sub)
     cli_shared.add_proxy_arg(sub)
     _add_function_arg(sub)
     _add_arguments_arg(sub)
@@ -443,17 +444,28 @@ def upgrade(args: Any):
 def query(args: Any):
     logger.debug("query")
 
-    # workaround so we can use the function bellow
+    # workaround so we can use the function below to set chainID
     args.chain = ""
     cli_shared.prepare_chain_id_in_args(args)
 
+    config = TransactionsFactoryConfig(args.chain)
+    abi = Abi.load(Path(args.abi)) if args.abi else None
+    contract = SmartContract(config, abi)
+
+    arguments, should_prepare_args = _get_contract_arguments(args)
     contract_address = Address.new_from_bech32(args.contract)
 
     proxy = ProxyNetworkProvider(args.proxy)
     function = args.function
-    arguments: List[Any] = args.arguments or []
 
-    result = query_contract(contract_address, proxy, function, arguments)
+    result = contract.query_contract(
+        contract_address=contract_address,
+        proxy=proxy,
+        function=function,
+        arguments=arguments,
+        should_prepare_args=should_prepare_args
+    )
+
     utils.dump_out_json(result)
 
 

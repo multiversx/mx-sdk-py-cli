@@ -212,7 +212,7 @@ def tx_to_dictionary_as_inner_for_relayed_V1(tx: Transaction) -> Dict[str, Any]:
         dictionary["sndUserName"] = base64.b64encode(tx.sender_username.encode()).decode()
 
     if tx.receiver_username:
-        dictionary[f"rcvUserName"] = base64.b64encode(tx.receiver_username.encode()).decode()
+        dictionary["rcvUserName"] = base64.b64encode(tx.receiver_username.encode()).decode()
 
     return dictionary
 

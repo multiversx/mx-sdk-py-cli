@@ -1,19 +1,18 @@
-import base64
 import logging
 from pathlib import Path
-from typing import Any, List, Optional, Protocol, Sequence, Union
+from typing import Any, List, Optional, Protocol, Union
 
-from multiversx_sdk import (Address, SmartContractTransactionsFactory, Token,
+from multiversx_sdk import (Address, QueryRunnerAdapter,
+                            SmartContractQueriesController,
+                            SmartContractTransactionsFactory, Token,
                             TokenComputer, TokenTransfer, Transaction,
                             TransactionPayload)
 from multiversx_sdk.abi import Abi
-from multiversx_sdk.network_providers.interface import IContractQuery
 
 from multiversx_sdk_cli import errors
 from multiversx_sdk_cli.accounts import Account
 from multiversx_sdk_cli.constants import DEFAULT_HRP
 from multiversx_sdk_cli.interfaces import IAddress
-from multiversx_sdk_cli.utils import Object
 
 logger = logging.getLogger("contracts")
 
@@ -28,41 +27,14 @@ class INetworkProvider(Protocol):
         ...
 
 
-class QueryResult(Object):
-    def __init__(self, as_base64: str, as_hex: str, as_number: Optional[int]):
-        self.base64 = as_base64
-        self.hex = as_hex
-        self.number = as_number
-
-
-class ContractQuery(IContractQuery):
-    def __init__(self, address: IAddress, function: str, value: int, arguments: List[bytes], caller: Optional[IAddress] = None):
-        self.contract = address
-        self.function = function
-        self.caller = caller
-        self.value = value
-        self.encoded_arguments = [item.hex() for item in arguments]
-
-    def get_contract(self) -> IAddress:
-        return self.contract
-
-    def get_function(self) -> str:
-        return self.function
-
-    def get_encoded_arguments(self) -> Sequence[str]:
-        return self.encoded_arguments
-
-    def get_caller(self) -> Optional[IAddress]:
-        return self.caller
-
-    def get_value(self) -> int:
-        return self.value
-
-
 class IContractQueryResponse(Protocol):
     return_data: List[str]
     return_code: str
     return_message: str
+    gas_used: int
+
+    def get_return_data_parts(self) -> List[bytes]:
+        ...
 
 
 class IConfig(Protocol):
@@ -95,7 +67,7 @@ class SmartContract:
                                    guardian: str) -> Transaction:
         args = arguments if arguments else []
         if should_prepare_args:
-            args = self.prepare_args_for_factory(args)
+            args = self._prepare_args_for_factory(args)
 
         tx = self._factory.create_transaction_for_deploy(
             sender=owner.address,
@@ -133,7 +105,7 @@ class SmartContract:
 
         args = arguments if arguments else []
         if should_prepare_args:
-            args = self.prepare_args_for_factory(args)
+            args = self._prepare_args_for_factory(args)
 
         tx = self._factory.create_transaction_for_execute(
             sender=caller.address,
@@ -170,7 +142,7 @@ class SmartContract:
                                     guardian: str) -> Transaction:
         args = arguments if arguments else []
         if should_prepare_args:
-            args = self.prepare_args_for_factory(args)
+            args = self._prepare_args_for_factory(args)
 
         tx = self._factory.create_transaction_for_upgrade(
             sender=owner.address,
@@ -192,6 +164,30 @@ class SmartContract:
 
         return tx
 
+    def query_contract(self,
+                       contract_address: IAddress,
+                       proxy: INetworkProvider,
+                       function: str,
+                       arguments: Optional[List[Any]],
+                       should_prepare_args: bool) -> List[Any]:
+        args = arguments if arguments else []
+        if should_prepare_args:
+            args = self._prepare_args_for_factory(args)
+
+        query_runner = QueryRunnerAdapter(proxy)
+        sc_query_controller = SmartContractQueriesController(query_runner, self._abi)
+
+        try:
+            response = sc_query_controller.query(
+                contract=contract_address.to_bech32(),
+                function=function,
+                arguments=args
+            )
+        except Exception as e:
+            raise errors.QueryContractError("Couldn't query contract: ", e)
+
+        return response
+
     def _prepare_token_transfers(self, transfers: List[str]) -> List[TokenTransfer]:
         token_computer = TokenComputer()
         token_transfers: List[TokenTransfer] = []
@@ -207,12 +203,12 @@ class SmartContract:
 
         return token_transfers
 
-    def prepare_args_for_factory(self, arguments: List[str]) -> List[Any]:
+    def _prepare_args_for_factory(self, arguments: List[str]) -> List[Any]:
         args: List[Any] = []
 
         for arg in arguments:
             if arg.startswith(HEX_PREFIX):
-                args.append(hex_to_bytes(arg))
+                args.append(self._hex_to_bytes(arg))
             elif arg.isnumeric():
                 args.append(int(arg))
             elif arg.startswith(DEFAULT_HRP):
@@ -228,64 +224,11 @@ class SmartContract:
 
         return args
 
-
-def query_contract(
-    contract_address: IAddress,
-    proxy: INetworkProvider,
-    function: str,
-    arguments: List[Any],
-    value: int = 0,
-    caller: Optional[IAddress] = None
-) -> List[Any]:
-    response_data = query_detailed(contract_address, proxy, function, arguments, value, caller)
-    return_data = response_data.return_data
-    return [_interpret_return_data(data) for data in return_data]
-
-
-def query_detailed(contract_address: IAddress, proxy: INetworkProvider, function: str, arguments: List[Any],
-                   value: int = 0, caller: Optional[IAddress] = None) -> Any:
-    arguments = arguments or []
-    # Temporary workaround, until we use sdk-core's serializer.
-    arguments_hex = [_prepare_argument(arg) for arg in arguments]
-    prepared_arguments_bytes = [bytes.fromhex(arg) for arg in arguments_hex]
-
-    query = ContractQuery(contract_address, function, value, prepared_arguments_bytes, caller)
-
-    response = proxy.query_contract(query)
-    # Temporary workaround, until we add "isSuccess" on the response class.
-    if response.return_code != "ok":
-        raise RuntimeError(f"Query failed: {response.return_message}")
-    return response
-
-
-def _interpret_return_data(data: str) -> Any:
-    if not data:
-        return data
-
-    try:
-        as_bytes = base64.b64decode(data)
-        as_hex = as_bytes.hex()
-        as_number = _interpret_as_number_if_safely(as_hex)
-
-        result = QueryResult(data, as_hex, as_number)
-        return result
-    except Exception:
-        logger.warn(f"Cannot interpret return data: {data}")
-        return None
-
-
-def _interpret_as_number_if_safely(as_hex: str) -> Optional[int]:
-    """
-    Makes sure the string can be safely converted to an int (and then back to a string).
-
-    See:
-        - https://stackoverflow.com/questions/73693104/valueerror-exceeds-the-limit-4300-for-integer-string-conversion
-        - https://github.com/python/cpython/issues/95778
-    """
-    try:
-        return int(str(int(as_hex or "0", 16)))
-    except Exception:
-        return None
+    def _hex_to_bytes(self, arg: str):
+        argument = arg[len(HEX_PREFIX):]
+        argument = argument.upper()
+        argument = ensure_even_length(argument)
+        return bytes.fromhex(argument)
 
 
 def prepare_execute_transaction_data(function: str, arguments: List[Any]) -> TransactionPayload:
@@ -297,14 +240,7 @@ def prepare_execute_transaction_data(function: str, arguments: List[Any]) -> Tra
     return TransactionPayload.from_str(tx_data)
 
 
-def hex_to_bytes(arg: str):
-    argument = arg[len(HEX_PREFIX):]
-    argument = argument.upper()
-    argument = ensure_even_length(argument)
-    return bytes.fromhex(argument)
-
-
-# only used for contract queries and stake operations
+# only used for stake operations
 def _prepare_argument(argument: Any):
     as_str = str(argument)
     as_hex = _to_hex(as_str)

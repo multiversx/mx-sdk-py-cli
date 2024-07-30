@@ -112,7 +112,7 @@ def _create_request_signature(account: Account, contract_address: Address, reque
 
 
 def query_status_with_task_id(url: str, task_id: str, interval: int = 10):
-    logger.info(f"Please wait while we verify your contract. This may take a while.")
+    logger.info("Please wait while we verify your contract. This may take a while.")
     old_status = ""
 
     while True:
@@ -120,7 +120,7 @@ def query_status_with_task_id(url: str, task_id: str, interval: int = 10):
         status = response.get("status", "")
 
         if status == "finished":
-            logger.info(f"Verification finished!")
+            logger.info("Verification finished!")
             dump_out_json(response)
             break
         elif status != old_status:
