@@ -12,7 +12,7 @@ def new_config(configfile: Path):
     configfile = configfile.expanduser().resolve()
 
     if configfile.exists():
-        logger.warning(f"Configuration file already exists: {configfile}")
+        logger.info(f"Configuration file already exists: {configfile}")
         return
 
     config = ConfigRoot()
