@@ -159,7 +159,7 @@ def setup_parser(args: List[str], subparsers: Any) -> Any:
     _add_build_options_args(sub)
     sub.add_argument("--docker-image", required=True, type=str,
                      help="the docker image tag used to build the contract")
-    sub.add_argument("--contract", type=str, help="relative path of the contract in the project")
+    sub.add_argument("--contract", type=str, help="contract to build (contract name, as found in Cargo.toml)")
     sub.add_argument("--no-docker-interactive", action="store_true", default=False)
     sub.add_argument("--no-docker-tty", action="store_true", default=False)
     sub.add_argument("--no-default-platform", action="store_true", default=False,
