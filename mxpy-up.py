@@ -21,8 +21,14 @@ def main():
     parser.add_argument("--from-branch", help="use a branch of multiversx/mx-sdk-py-cli")
     parser.add_argument("--not-interactive", action="store_true", default=False)
     parser.add_argument("--verbose", action="store_true", default=False)
+    parser.add_argument("--ignore-deprecation", action="store_false", default=True, help="'mxpy-up.py' is obsolete, install using 'pipx': https://docs.multiversx.com/sdk-and-tools/sdk-py/installing-mxpy/#install-using-pipx")
     parser.set_defaults(modify_path=True)
     args = parser.parse_args()
+
+    if args.ignore_deprecation:
+        logger.warning("'mxpy-up.py' is deprecated. Check out the documentation on how to install using `pipx`: https://docs.multiversx.com/sdk-and-tools/sdk-py/installing-mxpy/#install-using-pipx.")
+        logger.warning("To install using 'mxpy-up.py' set the `--ignore-deprecation` flag.")
+        return
 
     exact_version = args.exact_version
     from_branch = args.from_branch
@@ -55,6 +61,8 @@ Windows support is limited and experimental.
 
     if interactive:
         guide_system_path_integration()
+
+    logger.warning("Installing `mxpy` using `mxpy-up.py` is deprecated. Check out the documentation on how to install using `pipx`: https://docs.multiversx.com/sdk-and-tools/sdk-py/installing-mxpy/#install-using-pipx")
 
 
 def guard_non_root_user():
@@ -260,7 +268,7 @@ Do you UNDERSTAND the above?
         return
 
     old_export_directive = f'export PATH="{Path("~/elrondsdk").expanduser()}:$PATH"\t# elrond-sdk'
-    new_export_directive = f'export PATH="${{HOME}}/multiversx-sdk:$PATH"\t# multiversx-sdk'
+    new_export_directive = 'export PATH="${{HOME}}/multiversx-sdk:$PATH"\t# multiversx-sdk'
 
     profile_files = get_profile_files()
 
@@ -292,7 +300,7 @@ Please MANUALLY remove it from the shell profile (now or after the installer scr
 Your shell profile files:
 {profile_files_formatted}
 
-The entry (entries) to remove: 
+The entry (entries) to remove:
     {old_export_directive}
 ###############################################################################
 Make sure you UNDERSTAND the above before proceeding further.
@@ -306,12 +314,12 @@ Make sure you UNDERSTAND the above before proceeding further.
 ###############################################################################
 It seems that the path "~/multiversx-sdk" is already configured in shell profile.
 
-To confirm this, CHECK the shell profile (now or after the installer script ends). 
+To confirm this, CHECK the shell profile (now or after the installer script ends).
 
 Your shell profile files:
 {profile_files_formatted}
 
-The entry to check (it should be present): 
+The entry to check (it should be present):
     {new_export_directive}.
 ###############################################################################
 Make sure you UNDERSTAND the above before proceeding further.
