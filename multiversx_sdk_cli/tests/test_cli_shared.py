@@ -40,7 +40,7 @@ def test_args_obj_to_list():
     assert args_list[1] == contract_build_args.path
     assert args_list[2] == "--no-wasm-opt"
 
-    contract_build_args.ignore = "random_directory"
+    contract_build_args.ignore = "random_directory"  # type: ignore
     contract_build_args.no_imports = True
     args_list = convert_args_object_to_args_list(contract_build_args)
 

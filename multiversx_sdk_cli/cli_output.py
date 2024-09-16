@@ -3,8 +3,7 @@ import logging
 from collections import OrderedDict
 from typing import Any, Dict, List, Optional, Union
 
-from multiversx_sdk_network_providers.transactions import \
-    transaction_to_dictionary
+from multiversx_sdk import TransactionsConverter
 
 from multiversx_sdk_cli import utils
 from multiversx_sdk_cli.interfaces import IAddress, ITransaction
@@ -52,7 +51,8 @@ class CLIOutputBuilder:
         output: Dict[str, Any] = OrderedDict()
 
         if self.emitted_transaction:
-            emitted_transaction_dict = transaction_to_dictionary(self.emitted_transaction)
+            tx_converter = TransactionsConverter()
+            emitted_transaction_dict = tx_converter.transaction_to_dictionary(self.emitted_transaction)
             emitted_transaction_hash = self.emitted_transaction_hash or ""
             emitted_transaction_data = self.emitted_transaction.data.decode()
             utils.omit_fields(emitted_transaction_dict, self.emitted_transaction_omitted_fields)

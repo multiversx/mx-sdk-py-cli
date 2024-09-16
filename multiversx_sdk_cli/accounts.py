@@ -2,10 +2,9 @@ import logging
 from pathlib import Path
 from typing import Any, Optional, Protocol
 
-from multiversx_sdk_core import (Address, Message, MessageComputer,
-                                 TransactionComputer)
-from multiversx_sdk_network_providers.accounts import AccountOnNetwork
-from multiversx_sdk_wallet import UserSigner
+from multiversx_sdk import (Address, Message, MessageComputer,
+                            TransactionComputer, UserSigner)
+from multiversx_sdk.network_providers.accounts import AccountOnNetwork
 
 from multiversx_sdk_cli.constants import DEFAULT_HRP
 from multiversx_sdk_cli.interfaces import IAccount, IAddress, ITransaction
@@ -72,6 +71,9 @@ class Account(AccountBase):
         assert self.signer is not None
 
         transaction_computer = TransactionComputer()
+        if transaction.options & TX_HASH_SIGN_OPTIONS == TX_HASH_SIGN_OPTIONS:
+            return self.signer.sign(transaction_computer.compute_hash_for_signing(transaction)).hex()
+
         return self.signer.sign(transaction_computer.compute_bytes_for_signing(transaction)).hex()
 
     def sign_message(self, data: bytes) -> str:
@@ -96,7 +98,7 @@ class LedgerAccount(Account):
         should_use_hash_signing = compare_versions(ledger_version, SIGN_USING_HASH_VERSION) >= 0
         if should_use_hash_signing:
             transaction.version = TX_HASH_SIGN_VERSION
-            transaction.options = TX_HASH_SIGN_OPTIONS
+            transaction.options = transaction.options | TX_HASH_SIGN_OPTIONS
 
         transaction_computer = TransactionComputer()
 

@@ -63,6 +63,21 @@ generate() {
     command "Validator.ChangeRewardAddress" "validator change-reward-address"
     command "Validator.Claim" "validator claim"
 
+    group "StakingProvider" "staking-provider"
+    command "StakingProvider.CreateNewDelegationContract" "staking-provider create-new-delegation-contract"
+    command "StakingProvider.GetContractAddress" "staking-provider get-contract-address"
+    command "StakingProvider.AddNodes" "staking-provider add-nodes"
+    command "StakingProvider.RemoveNodes" "staking-provider remove-nodes"
+    command "StakingProvider.StakeNodes" "staking-provider stake-nodes"
+    command "StakingProvider.UnbondNodes" "staking-provider unbond-nodes"
+    command "StakingProvider.UnstakeNodes" "staking-provider unstake-nodes"
+    command "StakingProvider.UnjailNodes" "staking-provider unjail-nodes"
+    command "StakingProvider.ChangeServiceFee" "staking-provider change-service-fee"
+    command "StakingProvider.ModifyDelegationCap" "staking-provider modify-delegation-cap"
+    command "StakingProvider.AutomaticActivation" "staking-provider automatic-activation"
+    command "StakingProvider.RedelegateCap" "staking-provider redelegate-cap"
+    command "StakingProvider.SetMetadata" "staking-provider set-metadata"
+
     group "Account" "account"
     command "Account.Get" "account get"
 

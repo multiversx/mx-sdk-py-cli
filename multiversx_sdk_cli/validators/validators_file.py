@@ -1,9 +1,8 @@
 import json
 from pathlib import Path
-from typing import List
+from typing import Dict, List
 
-from multiversx_sdk_wallet import ValidatorSigner
-from multiversx_sdk_wallet.validator_pem import ValidatorPEM
+from multiversx_sdk import ValidatorPEM, ValidatorPublicKey, ValidatorSigner
 
 from multiversx_sdk_cli import guards
 from multiversx_sdk_cli.errors import CannotReadValidatorsData
@@ -23,16 +22,27 @@ class ValidatorsFile:
     def load_signers(self) -> List[ValidatorSigner]:
         signers: List[ValidatorSigner] = []
         for validator in self.get_validators_list():
-            # Get path of "pemFile", make it absolute
-            validator_pem = Path(validator.get("pemFile")).expanduser()
-            validator_pem = validator_pem if validator_pem.is_absolute() else self.validators_file_path.parent / validator_pem
-
-            pem_file = ValidatorPEM.from_file(validator_pem)
-
+            pem_file = self._load_validator_pem(validator)
             validator_signer = ValidatorSigner(pem_file.secret_key)
             signers.append(validator_signer)
 
         return signers
+
+    def load_public_keys(self) -> List[ValidatorPublicKey]:
+        public_keys: List[ValidatorPublicKey] = []
+
+        for validator in self.get_validators_list():
+            pem_file = self._load_validator_pem(validator)
+            public_keys.append(pem_file.secret_key.generate_public_key())
+
+        return public_keys
+
+    def _load_validator_pem(self, validator: Dict[str, str]) -> ValidatorPEM:
+        # Get path of "pemFile", make it absolute
+        validator_pem = Path(validator.get("pemFile", "")).expanduser()
+        validator_pem = validator_pem if validator_pem.is_absolute() else self.validators_file_path.parent / validator_pem
+
+        return ValidatorPEM.from_file(validator_pem)
 
     def _read_json_file_validators(self):
         val_file = self.validators_file_path.expanduser()

@@ -1,12 +1,10 @@
 from pathlib import Path
 from typing import Any, List
 
-from multiversx_sdk_network_providers.proxy_network_provider import \
-    ProxyNetworkProvider
-
 from multiversx_sdk_cli import cli_shared, utils
 from multiversx_sdk_cli.cli_output import CLIOutputBuilder
 from multiversx_sdk_cli.cosign_transaction import cosign_transaction
+from multiversx_sdk_cli.custom_network_provider import CustomNetworkProvider
 from multiversx_sdk_cli.errors import NoWalletProvided
 from multiversx_sdk_cli.transactions import (compute_relayed_v1_data,
                                              do_prepare_transaction,
@@ -19,6 +17,7 @@ def setup_parser(args: List[str], subparsers: Any) -> Any:
 
     sub = cli_shared.add_command_subparser(subparsers, "tx", "new", f"Create a new transaction.{CLIOutputBuilder.describe()}")
     _add_common_arguments(args, sub)
+    _add_token_transfers_args(sub)
     cli_shared.add_outfile_arg(sub, what="signed transaction, hash")
     cli_shared.add_broadcast_args(sub, relay=True)
     cli_shared.add_proxy_arg(sub)
@@ -63,6 +62,12 @@ def _add_common_arguments(args: List[str], sub: Any):
     sub.add_argument("--data-file", type=str, default=None, help="a file containing transaction data")
 
 
+def _add_token_transfers_args(sub: Any):
+    sub.add_argument("--token-transfers", nargs='+',
+                     help="token transfers for transfer & execute, as [token, amount] "
+                     "E.g. --token-transfers NFT-123456-0a 1 ESDT-987654 100000000")
+
+
 def create_transaction(args: Any):
     args = utils.as_object(args)
 
@@ -88,9 +93,9 @@ def send_transaction(args: Any):
 
     tx = load_transaction_from_file(args.infile)
     output = CLIOutputBuilder()
+    proxy = CustomNetworkProvider(args.proxy)
 
     try:
-        proxy = ProxyNetworkProvider(args.proxy)
         tx_hash = proxy.send_transaction(tx)
         output.set_emitted_transaction_hash(tx_hash)
     finally:
@@ -101,7 +106,7 @@ def send_transaction(args: Any):
 def get_transaction(args: Any):
     args = utils.as_object(args)
     omit_fields = cli_shared.parse_omit_fields_arg(args)
-    proxy = ProxyNetworkProvider(args.proxy)
+    proxy = CustomNetworkProvider(args.proxy)
 
     transaction = proxy.get_transaction(args.hash, True)
     output = CLIOutputBuilder().set_transaction_on_network(transaction, omit_fields).build()

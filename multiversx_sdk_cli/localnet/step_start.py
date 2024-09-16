@@ -63,7 +63,8 @@ async def do_start(configfile: Path, stop_after_seconds: int):
             f"--log-level={loglevel}",
             "--log-logger-name",
             f"--destination-shard-as-observer={observer.shard}",
-            f"--rest-api-interface={observer.api_interface()}"
+            f"--rest-api-interface={observer.api_interface()}",
+            "--operation-mode=historical-balances"
         ], cwd=observer.folder, delay=NODES_START_DELAY))
 
     # Validators
@@ -135,7 +136,7 @@ async def run(args: List[str], cwd: Path, delay: int = 0):
     if workstation.is_linux():
         env["LD_LIBRARY_PATH"] = str(cwd)
     else:
-        # For MacOS, libwasmer is directly found near the binary (no workaround needed)
+        # For MacOS, dylibs are directly found near the binary (no workaround needed)
         pass
 
     process = await asyncio.create_subprocess_exec(*args, stdout=asyncio.subprocess.PIPE,

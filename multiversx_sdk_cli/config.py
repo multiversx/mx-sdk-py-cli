@@ -3,7 +3,6 @@ from pathlib import Path
 from typing import Any, Dict, List
 
 from multiversx_sdk_cli import errors, utils
-from multiversx_sdk_cli.ux import show_warning
 
 SDK_PATH = Path("~/multiversx-sdk").expanduser().resolve()
 LOCAL_CONFIG_PATH = Path("mxpy.json").resolve()
@@ -143,7 +142,11 @@ def _guard_valid_config_deletion(name: str):
 
 def get_defaults() -> Dict[str, Any]:
     return {
-        "dependencies.rust.tag": "nightly-2023-12-11",
+        "dependencies.vmtools.tag": "v1.5.24",
+        "dependencies.vmtools.urlTemplate.linux": "https://github.com/multiversx/mx-chain-vm-go/archive/{TAG}.tar.gz",
+        "dependencies.vmtools.urlTemplate.osx": "https://github.com/multiversx/mx-chain-vm-go/archive/{TAG}.tar.gz",
+        "dependencies.vmtools.urlTemplate.windows": "https://github.com/multiversx/mx-chain-vm-go/archive/{TAG}.tar.gz",
+        "dependencies.rust.tag": "stable",
         "dependencies.golang.resolution": "SDK",
         "dependencies.golang.tag": "go1.20.7",
         "dependencies.golang.urlTemplate.linux": "https://golang.org/dl/{TAG}.linux-amd64.tar.gz",

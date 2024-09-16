@@ -3,7 +3,7 @@ from collections import OrderedDict
 from pathlib import Path
 from typing import Dict, Tuple
 
-from multiversx_sdk_wallet.validator_pem import ValidatorPEM
+from multiversx_sdk import ValidatorPEM
 
 from multiversx_sdk_cli import errors, utils
 from multiversx_sdk_cli.accounts import Account

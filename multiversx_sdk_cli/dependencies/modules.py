@@ -276,7 +276,7 @@ This may cause problems with the installation of rust.""")
         if tag:
             toolchain = tag
         else:
-            toolchain = "nightly"
+            toolchain = "stable"
 
         args = [str(installer_path), "--verbose", "--default-toolchain", toolchain, "--profile",
                 "minimal", "--target", "wasm32-unknown-unknown", "-y"]

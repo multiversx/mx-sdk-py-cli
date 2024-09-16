@@ -950,6 +950,631 @@ options:
                                                   🔐 the index of the address when using Ledger
 
 ```
+## Group **StakingProvider**
+
+
+```
+$ mxpy staking-provider --help
+usage: mxpy staking-provider COMMAND [-h] ...
+
+Staking provider omnitool
+
+COMMANDS:
+  {create-new-delegation-contract,get-contract-address,add-nodes,remove-nodes,stake-nodes,unbond-nodes,unstake-nodes,unjail-nodes,change-service-fee,modify-delegation-cap,automatic-activation,redelegate-cap,set-metadata}
+
+OPTIONS:
+  -h, --help            show this help message and exit
+
+```
+### StakingProvider.CreateNewDelegationContract
+
+
+```
+$ mxpy staking-provider create-new-delegation-contract --help
+usage: mxpy staking-provider create-new-delegation-contract [-h] ...
+
+Create a new delegation system smart contract, transferred value must begreater than baseIssuingCost + min deposit value
+
+options:
+  -h, --help                                      show this help message and exit
+  --proxy PROXY                                   🔗 the URL of the proxy
+  --pem PEM                                       🔑 the PEM file, if keyfile not provided
+  --pem-index PEM_INDEX                           🔑 the index in the PEM file (default: 0)
+  --keyfile KEYFILE                               🔑 a JSON keyfile, if PEM not provided
+  --passfile PASSFILE                             🔑 a file containing keyfile's password, if keyfile provided
+  --ledger                                        🔐 bool flag for signing transaction using ledger
+  --ledger-account-index LEDGER_ACCOUNT_INDEX     🔐 the index of the account when using Ledger
+  --ledger-address-index LEDGER_ADDRESS_INDEX     🔐 the index of the address when using Ledger
+  --sender-username SENDER_USERNAME               🖄 the username of the sender
+  --nonce NONCE                                   # the nonce for the transaction
+  --recall-nonce                                  ⭮ whether to recall the nonce when creating the transaction (default:
+                                                  False)
+  --gas-price GAS_PRICE                           ⛽ the gas price (default: 1000000000)
+  --gas-limit GAS_LIMIT                           ⛽ the gas limit
+  --estimate-gas                                  ⛽ whether to estimate the gas limit (default: 0)
+  --value VALUE                                   the value to transfer (default: 0)
+  --chain CHAIN                                   the chain identifier
+  --version VERSION                               the transaction version (default: 2)
+  --guardian GUARDIAN                             the address of the guradian
+  --guardian-service-url GUARDIAN_SERVICE_URL     the url of the guardian service
+  --guardian-2fa-code GUARDIAN_2FA_CODE           the 2fa code for the guardian
+  --options OPTIONS                               the transaction options (default: 0)
+  --send                                          ✓ whether to broadcast the transaction (default: False)
+  --simulate                                      whether to simulate the transaction (default: False)
+  --outfile OUTFILE                               where to save the output (signed transaction, hash) (default: stdout)
+  --guardian-pem GUARDIAN_PEM                     🔑 the PEM file, if keyfile not provided
+  --guardian-pem-index GUARDIAN_PEM_INDEX         🔑 the index in the PEM file (default: 0)
+  --guardian-keyfile GUARDIAN_KEYFILE             🔑 a JSON keyfile, if PEM not provided
+  --guardian-passfile GUARDIAN_PASSFILE           🔑 a file containing keyfile's password, if keyfile provided
+  --guardian-ledger                               🔐 bool flag for signing transaction using ledger
+  --guardian-ledger-account-index GUARDIAN_LEDGER_ACCOUNT_INDEX
+                                                  🔐 the index of the account when using Ledger
+  --guardian-ledger-address-index GUARDIAN_LEDGER_ADDRESS_INDEX
+                                                  🔐 the index of the address when using Ledger
+  --total-delegation-cap TOTAL_DELEGATION_CAP     the total delegation contract capacity
+  --service-fee SERVICE_FEE                       the delegation contract service fee
+
+```
+### StakingProvider.GetContractAddress
+
+
+```
+$ mxpy staking-provider get-contract-address --help
+usage: mxpy staking-provider get-contract-address [-h] ...
+
+Get create contract address by transaction hash
+
+options:
+  -h, --help                       show this help message and exit
+  --create-tx-hash CREATE_TX_HASH  the hash
+  --sender SENDER                  the sender address
+  --proxy PROXY                    🔗 the URL of the proxy
+
+```
+### StakingProvider.AddNodes
+
+
+```
+$ mxpy staking-provider add-nodes --help
+usage: mxpy staking-provider add-nodes [-h] ...
+
+Add new nodes must be called by the contract owner
+
+options:
+  -h, --help                                      show this help message and exit
+  --validators-file VALIDATORS_FILE               a JSON file describing the Nodes
+  --delegation-contract DELEGATION_CONTRACT       address of the delegation contract
+  --using-delegation-manager                      whether delegation contract was created using the Delegation Manager
+  --proxy PROXY                                   🔗 the URL of the proxy
+  --pem PEM                                       🔑 the PEM file, if keyfile not provided
+  --pem-index PEM_INDEX                           🔑 the index in the PEM file (default: 0)
+  --keyfile KEYFILE                               🔑 a JSON keyfile, if PEM not provided
+  --passfile PASSFILE                             🔑 a file containing keyfile's password, if keyfile provided
+  --ledger                                        🔐 bool flag for signing transaction using ledger
+  --ledger-account-index LEDGER_ACCOUNT_INDEX     🔐 the index of the account when using Ledger
+  --ledger-address-index LEDGER_ADDRESS_INDEX     🔐 the index of the address when using Ledger
+  --sender-username SENDER_USERNAME               🖄 the username of the sender
+  --nonce NONCE                                   # the nonce for the transaction
+  --recall-nonce                                  ⭮ whether to recall the nonce when creating the transaction (default:
+                                                  False)
+  --gas-price GAS_PRICE                           ⛽ the gas price (default: 1000000000)
+  --gas-limit GAS_LIMIT                           ⛽ the gas limit
+  --estimate-gas                                  ⛽ whether to estimate the gas limit (default: 0)
+  --value VALUE                                   the value to transfer (default: 0)
+  --chain CHAIN                                   the chain identifier
+  --version VERSION                               the transaction version (default: 2)
+  --guardian GUARDIAN                             the address of the guradian
+  --guardian-service-url GUARDIAN_SERVICE_URL     the url of the guardian service
+  --guardian-2fa-code GUARDIAN_2FA_CODE           the 2fa code for the guardian
+  --options OPTIONS                               the transaction options (default: 0)
+  --send                                          ✓ whether to broadcast the transaction (default: False)
+  --simulate                                      whether to simulate the transaction (default: False)
+  --outfile OUTFILE                               where to save the output (signed transaction, hash) (default: stdout)
+  --guardian-pem GUARDIAN_PEM                     🔑 the PEM file, if keyfile not provided
+  --guardian-pem-index GUARDIAN_PEM_INDEX         🔑 the index in the PEM file (default: 0)
+  --guardian-keyfile GUARDIAN_KEYFILE             🔑 a JSON keyfile, if PEM not provided
+  --guardian-passfile GUARDIAN_PASSFILE           🔑 a file containing keyfile's password, if keyfile provided
+  --guardian-ledger                               🔐 bool flag for signing transaction using ledger
+  --guardian-ledger-account-index GUARDIAN_LEDGER_ACCOUNT_INDEX
+                                                  🔐 the index of the account when using Ledger
+  --guardian-ledger-address-index GUARDIAN_LEDGER_ADDRESS_INDEX
+                                                  🔐 the index of the address when using Ledger
+
+```
+### StakingProvider.RemoveNodes
+
+
+```
+$ mxpy staking-provider remove-nodes --help
+usage: mxpy staking-provider remove-nodes [-h] ...
+
+Remove nodes must be called by the contract owner
+
+options:
+  -h, --help                                      show this help message and exit
+  --bls-keys BLS_KEYS                             a list with the bls keys of the nodes
+  --delegation-contract DELEGATION_CONTRACT       address of the delegation contract
+  --proxy PROXY                                   🔗 the URL of the proxy
+  --pem PEM                                       🔑 the PEM file, if keyfile not provided
+  --pem-index PEM_INDEX                           🔑 the index in the PEM file (default: 0)
+  --keyfile KEYFILE                               🔑 a JSON keyfile, if PEM not provided
+  --passfile PASSFILE                             🔑 a file containing keyfile's password, if keyfile provided
+  --ledger                                        🔐 bool flag for signing transaction using ledger
+  --ledger-account-index LEDGER_ACCOUNT_INDEX     🔐 the index of the account when using Ledger
+  --ledger-address-index LEDGER_ADDRESS_INDEX     🔐 the index of the address when using Ledger
+  --sender-username SENDER_USERNAME               🖄 the username of the sender
+  --nonce NONCE                                   # the nonce for the transaction
+  --recall-nonce                                  ⭮ whether to recall the nonce when creating the transaction (default:
+                                                  False)
+  --gas-price GAS_PRICE                           ⛽ the gas price (default: 1000000000)
+  --gas-limit GAS_LIMIT                           ⛽ the gas limit
+  --estimate-gas                                  ⛽ whether to estimate the gas limit (default: 0)
+  --value VALUE                                   the value to transfer (default: 0)
+  --chain CHAIN                                   the chain identifier
+  --version VERSION                               the transaction version (default: 2)
+  --guardian GUARDIAN                             the address of the guradian
+  --guardian-service-url GUARDIAN_SERVICE_URL     the url of the guardian service
+  --guardian-2fa-code GUARDIAN_2FA_CODE           the 2fa code for the guardian
+  --options OPTIONS                               the transaction options (default: 0)
+  --send                                          ✓ whether to broadcast the transaction (default: False)
+  --simulate                                      whether to simulate the transaction (default: False)
+  --outfile OUTFILE                               where to save the output (signed transaction, hash) (default: stdout)
+  --guardian-pem GUARDIAN_PEM                     🔑 the PEM file, if keyfile not provided
+  --guardian-pem-index GUARDIAN_PEM_INDEX         🔑 the index in the PEM file (default: 0)
+  --guardian-keyfile GUARDIAN_KEYFILE             🔑 a JSON keyfile, if PEM not provided
+  --guardian-passfile GUARDIAN_PASSFILE           🔑 a file containing keyfile's password, if keyfile provided
+  --guardian-ledger                               🔐 bool flag for signing transaction using ledger
+  --guardian-ledger-account-index GUARDIAN_LEDGER_ACCOUNT_INDEX
+                                                  🔐 the index of the account when using Ledger
+  --guardian-ledger-address-index GUARDIAN_LEDGER_ADDRESS_INDEX
+                                                  🔐 the index of the address when using Ledger
+
+```
+### StakingProvider.StakeNodes
+
+
+```
+$ mxpy staking-provider stake-nodes --help
+usage: mxpy staking-provider stake-nodes [-h] ...
+
+Stake nodes must be called by the contract owner
+
+options:
+  -h, --help                                      show this help message and exit
+  --bls-keys BLS_KEYS                             a list with the bls keys of the nodes
+  --delegation-contract DELEGATION_CONTRACT       address of the delegation contract
+  --proxy PROXY                                   🔗 the URL of the proxy
+  --pem PEM                                       🔑 the PEM file, if keyfile not provided
+  --pem-index PEM_INDEX                           🔑 the index in the PEM file (default: 0)
+  --keyfile KEYFILE                               🔑 a JSON keyfile, if PEM not provided
+  --passfile PASSFILE                             🔑 a file containing keyfile's password, if keyfile provided
+  --ledger                                        🔐 bool flag for signing transaction using ledger
+  --ledger-account-index LEDGER_ACCOUNT_INDEX     🔐 the index of the account when using Ledger
+  --ledger-address-index LEDGER_ADDRESS_INDEX     🔐 the index of the address when using Ledger
+  --sender-username SENDER_USERNAME               🖄 the username of the sender
+  --nonce NONCE                                   # the nonce for the transaction
+  --recall-nonce                                  ⭮ whether to recall the nonce when creating the transaction (default:
+                                                  False)
+  --gas-price GAS_PRICE                           ⛽ the gas price (default: 1000000000)
+  --gas-limit GAS_LIMIT                           ⛽ the gas limit
+  --estimate-gas                                  ⛽ whether to estimate the gas limit (default: 0)
+  --value VALUE                                   the value to transfer (default: 0)
+  --chain CHAIN                                   the chain identifier
+  --version VERSION                               the transaction version (default: 2)
+  --guardian GUARDIAN                             the address of the guradian
+  --guardian-service-url GUARDIAN_SERVICE_URL     the url of the guardian service
+  --guardian-2fa-code GUARDIAN_2FA_CODE           the 2fa code for the guardian
+  --options OPTIONS                               the transaction options (default: 0)
+  --send                                          ✓ whether to broadcast the transaction (default: False)
+  --simulate                                      whether to simulate the transaction (default: False)
+  --outfile OUTFILE                               where to save the output (signed transaction, hash) (default: stdout)
+  --guardian-pem GUARDIAN_PEM                     🔑 the PEM file, if keyfile not provided
+  --guardian-pem-index GUARDIAN_PEM_INDEX         🔑 the index in the PEM file (default: 0)
+  --guardian-keyfile GUARDIAN_KEYFILE             🔑 a JSON keyfile, if PEM not provided
+  --guardian-passfile GUARDIAN_PASSFILE           🔑 a file containing keyfile's password, if keyfile provided
+  --guardian-ledger                               🔐 bool flag for signing transaction using ledger
+  --guardian-ledger-account-index GUARDIAN_LEDGER_ACCOUNT_INDEX
+                                                  🔐 the index of the account when using Ledger
+  --guardian-ledger-address-index GUARDIAN_LEDGER_ADDRESS_INDEX
+                                                  🔐 the index of the address when using Ledger
+
+```
+### StakingProvider.UnbondNodes
+
+
+```
+$ mxpy staking-provider unbond-nodes --help
+usage: mxpy staking-provider unbond-nodes [-h] ...
+
+Unbond nodes must be called by the contract owner
+
+options:
+  -h, --help                                      show this help message and exit
+  --bls-keys BLS_KEYS                             a list with the bls keys of the nodes
+  --delegation-contract DELEGATION_CONTRACT       address of the delegation contract
+  --proxy PROXY                                   🔗 the URL of the proxy
+  --pem PEM                                       🔑 the PEM file, if keyfile not provided
+  --pem-index PEM_INDEX                           🔑 the index in the PEM file (default: 0)
+  --keyfile KEYFILE                               🔑 a JSON keyfile, if PEM not provided
+  --passfile PASSFILE                             🔑 a file containing keyfile's password, if keyfile provided
+  --ledger                                        🔐 bool flag for signing transaction using ledger
+  --ledger-account-index LEDGER_ACCOUNT_INDEX     🔐 the index of the account when using Ledger
+  --ledger-address-index LEDGER_ADDRESS_INDEX     🔐 the index of the address when using Ledger
+  --sender-username SENDER_USERNAME               🖄 the username of the sender
+  --nonce NONCE                                   # the nonce for the transaction
+  --recall-nonce                                  ⭮ whether to recall the nonce when creating the transaction (default:
+                                                  False)
+  --gas-price GAS_PRICE                           ⛽ the gas price (default: 1000000000)
+  --gas-limit GAS_LIMIT                           ⛽ the gas limit
+  --estimate-gas                                  ⛽ whether to estimate the gas limit (default: 0)
+  --value VALUE                                   the value to transfer (default: 0)
+  --chain CHAIN                                   the chain identifier
+  --version VERSION                               the transaction version (default: 2)
+  --guardian GUARDIAN                             the address of the guradian
+  --guardian-service-url GUARDIAN_SERVICE_URL     the url of the guardian service
+  --guardian-2fa-code GUARDIAN_2FA_CODE           the 2fa code for the guardian
+  --options OPTIONS                               the transaction options (default: 0)
+  --send                                          ✓ whether to broadcast the transaction (default: False)
+  --simulate                                      whether to simulate the transaction (default: False)
+  --outfile OUTFILE                               where to save the output (signed transaction, hash) (default: stdout)
+  --guardian-pem GUARDIAN_PEM                     🔑 the PEM file, if keyfile not provided
+  --guardian-pem-index GUARDIAN_PEM_INDEX         🔑 the index in the PEM file (default: 0)
+  --guardian-keyfile GUARDIAN_KEYFILE             🔑 a JSON keyfile, if PEM not provided
+  --guardian-passfile GUARDIAN_PASSFILE           🔑 a file containing keyfile's password, if keyfile provided
+  --guardian-ledger                               🔐 bool flag for signing transaction using ledger
+  --guardian-ledger-account-index GUARDIAN_LEDGER_ACCOUNT_INDEX
+                                                  🔐 the index of the account when using Ledger
+  --guardian-ledger-address-index GUARDIAN_LEDGER_ADDRESS_INDEX
+                                                  🔐 the index of the address when using Ledger
+
+```
+### StakingProvider.UnstakeNodes
+
+
+```
+$ mxpy staking-provider unstake-nodes --help
+usage: mxpy staking-provider unstake-nodes [-h] ...
+
+Unstake nodes must be called by the contract owner
+
+options:
+  -h, --help                                      show this help message and exit
+  --bls-keys BLS_KEYS                             a list with the bls keys of the nodes
+  --delegation-contract DELEGATION_CONTRACT       address of the delegation contract
+  --proxy PROXY                                   🔗 the URL of the proxy
+  --pem PEM                                       🔑 the PEM file, if keyfile not provided
+  --pem-index PEM_INDEX                           🔑 the index in the PEM file (default: 0)
+  --keyfile KEYFILE                               🔑 a JSON keyfile, if PEM not provided
+  --passfile PASSFILE                             🔑 a file containing keyfile's password, if keyfile provided
+  --ledger                                        🔐 bool flag for signing transaction using ledger
+  --ledger-account-index LEDGER_ACCOUNT_INDEX     🔐 the index of the account when using Ledger
+  --ledger-address-index LEDGER_ADDRESS_INDEX     🔐 the index of the address when using Ledger
+  --sender-username SENDER_USERNAME               🖄 the username of the sender
+  --nonce NONCE                                   # the nonce for the transaction
+  --recall-nonce                                  ⭮ whether to recall the nonce when creating the transaction (default:
+                                                  False)
+  --gas-price GAS_PRICE                           ⛽ the gas price (default: 1000000000)
+  --gas-limit GAS_LIMIT                           ⛽ the gas limit
+  --estimate-gas                                  ⛽ whether to estimate the gas limit (default: 0)
+  --value VALUE                                   the value to transfer (default: 0)
+  --chain CHAIN                                   the chain identifier
+  --version VERSION                               the transaction version (default: 2)
+  --guardian GUARDIAN                             the address of the guradian
+  --guardian-service-url GUARDIAN_SERVICE_URL     the url of the guardian service
+  --guardian-2fa-code GUARDIAN_2FA_CODE           the 2fa code for the guardian
+  --options OPTIONS                               the transaction options (default: 0)
+  --send                                          ✓ whether to broadcast the transaction (default: False)
+  --simulate                                      whether to simulate the transaction (default: False)
+  --outfile OUTFILE                               where to save the output (signed transaction, hash) (default: stdout)
+  --guardian-pem GUARDIAN_PEM                     🔑 the PEM file, if keyfile not provided
+  --guardian-pem-index GUARDIAN_PEM_INDEX         🔑 the index in the PEM file (default: 0)
+  --guardian-keyfile GUARDIAN_KEYFILE             🔑 a JSON keyfile, if PEM not provided
+  --guardian-passfile GUARDIAN_PASSFILE           🔑 a file containing keyfile's password, if keyfile provided
+  --guardian-ledger                               🔐 bool flag for signing transaction using ledger
+  --guardian-ledger-account-index GUARDIAN_LEDGER_ACCOUNT_INDEX
+                                                  🔐 the index of the account when using Ledger
+  --guardian-ledger-address-index GUARDIAN_LEDGER_ADDRESS_INDEX
+                                                  🔐 the index of the address when using Ledger
+
+```
+### StakingProvider.UnjailNodes
+
+
+```
+$ mxpy staking-provider unjail-nodes --help
+usage: mxpy staking-provider unjail-nodes [-h] ...
+
+Unjail nodes must be called by the contract owner
+
+options:
+  -h, --help                                      show this help message and exit
+  --bls-keys BLS_KEYS                             a list with the bls keys of the nodes
+  --delegation-contract DELEGATION_CONTRACT       address of the delegation contract
+  --proxy PROXY                                   🔗 the URL of the proxy
+  --pem PEM                                       🔑 the PEM file, if keyfile not provided
+  --pem-index PEM_INDEX                           🔑 the index in the PEM file (default: 0)
+  --keyfile KEYFILE                               🔑 a JSON keyfile, if PEM not provided
+  --passfile PASSFILE                             🔑 a file containing keyfile's password, if keyfile provided
+  --ledger                                        🔐 bool flag for signing transaction using ledger
+  --ledger-account-index LEDGER_ACCOUNT_INDEX     🔐 the index of the account when using Ledger
+  --ledger-address-index LEDGER_ADDRESS_INDEX     🔐 the index of the address when using Ledger
+  --sender-username SENDER_USERNAME               🖄 the username of the sender
+  --nonce NONCE                                   # the nonce for the transaction
+  --recall-nonce                                  ⭮ whether to recall the nonce when creating the transaction (default:
+                                                  False)
+  --gas-price GAS_PRICE                           ⛽ the gas price (default: 1000000000)
+  --gas-limit GAS_LIMIT                           ⛽ the gas limit
+  --estimate-gas                                  ⛽ whether to estimate the gas limit (default: 0)
+  --value VALUE                                   the value to transfer (default: 0)
+  --chain CHAIN                                   the chain identifier
+  --version VERSION                               the transaction version (default: 2)
+  --guardian GUARDIAN                             the address of the guradian
+  --guardian-service-url GUARDIAN_SERVICE_URL     the url of the guardian service
+  --guardian-2fa-code GUARDIAN_2FA_CODE           the 2fa code for the guardian
+  --options OPTIONS                               the transaction options (default: 0)
+  --send                                          ✓ whether to broadcast the transaction (default: False)
+  --simulate                                      whether to simulate the transaction (default: False)
+  --outfile OUTFILE                               where to save the output (signed transaction, hash) (default: stdout)
+  --guardian-pem GUARDIAN_PEM                     🔑 the PEM file, if keyfile not provided
+  --guardian-pem-index GUARDIAN_PEM_INDEX         🔑 the index in the PEM file (default: 0)
+  --guardian-keyfile GUARDIAN_KEYFILE             🔑 a JSON keyfile, if PEM not provided
+  --guardian-passfile GUARDIAN_PASSFILE           🔑 a file containing keyfile's password, if keyfile provided
+  --guardian-ledger                               🔐 bool flag for signing transaction using ledger
+  --guardian-ledger-account-index GUARDIAN_LEDGER_ACCOUNT_INDEX
+                                                  🔐 the index of the account when using Ledger
+  --guardian-ledger-address-index GUARDIAN_LEDGER_ADDRESS_INDEX
+                                                  🔐 the index of the address when using Ledger
+
+```
+### StakingProvider.ChangeServiceFee
+
+
+```
+$ mxpy staking-provider change-service-fee --help
+usage: mxpy staking-provider change-service-fee [-h] ...
+
+Change service fee must be called by the contract owner
+
+options:
+  -h, --help                                      show this help message and exit
+  --service-fee SERVICE_FEE                       new service fee value
+  --delegation-contract DELEGATION_CONTRACT       address of the delegation contract
+  --proxy PROXY                                   🔗 the URL of the proxy
+  --pem PEM                                       🔑 the PEM file, if keyfile not provided
+  --pem-index PEM_INDEX                           🔑 the index in the PEM file (default: 0)
+  --keyfile KEYFILE                               🔑 a JSON keyfile, if PEM not provided
+  --passfile PASSFILE                             🔑 a file containing keyfile's password, if keyfile provided
+  --ledger                                        🔐 bool flag for signing transaction using ledger
+  --ledger-account-index LEDGER_ACCOUNT_INDEX     🔐 the index of the account when using Ledger
+  --ledger-address-index LEDGER_ADDRESS_INDEX     🔐 the index of the address when using Ledger
+  --sender-username SENDER_USERNAME               🖄 the username of the sender
+  --nonce NONCE                                   # the nonce for the transaction
+  --recall-nonce                                  ⭮ whether to recall the nonce when creating the transaction (default:
+                                                  False)
+  --gas-price GAS_PRICE                           ⛽ the gas price (default: 1000000000)
+  --gas-limit GAS_LIMIT                           ⛽ the gas limit
+  --estimate-gas                                  ⛽ whether to estimate the gas limit (default: 0)
+  --value VALUE                                   the value to transfer (default: 0)
+  --chain CHAIN                                   the chain identifier
+  --version VERSION                               the transaction version (default: 2)
+  --guardian GUARDIAN                             the address of the guradian
+  --guardian-service-url GUARDIAN_SERVICE_URL     the url of the guardian service
+  --guardian-2fa-code GUARDIAN_2FA_CODE           the 2fa code for the guardian
+  --options OPTIONS                               the transaction options (default: 0)
+  --send                                          ✓ whether to broadcast the transaction (default: False)
+  --simulate                                      whether to simulate the transaction (default: False)
+  --outfile OUTFILE                               where to save the output (signed transaction, hash) (default: stdout)
+  --guardian-pem GUARDIAN_PEM                     🔑 the PEM file, if keyfile not provided
+  --guardian-pem-index GUARDIAN_PEM_INDEX         🔑 the index in the PEM file (default: 0)
+  --guardian-keyfile GUARDIAN_KEYFILE             🔑 a JSON keyfile, if PEM not provided
+  --guardian-passfile GUARDIAN_PASSFILE           🔑 a file containing keyfile's password, if keyfile provided
+  --guardian-ledger                               🔐 bool flag for signing transaction using ledger
+  --guardian-ledger-account-index GUARDIAN_LEDGER_ACCOUNT_INDEX
+                                                  🔐 the index of the account when using Ledger
+  --guardian-ledger-address-index GUARDIAN_LEDGER_ADDRESS_INDEX
+                                                  🔐 the index of the address when using Ledger
+
+```
+### StakingProvider.ModifyDelegationCap
+
+
+```
+$ mxpy staking-provider modify-delegation-cap --help
+usage: mxpy staking-provider modify-delegation-cap [-h] ...
+
+Modify delegation cap must be called by the contract owner
+
+options:
+  -h, --help                                      show this help message and exit
+  --delegation-cap DELEGATION_CAP                 new delegation contract capacity
+  --delegation-contract DELEGATION_CONTRACT       address of the delegation contract
+  --proxy PROXY                                   🔗 the URL of the proxy
+  --pem PEM                                       🔑 the PEM file, if keyfile not provided
+  --pem-index PEM_INDEX                           🔑 the index in the PEM file (default: 0)
+  --keyfile KEYFILE                               🔑 a JSON keyfile, if PEM not provided
+  --passfile PASSFILE                             🔑 a file containing keyfile's password, if keyfile provided
+  --ledger                                        🔐 bool flag for signing transaction using ledger
+  --ledger-account-index LEDGER_ACCOUNT_INDEX     🔐 the index of the account when using Ledger
+  --ledger-address-index LEDGER_ADDRESS_INDEX     🔐 the index of the address when using Ledger
+  --sender-username SENDER_USERNAME               🖄 the username of the sender
+  --nonce NONCE                                   # the nonce for the transaction
+  --recall-nonce                                  ⭮ whether to recall the nonce when creating the transaction (default:
+                                                  False)
+  --gas-price GAS_PRICE                           ⛽ the gas price (default: 1000000000)
+  --gas-limit GAS_LIMIT                           ⛽ the gas limit
+  --estimate-gas                                  ⛽ whether to estimate the gas limit (default: 0)
+  --value VALUE                                   the value to transfer (default: 0)
+  --chain CHAIN                                   the chain identifier
+  --version VERSION                               the transaction version (default: 2)
+  --guardian GUARDIAN                             the address of the guradian
+  --guardian-service-url GUARDIAN_SERVICE_URL     the url of the guardian service
+  --guardian-2fa-code GUARDIAN_2FA_CODE           the 2fa code for the guardian
+  --options OPTIONS                               the transaction options (default: 0)
+  --send                                          ✓ whether to broadcast the transaction (default: False)
+  --simulate                                      whether to simulate the transaction (default: False)
+  --outfile OUTFILE                               where to save the output (signed transaction, hash) (default: stdout)
+  --guardian-pem GUARDIAN_PEM                     🔑 the PEM file, if keyfile not provided
+  --guardian-pem-index GUARDIAN_PEM_INDEX         🔑 the index in the PEM file (default: 0)
+  --guardian-keyfile GUARDIAN_KEYFILE             🔑 a JSON keyfile, if PEM not provided
+  --guardian-passfile GUARDIAN_PASSFILE           🔑 a file containing keyfile's password, if keyfile provided
+  --guardian-ledger                               🔐 bool flag for signing transaction using ledger
+  --guardian-ledger-account-index GUARDIAN_LEDGER_ACCOUNT_INDEX
+                                                  🔐 the index of the account when using Ledger
+  --guardian-ledger-address-index GUARDIAN_LEDGER_ADDRESS_INDEX
+                                                  🔐 the index of the address when using Ledger
+
+```
+### StakingProvider.AutomaticActivation
+
+
+```
+$ mxpy staking-provider automatic-activation --help
+usage: mxpy staking-provider automatic-activation [-h] ...
+
+Automatic activation must be called by the contract owner
+
+options:
+  -h, --help                                      show this help message and exit
+  --set                                           set automatic activation True
+  --unset                                         set automatic activation False
+  --delegation-contract DELEGATION_CONTRACT       address of the delegation contract
+  --proxy PROXY                                   🔗 the URL of the proxy
+  --pem PEM                                       🔑 the PEM file, if keyfile not provided
+  --pem-index PEM_INDEX                           🔑 the index in the PEM file (default: 0)
+  --keyfile KEYFILE                               🔑 a JSON keyfile, if PEM not provided
+  --passfile PASSFILE                             🔑 a file containing keyfile's password, if keyfile provided
+  --ledger                                        🔐 bool flag for signing transaction using ledger
+  --ledger-account-index LEDGER_ACCOUNT_INDEX     🔐 the index of the account when using Ledger
+  --ledger-address-index LEDGER_ADDRESS_INDEX     🔐 the index of the address when using Ledger
+  --sender-username SENDER_USERNAME               🖄 the username of the sender
+  --nonce NONCE                                   # the nonce for the transaction
+  --recall-nonce                                  ⭮ whether to recall the nonce when creating the transaction (default:
+                                                  False)
+  --gas-price GAS_PRICE                           ⛽ the gas price (default: 1000000000)
+  --gas-limit GAS_LIMIT                           ⛽ the gas limit
+  --estimate-gas                                  ⛽ whether to estimate the gas limit (default: 0)
+  --value VALUE                                   the value to transfer (default: 0)
+  --chain CHAIN                                   the chain identifier
+  --version VERSION                               the transaction version (default: 2)
+  --guardian GUARDIAN                             the address of the guradian
+  --guardian-service-url GUARDIAN_SERVICE_URL     the url of the guardian service
+  --guardian-2fa-code GUARDIAN_2FA_CODE           the 2fa code for the guardian
+  --options OPTIONS                               the transaction options (default: 0)
+  --send                                          ✓ whether to broadcast the transaction (default: False)
+  --simulate                                      whether to simulate the transaction (default: False)
+  --outfile OUTFILE                               where to save the output (signed transaction, hash) (default: stdout)
+  --guardian-pem GUARDIAN_PEM                     🔑 the PEM file, if keyfile not provided
+  --guardian-pem-index GUARDIAN_PEM_INDEX         🔑 the index in the PEM file (default: 0)
+  --guardian-keyfile GUARDIAN_KEYFILE             🔑 a JSON keyfile, if PEM not provided
+  --guardian-passfile GUARDIAN_PASSFILE           🔑 a file containing keyfile's password, if keyfile provided
+  --guardian-ledger                               🔐 bool flag for signing transaction using ledger
+  --guardian-ledger-account-index GUARDIAN_LEDGER_ACCOUNT_INDEX
+                                                  🔐 the index of the account when using Ledger
+  --guardian-ledger-address-index GUARDIAN_LEDGER_ADDRESS_INDEX
+                                                  🔐 the index of the address when using Ledger
+
+```
+### StakingProvider.RedelegateCap
+
+
+```
+$ mxpy staking-provider redelegate-cap --help
+usage: mxpy staking-provider redelegate-cap [-h] ...
+
+Redelegate cap must be called by the contract owner
+
+options:
+  -h, --help                                      show this help message and exit
+  --set                                           set redelegate cap True
+  --unset                                         set redelegate cap False
+  --delegation-contract DELEGATION_CONTRACT       address of the delegation contract
+  --proxy PROXY                                   🔗 the URL of the proxy
+  --pem PEM                                       🔑 the PEM file, if keyfile not provided
+  --pem-index PEM_INDEX                           🔑 the index in the PEM file (default: 0)
+  --keyfile KEYFILE                               🔑 a JSON keyfile, if PEM not provided
+  --passfile PASSFILE                             🔑 a file containing keyfile's password, if keyfile provided
+  --ledger                                        🔐 bool flag for signing transaction using ledger
+  --ledger-account-index LEDGER_ACCOUNT_INDEX     🔐 the index of the account when using Ledger
+  --ledger-address-index LEDGER_ADDRESS_INDEX     🔐 the index of the address when using Ledger
+  --sender-username SENDER_USERNAME               🖄 the username of the sender
+  --nonce NONCE                                   # the nonce for the transaction
+  --recall-nonce                                  ⭮ whether to recall the nonce when creating the transaction (default:
+                                                  False)
+  --gas-price GAS_PRICE                           ⛽ the gas price (default: 1000000000)
+  --gas-limit GAS_LIMIT                           ⛽ the gas limit
+  --estimate-gas                                  ⛽ whether to estimate the gas limit (default: 0)
+  --value VALUE                                   the value to transfer (default: 0)
+  --chain CHAIN                                   the chain identifier
+  --version VERSION                               the transaction version (default: 2)
+  --guardian GUARDIAN                             the address of the guradian
+  --guardian-service-url GUARDIAN_SERVICE_URL     the url of the guardian service
+  --guardian-2fa-code GUARDIAN_2FA_CODE           the 2fa code for the guardian
+  --options OPTIONS                               the transaction options (default: 0)
+  --send                                          ✓ whether to broadcast the transaction (default: False)
+  --simulate                                      whether to simulate the transaction (default: False)
+  --outfile OUTFILE                               where to save the output (signed transaction, hash) (default: stdout)
+  --guardian-pem GUARDIAN_PEM                     🔑 the PEM file, if keyfile not provided
+  --guardian-pem-index GUARDIAN_PEM_INDEX         🔑 the index in the PEM file (default: 0)
+  --guardian-keyfile GUARDIAN_KEYFILE             🔑 a JSON keyfile, if PEM not provided
+  --guardian-passfile GUARDIAN_PASSFILE           🔑 a file containing keyfile's password, if keyfile provided
+  --guardian-ledger                               🔐 bool flag for signing transaction using ledger
+  --guardian-ledger-account-index GUARDIAN_LEDGER_ACCOUNT_INDEX
+                                                  🔐 the index of the account when using Ledger
+  --guardian-ledger-address-index GUARDIAN_LEDGER_ADDRESS_INDEX
+                                                  🔐 the index of the address when using Ledger
+
+```
+### StakingProvider.SetMetadata
+
+
+```
+$ mxpy staking-provider set-metadata --help
+usage: mxpy staking-provider set-metadata [-h] ...
+
+Set metadata must be called by the contract owner
+
+options:
+  -h, --help                                      show this help message and exit
+  --name NAME                                     name field in staking provider metadata
+  --website WEBSITE                               website field in staking provider metadata
+  --identifier IDENTIFIER                         identifier field in staking provider metadata
+  --delegation-contract DELEGATION_CONTRACT       address of the delegation contract
+  --proxy PROXY                                   🔗 the URL of the proxy
+  --pem PEM                                       🔑 the PEM file, if keyfile not provided
+  --pem-index PEM_INDEX                           🔑 the index in the PEM file (default: 0)
+  --keyfile KEYFILE                               🔑 a JSON keyfile, if PEM not provided
+  --passfile PASSFILE                             🔑 a file containing keyfile's password, if keyfile provided
+  --ledger                                        🔐 bool flag for signing transaction using ledger
+  --ledger-account-index LEDGER_ACCOUNT_INDEX     🔐 the index of the account when using Ledger
+  --ledger-address-index LEDGER_ADDRESS_INDEX     🔐 the index of the address when using Ledger
+  --sender-username SENDER_USERNAME               🖄 the username of the sender
+  --nonce NONCE                                   # the nonce for the transaction
+  --recall-nonce                                  ⭮ whether to recall the nonce when creating the transaction (default:
+                                                  False)
+  --gas-price GAS_PRICE                           ⛽ the gas price (default: 1000000000)
+  --gas-limit GAS_LIMIT                           ⛽ the gas limit
+  --estimate-gas                                  ⛽ whether to estimate the gas limit (default: 0)
+  --value VALUE                                   the value to transfer (default: 0)
+  --chain CHAIN                                   the chain identifier
+  --version VERSION                               the transaction version (default: 2)
+  --guardian GUARDIAN                             the address of the guradian
+  --guardian-service-url GUARDIAN_SERVICE_URL     the url of the guardian service
+  --guardian-2fa-code GUARDIAN_2FA_CODE           the 2fa code for the guardian
+  --options OPTIONS                               the transaction options (default: 0)
+  --send                                          ✓ whether to broadcast the transaction (default: False)
+  --simulate                                      whether to simulate the transaction (default: False)
+  --outfile OUTFILE                               where to save the output (signed transaction, hash) (default: stdout)
+  --guardian-pem GUARDIAN_PEM                     🔑 the PEM file, if keyfile not provided
+  --guardian-pem-index GUARDIAN_PEM_INDEX         🔑 the index in the PEM file (default: 0)
+  --guardian-keyfile GUARDIAN_KEYFILE             🔑 a JSON keyfile, if PEM not provided
+  --guardian-passfile GUARDIAN_PASSFILE           🔑 a file containing keyfile's password, if keyfile provided
+  --guardian-ledger                               🔐 bool flag for signing transaction using ledger
+  --guardian-ledger-account-index GUARDIAN_LEDGER_ACCOUNT_INDEX
+                                                  🔐 the index of the account when using Ledger
+  --guardian-ledger-address-index GUARDIAN_LEDGER_ADDRESS_INDEX
+                                                  🔐 the index of the address when using Ledger
+
+```
 ## Group **Account**
 
 
