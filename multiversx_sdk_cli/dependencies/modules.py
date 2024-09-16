@@ -1,5 +1,6 @@
 import logging
 import os
+import platform
 import shutil
 from os import path
 from pathlib import Path
@@ -135,59 +136,6 @@ class StandaloneModule(DependencyModule):
         return archive
 
 
-class VMToolsModule(StandaloneModule):
-    def __init__(self, key: str, aliases: List[str] = []):
-        super().__init__(key, aliases)
-        self.repo_name = 'mx-chain-vm-go'
-        self.organisation = 'multiversx'
-
-    def _post_install(self, tag: str):
-        dependencies.install_module('golang')
-
-        self.build_binary(tag, 'test')
-        self.make_binary_symlink_in_parent_folder(tag, 'test', 'run-scenarios')
-        self.copy_libwasmer_in_parent_directory(tag)
-
-    def build_binary(self, tag: str, binary_name: str):
-        source_folder = self.binary_source_folder(tag, binary_name)
-        golang = dependencies.get_module_by_key("golang")
-        golang_env = golang.get_env()
-        myprocess.run_process(['go', 'build'], cwd=source_folder, env=golang_env)
-
-    def binary_source_folder(self, tag: str, binary_name: str):
-        directory = self.get_source_directory(tag)
-        return directory / 'cmd' / binary_name
-
-    def make_binary_symlink_in_parent_folder(self, tag: str, binary_name: str, symlink_name: str):
-        source_folder = self.binary_source_folder(tag, binary_name)
-        binary = source_folder / binary_name
-
-        parent = self.get_parent_directory()
-        symlink = parent / symlink_name
-
-        symlink.unlink(missing_ok=True)
-        symlink.symlink_to(binary)
-
-    def copy_libwasmer_in_parent_directory(self, tag: str):
-        libwasmer_directory = self.get_source_directory(tag) / 'wasmer'
-        cmd_test_directory = self.get_source_directory(tag) / 'cmd' / 'test'
-        parent_directory = self.get_parent_directory()
-        for f in libwasmer_directory.iterdir():
-            if f.suffix in ['.dylib', '.so', '.dll']:
-                # Copy the dynamic library near the "run-scenarios" symlink
-                shutil.copy(f, parent_directory)
-                # Though, also copy the dynamic library near the target executable (seems to be necessary on MacOS)
-                shutil.copy(f, cmd_test_directory)
-
-    def get_env(self) -> Dict[str, str]:
-        return dict()
-
-    def get_source_directory(self, tag: str) -> Path:
-        directory = self.get_directory(tag)
-        first_subdirectory = next(directory.iterdir())
-        return first_subdirectory
-
-
 class GolangModule(StandaloneModule):
     def _post_install(self, tag: str):
         parent_directory = self.get_parent_directory()
@@ -244,11 +192,13 @@ class Rust(DependencyModule):
         which_rustc = shutil.which("rustc")
         which_cargo = shutil.which("cargo")
         which_sc_meta = shutil.which("sc-meta")
+        which_mx_scenario_go = shutil.which("mx-scenario-go")
         which_wasm_opt = shutil.which("wasm-opt")
         which_twiggy = shutil.which("twiggy")
         logger.info(f"which rustc: {which_rustc}")
         logger.info(f"which cargo: {which_cargo}")
         logger.info(f"which sc-meta: {which_sc_meta}")
+        logger.info(f"which mx-scenario-go: {which_mx_scenario_go}")
         logger.info(f"which wasm-opt: {which_wasm_opt}")
         logger.info(f"which twiggy: {which_twiggy}")
 
@@ -291,6 +241,7 @@ class Rust(DependencyModule):
         self._install_sc_meta()
         self._install_wasm_opt()
         self._install_twiggy()
+        self._install_sc_meta_deps()
 
     def _check_install_env(self, apply_correction: bool = True):
         """
@@ -304,7 +255,7 @@ class Rust(DependencyModule):
 This may cause problems with the installation.""")
 
             if apply_correction:
-                show_warning(f"CARGO_HOME will be temporarily unset.")
+                show_warning("CARGO_HOME will be temporarily unset.")
                 os.environ["CARGO_HOME"] = ""
 
         if current_rustup_home:
@@ -312,7 +263,7 @@ This may cause problems with the installation.""")
 This may cause problems with the installation of rust.""")
 
             if apply_correction:
-                show_warning(f"RUSTUP_HOME will be temporarily unset.")
+                show_warning("RUSTUP_HOME will be temporarily unset.")
                 os.environ["RUSTUP_HOME"] = ""
 
     def _install_rust(self, tag: str) -> None:
@@ -358,6 +309,18 @@ This may cause problems with the installation of rust.""")
             args.extend(["--version", tag])
 
         myprocess.run_process(args, env=self.get_cargo_env())
+
+    def _install_sc_meta_deps(self):
+        # this is needed for sc-meta to run the tests
+        # if os is Windows skip installation
+        os = platform.system().lower()
+        if os == "windows":
+            logger.warning("`sc-meta install all` command is not supported on windows")
+            return
+
+        logger.info("Installing sc-meta dependencies.")
+        args = ["sc-meta", "install", "all"]
+        myprocess.run_process(args)
 
     def _get_installer_url(self) -> str:
         if workstation.is_windows():
