@@ -255,7 +255,7 @@ class Rust(DependencyModule):
 This may cause problems with the installation.""")
 
             if apply_correction:
-                show_warning(f"CARGO_HOME will be temporarily unset.")
+                show_warning("CARGO_HOME will be temporarily unset.")
                 os.environ["CARGO_HOME"] = ""
 
         if current_rustup_home:
@@ -263,7 +263,7 @@ This may cause problems with the installation.""")
 This may cause problems with the installation of rust.""")
 
             if apply_correction:
-                show_warning(f"RUSTUP_HOME will be temporarily unset.")
+                show_warning("RUSTUP_HOME will be temporarily unset.")
                 os.environ["RUSTUP_HOME"] = ""
 
     def _install_rust(self, tag: str) -> None:
@@ -312,9 +312,10 @@ This may cause problems with the installation of rust.""")
 
     def _install_sc_meta_deps(self):
         # this is needed for sc-meta to run the tests
-        # if os is Windows skip insallation
+        # if os is Windows skip installation
         os = platform.system().lower()
         if os == "windows":
+            logger.warning("`sc-meta install all` command is not supported on windows")
             return
 
         logger.info("Installing sc-meta dependencies.")

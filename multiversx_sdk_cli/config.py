@@ -32,7 +32,7 @@ class MetaChainSystemSCsCost:
 def get_dependency_resolution(key: str) -> str:
     try:
         return get_value(f"dependencies.{key}.resolution")
-    except:
+    except Exception:
         return ""
 
 
