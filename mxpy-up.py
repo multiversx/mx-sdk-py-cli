@@ -28,7 +28,7 @@ def main():
     logger.warning("'mxpy-up.py' is deprecated. Check out the documentation on how to install using `pipx`: https://docs.multiversx.com/sdk-and-tools/sdk-py/installing-mxpy/#install-using-pipx.")
 
     if not args.ignore_deprecation:
-        raise Exception("'mxpy-up.py' is deprecated, please install using `pipx`: https://docs.multiversx.com/sdk-and-tools/sdk-py/installing-mxpy/#install-using-pipx. If installing using 'mxpy-up` is mandatory, provide the `--ignore-deprecation` flag.")
+        raise Exception("'mxpy-up.py' is deprecated, please install using `pipx`: https://docs.multiversx.com/sdk-and-tools/sdk-py/installing-mxpy/#install-using-pipx. If installing using 'mxpy-up` is necessary, provide the `--ignore-deprecation` flag.")
 
     exact_version = args.exact_version
     from_branch = args.from_branch
