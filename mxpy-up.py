@@ -21,13 +21,13 @@ def main():
     parser.add_argument("--from-branch", help="use a branch of multiversx/mx-sdk-py-cli")
     parser.add_argument("--not-interactive", action="store_true", default=False)
     parser.add_argument("--verbose", action="store_true", default=False)
-    parser.add_argument("--ignore-deprecation", action="store_false", default=True, help="'mxpy-up.py' is obsolete, install using 'pipx': https://docs.multiversx.com/sdk-and-tools/sdk-py/installing-mxpy/#install-using-pipx")
+    parser.add_argument("--ignore-deprecation", action="store_true", default=False, help="'mxpy-up.py' is obsolete, install using 'pipx': https://docs.multiversx.com/sdk-and-tools/sdk-py/installing-mxpy/#install-using-pipx")
     parser.set_defaults(modify_path=True)
     args = parser.parse_args()
 
     logger.warning("'mxpy-up.py' is deprecated. Check out the documentation on how to install using `pipx`: https://docs.multiversx.com/sdk-and-tools/sdk-py/installing-mxpy/#install-using-pipx.")
 
-    if args.ignore_deprecation:
+    if not args.ignore_deprecation:
         raise Exception("'mxpy-up.py' is deprecated, please install using `pipx`: https://docs.multiversx.com/sdk-and-tools/sdk-py/installing-mxpy/#install-using-pipx. If installing using 'mxpy-up` is mandatory, provide the `--ignore-deprecation` flag.")
 
     exact_version = args.exact_version
