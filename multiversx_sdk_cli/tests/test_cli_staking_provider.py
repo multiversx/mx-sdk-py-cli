@@ -223,6 +223,7 @@ def test_unjail_nodes(capsys: Any):
         "staking-provider", "unjail-nodes",
         "--bls-keys", f"{first_bls_key},{second_bls_key}",
         "--delegation-contract", "erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqthllllsy5r6rh",
+        "--value", "5000000000000000000",
         "--pem", str(alice),
         "--chain", "T",
         "--nonce", "7", "--estimate-gas"
@@ -235,6 +236,7 @@ def test_unjail_nodes(capsys: Any):
     assert transaction["sender"] == "erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th"
     assert transaction["receiver"] == "erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqthllllsy5r6rh"
     assert transaction["gasLimit"] == 13645500
+    assert transaction["value"] == "5000000000000000000"
 
 
 def test_change_service_fee(capsys: Any):
