@@ -21,7 +21,7 @@ from multiversx_sdk_cli.errors import DockerMissingError, NoWalletProvided
 from multiversx_sdk_cli.interfaces import IAddress
 from multiversx_sdk_cli.projects.core import get_project_paths_recursively
 from multiversx_sdk_cli.projects.templates import Contract
-from multiversx_sdk_cli.ux import show_message
+from multiversx_sdk_cli.ux import show_message, show_warning
 
 logger = logging.getLogger("cli.contracts")
 
@@ -293,16 +293,16 @@ def clean(args: Any):
 
 
 def build(args: Any):
-    check_if_rust_is_installed()
     project_paths = [Path(args.path)]
     arg_list = cli_shared.convert_args_object_to_args_list(args)
 
     for project in project_paths:
         projects.build_project(project, arg_list)
 
+    show_warning("The primary tool for building smart contracts is `sc-meta`. Try using the `sc-meta all build` command.")
+
 
 def do_report(args: Any):
-    check_if_rust_is_installed()
     args_dict = args.__dict__
     projects.do_report(args, args_dict)
 
