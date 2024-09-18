@@ -2,10 +2,11 @@ import base64
 import json
 import logging
 import time
+from pathlib import Path
 from typing import Any, Dict, List, Optional, Protocol, TextIO
 
 from multiversx_sdk import (Address, Token, TokenComputer, TokenTransfer,
-                            Transaction, TransactionPayload,
+                            Transaction, TransactionsConverter,
                             TransactionsFactoryConfig,
                             TransferTransactionsFactory)
 
@@ -37,48 +38,33 @@ class INetworkProvider(Protocol):
         ...
 
 
-class JSONTransaction:
-    def __init__(self) -> None:
-        self.hash = ""
-        self.nonce = 0
-        self.value = "0"
-        self.receiver = ""
-        self.sender = ""
-        self.senderUsername = ""
-        self.receiverUsername = ""
-        self.gasPrice = 0
-        self.gasLimit = 0
-        self.data: str = ""
-        self.chainID = ""
-        self.version = 0
-        self.options = 0
-        self.signature = ""
-        self.guardian = ""
-        self.guardianSignature = ""
-
-
 def do_prepare_transaction(args: Any) -> Transaction:
     account = load_sender_account_from_args(args)
+
+    native_amount = int(args.value)
     transfers = getattr(args, "token_transfers", [])
-    transfers = prepare_token_transfers(transfers) if transfers else []
+    transfers = prepare_token_transfers(transfers) if transfers else None
 
     config = TransactionsFactoryConfig(args.chain)
     factory = TransferTransactionsFactory(config)
     receiver = Address.new_from_bech32(args.receiver)
 
-    # will be replaced with 'create_transaction_for_transfer'
-    if transfers:
-        tx = factory.create_transaction_for_esdt_token_transfer(
+    if native_amount or transfers:
+        tx = factory.create_transaction_for_transfer(
             sender=account.address,
             receiver=receiver,
-            token_transfers=transfers
+            native_amount=native_amount,
+            token_transfers=transfers,
+            data=str(args.data).encode()
         )
     else:
-        tx = factory.create_transaction_for_native_token_transfer(
-            sender=account.address,
-            receiver=receiver,
-            native_amount=int(args.value),
-            data=str(args.data)
+        # this is for transactions with no token transfers(egld/esdt); useful for setting the data field
+        tx = Transaction(
+            sender=account.address.to_bech32(),
+            receiver=receiver.to_bech32(),
+            data=str(args.data).encode(),
+            gas_limit=int(args.gas_limit),
+            chain_id=args.chain
         )
 
     tx.gas_limit = int(args.gas_limit)
@@ -92,6 +78,12 @@ def do_prepare_transaction(args: Any) -> Transaction:
 
     if args.guardian:
         tx.guardian = args.guardian
+
+    if args.relayer:
+        tx.relayer = Address.new_from_bech32(args.relayer).to_bech32()
+
+    if args.inner_transactions:
+        tx.inner_transactions = load_inner_transactions_from_file(Path(args.inner_transactions).expanduser())
 
     tx.signature = bytes.fromhex(account.sign_transaction(tx))
     tx = sign_tx_by_guardian(args, tx)
@@ -231,37 +223,15 @@ def compute_relayed_v1_data(tx: Transaction) -> str:
 
 def load_transaction_from_file(f: TextIO) -> Transaction:
     data_json: bytes = f.read().encode()
-    fields = json.loads(data_json).get("tx") or json.loads(data_json).get("emittedTransaction")
+    transaction_dictionary = json.loads(data_json).get("tx") or json.loads(data_json).get("emittedTransaction")
 
-    instance = JSONTransaction()
-    instance.__dict__.update(fields)
-
-    loaded_tx = Transaction(
-        chain_id=instance.chainID,
-        sender=instance.sender,
-        receiver=instance.receiver,
-        sender_username=decode_field_value(instance.senderUsername),
-        receiver_username=decode_field_value(instance.receiverUsername),
-        gas_limit=instance.gasLimit,
-        gas_price=instance.gasPrice,
-        value=int(instance.value),
-        data=TransactionPayload.from_encoded_str(instance.data).data,
-        version=instance.version,
-        options=instance.options,
-        nonce=instance.nonce
-    )
-
-    if instance.guardian:
-        loaded_tx.guardian = instance.guardian
-
-    if instance.signature:
-        loaded_tx.signature = bytes.fromhex(instance.signature)
-
-    if instance.guardianSignature:
-        loaded_tx.guardian_signature = bytes.fromhex(instance.guardianSignature)
-
-    return loaded_tx
+    tx_converter = TransactionsConverter()
+    return tx_converter.dictionary_to_transaction(transaction_dictionary)
 
 
-def decode_field_value(value: str) -> str:
-    return base64.b64decode(value).decode()
+def load_inner_transactions_from_file(path: Path) -> List[Transaction]:
+    data_json = path.read_text()
+    transactions: List[Dict[str, Any]] = json.loads(data_json).get("innerTransactions")
+
+    tx_converter = TransactionsConverter()
+    return [tx_converter.dictionary_to_transaction(transaction) for transaction in transactions]
