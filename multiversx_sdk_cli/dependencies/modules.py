@@ -241,7 +241,7 @@ class Rust(DependencyModule):
         self._install_sc_meta()
         self._install_wasm_opt()
         self._install_twiggy()
-        show_message("Please also install all the necessary dependencies required for `sc-meta` to run properly by running the following command: `sc-meta install all`.")
+        show_message("To ensure sc-meta functions correctly, please install all the required dependencies by executing the following command: `sc-meta install all`.")
 
     def _check_install_env(self, apply_correction: bool = True):
         """
