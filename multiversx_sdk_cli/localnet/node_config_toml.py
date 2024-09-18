@@ -26,14 +26,8 @@ def patch_config(data: ConfigDict, config: ConfigRoot):
     data['EpochStartConfig'].update(epoch_start_config)
 
     # Always use the latest VM
-    virtual_machine: Dict[str, Any] = dict()
-    virtual_machine['Execution'] = dict()
-    virtual_machine['Execution']['WasmVMVersions'] = [{'StartEpoch': 0, 'Version': '*'}]
-    virtual_machine['Querying'] = dict()
-    virtual_machine['Querying']['NumConcurrentVMs'] = 1
-    virtual_machine['Querying']['WasmVMVersions'] = [{'StartEpoch': 0, 'Version': '*'}]
-
-    data['VirtualMachine'].update(virtual_machine)
+    data['VirtualMachine']['Execution']['WasmVMVersions'] = [{'StartEpoch': 0, 'Version': '*'}]
+    data['VirtualMachine']['Querying']['WasmVMVersions'] = [{'StartEpoch': 0, 'Version': '*'}]
 
 
 def patch_api(data: ConfigDict, config: ConfigRoot):
