@@ -1,5 +1,6 @@
 from collections import OrderedDict
 from typing import Any, Dict, Protocol
+
 from multiversx_sdk_cli.interfaces import ISimulateResponse, ITransaction
 from multiversx_sdk_cli.utils import ISerializable
 
@@ -18,6 +19,7 @@ class Simulation(ISerializable):
         dictionary["execution"] = self.simulation_response.to_dictionary()
 
         return dictionary
+
 
 class Simulator():
     def __init__(self, proxy: INetworkProvider) -> None:

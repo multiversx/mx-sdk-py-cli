@@ -303,8 +303,13 @@ def build(args: Any):
 
 
 def do_report(args: Any):
+    deprecation_message = "`mxpy contract report` is deprecated. Please use `sc-meta report` instead."
+    logger.warning(deprecation_message)
+
     args_dict = args.__dict__
     projects.do_report(args, args_dict)
+
+    show_warning(deprecation_message)
 
 
 def run_tests(args: Any):

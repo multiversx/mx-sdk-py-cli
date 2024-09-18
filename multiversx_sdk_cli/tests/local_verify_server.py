@@ -1,5 +1,5 @@
-from http.server import HTTPServer, BaseHTTPRequestHandler
 import json
+from http.server import BaseHTTPRequestHandler, HTTPServer
 
 HOST = 'localhost'
 PORT = 7777
@@ -14,7 +14,7 @@ class HTTP(BaseHTTPRequestHandler):
         if self.path == "/initialise":
             response = {'token': 7890}
             self.wfile.write(bytes(json.dumps(response), 'utf-8'))
-        
+
         if self.path == "/verify":
             response = {'status': 'sent to verification'}
             self.wfile.write(bytes(json.dumps(response), 'utf-8'))

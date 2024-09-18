@@ -10,7 +10,7 @@ from multiversx_sdk_cli import (config, dependencies, downloader, errors,
                                 myprocess, utils, workstation)
 from multiversx_sdk_cli.dependencies.resolution import (
     DependencyResolution, get_dependency_resolution)
-from multiversx_sdk_cli.ux import show_warning
+from multiversx_sdk_cli.ux import show_message, show_warning
 
 logger = logging.getLogger("modules")
 
@@ -241,7 +241,7 @@ class Rust(DependencyModule):
         self._install_sc_meta()
         self._install_wasm_opt()
         self._install_twiggy()
-        self._install_sc_meta_deps()
+        show_message("To ensure sc-meta functions correctly, please install all the required dependencies by executing the following command: `sc-meta install all`.")
 
     def _check_install_env(self, apply_correction: bool = True):
         """
