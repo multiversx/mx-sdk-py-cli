@@ -21,7 +21,7 @@ from multiversx_sdk_cli.errors import DockerMissingError, NoWalletProvided
 from multiversx_sdk_cli.interfaces import IAddress
 from multiversx_sdk_cli.projects.core import get_project_paths_recursively
 from multiversx_sdk_cli.projects.templates import Contract
-from multiversx_sdk_cli.ux import show_message
+from multiversx_sdk_cli.ux import show_message, show_warning
 
 logger = logging.getLogger("cli.contracts")
 
@@ -302,9 +302,14 @@ def build(args: Any):
 
 
 def do_report(args: Any):
+    deprecation_message = "`mxpy contract report` is deprecated. Please use `sc-meta report` instead."
+    logger.warning(deprecation_message)
+
     check_if_rust_is_installed()
     args_dict = args.__dict__
     projects.do_report(args, args_dict)
+
+    show_warning(deprecation_message)
 
 
 def run_tests(args: Any):
