@@ -171,11 +171,13 @@ class DelegationOperations:
         delegation_contract = Address.new_from_bech32(args.delegation_contract)
 
         public_keys = self._load_validators_public_keys(args)
+        amount = int(args.value)
 
         tx = self._factory.create_transaction_for_unjailing_nodes(
             sender=owner.address,
             delegation_contract=delegation_contract,
-            public_keys=public_keys
+            public_keys=public_keys,
+            amount=amount
         )
         tx.nonce = int(args.nonce)
         tx.version = int(args.version)

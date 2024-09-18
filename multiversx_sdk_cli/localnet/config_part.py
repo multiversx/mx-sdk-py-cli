@@ -24,8 +24,8 @@ class ConfigPart:
 
         if unknown_entries:
             logger.error(f"""\
-Unknown localnet configuration entries: {unknown_entries}. 
-Please check the configuration of the localnet. 
+Unknown localnet configuration entries: {unknown_entries}.
+Please check the configuration of the localnet.
 For "{self.get_name()}", the allowed entries are: {allowed_entries}.""")
             raise UnknownConfigurationError(f"Unknown localnet configuration entries: {unknown_entries}")
 

@@ -9,7 +9,7 @@ def get_version() -> str:
     try:
         # Works for local development
         return _get_version_from_pyproject()
-    except Exception as error:
+    except Exception:
         try:
             # Works for the installed package
             return _get_version_from_metadata()

@@ -103,7 +103,7 @@ def list_configs(args: Any):
 def delete_config(args: Any):
     config_file = config.resolve_config_path()
     if not config_file.is_file():
-        logger.info(f"Config file not found. Aborting...")
+        logger.info("Config file not found. Aborting...")
         return
 
     confirm_continuation(f"The file `{str(config_file)}` will be deleted. Do you want to continue? (y/n)")
