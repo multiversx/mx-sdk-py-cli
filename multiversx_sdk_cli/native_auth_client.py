@@ -6,7 +6,7 @@ import requests
 
 from multiversx_sdk_cli.errors import NativeAuthClientError
 
-EXPIRY_TIME_IN_SECONDS = 60 * 60 * 24
+EXPIRY_TIME_IN_SECONDS = 60 * 60 * 2
 DEFAULT_API_URL = "https://api.multiversx.com"
 
 
@@ -29,8 +29,8 @@ class NativeAuthClientConfig:
 
 
 class NativeAuthClient:
-    def __init__(self, config: NativeAuthClientConfig = NativeAuthClientConfig()) -> None:
-        self.config = config
+    def __init__(self, config: Optional[NativeAuthClientConfig] = None) -> None:
+        self.config = config or NativeAuthClientConfig()
 
     def get_token(self, address: str, token: str, signature: str) -> str:
         encoded_address = self.encode_value(address)

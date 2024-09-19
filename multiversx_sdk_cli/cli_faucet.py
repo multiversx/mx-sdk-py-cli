@@ -3,8 +3,6 @@ import webbrowser
 from enum import Enum
 from typing import Any, List, Tuple
 
-from multiversx_sdk import Message, MessageComputer
-
 from multiversx_sdk_cli import cli_shared
 from multiversx_sdk_cli.errors import BadUserInput
 from multiversx_sdk_cli.native_auth_client import (NativeAuthClient,
@@ -44,10 +42,8 @@ def faucet(args: Any):
     client = NativeAuthClient(config)
 
     init_token = client.initialize()
-    message = Message(f"{account.address.to_bech32()}{init_token}".encode())
-
-    message_computer = MessageComputer()
-    signature = account.sign_message(message_computer.compute_bytes_for_signing(message))
+    token_for_siginig = f"{account.address.to_bech32()}{init_token}"
+    signature = account.sign_message(token_for_siginig.encode())
 
     access_token = client.get_token(
         address=account.address.to_bech32(),
@@ -56,10 +52,10 @@ def faucet(args: Any):
     )
 
     logger.info(f"Requesting funds for address: {account.address.to_bech32()}")
-    call_web_Wallet_faucet(wallet_url=wallet, access_token=access_token)
+    call_web_wallet_faucet(wallet_url=wallet, access_token=access_token)
 
 
-def call_web_Wallet_faucet(wallet_url: str, access_token: str):
+def call_web_wallet_faucet(wallet_url: str, access_token: str):
     faucet_url = f"{wallet_url}/faucet?accessToken={access_token}"
     webbrowser.open_new_tab(faucet_url)
 

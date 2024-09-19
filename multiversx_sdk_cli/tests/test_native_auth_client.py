@@ -36,7 +36,7 @@ class TestNativeAuth:
 
     def test_latest_block_should_return_signable_token(self, mocker: Any):
         mock(mocker, 200, [{"hash": self.BLOCK_HASH}])
-        config = NativeAuthClientConfig(origin=self.ORIGIN)
+        config = NativeAuthClientConfig(origin=self.ORIGIN, expiry_seconds=self.TTL)
         client = NativeAuthClient(config)
         token = client.initialize()
         assert token == self.TOKEN
@@ -54,7 +54,7 @@ class TestNativeAuth:
                             "error": "Bad request"}])
         mock(mocker, 200, {"hash": self.BLOCK_HASH})
 
-        config = NativeAuthClientConfig(origin=self.ORIGIN)
+        config = NativeAuthClientConfig(origin=self.ORIGIN, expiry_seconds=self.TTL)
         client = NativeAuthClient(config)
 
         token = client.initialize()
@@ -85,7 +85,7 @@ class TestNativeAuthWithGateway:
         ]
         mock_side_effect(mocker, responses)
 
-        config = NativeAuthClientConfig(origin=self.ORIGIN, gateway_url=self.GATEWAY, block_hash_shard=self.METASHARD)
+        config = NativeAuthClientConfig(origin=self.ORIGIN, gateway_url=self.GATEWAY, block_hash_shard=self.METASHARD, expiry_seconds=self.TTL)
         client = NativeAuthClient(config)
         token = client.initialize()
         assert token == self.TOKEN
