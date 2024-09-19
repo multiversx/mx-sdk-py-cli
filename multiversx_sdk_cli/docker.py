@@ -18,7 +18,7 @@ def is_docker_installed():
             return True
         else:
             return False
-    except:
+    except Exception:
         logger.error("Something went wrong when checking if docker is installed!")
 
 

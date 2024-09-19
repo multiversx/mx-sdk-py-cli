@@ -1,17 +1,19 @@
+import json
 import logging
 import os
 from pathlib import Path
-from typing import Any, List
+from typing import Any, List, Tuple
 
 from multiversx_sdk import (Address, AddressComputer, ProxyNetworkProvider,
                             Transaction, TransactionsFactoryConfig)
+from multiversx_sdk.abi import Abi
 
 from multiversx_sdk_cli import cli_shared, projects, utils
 from multiversx_sdk_cli.cli_output import CLIOutputBuilder
 from multiversx_sdk_cli.constants import NUMBER_OF_SHARDS
 from multiversx_sdk_cli.contract_verification import \
     trigger_contract_verification
-from multiversx_sdk_cli.contracts import SmartContract, query_contract
+from multiversx_sdk_cli.contracts import SmartContract
 from multiversx_sdk_cli.cosign_transaction import cosign_transaction
 from multiversx_sdk_cli.dependency_checker import check_if_rust_is_installed
 from multiversx_sdk_cli.docker import is_docker_installed, run_docker
@@ -19,7 +21,7 @@ from multiversx_sdk_cli.errors import DockerMissingError, NoWalletProvided
 from multiversx_sdk_cli.interfaces import IAddress
 from multiversx_sdk_cli.projects.core import get_project_paths_recursively
 from multiversx_sdk_cli.projects.templates import Contract
-from multiversx_sdk_cli.ux import show_message
+from multiversx_sdk_cli.ux import show_message, show_warning
 
 logger = logging.getLogger("cli.contracts")
 
@@ -51,12 +53,13 @@ def setup_parser(args: List[str], subparsers: Any) -> Any:
     sub.add_argument("--path", default=os.getcwd(), help="the project directory (default: current directory)")
     sub.set_defaults(func=clean)
 
-    sub = cli_shared.add_command_subparser(subparsers, "contract", "test", "Run scenarios (tests).")
-    _add_project_arg(sub)
-    sub.add_argument("--directory", default="scenarios",
-                     help="🗀 the directory containing the tests (default: %(default)s)")
-    sub.add_argument("--wildcard", required=False, help="wildcard to match only specific test files")
-    _add_recursive_arg(sub)
+    sub = cli_shared.add_command_subparser(subparsers, "contract", "test", "Run tests.")
+    sub.add_argument("--path", default=os.getcwd(),
+                     help="the directory of the contract (default: %(default)s)")
+    sub.add_argument("--go", action="store_true",
+                     help="this arg runs rust and go tests (default: false)")
+    sub.add_argument("--scen", action="store_true", help="this arg runs scenarios (default: false). If `--scen` and `--go` are both specified, scen overrides the go argument")
+    sub.add_argument("--nocapture", action="store_true", help="this arg prints the entire output of the vm (default: false)")
     sub.set_defaults(func=run_tests)
 
     sub = cli_shared.add_command_subparser(subparsers, "contract", "report", "Print a detailed report of the smart contracts.")
@@ -71,11 +74,12 @@ def setup_parser(args: List[str], subparsers: Any) -> Any:
     output_description = CLIOutputBuilder.describe(with_contract=True, with_transaction_on_network=True, with_simulation=True)
     sub = cli_shared.add_command_subparser(subparsers, "contract", "deploy", f"Deploy a Smart Contract.{output_description}")
     _add_bytecode_arg(sub)
+    _add_contract_abi_arg(sub)
     _add_metadata_arg(sub)
     cli_shared.add_outfile_arg(sub)
     cli_shared.add_wallet_args(args, sub)
     cli_shared.add_proxy_arg(sub)
-    cli_shared.add_tx_args(args, sub, with_receiver=False, with_data=False, with_guardian=True)
+    cli_shared.add_tx_args(args, sub, with_receiver=False, with_data=False)
     _add_arguments_arg(sub)
     sub.add_argument("--wait-result", action="store_true", default=False,
                      help="signal to wait for the transaction result - only valid if --send is set")
@@ -89,10 +93,11 @@ def setup_parser(args: List[str], subparsers: Any) -> Any:
     sub = cli_shared.add_command_subparser(subparsers, "contract", "call",
                                            f"Interact with a Smart Contract (execute function).{output_description}")
     _add_contract_arg(sub)
+    _add_contract_abi_arg(sub)
     cli_shared.add_outfile_arg(sub)
     cli_shared.add_wallet_args(args, sub)
     cli_shared.add_proxy_arg(sub)
-    cli_shared.add_tx_args(args, sub, with_receiver=False, with_data=False, with_guardian=True)
+    cli_shared.add_tx_args(args, sub, with_receiver=False, with_data=False)
     _add_function_arg(sub)
     _add_arguments_arg(sub)
     _add_token_transfers_args(sub)
@@ -108,12 +113,13 @@ def setup_parser(args: List[str], subparsers: Any) -> Any:
     sub = cli_shared.add_command_subparser(subparsers, "contract", "upgrade",
                                            f"Upgrade a previously-deployed Smart Contract.{output_description}")
     _add_contract_arg(sub)
+    _add_contract_abi_arg(sub)
     cli_shared.add_outfile_arg(sub)
     _add_bytecode_arg(sub)
     _add_metadata_arg(sub)
     cli_shared.add_wallet_args(args, sub)
     cli_shared.add_proxy_arg(sub)
-    cli_shared.add_tx_args(args, sub, with_receiver=False, with_data=False, with_guardian=True)
+    cli_shared.add_tx_args(args, sub, with_receiver=False, with_data=False)
     _add_arguments_arg(sub)
     sub.add_argument("--wait-result", action="store_true", default=False,
                      help="signal to wait for the transaction result - only valid if --send is set")
@@ -127,6 +133,7 @@ def setup_parser(args: List[str], subparsers: Any) -> Any:
     sub = cli_shared.add_command_subparser(subparsers, "contract", "query",
                                            "Query a Smart Contract (call a pure function)")
     _add_contract_arg(sub)
+    _add_contract_abi_arg(sub)
     cli_shared.add_proxy_arg(sub)
     _add_function_arg(sub)
     _add_arguments_arg(sub)
@@ -157,7 +164,7 @@ def setup_parser(args: List[str], subparsers: Any) -> Any:
     _add_build_options_args(sub)
     sub.add_argument("--docker-image", required=True, type=str,
                      help="the docker image tag used to build the contract")
-    sub.add_argument("--contract", type=str, help="relative path of the contract in the project")
+    sub.add_argument("--contract", type=str, help="contract to build (contract name, as found in Cargo.toml)")
     sub.add_argument("--no-docker-interactive", action="store_true", default=False)
     sub.add_argument("--no-docker-tty", action="store_true", default=False)
     sub.add_argument("--no-default-platform", action="store_true", default=False,
@@ -170,7 +177,7 @@ def setup_parser(args: List[str], subparsers: Any) -> Any:
 
 def _add_project_arg(sub: Any):
     sub.add_argument("project", nargs='?', default=os.getcwd(),
-                     help="🗀 the project directory (default: current directory)")
+                     help="the project directory (default: current directory)")
 
 
 def _add_build_options_sc_meta(sub: Any):
@@ -211,10 +218,6 @@ def _add_build_options_args(sub: Any):
                      help="for rust projects, optionally specify the suffix of the wasm bytecode output file")
 
 
-def _add_recursive_arg(sub: Any):
-    sub.add_argument("-r", "--recursive", dest="recursive", action="store_true", help="locate projects recursively")
-
-
 def _add_bytecode_arg(sub: Any):
     sub.add_argument("--bytecode", type=str, required=True,
                      help="the file containing the WASM bytecode")
@@ -222,6 +225,10 @@ def _add_bytecode_arg(sub: Any):
 
 def _add_contract_arg(sub: Any):
     sub.add_argument("contract", help="🖄 the address of the Smart Contract")
+
+
+def _add_contract_abi_arg(sub: Any):
+    sub.add_argument("--abi", type=str, help="the ABI of the Smart Contract")
 
 
 def _add_function_arg(sub: Any):
@@ -232,6 +239,8 @@ def _add_arguments_arg(sub: Any):
     sub.add_argument("--arguments", nargs='+',
                      help="arguments for the contract transaction, as [number, bech32-address, ascii string, "
                      "boolean] or hex-encoded. E.g. --arguments 42 0x64 1000 0xabba str:TOK-a1c2ef true erd1[..]")
+    sub.add_argument("--arguments-file", type=str, help="a json file containing the arguments. ONLY if abi file is provided. "
+                     "E.g. [{ 'to': 'erd1...', 'amount': 10000000000 }]")
 
 
 def _add_token_transfers_args(sub: Any):
@@ -284,25 +293,28 @@ def clean(args: Any):
 
 
 def build(args: Any):
-    check_if_rust_is_installed()
     project_paths = [Path(args.path)]
     arg_list = cli_shared.convert_args_object_to_args_list(args)
 
     for project in project_paths:
         projects.build_project(project, arg_list)
 
+    show_warning("The primary tool for building smart contracts is `sc-meta`. Try using the `sc-meta all build` command.")
+
 
 def do_report(args: Any):
-    check_if_rust_is_installed()
+    deprecation_message = "`mxpy contract report` is deprecated. Please use `sc-meta report` instead."
+    logger.warning(deprecation_message)
+
     args_dict = args.__dict__
     projects.do_report(args, args_dict)
+
+    show_warning(deprecation_message)
 
 
 def run_tests(args: Any):
     check_if_rust_is_installed()
-    project_paths = get_project_paths(args)
-    for project in project_paths:
-        projects.run_tests(project, args)
+    projects.run_tests(args)
 
 
 def deploy(args: Any):
@@ -314,15 +326,16 @@ def deploy(args: Any):
 
     sender = cli_shared.prepare_account(args)
     config = TransactionsFactoryConfig(args.chain)
-    contract = SmartContract(config)
+    abi = Abi.load(Path(args.abi)) if args.abi else None
+    contract = SmartContract(config, abi)
 
-    address_computer = AddressComputer(NUMBER_OF_SHARDS)
-    contract_address = address_computer.compute_contract_address(deployer=sender.address, deployment_nonce=args.nonce)
+    arguments, should_prepare_args = _get_contract_arguments(args)
 
     tx = contract.prepare_deploy_transaction(
         owner=sender,
         bytecode=Path(args.bytecode),
-        arguments=args.arguments,
+        arguments=arguments,
+        should_prepare_args=should_prepare_args,
         upgradeable=args.metadata_upgradeable,
         readable=args.metadata_readable,
         payable=args.metadata_payable,
@@ -334,6 +347,9 @@ def deploy(args: Any):
         options=int(args.options),
         guardian=args.guardian)
     tx = _sign_guarded_tx(args, tx)
+
+    address_computer = AddressComputer(NUMBER_OF_SHARDS)
+    contract_address = address_computer.compute_contract_address(deployer=sender.address, deployment_nonce=args.nonce)
 
     logger.info("Contract address: %s", contract_address.to_bech32())
     utils.log_explorer_contract_address(args.chain, contract_address.to_bech32())
@@ -363,15 +379,20 @@ def call(args: Any):
     cli_shared.prepare_nonce_in_args(args)
 
     sender = cli_shared.prepare_account(args)
+
     config = TransactionsFactoryConfig(args.chain)
-    contract = SmartContract(config)
+    abi = Abi.load(Path(args.abi)) if args.abi else None
+    contract = SmartContract(config, abi)
+
+    arguments, should_prepare_args = _get_contract_arguments(args)
     contract_address = Address.new_from_bech32(args.contract)
 
     tx = contract.prepare_execute_transaction(
         caller=sender,
         contract=contract_address,
         function=args.function,
-        arguments=args.arguments,
+        arguments=arguments,
+        should_prepare_args=should_prepare_args,
         gas_limit=int(args.gas_limit),
         value=int(args.value),
         transfers=args.token_transfers,
@@ -393,14 +414,18 @@ def upgrade(args: Any):
 
     sender = cli_shared.prepare_account(args)
     config = TransactionsFactoryConfig(args.chain)
-    contract = SmartContract(config)
+    abi = Abi.load(Path(args.abi)) if args.abi else None
+    contract = SmartContract(config, abi)
+
+    arguments, should_prepare_args = _get_contract_arguments(args)
     contract_address = Address.new_from_bech32(args.contract)
 
     tx = contract.prepare_upgrade_transaction(
         owner=sender,
         contract=contract_address,
         bytecode=Path(args.bytecode),
-        arguments=args.arguments,
+        arguments=arguments,
+        should_prepare_args=should_prepare_args,
         upgradeable=args.metadata_upgradeable,
         readable=args.metadata_readable,
         payable=args.metadata_payable,
@@ -419,18 +444,44 @@ def upgrade(args: Any):
 def query(args: Any):
     logger.debug("query")
 
-    # workaround so we can use the function bellow
+    # workaround so we can use the function below to set chainID
     args.chain = ""
     cli_shared.prepare_chain_id_in_args(args)
 
+    config = TransactionsFactoryConfig(args.chain)
+    abi = Abi.load(Path(args.abi)) if args.abi else None
+    contract = SmartContract(config, abi)
+
+    arguments, should_prepare_args = _get_contract_arguments(args)
     contract_address = Address.new_from_bech32(args.contract)
 
     proxy = ProxyNetworkProvider(args.proxy)
     function = args.function
-    arguments: List[Any] = args.arguments or []
 
-    result = query_contract(contract_address, proxy, function, arguments)
+    result = contract.query_contract(
+        contract_address=contract_address,
+        proxy=proxy,
+        function=function,
+        arguments=arguments,
+        should_prepare_args=should_prepare_args
+    )
+
     utils.dump_out_json(result)
+
+
+def _get_contract_arguments(args: Any) -> Tuple[List[Any], bool]:
+    json_args = json.loads(Path(args.arguments_file).expanduser().read_text()) if args.arguments_file else None
+
+    if json_args and args.arguments:
+        raise Exception("Provide either '--arguments' or '--arguments-file'.")
+
+    if json_args:
+        if not args.abi:
+            raise Exception("Can't use '--arguments-file' without providing the Abi file.")
+
+        return json_args, False
+    else:
+        return args.arguments, True
 
 
 def _send_or_simulate(tx: Transaction, contract_address: IAddress, args: Any):

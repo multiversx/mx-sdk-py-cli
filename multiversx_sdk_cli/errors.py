@@ -1,5 +1,3 @@
-
-from pathlib import Path
 from typing import Any, List, Tuple, Union
 
 
@@ -20,16 +18,6 @@ class KnownError(Exception):
 
 class ProgrammingError(KnownError):
     pass
-
-
-class TemplateMissingError(KnownError):
-    def __init__(self, template: str):
-        super().__init__(f"Template missing: {template}")
-
-
-class BadTemplateError(KnownError):
-    def __init__(self, directory: Path):
-        super().__init__(f"Bad template: {directory}")
 
 
 class DownloadError(KnownError):
@@ -75,7 +63,7 @@ class BadDirectory(KnownError):
 
 
 class BadFile(KnownError):
-    def __init__(self, filename: str, inner=None):
+    def __init__(self, filename: str, inner: Any = None):
         super().__init__(f"Bad file: {filename}.", inner)
 
 
@@ -104,16 +92,6 @@ class BadInputError(KnownError):
         super().__init__(f"Bad input [{input}]: {message}")
 
 
-class BadAddressFormatError(KnownError):
-    def __init__(self, value: str):
-        super().__init__(f"Bad address [{value}].")
-
-
-class EmptyAddressError(KnownError):
-    def __init__(self):
-        super().__init__("Address is empty.")
-
-
 class ExternalProcessError(KnownError):
     def __init__(self, command_line: str, message: str):
         super().__init__(f"""External process error:
@@ -134,25 +112,6 @@ class ConfigurationShouldBeUniqueError(KnownError):
 class ConfigurationProtectedError(KnownError):
     def __init__(self, name: str):
         super().__init__(f"This configuration name is protected: {name}.")
-
-
-class UnsupportedConfigurationValue(KnownError):
-    pass
-
-
-class UnknownDerivationFunction(KnownError):
-    def __init__(self):
-        super().__init__("Unknown key derivation function.")
-
-
-class UnknownCipher(KnownError):
-    def __init__(self, name: str):
-        super().__init__(f"Unknown cipher: {name}.")
-
-
-class GasLimitTooLarge(KnownError):
-    def __init__(self, current: int, limit: int):
-        super().__init__(f"The gas limit provided ({current}) exceeds the max gas limit of allowed for a transaction ({limit})")
 
 
 class BadUserInput(KnownError):
@@ -208,6 +167,16 @@ class ProxyError(KnownError):
             "code": code
         }
         super().__init__(message, inner)
+
+
+class WalletGenerationError(KnownError):
+    def __init__(self, message: str):
+        super().__init__(message)
+
+
+class QueryContractError(KnownError):
+    def __init__(self, message: str, inner: Any = None):
+        super().__init__(message, str(inner))
 
 
 class NativeAuthClientError(KnownError):

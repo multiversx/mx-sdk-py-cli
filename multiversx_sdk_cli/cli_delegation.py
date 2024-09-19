@@ -171,7 +171,7 @@ def setup_parser(args: List[str], subparsers: Any) -> Any:
                                            "Create a delegation contract from validator data. Must be called by the node operator")
 
     sub.add_argument("--max-cap", required=True, help="total delegation cap in EGLD, fully denominated. Use value 0 for uncapped")
-    sub.add_argument("--fee", required=True, help=f"service fee as hundredths of percents. (e.g.  a service fee of 37.45 percent is expressed by the integer 3745)")
+    sub.add_argument("--fee", required=True, help="service fee as hundredths of percents. (e.g.  a service fee of 37.45 percent is expressed by the integer 3745)")
     _add_common_arguments(args, sub)
     sub.set_defaults(func=make_new_contract_from_validator_data)
 
@@ -182,7 +182,7 @@ def setup_parser(args: List[str], subparsers: Any) -> Any:
 def _add_common_arguments(args: List[str], sub: Any):
     cli_shared.add_proxy_arg(sub)
     cli_shared.add_wallet_args(args, sub)
-    cli_shared.add_tx_args(args, sub, with_receiver=False, with_data=False, with_estimate_gas=True, with_guardian=True)
+    cli_shared.add_tx_args(args, sub, with_receiver=False, with_data=False, with_estimate_gas=True)
     cli_shared.add_broadcast_args(sub, relay=False)
     cli_shared.add_outfile_arg(sub, what="signed transaction, hash")
     cli_shared.add_guardian_wallet_args(args, sub)

@@ -1,0 +1,15 @@
+[
+    {
+        "bech32": "erd1qqqqqqqqqqqqqpgqpg2tnjelx3s3dhkksqhjavprtgmt9xt4d8ss9al8m4"
+    },
+    0,
+    {
+        "bech32": "erd1qqqqqqqqqqqqqpgqak8zt22wl2ph4tswtyc39namqx6ysa2sd8ss4xmlj3"
+    },
+    {
+        "hex": "0500"
+    },
+    [
+        0
+    ]
+]
