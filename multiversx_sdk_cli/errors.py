@@ -177,3 +177,8 @@ class WalletGenerationError(KnownError):
 class QueryContractError(KnownError):
     def __init__(self, message: str, inner: Any = None):
         super().__init__(message, str(inner))
+
+
+class NativeAuthClientError(KnownError):
+    def __init__(self, message: str):
+        super().__init__(message)

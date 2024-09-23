@@ -12,7 +12,7 @@ def setup_parser(args: List[str], subparsers: Any) -> Any:
 
     # create new delegation contract
     sub = cli_shared.add_command_subparser(subparsers, "staking-provider", "create-new-delegation-contract",
-                                           "Create a new delegation system smart contract, transferred value must be"
+                                           "Create a new delegation system smart contract, transferred value must be "
                                            "greater than baseIssuingCost + min deposit value")
     _add_common_arguments(args, sub)
     sub.add_argument("--total-delegation-cap", required=True, help="the total delegation contract capacity")

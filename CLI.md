@@ -23,7 +23,7 @@ See:
         
 
 COMMAND GROUPS:
-  {contract,tx,validator,account,ledger,wallet,deps,config,localnet,data,staking-provider,dns}
+  {contract,tx,validator,account,ledger,wallet,deps,config,localnet,data,staking-provider,dns,faucet}
 
 TOP-LEVEL OPTIONS:
   -h, --help            show this help message and exit
@@ -45,6 +45,7 @@ localnet                       Set up, start and control localnets
 data                           Data manipulation omnitool
 staking-provider               Staking provider omnitool
 dns                            Operations related to the Domain Name Service
+faucet                         Get xEGLD on Devnet or Testnet
 
 ```
 ## Group **Contract**
@@ -69,7 +70,7 @@ new                            Create a new Smart Contract project based on a te
 templates                      List the available Smart Contract templates.
 build                          Build a Smart Contract project.
 clean                          Clean a Smart Contract project.
-test                           Run scenarios (tests).
+test                           Run tests.
 report                         Print a detailed report of the smart contracts.
 deploy                         Deploy a Smart Contract.
 call                           Interact with a Smart Contract (execute function).
@@ -194,6 +195,7 @@ Output example:
 options:
   -h, --help                                      show this help message and exit
   --bytecode BYTECODE                             the file containing the WASM bytecode
+  --abi ABI                                       the ABI of the Smart Contract
   --metadata-not-upgradeable                      ‼ mark the contract as NOT upgradeable (default: upgradeable)
   --metadata-not-readable                         ‼ mark the contract as NOT readable (default: readable)
   --metadata-payable                              ‼ mark the contract as payable (default: not payable)
@@ -219,10 +221,18 @@ options:
   --guardian GUARDIAN                             the address of the guradian
   --guardian-service-url GUARDIAN_SERVICE_URL     the url of the guardian service
   --guardian-2fa-code GUARDIAN_2FA_CODE           the 2fa code for the guardian
+  --relayer RELAYER                               the address of the relayer
+  --inner-transactions INNER_TRANSACTIONS         a json file containing the inner transactions; should only be provided
+                                                  when creating the relayer's transaction
+  --inner-transactions-outfile INNER_TRANSACTIONS_OUTFILE
+                                                  where to save the transaction as an inner transaction (default:
+                                                  stdout)
   --options OPTIONS                               the transaction options (default: 0)
   --arguments ARGUMENTS [ARGUMENTS ...]           arguments for the contract transaction, as [number, bech32-address,
                                                   ascii string, boolean] or hex-encoded. E.g. --arguments 42 0x64 1000
                                                   0xabba str:TOK-a1c2ef true erd1[..]
+  --arguments-file ARGUMENTS_FILE                 a json file containing the arguments. ONLY if abi file is provided.
+                                                  E.g. [{ 'to': 'erd1...', 'amount': 10000000000 }]
   --wait-result                                   signal to wait for the transaction result - only valid if --send is
                                                   set
   --timeout TIMEOUT                               max num of seconds to wait for result - only valid if --wait-result is
@@ -282,6 +292,7 @@ positional arguments:
 
 options:
   -h, --help                                      show this help message and exit
+  --abi ABI                                       the ABI of the Smart Contract
   --outfile OUTFILE                               where to save the output (default: stdout)
   --pem PEM                                       🔑 the PEM file, if keyfile not provided
   --pem-index PEM_INDEX                           🔑 the index in the PEM file (default: 0)
@@ -303,11 +314,19 @@ options:
   --guardian GUARDIAN                             the address of the guradian
   --guardian-service-url GUARDIAN_SERVICE_URL     the url of the guardian service
   --guardian-2fa-code GUARDIAN_2FA_CODE           the 2fa code for the guardian
+  --relayer RELAYER                               the address of the relayer
+  --inner-transactions INNER_TRANSACTIONS         a json file containing the inner transactions; should only be provided
+                                                  when creating the relayer's transaction
+  --inner-transactions-outfile INNER_TRANSACTIONS_OUTFILE
+                                                  where to save the transaction as an inner transaction (default:
+                                                  stdout)
   --options OPTIONS                               the transaction options (default: 0)
   --function FUNCTION                             the function to call
   --arguments ARGUMENTS [ARGUMENTS ...]           arguments for the contract transaction, as [number, bech32-address,
                                                   ascii string, boolean] or hex-encoded. E.g. --arguments 42 0x64 1000
                                                   0xabba str:TOK-a1c2ef true erd1[..]
+  --arguments-file ARGUMENTS_FILE                 a json file containing the arguments. ONLY if abi file is provided.
+                                                  E.g. [{ 'to': 'erd1...', 'amount': 10000000000 }]
   --token-transfers TOKEN_TRANSFERS [TOKEN_TRANSFERS ...]
                                                   token transfers for transfer & execute, as [token, amount] E.g.
                                                   --token-transfers NFT-123456-0a 1 ESDT-987654 100000000
@@ -371,6 +390,7 @@ positional arguments:
 
 options:
   -h, --help                                      show this help message and exit
+  --abi ABI                                       the ABI of the Smart Contract
   --outfile OUTFILE                               where to save the output (default: stdout)
   --bytecode BYTECODE                             the file containing the WASM bytecode
   --metadata-not-upgradeable                      ‼ mark the contract as NOT upgradeable (default: upgradeable)
@@ -397,10 +417,18 @@ options:
   --guardian GUARDIAN                             the address of the guradian
   --guardian-service-url GUARDIAN_SERVICE_URL     the url of the guardian service
   --guardian-2fa-code GUARDIAN_2FA_CODE           the 2fa code for the guardian
+  --relayer RELAYER                               the address of the relayer
+  --inner-transactions INNER_TRANSACTIONS         a json file containing the inner transactions; should only be provided
+                                                  when creating the relayer's transaction
+  --inner-transactions-outfile INNER_TRANSACTIONS_OUTFILE
+                                                  where to save the transaction as an inner transaction (default:
+                                                  stdout)
   --options OPTIONS                               the transaction options (default: 0)
   --arguments ARGUMENTS [ARGUMENTS ...]           arguments for the contract transaction, as [number, bech32-address,
                                                   ascii string, boolean] or hex-encoded. E.g. --arguments 42 0x64 1000
                                                   0xabba str:TOK-a1c2ef true erd1[..]
+  --arguments-file ARGUMENTS_FILE                 a json file containing the arguments. ONLY if abi file is provided.
+                                                  E.g. [{ 'to': 'erd1...', 'amount': 10000000000 }]
   --wait-result                                   signal to wait for the transaction result - only valid if --send is
                                                   set
   --timeout TIMEOUT                               max num of seconds to wait for result - only valid if --wait-result is
@@ -432,11 +460,14 @@ positional arguments:
 
 options:
   -h, --help                             show this help message and exit
+  --abi ABI                              the ABI of the Smart Contract
   --proxy PROXY                          🔗 the URL of the proxy
   --function FUNCTION                    the function to call
   --arguments ARGUMENTS [ARGUMENTS ...]  arguments for the contract transaction, as [number, bech32-address, ascii
                                          string, boolean] or hex-encoded. E.g. --arguments 42 0x64 1000 0xabba
                                          str:TOK-a1c2ef true erd1[..]
+  --arguments-file ARGUMENTS_FILE        a json file containing the arguments. ONLY if abi file is provided. E.g. [{
+                                         'to': 'erd1...', 'amount': 10000000000 }]
 
 ```
 ### Contract.Report
@@ -549,8 +580,17 @@ options:
   --guardian GUARDIAN                             the address of the guradian
   --guardian-service-url GUARDIAN_SERVICE_URL     the url of the guardian service
   --guardian-2fa-code GUARDIAN_2FA_CODE           the 2fa code for the guardian
+  --relayer RELAYER                               the address of the relayer
+  --inner-transactions INNER_TRANSACTIONS         a json file containing the inner transactions; should only be provided
+                                                  when creating the relayer's transaction
+  --inner-transactions-outfile INNER_TRANSACTIONS_OUTFILE
+                                                  where to save the transaction as an inner transaction (default:
+                                                  stdout)
   --options OPTIONS                               the transaction options (default: 0)
   --data-file DATA_FILE                           a file containing transaction data
+  --token-transfers TOKEN_TRANSFERS [TOKEN_TRANSFERS ...]
+                                                  token transfers for transfer & execute, as [token, amount] E.g.
+                                                  --token-transfers NFT-123456-0a 1 ESDT-987654 100000000
   --outfile OUTFILE                               where to save the output (signed transaction, hash) (default: stdout)
   --send                                          ✓ whether to broadcast the transaction (default: False)
   --simulate                                      whether to simulate the transaction (default: False)
@@ -693,6 +733,12 @@ options:
   --guardian GUARDIAN                             the address of the guradian
   --guardian-service-url GUARDIAN_SERVICE_URL     the url of the guardian service
   --guardian-2fa-code GUARDIAN_2FA_CODE           the 2fa code for the guardian
+  --relayer RELAYER                               the address of the relayer
+  --inner-transactions INNER_TRANSACTIONS         a json file containing the inner transactions; should only be provided
+                                                  when creating the relayer's transaction
+  --inner-transactions-outfile INNER_TRANSACTIONS_OUTFILE
+                                                  where to save the transaction as an inner transaction (default:
+                                                  stdout)
   --options OPTIONS                               the transaction options (default: 0)
   --send                                          ✓ whether to broadcast the transaction (default: False)
   --simulate                                      whether to simulate the transaction (default: False)
@@ -743,6 +789,12 @@ options:
   --guardian GUARDIAN                             the address of the guradian
   --guardian-service-url GUARDIAN_SERVICE_URL     the url of the guardian service
   --guardian-2fa-code GUARDIAN_2FA_CODE           the 2fa code for the guardian
+  --relayer RELAYER                               the address of the relayer
+  --inner-transactions INNER_TRANSACTIONS         a json file containing the inner transactions; should only be provided
+                                                  when creating the relayer's transaction
+  --inner-transactions-outfile INNER_TRANSACTIONS_OUTFILE
+                                                  where to save the transaction as an inner transaction (default:
+                                                  stdout)
   --options OPTIONS                               the transaction options (default: 0)
   --send                                          ✓ whether to broadcast the transaction (default: False)
   --simulate                                      whether to simulate the transaction (default: False)
@@ -791,6 +843,12 @@ options:
   --guardian GUARDIAN                             the address of the guradian
   --guardian-service-url GUARDIAN_SERVICE_URL     the url of the guardian service
   --guardian-2fa-code GUARDIAN_2FA_CODE           the 2fa code for the guardian
+  --relayer RELAYER                               the address of the relayer
+  --inner-transactions INNER_TRANSACTIONS         a json file containing the inner transactions; should only be provided
+                                                  when creating the relayer's transaction
+  --inner-transactions-outfile INNER_TRANSACTIONS_OUTFILE
+                                                  where to save the transaction as an inner transaction (default:
+                                                  stdout)
   --options OPTIONS                               the transaction options (default: 0)
   --send                                          ✓ whether to broadcast the transaction (default: False)
   --simulate                                      whether to simulate the transaction (default: False)
@@ -839,6 +897,12 @@ options:
   --guardian GUARDIAN                             the address of the guradian
   --guardian-service-url GUARDIAN_SERVICE_URL     the url of the guardian service
   --guardian-2fa-code GUARDIAN_2FA_CODE           the 2fa code for the guardian
+  --relayer RELAYER                               the address of the relayer
+  --inner-transactions INNER_TRANSACTIONS         a json file containing the inner transactions; should only be provided
+                                                  when creating the relayer's transaction
+  --inner-transactions-outfile INNER_TRANSACTIONS_OUTFILE
+                                                  where to save the transaction as an inner transaction (default:
+                                                  stdout)
   --options OPTIONS                               the transaction options (default: 0)
   --send                                          ✓ whether to broadcast the transaction (default: False)
   --simulate                                      whether to simulate the transaction (default: False)
@@ -887,6 +951,12 @@ options:
   --guardian GUARDIAN                             the address of the guradian
   --guardian-service-url GUARDIAN_SERVICE_URL     the url of the guardian service
   --guardian-2fa-code GUARDIAN_2FA_CODE           the 2fa code for the guardian
+  --relayer RELAYER                               the address of the relayer
+  --inner-transactions INNER_TRANSACTIONS         a json file containing the inner transactions; should only be provided
+                                                  when creating the relayer's transaction
+  --inner-transactions-outfile INNER_TRANSACTIONS_OUTFILE
+                                                  where to save the transaction as an inner transaction (default:
+                                                  stdout)
   --options OPTIONS                               the transaction options (default: 0)
   --send                                          ✓ whether to broadcast the transaction (default: False)
   --simulate                                      whether to simulate the transaction (default: False)
@@ -935,6 +1005,12 @@ options:
   --guardian GUARDIAN                             the address of the guradian
   --guardian-service-url GUARDIAN_SERVICE_URL     the url of the guardian service
   --guardian-2fa-code GUARDIAN_2FA_CODE           the 2fa code for the guardian
+  --relayer RELAYER                               the address of the relayer
+  --inner-transactions INNER_TRANSACTIONS         a json file containing the inner transactions; should only be provided
+                                                  when creating the relayer's transaction
+  --inner-transactions-outfile INNER_TRANSACTIONS_OUTFILE
+                                                  where to save the transaction as an inner transaction (default:
+                                                  stdout)
   --options OPTIONS                               the transaction options (default: 0)
   --send                                          ✓ whether to broadcast the transaction (default: False)
   --simulate                                      whether to simulate the transaction (default: False)
@@ -960,10 +1036,33 @@ usage: mxpy staking-provider COMMAND [-h] ...
 Staking provider omnitool
 
 COMMANDS:
-  {create-new-delegation-contract,get-contract-address,add-nodes,remove-nodes,stake-nodes,unbond-nodes,unstake-nodes,unjail-nodes,change-service-fee,modify-delegation-cap,automatic-activation,redelegate-cap,set-metadata}
+  {create-new-delegation-contract,get-contract-address,add-nodes,remove-nodes,stake-nodes,unbond-nodes,unstake-nodes,unjail-nodes,delegate,claim-rewards,redelegate-rewards,undelegate,withdraw,change-service-fee,modify-delegation-cap,automatic-activation,redelegate-cap,set-metadata,make-delegation-contract-from-validator}
 
 OPTIONS:
   -h, --help            show this help message and exit
+
+----------------
+COMMANDS summary
+----------------
+create-new-delegation-contract Create a new delegation system smart contract, transferred value must be greater than baseIssuingCost + min deposit value
+get-contract-address           Get create contract address by transaction hash
+add-nodes                      Add new nodes must be called by the contract owner
+remove-nodes                   Remove nodes must be called by the contract owner
+stake-nodes                    Stake nodes must be called by the contract owner
+unbond-nodes                   Unbond nodes must be called by the contract owner
+unstake-nodes                  Unstake nodes must be called by the contract owner
+unjail-nodes                   Unjail nodes must be called by the contract owner
+delegate                       Delegate funds to a delegation contract
+claim-rewards                  Claim the rewards earned for delegating
+redelegate-rewards             Redelegate the rewards earned for delegating
+undelegate                     Undelegate funds from a delegation contract
+withdraw                       Withdraw funds from a delegation contract
+change-service-fee             Change service fee must be called by the contract owner
+modify-delegation-cap          Modify delegation cap must be called by the contract owner
+automatic-activation           Automatic activation must be called by the contract owner
+redelegate-cap                 Redelegate cap must be called by the contract owner
+set-metadata                   Set metadata must be called by the contract owner
+make-delegation-contract-from-validator Create a delegation contract from validator data. Must be called by the node operator
 
 ```
 ### StakingProvider.CreateNewDelegationContract
@@ -973,7 +1072,7 @@ OPTIONS:
 $ mxpy staking-provider create-new-delegation-contract --help
 usage: mxpy staking-provider create-new-delegation-contract [-h] ...
 
-Create a new delegation system smart contract, transferred value must begreater than baseIssuingCost + min deposit value
+Create a new delegation system smart contract, transferred value must be greater than baseIssuingCost + min deposit value
 
 options:
   -h, --help                                      show this help message and exit
@@ -998,6 +1097,12 @@ options:
   --guardian GUARDIAN                             the address of the guradian
   --guardian-service-url GUARDIAN_SERVICE_URL     the url of the guardian service
   --guardian-2fa-code GUARDIAN_2FA_CODE           the 2fa code for the guardian
+  --relayer RELAYER                               the address of the relayer
+  --inner-transactions INNER_TRANSACTIONS         a json file containing the inner transactions; should only be provided
+                                                  when creating the relayer's transaction
+  --inner-transactions-outfile INNER_TRANSACTIONS_OUTFILE
+                                                  where to save the transaction as an inner transaction (default:
+                                                  stdout)
   --options OPTIONS                               the transaction options (default: 0)
   --send                                          ✓ whether to broadcast the transaction (default: False)
   --simulate                                      whether to simulate the transaction (default: False)
@@ -1044,7 +1149,6 @@ options:
   -h, --help                                      show this help message and exit
   --validators-file VALIDATORS_FILE               a JSON file describing the Nodes
   --delegation-contract DELEGATION_CONTRACT       address of the delegation contract
-  --using-delegation-manager                      whether delegation contract was created using the Delegation Manager
   --proxy PROXY                                   🔗 the URL of the proxy
   --pem PEM                                       🔑 the PEM file, if keyfile not provided
   --pem-index PEM_INDEX                           🔑 the index in the PEM file (default: 0)
@@ -1066,6 +1170,12 @@ options:
   --guardian GUARDIAN                             the address of the guradian
   --guardian-service-url GUARDIAN_SERVICE_URL     the url of the guardian service
   --guardian-2fa-code GUARDIAN_2FA_CODE           the 2fa code for the guardian
+  --relayer RELAYER                               the address of the relayer
+  --inner-transactions INNER_TRANSACTIONS         a json file containing the inner transactions; should only be provided
+                                                  when creating the relayer's transaction
+  --inner-transactions-outfile INNER_TRANSACTIONS_OUTFILE
+                                                  where to save the transaction as an inner transaction (default:
+                                                  stdout)
   --options OPTIONS                               the transaction options (default: 0)
   --send                                          ✓ whether to broadcast the transaction (default: False)
   --simulate                                      whether to simulate the transaction (default: False)
@@ -1093,6 +1203,7 @@ Remove nodes must be called by the contract owner
 options:
   -h, --help                                      show this help message and exit
   --bls-keys BLS_KEYS                             a list with the bls keys of the nodes
+  --validators-file VALIDATORS_FILE               a JSON file describing the Nodes
   --delegation-contract DELEGATION_CONTRACT       address of the delegation contract
   --proxy PROXY                                   🔗 the URL of the proxy
   --pem PEM                                       🔑 the PEM file, if keyfile not provided
@@ -1115,6 +1226,12 @@ options:
   --guardian GUARDIAN                             the address of the guradian
   --guardian-service-url GUARDIAN_SERVICE_URL     the url of the guardian service
   --guardian-2fa-code GUARDIAN_2FA_CODE           the 2fa code for the guardian
+  --relayer RELAYER                               the address of the relayer
+  --inner-transactions INNER_TRANSACTIONS         a json file containing the inner transactions; should only be provided
+                                                  when creating the relayer's transaction
+  --inner-transactions-outfile INNER_TRANSACTIONS_OUTFILE
+                                                  where to save the transaction as an inner transaction (default:
+                                                  stdout)
   --options OPTIONS                               the transaction options (default: 0)
   --send                                          ✓ whether to broadcast the transaction (default: False)
   --simulate                                      whether to simulate the transaction (default: False)
@@ -1142,6 +1259,7 @@ Stake nodes must be called by the contract owner
 options:
   -h, --help                                      show this help message and exit
   --bls-keys BLS_KEYS                             a list with the bls keys of the nodes
+  --validators-file VALIDATORS_FILE               a JSON file describing the Nodes
   --delegation-contract DELEGATION_CONTRACT       address of the delegation contract
   --proxy PROXY                                   🔗 the URL of the proxy
   --pem PEM                                       🔑 the PEM file, if keyfile not provided
@@ -1164,6 +1282,12 @@ options:
   --guardian GUARDIAN                             the address of the guradian
   --guardian-service-url GUARDIAN_SERVICE_URL     the url of the guardian service
   --guardian-2fa-code GUARDIAN_2FA_CODE           the 2fa code for the guardian
+  --relayer RELAYER                               the address of the relayer
+  --inner-transactions INNER_TRANSACTIONS         a json file containing the inner transactions; should only be provided
+                                                  when creating the relayer's transaction
+  --inner-transactions-outfile INNER_TRANSACTIONS_OUTFILE
+                                                  where to save the transaction as an inner transaction (default:
+                                                  stdout)
   --options OPTIONS                               the transaction options (default: 0)
   --send                                          ✓ whether to broadcast the transaction (default: False)
   --simulate                                      whether to simulate the transaction (default: False)
@@ -1191,6 +1315,7 @@ Unbond nodes must be called by the contract owner
 options:
   -h, --help                                      show this help message and exit
   --bls-keys BLS_KEYS                             a list with the bls keys of the nodes
+  --validators-file VALIDATORS_FILE               a JSON file describing the Nodes
   --delegation-contract DELEGATION_CONTRACT       address of the delegation contract
   --proxy PROXY                                   🔗 the URL of the proxy
   --pem PEM                                       🔑 the PEM file, if keyfile not provided
@@ -1213,6 +1338,12 @@ options:
   --guardian GUARDIAN                             the address of the guradian
   --guardian-service-url GUARDIAN_SERVICE_URL     the url of the guardian service
   --guardian-2fa-code GUARDIAN_2FA_CODE           the 2fa code for the guardian
+  --relayer RELAYER                               the address of the relayer
+  --inner-transactions INNER_TRANSACTIONS         a json file containing the inner transactions; should only be provided
+                                                  when creating the relayer's transaction
+  --inner-transactions-outfile INNER_TRANSACTIONS_OUTFILE
+                                                  where to save the transaction as an inner transaction (default:
+                                                  stdout)
   --options OPTIONS                               the transaction options (default: 0)
   --send                                          ✓ whether to broadcast the transaction (default: False)
   --simulate                                      whether to simulate the transaction (default: False)
@@ -1240,6 +1371,7 @@ Unstake nodes must be called by the contract owner
 options:
   -h, --help                                      show this help message and exit
   --bls-keys BLS_KEYS                             a list with the bls keys of the nodes
+  --validators-file VALIDATORS_FILE               a JSON file describing the Nodes
   --delegation-contract DELEGATION_CONTRACT       address of the delegation contract
   --proxy PROXY                                   🔗 the URL of the proxy
   --pem PEM                                       🔑 the PEM file, if keyfile not provided
@@ -1262,6 +1394,12 @@ options:
   --guardian GUARDIAN                             the address of the guradian
   --guardian-service-url GUARDIAN_SERVICE_URL     the url of the guardian service
   --guardian-2fa-code GUARDIAN_2FA_CODE           the 2fa code for the guardian
+  --relayer RELAYER                               the address of the relayer
+  --inner-transactions INNER_TRANSACTIONS         a json file containing the inner transactions; should only be provided
+                                                  when creating the relayer's transaction
+  --inner-transactions-outfile INNER_TRANSACTIONS_OUTFILE
+                                                  where to save the transaction as an inner transaction (default:
+                                                  stdout)
   --options OPTIONS                               the transaction options (default: 0)
   --send                                          ✓ whether to broadcast the transaction (default: False)
   --simulate                                      whether to simulate the transaction (default: False)
@@ -1289,6 +1427,7 @@ Unjail nodes must be called by the contract owner
 options:
   -h, --help                                      show this help message and exit
   --bls-keys BLS_KEYS                             a list with the bls keys of the nodes
+  --validators-file VALIDATORS_FILE               a JSON file describing the Nodes
   --delegation-contract DELEGATION_CONTRACT       address of the delegation contract
   --proxy PROXY                                   🔗 the URL of the proxy
   --pem PEM                                       🔑 the PEM file, if keyfile not provided
@@ -1311,6 +1450,12 @@ options:
   --guardian GUARDIAN                             the address of the guradian
   --guardian-service-url GUARDIAN_SERVICE_URL     the url of the guardian service
   --guardian-2fa-code GUARDIAN_2FA_CODE           the 2fa code for the guardian
+  --relayer RELAYER                               the address of the relayer
+  --inner-transactions INNER_TRANSACTIONS         a json file containing the inner transactions; should only be provided
+                                                  when creating the relayer's transaction
+  --inner-transactions-outfile INNER_TRANSACTIONS_OUTFILE
+                                                  where to save the transaction as an inner transaction (default:
+                                                  stdout)
   --options OPTIONS                               the transaction options (default: 0)
   --send                                          ✓ whether to broadcast the transaction (default: False)
   --simulate                                      whether to simulate the transaction (default: False)
@@ -1360,6 +1505,12 @@ options:
   --guardian GUARDIAN                             the address of the guradian
   --guardian-service-url GUARDIAN_SERVICE_URL     the url of the guardian service
   --guardian-2fa-code GUARDIAN_2FA_CODE           the 2fa code for the guardian
+  --relayer RELAYER                               the address of the relayer
+  --inner-transactions INNER_TRANSACTIONS         a json file containing the inner transactions; should only be provided
+                                                  when creating the relayer's transaction
+  --inner-transactions-outfile INNER_TRANSACTIONS_OUTFILE
+                                                  where to save the transaction as an inner transaction (default:
+                                                  stdout)
   --options OPTIONS                               the transaction options (default: 0)
   --send                                          ✓ whether to broadcast the transaction (default: False)
   --simulate                                      whether to simulate the transaction (default: False)
@@ -1409,6 +1560,12 @@ options:
   --guardian GUARDIAN                             the address of the guradian
   --guardian-service-url GUARDIAN_SERVICE_URL     the url of the guardian service
   --guardian-2fa-code GUARDIAN_2FA_CODE           the 2fa code for the guardian
+  --relayer RELAYER                               the address of the relayer
+  --inner-transactions INNER_TRANSACTIONS         a json file containing the inner transactions; should only be provided
+                                                  when creating the relayer's transaction
+  --inner-transactions-outfile INNER_TRANSACTIONS_OUTFILE
+                                                  where to save the transaction as an inner transaction (default:
+                                                  stdout)
   --options OPTIONS                               the transaction options (default: 0)
   --send                                          ✓ whether to broadcast the transaction (default: False)
   --simulate                                      whether to simulate the transaction (default: False)
@@ -1459,6 +1616,12 @@ options:
   --guardian GUARDIAN                             the address of the guradian
   --guardian-service-url GUARDIAN_SERVICE_URL     the url of the guardian service
   --guardian-2fa-code GUARDIAN_2FA_CODE           the 2fa code for the guardian
+  --relayer RELAYER                               the address of the relayer
+  --inner-transactions INNER_TRANSACTIONS         a json file containing the inner transactions; should only be provided
+                                                  when creating the relayer's transaction
+  --inner-transactions-outfile INNER_TRANSACTIONS_OUTFILE
+                                                  where to save the transaction as an inner transaction (default:
+                                                  stdout)
   --options OPTIONS                               the transaction options (default: 0)
   --send                                          ✓ whether to broadcast the transaction (default: False)
   --simulate                                      whether to simulate the transaction (default: False)
@@ -1509,6 +1672,12 @@ options:
   --guardian GUARDIAN                             the address of the guradian
   --guardian-service-url GUARDIAN_SERVICE_URL     the url of the guardian service
   --guardian-2fa-code GUARDIAN_2FA_CODE           the 2fa code for the guardian
+  --relayer RELAYER                               the address of the relayer
+  --inner-transactions INNER_TRANSACTIONS         a json file containing the inner transactions; should only be provided
+                                                  when creating the relayer's transaction
+  --inner-transactions-outfile INNER_TRANSACTIONS_OUTFILE
+                                                  where to save the transaction as an inner transaction (default:
+                                                  stdout)
   --options OPTIONS                               the transaction options (default: 0)
   --send                                          ✓ whether to broadcast the transaction (default: False)
   --simulate                                      whether to simulate the transaction (default: False)
@@ -1560,6 +1729,12 @@ options:
   --guardian GUARDIAN                             the address of the guradian
   --guardian-service-url GUARDIAN_SERVICE_URL     the url of the guardian service
   --guardian-2fa-code GUARDIAN_2FA_CODE           the 2fa code for the guardian
+  --relayer RELAYER                               the address of the relayer
+  --inner-transactions INNER_TRANSACTIONS         a json file containing the inner transactions; should only be provided
+                                                  when creating the relayer's transaction
+  --inner-transactions-outfile INNER_TRANSACTIONS_OUTFILE
+                                                  where to save the transaction as an inner transaction (default:
+                                                  stdout)
   --options OPTIONS                               the transaction options (default: 0)
   --send                                          ✓ whether to broadcast the transaction (default: False)
   --simulate                                      whether to simulate the transaction (default: False)
@@ -1657,6 +1832,7 @@ options:
                                                   (default: None)
   --address-hrp ADDRESS_HRP                       the human-readable part of the address, when format is keystore-
                                                   secret-key or pem (default: erd)
+  --shard SHARD                                   the shard in which the address will be generated; (default: random)
 
 ```
 ### Wallet.Convert
@@ -1888,11 +2064,11 @@ usage: mxpy deps install [-h] ...
 Install dependencies or multiversx-sdk modules.
 
 positional arguments:
-  {all,rust,golang,vmtools,testwallets}  the dependency to install
+  {all,rust,golang,testwallets}  the dependency to install
 
 options:
-  -h, --help                             show this help message and exit
-  --overwrite                            whether to overwrite an existing installation
+  -h, --help                     show this help message and exit
+  --overwrite                    whether to overwrite an existing installation
 
 ```
 ### Dependencies.Check
@@ -1905,10 +2081,10 @@ usage: mxpy deps check [-h] ...
 Check whether a dependency is installed.
 
 positional arguments:
-  {all,rust,golang,vmtools,testwallets}  the dependency to check
+  {all,rust,golang,testwallets}  the dependency to check
 
 options:
-  -h, --help                             show this help message and exit
+  -h, --help                     show this help message and exit
 
 ```
 ## Group **Configuration**
@@ -2114,5 +2290,48 @@ options:
   --key KEY              the key
   --partition PARTITION  the storage partition (default: *)
   --use-global           use the global storage (default: False)
+
+```
+## Group **Faucet**
+
+
+```
+$ mxpy faucet --help
+usage: mxpy faucet COMMAND [-h] ...
+
+Get xEGLD on Devnet or Testnet
+
+COMMANDS:
+  {request}
+
+OPTIONS:
+  -h, --help  show this help message and exit
+
+----------------
+COMMANDS summary
+----------------
+request                        Request xEGLD.
+
+```
+### Faucet.Request
+
+
+```
+$ mxpy faucet request --help
+usage: mxpy faucet request [-h] ...
+
+Request xEGLD.
+
+options:
+  -h, --help                                   show this help message and exit
+  --pem PEM                                    🔑 the PEM file, if keyfile not provided
+  --pem-index PEM_INDEX                        🔑 the index in the PEM file (default: 0)
+  --keyfile KEYFILE                            🔑 a JSON keyfile, if PEM not provided
+  --passfile PASSFILE                          🔑 a file containing keyfile's password, if keyfile provided
+  --ledger                                     🔐 bool flag for signing transaction using ledger
+  --ledger-account-index LEDGER_ACCOUNT_INDEX  🔐 the index of the account when using Ledger
+  --ledger-address-index LEDGER_ADDRESS_INDEX  🔐 the index of the address when using Ledger
+  --sender-username SENDER_USERNAME            🖄 the username of the sender
+  --chain CHAIN                                the chain identifier
 
 ```
