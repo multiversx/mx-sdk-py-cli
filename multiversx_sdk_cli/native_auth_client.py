@@ -6,7 +6,7 @@ import requests
 
 from multiversx_sdk_cli.errors import NativeAuthClientError
 
-EXPIRY_TIME_IN_SECONDS = 60 * 60 * 2
+DEFAULT_EXPIRY_TIME_IN_SECONDS = 60 * 60 * 2
 DEFAULT_API_URL = "https://api.multiversx.com"
 
 
@@ -15,7 +15,7 @@ class NativeAuthClientConfig:
             self,
             origin: str = '',
             api_url: str = DEFAULT_API_URL,
-            expiry_seconds: int = EXPIRY_TIME_IN_SECONDS,
+            expiry_seconds: int = DEFAULT_EXPIRY_TIME_IN_SECONDS,
             block_hash_shard: Optional[int] = None,
             gateway_url: Optional[str] = None,
             extra_request_headers: Optional[Dict[str, str]] = None
@@ -32,18 +32,18 @@ class NativeAuthClient:
     def __init__(self, config: Optional[NativeAuthClientConfig] = None) -> None:
         self.config = config or NativeAuthClientConfig()
 
-    def get_token(self, address: str, token: str, signature: str) -> str:
-        encoded_address = self.encode_value(address)
-        encoded_token = self.encode_value(token)
-
-        return f"{encoded_address}.{encoded_token}.{signature}"
-
     def initialize(self, extra_info: Dict[Any, Any] = {}) -> str:
         block_hash = self.get_current_block_hash()
-        encoded_extra_info = self.encode_value(json.dumps(extra_info))
-        encoded_origin = self.encode_value(self.config.origin)
+        encoded_extra_info = self._encode_value(json.dumps(extra_info))
+        encoded_origin = self._encode_value(self.config.origin)
 
         return f"{encoded_origin}.{block_hash}.{self.config.expiry_seconds}.{encoded_extra_info}"
+
+    def get_token(self, address: str, token: str, signature: str) -> str:
+        encoded_address = self._encode_value(address)
+        encoded_token = self._encode_value(token)
+
+        return f"{encoded_address}.{encoded_token}.{signature}"
 
     def get_current_block_hash(self) -> str:
         if self.config.gateway_url:
@@ -91,11 +91,11 @@ class NativeAuthClient:
         response = self._execute_request(url)
         return response[0]["hash"]
 
-    def encode_value(self, string: str) -> str:
+    def _encode_value(self, string: str) -> str:
         encoded = base64.b64encode(string.encode('utf-8')).decode('utf-8')
-        return self.escape(encoded)
+        return self._escape(encoded)
 
-    def escape(self, string: str) -> str:
+    def _escape(self, string: str) -> str:
         return string.replace("+", "-").replace("/", "_").replace("=", "")
 
     def _execute_request(self, url: str) -> Any:
