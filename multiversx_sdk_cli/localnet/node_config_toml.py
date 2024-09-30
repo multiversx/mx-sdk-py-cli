@@ -24,6 +24,7 @@ def patch_config(data: ConfigDict, config: ConfigRoot):
     epoch_start_config['MinRoundsBetweenEpochs'] = int(config.general.rounds_per_epoch / 4)
 
     data['EpochStartConfig'].update(epoch_start_config)
+    data['WebServerAntiflood']['VmQueryDelayAfterStartInSec'] = 30
 
     # Always use the latest VM
     data['VirtualMachine']['Execution']['WasmVMVersions'] = [{'StartEpoch': 0, 'Version': '*'}]
