@@ -1,9 +1,11 @@
+# PYTHON_ARGCOMPLETE_OK
 import argparse
 import logging
 import sys
 from argparse import ArgumentParser
 from typing import Any, List
 
+import argcomplete
 from rich.logging import RichHandler
 
 import multiversx_sdk_cli.cli_accounts
@@ -13,6 +15,7 @@ import multiversx_sdk_cli.cli_data
 import multiversx_sdk_cli.cli_delegation
 import multiversx_sdk_cli.cli_deps
 import multiversx_sdk_cli.cli_dns
+import multiversx_sdk_cli.cli_faucet
 import multiversx_sdk_cli.cli_ledger
 import multiversx_sdk_cli.cli_localnet
 import multiversx_sdk_cli.cli_transactions
@@ -41,6 +44,7 @@ def _do_main(cli_args: List[str]):
     utils.ensure_folder(config.SDK_PATH)
     argv_with_config_args = config.add_config_args(cli_args)
     parser = setup_parser(argv_with_config_args)
+    argcomplete.autocomplete(parser)
     args = parser.parse_args(argv_with_config_args)
 
     if args.verbose:
@@ -97,6 +101,7 @@ See:
     commands.append(multiversx_sdk_cli.cli_data.setup_parser(subparsers))
     commands.append(multiversx_sdk_cli.cli_delegation.setup_parser(args, subparsers))
     commands.append(multiversx_sdk_cli.cli_dns.setup_parser(args, subparsers))
+    commands.append(multiversx_sdk_cli.cli_faucet.setup_parser(args, subparsers))
 
     parser.epilog = """
 ----------------------

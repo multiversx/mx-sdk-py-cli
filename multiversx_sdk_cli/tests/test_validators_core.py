@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from multiversx_sdk_core import Address
+from multiversx_sdk import Address
 
 from multiversx_sdk_cli.validators.core import \
     prepare_transaction_data_for_stake

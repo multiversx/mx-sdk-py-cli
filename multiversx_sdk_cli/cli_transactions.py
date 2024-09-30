@@ -1,14 +1,20 @@
+import logging
 from pathlib import Path
-from typing import Any, List
+from typing import Any, Dict, List
+
+from multiversx_sdk import Transaction, TransactionsConverter
 
 from multiversx_sdk_cli import cli_shared, utils
 from multiversx_sdk_cli.cli_output import CLIOutputBuilder
 from multiversx_sdk_cli.cosign_transaction import cosign_transaction
 from multiversx_sdk_cli.custom_network_provider import CustomNetworkProvider
-from multiversx_sdk_cli.errors import NoWalletProvided
+from multiversx_sdk_cli.errors import BadUsage, NoWalletProvided
 from multiversx_sdk_cli.transactions import (compute_relayed_v1_data,
                                              do_prepare_transaction,
+                                             load_inner_transactions_from_file,
                                              load_transaction_from_file)
+
+logger = logging.getLogger("cli.transactions")
 
 
 def setup_parser(args: List[str], subparsers: Any) -> Any:
@@ -17,6 +23,7 @@ def setup_parser(args: List[str], subparsers: Any) -> Any:
 
     sub = cli_shared.add_command_subparser(subparsers, "tx", "new", f"Create a new transaction.{CLIOutputBuilder.describe()}")
     _add_common_arguments(args, sub)
+    _add_token_transfers_args(sub)
     cli_shared.add_outfile_arg(sub, what="signed transaction, hash")
     cli_shared.add_broadcast_args(sub, relay=True)
     cli_shared.add_proxy_arg(sub)
@@ -57,8 +64,14 @@ def setup_parser(args: List[str], subparsers: Any) -> Any:
 
 def _add_common_arguments(args: List[str], sub: Any):
     cli_shared.add_wallet_args(args, sub)
-    cli_shared.add_tx_args(args, sub, with_guardian=True)
+    cli_shared.add_tx_args(args, sub)
     sub.add_argument("--data-file", type=str, default=None, help="a file containing transaction data")
+
+
+def _add_token_transfers_args(sub: Any):
+    sub.add_argument("--token-transfers", nargs='+',
+                     help="token transfers for transfer & execute, as [token, amount] "
+                     "E.g. --token-transfers NFT-123456-0a 1 ESDT-987654 100000000")
 
 
 def create_transaction(args: Any):
@@ -72,13 +85,44 @@ def create_transaction(args: Any):
     if args.data_file:
         args.data = Path(args.data_file).read_text()
 
+    check_relayer_transaction_with_data_field_for_relayed_v3(args)
+
     tx = do_prepare_transaction(args)
 
+    if hasattr(args, "inner_transactions_outfile") and args.inner_transactions_outfile:
+        save_transaction_to_inner_transactions_file(tx, args)
+        return
+
     if hasattr(args, "relay") and args.relay:
+        logger.warning("RelayedV1 transactions are deprecated. Please use RelayedV3 instead.")
         args.outfile.write(compute_relayed_v1_data(tx))
         return
 
     cli_shared.send_or_simulate(tx, args)
+
+
+def save_transaction_to_inner_transactions_file(transaction: Transaction, args: Any):
+    inner_txs_file = Path(args.inner_transactions_outfile).expanduser()
+    transactions = get_inner_transactions_if_any(inner_txs_file)
+    transactions.append(transaction)
+
+    tx_converter = TransactionsConverter()
+    inner_transactions: Dict[str, Any] = {}
+    inner_transactions["innerTransactions"] = [tx_converter.transaction_to_dictionary(tx) for tx in transactions]
+
+    with open(inner_txs_file, "w") as file:
+        utils.dump_out_json(inner_transactions, file)
+
+
+def get_inner_transactions_if_any(file: Path) -> List[Transaction]:
+    if file.is_file():
+        return load_inner_transactions_from_file(file)
+    return []
+
+
+def check_relayer_transaction_with_data_field_for_relayed_v3(args: Any):
+    if hasattr(args, "inner_transactions") and args.inner_transactions and args.data:
+        raise BadUsage("Can't set data field when creating a relayedV3 transaction")
 
 
 def send_transaction(args: Any):

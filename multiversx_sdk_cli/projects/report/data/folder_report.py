@@ -1,9 +1,12 @@
 from pathlib import Path
 from typing import Any, List, Optional
-from multiversx_sdk_cli.projects.report.data.common import first_not_none, flatten_list_of_rows, merge_values_by_key
 
-from multiversx_sdk_cli.projects.report.data.project_report import ProjectReport, merge_list_of_projects
-from multiversx_sdk_cli.projects.report.format.format_options import FormatOptions
+from multiversx_sdk_cli.projects.report.data.common import (
+    first_not_none, flatten_list_of_rows, merge_values_by_key)
+from multiversx_sdk_cli.projects.report.data.project_report import (
+    ProjectReport, merge_list_of_projects)
+from multiversx_sdk_cli.projects.report.format.format_options import \
+    FormatOptions
 
 
 class FolderReport:
@@ -17,6 +20,7 @@ class FolderReport:
             'projects': self.projects
         }
 
+    @staticmethod
     def from_json(json: Any) -> 'FolderReport':
         projects = [ProjectReport.from_json(project) for project in json['projects']]
         return FolderReport(Path(json['root_path']), projects)

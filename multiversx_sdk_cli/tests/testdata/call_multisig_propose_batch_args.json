@@ -1,0 +1,20 @@
+[
+    [
+        {
+            "__discriminant__": 5,
+            "0": {
+                "to": {
+                    "bech32": "erd1qqqqqqqqqqqqqpgqak8zt22wl2ph4tswtyc39namqx6ysa2sd8ss4xmlj3"
+                },
+                "egld_amount": 1000000000000000000,
+                "endpoint_name": "add",
+                "arguments": [
+                    {
+                        "hex": "07"
+                    }
+                ],
+                "opt_gas_limit": 15000000
+            }
+        }
+    ]
+]

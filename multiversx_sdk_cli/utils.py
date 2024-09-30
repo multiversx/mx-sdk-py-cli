@@ -11,10 +11,8 @@ from pathlib import Path
 from typing import (Any, Dict, List, Optional, Protocol, Union,
                     runtime_checkable)
 
-import requests_cache
 import toml
 
-import multiversx_sdk_cli.config
 from multiversx_sdk_cli import errors
 
 logger = logging.getLogger("utils")
@@ -39,9 +37,11 @@ class Object(ISerializable):
 
 
 class BasicEncoder(json.JSONEncoder):
-    def default(self, o: Any):
+    def default(self, o: Any) -> Any:
         if isinstance(o, ISerializable):
             return o.to_dictionary()
+        if isinstance(o, bytes):
+            return o.hex()
         return super().default(o)
 
 
@@ -149,17 +149,6 @@ def mark_executable(file: str) -> None:
     os.chmod(file, st.st_mode | stat.S_IEXEC)
 
 
-def find_in_dictionary(dictionary, compound_path):
-    keys = compound_path.split(".")
-    node = dictionary
-    for key in keys:
-        node = node.get(key)
-        if node is None:
-            break
-
-    return node
-
-
 def list_files(folder: Path, suffix: Optional[str] = None) -> List[Path]:
     folder = folder.expanduser()
     files: List[Path] = [folder / file for file in os.listdir(folder)]
@@ -210,7 +199,7 @@ def str_int_to_hex_str(number_str: str) -> str:
     return bytes_str
 
 
-def parse_keys(bls_public_keys):
+def parse_keys(bls_public_keys: str):
     keys = bls_public_keys.split(',')
     parsed_keys = ''
     for key in keys:

@@ -19,7 +19,7 @@ def test_prepare_chain_id_in_args():
         prepare_chain_id_in_args(args)
 
     args.chain = "I"
-    args.proxy = "https://testnet-gateway.multiversx.com"
+    args.proxy = "https://testnet-api.multiversx.com"
 
     prepare_chain_id_in_args(args)
     assert args.chain == "T"

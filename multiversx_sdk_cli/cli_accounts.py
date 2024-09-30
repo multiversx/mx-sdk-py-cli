@@ -1,9 +1,7 @@
 import logging
 from typing import Any
 
-from multiversx_sdk_core import Address
-from multiversx_sdk_network_providers.proxy_network_provider import \
-    ProxyNetworkProvider
+from multiversx_sdk import Address, ProxyNetworkProvider
 
 from multiversx_sdk_cli import cli_shared, utils
 

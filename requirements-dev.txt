@@ -1,3 +1,4 @@
 pytest
 flake8
 autopep8
+pytest-mock

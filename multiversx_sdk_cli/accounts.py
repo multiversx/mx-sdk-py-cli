@@ -2,10 +2,9 @@ import logging
 from pathlib import Path
 from typing import Any, Optional, Protocol
 
-from multiversx_sdk_core import (Address, Message, MessageComputer,
-                                 TransactionComputer)
-from multiversx_sdk_network_providers.accounts import AccountOnNetwork
-from multiversx_sdk_wallet import UserSigner
+from multiversx_sdk import (Address, Message, MessageComputer,
+                            TransactionComputer, UserSigner)
+from multiversx_sdk.network_providers.accounts import AccountOnNetwork
 
 from multiversx_sdk_cli.constants import DEFAULT_HRP
 from multiversx_sdk_cli.interfaces import IAccount, IAddress, ITransaction

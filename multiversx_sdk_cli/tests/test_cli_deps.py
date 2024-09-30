@@ -31,18 +31,6 @@ def test_deps_check_rust():
     assert which_twiggy and Path.is_file(Path(which_twiggy))
 
 
-@pytest.mark.skip_on_windows
-def test_deps_install_vmtools():
-    return_code = main(["deps", "install", "vmtools"])
-    assert return_code == 0
-
-
-@pytest.mark.skip_on_windows
-def test_deps_check_vmtools():
-    return_code = main(["deps", "check", "vmtools"])
-    assert return_code == 0
-
-
 def test_deps_install_testwallets():
     return_code = main(["deps", "install", "testwallets"])
     assert return_code == 0

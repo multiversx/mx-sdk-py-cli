@@ -5,9 +5,7 @@ import sys
 from argparse import FileType
 from typing import Any, Dict, List, Text, cast
 
-from multiversx_sdk_core import Address
-from multiversx_sdk_network_providers.proxy_network_provider import \
-    ProxyNetworkProvider
+from multiversx_sdk import Address, ProxyNetworkProvider
 
 from multiversx_sdk_cli import config, errors, utils
 from multiversx_sdk_cli.accounts import Account, LedgerAccount
@@ -65,7 +63,13 @@ def add_command_subparser(subparsers: Any, group: str, command: str, description
     )
 
 
-def add_tx_args(args: List[str], sub: Any, with_nonce: bool = True, with_receiver: bool = True, with_data: bool = True, with_estimate_gas: bool = False, with_guardian: bool = False):
+def add_tx_args(
+        args: List[str],
+        sub: Any,
+        with_nonce: bool = True,
+        with_receiver: bool = True,
+        with_data: bool = True,
+        with_estimate_gas: bool = False):
     if with_nonce:
         sub.add_argument("--nonce", type=int, required=not ("--recall-nonce" in args), help="# the nonce for the transaction")
         sub.add_argument("--recall-nonce", action="store_true", default=False, help="⭮ whether to recall the nonce when creating the transaction (default: %(default)s)")
@@ -87,10 +91,16 @@ def add_tx_args(args: List[str], sub: Any, with_nonce: bool = True, with_receive
     sub.add_argument("--chain", help="the chain identifier")
     sub.add_argument("--version", type=int, default=DEFAULT_TX_VERSION, help="the transaction version (default: %(default)s)")
 
-    if with_guardian:
-        add_guardian_args(sub)
+    add_guardian_args(sub)
+    add_relayed_v3_args(sub)
 
     sub.add_argument("--options", type=int, default=0, help="the transaction options (default: 0)")
+
+
+def add_relayed_v3_args(sub: Any):
+    sub.add_argument("--relayer", help="the address of the relayer")
+    sub.add_argument("--inner-transactions", help="a json file containing the inner transactions; should only be provided when creating the relayer's transaction")
+    sub.add_argument("--inner-transactions-outfile", type=str, help="where to save the transaction as an inner transaction (default: stdout)")
 
 
 def add_guardian_args(sub: Any):

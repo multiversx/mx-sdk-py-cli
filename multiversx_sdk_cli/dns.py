@@ -1,12 +1,13 @@
 from typing import Any, List, Protocol
 
 from Cryptodome.Hash import keccak
-from multiversx_sdk_core import Address, AddressComputer
+from multiversx_sdk import Address, AddressComputer, TransactionsFactoryConfig
+from multiversx_sdk.network_providers.network_config import NetworkConfig
 
 from multiversx_sdk_cli import cli_shared, utils
 from multiversx_sdk_cli.accounts import Account
 from multiversx_sdk_cli.constants import ADDRESS_ZERO_BECH32, DEFAULT_HRP
-from multiversx_sdk_cli.contracts import query_contract
+from multiversx_sdk_cli.contracts import SmartContract
 from multiversx_sdk_cli.transactions import (compute_relayed_v1_data,
                                              do_prepare_transaction)
 
@@ -19,22 +20,48 @@ class INetworkProvider(Protocol):
     def query_contract(self, query: Any) -> Any:
         ...
 
+    def get_network_config(self) -> NetworkConfig:
+        ...
+
 
 def resolve(name: str, proxy: INetworkProvider) -> Address:
     name_arg = "0x{}".format(str.encode(name).hex())
     dns_address = dns_address_for_name(name)
 
-    result = query_contract(dns_address, proxy, "resolve", [name_arg])
-    if len(result) == 0:
+    response = _query_contract(
+        contract_address=dns_address,
+        proxy=proxy,
+        function="resolve",
+        args=[name_arg]
+    )
+
+    if len(response) == 0:
         return Address.from_bech32(ADDRESS_ZERO_BECH32)
-    return Address.from_hex(result[0].hex, DEFAULT_HRP)
+
+    result = response[0].get("returnDataParts")[0]
+    return Address.from_hex(result, DEFAULT_HRP)
 
 
 def validate_name(name: str, shard_id: int, proxy: INetworkProvider):
     name_arg = "0x{}".format(str.encode(name).hex())
     dns_address = compute_dns_address_for_shard_id(shard_id)
 
-    query_contract(dns_address, proxy, "validateName", [name_arg])
+    response = _query_contract(
+        contract_address=dns_address,
+        proxy=proxy,
+        function="validateName",
+        args=[name_arg]
+    )
+
+    response = response[0]
+
+    return_code = response["returnCode"]
+    if return_code == "ok":
+        print(f"name [{name}] is valid")
+    else:
+        print(f"name [{name}] is invalid")
+
+    print(response)
 
 
 def register(args: Any):
@@ -69,17 +96,35 @@ def name_hash(name: str) -> bytes:
 
 def registration_cost(shard_id: int, proxy: INetworkProvider) -> int:
     dns_address = compute_dns_address_for_shard_id(shard_id)
-    result = query_contract(dns_address, proxy, "getRegistrationCost", [])
-    if len(result[0]) == 0:
+
+    response = _query_contract(
+        contract_address=dns_address,
+        proxy=proxy,
+        function="getRegistrationCost",
+        args=[]
+    )
+
+    response = response[0]
+
+    data = response["returnDataParts"][0]
+    if not data:
         return 0
     else:
-        return int("0x{}".format(result[0]))
+        return int("0x{}".format(data))
 
 
 def version(shard_id: int, proxy: INetworkProvider) -> str:
     dns_address = compute_dns_address_for_shard_id(shard_id)
-    result = query_contract(dns_address, proxy, "version", [])
-    return bytearray.fromhex(result[0].hex).decode()
+
+    response = _query_contract(
+        contract_address=dns_address,
+        proxy=proxy,
+        function="version",
+        args=[]
+    )
+
+    response = response[0]
+    return bytearray.fromhex(response["returnDataParts"][0]).decode()
 
 
 def dns_address_for_name(name: str) -> Address:
@@ -102,3 +147,17 @@ def compute_dns_address_for_shard_id(shard_id: int) -> Address:
 def dns_register_data(name: str) -> str:
     name_enc: bytes = str.encode(name)
     return "register@{}".format(name_enc.hex())
+
+
+def _query_contract(contract_address: Address, proxy: INetworkProvider, function: str, args: List[Any]) -> List[Any]:
+    chain_id = proxy.get_network_config().chain_id
+    config = TransactionsFactoryConfig(chain_id)
+    contract = SmartContract(config)
+
+    return contract.query_contract(
+        contract_address=contract_address,
+        proxy=proxy,
+        function=function,
+        arguments=args,
+        should_prepare_args=False
+    )
