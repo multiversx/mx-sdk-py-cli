@@ -171,17 +171,13 @@ def copy_config_to_proxy(config: ConfigRoot):
     proxy_config = config.proxy_config_folder()
     makefolder(proxy_config)
 
-    shutil.copy(
-        config_prototype / 'config.toml',
-        proxy_config)
+    shutil.copy(config_prototype / 'config.toml', proxy_config)
+    shutil.copytree(config_prototype / 'apiConfig', proxy_config / 'apiConfig')
 
-    shutil.copytree(
-        config_prototype / 'apiConfig',
-        proxy_config / 'apiConfig')
-
-    shutil.copy(
-        config_prototype / 'external.toml',
-        proxy_config)
+    # Removed in newer versions:
+    # https://github.com/multiversx/mx-chain-proxy-go/pull/454
+    if (config_prototype / 'external.toml').exists():
+        shutil.copy(config_prototype / 'external.toml', proxy_config)
 
 
 def patch_proxy_config(config: ConfigRoot):
