@@ -1,0 +1,49 @@
+name: Test localnet-dependent tests
+
+on:
+  pull_request:
+    branches: [main, feat/*]
+  workflow_dispatch:
+
+env:
+ BRANCH_NAME: ${{ github.head_ref || github.ref_name }}
+
+jobs:
+  localnet:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+#        TODO: enable mac-os back once debugging is done.
+#        os: [ubuntu-latest, macos-latest]
+        os: [ubuntu-latest]
+        python-version: [3.11]
+
+    steps:
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - uses: actions/checkout@v2
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install dependencies
+        run: |
+          python3 -m pip install --upgrade pip
+          pip3 install -r requirements.txt
+          pip3 install -r ./requirements-dev.txt --upgrade
+
+      - name: Set up Docker image
+        run: |
+          docker build --build-arg PYTHON_VERSION=${{ matrix.python-version }} -t mxpy .
+
+      - name: Deploy a localnet
+        run: |
+          docker run --name localnet -d -p 7950:7950 mxpy localnet setup && python -m multiversx_sdk_cli.cli localnet start
+
+      - name: Test localnet dependent tests
+        run: |
+          pytest -m require_localnet multiversx_sdk_cli/tests
