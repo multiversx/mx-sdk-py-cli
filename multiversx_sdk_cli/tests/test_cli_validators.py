@@ -18,7 +18,7 @@ bls_key = "e7beaa95b3877f47348df4dd1cb578a4f7cabf7a20bfeefe5cdd263878ff132b765e0
 @pytest.fixture()
 def poll_endpoint():
     start_time = time.time()  # Record the start time
-    timeout = 300
+    timeout = 600
     interval = 1
 
     while True:

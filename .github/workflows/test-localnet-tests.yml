@@ -46,6 +46,4 @@ jobs:
 
       - name: Test localnet dependent tests
         run: |
-          sleep 2m
-          curl -XGET http://0.0.0.0:7950/network/config
           pytest -m require_localnet multiversx_sdk_cli/tests
