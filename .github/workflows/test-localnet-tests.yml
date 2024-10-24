@@ -43,10 +43,10 @@ jobs:
       - name: Deploy a localnet
         run: |
           docker run --name localnet -d -p 7950:7950 mxpy localnet start
+          sleep 2m
 
       - name: Test localnet dependent tests
         run: |
-          sleep 5m
           docker logs localnet | grep proxy
           curl -X GET http://0.0.0.0:7950/network/config
           pytest -m require_localnet multiversx_sdk_cli/tests
