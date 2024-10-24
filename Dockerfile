@@ -15,8 +15,11 @@ COPY requirements-dev.txt ./
 # Step 6: Install any dependencies listed in requirements.txt
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Step 7: Copy the current directory contents into the container
+# Step 7: Install build-essential. Will be needed to compile the node binaries.
+RUN apt update && apt install -y build-essential
+
+# Step 8: Copy the current directory contents into the container
 COPY . .
 
-# Step 6: Specify the command to run the application
+# Step 9: Specify the command to run the application
 ENTRYPOINT ["python", "-m", "multiversx_sdk_cli.cli"]
