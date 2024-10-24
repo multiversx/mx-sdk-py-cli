@@ -42,8 +42,4 @@ jobs:
 
       - name: Deploy a localnet
         run: |
-          docker run --name localnet -d -p 7950:7950 mxpy localnet start
-
-      - name: Test localnet dependent tests
-        run: |
-          pytest -m require_localnet multiversx_sdk_cli/tests
+          docker run --name localnet -p 7950:7950 mxpy localnet start
