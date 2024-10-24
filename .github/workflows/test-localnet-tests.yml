@@ -55,8 +55,6 @@ jobs:
             echo "The localnet failed to process blocks."
             exit 1
           fi
-          
-          ls
 
       - name: Test localnet dependent tests
         run: |
