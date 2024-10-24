@@ -19,6 +19,7 @@ jobs:
         python-version: [3.11]
 
     steps:
+      - uses: actions/checkout@v2
       - name: Set up Docker image
         run: |
           docker build --build-arg PYTHON_VERSION=${{ matrix.python-version }} -t mxpy .
