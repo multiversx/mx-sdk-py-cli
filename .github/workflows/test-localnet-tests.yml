@@ -1,0 +1,63 @@
+name: Test localnet-dependent tests
+
+on:
+  pull_request:
+    branches: [main, feat/*]
+  workflow_dispatch:
+
+env:
+ BRANCH_NAME: ${{ github.head_ref || github.ref_name }}
+
+jobs:
+  localnet:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+        python-version: [3.11]
+
+    steps:
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - uses: actions/checkout@v2
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install dependencies
+        run: |
+          python3 -m pip install --upgrade pip
+          pip3 install -r requirements.txt
+          pip3 install -r ./requirements-dev.txt --upgrade
+
+      - name: Deploy a localnet
+        run: |
+          mkdir -p ~/multiversx-sdk
+          export PYTHONPATH=.
+          python3 -m multiversx_sdk_cli.cli config set github_api_token ${{ secrets.GITHUB_TOKEN }}
+          python3 -m multiversx_sdk_cli.cli localnet prerequisites --configfile=./multiversx_sdk_cli/tests/testdata/localnet_with_resolution_remote.toml
+          python3 -m multiversx_sdk_cli.cli localnet build --configfile=./multiversx_sdk_cli/tests/testdata/localnet_with_resolution_remote.toml
+         
+          # "Go" and artifacts from "GOPATH/pkg/mod" are not needed anymore.
+          sudo rm -rf ~/multiversx-sdk/golang
+          
+          python3 -m multiversx_sdk_cli.cli localnet clean --configfile=./multiversx_sdk_cli/tests/testdata/localnet_with_resolution_remote.toml
+          python3 -m multiversx_sdk_cli.cli localnet config --configfile=./multiversx_sdk_cli/tests/testdata/localnet_with_resolution_remote.toml
+          python3 -m multiversx_sdk_cli.cli localnet start --configfile=./multiversx_sdk_cli/tests/testdata/localnet_with_resolution_remote.toml --stop-after-seconds=120
+
+          if grep -r --include=\*.log "started committing block" ./localnet; then
+            echo "The localnet processed blocks successfully."
+          else
+            echo "The localnet failed to process blocks."
+            exit 1
+          fi
+          
+          ls
+
+      - name: Test localnet dependent tests
+        run: |
+          pytest -m require_localnet multiversx_sdk_cli/tests
