@@ -19,46 +19,14 @@ jobs:
         python-version: [3.11]
 
     steps:
-      - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v2
-        with:
-          python-version: ${{ matrix.python-version }}
-
-      - uses: actions/checkout@v2
-      - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v2
-        with:
-          python-version: ${{ matrix.python-version }}
-
-      - name: Install dependencies
+      - name: Set up Docker image
         run: |
-          python3 -m pip install --upgrade pip
-          pip3 install -r requirements.txt
-          pip3 install -r ./requirements-dev.txt --upgrade
+          docker build --build-arg PYTHON_VERSION=${{ matrix.python-version }} -t mxpy .
 
       - name: Deploy a localnet
         run: |
-          mkdir -p ~/multiversx-sdk
-          export PYTHONPATH=.
-          python3 -m multiversx_sdk_cli.cli config set github_api_token ${{ secrets.GITHUB_TOKEN }}
-          python3 -m multiversx_sdk_cli.cli localnet prerequisites --configfile=./multiversx_sdk_cli/tests/testdata/localnet_with_resolution_remote.toml
-          python3 -m multiversx_sdk_cli.cli localnet build --configfile=./multiversx_sdk_cli/tests/testdata/localnet_with_resolution_remote.toml
-         
-          # "Go" and artifacts from "GOPATH/pkg/mod" are not needed anymore.
-          sudo rm -rf ~/multiversx-sdk/golang
-          
-          python3 -m multiversx_sdk_cli.cli localnet clean --configfile=./multiversx_sdk_cli/tests/testdata/localnet_with_resolution_remote.toml
-          python3 -m multiversx_sdk_cli.cli localnet config --configfile=./multiversx_sdk_cli/tests/testdata/localnet_with_resolution_remote.toml
-          python3 -m multiversx_sdk_cli.cli localnet start --configfile=./multiversx_sdk_cli/tests/testdata/localnet_with_resolution_remote.toml &
-
-          if grep -r --include=\*.log "started committing block" ./localnet; then
-            echo "The localnet processed blocks successfully."
-          else
-            echo "The localnet failed to process blocks."
-            exit 1
-          fi
+          docker run -d -p 7950:7950 mxpy localnet start
 
       - name: Test localnet dependent tests
         run: |
-          curl -XGET http://127.0.0.1:7950/network/config
           pytest -m require_localnet multiversx_sdk_cli/tests
