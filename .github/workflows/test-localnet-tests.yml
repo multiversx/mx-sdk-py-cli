@@ -42,7 +42,7 @@ jobs:
 
       - name: Deploy a localnet
         run: |
-          docker run -name localnet -d -p 7950:7950 mxpy localnet start
+          docker run --name localnet -d -p 7950:7950 mxpy localnet start
 
       - name: Test localnet dependent tests
         run: |
