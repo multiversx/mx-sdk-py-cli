@@ -25,4 +25,4 @@ COPY . .
 RUN python -m multiversx_sdk_cli.cli localnet setup --configfile=/usr/src/app/multiversx_sdk_cli/tests/testdata/localnet_with_resolution_remote.toml
 
 # Step 10: Specify the entrypoint to run the application
-ENTRYPOINT ["python", "-m", "multiversx_sdk_cli.cli"]
+CMD ["python", "-m", "multiversx_sdk_cli.cli"]
