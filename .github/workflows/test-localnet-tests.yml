@@ -42,7 +42,7 @@ jobs:
 
       - name: Deploy a localnet
         run: |
-          docker run -d -p 7950:7950 \ 
+          docker run -d -p 7950:7950 \
           -v ./multiversx_sdk_cli/tests/testdata/localnet_with_resolution_remote.toml=/usr/src/app/localnet.toml \
           mxpy localnet setup && python -m multiversx_sdk_cli.cli localnet start
 
