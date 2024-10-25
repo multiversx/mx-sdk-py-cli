@@ -52,7 +52,7 @@ jobs:
            docker cp localnet:/usr/src/app/localnet/validator02/config/validatorKey.pem ./validatorKey02.pem
            
            ls
-           echo $(pwd)
+           echo ~
            
            
            pytest -m require_localnet multiversx_sdk_cli/tests
