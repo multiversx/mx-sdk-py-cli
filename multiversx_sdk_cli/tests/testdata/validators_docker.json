@@ -7,7 +7,7 @@
       "pemFile": "~/work/mx-sdk-py-cli/mx-sdk-py-cli/validatorKey01.pem"
     },
     {
-      "pemFile": "~/work/mx-sdk-py-cli/mx-sdk-py-clivalidatorKey02.pem"
+      "pemFile": "~/work/mx-sdk-py-cli/mx-sdk-py-cli/validatorKey02.pem"
     }
   ]
 }
