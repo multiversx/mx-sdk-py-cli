@@ -42,8 +42,15 @@ jobs:
 
       - name: Deploy a localnet
         run: |
-          docker run -d -p 7950:7950 mxpy localnet start \
+          docker run --name localnet -d -p 7950:7950 mxpy localnet start \
           --configfile=/usr/src/app/multiversx_sdk_cli/tests/testdata/localnet_with_resolution_remote.toml
+
       - name: Test localnet dependent tests
         run: |
+           docker cp localnet:/usr/src/app/localnet/validator00/config/validatorKey.pem ./validatorKey00.pem
+           docker cp localnet:/usr/src/app/localnet/validator01/config/validatorKey.pem ./validatorKey01.pem
+           docker cp localnet:/usr/src/app/localnet/validator02/config/validatorKey.pem ./validatorKey02.pem
+          
+          
+          
           pytest -m require_localnet multiversx_sdk_cli/tests
