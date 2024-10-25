@@ -1,13 +1,13 @@
 {
   "validators": [
     {
-      "pemFile": "/usr/src/app/localnet/validator00/config/walletKey.pem"
+      "pemFile": "/usr/src/app/localnet/validator00/config/validatorKey.pem"
     },
     {
-      "pemFile": "/usr/src/app/localnet/validator00/config/walletKey.pem"
+      "pemFile": "/usr/src/app/localnet/validator00/config/validatorKey.pem"
     },
     {
-      "pemFile": "/usr/src/app/localnet/validator00/config/walletKey.pem"
+      "pemFile": "/usr/src/app/localnet/validator00/config/validatorKey.pem"
     }
   ]
 }
