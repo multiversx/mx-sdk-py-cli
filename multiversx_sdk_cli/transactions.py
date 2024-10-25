@@ -2,7 +2,6 @@ import base64
 import json
 import logging
 import time
-from pathlib import Path
 from typing import Any, Dict, List, Optional, Protocol, TextIO
 
 from multiversx_sdk import (Address, Token, TokenComputer, TokenTransfer,
@@ -78,12 +77,6 @@ def do_prepare_transaction(args: Any) -> Transaction:
 
     if args.guardian:
         tx.guardian = args.guardian
-
-    if args.relayer:
-        tx.relayer = Address.new_from_bech32(args.relayer).to_bech32()
-
-    if args.inner_transactions:
-        tx.inner_transactions = load_inner_transactions_from_file(Path(args.inner_transactions).expanduser())
 
     tx.signature = bytes.fromhex(account.sign_transaction(tx))
     tx = sign_tx_by_guardian(args, tx)
@@ -227,11 +220,3 @@ def load_transaction_from_file(f: TextIO) -> Transaction:
 
     tx_converter = TransactionsConverter()
     return tx_converter.dictionary_to_transaction(transaction_dictionary)
-
-
-def load_inner_transactions_from_file(path: Path) -> List[Transaction]:
-    data_json = path.read_text()
-    transactions: List[Dict[str, Any]] = json.loads(data_json).get("innerTransactions")
-
-    tx_converter = TransactionsConverter()
-    return [tx_converter.dictionary_to_transaction(transaction) for transaction in transactions]

@@ -92,15 +92,8 @@ def add_tx_args(
     sub.add_argument("--version", type=int, default=DEFAULT_TX_VERSION, help="the transaction version (default: %(default)s)")
 
     add_guardian_args(sub)
-    add_relayed_v3_args(sub)
 
     sub.add_argument("--options", type=int, default=0, help="the transaction options (default: 0)")
-
-
-def add_relayed_v3_args(sub: Any):
-    sub.add_argument("--relayer", help="the address of the relayer")
-    sub.add_argument("--inner-transactions", help="a json file containing the inner transactions; should only be provided when creating the relayer's transaction")
-    sub.add_argument("--inner-transactions-outfile", type=str, help="where to save the transaction as an inner transaction (default: stdout)")
 
 
 def add_guardian_args(sub: Any):
