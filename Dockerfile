@@ -21,5 +21,8 @@ RUN apt update && apt install -y build-essential
 # Step 8: Copy the current directory contents into the container
 COPY . .
 
-# Step 9: Specify the command to run the application
+# Step 9: Setup the localnet configuration in the eventuality of a localnet start.
+RUN python -m multiversx_sdk_cli.cli localnet setup --configfile=/usr/src/app/multiversx_sdk_cli/tests/testdata/localnet_with_resolution_remote.toml
+
+# Step 10: Specify the entrypoint to run the application
 ENTRYPOINT ["python", "-m", "multiversx_sdk_cli.cli"]
