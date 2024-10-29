@@ -1,7 +1,6 @@
 import json
-import os
 from pathlib import Path
-from typing import Any, List
+from typing import Any
 
 from multiversx_sdk_cli.cli import main
 
@@ -87,94 +86,6 @@ def test_create_multi_transfer_transaction(capsys: Any):
     tx_json = json.loads(tx)
     signature = tx_json["emittedTransaction"]["signature"]
     assert signature == "575b029d52ff5ffbfb7bab2f04052de88a6f7d022a6ad368459b8af9acaed3717d3f95db09f460649a8f405800838bc2c432496bd03c9039ea166bd32b84660e"
-
-
-def test_create_and_save_inner_transaction():
-    return_code = main([
-        "tx", "new",
-        "--pem", str(testdata_path / "alice.pem"),
-        "--receiver", "erd1spyavw0956vq68xj8y4tenjpq2wd5a9p2c6j8gsz7ztyrnpxrruqzu66jx",
-        "--nonce", "77",
-        "--gas-limit", "500000",
-        "--relayer", "erd1k2s324ww2g0yj38qn2ch2jwctdy8mnfxep94q9arncc6xecg3xaq6mjse8",
-        "--inner-transactions-outfile", str(testdata_out / "inner_transactions.json"),
-        "--chain", "T",
-    ])
-    assert False if return_code else True
-    assert Path(testdata_out / "inner_transactions.json").is_file()
-
-
-def test_create_and_append_inner_transaction():
-    return_code = main([
-        "tx", "new",
-        "--pem", str(testdata_path / "alice.pem"),
-        "--receiver", "erd1fggp5ru0jhcjrp5rjqyqrnvhr3sz3v2e0fm3ktknvlg7mcyan54qzccnan",
-        "--nonce", "1234",
-        "--gas-limit", "50000",
-        "--relayer", "erd1k2s324ww2g0yj38qn2ch2jwctdy8mnfxep94q9arncc6xecg3xaq6mjse8",
-        "--inner-transactions-outfile", str(testdata_out / "inner_transactions.json"),
-        "--chain", "T",
-    ])
-    assert False if return_code else True
-
-    with open(testdata_out / "inner_transactions.json", "r") as file:
-        json_file = json.load(file)
-
-    inner_txs: List[Any] = json_file["innerTransactions"]
-    assert len(inner_txs) == 2
-
-
-def test_create_invalid_relayed_transaction():
-    return_code = main([
-        "tx", "new",
-        "--pem", str(testdata_path / "testUser.pem"),
-        "--receiver", "erd1cqqxak4wun7508e0yj9ng843r6hv4mzd0hhpjpsejkpn9wa9yq8sj7u2u5",
-        "--nonce", "987",
-        "--gas-limit", "5000000",
-        "--inner-transactions", str(testdata_out / "inner_transactions.json"),
-        "--data", "test data",
-        "--chain", "T",
-    ])
-    assert return_code
-
-
-def test_create_relayer_transaction(capsys: Any):
-    return_code = main([
-        "tx", "new",
-        "--pem", str(testdata_path / "testUser.pem"),
-        "--receiver", "erd1cqqxak4wun7508e0yj9ng843r6hv4mzd0hhpjpsejkpn9wa9yq8sj7u2u5",
-        "--nonce", "987",
-        "--gas-limit", "5000000",
-        "--inner-transactions", str(testdata_out / "inner_transactions.json"),
-        "--chain", "T",
-    ])
-    # remove test file to ensure consistency when running test file locally
-    os.remove(testdata_out / "inner_transactions.json")
-
-    assert False if return_code else True
-
-    tx = _read_stdout(capsys)
-    tx_json = json.loads(tx)["emittedTransaction"]
-
-    assert tx_json["sender"] == "erd1cqqxak4wun7508e0yj9ng843r6hv4mzd0hhpjpsejkpn9wa9yq8sj7u2u5"
-    assert tx_json["receiver"] == "erd1cqqxak4wun7508e0yj9ng843r6hv4mzd0hhpjpsejkpn9wa9yq8sj7u2u5"
-    assert tx_json["gasLimit"] == 5000000
-    assert tx_json["nonce"] == 987
-    assert tx_json["chainID"] == "T"
-
-    # should be the two inner transactions created in the tests above
-    inner_transactions = tx_json["innerTransactions"]
-    assert len(inner_transactions) == 2
-
-    assert inner_transactions[0]["sender"] == "erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th"
-    assert inner_transactions[0]["receiver"] == "erd1spyavw0956vq68xj8y4tenjpq2wd5a9p2c6j8gsz7ztyrnpxrruqzu66jx"
-    assert inner_transactions[0]["nonce"] == 77
-    assert inner_transactions[0]["relayer"] == "erd1k2s324ww2g0yj38qn2ch2jwctdy8mnfxep94q9arncc6xecg3xaq6mjse8"
-
-    assert inner_transactions[1]["sender"] == "erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th"
-    assert inner_transactions[1]["receiver"] == "erd1fggp5ru0jhcjrp5rjqyqrnvhr3sz3v2e0fm3ktknvlg7mcyan54qzccnan"
-    assert inner_transactions[1]["nonce"] == 1234
-    assert inner_transactions[1]["relayer"] == "erd1k2s324ww2g0yj38qn2ch2jwctdy8mnfxep94q9arncc6xecg3xaq6mjse8"
 
 
 def _read_stdout(capsys: Any) -> str:
