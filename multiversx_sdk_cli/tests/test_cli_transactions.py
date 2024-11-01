@@ -88,5 +88,22 @@ def test_create_multi_transfer_transaction(capsys: Any):
     assert signature == "575b029d52ff5ffbfb7bab2f04052de88a6f7d022a6ad368459b8af9acaed3717d3f95db09f460649a8f405800838bc2c432496bd03c9039ea166bd32b84660e"
 
 
+def test_create_multi_transfer_transaction_with_single_egld_transfer(capsys: Any):
+    return_code = main([
+        "tx", "new",
+        "--pem", str(testdata_path / "alice.pem"),
+        "--receiver", "erd1spyavw0956vq68xj8y4tenjpq2wd5a9p2c6j8gsz7ztyrnpxrruqzu66jx",
+        "--nonce", "7",
+        "--gas-limit", "1300000",
+        "--token-transfers", "EGLD-000000", "1000000000000000000",
+        "--chain", "T",
+    ])
+    assert return_code == 0
+    tx = _read_stdout(capsys)
+    tx_json = json.loads(tx)
+    data = tx_json["emittedTransactionData"]
+    assert data == "MultiESDTNFTTransfer@8049d639e5a6980d1cd2392abcce41029cda74a1563523a202f09641cc2618f8@01@45474c442d303030303030@@0de0b6b3a7640000"
+
+
 def _read_stdout(capsys: Any) -> str:
     return capsys.readouterr().out.strip()

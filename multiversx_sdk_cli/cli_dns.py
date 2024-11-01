@@ -4,6 +4,7 @@ from multiversx_sdk import Address, ProxyNetworkProvider
 from prettytable import PrettyTable
 
 from multiversx_sdk_cli import cli_shared
+from multiversx_sdk_cli.config import get_config_for_network_providers
 from multiversx_sdk_cli.constants import ADDRESS_ZERO_BECH32
 from multiversx_sdk_cli.dns import (compute_dns_address_for_shard_id,
                                     dns_address_for_name, name_hash, register,
@@ -79,14 +80,17 @@ def _ensure_proxy_is_provided(args: Any):
 def dns_resolve(args: Any):
     _ensure_proxy_is_provided(args)
 
-    addr = resolve(args.name, ProxyNetworkProvider(args.proxy))
+    config = get_config_for_network_providers()
+    addr = resolve(args.name, ProxyNetworkProvider(url=args.proxy, config=config))
     if addr.to_hex() != Address.new_from_bech32(ADDRESS_ZERO_BECH32).to_hex():
         print(addr.to_bech32())
 
 
 def dns_validate_name(args: Any):
     _ensure_proxy_is_provided(args)
-    validate_name(args.name, args.shard_id, ProxyNetworkProvider(args.proxy))
+
+    config = get_config_for_network_providers()
+    validate_name(args.name, args.shard_id, ProxyNetworkProvider(url=args.proxy, config=config))
 
 
 def get_name_hash(args: Any):
@@ -107,13 +111,16 @@ def get_dns_address_for_name_hex(args: Any):
 
 def get_registration_cost(args: Any):
     _ensure_proxy_is_provided(args)
-    print(registration_cost(args.shard_id, ProxyNetworkProvider(args.proxy)))
+
+    config = get_config_for_network_providers()
+    print(registration_cost(args.shard_id, ProxyNetworkProvider(url=args.proxy, config=config)))
 
 
 def get_version(args: Any):
     _ensure_proxy_is_provided(args)
 
-    proxy = ProxyNetworkProvider(args.proxy)
+    config = get_config_for_network_providers()
+    proxy = ProxyNetworkProvider(url=args.proxy, config=config)
     if args.all:
         t = PrettyTable(['Shard ID', 'Contract address (bech32)', 'Contract address (hex)', 'Version'])
         for shard_id in range(0, 256):

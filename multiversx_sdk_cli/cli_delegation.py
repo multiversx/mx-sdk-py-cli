@@ -3,6 +3,7 @@ from typing import Any, List
 from multiversx_sdk import ProxyNetworkProvider, TransactionsFactoryConfig
 
 from multiversx_sdk_cli import cli_shared, errors, utils
+from multiversx_sdk_cli.config import get_config_for_network_providers
 from multiversx_sdk_cli.delegation import DelegationOperations
 
 
@@ -209,7 +210,8 @@ def do_create_delegation_contract(args: Any):
 def get_contract_address_by_deploy_tx_hash(args: Any):
     args = utils.as_object(args)
 
-    proxy = ProxyNetworkProvider(args.proxy)
+    config = get_config_for_network_providers()
+    proxy = ProxyNetworkProvider(url=args.proxy, config=config)
 
     transaction = proxy.get_transaction(args.create_tx_hash)
     transaction_events = transaction.logs.events
