@@ -14,7 +14,6 @@ from multiversx_sdk_cli.cli_password import (load_guardian_password,
                                              load_password)
 from multiversx_sdk_cli.constants import (DEFAULT_TX_VERSION,
                                           TRANSACTION_OPTIONS_TX_GUARDED)
-from multiversx_sdk_cli.custom_network_provider import CustomNetworkProvider
 from multiversx_sdk_cli.errors import ArgumentsNotProvidedError
 from multiversx_sdk_cli.interfaces import ITransaction
 from multiversx_sdk_cli.ledger.ledger_functions import do_get_ledger_address
@@ -141,6 +140,12 @@ def add_omit_fields_arg(sub: Any):
     sub.add_argument("--omit-fields", default="[]", type=str, required=False, help="omit fields in the output payload (default: %(default)s)")
 
 
+def add_token_transfers_args(sub: Any):
+    sub.add_argument("--token-transfers", nargs='+',
+                     help="token transfers for transfer & execute, as [token, amount] "
+                     "E.g. --token-transfers NFT-123456-0a 1 ESDT-987654 100000000")
+
+
 def parse_omit_fields_arg(args: Any) -> List[str]:
     literal = args.omit_fields
     parsed = ast.literal_eval(literal)
@@ -182,7 +187,8 @@ def prepare_nonce_in_args(args: Any):
 
     if args.recall_nonce:
         account = prepare_account(args)
-        account.sync_nonce(ProxyNetworkProvider(args.proxy))
+        network_provider_config = config.get_config_for_network_providers()
+        account.sync_nonce(ProxyNetworkProvider(url=args.proxy, config=network_provider_config))
         args.nonce = account.nonce
 
 
@@ -191,7 +197,8 @@ def prepare_chain_id_in_args(args: Any):
         raise ArgumentsNotProvidedError("chain ID cannot be decided: `--chain` or `--proxy` should be provided")
 
     if args.chain and args.proxy:
-        proxy = ProxyNetworkProvider(args.proxy)
+        network_provider_config = config.get_config_for_network_providers()
+        proxy = ProxyNetworkProvider(url=args.proxy, config=network_provider_config)
         fetched_chain_id = proxy.get_network_config().chain_id
 
         if args.chain != fetched_chain_id:
@@ -204,7 +211,8 @@ def prepare_chain_id_in_args(args: Any):
     if args.chain:
         return
     elif args.proxy:
-        proxy = ProxyNetworkProvider(args.proxy)
+        network_provider_config = config.get_config_for_network_providers()
+        proxy = ProxyNetworkProvider(url=args.proxy, config=network_provider_config)
         args.chain = proxy.get_network_config().chain_id
 
 
@@ -253,7 +261,8 @@ def check_options_for_guarded_tx(options: int):
 
 
 def send_or_simulate(tx: ITransaction, args: Any, dump_output: bool = True) -> CLIOutputBuilder:
-    proxy = CustomNetworkProvider(args.proxy)
+    network_provider_config = config.get_config_for_network_providers()
+    proxy = ProxyNetworkProvider(url=args.proxy, config=network_provider_config)
 
     is_set_wait_result = hasattr(args, "wait_result") and args.wait_result
     is_set_send = hasattr(args, "send") and args.send

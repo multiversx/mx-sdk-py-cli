@@ -2,6 +2,8 @@ import os
 from pathlib import Path
 from typing import Any, Dict, List
 
+from multiversx_sdk import NetworkProviderConfig
+
 from multiversx_sdk_cli import errors, utils
 
 SDK_PATH = Path("~/multiversx-sdk").expanduser().resolve()
@@ -242,3 +244,7 @@ def get_dependency_directory(key: str, tag: str) -> Path:
 
 def get_dependency_parent_directory(key: str) -> Path:
     return SDK_PATH / key
+
+
+def get_config_for_network_providers() -> NetworkProviderConfig:
+    return NetworkProviderConfig(client_name="mxpy")

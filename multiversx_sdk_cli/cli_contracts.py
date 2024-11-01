@@ -10,6 +10,7 @@ from multiversx_sdk.abi import Abi
 
 from multiversx_sdk_cli import cli_shared, projects, utils
 from multiversx_sdk_cli.cli_output import CLIOutputBuilder
+from multiversx_sdk_cli.config import get_config_for_network_providers
 from multiversx_sdk_cli.constants import NUMBER_OF_SHARDS
 from multiversx_sdk_cli.contract_verification import \
     trigger_contract_verification
@@ -100,7 +101,7 @@ def setup_parser(args: List[str], subparsers: Any) -> Any:
     cli_shared.add_tx_args(args, sub, with_receiver=False, with_data=False)
     _add_function_arg(sub)
     _add_arguments_arg(sub)
-    _add_token_transfers_args(sub)
+    cli_shared.add_token_transfers_args(sub)
     sub.add_argument("--wait-result", action="store_true", default=False,
                      help="signal to wait for the transaction result - only valid if --send is set")
     sub.add_argument("--timeout", default=100, help="max num of seconds to wait for result"
@@ -241,12 +242,6 @@ def _add_arguments_arg(sub: Any):
                      "boolean] or hex-encoded. E.g. --arguments 42 0x64 1000 0xabba str:TOK-a1c2ef true erd1[..]")
     sub.add_argument("--arguments-file", type=str, help="a json file containing the arguments. ONLY if abi file is provided. "
                      "E.g. [{ 'to': 'erd1...', 'amount': 10000000000 }]")
-
-
-def _add_token_transfers_args(sub: Any):
-    sub.add_argument("--token-transfers", nargs='+',
-                     help="token transfers for transfer & execute, as [token, amount] "
-                     "E.g. --token-transfers NFT-123456-0a 1 ESDT-987654 100000000")
 
 
 def _add_metadata_arg(sub: Any):
@@ -448,14 +443,15 @@ def query(args: Any):
     args.chain = ""
     cli_shared.prepare_chain_id_in_args(args)
 
-    config = TransactionsFactoryConfig(args.chain)
+    factory_config = TransactionsFactoryConfig(args.chain)
     abi = Abi.load(Path(args.abi)) if args.abi else None
-    contract = SmartContract(config, abi)
+    contract = SmartContract(factory_config, abi)
 
     arguments, should_prepare_args = _get_contract_arguments(args)
     contract_address = Address.new_from_bech32(args.contract)
 
-    proxy = ProxyNetworkProvider(args.proxy)
+    network_provider_config = get_config_for_network_providers()
+    proxy = ProxyNetworkProvider(url=args.proxy, config=network_provider_config)
     function = args.function
 
     result = contract.query_contract(
