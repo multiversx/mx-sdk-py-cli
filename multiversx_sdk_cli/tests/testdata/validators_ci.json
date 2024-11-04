@@ -1,13 +1,13 @@
 {
   "validators": [
     {
-      "pemFile": "~/work/mx-sdk-py-cli/mx-sdk-py-cli/localnet/validator00/validatorKey00.pem"
+      "pemFile": "~/work/mx-sdk-py-cli/mx-sdk-py-cli/localnet/validator00/config/validatorKey.pem"
     },
     {
-      "pemFile": "~/work/mx-sdk-py-cli/mx-sdk-py-cli/localnet/validator01/validatorKey01.pem"
+      "pemFile": "~/work/mx-sdk-py-cli/mx-sdk-py-cli/localnet/validator01/config/validatorKey.pem"
     },
     {
-      "pemFile": "~/work/mx-sdk-py-cli/mx-sdk-py-cli/localnet/validator02/validatorKey02.pem"
+      "pemFile": "~/work/mx-sdk-py-cli/mx-sdk-py-cli/localnet/validator02/config/validatorKey.pem"
     }
   ]
 }
