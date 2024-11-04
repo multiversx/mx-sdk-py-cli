@@ -52,3 +52,4 @@ jobs:
       - name: Test localnet dependent tests
         run: |
            pytest -m require_localnet multiversx_sdk_cli/tests
+          

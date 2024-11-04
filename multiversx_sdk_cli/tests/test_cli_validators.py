@@ -1,5 +1,3 @@
-import requests
-import time
 import pytest
 
 from pathlib import Path
