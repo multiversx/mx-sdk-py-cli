@@ -46,7 +46,7 @@ def poll_endpoint():
 
 @pytest.mark.require_localnet
 def test_stake(poll_endpoint):
-    validators_json = testdata_path / "validators_docker.json"
+    validators_json = testdata_path / "validators_ci.json"
 
     # Stake with recall nonce
     return_code = main([
