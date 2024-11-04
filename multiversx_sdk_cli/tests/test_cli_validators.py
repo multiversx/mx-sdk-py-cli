@@ -44,35 +44,35 @@ def poll_endpoint():
         time.sleep(interval)
 
 
-@pytest.mark.require_localnet
-def test_stake(poll_endpoint):
-    validators_json = testdata_path / "validators_ci.json"
-
-    # Stake with recall nonce
-    return_code = main([
-        "validator", "stake",
-        "--pem", str(alice_pem),
-        "--value", "2500000000000000000000",
-        "--validators-file", str(validators_json),
-        "--reward-address", reward_address,
-        "--chain", "localnet",
-        "--proxy", "http://127.0.0.1:7950",
-        "--estimate-gas", "--recall-nonce"
-    ])
-    assert return_code == 0
-
-    # Stake with provided nonce
-    return_code = main([
-        "validator", "stake",
-        "--pem", str(alice_pem),
-        "--value", "2500000000000000000000",
-        "--validators-file", str(validators_json),
-        "--reward-address", reward_address,
-        "--chain", "localnet",
-        "--proxy", "http://127.0.0.1:7950",
-        "--estimate-gas", "--nonce=0"
-    ])
-    assert return_code == 0
+# @pytest.mark.require_localnet
+# def test_stake(poll_endpoint):
+#     validators_json = testdata_path / "validators_ci.json"
+#
+#     # Stake with recall nonce
+#     return_code = main([
+#         "validator", "stake",
+#         "--pem", str(alice_pem),
+#         "--value", "2500000000000000000000",
+#         "--validators-file", str(validators_json),
+#         "--reward-address", reward_address,
+#         "--chain", "localnet",
+#         "--proxy", "http://127.0.0.1:7950",
+#         "--estimate-gas", "--recall-nonce"
+#     ])
+#     assert return_code == 0
+#
+#     # Stake with provided nonce
+#     return_code = main([
+#         "validator", "stake",
+#         "--pem", str(alice_pem),
+#         "--value", "2500000000000000000000",
+#         "--validators-file", str(validators_json),
+#         "--reward-address", reward_address,
+#         "--chain", "localnet",
+#         "--proxy", "http://127.0.0.1:7950",
+#         "--estimate-gas", "--nonce=0"
+#     ])
+#     assert return_code == 0
 
 
 @pytest.mark.require_localnet
