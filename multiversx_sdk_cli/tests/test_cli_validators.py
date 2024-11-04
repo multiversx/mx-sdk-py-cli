@@ -76,7 +76,7 @@ def test_stake():
 
 
 @pytest.mark.require_localnet
-def test_stake_top_up(poll_endpoint):
+def test_stake_top_up():
     # Stake with topUp
     return_code = main([
         "validator", "stake", "--top-up",
@@ -90,7 +90,7 @@ def test_stake_top_up(poll_endpoint):
 
 
 @pytest.mark.require_localnet
-def test_unstake(poll_endpoint):
+def test_unstake():
     # Unstake
     return_code = main([
         "validator", "unstake",
@@ -104,7 +104,7 @@ def test_unstake(poll_endpoint):
 
 
 @pytest.mark.require_localnet
-def test_unbond(poll_endpoint):
+def test_unbond():
     # Unbond
     return_code = main([
         "validator", "unbond",
@@ -118,7 +118,7 @@ def test_unbond(poll_endpoint):
 
 
 @pytest.mark.require_localnet
-def test_unjail(poll_endpoint):
+def test_unjail():
     # Unjail
     return_code = main([
         "validator", "unjail",
@@ -133,7 +133,7 @@ def test_unjail(poll_endpoint):
 
 
 @pytest.mark.require_localnet
-def test_change_reward_address(poll_endpoint):
+def test_change_reward_address():
     # Change reward address
     return_code = main([
         "validator", "change-reward-address",
@@ -147,7 +147,7 @@ def test_change_reward_address(poll_endpoint):
 
 
 @pytest.mark.require_localnet
-def test_unstake_nodes(poll_endpoint):
+def test_unstake_nodes():
     # Unstake Nodes
     return_code = main([
         "validator", "unstake-nodes",
@@ -161,7 +161,7 @@ def test_unstake_nodes(poll_endpoint):
 
 
 @pytest.mark.require_localnet
-def test_unstake_tokens(poll_endpoint):
+def test_unstake_tokens():
     # Unstake Tokens
     return_code = main([
         "validator", "unstake-tokens",
@@ -175,7 +175,7 @@ def test_unstake_tokens(poll_endpoint):
 
 
 @pytest.mark.require_localnet
-def test_unbond_nodes(poll_endpoint):
+def test_unbond_nodes():
     # Unbond nodes
     return_code = main([
         "validator", "unbond-nodes",
@@ -189,7 +189,7 @@ def test_unbond_nodes(poll_endpoint):
 
 
 @pytest.mark.require_localnet
-def test_unbond_tokens(poll_endpoint):
+def test_unbond_tokens():
     # Unbond nodes
     return_code = main([
         "validator", "unbond-tokens",
@@ -203,7 +203,7 @@ def test_unbond_tokens(poll_endpoint):
 
 
 @pytest.mark.require_localnet
-def test_clean_registration_data(poll_endpoint):
+def test_clean_registration_data():
     # Clean registration data
     return_code = main([
         "validator", "clean-registered-data",
@@ -216,7 +216,7 @@ def test_clean_registration_data(poll_endpoint):
 
 
 @pytest.mark.require_localnet
-def test_re_stake_unstaked_nodes(poll_endpoint):
+def test_re_stake_unstaked_nodes():
     # Clean registration data
     return_code = main([
         "validator", "restake-unstaked-nodes",
