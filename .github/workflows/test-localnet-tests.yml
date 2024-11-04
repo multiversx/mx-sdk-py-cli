@@ -38,8 +38,8 @@ jobs:
         run: |
           # Start the local testnet with mxpy
           mkdir -p ~/localnet && cd ~/localnet
-          mxpy localnet setup --configfile=${GITHUB_WORKSPACE}/localnet.toml
-          nohup mxpy localnet start --configfile=${GITHUB_WORKSPACE}/localnet.toml > localnet.log 2>&1 & echo $! > localnet.pid
+          python3 -m multiversx_sdk_cli.cli localnet setup --configfile=${GITHUB_WORKSPACE}/localnet.toml
+          nohup python3 -m multiversx_sdk_cli.cli localnet start --configfile=${GITHUB_WORKSPACE}/localnet.toml > localnet.log 2>&1 & echo $! > localnet.pid
           sleep 120 # Allow time for the testnet to fully start
 
       - name: Test localnet dependent tests
