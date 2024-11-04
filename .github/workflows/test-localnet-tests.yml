@@ -37,7 +37,6 @@ jobs:
       - name: Set up MultiversX localnet
         run: |
           # Start the local testnet with mxpy
-          mkdir -p ~/localnet && cd ~/localnet
           python3 -m multiversx_sdk_cli.cli localnet setup --configfile=${GITHUB_WORKSPACE}/localnet.toml
           nohup python3 -m multiversx_sdk_cli.cli localnet start --configfile=${GITHUB_WORKSPACE}/localnet.toml > localnet.log 2>&1 & echo $! > localnet.pid
           sleep 120 # Allow time for the testnet to fully start
