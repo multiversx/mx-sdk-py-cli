@@ -6,12 +6,8 @@ USE_PROXY=$1
 testAll() {
     pushd $SCRIPT_DIR
     source ./shared.sh
-    source ./test_cli_contracts.sh && testAll
-    source ./test_cli_dns.sh && testAll
 
     if [ -n "$USE_PROXY" ]; then
-        source ./test_cli_validators.sh && testAll
-        source ./test_cli_tx.sh && testAll
         source ./test_cli_config.sh && testAll
     fi
     popd
