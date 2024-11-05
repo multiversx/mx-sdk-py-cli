@@ -47,7 +47,7 @@ jobs:
         shell: bash
         run: |
           export PYTHONPATH=.
-          pytest -m "run_on_windows" .
+          pytest -m "not skip_on_windows" .
       - name: Run CLI tests
         shell: bash
         run: |
