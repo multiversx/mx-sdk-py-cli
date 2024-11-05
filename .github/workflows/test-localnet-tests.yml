@@ -52,4 +52,4 @@ jobs:
       - name: Test localnet dependent tests
         run: |
            pytest -m require_localnet .
-           python3 -m multiversx_sdk_cli.cli localnet stop --configfile=./multiversx_sdk_cli/tests/testdata/localnet_with_resolution_remote.toml
+           python3 -m multiversx_sdk_cli.cli localnet clean --configfile=./multiversx_sdk_cli/tests/testdata/localnet_with_resolution_remote.toml
