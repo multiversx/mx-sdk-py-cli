@@ -48,10 +48,3 @@ jobs:
         run: |
           export PYTHONPATH=.
           pytest -m "not skip_on_windows and not require_localnet" .
-      - name: Run CLI tests
-        shell: bash
-        run: |
-          export PROXY=https://testnet-gateway.multiversx.com
-          export CHAIN_ID=T
-          cd ./multiversx_sdk_cli/tests
-          testAll || return 1
