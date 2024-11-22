@@ -78,6 +78,18 @@ def do_prepare_transaction(args: Any) -> Transaction:
     if args.guardian:
         tx.guardian = args.guardian
 
+    if args.relayer:
+        tx.relayer = args.relayer
+
+        try:
+            relayer_account = load_relayer_account_from_args(args)
+            if relayer_account.address.to_bech32() != tx.relayer:
+                raise Exception("Relayer address does not match the provided relayer wallet.")
+
+            tx.relayer_signature = bytes.fromhex(relayer_account.sign_transaction(tx))
+        except errors.NoWalletProvided:
+            logger.warning("Relayer wallet not provided. Transaction will not be signed by relayer.")
+
     tx.signature = bytes.fromhex(account.sign_transaction(tx))
     tx = sign_tx_by_guardian(args, tx)
 
@@ -93,6 +105,20 @@ def load_sender_account_from_args(args: Any) -> Account:
     elif args.keyfile:
         password = load_password(args)
         account = Account(key_file=args.keyfile, password=password)
+
+    return account
+
+
+def load_relayer_account_from_args(args: Any) -> Account:
+    if args.relayer_ledger:
+        account = LedgerAccount(account_index=args.relayer_ledger_account_index, address_index=args.relayer_ledger_address_index)
+    if args.relayer_pem:
+        account = Account(pem_file=args.relayer_pem, pem_index=args.relayer_pem_index)
+    elif args.relayer_keyfile:
+        password = load_password(args)
+        account = Account(key_file=args.relayer_keyfile, password=password)
+    else:
+        raise errors.NoWalletProvided()
 
     return account
 

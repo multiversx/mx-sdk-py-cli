@@ -68,7 +68,8 @@ def add_tx_args(
         with_nonce: bool = True,
         with_receiver: bool = True,
         with_data: bool = True,
-        with_estimate_gas: bool = False):
+        with_estimate_gas: bool = False,
+        with_relayer_wallet_args: bool = True):
     if with_nonce:
         sub.add_argument("--nonce", type=int, required=not ("--recall-nonce" in args), help="# the nonce for the transaction")
         sub.add_argument("--recall-nonce", action="store_true", default=False, help="⭮ whether to recall the nonce when creating the transaction (default: %(default)s)")
@@ -89,6 +90,10 @@ def add_tx_args(
 
     sub.add_argument("--chain", help="the chain identifier")
     sub.add_argument("--version", type=int, default=DEFAULT_TX_VERSION, help="the transaction version (default: %(default)s)")
+
+    sub.add_argument("--relayer", help="the bech32 address of the relayer")
+    if with_relayer_wallet_args:
+        add_relayed_v3_wallet_args(args, sub)
 
     add_guardian_args(sub)
 
@@ -120,6 +125,16 @@ def add_guardian_wallet_args(args: List[str], sub: Any):
     sub.add_argument("--guardian-ledger", action="store_true", required=check_if_sign_method_required(args, "--guardian-ledger"), default=False, help="🔐 bool flag for signing transaction using ledger")
     sub.add_argument("--guardian-ledger-account-index", type=int, default=0, help="🔐 the index of the account when using Ledger")
     sub.add_argument("--guardian-ledger-address-index", type=int, default=0, help="🔐 the index of the address when using Ledger")
+
+
+def add_relayed_v3_wallet_args(args: List[str], sub: Any):
+    sub.add_argument("--relayer-pem", required=check_if_sign_method_required(args, "--relayer-pem"), help="🔑 the PEM file, if keyfile not provided")
+    sub.add_argument("--relayer-pem-index", type=int, default=0, help="🔑 the index in the PEM file (default: %(default)s)")
+    sub.add_argument("--relayer-keyfile", required=check_if_sign_method_required(args, "--relayer-keyfile"), help="🔑 a JSON keyfile, if PEM not provided")
+    sub.add_argument("--relayer-passfile", help="🔑 a file containing keyfile's password, if keyfile provided")
+    sub.add_argument("--relayer-ledger", action="store_true", required=check_if_sign_method_required(args, "--relayer-ledger"), default=False, help="🔐 bool flag for signing transaction using ledger")
+    sub.add_argument("--relayer-ledger-account-index", type=int, default=0, help="🔐 the index of the account when using Ledger")
+    sub.add_argument("--relayer-ledger-address-index", type=int, default=0, help="🔐 the index of the address when using Ledger")
 
 
 def add_proxy_arg(sub: Any):
