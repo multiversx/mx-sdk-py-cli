@@ -127,12 +127,13 @@ def add_guardian_wallet_args(args: List[str], sub: Any):
     sub.add_argument("--guardian-ledger-address-index", type=int, default=0, help="🔐 the index of the address when using Ledger")
 
 
+# Required check not properly working, same for guardian. Will be refactored in the future.
 def add_relayed_v3_wallet_args(args: List[str], sub: Any):
-    sub.add_argument("--relayer-pem", required=check_if_sign_method_required(args, "--relayer-pem"), help="🔑 the PEM file, if keyfile not provided")
+    sub.add_argument("--relayer-pem", help="🔑 the PEM file, if keyfile not provided")
     sub.add_argument("--relayer-pem-index", type=int, default=0, help="🔑 the index in the PEM file (default: %(default)s)")
-    sub.add_argument("--relayer-keyfile", required=check_if_sign_method_required(args, "--relayer-keyfile"), help="🔑 a JSON keyfile, if PEM not provided")
+    sub.add_argument("--relayer-keyfile", help="🔑 a JSON keyfile, if PEM not provided")
     sub.add_argument("--relayer-passfile", help="🔑 a file containing keyfile's password, if keyfile provided")
-    sub.add_argument("--relayer-ledger", action="store_true", required=check_if_sign_method_required(args, "--relayer-ledger"), default=False, help="🔐 bool flag for signing transaction using ledger")
+    sub.add_argument("--relayer-ledger", action="store_true", default=False, help="🔐 bool flag for signing transaction using ledger")
     sub.add_argument("--relayer-ledger-account-index", type=int, default=0, help="🔐 the index of the account when using Ledger")
     sub.add_argument("--relayer-ledger-address-index", type=int, default=0, help="🔐 the index of the address when using Ledger")
 
@@ -175,6 +176,20 @@ def prepare_account(args: Any):
         account = Account(key_file=args.keyfile, password=password)
     elif args.ledger:
         account = LedgerAccount(account_index=args.ledger_account_index, address_index=args.ledger_address_index)
+    else:
+        raise errors.NoWalletProvided()
+
+    return account
+
+
+def prepare_relayer_account(args: Any) -> Account:
+    if args.relayer_ledger:
+        account = LedgerAccount(account_index=args.relayer_ledger_account_index, address_index=args.relayer_ledger_address_index)
+    if args.relayer_pem:
+        account = Account(pem_file=args.relayer_pem, pem_index=args.relayer_pem_index)
+    elif args.relayer_keyfile:
+        password = load_password(args)
+        account = Account(key_file=args.relayer_keyfile, password=password)
     else:
         raise errors.NoWalletProvided()
 

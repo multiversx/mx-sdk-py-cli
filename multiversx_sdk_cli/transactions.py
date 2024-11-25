@@ -14,7 +14,7 @@ from multiversx_sdk_cli.accounts import Account, LedgerAccount
 from multiversx_sdk_cli.cli_password import (load_guardian_password,
                                              load_password)
 from multiversx_sdk_cli.cosign_transaction import cosign_transaction
-from multiversx_sdk_cli.errors import NoWalletProvided
+from multiversx_sdk_cli.errors import IncorrectWalletError, NoWalletProvided
 from multiversx_sdk_cli.interfaces import ITransaction
 from multiversx_sdk_cli.ledger.ledger_functions import do_get_ledger_address
 
@@ -84,11 +84,13 @@ def do_prepare_transaction(args: Any) -> Transaction:
         try:
             relayer_account = load_relayer_account_from_args(args)
             if relayer_account.address.to_bech32() != tx.relayer:
-                raise Exception("Relayer address does not match the provided relayer wallet.")
+                raise IncorrectWalletError("")
 
             tx.relayer_signature = bytes.fromhex(relayer_account.sign_transaction(tx))
-        except errors.NoWalletProvided:
+        except NoWalletProvided:
             logger.warning("Relayer wallet not provided. Transaction will not be signed by relayer.")
+        except IncorrectWalletError:
+            raise IncorrectWalletError("Relayer wallet does not match the relayer's address set in the transaction.")
 
     tx.signature = bytes.fromhex(account.sign_transaction(tx))
     tx = sign_tx_by_guardian(args, tx)

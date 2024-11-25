@@ -2,8 +2,6 @@ import json
 from pathlib import Path
 from typing import Any
 
-import pytest
-
 from multiversx_sdk_cli.cli import main
 
 testdata_path = Path(__file__).parent / "testdata"
@@ -107,7 +105,46 @@ def test_create_multi_transfer_transaction_with_single_egld_transfer(capsys: Any
     assert data == "MultiESDTNFTTransfer@8049d639e5a6980d1cd2392abcce41029cda74a1563523a202f09641cc2618f8@01@45474c442d303030303030@@0de0b6b3a7640000"
 
 
+def test_relayed_v3_without_relayer_wallet(capsys: Any):
+    return_code = main([
+        "tx", "new",
+        "--pem", str(testdata_path / "alice.pem"),
+        "--receiver", "erd1spyavw0956vq68xj8y4tenjpq2wd5a9p2c6j8gsz7ztyrnpxrruqzu66jx",
+        "--nonce", "7",
+        "--gas-limit", "1300000",
+        "--value", "1000000000000000000",
+        "--chain", "T",
+        "--relayer", "erd1cqqxak4wun7508e0yj9ng843r6hv4mzd0hhpjpsejkpn9wa9yq8sj7u2u5"
+    ])
+    assert return_code == 0
+    tx = _read_stdout(capsys)
+    tx_json = json.loads(tx)["emittedTransaction"]
+    assert tx_json["sender"] == "erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th"
+    assert tx_json["receiver"] == "erd1spyavw0956vq68xj8y4tenjpq2wd5a9p2c6j8gsz7ztyrnpxrruqzu66jx"
+    assert tx_json["relayer"] == "erd1cqqxak4wun7508e0yj9ng843r6hv4mzd0hhpjpsejkpn9wa9yq8sj7u2u5"
+    assert tx_json["signature"]
+    assert not tx_json["relayerSignature"]
+
+
+def test_relayed_v3_incorrect_relayer():
+    return_code = main([
+        "tx", "new",
+        "--pem", str(testdata_path / "alice.pem"),
+        "--receiver", "erd1spyavw0956vq68xj8y4tenjpq2wd5a9p2c6j8gsz7ztyrnpxrruqzu66jx",
+        "--nonce", "7",
+        "--gas-limit", "1300000",
+        "--value", "1000000000000000000",
+        "--chain", "T",
+        "--relayer", "erd1cqqxak4wun7508e0yj9ng843r6hv4mzd0hhpjpsejkpn9wa9yq8sj7u2u5",
+        "--relayer-pem", str(testdata_path / "alice.pem")
+    ])
+    assert return_code
+
+
 def test_create_relayed_v3_transaction(capsys: Any):
+    # create relayed v3 tx and save signature and relayer signature
+    # create the same tx, save to file
+    # sign from file with relayer wallet and make sure signatures match
     return_code = main([
         "tx", "new",
         "--pem", str(testdata_path / "alice.pem"),
@@ -129,7 +166,13 @@ def test_create_relayed_v3_transaction(capsys: Any):
     assert tx_json["signature"]
     assert tx_json["relayerSignature"]
 
-    # no relayer wallet provided
+    initial_sender_signature = tx_json["signature"]
+    initial_relayer_signature = tx_json["relayerSignature"]
+
+    # Clear the captured content
+    capsys.readouterr()
+
+    # save tx to file then load and sign tx by relayer
     return_code = main([
         "tx", "new",
         "--pem", str(testdata_path / "alice.pem"),
@@ -138,30 +181,36 @@ def test_create_relayed_v3_transaction(capsys: Any):
         "--gas-limit", "1300000",
         "--value", "1000000000000000000",
         "--chain", "T",
-        "--relayer", "erd1cqqxak4wun7508e0yj9ng843r6hv4mzd0hhpjpsejkpn9wa9yq8sj7u2u5"
+        "--relayer", "erd1cqqxak4wun7508e0yj9ng843r6hv4mzd0hhpjpsejkpn9wa9yq8sj7u2u5",
+        "--outfile", str(testdata_out / "relayed.json")
     ])
     assert return_code == 0
+
+    # Clear the captured content
+    capsys.readouterr()
+
+    return_code = main([
+        "tx", "relay",
+        "--relayer-pem", str(testdata_path / "testUser.pem"),
+        "--infile", str(testdata_out / "relayed.json")
+    ])
+    assert return_code == 0
+
     tx = _read_stdout(capsys)
     tx_json = json.loads(tx)["emittedTransaction"]
-    assert tx_json["sender"] == "erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th"
-    assert tx_json["receiver"] == "erd1spyavw0956vq68xj8y4tenjpq2wd5a9p2c6j8gsz7ztyrnpxrruqzu66jx"
-    assert tx_json["relayer"] == "erd1cqqxak4wun7508e0yj9ng843r6hv4mzd0hhpjpsejkpn9wa9yq8sj7u2u5"
-    assert tx_json["signature"]
-    assert not tx_json["relayerSignature"]
+    assert tx_json["signature"] == initial_sender_signature
+    assert tx_json["relayerSignature"] == initial_relayer_signature
 
-    # incorrect relayer wallet
-    with pytest.raises(Exception, match="Relayer address does not match the provided relayer wallet."):
-        main([
-            "tx", "new",
-            "--pem", str(testdata_path / "alice.pem"),
-            "--receiver", "erd1spyavw0956vq68xj8y4tenjpq2wd5a9p2c6j8gsz7ztyrnpxrruqzu66jx",
-            "--nonce", "7",
-            "--gas-limit", "1300000",
-            "--value", "1000000000000000000",
-            "--chain", "T",
-            "--relayer", "erd1cqqxak4wun7508e0yj9ng843r6hv4mzd0hhpjpsejkpn9wa9yq8sj7u2u5",
-            "--relayer-pem", str(testdata_path / "alice.pem")
-        ])
+    # Clear the captured content
+    capsys.readouterr()
+
+
+def test_check_relayer_wallet_is_provided():
+    return_code = main([
+        "tx", "relay",
+        "--infile", str(testdata_out / "relayed.json")
+    ])
+    assert return_code
 
 
 def _read_stdout(capsys: Any) -> str:
