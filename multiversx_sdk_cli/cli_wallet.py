@@ -10,7 +10,8 @@ from multiversx_sdk import (Address, Mnemonic, UserPEM, UserSecretKey,
 from multiversx_sdk.core.address import get_shard_of_pubkey
 
 from multiversx_sdk_cli import cli_shared, utils
-from multiversx_sdk_cli.constants import DEFAULT_HRP, NUMBER_OF_SHARDS
+from multiversx_sdk_cli.config import get_address_hrp
+from multiversx_sdk_cli.constants import NUMBER_OF_SHARDS
 from multiversx_sdk_cli.errors import (BadUserInput, KnownError,
                                        WalletGenerationError)
 from multiversx_sdk_cli.sign_verify import SignedMessage, sign_message
@@ -54,7 +55,7 @@ def setup_parser(args: List[str], subparsers: Any) -> Any:
     )
     sub.add_argument("--format", choices=WALLET_FORMATS, help="the format of the generated wallet file (default: %(default)s)", default=None)
     sub.add_argument("--outfile", help="the output path and base file name for the generated wallet files (default: %(default)s)", type=str)
-    sub.add_argument("--address-hrp", help=f"the human-readable part of the address, when format is {WALLET_FORMAT_KEYSTORE_SECRET_KEY} or {WALLET_FORMAT_PEM} (default: %(default)s)", type=str, default=DEFAULT_HRP)
+    sub.add_argument("--address-hrp", help=f"the human-readable part of the address, when format is {WALLET_FORMAT_KEYSTORE_SECRET_KEY} or {WALLET_FORMAT_PEM} (default: %(default)s)", type=str, default=get_address_hrp())
     sub.add_argument("--shard", type=int, help="the shard in which the address will be generated; (default: random)")
     sub.set_defaults(func=wallet_new)
 
@@ -69,7 +70,7 @@ def setup_parser(args: List[str], subparsers: Any) -> Any:
     sub.add_argument("--in-format", required=True, choices=WALLET_FORMATS, help="the format of the input file")
     sub.add_argument("--out-format", required=True, choices=WALLET_FORMATS_AND_ADDRESSES, help="the format of the output file")
     sub.add_argument("--address-index", help=f"the address index, if input format is {WALLET_FORMAT_RAW_MNEMONIC}, {WALLET_FORMAT_KEYSTORE_MNEMONIC} or {WALLET_FORMAT_PEM} (with multiple entries) and the output format is {WALLET_FORMAT_KEYSTORE_SECRET_KEY} or {WALLET_FORMAT_PEM}", type=int, default=0)
-    sub.add_argument("--address-hrp", help=f"the human-readable part of the address, when the output format is {WALLET_FORMAT_KEYSTORE_SECRET_KEY} or {WALLET_FORMAT_PEM} (default: %(default)s)", type=str, default=DEFAULT_HRP)
+    sub.add_argument("--address-hrp", help=f"the human-readable part of the address, when the output format is {WALLET_FORMAT_KEYSTORE_SECRET_KEY} or {WALLET_FORMAT_PEM} (default: %(default)s)", type=str, default=get_address_hrp())
     sub.set_defaults(func=convert_wallet)
 
     sub = cli_shared.add_command_subparser(
@@ -82,6 +83,7 @@ def setup_parser(args: List[str], subparsers: Any) -> Any:
     group = sub.add_mutually_exclusive_group(required=True)
     group.add_argument("--encode", action="store_true", help="whether to encode")
     group.add_argument("--decode", action="store_true", help="whether to decode")
+    sub.add_argument("--hrp", type=str, help="the human readable part; only used for encoding to bech32")
     sub.set_defaults(func=do_bech32)
 
     sub = cli_shared.add_command_subparser(
@@ -288,7 +290,8 @@ def do_bech32(args: Any):
     value = args.value
 
     if encode:
-        address = Address.new_from_hex(value, DEFAULT_HRP)
+        hrp = args.hrp if args.hrp else get_address_hrp()
+        address = Address.new_from_hex(value, hrp)
         result = address.to_bech32()
     else:
         address = Address.new_from_bech32(value)

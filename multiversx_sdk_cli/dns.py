@@ -6,7 +6,8 @@ from multiversx_sdk.network_providers.network_config import NetworkConfig
 
 from multiversx_sdk_cli import cli_shared, utils
 from multiversx_sdk_cli.accounts import Account
-from multiversx_sdk_cli.constants import ADDRESS_ZERO_BECH32, DEFAULT_HRP
+from multiversx_sdk_cli.config import get_address_hrp
+from multiversx_sdk_cli.constants import ADDRESS_ZERO_HEX
 from multiversx_sdk_cli.contracts import SmartContract
 from multiversx_sdk_cli.transactions import (compute_relayed_v1_data,
                                              do_prepare_transaction)
@@ -36,10 +37,10 @@ def resolve(name: str, proxy: INetworkProvider) -> Address:
     )
 
     if len(response) == 0:
-        return Address.from_bech32(ADDRESS_ZERO_BECH32)
+        return Address.new_from_hex(ADDRESS_ZERO_HEX, get_address_hrp())
 
     result = response[0].get("returnDataParts")[0]
-    return Address.from_hex(result, DEFAULT_HRP)
+    return Address.new_from_hex(result, get_address_hrp())
 
 
 def validate_name(name: str, shard_id: int, proxy: INetworkProvider):
@@ -137,7 +138,7 @@ def compute_dns_address_for_shard_id(shard_id: int) -> Address:
     deployer_pubkey_prefix = InitialDNSAddress[:len(InitialDNSAddress) - ShardIdentiferLen]
 
     deployer_pubkey = deployer_pubkey_prefix + bytes([0, shard_id])
-    deployer = Account(address=Address(deployer_pubkey, DEFAULT_HRP))
+    deployer = Account(address=Address(deployer_pubkey, get_address_hrp()))
     deployer.nonce = 0
     address_computer = AddressComputer(number_of_shards=3)
     contract_address = address_computer.compute_contract_address(deployer.address, deployer.nonce)
