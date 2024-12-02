@@ -83,7 +83,7 @@ def setup_parser(args: List[str], subparsers: Any) -> Any:
     group = sub.add_mutually_exclusive_group(required=True)
     group.add_argument("--encode", action="store_true", help="whether to encode")
     group.add_argument("--decode", action="store_true", help="whether to decode")
-    sub.add_argument("--hrp", type=str, help="the human readable part; only used for encoding to bech32")
+    sub.add_argument("--hrp", type=str, help="the human readable part; only used for encoding to bech32 (default: %(default)s)", default=get_address_hrp())
     sub.set_defaults(func=do_bech32)
 
     sub = cli_shared.add_command_subparser(
@@ -290,7 +290,7 @@ def do_bech32(args: Any):
     value = args.value
 
     if encode:
-        hrp = args.hrp if args.hrp else get_address_hrp()
+        hrp = args.hrp
         address = Address.new_from_hex(value, hrp)
         result = address.to_bech32()
     else:
