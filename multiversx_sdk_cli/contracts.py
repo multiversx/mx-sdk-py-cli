@@ -11,7 +11,7 @@ from multiversx_sdk.abi import Abi
 
 from multiversx_sdk_cli import errors
 from multiversx_sdk_cli.accounts import Account
-from multiversx_sdk_cli.constants import DEFAULT_HRP
+from multiversx_sdk_cli.config import get_address_hrp
 from multiversx_sdk_cli.interfaces import IAddress
 
 logger = logging.getLogger("contracts")
@@ -211,7 +211,7 @@ class SmartContract:
                 args.append(self._hex_to_bytes(arg))
             elif arg.isnumeric():
                 args.append(int(arg))
-            elif arg.startswith(DEFAULT_HRP):
+            elif arg.startswith(get_address_hrp()):
                 args.append(Address.new_from_bech32(arg))
             elif arg.lower() == FALSE_STR_LOWER:
                 args.append(False)
@@ -253,7 +253,7 @@ def _to_hex(arg: str):
 
     if arg.isnumeric():
         return _prepare_decimal(arg)
-    elif arg.startswith(DEFAULT_HRP):
+    elif arg.startswith(get_address_hrp()):
         addr = Address.from_bech32(arg)
         return _prepare_hexadecimal(f"{HEX_PREFIX}{addr.hex()}")
     elif arg.lower() == FALSE_STR_LOWER or arg.lower() == TRUE_STR_LOWER:

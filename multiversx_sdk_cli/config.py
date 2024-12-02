@@ -60,6 +60,10 @@ def get_value(name: str) -> str:
     return value
 
 
+def get_address_hrp():
+    return get_value("default_address_hrp")
+
+
 def set_value(name: str, value: Any):
     _guard_valid_name(name)
     data = read_file()
@@ -162,6 +166,7 @@ def get_defaults() -> Dict[str, Any]:
         "dependencies.testwallets.urlTemplate.windows": "https://github.com/multiversx/mx-sdk-testwallets/archive/{TAG}.tar.gz",
         "dependencies.wasm-opt.tag": "0.112.0",
         "github_api_token": "",
+        "default_address_hrp": "erd"
     }
 
 
