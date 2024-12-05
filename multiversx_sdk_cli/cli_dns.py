@@ -1,11 +1,11 @@
 from typing import Any, List
 
-from multiversx_sdk import Address, ProxyNetworkProvider
+from multiversx_sdk import ProxyNetworkProvider
 from prettytable import PrettyTable
 
 from multiversx_sdk_cli import cli_shared
 from multiversx_sdk_cli.config import get_config_for_network_providers
-from multiversx_sdk_cli.constants import ADDRESS_ZERO_BECH32
+from multiversx_sdk_cli.constants import ADDRESS_ZERO_HEX
 from multiversx_sdk_cli.dns import (compute_dns_address_for_shard_id,
                                     dns_address_for_name, name_hash, register,
                                     registration_cost, resolve, validate_name,
@@ -82,7 +82,7 @@ def dns_resolve(args: Any):
 
     config = get_config_for_network_providers()
     addr = resolve(args.name, ProxyNetworkProvider(url=args.proxy, config=config))
-    if addr.to_hex() != Address.new_from_bech32(ADDRESS_ZERO_BECH32).to_hex():
+    if addr.to_hex() != ADDRESS_ZERO_HEX:
         print(addr.to_bech32())
 
 

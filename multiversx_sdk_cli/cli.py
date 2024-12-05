@@ -6,6 +6,7 @@ from argparse import ArgumentParser
 from typing import Any, List
 
 import argcomplete
+from multiversx_sdk import LibraryConfig
 from rich.logging import RichHandler
 
 import multiversx_sdk_cli.cli_accounts
@@ -53,6 +54,8 @@ def _do_main(cli_args: List[str]):
         logging.basicConfig(level="INFO", format='%(name)s: %(message)s', handlers=[RichHandler(show_time=False, rich_tracebacks=True)])
 
     verify_deprecated_entries_in_config_file()
+    default_hrp = config.get_address_hrp()
+    LibraryConfig.default_address_hrp = default_hrp
 
     if not hasattr(args, "func"):
         parser.print_help()

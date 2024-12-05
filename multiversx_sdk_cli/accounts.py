@@ -6,7 +6,7 @@ from multiversx_sdk import (Address, Message, MessageComputer,
                             TransactionComputer, UserSigner)
 from multiversx_sdk.network_providers.accounts import AccountOnNetwork
 
-from multiversx_sdk_cli.constants import DEFAULT_HRP
+from multiversx_sdk_cli.config import get_address_hrp
 from multiversx_sdk_cli.interfaces import IAccount, IAddress, ITransaction
 from multiversx_sdk_cli.ledger.config import compare_versions
 from multiversx_sdk_cli.ledger.ledger_app_handler import \
@@ -61,11 +61,11 @@ class Account(AccountBase):
         if pem_file:
             pem_path = Path(pem_file).expanduser().resolve()
             self.signer = UserSigner.from_pem_file(pem_path, pem_index)
-            self.address = Address(self.signer.get_pubkey().buffer, DEFAULT_HRP)
+            self.address = Address(self.signer.get_pubkey().buffer, get_address_hrp())
         elif key_file and password:
             key_file_path = Path(key_file).expanduser().resolve()
             self.signer = UserSigner.from_wallet(key_file_path, password)
-            self.address = Address(self.signer.get_pubkey().buffer, DEFAULT_HRP)
+            self.address = Address(self.signer.get_pubkey().buffer, get_address_hrp())
 
     def sign_transaction(self, transaction: ITransaction) -> str:
         assert self.signer is not None
