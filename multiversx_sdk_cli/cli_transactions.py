@@ -60,7 +60,7 @@ def setup_parser(args: List[str], subparsers: Any) -> Any:
     sub = cli_shared.add_command_subparser(subparsers, "tx", "relay", f"Relay a previously saved transaction.{CLIOutputBuilder.describe()}")
     cli_shared.add_relayed_v3_wallet_args(args, sub)
     cli_shared.add_infile_arg(sub, what="a previously saved transaction")
-    cli_shared.add_outfile_arg(sub, what="the signed transaction")
+    cli_shared.add_outfile_arg(sub, what="the relayer signed transaction")
     cli_shared.add_broadcast_args(sub)
     cli_shared.add_proxy_arg(sub)
     sub.set_defaults(func=relay_transaction)
