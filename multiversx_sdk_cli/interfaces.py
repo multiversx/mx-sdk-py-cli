@@ -25,6 +25,8 @@ class ITransaction(Protocol):
     guardian: str
     signature: bytes
     guardian_signature: bytes
+    relayer: str
+    relayer_signature: bytes
 
 
 class IAccount(Protocol):

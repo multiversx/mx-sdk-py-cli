@@ -14,7 +14,7 @@ from multiversx_sdk_cli.accounts import Account, LedgerAccount
 from multiversx_sdk_cli.cli_password import (load_guardian_password,
                                              load_password)
 from multiversx_sdk_cli.cosign_transaction import cosign_transaction
-from multiversx_sdk_cli.errors import NoWalletProvided
+from multiversx_sdk_cli.errors import IncorrectWalletError, NoWalletProvided
 from multiversx_sdk_cli.interfaces import ITransaction
 from multiversx_sdk_cli.ledger.ledger_functions import do_get_ledger_address
 
@@ -78,6 +78,20 @@ def do_prepare_transaction(args: Any) -> Transaction:
     if args.guardian:
         tx.guardian = args.guardian
 
+    if args.relayer:
+        tx.relayer = args.relayer
+
+        try:
+            relayer_account = load_relayer_account_from_args(args)
+            if relayer_account.address.to_bech32() != tx.relayer:
+                raise IncorrectWalletError("")
+
+            tx.relayer_signature = bytes.fromhex(relayer_account.sign_transaction(tx))
+        except NoWalletProvided:
+            logger.warning("Relayer wallet not provided. Transaction will not be signed by relayer.")
+        except IncorrectWalletError:
+            raise IncorrectWalletError("Relayer wallet does not match the relayer's address set in the transaction.")
+
     tx.signature = bytes.fromhex(account.sign_transaction(tx))
     tx = sign_tx_by_guardian(args, tx)
 
@@ -93,6 +107,20 @@ def load_sender_account_from_args(args: Any) -> Account:
     elif args.keyfile:
         password = load_password(args)
         account = Account(key_file=args.keyfile, password=password)
+
+    return account
+
+
+def load_relayer_account_from_args(args: Any) -> Account:
+    if args.relayer_ledger:
+        account = LedgerAccount(account_index=args.relayer_ledger_account_index, address_index=args.relayer_ledger_address_index)
+    if args.relayer_pem:
+        account = Account(pem_file=args.relayer_pem, pem_index=args.relayer_pem_index)
+    elif args.relayer_keyfile:
+        password = load_password(args)
+        account = Account(key_file=args.relayer_keyfile, password=password)
+    else:
+        raise errors.NoWalletProvided()
 
     return account
 

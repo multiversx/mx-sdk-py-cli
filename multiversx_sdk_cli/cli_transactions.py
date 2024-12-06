@@ -8,7 +8,7 @@ from multiversx_sdk_cli import cli_shared, utils
 from multiversx_sdk_cli.cli_output import CLIOutputBuilder
 from multiversx_sdk_cli.config import get_config_for_network_providers
 from multiversx_sdk_cli.cosign_transaction import cosign_transaction
-from multiversx_sdk_cli.errors import NoWalletProvided
+from multiversx_sdk_cli.errors import IncorrectWalletError, NoWalletProvided
 from multiversx_sdk_cli.transactions import (compute_relayed_v1_data,
                                              do_prepare_transaction,
                                              load_transaction_from_file)
@@ -56,6 +56,14 @@ def setup_parser(args: List[str], subparsers: Any) -> Any:
     cli_shared.add_guardian_args(sub)
     cli_shared.add_guardian_wallet_args(args, sub)
     sub.set_defaults(func=sign_transaction)
+
+    sub = cli_shared.add_command_subparser(subparsers, "tx", "relay", f"Relay a previously saved transaction.{CLIOutputBuilder.describe()}")
+    cli_shared.add_relayed_v3_wallet_args(args, sub)
+    cli_shared.add_infile_arg(sub, what="a previously saved transaction")
+    cli_shared.add_outfile_arg(sub, what="the relayer signed transaction")
+    cli_shared.add_broadcast_args(sub)
+    cli_shared.add_proxy_arg(sub)
+    sub.set_defaults(func=relay_transaction)
 
     parser.epilog = cli_shared.build_group_epilog(subparsers)
     return subparsers
@@ -141,3 +149,26 @@ def sign_transaction(args: Any):
         tx = cosign_transaction(tx, args.guardian_service_url, args.guardian_2fa_code)
 
     cli_shared.send_or_simulate(tx, args)
+
+
+def relay_transaction(args: Any):
+    args = utils.as_object(args)
+
+    if not _is_relayer_wallet_provided(args):
+        raise NoWalletProvided()
+
+    cli_shared.check_broadcast_args(args)
+
+    tx = load_transaction_from_file(args.infile)
+    relayer = cli_shared.prepare_relayer_account(args)
+
+    if tx.relayer != relayer.address.to_bech32():
+        raise IncorrectWalletError("Relayer wallet does not match the relayer's address set in the transaction.")
+
+    tx.relayer_signature = bytes.fromhex(relayer.sign_transaction(tx))
+
+    cli_shared.send_or_simulate(tx, args)
+
+
+def _is_relayer_wallet_provided(args: Any):
+    return any([args.relayer_pem, args.relayer_keyfile, args.relayer_ledger])
