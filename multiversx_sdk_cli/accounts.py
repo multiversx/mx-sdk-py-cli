@@ -96,6 +96,8 @@ class LedgerAccount(Account):
     def sign_transaction(self, transaction: ITransaction) -> str:
         ledger_version = do_get_ledger_version()
         should_use_hash_signing = compare_versions(ledger_version, SIGN_USING_HASH_VERSION) >= 0
+
+        # TODO: This check will be removed in the next major release.
         if should_use_hash_signing:
             transaction.version = TX_HASH_SIGN_VERSION
             transaction.options = transaction.options | TX_HASH_SIGN_OPTIONS

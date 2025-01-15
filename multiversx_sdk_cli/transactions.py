@@ -2,15 +2,15 @@ import base64
 import json
 import logging
 import time
-from typing import Any, Dict, List, Optional, Protocol, TextIO
+from typing import Any, Dict, List, Optional, Protocol, TextIO, Union
 
 from multiversx_sdk import (Address, Token, TokenComputer, TokenTransfer,
                             Transaction, TransactionsConverter,
                             TransactionsFactoryConfig,
-                            TransferTransactionsFactory)
+                            TransferTransactionsFactory, TransactionComputer)
 
 from multiversx_sdk_cli import errors
-from multiversx_sdk_cli.accounts import Account, LedgerAccount
+from multiversx_sdk_cli.accounts import Account, AccountBase, LedgerAccount
 from multiversx_sdk_cli.cli_password import (load_guardian_password,
                                              load_password)
 from multiversx_sdk_cli.cosign_transaction import cosign_transaction
@@ -75,6 +75,10 @@ def do_prepare_transaction(args: Any) -> Transaction:
     tx.version = int(args.version)
     tx.options = int(args.options)
 
+    tx_computer = TransactionComputer()
+    if isinstance(account, LedgerAccount):
+        tx_computer.apply_options_for_hash_signing(tx)
+
     if args.guardian:
         tx.guardian = args.guardian
 
@@ -86,14 +90,25 @@ def do_prepare_transaction(args: Any) -> Transaction:
             if relayer_account.address.to_bech32() != tx.relayer:
                 raise IncorrectWalletError("")
 
+            if isinstance(relayer_account, LedgerAccount):
+                tx_computer.apply_options_for_hash_signing(tx)
+
             tx.relayer_signature = bytes.fromhex(relayer_account.sign_transaction(tx))
         except NoWalletProvided:
             logger.warning("Relayer wallet not provided. Transaction will not be signed by relayer.")
         except IncorrectWalletError:
             raise IncorrectWalletError("Relayer wallet does not match the relayer's address set in the transaction.")
 
+    try:
+        guardian_account = get_guardian_account_from_args(args)
+        if isinstance(guardian_account, LedgerAccount):
+            tx_computer.apply_options_for_hash_signing(tx)
+
+    except NoWalletProvided:
+        guardian_account = None
+
     tx.signature = bytes.fromhex(account.sign_transaction(tx))
-    tx = sign_tx_by_guardian(args, tx)
+    tx = sign_tx_by_guardian(args, tx, guardian_account)
 
     return tx
 
@@ -141,12 +156,7 @@ def prepare_token_transfers(transfers: List[Any]) -> List[TokenTransfer]:
     return token_transfers
 
 
-def sign_tx_by_guardian(args: Any, tx: Transaction) -> Transaction:
-    try:
-        guardian_account = get_guardian_account_from_args(args)
-    except NoWalletProvided:
-        guardian_account = None
-
+def sign_tx_by_guardian(args: Any, tx: Transaction, guardian_account: Union[AccountBase, None]) -> Transaction:
     if guardian_account:
         tx.guardian_signature = bytes.fromhex(guardian_account.sign_transaction(tx))
     elif args.guardian:
