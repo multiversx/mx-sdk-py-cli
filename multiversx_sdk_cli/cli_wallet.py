@@ -25,6 +25,7 @@ WALLET_FORMAT_KEYSTORE_SECRET_KEY = "keystore-secret-key"
 WALLET_FORMAT_PEM = "pem"
 WALLET_FORMAT_ADDRESS_BECH32 = "address-bech32"
 WALLET_FORMAT_ADDRESS_HEX = "address-hex"
+WALLET_FORMAT_PRIVATE_HEX = "private-hex"
 
 WALLET_FORMATS = [
     WALLET_FORMAT_RAW_MNEMONIC,
@@ -33,7 +34,7 @@ WALLET_FORMATS = [
     WALLET_FORMAT_PEM,
 ]
 
-WALLET_FORMATS_AND_ADDRESSES = [*WALLET_FORMATS, WALLET_FORMAT_ADDRESS_BECH32, WALLET_FORMAT_ADDRESS_HEX]
+WALLET_FORMATS_AND_ADDRESSES = [*WALLET_FORMATS, WALLET_FORMAT_ADDRESS_BECH32, WALLET_FORMAT_ADDRESS_HEX, WALLET_FORMAT_PRIVATE_HEX]
 
 MAX_ITERATIONS_FOR_GENERATING_WALLET = 100
 CURRENT_SHARDS = [i for i in range(NUMBER_OF_SHARDS)]
@@ -281,6 +282,13 @@ def _create_wallet_content(
 
         pubkey = secret_key.generate_public_key()
         return pubkey.hex()
+
+    if out_format == WALLET_FORMAT_PRIVATE_HEX:
+        if mnemonic:
+            secret_key = mnemonic.derive_key(address_index)
+        assert secret_key is not None
+
+        return secret_key.hex()
 
     raise KnownError(f"Cannot create wallet, unknown output format: <{out_format}>. Make sure to use one of following: {WALLET_FORMATS}.")
 
