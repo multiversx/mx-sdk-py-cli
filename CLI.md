@@ -1939,7 +1939,7 @@ options:
   --outfile OUTFILE                               path to the output file
   --in-format {raw-mnemonic,keystore-mnemonic,keystore-secret-key,pem}
                                                   the format of the input file
-  --out-format {raw-mnemonic,keystore-mnemonic,keystore-secret-key,pem,address-bech32,address-hex}
+  --out-format {raw-mnemonic,keystore-mnemonic,keystore-secret-key,pem,address-bech32,address-hex,private-hex}
                                                   the format of the output file
   --address-index ADDRESS_INDEX                   the address index, if input format is raw-mnemonic, keystore-mnemonic
                                                   or pem (with multiple entries) and the output format is keystore-

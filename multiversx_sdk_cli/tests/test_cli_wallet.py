@@ -255,6 +255,15 @@ def test_wallet_convert_pem_to_pubkey(capsys: Any):
     out = _read_stdout(capsys).strip("Output:\n\n")
     assert out == "0139472eff6886771a982f3083da5d421f24c29181e63888228dc81ca60d69e1"
 
+def test_wallet_convert_pem_to_private_hex(capsys: Any):
+    infile = testdata_path / "alice.pem"
+
+    main([
+        "wallet", "convert", "--infile", str(infile), "--in-format", "pem", "--out-format", "private-hex"
+    ])
+
+    out = _read_stdout(capsys).strip("Output:\n\n")
+    assert out == "413f42575f7f26fad3317a778771212fdb80245850981e48b58a4f25e344e8f9"
 
 def test_wallet_sign_message(capsys: Any):
     message = "test"
