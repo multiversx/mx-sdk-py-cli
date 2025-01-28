@@ -45,4 +45,4 @@ def get_account(args: Any):
     elif args.username:
         print(account.username)
     else:
-        utils.dump_out_json(account.to_dictionary())
+        utils.dump_out_json(account.raw)

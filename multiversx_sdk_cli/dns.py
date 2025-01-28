@@ -1,8 +1,8 @@
-from typing import Any, List, Protocol
+from typing import Any, List, Optional, Protocol, Union
 
 from Cryptodome.Hash import keccak
-from multiversx_sdk import Address, AddressComputer, TransactionsFactoryConfig
-from multiversx_sdk.network_providers.network_config import NetworkConfig
+from multiversx_sdk import Address, AddressComputer, TransactionsFactoryConfig, AwaitingOptions, TransactionOnNetwork
+from multiversx_sdk import NetworkConfig
 
 from multiversx_sdk_cli import cli_shared, utils
 from multiversx_sdk_cli.accounts import Account
@@ -22,6 +22,11 @@ class INetworkProvider(Protocol):
         ...
 
     def get_network_config(self) -> NetworkConfig:
+        ...
+
+    def await_transaction_completed(
+        self, transaction_hash: Union[bytes, str], options: Optional[AwaitingOptions] = None
+    ) -> TransactionOnNetwork:
         ...
 
 
