@@ -14,7 +14,6 @@ from multiversx_sdk_cli.cli_password import (load_guardian_password,
                                              load_password)
 from multiversx_sdk_cli.constants import (DEFAULT_TX_VERSION,
                                           TRANSACTION_OPTIONS_TX_GUARDED)
-from multiversx_sdk_cli.custom_network_provider import CustomNetworkProvider
 from multiversx_sdk_cli.errors import ArgumentsNotProvidedError
 from multiversx_sdk_cli.interfaces import ITransaction
 from multiversx_sdk_cli.ledger.ledger_functions import do_get_ledger_address
@@ -69,7 +68,8 @@ def add_tx_args(
         with_nonce: bool = True,
         with_receiver: bool = True,
         with_data: bool = True,
-        with_estimate_gas: bool = False):
+        with_estimate_gas: bool = False,
+        with_relayer_wallet_args: bool = True):
     if with_nonce:
         sub.add_argument("--nonce", type=int, required=not ("--recall-nonce" in args), help="# the nonce for the transaction")
         sub.add_argument("--recall-nonce", action="store_true", default=False, help="⭮ whether to recall the nonce when creating the transaction (default: %(default)s)")
@@ -91,16 +91,13 @@ def add_tx_args(
     sub.add_argument("--chain", help="the chain identifier")
     sub.add_argument("--version", type=int, default=DEFAULT_TX_VERSION, help="the transaction version (default: %(default)s)")
 
+    sub.add_argument("--relayer", help="the bech32 address of the relayer")
+    if with_relayer_wallet_args:
+        add_relayed_v3_wallet_args(args, sub)
+
     add_guardian_args(sub)
-    add_relayed_v3_args(sub)
 
     sub.add_argument("--options", type=int, default=0, help="the transaction options (default: 0)")
-
-
-def add_relayed_v3_args(sub: Any):
-    sub.add_argument("--relayer", help="the address of the relayer")
-    sub.add_argument("--inner-transactions", help="a json file containing the inner transactions; should only be provided when creating the relayer's transaction")
-    sub.add_argument("--inner-transactions-outfile", type=str, help="where to save the transaction as an inner transaction (default: stdout)")
 
 
 def add_guardian_args(sub: Any):
@@ -130,6 +127,17 @@ def add_guardian_wallet_args(args: List[str], sub: Any):
     sub.add_argument("--guardian-ledger-address-index", type=int, default=0, help="🔐 the index of the address when using Ledger")
 
 
+# Required check not properly working, same for guardian. Will be refactored in the future.
+def add_relayed_v3_wallet_args(args: List[str], sub: Any):
+    sub.add_argument("--relayer-pem", help="🔑 the PEM file, if keyfile not provided")
+    sub.add_argument("--relayer-pem-index", type=int, default=0, help="🔑 the index in the PEM file (default: %(default)s)")
+    sub.add_argument("--relayer-keyfile", help="🔑 a JSON keyfile, if PEM not provided")
+    sub.add_argument("--relayer-passfile", help="🔑 a file containing keyfile's password, if keyfile provided")
+    sub.add_argument("--relayer-ledger", action="store_true", default=False, help="🔐 bool flag for signing transaction using ledger")
+    sub.add_argument("--relayer-ledger-account-index", type=int, default=0, help="🔐 the index of the account when using Ledger")
+    sub.add_argument("--relayer-ledger-address-index", type=int, default=0, help="🔐 the index of the address when using Ledger")
+
+
 def add_proxy_arg(sub: Any):
     sub.add_argument("--proxy", help="🔗 the URL of the proxy")
 
@@ -148,6 +156,12 @@ def add_omit_fields_arg(sub: Any):
     sub.add_argument("--omit-fields", default="[]", type=str, required=False, help="omit fields in the output payload (default: %(default)s)")
 
 
+def add_token_transfers_args(sub: Any):
+    sub.add_argument("--token-transfers", nargs='+',
+                     help="token transfers for transfer & execute, as [token, amount] "
+                     "E.g. --token-transfers NFT-123456-0a 1 ESDT-987654 100000000")
+
+
 def parse_omit_fields_arg(args: Any) -> List[str]:
     literal = args.omit_fields
     parsed = ast.literal_eval(literal)
@@ -162,6 +176,20 @@ def prepare_account(args: Any):
         account = Account(key_file=args.keyfile, password=password)
     elif args.ledger:
         account = LedgerAccount(account_index=args.ledger_account_index, address_index=args.ledger_address_index)
+    else:
+        raise errors.NoWalletProvided()
+
+    return account
+
+
+def prepare_relayer_account(args: Any) -> Account:
+    if args.relayer_ledger:
+        account = LedgerAccount(account_index=args.relayer_ledger_account_index, address_index=args.relayer_ledger_address_index)
+    if args.relayer_pem:
+        account = Account(pem_file=args.relayer_pem, pem_index=args.relayer_pem_index)
+    elif args.relayer_keyfile:
+        password = load_password(args)
+        account = Account(key_file=args.relayer_keyfile, password=password)
     else:
         raise errors.NoWalletProvided()
 
@@ -189,7 +217,8 @@ def prepare_nonce_in_args(args: Any):
 
     if args.recall_nonce:
         account = prepare_account(args)
-        account.sync_nonce(ProxyNetworkProvider(args.proxy))
+        network_provider_config = config.get_config_for_network_providers()
+        account.sync_nonce(ProxyNetworkProvider(url=args.proxy, config=network_provider_config))
         args.nonce = account.nonce
 
 
@@ -198,7 +227,8 @@ def prepare_chain_id_in_args(args: Any):
         raise ArgumentsNotProvidedError("chain ID cannot be decided: `--chain` or `--proxy` should be provided")
 
     if args.chain and args.proxy:
-        proxy = ProxyNetworkProvider(args.proxy)
+        network_provider_config = config.get_config_for_network_providers()
+        proxy = ProxyNetworkProvider(url=args.proxy, config=network_provider_config)
         fetched_chain_id = proxy.get_network_config().chain_id
 
         if args.chain != fetched_chain_id:
@@ -211,7 +241,8 @@ def prepare_chain_id_in_args(args: Any):
     if args.chain:
         return
     elif args.proxy:
-        proxy = ProxyNetworkProvider(args.proxy)
+        network_provider_config = config.get_config_for_network_providers()
+        proxy = ProxyNetworkProvider(url=args.proxy, config=network_provider_config)
         args.chain = proxy.get_network_config().chain_id
 
 
@@ -260,7 +291,8 @@ def check_options_for_guarded_tx(options: int):
 
 
 def send_or_simulate(tx: ITransaction, args: Any, dump_output: bool = True) -> CLIOutputBuilder:
-    proxy = CustomNetworkProvider(args.proxy)
+    network_provider_config = config.get_config_for_network_providers()
+    proxy = ProxyNetworkProvider(url=args.proxy, config=network_provider_config)
 
     is_set_wait_result = hasattr(args, "wait_result") and args.wait_result
     is_set_send = hasattr(args, "send") and args.send

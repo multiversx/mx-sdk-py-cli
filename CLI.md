@@ -218,15 +218,19 @@ options:
   --value VALUE                                   the value to transfer (default: 0)
   --chain CHAIN                                   the chain identifier
   --version VERSION                               the transaction version (default: 2)
+  --relayer RELAYER                               the bech32 address of the relayer
+  --relayer-pem RELAYER_PEM                       🔑 the PEM file, if keyfile not provided
+  --relayer-pem-index RELAYER_PEM_INDEX           🔑 the index in the PEM file (default: 0)
+  --relayer-keyfile RELAYER_KEYFILE               🔑 a JSON keyfile, if PEM not provided
+  --relayer-passfile RELAYER_PASSFILE             🔑 a file containing keyfile's password, if keyfile provided
+  --relayer-ledger                                🔐 bool flag for signing transaction using ledger
+  --relayer-ledger-account-index RELAYER_LEDGER_ACCOUNT_INDEX
+                                                  🔐 the index of the account when using Ledger
+  --relayer-ledger-address-index RELAYER_LEDGER_ADDRESS_INDEX
+                                                  🔐 the index of the address when using Ledger
   --guardian GUARDIAN                             the address of the guradian
   --guardian-service-url GUARDIAN_SERVICE_URL     the url of the guardian service
   --guardian-2fa-code GUARDIAN_2FA_CODE           the 2fa code for the guardian
-  --relayer RELAYER                               the address of the relayer
-  --inner-transactions INNER_TRANSACTIONS         a json file containing the inner transactions; should only be provided
-                                                  when creating the relayer's transaction
-  --inner-transactions-outfile INNER_TRANSACTIONS_OUTFILE
-                                                  where to save the transaction as an inner transaction (default:
-                                                  stdout)
   --options OPTIONS                               the transaction options (default: 0)
   --arguments ARGUMENTS [ARGUMENTS ...]           arguments for the contract transaction, as [number, bech32-address,
                                                   ascii string, boolean] or hex-encoded. E.g. --arguments 42 0x64 1000
@@ -311,15 +315,19 @@ options:
   --value VALUE                                   the value to transfer (default: 0)
   --chain CHAIN                                   the chain identifier
   --version VERSION                               the transaction version (default: 2)
+  --relayer RELAYER                               the bech32 address of the relayer
+  --relayer-pem RELAYER_PEM                       🔑 the PEM file, if keyfile not provided
+  --relayer-pem-index RELAYER_PEM_INDEX           🔑 the index in the PEM file (default: 0)
+  --relayer-keyfile RELAYER_KEYFILE               🔑 a JSON keyfile, if PEM not provided
+  --relayer-passfile RELAYER_PASSFILE             🔑 a file containing keyfile's password, if keyfile provided
+  --relayer-ledger                                🔐 bool flag for signing transaction using ledger
+  --relayer-ledger-account-index RELAYER_LEDGER_ACCOUNT_INDEX
+                                                  🔐 the index of the account when using Ledger
+  --relayer-ledger-address-index RELAYER_LEDGER_ADDRESS_INDEX
+                                                  🔐 the index of the address when using Ledger
   --guardian GUARDIAN                             the address of the guradian
   --guardian-service-url GUARDIAN_SERVICE_URL     the url of the guardian service
   --guardian-2fa-code GUARDIAN_2FA_CODE           the 2fa code for the guardian
-  --relayer RELAYER                               the address of the relayer
-  --inner-transactions INNER_TRANSACTIONS         a json file containing the inner transactions; should only be provided
-                                                  when creating the relayer's transaction
-  --inner-transactions-outfile INNER_TRANSACTIONS_OUTFILE
-                                                  where to save the transaction as an inner transaction (default:
-                                                  stdout)
   --options OPTIONS                               the transaction options (default: 0)
   --function FUNCTION                             the function to call
   --arguments ARGUMENTS [ARGUMENTS ...]           arguments for the contract transaction, as [number, bech32-address,
@@ -414,15 +422,19 @@ options:
   --value VALUE                                   the value to transfer (default: 0)
   --chain CHAIN                                   the chain identifier
   --version VERSION                               the transaction version (default: 2)
+  --relayer RELAYER                               the bech32 address of the relayer
+  --relayer-pem RELAYER_PEM                       🔑 the PEM file, if keyfile not provided
+  --relayer-pem-index RELAYER_PEM_INDEX           🔑 the index in the PEM file (default: 0)
+  --relayer-keyfile RELAYER_KEYFILE               🔑 a JSON keyfile, if PEM not provided
+  --relayer-passfile RELAYER_PASSFILE             🔑 a file containing keyfile's password, if keyfile provided
+  --relayer-ledger                                🔐 bool flag for signing transaction using ledger
+  --relayer-ledger-account-index RELAYER_LEDGER_ACCOUNT_INDEX
+                                                  🔐 the index of the account when using Ledger
+  --relayer-ledger-address-index RELAYER_LEDGER_ADDRESS_INDEX
+                                                  🔐 the index of the address when using Ledger
   --guardian GUARDIAN                             the address of the guradian
   --guardian-service-url GUARDIAN_SERVICE_URL     the url of the guardian service
   --guardian-2fa-code GUARDIAN_2FA_CODE           the 2fa code for the guardian
-  --relayer RELAYER                               the address of the relayer
-  --inner-transactions INNER_TRANSACTIONS         a json file containing the inner transactions; should only be provided
-                                                  when creating the relayer's transaction
-  --inner-transactions-outfile INNER_TRANSACTIONS_OUTFILE
-                                                  where to save the transaction as an inner transaction (default:
-                                                  stdout)
   --options OPTIONS                               the transaction options (default: 0)
   --arguments ARGUMENTS [ARGUMENTS ...]           arguments for the contract transaction, as [number, bech32-address,
                                                   ascii string, boolean] or hex-encoded. E.g. --arguments 42 0x64 1000
@@ -520,10 +532,10 @@ usage: mxpy tx COMMAND [-h] ...
 Create and broadcast Transactions
 
 COMMANDS:
-  {new,send,get,sign}
+  {new,send,get,sign,relay}
 
 OPTIONS:
-  -h, --help           show this help message and exit
+  -h, --help            show this help message and exit
 
 ----------------
 COMMANDS summary
@@ -532,6 +544,7 @@ new                            Create a new transaction.
 send                           Send a previously saved transaction.
 get                            Get a transaction.
 sign                           Sign a previously saved transaction.
+relay                          Relay a previously saved transaction.
 
 ```
 ### Transactions.New
@@ -577,15 +590,19 @@ options:
   --data DATA                                     the payload, or 'memo' of the transaction (default: )
   --chain CHAIN                                   the chain identifier
   --version VERSION                               the transaction version (default: 2)
+  --relayer RELAYER                               the bech32 address of the relayer
+  --relayer-pem RELAYER_PEM                       🔑 the PEM file, if keyfile not provided
+  --relayer-pem-index RELAYER_PEM_INDEX           🔑 the index in the PEM file (default: 0)
+  --relayer-keyfile RELAYER_KEYFILE               🔑 a JSON keyfile, if PEM not provided
+  --relayer-passfile RELAYER_PASSFILE             🔑 a file containing keyfile's password, if keyfile provided
+  --relayer-ledger                                🔐 bool flag for signing transaction using ledger
+  --relayer-ledger-account-index RELAYER_LEDGER_ACCOUNT_INDEX
+                                                  🔐 the index of the account when using Ledger
+  --relayer-ledger-address-index RELAYER_LEDGER_ADDRESS_INDEX
+                                                  🔐 the index of the address when using Ledger
   --guardian GUARDIAN                             the address of the guradian
   --guardian-service-url GUARDIAN_SERVICE_URL     the url of the guardian service
   --guardian-2fa-code GUARDIAN_2FA_CODE           the 2fa code for the guardian
-  --relayer RELAYER                               the address of the relayer
-  --inner-transactions INNER_TRANSACTIONS         a json file containing the inner transactions; should only be provided
-                                                  when creating the relayer's transaction
-  --inner-transactions-outfile INNER_TRANSACTIONS_OUTFILE
-                                                  where to save the transaction as an inner transaction (default:
-                                                  stdout)
   --options OPTIONS                               the transaction options (default: 0)
   --data-file DATA_FILE                           a file containing transaction data
   --token-transfers TOKEN_TRANSFERS [TOKEN_TRANSFERS ...]
@@ -730,15 +747,19 @@ options:
   --value VALUE                                   the value to transfer (default: 0)
   --chain CHAIN                                   the chain identifier
   --version VERSION                               the transaction version (default: 2)
+  --relayer RELAYER                               the bech32 address of the relayer
+  --relayer-pem RELAYER_PEM                       🔑 the PEM file, if keyfile not provided
+  --relayer-pem-index RELAYER_PEM_INDEX           🔑 the index in the PEM file (default: 0)
+  --relayer-keyfile RELAYER_KEYFILE               🔑 a JSON keyfile, if PEM not provided
+  --relayer-passfile RELAYER_PASSFILE             🔑 a file containing keyfile's password, if keyfile provided
+  --relayer-ledger                                🔐 bool flag for signing transaction using ledger
+  --relayer-ledger-account-index RELAYER_LEDGER_ACCOUNT_INDEX
+                                                  🔐 the index of the account when using Ledger
+  --relayer-ledger-address-index RELAYER_LEDGER_ADDRESS_INDEX
+                                                  🔐 the index of the address when using Ledger
   --guardian GUARDIAN                             the address of the guradian
   --guardian-service-url GUARDIAN_SERVICE_URL     the url of the guardian service
   --guardian-2fa-code GUARDIAN_2FA_CODE           the 2fa code for the guardian
-  --relayer RELAYER                               the address of the relayer
-  --inner-transactions INNER_TRANSACTIONS         a json file containing the inner transactions; should only be provided
-                                                  when creating the relayer's transaction
-  --inner-transactions-outfile INNER_TRANSACTIONS_OUTFILE
-                                                  where to save the transaction as an inner transaction (default:
-                                                  stdout)
   --options OPTIONS                               the transaction options (default: 0)
   --send                                          ✓ whether to broadcast the transaction (default: False)
   --simulate                                      whether to simulate the transaction (default: False)
@@ -786,15 +807,19 @@ options:
   --value VALUE                                   the value to transfer (default: 0)
   --chain CHAIN                                   the chain identifier
   --version VERSION                               the transaction version (default: 2)
+  --relayer RELAYER                               the bech32 address of the relayer
+  --relayer-pem RELAYER_PEM                       🔑 the PEM file, if keyfile not provided
+  --relayer-pem-index RELAYER_PEM_INDEX           🔑 the index in the PEM file (default: 0)
+  --relayer-keyfile RELAYER_KEYFILE               🔑 a JSON keyfile, if PEM not provided
+  --relayer-passfile RELAYER_PASSFILE             🔑 a file containing keyfile's password, if keyfile provided
+  --relayer-ledger                                🔐 bool flag for signing transaction using ledger
+  --relayer-ledger-account-index RELAYER_LEDGER_ACCOUNT_INDEX
+                                                  🔐 the index of the account when using Ledger
+  --relayer-ledger-address-index RELAYER_LEDGER_ADDRESS_INDEX
+                                                  🔐 the index of the address when using Ledger
   --guardian GUARDIAN                             the address of the guradian
   --guardian-service-url GUARDIAN_SERVICE_URL     the url of the guardian service
   --guardian-2fa-code GUARDIAN_2FA_CODE           the 2fa code for the guardian
-  --relayer RELAYER                               the address of the relayer
-  --inner-transactions INNER_TRANSACTIONS         a json file containing the inner transactions; should only be provided
-                                                  when creating the relayer's transaction
-  --inner-transactions-outfile INNER_TRANSACTIONS_OUTFILE
-                                                  where to save the transaction as an inner transaction (default:
-                                                  stdout)
   --options OPTIONS                               the transaction options (default: 0)
   --send                                          ✓ whether to broadcast the transaction (default: False)
   --simulate                                      whether to simulate the transaction (default: False)
@@ -840,15 +865,19 @@ options:
   --value VALUE                                   the value to transfer (default: 0)
   --chain CHAIN                                   the chain identifier
   --version VERSION                               the transaction version (default: 2)
+  --relayer RELAYER                               the bech32 address of the relayer
+  --relayer-pem RELAYER_PEM                       🔑 the PEM file, if keyfile not provided
+  --relayer-pem-index RELAYER_PEM_INDEX           🔑 the index in the PEM file (default: 0)
+  --relayer-keyfile RELAYER_KEYFILE               🔑 a JSON keyfile, if PEM not provided
+  --relayer-passfile RELAYER_PASSFILE             🔑 a file containing keyfile's password, if keyfile provided
+  --relayer-ledger                                🔐 bool flag for signing transaction using ledger
+  --relayer-ledger-account-index RELAYER_LEDGER_ACCOUNT_INDEX
+                                                  🔐 the index of the account when using Ledger
+  --relayer-ledger-address-index RELAYER_LEDGER_ADDRESS_INDEX
+                                                  🔐 the index of the address when using Ledger
   --guardian GUARDIAN                             the address of the guradian
   --guardian-service-url GUARDIAN_SERVICE_URL     the url of the guardian service
   --guardian-2fa-code GUARDIAN_2FA_CODE           the 2fa code for the guardian
-  --relayer RELAYER                               the address of the relayer
-  --inner-transactions INNER_TRANSACTIONS         a json file containing the inner transactions; should only be provided
-                                                  when creating the relayer's transaction
-  --inner-transactions-outfile INNER_TRANSACTIONS_OUTFILE
-                                                  where to save the transaction as an inner transaction (default:
-                                                  stdout)
   --options OPTIONS                               the transaction options (default: 0)
   --send                                          ✓ whether to broadcast the transaction (default: False)
   --simulate                                      whether to simulate the transaction (default: False)
@@ -894,15 +923,19 @@ options:
   --value VALUE                                   the value to transfer (default: 0)
   --chain CHAIN                                   the chain identifier
   --version VERSION                               the transaction version (default: 2)
+  --relayer RELAYER                               the bech32 address of the relayer
+  --relayer-pem RELAYER_PEM                       🔑 the PEM file, if keyfile not provided
+  --relayer-pem-index RELAYER_PEM_INDEX           🔑 the index in the PEM file (default: 0)
+  --relayer-keyfile RELAYER_KEYFILE               🔑 a JSON keyfile, if PEM not provided
+  --relayer-passfile RELAYER_PASSFILE             🔑 a file containing keyfile's password, if keyfile provided
+  --relayer-ledger                                🔐 bool flag for signing transaction using ledger
+  --relayer-ledger-account-index RELAYER_LEDGER_ACCOUNT_INDEX
+                                                  🔐 the index of the account when using Ledger
+  --relayer-ledger-address-index RELAYER_LEDGER_ADDRESS_INDEX
+                                                  🔐 the index of the address when using Ledger
   --guardian GUARDIAN                             the address of the guradian
   --guardian-service-url GUARDIAN_SERVICE_URL     the url of the guardian service
   --guardian-2fa-code GUARDIAN_2FA_CODE           the 2fa code for the guardian
-  --relayer RELAYER                               the address of the relayer
-  --inner-transactions INNER_TRANSACTIONS         a json file containing the inner transactions; should only be provided
-                                                  when creating the relayer's transaction
-  --inner-transactions-outfile INNER_TRANSACTIONS_OUTFILE
-                                                  where to save the transaction as an inner transaction (default:
-                                                  stdout)
   --options OPTIONS                               the transaction options (default: 0)
   --send                                          ✓ whether to broadcast the transaction (default: False)
   --simulate                                      whether to simulate the transaction (default: False)
@@ -948,15 +981,19 @@ options:
   --value VALUE                                   the value to transfer (default: 0)
   --chain CHAIN                                   the chain identifier
   --version VERSION                               the transaction version (default: 2)
+  --relayer RELAYER                               the bech32 address of the relayer
+  --relayer-pem RELAYER_PEM                       🔑 the PEM file, if keyfile not provided
+  --relayer-pem-index RELAYER_PEM_INDEX           🔑 the index in the PEM file (default: 0)
+  --relayer-keyfile RELAYER_KEYFILE               🔑 a JSON keyfile, if PEM not provided
+  --relayer-passfile RELAYER_PASSFILE             🔑 a file containing keyfile's password, if keyfile provided
+  --relayer-ledger                                🔐 bool flag for signing transaction using ledger
+  --relayer-ledger-account-index RELAYER_LEDGER_ACCOUNT_INDEX
+                                                  🔐 the index of the account when using Ledger
+  --relayer-ledger-address-index RELAYER_LEDGER_ADDRESS_INDEX
+                                                  🔐 the index of the address when using Ledger
   --guardian GUARDIAN                             the address of the guradian
   --guardian-service-url GUARDIAN_SERVICE_URL     the url of the guardian service
   --guardian-2fa-code GUARDIAN_2FA_CODE           the 2fa code for the guardian
-  --relayer RELAYER                               the address of the relayer
-  --inner-transactions INNER_TRANSACTIONS         a json file containing the inner transactions; should only be provided
-                                                  when creating the relayer's transaction
-  --inner-transactions-outfile INNER_TRANSACTIONS_OUTFILE
-                                                  where to save the transaction as an inner transaction (default:
-                                                  stdout)
   --options OPTIONS                               the transaction options (default: 0)
   --send                                          ✓ whether to broadcast the transaction (default: False)
   --simulate                                      whether to simulate the transaction (default: False)
@@ -1002,15 +1039,19 @@ options:
   --value VALUE                                   the value to transfer (default: 0)
   --chain CHAIN                                   the chain identifier
   --version VERSION                               the transaction version (default: 2)
+  --relayer RELAYER                               the bech32 address of the relayer
+  --relayer-pem RELAYER_PEM                       🔑 the PEM file, if keyfile not provided
+  --relayer-pem-index RELAYER_PEM_INDEX           🔑 the index in the PEM file (default: 0)
+  --relayer-keyfile RELAYER_KEYFILE               🔑 a JSON keyfile, if PEM not provided
+  --relayer-passfile RELAYER_PASSFILE             🔑 a file containing keyfile's password, if keyfile provided
+  --relayer-ledger                                🔐 bool flag for signing transaction using ledger
+  --relayer-ledger-account-index RELAYER_LEDGER_ACCOUNT_INDEX
+                                                  🔐 the index of the account when using Ledger
+  --relayer-ledger-address-index RELAYER_LEDGER_ADDRESS_INDEX
+                                                  🔐 the index of the address when using Ledger
   --guardian GUARDIAN                             the address of the guradian
   --guardian-service-url GUARDIAN_SERVICE_URL     the url of the guardian service
   --guardian-2fa-code GUARDIAN_2FA_CODE           the 2fa code for the guardian
-  --relayer RELAYER                               the address of the relayer
-  --inner-transactions INNER_TRANSACTIONS         a json file containing the inner transactions; should only be provided
-                                                  when creating the relayer's transaction
-  --inner-transactions-outfile INNER_TRANSACTIONS_OUTFILE
-                                                  where to save the transaction as an inner transaction (default:
-                                                  stdout)
   --options OPTIONS                               the transaction options (default: 0)
   --send                                          ✓ whether to broadcast the transaction (default: False)
   --simulate                                      whether to simulate the transaction (default: False)
@@ -1094,15 +1135,19 @@ options:
   --value VALUE                                   the value to transfer (default: 0)
   --chain CHAIN                                   the chain identifier
   --version VERSION                               the transaction version (default: 2)
+  --relayer RELAYER                               the bech32 address of the relayer
+  --relayer-pem RELAYER_PEM                       🔑 the PEM file, if keyfile not provided
+  --relayer-pem-index RELAYER_PEM_INDEX           🔑 the index in the PEM file (default: 0)
+  --relayer-keyfile RELAYER_KEYFILE               🔑 a JSON keyfile, if PEM not provided
+  --relayer-passfile RELAYER_PASSFILE             🔑 a file containing keyfile's password, if keyfile provided
+  --relayer-ledger                                🔐 bool flag for signing transaction using ledger
+  --relayer-ledger-account-index RELAYER_LEDGER_ACCOUNT_INDEX
+                                                  🔐 the index of the account when using Ledger
+  --relayer-ledger-address-index RELAYER_LEDGER_ADDRESS_INDEX
+                                                  🔐 the index of the address when using Ledger
   --guardian GUARDIAN                             the address of the guradian
   --guardian-service-url GUARDIAN_SERVICE_URL     the url of the guardian service
   --guardian-2fa-code GUARDIAN_2FA_CODE           the 2fa code for the guardian
-  --relayer RELAYER                               the address of the relayer
-  --inner-transactions INNER_TRANSACTIONS         a json file containing the inner transactions; should only be provided
-                                                  when creating the relayer's transaction
-  --inner-transactions-outfile INNER_TRANSACTIONS_OUTFILE
-                                                  where to save the transaction as an inner transaction (default:
-                                                  stdout)
   --options OPTIONS                               the transaction options (default: 0)
   --send                                          ✓ whether to broadcast the transaction (default: False)
   --simulate                                      whether to simulate the transaction (default: False)
@@ -1167,15 +1212,19 @@ options:
   --value VALUE                                   the value to transfer (default: 0)
   --chain CHAIN                                   the chain identifier
   --version VERSION                               the transaction version (default: 2)
+  --relayer RELAYER                               the bech32 address of the relayer
+  --relayer-pem RELAYER_PEM                       🔑 the PEM file, if keyfile not provided
+  --relayer-pem-index RELAYER_PEM_INDEX           🔑 the index in the PEM file (default: 0)
+  --relayer-keyfile RELAYER_KEYFILE               🔑 a JSON keyfile, if PEM not provided
+  --relayer-passfile RELAYER_PASSFILE             🔑 a file containing keyfile's password, if keyfile provided
+  --relayer-ledger                                🔐 bool flag for signing transaction using ledger
+  --relayer-ledger-account-index RELAYER_LEDGER_ACCOUNT_INDEX
+                                                  🔐 the index of the account when using Ledger
+  --relayer-ledger-address-index RELAYER_LEDGER_ADDRESS_INDEX
+                                                  🔐 the index of the address when using Ledger
   --guardian GUARDIAN                             the address of the guradian
   --guardian-service-url GUARDIAN_SERVICE_URL     the url of the guardian service
   --guardian-2fa-code GUARDIAN_2FA_CODE           the 2fa code for the guardian
-  --relayer RELAYER                               the address of the relayer
-  --inner-transactions INNER_TRANSACTIONS         a json file containing the inner transactions; should only be provided
-                                                  when creating the relayer's transaction
-  --inner-transactions-outfile INNER_TRANSACTIONS_OUTFILE
-                                                  where to save the transaction as an inner transaction (default:
-                                                  stdout)
   --options OPTIONS                               the transaction options (default: 0)
   --send                                          ✓ whether to broadcast the transaction (default: False)
   --simulate                                      whether to simulate the transaction (default: False)
@@ -1223,15 +1272,19 @@ options:
   --value VALUE                                   the value to transfer (default: 0)
   --chain CHAIN                                   the chain identifier
   --version VERSION                               the transaction version (default: 2)
+  --relayer RELAYER                               the bech32 address of the relayer
+  --relayer-pem RELAYER_PEM                       🔑 the PEM file, if keyfile not provided
+  --relayer-pem-index RELAYER_PEM_INDEX           🔑 the index in the PEM file (default: 0)
+  --relayer-keyfile RELAYER_KEYFILE               🔑 a JSON keyfile, if PEM not provided
+  --relayer-passfile RELAYER_PASSFILE             🔑 a file containing keyfile's password, if keyfile provided
+  --relayer-ledger                                🔐 bool flag for signing transaction using ledger
+  --relayer-ledger-account-index RELAYER_LEDGER_ACCOUNT_INDEX
+                                                  🔐 the index of the account when using Ledger
+  --relayer-ledger-address-index RELAYER_LEDGER_ADDRESS_INDEX
+                                                  🔐 the index of the address when using Ledger
   --guardian GUARDIAN                             the address of the guradian
   --guardian-service-url GUARDIAN_SERVICE_URL     the url of the guardian service
   --guardian-2fa-code GUARDIAN_2FA_CODE           the 2fa code for the guardian
-  --relayer RELAYER                               the address of the relayer
-  --inner-transactions INNER_TRANSACTIONS         a json file containing the inner transactions; should only be provided
-                                                  when creating the relayer's transaction
-  --inner-transactions-outfile INNER_TRANSACTIONS_OUTFILE
-                                                  where to save the transaction as an inner transaction (default:
-                                                  stdout)
   --options OPTIONS                               the transaction options (default: 0)
   --send                                          ✓ whether to broadcast the transaction (default: False)
   --simulate                                      whether to simulate the transaction (default: False)
@@ -1279,15 +1332,19 @@ options:
   --value VALUE                                   the value to transfer (default: 0)
   --chain CHAIN                                   the chain identifier
   --version VERSION                               the transaction version (default: 2)
+  --relayer RELAYER                               the bech32 address of the relayer
+  --relayer-pem RELAYER_PEM                       🔑 the PEM file, if keyfile not provided
+  --relayer-pem-index RELAYER_PEM_INDEX           🔑 the index in the PEM file (default: 0)
+  --relayer-keyfile RELAYER_KEYFILE               🔑 a JSON keyfile, if PEM not provided
+  --relayer-passfile RELAYER_PASSFILE             🔑 a file containing keyfile's password, if keyfile provided
+  --relayer-ledger                                🔐 bool flag for signing transaction using ledger
+  --relayer-ledger-account-index RELAYER_LEDGER_ACCOUNT_INDEX
+                                                  🔐 the index of the account when using Ledger
+  --relayer-ledger-address-index RELAYER_LEDGER_ADDRESS_INDEX
+                                                  🔐 the index of the address when using Ledger
   --guardian GUARDIAN                             the address of the guradian
   --guardian-service-url GUARDIAN_SERVICE_URL     the url of the guardian service
   --guardian-2fa-code GUARDIAN_2FA_CODE           the 2fa code for the guardian
-  --relayer RELAYER                               the address of the relayer
-  --inner-transactions INNER_TRANSACTIONS         a json file containing the inner transactions; should only be provided
-                                                  when creating the relayer's transaction
-  --inner-transactions-outfile INNER_TRANSACTIONS_OUTFILE
-                                                  where to save the transaction as an inner transaction (default:
-                                                  stdout)
   --options OPTIONS                               the transaction options (default: 0)
   --send                                          ✓ whether to broadcast the transaction (default: False)
   --simulate                                      whether to simulate the transaction (default: False)
@@ -1335,15 +1392,19 @@ options:
   --value VALUE                                   the value to transfer (default: 0)
   --chain CHAIN                                   the chain identifier
   --version VERSION                               the transaction version (default: 2)
+  --relayer RELAYER                               the bech32 address of the relayer
+  --relayer-pem RELAYER_PEM                       🔑 the PEM file, if keyfile not provided
+  --relayer-pem-index RELAYER_PEM_INDEX           🔑 the index in the PEM file (default: 0)
+  --relayer-keyfile RELAYER_KEYFILE               🔑 a JSON keyfile, if PEM not provided
+  --relayer-passfile RELAYER_PASSFILE             🔑 a file containing keyfile's password, if keyfile provided
+  --relayer-ledger                                🔐 bool flag for signing transaction using ledger
+  --relayer-ledger-account-index RELAYER_LEDGER_ACCOUNT_INDEX
+                                                  🔐 the index of the account when using Ledger
+  --relayer-ledger-address-index RELAYER_LEDGER_ADDRESS_INDEX
+                                                  🔐 the index of the address when using Ledger
   --guardian GUARDIAN                             the address of the guradian
   --guardian-service-url GUARDIAN_SERVICE_URL     the url of the guardian service
   --guardian-2fa-code GUARDIAN_2FA_CODE           the 2fa code for the guardian
-  --relayer RELAYER                               the address of the relayer
-  --inner-transactions INNER_TRANSACTIONS         a json file containing the inner transactions; should only be provided
-                                                  when creating the relayer's transaction
-  --inner-transactions-outfile INNER_TRANSACTIONS_OUTFILE
-                                                  where to save the transaction as an inner transaction (default:
-                                                  stdout)
   --options OPTIONS                               the transaction options (default: 0)
   --send                                          ✓ whether to broadcast the transaction (default: False)
   --simulate                                      whether to simulate the transaction (default: False)
@@ -1391,15 +1452,19 @@ options:
   --value VALUE                                   the value to transfer (default: 0)
   --chain CHAIN                                   the chain identifier
   --version VERSION                               the transaction version (default: 2)
+  --relayer RELAYER                               the bech32 address of the relayer
+  --relayer-pem RELAYER_PEM                       🔑 the PEM file, if keyfile not provided
+  --relayer-pem-index RELAYER_PEM_INDEX           🔑 the index in the PEM file (default: 0)
+  --relayer-keyfile RELAYER_KEYFILE               🔑 a JSON keyfile, if PEM not provided
+  --relayer-passfile RELAYER_PASSFILE             🔑 a file containing keyfile's password, if keyfile provided
+  --relayer-ledger                                🔐 bool flag for signing transaction using ledger
+  --relayer-ledger-account-index RELAYER_LEDGER_ACCOUNT_INDEX
+                                                  🔐 the index of the account when using Ledger
+  --relayer-ledger-address-index RELAYER_LEDGER_ADDRESS_INDEX
+                                                  🔐 the index of the address when using Ledger
   --guardian GUARDIAN                             the address of the guradian
   --guardian-service-url GUARDIAN_SERVICE_URL     the url of the guardian service
   --guardian-2fa-code GUARDIAN_2FA_CODE           the 2fa code for the guardian
-  --relayer RELAYER                               the address of the relayer
-  --inner-transactions INNER_TRANSACTIONS         a json file containing the inner transactions; should only be provided
-                                                  when creating the relayer's transaction
-  --inner-transactions-outfile INNER_TRANSACTIONS_OUTFILE
-                                                  where to save the transaction as an inner transaction (default:
-                                                  stdout)
   --options OPTIONS                               the transaction options (default: 0)
   --send                                          ✓ whether to broadcast the transaction (default: False)
   --simulate                                      whether to simulate the transaction (default: False)
@@ -1447,15 +1512,19 @@ options:
   --value VALUE                                   the value to transfer (default: 0)
   --chain CHAIN                                   the chain identifier
   --version VERSION                               the transaction version (default: 2)
+  --relayer RELAYER                               the bech32 address of the relayer
+  --relayer-pem RELAYER_PEM                       🔑 the PEM file, if keyfile not provided
+  --relayer-pem-index RELAYER_PEM_INDEX           🔑 the index in the PEM file (default: 0)
+  --relayer-keyfile RELAYER_KEYFILE               🔑 a JSON keyfile, if PEM not provided
+  --relayer-passfile RELAYER_PASSFILE             🔑 a file containing keyfile's password, if keyfile provided
+  --relayer-ledger                                🔐 bool flag for signing transaction using ledger
+  --relayer-ledger-account-index RELAYER_LEDGER_ACCOUNT_INDEX
+                                                  🔐 the index of the account when using Ledger
+  --relayer-ledger-address-index RELAYER_LEDGER_ADDRESS_INDEX
+                                                  🔐 the index of the address when using Ledger
   --guardian GUARDIAN                             the address of the guradian
   --guardian-service-url GUARDIAN_SERVICE_URL     the url of the guardian service
   --guardian-2fa-code GUARDIAN_2FA_CODE           the 2fa code for the guardian
-  --relayer RELAYER                               the address of the relayer
-  --inner-transactions INNER_TRANSACTIONS         a json file containing the inner transactions; should only be provided
-                                                  when creating the relayer's transaction
-  --inner-transactions-outfile INNER_TRANSACTIONS_OUTFILE
-                                                  where to save the transaction as an inner transaction (default:
-                                                  stdout)
   --options OPTIONS                               the transaction options (default: 0)
   --send                                          ✓ whether to broadcast the transaction (default: False)
   --simulate                                      whether to simulate the transaction (default: False)
@@ -1502,15 +1571,19 @@ options:
   --value VALUE                                   the value to transfer (default: 0)
   --chain CHAIN                                   the chain identifier
   --version VERSION                               the transaction version (default: 2)
+  --relayer RELAYER                               the bech32 address of the relayer
+  --relayer-pem RELAYER_PEM                       🔑 the PEM file, if keyfile not provided
+  --relayer-pem-index RELAYER_PEM_INDEX           🔑 the index in the PEM file (default: 0)
+  --relayer-keyfile RELAYER_KEYFILE               🔑 a JSON keyfile, if PEM not provided
+  --relayer-passfile RELAYER_PASSFILE             🔑 a file containing keyfile's password, if keyfile provided
+  --relayer-ledger                                🔐 bool flag for signing transaction using ledger
+  --relayer-ledger-account-index RELAYER_LEDGER_ACCOUNT_INDEX
+                                                  🔐 the index of the account when using Ledger
+  --relayer-ledger-address-index RELAYER_LEDGER_ADDRESS_INDEX
+                                                  🔐 the index of the address when using Ledger
   --guardian GUARDIAN                             the address of the guradian
   --guardian-service-url GUARDIAN_SERVICE_URL     the url of the guardian service
   --guardian-2fa-code GUARDIAN_2FA_CODE           the 2fa code for the guardian
-  --relayer RELAYER                               the address of the relayer
-  --inner-transactions INNER_TRANSACTIONS         a json file containing the inner transactions; should only be provided
-                                                  when creating the relayer's transaction
-  --inner-transactions-outfile INNER_TRANSACTIONS_OUTFILE
-                                                  where to save the transaction as an inner transaction (default:
-                                                  stdout)
   --options OPTIONS                               the transaction options (default: 0)
   --send                                          ✓ whether to broadcast the transaction (default: False)
   --simulate                                      whether to simulate the transaction (default: False)
@@ -1557,15 +1630,19 @@ options:
   --value VALUE                                   the value to transfer (default: 0)
   --chain CHAIN                                   the chain identifier
   --version VERSION                               the transaction version (default: 2)
+  --relayer RELAYER                               the bech32 address of the relayer
+  --relayer-pem RELAYER_PEM                       🔑 the PEM file, if keyfile not provided
+  --relayer-pem-index RELAYER_PEM_INDEX           🔑 the index in the PEM file (default: 0)
+  --relayer-keyfile RELAYER_KEYFILE               🔑 a JSON keyfile, if PEM not provided
+  --relayer-passfile RELAYER_PASSFILE             🔑 a file containing keyfile's password, if keyfile provided
+  --relayer-ledger                                🔐 bool flag for signing transaction using ledger
+  --relayer-ledger-account-index RELAYER_LEDGER_ACCOUNT_INDEX
+                                                  🔐 the index of the account when using Ledger
+  --relayer-ledger-address-index RELAYER_LEDGER_ADDRESS_INDEX
+                                                  🔐 the index of the address when using Ledger
   --guardian GUARDIAN                             the address of the guradian
   --guardian-service-url GUARDIAN_SERVICE_URL     the url of the guardian service
   --guardian-2fa-code GUARDIAN_2FA_CODE           the 2fa code for the guardian
-  --relayer RELAYER                               the address of the relayer
-  --inner-transactions INNER_TRANSACTIONS         a json file containing the inner transactions; should only be provided
-                                                  when creating the relayer's transaction
-  --inner-transactions-outfile INNER_TRANSACTIONS_OUTFILE
-                                                  where to save the transaction as an inner transaction (default:
-                                                  stdout)
   --options OPTIONS                               the transaction options (default: 0)
   --send                                          ✓ whether to broadcast the transaction (default: False)
   --simulate                                      whether to simulate the transaction (default: False)
@@ -1613,15 +1690,19 @@ options:
   --value VALUE                                   the value to transfer (default: 0)
   --chain CHAIN                                   the chain identifier
   --version VERSION                               the transaction version (default: 2)
+  --relayer RELAYER                               the bech32 address of the relayer
+  --relayer-pem RELAYER_PEM                       🔑 the PEM file, if keyfile not provided
+  --relayer-pem-index RELAYER_PEM_INDEX           🔑 the index in the PEM file (default: 0)
+  --relayer-keyfile RELAYER_KEYFILE               🔑 a JSON keyfile, if PEM not provided
+  --relayer-passfile RELAYER_PASSFILE             🔑 a file containing keyfile's password, if keyfile provided
+  --relayer-ledger                                🔐 bool flag for signing transaction using ledger
+  --relayer-ledger-account-index RELAYER_LEDGER_ACCOUNT_INDEX
+                                                  🔐 the index of the account when using Ledger
+  --relayer-ledger-address-index RELAYER_LEDGER_ADDRESS_INDEX
+                                                  🔐 the index of the address when using Ledger
   --guardian GUARDIAN                             the address of the guradian
   --guardian-service-url GUARDIAN_SERVICE_URL     the url of the guardian service
   --guardian-2fa-code GUARDIAN_2FA_CODE           the 2fa code for the guardian
-  --relayer RELAYER                               the address of the relayer
-  --inner-transactions INNER_TRANSACTIONS         a json file containing the inner transactions; should only be provided
-                                                  when creating the relayer's transaction
-  --inner-transactions-outfile INNER_TRANSACTIONS_OUTFILE
-                                                  where to save the transaction as an inner transaction (default:
-                                                  stdout)
   --options OPTIONS                               the transaction options (default: 0)
   --send                                          ✓ whether to broadcast the transaction (default: False)
   --simulate                                      whether to simulate the transaction (default: False)
@@ -1669,15 +1750,19 @@ options:
   --value VALUE                                   the value to transfer (default: 0)
   --chain CHAIN                                   the chain identifier
   --version VERSION                               the transaction version (default: 2)
+  --relayer RELAYER                               the bech32 address of the relayer
+  --relayer-pem RELAYER_PEM                       🔑 the PEM file, if keyfile not provided
+  --relayer-pem-index RELAYER_PEM_INDEX           🔑 the index in the PEM file (default: 0)
+  --relayer-keyfile RELAYER_KEYFILE               🔑 a JSON keyfile, if PEM not provided
+  --relayer-passfile RELAYER_PASSFILE             🔑 a file containing keyfile's password, if keyfile provided
+  --relayer-ledger                                🔐 bool flag for signing transaction using ledger
+  --relayer-ledger-account-index RELAYER_LEDGER_ACCOUNT_INDEX
+                                                  🔐 the index of the account when using Ledger
+  --relayer-ledger-address-index RELAYER_LEDGER_ADDRESS_INDEX
+                                                  🔐 the index of the address when using Ledger
   --guardian GUARDIAN                             the address of the guradian
   --guardian-service-url GUARDIAN_SERVICE_URL     the url of the guardian service
   --guardian-2fa-code GUARDIAN_2FA_CODE           the 2fa code for the guardian
-  --relayer RELAYER                               the address of the relayer
-  --inner-transactions INNER_TRANSACTIONS         a json file containing the inner transactions; should only be provided
-                                                  when creating the relayer's transaction
-  --inner-transactions-outfile INNER_TRANSACTIONS_OUTFILE
-                                                  where to save the transaction as an inner transaction (default:
-                                                  stdout)
   --options OPTIONS                               the transaction options (default: 0)
   --send                                          ✓ whether to broadcast the transaction (default: False)
   --simulate                                      whether to simulate the transaction (default: False)
@@ -1726,15 +1811,19 @@ options:
   --value VALUE                                   the value to transfer (default: 0)
   --chain CHAIN                                   the chain identifier
   --version VERSION                               the transaction version (default: 2)
+  --relayer RELAYER                               the bech32 address of the relayer
+  --relayer-pem RELAYER_PEM                       🔑 the PEM file, if keyfile not provided
+  --relayer-pem-index RELAYER_PEM_INDEX           🔑 the index in the PEM file (default: 0)
+  --relayer-keyfile RELAYER_KEYFILE               🔑 a JSON keyfile, if PEM not provided
+  --relayer-passfile RELAYER_PASSFILE             🔑 a file containing keyfile's password, if keyfile provided
+  --relayer-ledger                                🔐 bool flag for signing transaction using ledger
+  --relayer-ledger-account-index RELAYER_LEDGER_ACCOUNT_INDEX
+                                                  🔐 the index of the account when using Ledger
+  --relayer-ledger-address-index RELAYER_LEDGER_ADDRESS_INDEX
+                                                  🔐 the index of the address when using Ledger
   --guardian GUARDIAN                             the address of the guradian
   --guardian-service-url GUARDIAN_SERVICE_URL     the url of the guardian service
   --guardian-2fa-code GUARDIAN_2FA_CODE           the 2fa code for the guardian
-  --relayer RELAYER                               the address of the relayer
-  --inner-transactions INNER_TRANSACTIONS         a json file containing the inner transactions; should only be provided
-                                                  when creating the relayer's transaction
-  --inner-transactions-outfile INNER_TRANSACTIONS_OUTFILE
-                                                  where to save the transaction as an inner transaction (default:
-                                                  stdout)
   --options OPTIONS                               the transaction options (default: 0)
   --send                                          ✓ whether to broadcast the transaction (default: False)
   --simulate                                      whether to simulate the transaction (default: False)

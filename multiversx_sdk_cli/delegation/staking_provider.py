@@ -5,6 +5,7 @@ from multiversx_sdk import (Address, DelegationTransactionsFactory,
                             Transaction, ValidatorPublicKey)
 from multiversx_sdk.core.serializer import args_to_string
 
+from multiversx_sdk_cli.config import get_address_hrp
 from multiversx_sdk_cli.errors import BadUsage
 from multiversx_sdk_cli.interfaces import IAddress, ITransaction
 from multiversx_sdk_cli.validators.validators_file import ValidatorsFile
@@ -408,7 +409,7 @@ class DelegationOperations:
         return tx
 
     def prepare_transaction_for_creating_delegation_contract_from_validator(self, owner: IAccount, args: Any) -> ITransaction:
-        receiver = "erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqylllslmq6y6"
+        receiver = Address.new_from_hex("000000000000000000010000000000000000000000000000000000000004ffff", get_address_hrp()).to_bech32()
         max_cap = int(args.max_cap)
         fee = int(args.fee)
         data = "makeNewContractFromValidatorData@" + args_to_string([max_cap, fee])

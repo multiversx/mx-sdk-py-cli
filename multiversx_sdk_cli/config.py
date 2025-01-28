@@ -2,6 +2,8 @@ import os
 from pathlib import Path
 from typing import Any, Dict, List
 
+from multiversx_sdk import NetworkProviderConfig
+
 from multiversx_sdk_cli import errors, utils
 
 SDK_PATH = Path("~/multiversx-sdk").expanduser().resolve()
@@ -56,6 +58,10 @@ def get_value(name: str) -> str:
     value = data.get(name, default_value)
     assert isinstance(value, str)
     return value
+
+
+def get_address_hrp():
+    return get_value("default_address_hrp")
 
 
 def set_value(name: str, value: Any):
@@ -160,6 +166,7 @@ def get_defaults() -> Dict[str, Any]:
         "dependencies.testwallets.urlTemplate.windows": "https://github.com/multiversx/mx-sdk-testwallets/archive/{TAG}.tar.gz",
         "dependencies.wasm-opt.tag": "0.112.0",
         "github_api_token": "",
+        "default_address_hrp": "erd"
     }
 
 
@@ -242,3 +249,7 @@ def get_dependency_directory(key: str, tag: str) -> Path:
 
 def get_dependency_parent_directory(key: str) -> Path:
     return SDK_PATH / key
+
+
+def get_config_for_network_providers() -> NetworkProviderConfig:
+    return NetworkProviderConfig(client_name="mxpy")

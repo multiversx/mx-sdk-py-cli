@@ -8,7 +8,7 @@ Python Command Line Tools for interacting with Multivers<sup>X</sup>.
 [CLI](CLI.md)
 
 ## Distribution
-[mxpy-up](https://docs.multiversx.com/sdk-and-tools/sdk-py/installing-mxpy/) and [PyPi](https://pypi.org/project/multiversx-sdk-cli/#history)
+[pipx](https://docs.multiversx.com/sdk-and-tools/sdk-py/installing-mxpy/) [(PyPi)](https://pypi.org/project/multiversx-sdk-cli/#history)
 
 ## Development setup
 
