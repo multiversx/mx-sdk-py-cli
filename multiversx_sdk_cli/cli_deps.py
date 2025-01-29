@@ -12,11 +12,18 @@ def setup_parser(subparsers: Any) -> Any:
     parser = cli_shared.add_group_subparser(subparsers, "deps", "Manage dependencies or multiversx-sdk modules")
     subparsers = parser.add_subparsers()
 
-    choices = ['all'] + list(get_deps_dict().keys())
+    choices = ["all"] + list(get_deps_dict().keys())
 
-    sub = cli_shared.add_command_subparser(subparsers, "deps", "install", "Install dependencies or multiversx-sdk modules.")
+    sub = cli_shared.add_command_subparser(
+        subparsers, "deps", "install", "Install dependencies or multiversx-sdk modules."
+    )
     sub.add_argument("name", choices=choices, help="the dependency to install")
-    sub.add_argument("--overwrite", action="store_true", default=False, help="whether to overwrite an existing installation")
+    sub.add_argument(
+        "--overwrite",
+        action="store_true",
+        default=False,
+        help="whether to overwrite an existing installation",
+    )
     sub.set_defaults(func=install)
 
     sub = cli_shared.add_command_subparser(subparsers, "deps", "check", "Check whether a dependency is installed.")

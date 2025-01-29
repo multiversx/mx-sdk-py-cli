@@ -13,7 +13,7 @@ def test_get_account():
             "--address",
             "erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th",
             "--proxy",
-            "https://testnet-api.multiversx.com"
+            "https://testnet-api.multiversx.com",
         ]
     )
     assert False if result else True

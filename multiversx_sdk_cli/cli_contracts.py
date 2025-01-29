@@ -4,16 +4,20 @@ import os
 from pathlib import Path
 from typing import Any, List, Tuple
 
-from multiversx_sdk import (Address, AddressComputer, ProxyNetworkProvider,
-                            Transaction, TransactionsFactoryConfig)
+from multiversx_sdk import (
+    Address,
+    AddressComputer,
+    ProxyNetworkProvider,
+    Transaction,
+    TransactionsFactoryConfig,
+)
 from multiversx_sdk.abi import Abi
 
 from multiversx_sdk_cli import cli_shared, projects, utils
 from multiversx_sdk_cli.cli_output import CLIOutputBuilder
 from multiversx_sdk_cli.config import get_config_for_network_providers
 from multiversx_sdk_cli.constants import NUMBER_OF_SHARDS
-from multiversx_sdk_cli.contract_verification import \
-    trigger_contract_verification
+from multiversx_sdk_cli.contract_verification import trigger_contract_verification
 from multiversx_sdk_cli.contracts import SmartContract
 from multiversx_sdk_cli.cosign_transaction import cosign_transaction
 from multiversx_sdk_cli.dependency_checker import check_if_rust_is_installed
@@ -28,52 +32,126 @@ logger = logging.getLogger("cli.contracts")
 
 
 def setup_parser(args: List[str], subparsers: Any) -> Any:
-    parser = cli_shared.add_group_subparser(subparsers, "contract", "Build, deploy, upgrade and interact with Smart Contracts")
+    parser = cli_shared.add_group_subparser(
+        subparsers,
+        "contract",
+        "Build, deploy, upgrade and interact with Smart Contracts",
+    )
     subparsers = parser.add_subparsers()
 
-    sub = cli_shared.add_command_subparser(subparsers, "contract", "new",
-                                           "Create a new Smart Contract project based on a template.")
-    sub.add_argument("--name", help="The name of the contract. If missing, the name of the template will be used.")
+    sub = cli_shared.add_command_subparser(
+        subparsers,
+        "contract",
+        "new",
+        "Create a new Smart Contract project based on a template.",
+    )
+    sub.add_argument(
+        "--name",
+        help="The name of the contract. If missing, the name of the template will be used.",
+    )
     sub.add_argument("--template", required=True, help="the template to use")
     sub.add_argument("--tag", help="the framework version on which the contract should be created")
-    sub.add_argument("--path", type=str, default=os.getcwd(),
-                     help="the parent directory of the project (default: current directory)")
+    sub.add_argument(
+        "--path",
+        type=str,
+        default=os.getcwd(),
+        help="the parent directory of the project (default: current directory)",
+    )
     sub.set_defaults(func=create)
 
-    sub = cli_shared.add_command_subparser(subparsers, "contract", "templates",
-                                           "List the available Smart Contract templates.")
+    sub = cli_shared.add_command_subparser(
+        subparsers,
+        "contract",
+        "templates",
+        "List the available Smart Contract templates.",
+    )
     sub.add_argument("--tag", help="the sc-meta framework version referred to")
     sub.set_defaults(func=list_templates)
 
-    sub = cli_shared.add_command_subparser(subparsers, "contract", "build",
-                                           "Build a Smart Contract project.")
+    sub = cli_shared.add_command_subparser(subparsers, "contract", "build", "Build a Smart Contract project.")
     _add_build_options_sc_meta(sub)
     sub.set_defaults(func=build)
 
     sub = cli_shared.add_command_subparser(subparsers, "contract", "clean", "Clean a Smart Contract project.")
-    sub.add_argument("--path", default=os.getcwd(), help="the project directory (default: current directory)")
+    sub.add_argument(
+        "--path",
+        default=os.getcwd(),
+        help="the project directory (default: current directory)",
+    )
     sub.set_defaults(func=clean)
 
     sub = cli_shared.add_command_subparser(subparsers, "contract", "test", "Run tests.")
-    sub.add_argument("--path", default=os.getcwd(),
-                     help="the directory of the contract (default: %(default)s)")
-    sub.add_argument("--go", action="store_true",
-                     help="this arg runs rust and go tests (default: false)")
-    sub.add_argument("--scen", action="store_true", help="this arg runs scenarios (default: false). If `--scen` and `--go` are both specified, scen overrides the go argument")
-    sub.add_argument("--nocapture", action="store_true", help="this arg prints the entire output of the vm (default: false)")
+    sub.add_argument(
+        "--path",
+        default=os.getcwd(),
+        help="the directory of the contract (default: %(default)s)",
+    )
+    sub.add_argument(
+        "--go",
+        action="store_true",
+        help="this arg runs rust and go tests (default: false)",
+    )
+    sub.add_argument(
+        "--scen",
+        action="store_true",
+        help="this arg runs scenarios (default: false). If `--scen` and `--go` are both specified, scen overrides the go argument",
+    )
+    sub.add_argument(
+        "--nocapture",
+        action="store_true",
+        help="this arg prints the entire output of the vm (default: false)",
+    )
     sub.set_defaults(func=run_tests)
 
-    sub = cli_shared.add_command_subparser(subparsers, "contract", "report", "Print a detailed report of the smart contracts.")
-    sub.add_argument("--skip-build", action="store_true", default=False, help="skips the step of building of the wasm contracts")
-    sub.add_argument("--skip-twiggy", action="store_true", default=False, help="skips the steps of building the debug wasm files and running twiggy")
-    sub.add_argument("--output-format", type=str, default="text-markdown", choices=["github-markdown", "text-markdown", "json"], help="report output format (default: %(default)s)")
-    sub.add_argument("--output-file", type=Path, help="if specified, the output is written to a file, otherwise it's written to the standard output")
-    sub.add_argument("--compare", type=Path, nargs='+', metavar=("report-1.json", "report-2.json"), help="create a comparison from two or more reports")
+    sub = cli_shared.add_command_subparser(
+        subparsers,
+        "contract",
+        "report",
+        "Print a detailed report of the smart contracts.",
+    )
+    sub.add_argument(
+        "--skip-build",
+        action="store_true",
+        default=False,
+        help="skips the step of building of the wasm contracts",
+    )
+    sub.add_argument(
+        "--skip-twiggy",
+        action="store_true",
+        default=False,
+        help="skips the steps of building the debug wasm files and running twiggy",
+    )
+    sub.add_argument(
+        "--output-format",
+        type=str,
+        default="text-markdown",
+        choices=["github-markdown", "text-markdown", "json"],
+        help="report output format (default: %(default)s)",
+    )
+    sub.add_argument(
+        "--output-file",
+        type=Path,
+        help="if specified, the output is written to a file, otherwise it's written to the standard output",
+    )
+    sub.add_argument(
+        "--compare",
+        type=Path,
+        nargs="+",
+        metavar=("report-1.json", "report-2.json"),
+        help="create a comparison from two or more reports",
+    )
     _add_build_options_sc_meta(sub)
     sub.set_defaults(func=do_report)
 
-    output_description = CLIOutputBuilder.describe(with_contract=True, with_transaction_on_network=True, with_simulation=True)
-    sub = cli_shared.add_command_subparser(subparsers, "contract", "deploy", f"Deploy a Smart Contract.{output_description}")
+    output_description = CLIOutputBuilder.describe(
+        with_contract=True, with_transaction_on_network=True, with_simulation=True
+    )
+    sub = cli_shared.add_command_subparser(
+        subparsers,
+        "contract",
+        "deploy",
+        f"Deploy a Smart Contract.{output_description}",
+    )
     _add_bytecode_arg(sub)
     _add_contract_abi_arg(sub)
     _add_metadata_arg(sub)
@@ -82,17 +160,28 @@ def setup_parser(args: List[str], subparsers: Any) -> Any:
     cli_shared.add_proxy_arg(sub)
     cli_shared.add_tx_args(args, sub, with_receiver=False, with_data=False)
     _add_arguments_arg(sub)
-    sub.add_argument("--wait-result", action="store_true", default=False,
-                     help="signal to wait for the transaction result - only valid if --send is set")
-    sub.add_argument("--timeout", default=100, help="max num of seconds to wait for result"
-                                                    " - only valid if --wait-result is set")
+    sub.add_argument(
+        "--wait-result",
+        action="store_true",
+        default=False,
+        help="signal to wait for the transaction result - only valid if --send is set",
+    )
+    sub.add_argument(
+        "--timeout",
+        default=100,
+        help="max num of seconds to wait for result" " - only valid if --wait-result is set",
+    )
     cli_shared.add_broadcast_args(sub)
     cli_shared.add_guardian_wallet_args(args, sub)
 
     sub.set_defaults(func=deploy)
 
-    sub = cli_shared.add_command_subparser(subparsers, "contract", "call",
-                                           f"Interact with a Smart Contract (execute function).{output_description}")
+    sub = cli_shared.add_command_subparser(
+        subparsers,
+        "contract",
+        "call",
+        f"Interact with a Smart Contract (execute function).{output_description}",
+    )
     _add_contract_arg(sub)
     _add_contract_abi_arg(sub)
     cli_shared.add_outfile_arg(sub)
@@ -102,17 +191,28 @@ def setup_parser(args: List[str], subparsers: Any) -> Any:
     _add_function_arg(sub)
     _add_arguments_arg(sub)
     cli_shared.add_token_transfers_args(sub)
-    sub.add_argument("--wait-result", action="store_true", default=False,
-                     help="signal to wait for the transaction result - only valid if --send is set")
-    sub.add_argument("--timeout", default=100, help="max num of seconds to wait for result"
-                                                    " - only valid if --wait-result is set")
+    sub.add_argument(
+        "--wait-result",
+        action="store_true",
+        default=False,
+        help="signal to wait for the transaction result - only valid if --send is set",
+    )
+    sub.add_argument(
+        "--timeout",
+        default=100,
+        help="max num of seconds to wait for result" " - only valid if --wait-result is set",
+    )
     cli_shared.add_broadcast_args(sub, relay=True)
     cli_shared.add_guardian_wallet_args(args, sub)
 
     sub.set_defaults(func=call)
 
-    sub = cli_shared.add_command_subparser(subparsers, "contract", "upgrade",
-                                           f"Upgrade a previously-deployed Smart Contract.{output_description}")
+    sub = cli_shared.add_command_subparser(
+        subparsers,
+        "contract",
+        "upgrade",
+        f"Upgrade a previously-deployed Smart Contract.{output_description}",
+    )
     _add_contract_arg(sub)
     _add_contract_abi_arg(sub)
     cli_shared.add_outfile_arg(sub)
@@ -122,17 +222,25 @@ def setup_parser(args: List[str], subparsers: Any) -> Any:
     cli_shared.add_proxy_arg(sub)
     cli_shared.add_tx_args(args, sub, with_receiver=False, with_data=False)
     _add_arguments_arg(sub)
-    sub.add_argument("--wait-result", action="store_true", default=False,
-                     help="signal to wait for the transaction result - only valid if --send is set")
-    sub.add_argument("--timeout", default=100, help="max num of seconds to wait for result"
-                                                    " - only valid if --wait-result is set")
+    sub.add_argument(
+        "--wait-result",
+        action="store_true",
+        default=False,
+        help="signal to wait for the transaction result - only valid if --send is set",
+    )
+    sub.add_argument(
+        "--timeout",
+        default=100,
+        help="max num of seconds to wait for result" " - only valid if --wait-result is set",
+    )
     cli_shared.add_broadcast_args(sub)
     cli_shared.add_guardian_wallet_args(args, sub)
 
     sub.set_defaults(func=upgrade)
 
-    sub = cli_shared.add_command_subparser(subparsers, "contract", "query",
-                                           "Query a Smart Contract (call a pure function)")
+    sub = cli_shared.add_command_subparser(
+        subparsers, "contract", "query", "Query a Smart Contract (call a pure function)"
+    )
     _add_contract_arg(sub)
     _add_contract_abi_arg(sub)
     cli_shared.add_proxy_arg(sub)
@@ -140,12 +248,17 @@ def setup_parser(args: List[str], subparsers: Any) -> Any:
     _add_arguments_arg(sub)
     sub.set_defaults(func=query)
 
-    sub = cli_shared.add_command_subparser(subparsers, "contract", "verify",
-                                           "Verify the authenticity of the code of a deployed Smart Contract",
-                                           )
+    sub = cli_shared.add_command_subparser(
+        subparsers,
+        "contract",
+        "verify",
+        "Verify the authenticity of the code of a deployed Smart Contract",
+    )
 
     sub.add_argument(
-        "--packaged-src", required=True, help="JSON file containing the source code of the contract"
+        "--packaged-src",
+        required=True,
+        help="JSON file containing the source code of the contract",
     )
 
     _add_contract_arg(sub)
@@ -155,21 +268,42 @@ def setup_parser(args: List[str], subparsers: Any) -> Any:
         help="the url of the service that validates the contract",
     )
     sub.add_argument("--docker-image", required=True, help="the docker image used for the build")
-    sub.add_argument("--contract-variant", required=False, default=None, help="in case of a multicontract, specify the contract variant you want to verify")
+    sub.add_argument(
+        "--contract-variant",
+        required=False,
+        default=None,
+        help="in case of a multicontract, specify the contract variant you want to verify",
+    )
     cli_shared.add_wallet_args(args, sub)
     sub.set_defaults(func=verify)
 
-    sub = cli_shared.add_command_subparser(subparsers, "contract", "reproducible-build",
-                                           "Build a Smart Contract and get the same output as a previously built Smart Contract")
+    sub = cli_shared.add_command_subparser(
+        subparsers,
+        "contract",
+        "reproducible-build",
+        "Build a Smart Contract and get the same output as a previously built Smart Contract",
+    )
     _add_project_arg(sub)
     _add_build_options_args(sub)
-    sub.add_argument("--docker-image", required=True, type=str,
-                     help="the docker image tag used to build the contract")
-    sub.add_argument("--contract", type=str, help="contract to build (contract name, as found in Cargo.toml)")
+    sub.add_argument(
+        "--docker-image",
+        required=True,
+        type=str,
+        help="the docker image tag used to build the contract",
+    )
+    sub.add_argument(
+        "--contract",
+        type=str,
+        help="contract to build (contract name, as found in Cargo.toml)",
+    )
     sub.add_argument("--no-docker-interactive", action="store_true", default=False)
     sub.add_argument("--no-docker-tty", action="store_true", default=False)
-    sub.add_argument("--no-default-platform", action="store_true", default=False,
-                     help="do not set DOCKER_DEFAULT_PLATFORM environment variable to 'linux/amd64'")
+    sub.add_argument(
+        "--no-default-platform",
+        action="store_true",
+        default=False,
+        help="do not set DOCKER_DEFAULT_PLATFORM environment variable to 'linux/amd64'",
+    )
     sub.set_defaults(func=do_reproducible_build)
 
     parser.epilog = cli_shared.build_group_epilog(subparsers)
@@ -177,51 +311,153 @@ def setup_parser(args: List[str], subparsers: Any) -> Any:
 
 
 def _add_project_arg(sub: Any):
-    sub.add_argument("project", nargs='?', default=os.getcwd(),
-                     help="the project directory (default: current directory)")
+    sub.add_argument(
+        "project",
+        nargs="?",
+        default=os.getcwd(),
+        help="the project directory (default: current directory)",
+    )
 
 
 def _add_build_options_sc_meta(sub: Any):
-    sub.add_argument("--path", default=os.getcwd(), help="the project directory (default: current directory)")
-    sub.add_argument("--no-wasm-opt", action="store_true", default=False,
-                     help="do not optimize wasm files after the build (default: %(default)s)")
-    sub.add_argument("--wasm-symbols", action="store_true", default=False,
-                     help="for rust projects, does not strip the symbols from the wasm output. Useful for analysing the bytecode. Creates larger wasm files. Avoid in production (default: %(default)s)")
-    sub.add_argument("--wasm-name", type=str,
-                     help="for rust projects, optionally specify the name of the wasm bytecode output file")
-    sub.add_argument("--wasm-suffix", type=str,
-                     help="for rust projects, optionally specify the suffix of the wasm bytecode output file")
-    sub.add_argument("--target-dir", type=str, help="for rust projects, forward the parameter to Cargo")
-    sub.add_argument("--wat", action="store_true", help="also generate a WAT file when building", default=False)
-    sub.add_argument("--mir", action="store_true", help="also emit MIR files when building", default=False)
-    sub.add_argument("--llvm-ir", action="store_true", help="also emit LL (LLVM) files when building", default=False)
+    sub.add_argument(
+        "--path",
+        default=os.getcwd(),
+        help="the project directory (default: current directory)",
+    )
+    sub.add_argument(
+        "--no-wasm-opt",
+        action="store_true",
+        default=False,
+        help="do not optimize wasm files after the build (default: %(default)s)",
+    )
+    sub.add_argument(
+        "--wasm-symbols",
+        action="store_true",
+        default=False,
+        help="for rust projects, does not strip the symbols from the wasm output. Useful for analysing the bytecode. Creates larger wasm files. Avoid in production (default: %(default)s)",
+    )
+    sub.add_argument(
+        "--wasm-name",
+        type=str,
+        help="for rust projects, optionally specify the name of the wasm bytecode output file",
+    )
+    sub.add_argument(
+        "--wasm-suffix",
+        type=str,
+        help="for rust projects, optionally specify the suffix of the wasm bytecode output file",
+    )
+    sub.add_argument(
+        "--target-dir",
+        type=str,
+        help="for rust projects, forward the parameter to Cargo",
+    )
+    sub.add_argument(
+        "--wat",
+        action="store_true",
+        help="also generate a WAT file when building",
+        default=False,
+    )
+    sub.add_argument(
+        "--mir",
+        action="store_true",
+        help="also emit MIR files when building",
+        default=False,
+    )
+    sub.add_argument(
+        "--llvm-ir",
+        action="store_true",
+        help="also emit LL (LLVM) files when building",
+        default=False,
+    )
     sub.add_argument("--ignore", help="ignore all directories with these names. [default: target]")
-    sub.add_argument("--no-imports", action="store_true", default=False, help="skips extracting the EI imports after building the contracts")
-    sub.add_argument("--no-abi-git-version", action="store_true", default=False, help="skips loading the Git version into the ABI")
-    sub.add_argument("--twiggy-top", action="store_true", default=False, help="generate a twiggy top report after building")
-    sub.add_argument("--twiggy-paths", action="store_true", default=False, help="generate a twiggy paths report after building")
-    sub.add_argument("--twiggy-monos", action="store_true", default=False, help="generate a twiggy monos report after building")
-    sub.add_argument("--twiggy-dominators", action="store_true", default=False, help="generate a twiggy dominators report after building")
+    sub.add_argument(
+        "--no-imports",
+        action="store_true",
+        default=False,
+        help="skips extracting the EI imports after building the contracts",
+    )
+    sub.add_argument(
+        "--no-abi-git-version",
+        action="store_true",
+        default=False,
+        help="skips loading the Git version into the ABI",
+    )
+    sub.add_argument(
+        "--twiggy-top",
+        action="store_true",
+        default=False,
+        help="generate a twiggy top report after building",
+    )
+    sub.add_argument(
+        "--twiggy-paths",
+        action="store_true",
+        default=False,
+        help="generate a twiggy paths report after building",
+    )
+    sub.add_argument(
+        "--twiggy-monos",
+        action="store_true",
+        default=False,
+        help="generate a twiggy monos report after building",
+    )
+    sub.add_argument(
+        "--twiggy-dominators",
+        action="store_true",
+        default=False,
+        help="generate a twiggy dominators report after building",
+    )
 
 
 def _add_build_options_args(sub: Any):
-    sub.add_argument("--debug", action="store_true", default=False, help="set debug flag (default: %(default)s)")
-    sub.add_argument("--no-optimization", action="store_true", default=False,
-                     help="bypass optimizations (for clang) (default: %(default)s)")
-    sub.add_argument("--no-wasm-opt", action="store_true", default=False,
-                     help="do not optimize wasm files after the build (default: %(default)s)")
-    sub.add_argument("--cargo-target-dir", type=str, help="for rust projects, forward the parameter to Cargo")
-    sub.add_argument("--wasm-symbols", action="store_true", default=False,
-                     help="for rust projects, does not strip the symbols from the wasm output. Useful for analysing the bytecode. Creates larger wasm files. Avoid in production (default: %(default)s)")
-    sub.add_argument("--wasm-name", type=str,
-                     help="for rust projects, optionally specify the name of the wasm bytecode output file")
-    sub.add_argument("--wasm-suffix", type=str,
-                     help="for rust projects, optionally specify the suffix of the wasm bytecode output file")
+    sub.add_argument(
+        "--debug",
+        action="store_true",
+        default=False,
+        help="set debug flag (default: %(default)s)",
+    )
+    sub.add_argument(
+        "--no-optimization",
+        action="store_true",
+        default=False,
+        help="bypass optimizations (for clang) (default: %(default)s)",
+    )
+    sub.add_argument(
+        "--no-wasm-opt",
+        action="store_true",
+        default=False,
+        help="do not optimize wasm files after the build (default: %(default)s)",
+    )
+    sub.add_argument(
+        "--cargo-target-dir",
+        type=str,
+        help="for rust projects, forward the parameter to Cargo",
+    )
+    sub.add_argument(
+        "--wasm-symbols",
+        action="store_true",
+        default=False,
+        help="for rust projects, does not strip the symbols from the wasm output. Useful for analysing the bytecode. Creates larger wasm files. Avoid in production (default: %(default)s)",
+    )
+    sub.add_argument(
+        "--wasm-name",
+        type=str,
+        help="for rust projects, optionally specify the name of the wasm bytecode output file",
+    )
+    sub.add_argument(
+        "--wasm-suffix",
+        type=str,
+        help="for rust projects, optionally specify the suffix of the wasm bytecode output file",
+    )
 
 
 def _add_bytecode_arg(sub: Any):
-    sub.add_argument("--bytecode", type=str, required=True,
-                     help="the file containing the WASM bytecode")
+    sub.add_argument(
+        "--bytecode",
+        type=str,
+        required=True,
+        help="the file containing the WASM bytecode",
+    )
 
 
 def _add_contract_arg(sub: Any):
@@ -237,22 +473,45 @@ def _add_function_arg(sub: Any):
 
 
 def _add_arguments_arg(sub: Any):
-    sub.add_argument("--arguments", nargs='+',
-                     help="arguments for the contract transaction, as [number, bech32-address, ascii string, "
-                     "boolean] or hex-encoded. E.g. --arguments 42 0x64 1000 0xabba str:TOK-a1c2ef true erd1[..]")
-    sub.add_argument("--arguments-file", type=str, help="a json file containing the arguments. ONLY if abi file is provided. "
-                     "E.g. [{ 'to': 'erd1...', 'amount': 10000000000 }]")
+    sub.add_argument(
+        "--arguments",
+        nargs="+",
+        help="arguments for the contract transaction, as [number, bech32-address, ascii string, "
+        "boolean] or hex-encoded. E.g. --arguments 42 0x64 1000 0xabba str:TOK-a1c2ef true erd1[..]",
+    )
+    sub.add_argument(
+        "--arguments-file",
+        type=str,
+        help="a json file containing the arguments. ONLY if abi file is provided. "
+        "E.g. [{ 'to': 'erd1...', 'amount': 10000000000 }]",
+    )
 
 
 def _add_metadata_arg(sub: Any):
-    sub.add_argument("--metadata-not-upgradeable", dest="metadata_upgradeable", action="store_false",
-                     help="‼ mark the contract as NOT upgradeable (default: upgradeable)")
-    sub.add_argument("--metadata-not-readable", dest="metadata_readable", action="store_false",
-                     help="‼ mark the contract as NOT readable (default: readable)")
-    sub.add_argument("--metadata-payable", dest="metadata_payable", action="store_true",
-                     help="‼ mark the contract as payable (default: not payable)")
-    sub.add_argument("--metadata-payable-by-sc", dest="metadata_payable_by_sc", action="store_true",
-                     help="‼ mark the contract as payable by SC (default: not payable by SC)")
+    sub.add_argument(
+        "--metadata-not-upgradeable",
+        dest="metadata_upgradeable",
+        action="store_false",
+        help="‼ mark the contract as NOT upgradeable (default: upgradeable)",
+    )
+    sub.add_argument(
+        "--metadata-not-readable",
+        dest="metadata_readable",
+        action="store_false",
+        help="‼ mark the contract as NOT readable (default: readable)",
+    )
+    sub.add_argument(
+        "--metadata-payable",
+        dest="metadata_payable",
+        action="store_true",
+        help="‼ mark the contract as payable (default: not payable)",
+    )
+    sub.add_argument(
+        "--metadata-payable-by-sc",
+        dest="metadata_payable_by_sc",
+        action="store_true",
+        help="‼ mark the contract as payable by SC (default: not payable by SC)",
+    )
     sub.set_defaults(metadata_upgradeable=True, metadata_payable=False)
 
 
@@ -294,7 +553,9 @@ def build(args: Any):
     for project in project_paths:
         projects.build_project(project, arg_list)
 
-    show_warning("The primary tool for building smart contracts is `sc-meta`. Try using the `sc-meta all build` command.")
+    show_warning(
+        "The primary tool for building smart contracts is `sc-meta`. Try using the `sc-meta all build` command."
+    )
 
 
 def do_report(args: Any):
@@ -340,7 +601,8 @@ def deploy(args: Any):
         nonce=int(args.nonce),
         version=int(args.version),
         options=int(args.options),
-        guardian=args.guardian)
+        guardian=args.guardian,
+    )
     tx = _sign_guarded_tx(args, tx)
 
     address_computer = AddressComputer(NUMBER_OF_SHARDS)
@@ -394,7 +656,8 @@ def call(args: Any):
         nonce=int(args.nonce),
         version=int(args.version),
         options=int(args.options),
-        guardian=args.guardian)
+        guardian=args.guardian,
+    )
     tx = _sign_guarded_tx(args, tx)
 
     _send_or_simulate(tx, contract_address, args)
@@ -430,7 +693,8 @@ def upgrade(args: Any):
         nonce=int(args.nonce),
         version=int(args.version),
         options=int(args.options),
-        guardian=args.guardian)
+        guardian=args.guardian,
+    )
     tx = _sign_guarded_tx(args, tx)
 
     _send_or_simulate(tx, contract_address, args)
@@ -459,7 +723,7 @@ def query(args: Any):
         proxy=proxy,
         function=function,
         arguments=arguments,
-        should_prepare_args=should_prepare_args
+        should_prepare_args=should_prepare_args,
     )
 
     utils.dump_out_json(result)
@@ -496,9 +760,7 @@ def verify(args: Any) -> None:
     docker_image = args.docker_image
     contract_variant = args.contract_variant
 
-    trigger_contract_verification(
-        packaged_src, owner, contract, verifier_url, docker_image, contract_variant
-    )
+    trigger_contract_verification(packaged_src, owner, contract, verifier_url, docker_image, contract_variant)
     logger.info("Contract verification request completed!")
 
 
@@ -523,7 +785,16 @@ def do_reproducible_build(args: Any):
         raise DockerMissingError()
 
     logger.info("Starting the docker run...")
-    run_docker(docker_image, project_path, contract_path, output_path, no_wasm_opt, docker_interactive, docker_tty, no_default_platform)
+    run_docker(
+        docker_image,
+        project_path,
+        contract_path,
+        output_path,
+        no_wasm_opt,
+        docker_interactive,
+        docker_tty,
+        no_default_platform,
+    )
 
     logger.info("Docker build ran successfully!")
     logger.info(f"Inspect summary of generated artifacts here: {artifacts_path}")

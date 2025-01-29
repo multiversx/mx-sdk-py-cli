@@ -9,12 +9,13 @@ logger = logging.getLogger("projects.templates")
 
 
 class Contract:
-    def __init__(self,
-                 tag: Union[str, None] = None,
-                 name: Union[str, None] = None,
-                 template: str = "",
-                 path: Path = Path()
-                 ) -> None:
+    def __init__(
+        self,
+        tag: Union[str, None] = None,
+        name: Union[str, None] = None,
+        template: str = "",
+        path: Path = Path(),
+    ) -> None:
         self.tag = tag
         self.name = name
         self.template = template

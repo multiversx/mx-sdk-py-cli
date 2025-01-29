@@ -23,10 +23,12 @@ class ConfigPart:
         unknown_entries = overriding_entries - allowed_entries
 
         if unknown_entries:
-            logger.error(f"""\
+            logger.error(
+                f"""\
 Unknown localnet configuration entries: {unknown_entries}.
 Please check the configuration of the localnet.
-For "{self.get_name()}", the allowed entries are: {allowed_entries}.""")
+For "{self.get_name()}", the allowed entries are: {allowed_entries}."""
+            )
             raise UnknownConfigurationError(f"Unknown localnet configuration entries: {unknown_entries}")
 
     def _do_override(self, other: Dict[str, Any]) -> None:

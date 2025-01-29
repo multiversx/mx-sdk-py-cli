@@ -49,9 +49,18 @@ def _do_main(cli_args: List[str]):
     args = parser.parse_args(argv_with_config_args)
 
     if args.verbose:
-        logging.basicConfig(level="DEBUG", force=True, format='%(name)s: %(message)s', handlers=[RichHandler(show_time=False, rich_tracebacks=True)])
+        logging.basicConfig(
+            level="DEBUG",
+            force=True,
+            format="%(name)s: %(message)s",
+            handlers=[RichHandler(show_time=False, rich_tracebacks=True)],
+        )
     else:
-        logging.basicConfig(level="INFO", format='%(name)s: %(message)s', handlers=[RichHandler(show_time=False, rich_tracebacks=True)])
+        logging.basicConfig(
+            level="INFO",
+            format="%(name)s: %(message)s",
+            handlers=[RichHandler(show_time=False, rich_tracebacks=True)],
+        )
 
     verify_deprecated_entries_in_config_file()
     default_hrp = config.get_address_hrp()
@@ -80,13 +89,18 @@ See:
  - https://docs.multiversx.com/sdk-and-tools/sdk-py
  - https://docs.multiversx.com/sdk-and-tools/sdk-py/mxpy-cli
         """,
-        formatter_class=argparse.RawDescriptionHelpFormatter
+        formatter_class=argparse.RawDescriptionHelpFormatter,
     )
 
     parser._positionals.title = "COMMAND GROUPS"
     parser._optionals.title = "TOP-LEVEL OPTIONS"
     version = multiversx_sdk_cli.version.get_version()
-    parser.add_argument("-v", "--version", action="version", version=f"MultiversX Python CLI (mxpy) {version}")
+    parser.add_argument(
+        "-v",
+        "--version",
+        action="version",
+        version=f"MultiversX Python CLI (mxpy) {version}",
+    )
     parser.add_argument("--verbose", action="store_true", default=False)
 
     subparsers = parser.add_subparsers()
@@ -112,7 +126,7 @@ COMMAND GROUPS summary
 ----------------------
 """
     for choice, sub in subparsers.choices.items():
-        parser.epilog += (f"{choice.ljust(30)} {sub.description}\n")
+        parser.epilog += f"{choice.ljust(30)} {sub.description}\n"
 
     return parser
 
@@ -127,7 +141,7 @@ def verify_deprecated_entries_in_config_file():
     for entry in deprecated_keys:
         message += f"-> {entry} \n"
 
-    ux.show_warning(message.rstrip('\n'))
+    ux.show_warning(message.rstrip("\n"))
 
 
 if __name__ == "__main__":

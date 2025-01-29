@@ -1,6 +1,13 @@
 from typing import Any, List, Optional
-from multiversx_sdk_cli.projects.report.data.common import first_not_none, merge_values_by_key
-from multiversx_sdk_cli.projects.report.data.extracted_feature import ExtractedFeature, merge_lists_of_extracted_features
+
+from multiversx_sdk_cli.projects.report.data.common import (
+    first_not_none,
+    merge_values_by_key,
+)
+from multiversx_sdk_cli.projects.report.data.extracted_feature import (
+    ExtractedFeature,
+    merge_lists_of_extracted_features,
+)
 from multiversx_sdk_cli.projects.report.format.format_options import FormatOptions
 
 
@@ -11,14 +18,16 @@ class WasmReport:
 
     def to_json(self) -> Any:
         return {
-            'wasm_name': self.wasm_name,
-            'extracted_features': self.extracted_features
+            "wasm_name": self.wasm_name,
+            "extracted_features": self.extracted_features,
         }
 
     @staticmethod
-    def from_json(json: Any) -> 'WasmReport':
-        extracted_features = [ExtractedFeature.from_json(extracted_feature) for extracted_feature in json['extracted_features']]
-        return WasmReport(json['wasm_name'], extracted_features)
+    def from_json(json: Any) -> "WasmReport":
+        extracted_features = [
+            ExtractedFeature.from_json(extracted_feature) for extracted_feature in json["extracted_features"]
+        ]
+        return WasmReport(json["wasm_name"], extracted_features)
 
     def get_extracted_features_markdown(self, format_options: FormatOptions) -> List[str]:
         return [extracted_feature.results_to_markdown(format_options) for extracted_feature in self.extracted_features]
@@ -32,7 +41,9 @@ def _get_wasm_report_key(wasm_report: WasmReport) -> str:
     return wasm_report.wasm_name
 
 
-def _get_extracted_features_or_default(wasm: Optional[WasmReport]) -> List[ExtractedFeature]:
+def _get_extracted_features_or_default(
+    wasm: Optional[WasmReport],
+) -> List[ExtractedFeature]:
     if wasm is None:
         return []
     return wasm.extracted_features

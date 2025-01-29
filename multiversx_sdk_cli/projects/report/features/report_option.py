@@ -23,7 +23,7 @@ class ReportFeature:
         return False
 
 
-def str_or_default(field: Optional[Any], default: str = '-') -> str:
+def str_or_default(field: Optional[Any], default: str = "-") -> str:
     if field is None:
         return default
     return str(field)

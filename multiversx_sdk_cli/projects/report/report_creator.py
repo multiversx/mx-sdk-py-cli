@@ -1,4 +1,3 @@
-
 import itertools
 import operator
 from pathlib import Path
@@ -8,25 +7,32 @@ from multiversx_sdk_cli import guards
 from multiversx_sdk_cli.projects.core import load_project
 from multiversx_sdk_cli.projects.project_base import remove_suffix
 from multiversx_sdk_cli.projects.project_rust import ProjectRust
-from multiversx_sdk_cli.projects.report.data.extracted_feature import \
-    ExtractedFeature
+from multiversx_sdk_cli.projects.report.data.extracted_feature import ExtractedFeature
 from multiversx_sdk_cli.projects.report.data.folder_report import FolderReport
-from multiversx_sdk_cli.projects.report.data.project_report import \
-    ProjectReport
+from multiversx_sdk_cli.projects.report.data.project_report import ProjectReport
 from multiversx_sdk_cli.projects.report.data.report import Report
 from multiversx_sdk_cli.projects.report.data.wasm_report import WasmReport
-from multiversx_sdk_cli.projects.report.features.report_option import \
-    ReportFeature
-from multiversx_sdk_cli.projects.report.features.twiggy_paths_check import \
-    run_twiggy_paths
+from multiversx_sdk_cli.projects.report.features.report_option import ReportFeature
+from multiversx_sdk_cli.projects.report.features.twiggy_paths_check import (
+    run_twiggy_paths,
+)
 
 
 class ReportCreator:
-    def __init__(self, options: List[ReportFeature], skip_build: bool, skip_twiggy: bool, build_options: Dict[str, Any], build_args: List[str]) -> None:
+    def __init__(
+        self,
+        options: List[ReportFeature],
+        skip_build: bool,
+        skip_twiggy: bool,
+        build_options: Dict[str, Any],
+        build_args: List[str],
+    ) -> None:
         self.report_features = options
         self.skip_build = skip_build
         self.skip_twiggy = skip_twiggy
-        self.require_twiggy_paths = any(report_feature.requires_twiggy_paths() for report_feature in self.report_features)
+        self.require_twiggy_paths = any(
+            report_feature.requires_twiggy_paths() for report_feature in self.report_features
+        )
         self.build_options = build_options
         self.build_args = build_args
 
@@ -34,13 +40,17 @@ class ReportCreator:
         base_path = base_path.resolve()
         guards.is_directory(base_path)
 
-        folder_groups = [self._create_folder_report(base_path, parent_folder, iter)
-                         for parent_folder, iter in _group_projects_by_folder(project_paths)]
+        folder_groups = [
+            self._create_folder_report(base_path, parent_folder, iter)
+            for parent_folder, iter in _group_projects_by_folder(project_paths)
+        ]
 
         feature_names = [report_feature.name for report_feature in self.report_features]
         return Report(feature_names, folder_groups)
 
-    def _create_folder_report(self, base_path: Path, parent_folder: Path, iter: Iterable[Tuple[Path, Path]]) -> FolderReport:
+    def _create_folder_report(
+        self, base_path: Path, parent_folder: Path, iter: Iterable[Tuple[Path, Path]]
+    ) -> FolderReport:
         parent_folder = parent_folder.resolve()
         project_reports = [self._create_project_report(parent_folder, project_path) for _, project_path in iter]
 
@@ -60,8 +70,10 @@ class ReportCreator:
             project.build_wasm_with_debug_symbols(self.build_options)
             twiggy_requirements_met = True
 
-        wasm_reports = [self._create_wasm_report(wasm_path, twiggy_requirements_met) for wasm_path in project.find_wasm_files()]
-        wasm_reports.sort(key=lambda report: remove_suffix(report.wasm_name, '.wasm'))
+        wasm_reports = [
+            self._create_wasm_report(wasm_path, twiggy_requirements_met) for wasm_path in project.find_wasm_files()
+        ]
+        wasm_reports.sort(key=lambda report: remove_suffix(report.wasm_name, ".wasm"))
 
         return ProjectReport(project_path.relative_to(parent_path), wasm_reports)
 
@@ -78,6 +90,8 @@ def _extract_feature(feature: ReportFeature, wasm_path: Path) -> ExtractedFeatur
     return ExtractedFeature(feature.name, [result])
 
 
-def _group_projects_by_folder(project_paths: List[Path]) -> Iterable[Tuple[Path, Iterable[Tuple[Path, Path]]]]:
+def _group_projects_by_folder(
+    project_paths: List[Path],
+) -> Iterable[Tuple[Path, Iterable[Tuple[Path, Path]]]]:
     path_pairs = sorted([(path.parent, path) for path in project_paths])
     return itertools.groupby(path_pairs, operator.itemgetter(0))

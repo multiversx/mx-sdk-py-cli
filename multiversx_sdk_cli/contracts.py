@@ -2,11 +2,28 @@ import logging
 from pathlib import Path
 from typing import Any, List, Optional, Protocol, Union
 
-from multiversx_sdk import (Address,
-                            SmartContractController, SmartContractQuery, SmartContractQueryResponse,
-                            SmartContractTransactionsFactory, Token,
-                            TokenComputer, TokenTransfer, Transaction, TransactionsFactoryConfig, TransactionOnNetwork, AwaitingOptions)
-from multiversx_sdk.abi import Abi, BytesValue, BigUIntValue, AddressValue, BoolValue, StringValue
+from multiversx_sdk import (
+    Address,
+    AwaitingOptions,
+    SmartContractController,
+    SmartContractQuery,
+    SmartContractQueryResponse,
+    SmartContractTransactionsFactory,
+    Token,
+    TokenComputer,
+    TokenTransfer,
+    Transaction,
+    TransactionOnNetwork,
+    TransactionsFactoryConfig,
+)
+from multiversx_sdk.abi import (
+    Abi,
+    AddressValue,
+    BigUIntValue,
+    BoolValue,
+    BytesValue,
+    StringValue,
+)
 
 from multiversx_sdk_cli import errors
 from multiversx_sdk_cli.accounts import Account
@@ -20,6 +37,7 @@ TRUE_STR_LOWER = "true"
 STR_PREFIX = "str:"
 
 
+# fmt: off
 class INetworkProvider(Protocol):
     def query_contract(self, query: SmartContractQuery) -> SmartContractQueryResponse:
         ...
@@ -28,6 +46,7 @@ class INetworkProvider(Protocol):
         self, transaction_hash: Union[bytes, str], options: Optional[AwaitingOptions] = None
     ) -> TransactionOnNetwork:
         ...
+# fmt: on
 
 
 class SmartContract:
@@ -36,21 +55,23 @@ class SmartContract:
         self._config = config
         self._factory = SmartContractTransactionsFactory(config, abi)
 
-    def prepare_deploy_transaction(self,
-                                   owner: Account,
-                                   bytecode: Path,
-                                   arguments: Union[List[Any], None],
-                                   should_prepare_args: bool,
-                                   upgradeable: bool,
-                                   readable: bool,
-                                   payable: bool,
-                                   payable_by_sc: bool,
-                                   gas_limit: int,
-                                   value: int,
-                                   nonce: int,
-                                   version: int,
-                                   options: int,
-                                   guardian: Address) -> Transaction:
+    def prepare_deploy_transaction(
+        self,
+        owner: Account,
+        bytecode: Path,
+        arguments: Union[List[Any], None],
+        should_prepare_args: bool,
+        upgradeable: bool,
+        readable: bool,
+        payable: bool,
+        payable_by_sc: bool,
+        gas_limit: int,
+        value: int,
+        nonce: int,
+        version: int,
+        options: int,
+        guardian: Address,
+    ) -> Transaction:
         args = arguments if arguments else []
         if should_prepare_args:
             args = self._prepare_args_for_factory(args)
@@ -64,7 +85,7 @@ class SmartContract:
             is_upgradeable=upgradeable,
             is_readable=readable,
             is_payable=payable,
-            is_payable_by_sc=payable_by_sc
+            is_payable_by_sc=payable_by_sc,
         )
         tx.nonce = nonce
         tx.version = version
@@ -74,19 +95,21 @@ class SmartContract:
 
         return tx
 
-    def prepare_execute_transaction(self,
-                                    caller: Account,
-                                    contract: Address,
-                                    function: str,
-                                    arguments: Union[List[Any], None],
-                                    should_prepare_args: bool,
-                                    gas_limit: int,
-                                    value: int,
-                                    transfers: Union[List[str], None],
-                                    nonce: int,
-                                    version: int,
-                                    options: int,
-                                    guardian: Address) -> Transaction:
+    def prepare_execute_transaction(
+        self,
+        caller: Account,
+        contract: Address,
+        function: str,
+        arguments: Union[List[Any], None],
+        should_prepare_args: bool,
+        gas_limit: int,
+        value: int,
+        transfers: Union[List[str], None],
+        nonce: int,
+        version: int,
+        options: int,
+        guardian: Address,
+    ) -> Transaction:
         token_transfers = self._prepare_token_transfers(transfers) if transfers else []
 
         args = arguments if arguments else []
@@ -100,7 +123,7 @@ class SmartContract:
             gas_limit=gas_limit,
             arguments=args,
             native_transfer_amount=value,
-            token_transfers=token_transfers
+            token_transfers=token_transfers,
         )
         tx.nonce = nonce
         tx.version = version
@@ -110,22 +133,24 @@ class SmartContract:
 
         return tx
 
-    def prepare_upgrade_transaction(self,
-                                    owner: Account,
-                                    contract: Address,
-                                    bytecode: Path,
-                                    arguments: Union[List[str], None],
-                                    should_prepare_args: bool,
-                                    upgradeable: bool,
-                                    readable: bool,
-                                    payable: bool,
-                                    payable_by_sc: bool,
-                                    gas_limit: int,
-                                    value: int,
-                                    nonce: int,
-                                    version: int,
-                                    options: int,
-                                    guardian: Address) -> Transaction:
+    def prepare_upgrade_transaction(
+        self,
+        owner: Account,
+        contract: Address,
+        bytecode: Path,
+        arguments: Union[List[str], None],
+        should_prepare_args: bool,
+        upgradeable: bool,
+        readable: bool,
+        payable: bool,
+        payable_by_sc: bool,
+        gas_limit: int,
+        value: int,
+        nonce: int,
+        version: int,
+        options: int,
+        guardian: Address,
+    ) -> Transaction:
         args = arguments if arguments else []
         if should_prepare_args:
             args = self._prepare_args_for_factory(args)
@@ -140,7 +165,7 @@ class SmartContract:
             is_upgradeable=upgradeable,
             is_readable=readable,
             is_payable=payable,
-            is_payable_by_sc=payable_by_sc
+            is_payable_by_sc=payable_by_sc,
         )
         tx.nonce = nonce
         tx.version = version
@@ -150,12 +175,14 @@ class SmartContract:
 
         return tx
 
-    def query_contract(self,
-                       contract_address: Address,
-                       proxy: INetworkProvider,
-                       function: str,
-                       arguments: Optional[List[Any]],
-                       should_prepare_args: bool) -> List[Any]:
+    def query_contract(
+        self,
+        contract_address: Address,
+        proxy: INetworkProvider,
+        function: str,
+        arguments: Optional[List[Any]],
+        should_prepare_args: bool,
+    ) -> List[Any]:
         args = arguments if arguments else []
         if should_prepare_args:
             args = self._prepare_args_for_factory(args)
@@ -163,11 +190,7 @@ class SmartContract:
         sc_query_controller = SmartContractController(self._config.chain_id, proxy, self._abi)
 
         try:
-            response = sc_query_controller.query(
-                contract=contract_address,
-                function=function,
-                arguments=args
-            )
+            response = sc_query_controller.query(contract=contract_address, function=function, arguments=args)
         except Exception as e:
             raise errors.QueryContractError("Couldn't query contract: ", e)
 
@@ -203,14 +226,16 @@ class SmartContract:
             elif arg.lower() == TRUE_STR_LOWER:
                 args.append(BoolValue(True))
             elif arg.startswith(STR_PREFIX):
-                args.append(StringValue(arg[len(STR_PREFIX):]))
+                args.append(StringValue(arg[len(STR_PREFIX) :]))
             else:
-                raise errors.BadUserInput(f"Unknown argument type for argument: `{arg}`. Use `mxpy contract <sub-command> --help` to check all supported arguments")
+                raise errors.BadUserInput(
+                    f"Unknown argument type for argument: `{arg}`. Use `mxpy contract <sub-command> --help` to check all supported arguments"
+                )
 
         return args
 
     def _hex_to_bytes(self, arg: str):
-        argument = arg[len(HEX_PREFIX):]
+        argument = arg[len(HEX_PREFIX) :]
         argument = argument.upper()
         argument = ensure_even_length(argument)
         return bytes.fromhex(argument)
@@ -252,7 +277,7 @@ def _to_hex(arg: str):
 
 
 def _prepare_hexadecimal(argument: str) -> str:
-    argument = argument[len(HEX_PREFIX):]
+    argument = argument[len(HEX_PREFIX) :]
     argument = argument.upper()
     argument = ensure_even_length(argument)
 
@@ -271,12 +296,12 @@ def _prepare_decimal(argument: str) -> str:
         raise errors.UnknownArgumentFormat(argument)
 
     as_number = int(argument)
-    as_hexstring = hex(as_number)[len(HEX_PREFIX):]
+    as_hexstring = hex(as_number)[len(HEX_PREFIX) :]
     as_hexstring = ensure_even_length(as_hexstring)
     return as_hexstring.upper()
 
 
 def ensure_even_length(string: str) -> str:
     if len(string) % 2 == 1:
-        return '0' + string
+        return "0" + string
     return string

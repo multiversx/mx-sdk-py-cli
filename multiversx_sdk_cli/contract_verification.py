@@ -25,7 +25,7 @@ class ContractVerificationRequest:
         source_code: Dict[str, Any],
         signature: bytes,
         docker_image: str,
-        contract_variant: Optional[str]
+        contract_variant: Optional[str],
     ) -> None:
         self.contract = contract
         self.source_code = source_code
@@ -40,13 +40,19 @@ class ContractVerificationRequest:
                 "contract": self.contract.bech32(),
                 "dockerImage": self.docker_image,
                 "sourceCode": self.source_code,
-                "contractVariant": self.contract_variant
-            }
+                "contractVariant": self.contract_variant,
+            },
         }
 
 
 class ContractVerificationPayload:
-    def __init__(self, contract: Address, source_code: Dict[str, Any], docker_image: str, contract_variant: Optional[str]) -> None:
+    def __init__(
+        self,
+        contract: Address,
+        source_code: Dict[str, Any],
+        docker_image: str,
+        contract_variant: Optional[str],
+    ) -> None:
         self.contract = contract
         self.source_code = source_code
         self.docker_image = docker_image
@@ -57,24 +63,27 @@ class ContractVerificationPayload:
             "contract": self.contract.to_bech32(),
             "dockerImage": self.docker_image,
             "sourceCode": self.source_code,
-            "contractVariant": self.contract_variant
+            "contractVariant": self.contract_variant,
         }
 
-        return json.dumps(payload, separators=(',', ':'))
+        return json.dumps(payload, separators=(",", ":"))
 
 
 def trigger_contract_verification(
-        packaged_source: Path,
-        owner: Account,
-        contract: Address,
-        verifier_url: str,
-        docker_image: str,
-        contract_variant: Optional[str]):
+    packaged_source: Path,
+    owner: Account,
+    contract: Address,
+    verifier_url: str,
+    docker_image: str,
+    contract_variant: Optional[str],
+):
     source_code = read_json_file(packaged_source)
 
     payload = ContractVerificationPayload(contract, source_code, docker_image, contract_variant).serialize()
     signature = _create_request_signature(owner, contract, payload.encode())
-    contract_verification = ContractVerificationRequest(contract, source_code, signature, docker_image, contract_variant)
+    contract_verification = ContractVerificationRequest(
+        contract, source_code, signature, docker_image, contract_variant
+    )
 
     request_dictionary = contract_verification.to_dictionary()
 

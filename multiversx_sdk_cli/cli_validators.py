@@ -5,18 +5,28 @@ from multiversx_sdk_cli.transactions import do_prepare_transaction
 
 
 def setup_parser(args: List[str], subparsers: Any) -> Any:
-    parser = cli_shared.add_group_subparser(subparsers, "validator", "Stake, UnStake, UnBond, Unjail and other "
-                                                                     "actions useful for "
-                                                                     "Validators")
+    parser = cli_shared.add_group_subparser(
+        subparsers,
+        "validator",
+        "Stake, UnStake, UnBond, Unjail and other " "actions useful for " "Validators",
+    )
     subparsers = parser.add_subparsers()
 
     sub = cli_shared.add_command_subparser(subparsers, "validator", "stake", "Stake value into the Network")
     _add_common_arguments(args, sub)
     sub.add_argument("--reward-address", default="", help="the reward address")
-    sub.add_argument("--validators-file", required=not (utils.is_arg_present(args, "--top-up")),
-                     help="a JSON file describing the Nodes")
-    sub.add_argument("--top-up", action="store_true", default=False,
-                     required=not (utils.is_arg_present(args, "--validators-file")), help="Stake value for top up")
+    sub.add_argument(
+        "--validators-file",
+        required=not (utils.is_arg_present(args, "--top-up")),
+        help="a JSON file describing the Nodes",
+    )
+    sub.add_argument(
+        "--top-up",
+        action="store_true",
+        default=False,
+        required=not (utils.is_arg_present(args, "--validators-file")),
+        help="Stake value for top up",
+    )
     sub.set_defaults(func=do_stake)
 
     sub = cli_shared.add_command_subparser(subparsers, "validator", "unstake", "Unstake value")
@@ -34,8 +44,9 @@ def setup_parser(args: List[str], subparsers: Any) -> Any:
     _add_nodes_arg(sub)
     sub.set_defaults(func=do_unbond)
 
-    sub = cli_shared.add_command_subparser(subparsers, "validator", "change-reward-address",
-                                           "Change the reward address")
+    sub = cli_shared.add_command_subparser(
+        subparsers, "validator", "change-reward-address", "Change the reward address"
+    )
     _add_common_arguments(args, sub)
     sub.add_argument("--reward-address", required=True, help="the new reward address")
     sub.set_defaults(func=change_reward_address)
@@ -44,17 +55,26 @@ def setup_parser(args: List[str], subparsers: Any) -> Any:
     _add_common_arguments(args, sub)
     sub.set_defaults(func=do_claim)
 
-    sub = cli_shared.add_command_subparser(subparsers, "validator", "unstake-nodes", "Unstake-nodes will unstake "
-                                                                                     "nodes for provided bls keys")
+    sub = cli_shared.add_command_subparser(
+        subparsers,
+        "validator",
+        "unstake-nodes",
+        "Unstake-nodes will unstake " "nodes for provided bls keys",
+    )
     _add_common_arguments(args, sub)
     _add_nodes_arg(sub)
     sub.set_defaults(func=do_unstake_nodes)
 
-    sub = cli_shared.add_command_subparser(subparsers, "validator", "unstake-tokens", "This command will un-stake the "
-                                                                                      "given amount (if value is "
-                                                                                      "greater than the existing "
-                                                                                      "topUp value, it will unStake "
-                                                                                      "one or several nodes)")
+    sub = cli_shared.add_command_subparser(
+        subparsers,
+        "validator",
+        "unstake-tokens",
+        "This command will un-stake the "
+        "given amount (if value is "
+        "greater than the existing "
+        "topUp value, it will unStake "
+        "one or several nodes)",
+    )
     _add_common_arguments(args, sub)
     sub.add_argument("--unstake-value", default=0, help="the unstake value")
     sub.set_defaults(func=do_unstake_tokens)
@@ -64,19 +84,31 @@ def setup_parser(args: List[str], subparsers: Any) -> Any:
     _add_nodes_arg(sub)
     sub.set_defaults(func=do_unbond_nodes)
 
-    sub = cli_shared.add_command_subparser(subparsers, "validator", "unbond-tokens", "It will unBond tokens, if "
-                                                                                     "provided value is bigger that "
-                                                                                     "topUp value will unBond nodes")
+    sub = cli_shared.add_command_subparser(
+        subparsers,
+        "validator",
+        "unbond-tokens",
+        "It will unBond tokens, if " "provided value is bigger that " "topUp value will unBond nodes",
+    )
     _add_common_arguments(args, sub)
     sub.add_argument("--unbond-value", default=0, help="the unbond value")
     sub.set_defaults(func=do_unbond_tokens)
 
-    sub = cli_shared.add_command_subparser(subparsers, "validator", "clean-registered-data", "Deletes duplicated keys "
-                                                                                             "from registered data")
+    sub = cli_shared.add_command_subparser(
+        subparsers,
+        "validator",
+        "clean-registered-data",
+        "Deletes duplicated keys " "from registered data",
+    )
     _add_common_arguments(args, sub)
     sub.set_defaults(func=do_clean_registered_data)
 
-    sub = cli_shared.add_command_subparser(subparsers, "validator", "restake-unstaked-nodes", "It will reStake UnStaked nodes")
+    sub = cli_shared.add_command_subparser(
+        subparsers,
+        "validator",
+        "restake-unstaked-nodes",
+        "It will reStake UnStaked nodes",
+    )
     _add_common_arguments(args, sub)
     _add_nodes_arg(sub)
     sub.set_defaults(func=do_restake_unstaked_nodes)
@@ -95,7 +127,11 @@ def _add_common_arguments(args: List[str], sub: Any):
 
 
 def _add_nodes_arg(sub: Any):
-    sub.add_argument("--nodes-public-keys", required=True, help="the public keys of the nodes as CSV (addrA,addrB)")
+    sub.add_argument(
+        "--nodes-public-keys",
+        required=True,
+        help="the public keys of the nodes as CSV (addrA,addrB)",
+    )
 
 
 def do_stake(args: Any):

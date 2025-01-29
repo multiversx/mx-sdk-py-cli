@@ -23,14 +23,14 @@ def is_docker_installed():
 
 
 def run_docker(
-        image: str,
-        project_path: Path,
-        contract: str,
-        output_path: Path,
-        no_wasm_opt: bool,
-        docker_interactive: bool,
-        docker_tty: bool,
-        no_default_platform: bool
+    image: str,
+    project_path: Path,
+    contract: str,
+    output_path: Path,
+    no_wasm_opt: bool,
+    docker_interactive: bool,
+    docker_tty: bool,
+    no_default_platform: bool,
 ):
     docker_mount_args: List[str] = ["--volume", f"{output_path}:/output"]
 

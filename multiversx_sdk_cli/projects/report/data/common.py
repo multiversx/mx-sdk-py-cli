@@ -1,5 +1,5 @@
-from collections import OrderedDict
 import itertools
+from collections import OrderedDict
 from typing import Callable, List, Optional, TypeVar
 
 
@@ -11,8 +11,8 @@ def merge_values(first: List[str], second: List[str]) -> List[str]:
     return list(OrderedDict.fromkeys(first + second))
 
 
-T = TypeVar('T')
-K = TypeVar('K')
+T = TypeVar("T")
+K = TypeVar("K")
 
 
 def first_not_none(first: Optional[T], second: Optional[T]) -> T:
@@ -23,26 +23,31 @@ def get_keys(items: List[T], key_getter: Callable[[T], K]) -> List[K]:
     return [key_getter(item) for item in items]
 
 
-def list_as_key_value_dict(items: List[T], key_getter: Callable[[T], K]) -> 'OrderedDict[K, T]':
+def list_as_key_value_dict(items: List[T], key_getter: Callable[[T], K]) -> "OrderedDict[K, T]":
     return OrderedDict(zip(get_keys(items, key_getter), items))
 
 
-def merge_values_by_key(first: List[T], second: List[T], key_getter: Callable[[T], K], merge: Callable[[Optional[T], Optional[T]], T]) -> List[T]:
+def merge_values_by_key(
+    first: List[T],
+    second: List[T],
+    key_getter: Callable[[T], K],
+    merge: Callable[[Optional[T], Optional[T]], T],
+) -> List[T]:
     """
-    Merge the values of two lists when the key matches.
-    Used in order to de-duplicate report entries depending on certain criteria, such as paths or feature names.
+        Merge the values of two lists when the key matches.
+        Used in order to de-duplicate report entries depending on certain criteria, such as paths or feature names.
 
->>> def merge_func(a, b):
-...     if a == None:
-...         return (b[0], b[1] + 100)
-...     if b == None:
-...         return (a[0], a[1] + 200)
-...     return (a[0], a[1] + b[1])
->>> first = [('one', 1), ('two', 2)]
->>> second = [('two', 3), ('three', 4)]
->>> key_getter = lambda item: item[0]
->>> merge_values_by_key(first, second, key_getter, merge_func)
-[('one', 201), ('two', 5), ('three', 104)]
+    >>> def merge_func(a, b):
+    ...     if a == None:
+    ...         return (b[0], b[1] + 100)
+    ...     if b == None:
+    ...         return (a[0], a[1] + 200)
+    ...     return (a[0], a[1] + b[1])
+    >>> first = [('one', 1), ('two', 2)]
+    >>> second = [('two', 3), ('three', 4)]
+    >>> key_getter = lambda item: item[0]
+    >>> merge_values_by_key(first, second, key_getter, merge_func)
+    [('one', 201), ('two', 5), ('three', 104)]
     """
     first_as_dict = list_as_key_value_dict(first, key_getter)
     second_as_dict = list_as_key_value_dict(second, key_getter)

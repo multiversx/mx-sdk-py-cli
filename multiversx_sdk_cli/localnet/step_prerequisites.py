@@ -5,8 +5,10 @@ from pathlib import Path
 
 from multiversx_sdk_cli import dependencies
 from multiversx_sdk_cli.localnet.config_root import ConfigRoot
-from multiversx_sdk_cli.localnet.config_software import (SoftwareComponent,
-                                                         SoftwareResolution)
+from multiversx_sdk_cli.localnet.config_software import (
+    SoftwareComponent,
+    SoftwareResolution,
+)
 
 logger = logging.getLogger("localnet")
 

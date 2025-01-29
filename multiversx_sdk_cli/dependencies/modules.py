@@ -6,10 +6,19 @@ from os import path
 from pathlib import Path
 from typing import Dict, List, Optional
 
-from multiversx_sdk_cli import (config, dependencies, downloader, errors,
-                                myprocess, utils, workstation)
+from multiversx_sdk_cli import (
+    config,
+    dependencies,
+    downloader,
+    errors,
+    myprocess,
+    utils,
+    workstation,
+)
 from multiversx_sdk_cli.dependencies.resolution import (
-    DependencyResolution, get_dependency_resolution)
+    DependencyResolution,
+    get_dependency_resolution,
+)
 from multiversx_sdk_cli.ux import show_message, show_warning
 
 logger = logging.getLogger("modules")
@@ -63,11 +72,13 @@ class DependencyModule:
 
 
 class StandaloneModule(DependencyModule):
-    def __init__(self,
-                 key: str,
-                 aliases: List[str] = [],
-                 repo_name: Optional[str] = None,
-                 organisation: Optional[str] = None):
+    def __init__(
+        self,
+        key: str,
+        aliases: List[str] = [],
+        repo_name: Optional[str] = None,
+        organisation: Optional[str] = None,
+    ):
         super().__init__(key, aliases)
         self.archive_type = "tar.gz"
         self.repo_name = repo_name
@@ -113,8 +124,8 @@ class StandaloneModule(DependencyModule):
             tag_no_v = tag_no_v[1:]
         assert isinstance(self.repo_name, str)
 
-        source_folder_option_1 = self.get_directory(tag) / f'{self.repo_name}-{tag_no_v}'
-        source_folder_option_2 = self.get_directory(tag) / f'{self.repo_name}-{tag}'
+        source_folder_option_1 = self.get_directory(tag) / f"{self.repo_name}-{tag_no_v}"
+        source_folder_option_2 = self.get_directory(tag) / f"{self.repo_name}-{tag}"
         return source_folder_option_1 if source_folder_option_1.exists() else source_folder_option_2
 
     def get_parent_directory(self) -> Path:
@@ -165,7 +176,7 @@ class GolangModule(StandaloneModule):
                 "PATH": os.environ.get("PATH", ""),
                 "GOPATH": os.environ.get("GOPATH", ""),
                 "GOCACHE": os.environ.get("GOCACHE", ""),
-                "GOROOT": os.environ.get("GOROOT", "")
+                "GOROOT": os.environ.get("GOROOT", ""),
             }
         if resolution == DependencyResolution.SDK:
             current_path = os.environ.get("PATH", "")
@@ -178,7 +189,7 @@ class GolangModule(StandaloneModule):
                 "PATH": f"{(directory / 'go' / 'bin')}:{current_path_without_go}",
                 "GOPATH": str(self.get_gopath()),
                 "GOCACHE": str(parent_directory / "GOCACHE"),
-                "GOROOT": str(directory / "go")
+                "GOROOT": str(directory / "go"),
             }
 
         raise errors.BadDependencyResolution(self.key, resolution)
@@ -202,7 +213,13 @@ class Rust(DependencyModule):
         logger.info(f"which wasm-opt: {which_wasm_opt}")
         logger.info(f"which twiggy: {which_twiggy}")
 
-        dependencies = [which_rustc, which_cargo, which_sc_meta, which_wasm_opt, which_twiggy]
+        dependencies = [
+            which_rustc,
+            which_cargo,
+            which_sc_meta,
+            which_wasm_opt,
+            which_twiggy,
+        ]
         installed = all(dependency is not None for dependency in dependencies)
 
         if installed:
@@ -213,7 +230,9 @@ class Rust(DependencyModule):
             elif "not found" in actual_version_installed:
                 show_warning("You have installed Rust without using `rustup`.")
             else:
-                show_warning(f"The Rust version you have installed does not match the recommended version.\nInstalled [{actual_version_installed}], expected [{tag}].")
+                show_warning(
+                    f"The Rust version you have installed does not match the recommended version.\nInstalled [{actual_version_installed}], expected [{tag}]."
+                )
 
         return installed
 
@@ -229,7 +248,9 @@ class Rust(DependencyModule):
         tag: str = config.get_dependency_tag(module.key)
 
         if not overwrite:
-            show_warning(f"We recommend using rust {tag}. If you'd like to overwrite your current version please run `mxpy deps install rust --overwrite`.")
+            show_warning(
+                f"We recommend using rust {tag}. If you'd like to overwrite your current version please run `mxpy deps install rust --overwrite`."
+            )
         logger.info(f"install: key={self.key}, tag={tag}, overwrite={overwrite}")
 
         if overwrite:
@@ -241,7 +262,9 @@ class Rust(DependencyModule):
         self._install_sc_meta()
         self._install_wasm_opt()
         self._install_twiggy()
-        show_message("To ensure sc-meta functions correctly, please install all the required dependencies by executing the following command: `sc-meta install all`.")
+        show_message(
+            "To ensure sc-meta functions correctly, please install all the required dependencies by executing the following command: `sc-meta install all`."
+        )
 
     def _check_install_env(self, apply_correction: bool = True):
         """
@@ -251,16 +274,20 @@ class Rust(DependencyModule):
         current_cargo_home = os.environ.get("CARGO_HOME", None)
         current_rustup_home = os.environ.get("RUSTUP_HOME", None)
         if current_cargo_home:
-            show_warning(f"""CARGO_HOME variable is set to: {current_cargo_home}.
-This may cause problems with the installation.""")
+            show_warning(
+                f"""CARGO_HOME variable is set to: {current_cargo_home}.
+This may cause problems with the installation."""
+            )
 
             if apply_correction:
                 show_warning("CARGO_HOME will be temporarily unset.")
                 os.environ["CARGO_HOME"] = ""
 
         if current_rustup_home:
-            show_warning(f"""RUSTUP_HOME variable is set to: {current_rustup_home}.
-This may cause problems with the installation of rust.""")
+            show_warning(
+                f"""RUSTUP_HOME variable is set to: {current_rustup_home}.
+This may cause problems with the installation of rust."""
+            )
 
             if apply_correction:
                 show_warning("RUSTUP_HOME will be temporarily unset.")
@@ -278,8 +305,17 @@ This may cause problems with the installation of rust.""")
         else:
             toolchain = "stable"
 
-        args = [str(installer_path), "--verbose", "--default-toolchain", toolchain, "--profile",
-                "minimal", "--target", "wasm32-unknown-unknown", "-y"]
+        args = [
+            str(installer_path),
+            "--verbose",
+            "--default-toolchain",
+            toolchain,
+            "--profile",
+            "minimal",
+            "--target",
+            "wasm32-unknown-unknown",
+            "-y",
+        ]
 
         logger.info("Installing rust.")
         myprocess.run_process(args)

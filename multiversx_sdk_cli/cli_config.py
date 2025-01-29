@@ -14,7 +14,12 @@ def setup_parser(subparsers: Any) -> Any:
     subparsers = parser.add_subparsers()
 
     sub = cli_shared.add_command_subparser(subparsers, "config", "dump", "Dumps configuration.")
-    sub.add_argument('--defaults', required=False, help='dump defaults instead of local config', action='store_true')
+    sub.add_argument(
+        "--defaults",
+        required=False,
+        help="dump defaults instead of local config",
+        action="store_true",
+    )
     sub.set_defaults(func=dump)
 
     sub = cli_shared.add_command_subparser(subparsers, "config", "get", "Gets a configuration value.")
@@ -32,7 +37,11 @@ def setup_parser(subparsers: Any) -> Any:
 
     sub = cli_shared.add_command_subparser(subparsers, "config", "new", "Creates a new configuration.")
     _add_name_arg(sub)
-    sub.add_argument("--template", required=False, help="template from which to create the new config")
+    sub.add_argument(
+        "--template",
+        required=False,
+        help="template from which to create the new config",
+    )
     sub.set_defaults(func=new_config)
 
     sub = cli_shared.add_command_subparser(subparsers, "config", "switch", "Switch to a different config")
@@ -42,7 +51,12 @@ def setup_parser(subparsers: Any) -> Any:
     sub = cli_shared.add_command_subparser(subparsers, "config", "list", "List available configs")
     sub.set_defaults(func=list_configs)
 
-    sub = cli_shared.add_command_subparser(subparsers, "config", "reset", "Deletes the config file. Default config will be used.")
+    sub = cli_shared.add_command_subparser(
+        subparsers,
+        "config",
+        "reset",
+        "Deletes the config file. Default config will be used.",
+    )
     sub.set_defaults(func=delete_config)
 
     parser.epilog = cli_shared.build_group_epilog(subparsers)
@@ -93,7 +107,7 @@ def switch_config(args: Any):
 
 def list_configs(args: Any):
     data = config.read_file()
-    configurations = data.get('configurations', {})
+    configurations = data.get("configurations", {})
     for config_name in configurations.keys():
         if config_name == data.get("active", "default"):
             config_name += "*"

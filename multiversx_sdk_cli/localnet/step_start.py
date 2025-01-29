@@ -11,8 +11,7 @@ from rich.table import Table
 
 from multiversx_sdk_cli import workstation
 from multiversx_sdk_cli.localnet.config_root import ConfigRoot
-from multiversx_sdk_cli.localnet.constants import \
-    NETWORK_MONITORING_INTERVAL_IN_SECONDS
+from multiversx_sdk_cli.localnet.constants import NETWORK_MONITORING_INTERVAL_IN_SECONDS
 
 logger = logging.getLogger("localnet")
 
@@ -40,49 +39,69 @@ async def do_start(configfile: Path, stop_after_seconds: int):
 
     display_api_table(config)
 
-    logger.info('Localnet folder is %s', config.root())
+    logger.info("Localnet folder is %s", config.root())
 
     to_run: List[Coroutine[Any, Any, None]] = []
 
     # Seed node
-    to_run.append(run([
-        "./seednode",
-        "--log-save",
-        f"--rest-api-interface={config.seednode_api_interface()}",
-    ], cwd=config.seednode_folder()))
+    to_run.append(
+        run(
+            [
+                "./seednode",
+                "--log-save",
+                f"--rest-api-interface={config.seednode_api_interface()}",
+            ],
+            cwd=config.seednode_folder(),
+        )
+    )
 
     loglevel = _patch_loglevel(config.general.log_level)
     logger.info(f"loglevel: {loglevel}")
 
     # Observers
     for observer in config.observers():
-        to_run.append(run([
-            "./node",
-            "--use-log-view",
-            "--log-save",
-            f"--log-level={loglevel}",
-            "--log-logger-name",
-            f"--destination-shard-as-observer={observer.shard}",
-            f"--rest-api-interface={observer.api_interface()}",
-            "--operation-mode=historical-balances"
-        ], cwd=observer.folder, delay=NODES_START_DELAY))
+        to_run.append(
+            run(
+                [
+                    "./node",
+                    "--use-log-view",
+                    "--log-save",
+                    f"--log-level={loglevel}",
+                    "--log-logger-name",
+                    f"--destination-shard-as-observer={observer.shard}",
+                    f"--rest-api-interface={observer.api_interface()}",
+                    "--operation-mode=historical-balances",
+                ],
+                cwd=observer.folder,
+                delay=NODES_START_DELAY,
+            )
+        )
 
     # Validators
     for validator in config.validators():
-        to_run.append(run([
-            "./node",
-            "--use-log-view",
-            "--log-save",
-            f"--log-level={loglevel}",
-            "--log-logger-name",
-            f"--rest-api-interface={validator.api_interface()}"
-        ], cwd=validator.folder, delay=NODES_START_DELAY))
+        to_run.append(
+            run(
+                [
+                    "./node",
+                    "--use-log-view",
+                    "--log-save",
+                    f"--log-level={loglevel}",
+                    "--log-logger-name",
+                    f"--rest-api-interface={validator.api_interface()}",
+                ],
+                cwd=validator.folder,
+                delay=NODES_START_DELAY,
+            )
+        )
 
     # Proxy
-    to_run.append(run([
-        "./proxy",
-        "--log-save"
-    ], cwd=config.proxy_folder(), delay=PROXY_START_DELAY))
+    to_run.append(
+        run(
+            ["./proxy", "--log-save"],
+            cwd=config.proxy_folder(),
+            delay=PROXY_START_DELAY,
+        )
+    )
 
     # Monitor network
     to_run.append(monitor_network(stop_after_seconds))
@@ -139,16 +158,24 @@ async def run(args: List[str], cwd: Path, delay: int = 0):
         # For MacOS, dylibs are directly found near the binary (no workaround needed)
         pass
 
-    process = await asyncio.create_subprocess_exec(*args, stdout=asyncio.subprocess.PIPE,
-                                                   stderr=asyncio.subprocess.PIPE, cwd=cwd, limit=1024 * 512, env=env)
+    process = await asyncio.create_subprocess_exec(
+        *args,
+        stdout=asyncio.subprocess.PIPE,
+        stderr=asyncio.subprocess.PIPE,
+        cwd=cwd,
+        limit=1024 * 512,
+        env=env,
+    )
 
     pid = process.pid
 
     print(f"Started process [{pid}]", args)
-    await asyncio.wait([
-        asyncio.create_task(_read_stream(process.stdout, pid)),
-        asyncio.create_task(_read_stream(process.stderr, pid))
-    ])
+    await asyncio.wait(
+        [
+            asyncio.create_task(_read_stream(process.stdout, pid)),
+            asyncio.create_task(_read_stream(process.stderr, pid)),
+        ]
+    )
 
     return_code = await process.wait()
     print(f"Proces [{pid}] stopped. Return code: {return_code}.")
@@ -180,7 +207,13 @@ def _patch_loglevel(loglevel: str) -> str:
 
 
 LOGLINE_GENESIS_THRESHOLD_MARKER = "started committing block"
-LOGLINE_AFTER_GENESIS_INTERESTING_MARKERS = ["started committing block", "ERROR", "WARN", "vm", "smartcontract"]
+LOGLINE_AFTER_GENESIS_INTERESTING_MARKERS = [
+    "started committing block",
+    "ERROR",
+    "WARN",
+    "vm",
+    "smartcontract",
+]
 # We ignore SC calls on genesis.
 LOGLINE_ON_GENESIS_INTERESTING_MARKERS = ["started committing block", "ERROR", "WARN"]
 

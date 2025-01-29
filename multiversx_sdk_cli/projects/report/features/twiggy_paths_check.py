@@ -3,8 +3,7 @@ from pathlib import Path
 
 from multiversx_sdk_cli import dependencies, myprocess, utils
 from multiversx_sdk_cli.errors import BadFile
-from multiversx_sdk_cli.projects.report.features.report_option import \
-    ReportFeature
+from multiversx_sdk_cli.projects.report.features.report_option import ReportFeature
 
 logger = logging.getLogger("projects.report.options.twiggy_paths_check")
 
@@ -21,7 +20,7 @@ class TwiggyPathsCheck(ReportFeature):
             text = utils.read_text_file(twiggy_paths_path)
             return str(self.pattern in text)
         except BadFile:
-            return 'N/A'
+            return "N/A"
 
     def requires_twiggy_paths(self):
         return True
@@ -32,7 +31,12 @@ def run_twiggy_paths(wasm_path: Path) -> Path:
     debug_wasm_path = _get_debug_wasm_path(wasm_path)
 
     twiggy_paths_args = ["twiggy", "paths", str(debug_wasm_path)]
-    output = myprocess.run_process(twiggy_paths_args, env=rust.get_env(), cwd=debug_wasm_path.parent, dump_to_stdout=False)
+    output = myprocess.run_process(
+        twiggy_paths_args,
+        env=rust.get_env(),
+        cwd=debug_wasm_path.parent,
+        dump_to_stdout=False,
+    )
 
     output_path = _get_twiggy_paths_path(wasm_path)
     utils.write_file(output_path, output)
@@ -52,16 +56,16 @@ def _add_file_prefix(file_path: Path, prefix: str) -> Path:
 
 def _get_debug_wasm_path(wasm_path: Path) -> Path:
     """
->>> _get_debug_wasm_path(Path('test/contract.wasm'))
-PosixPath('test/contract-dbg.wasm')
+    >>> _get_debug_wasm_path(Path('test/contract.wasm'))
+    PosixPath('test/contract-dbg.wasm')
     """
-    return _replace_file_suffix(wasm_path, '-dbg.wasm')
+    return _replace_file_suffix(wasm_path, "-dbg.wasm")
 
 
 def _get_twiggy_paths_path(wasm_path: Path) -> Path:
     """
->>> _get_twiggy_paths_path(Path('test/contract.wasm'))
-PosixPath('test/twiggy-paths-contract-dbg.txt')
+    >>> _get_twiggy_paths_path(Path('test/contract.wasm'))
+    PosixPath('test/twiggy-paths-contract-dbg.txt')
     """
-    txt_file_path = _replace_file_suffix(wasm_path, '-dbg.txt')
-    return _add_file_prefix(txt_file_path, 'twiggy-paths-')
+    txt_file_path = _replace_file_suffix(wasm_path, "-dbg.txt")
+    return _add_file_prefix(txt_file_path, "twiggy-paths-")

@@ -38,7 +38,11 @@ class CLIOutputBuilder:
     def set_awaited_transaction(self, awaited_transaction: TransactionOnNetwork, omitted_fields: List[str] = []):
         return self.set_transaction_on_network(awaited_transaction, omitted_fields)
 
-    def set_transaction_on_network(self, transaction_on_network: TransactionOnNetwork, omitted_fields: List[str] = []):
+    def set_transaction_on_network(
+        self,
+        transaction_on_network: TransactionOnNetwork,
+        omitted_fields: List[str] = [],
+    ):
         self.transaction_on_network = transaction_on_network
         self.transaction_on_network_omitted_fields = omitted_fields
         return self
@@ -75,11 +79,22 @@ class CLIOutputBuilder:
         return output
 
     @classmethod
-    def describe(cls, with_emitted: bool = True, with_contract: bool = False, with_transaction_on_network: bool = False, with_simulation: bool = False) -> str:
+    def describe(
+        cls,
+        with_emitted: bool = True,
+        with_contract: bool = False,
+        with_transaction_on_network: bool = False,
+        with_simulation: bool = False,
+    ) -> str:
         output: Dict[str, Any] = OrderedDict()
 
         if with_emitted:
-            output["emittedTransaction"] = {"nonce": 42, "sender": "alice", "receiver": "bob", "...": "..."}
+            output["emittedTransaction"] = {
+                "nonce": 42,
+                "sender": "alice",
+                "receiver": "bob",
+                "...": "...",
+            }
             output["emittedTransactionData"] = "the transaction data, not encoded"
             output["emittedTransactionHash"] = "the transaction hash"
 
@@ -87,13 +102,15 @@ class CLIOutputBuilder:
             output["contractAddress"] = "the address of the contract"
 
         if with_transaction_on_network:
-            output["transactionOnNetwork"] = {"nonce": 42, "sender": "alice", "receiver": "bob", "...": "..."}
+            output["transactionOnNetwork"] = {
+                "nonce": 42,
+                "sender": "alice",
+                "receiver": "bob",
+                "...": "...",
+            }
 
         if with_simulation:
-            output["simulation"] = {
-                "execution": {"...": "..."},
-                "cost": {"...": "..."}
-            }
+            output["simulation"] = {"execution": {"...": "..."}, "cost": {"...": "..."}}
 
         description = json.dumps(output, indent=4)
         description_wrapped = f"""

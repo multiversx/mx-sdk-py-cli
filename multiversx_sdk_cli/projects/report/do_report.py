@@ -5,12 +5,11 @@ from typing import Any, Dict, List
 
 from multiversx_sdk_cli import cli_shared, utils
 from multiversx_sdk_cli.projects.core import get_project_paths_recursively
-from multiversx_sdk_cli.projects.report.data.report import (
-    Report, merge_list_of_reports)
-from multiversx_sdk_cli.projects.report.features.features import \
-    get_default_report_features
-from multiversx_sdk_cli.projects.report.format.format_options import \
-    FormatOptions
+from multiversx_sdk_cli.projects.report.data.report import Report, merge_list_of_reports
+from multiversx_sdk_cli.projects.report.features.features import (
+    get_default_report_features,
+)
+from multiversx_sdk_cli.projects.report.format.format_options import FormatOptions
 from multiversx_sdk_cli.projects.report.report_creator import ReportCreator
 
 logger = logging.getLogger("report")
@@ -32,7 +31,13 @@ def _build_report(args: Any, build_options: Dict[str, Any]) -> None:
     args_copy = _prepare_args_for_build(args)
     build_args = cli_shared.convert_args_object_to_args_list(args_copy)
 
-    report_creator = ReportCreator(options, skip_build=args.skip_build, skip_twiggy=args.skip_twiggy, build_options=build_options, build_args=build_args)
+    report_creator = ReportCreator(
+        options,
+        skip_build=args.skip_build,
+        skip_twiggy=args.skip_twiggy,
+        build_options=build_options,
+        build_args=build_args,
+    )
     report = report_creator.create_report(base_path, project_paths)
     _finalize_report(report, args)
 
@@ -60,13 +65,13 @@ def _finalize_report(report: Report, args: Any) -> None:
 
 def _get_report_output_string(report: Report, args: Any) -> str:
     output_format = args.output_format
-    if output_format == 'github-markdown':
+    if output_format == "github-markdown":
         return report.to_markdown(FormatOptions(github_markdown=True))
-    if output_format == 'text-markdown':
+    if output_format == "text-markdown":
         return report.to_markdown(FormatOptions(github_markdown=False))
-    elif output_format == 'json':
+    elif output_format == "json":
         return report.to_json_string()
-    raise Exception('Invalid output format')
+    raise Exception("Invalid output format")
 
 
 def _store_output(output: str, args: Any) -> None:

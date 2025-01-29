@@ -173,7 +173,7 @@ def get_contract_suffix(name: str) -> str:
 def remove_suffix(name: str, suffix: str) -> str:
     if not name.endswith(suffix) or len(suffix) == 0:
         return name
-    return name[:-len(suffix)]
+    return name[: -len(suffix)]
 
 
 def adjust_wasm_filename(path: Path, name_hint: str) -> Path:

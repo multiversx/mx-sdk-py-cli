@@ -7,8 +7,12 @@ from multiversx_sdk import Address, ValidatorPEM, ValidatorSigner
 from multiversx_sdk_cli import utils
 from multiversx_sdk_cli.accounts import Account
 from multiversx_sdk_cli.cli_password import load_password
-from multiversx_sdk_cli.config import (GAS_PER_DATA_BYTE, MIN_GAS_LIMIT,
-                                       MetaChainSystemSCsCost, get_address_hrp)
+from multiversx_sdk_cli.config import (
+    GAS_PER_DATA_BYTE,
+    MIN_GAS_LIMIT,
+    MetaChainSystemSCsCost,
+    get_address_hrp,
+)
 from multiversx_sdk_cli.contracts import prepare_execute_transaction_data
 from multiversx_sdk_cli.errors import BadUsage
 from multiversx_sdk_cli.validators.validators_file import ValidatorsFile
@@ -42,7 +46,11 @@ def prepare_args_for_stake(args: Any):
         args.gas_limit = gas_limit
 
 
-def prepare_transaction_data_for_stake(node_operator_address: Address, validators_file_path: Path, reward_address: Union[Address, None]) -> Tuple[str, int]:
+def prepare_transaction_data_for_stake(
+    node_operator_address: Address,
+    validators_file_path: Path,
+    reward_address: Union[Address, None],
+) -> Tuple[str, int]:
     validators_file = ValidatorsFile(validators_file_path)
     num_of_nodes = validators_file.get_num_of_nodes()
     validators_list = validators_file.get_validators_list()
@@ -73,7 +81,7 @@ def prepare_transaction_data_for_stake(node_operator_address: Address, validator
 
 
 def prepare_args_for_top_up(args: Any):
-    args.data = 'stake'
+    args.data = "stake"
     args.receiver = Address.new_from_hex(VALIDATORS_SMART_CONTRACT_ADDRESS_HEX, get_address_hrp()).to_bech32()
 
     if args.estimate_gas:
@@ -82,7 +90,7 @@ def prepare_args_for_top_up(args: Any):
 
 def prepare_args_for_unstake(args: Any):
     parsed_keys, num_keys = utils.parse_keys(args.nodes_public_keys)
-    args.data = 'unStake' + parsed_keys
+    args.data = "unStake" + parsed_keys
     args.receiver = Address.new_from_hex(VALIDATORS_SMART_CONTRACT_ADDRESS_HEX, get_address_hrp()).to_bech32()
 
     if args.estimate_gas:
@@ -91,7 +99,7 @@ def prepare_args_for_unstake(args: Any):
 
 def prepare_args_for_unbond(args: Any):
     parsed_keys, num_keys = utils.parse_keys(args.nodes_public_keys)
-    args.data = 'unBond' + parsed_keys
+    args.data = "unBond" + parsed_keys
     args.receiver = Address.new_from_hex(VALIDATORS_SMART_CONTRACT_ADDRESS_HEX, get_address_hrp()).to_bech32()
 
     if args.estimate_gas:
@@ -100,7 +108,7 @@ def prepare_args_for_unbond(args: Any):
 
 def prepare_args_for_unjail(args: Any):
     parsed_keys, num_keys = utils.parse_keys(args.nodes_public_keys)
-    args.data = 'unJail' + parsed_keys
+    args.data = "unJail" + parsed_keys
     args.receiver = Address.new_from_hex(VALIDATORS_SMART_CONTRACT_ADDRESS_HEX, get_address_hrp()).to_bech32()
 
     if args.estimate_gas:
@@ -109,7 +117,7 @@ def prepare_args_for_unjail(args: Any):
 
 def prepare_args_for_change_reward_address(args: Any):
     reward_address = Address.new_from_bech32(args.reward_address)
-    args.data = 'changeRewardAddress@' + reward_address.hex()
+    args.data = "changeRewardAddress@" + reward_address.hex()
     args.receiver = Address.new_from_hex(VALIDATORS_SMART_CONTRACT_ADDRESS_HEX, get_address_hrp()).to_bech32()
 
     if args.estimate_gas:
@@ -117,7 +125,7 @@ def prepare_args_for_change_reward_address(args: Any):
 
 
 def prepare_args_for_claim(args: Any):
-    args.data = 'claim'
+    args.data = "claim"
     args.receiver = Address.new_from_hex(VALIDATORS_SMART_CONTRACT_ADDRESS_HEX, get_address_hrp()).to_bech32()
 
     if args.estimate_gas:
@@ -126,7 +134,7 @@ def prepare_args_for_claim(args: Any):
 
 def prepare_args_for_unstake_nodes(args: Any):
     parsed_keys, num_keys = utils.parse_keys(args.nodes_public_keys)
-    args.data = 'unStakeNodes' + parsed_keys
+    args.data = "unStakeNodes" + parsed_keys
 
     args.receiver = Address.new_from_hex(VALIDATORS_SMART_CONTRACT_ADDRESS_HEX, get_address_hrp()).to_bech32()
     if args.estimate_gas:
@@ -134,8 +142,8 @@ def prepare_args_for_unstake_nodes(args: Any):
 
 
 def prepare_args_for_unstake_tokens(args: Any):
-    args.data = 'unStakeTokens'
-    args.data += '@' + utils.str_int_to_hex_str(str(args.unstake_value))
+    args.data = "unStakeTokens"
+    args.data += "@" + utils.str_int_to_hex_str(str(args.unstake_value))
 
     args.receiver = Address.new_from_hex(VALIDATORS_SMART_CONTRACT_ADDRESS_HEX, get_address_hrp()).to_bech32()
     if args.estimate_gas:
@@ -144,7 +152,7 @@ def prepare_args_for_unstake_tokens(args: Any):
 
 def prepare_args_for_unbond_nodes(args: Any):
     parsed_keys, num_keys = utils.parse_keys(args.nodes_public_keys)
-    args.data = 'unBondNodes' + parsed_keys
+    args.data = "unBondNodes" + parsed_keys
 
     args.receiver = Address.new_from_hex(VALIDATORS_SMART_CONTRACT_ADDRESS_HEX, get_address_hrp()).to_bech32()
     if args.estimate_gas:
@@ -152,8 +160,8 @@ def prepare_args_for_unbond_nodes(args: Any):
 
 
 def prepare_args_for_unbond_tokens(args: Any):
-    args.data = 'unBondTokens'
-    args.data += '@' + utils.str_int_to_hex_str(str(args.unbond_value))
+    args.data = "unBondTokens"
+    args.data += "@" + utils.str_int_to_hex_str(str(args.unbond_value))
 
     args.receiver = Address.new_from_hex(VALIDATORS_SMART_CONTRACT_ADDRESS_HEX, get_address_hrp()).to_bech32()
     if args.estimate_gas:
@@ -161,7 +169,7 @@ def prepare_args_for_unbond_tokens(args: Any):
 
 
 def prepare_args_for_clean_registered_data(args: Any):
-    args.data = 'cleanRegisteredData'
+    args.data = "cleanRegisteredData"
 
     args.receiver = Address.new_from_hex(VALIDATORS_SMART_CONTRACT_ADDRESS_HEX, get_address_hrp()).to_bech32()
     if args.estimate_gas:
@@ -170,7 +178,7 @@ def prepare_args_for_clean_registered_data(args: Any):
 
 def prepare_args_for_restake_unstaked_nodes(args: Any):
     parsed_keys, num_keys = utils.parse_keys(args.nodes_public_keys)
-    args.data = 'reStakeUnStakedNodes' + parsed_keys
+    args.data = "reStakeUnStakedNodes" + parsed_keys
 
     args.receiver = Address.new_from_hex(VALIDATORS_SMART_CONTRACT_ADDRESS_HEX, get_address_hrp()).to_bech32()
     if args.estimate_gas:

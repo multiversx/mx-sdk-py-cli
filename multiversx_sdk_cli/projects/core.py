@@ -4,8 +4,10 @@ from typing import Any, List
 
 from multiversx_sdk_cli import errors, guards
 from multiversx_sdk_cli.projects import shared
-from multiversx_sdk_cli.projects.constants import (OLD_PROJECT_CONFIG_FILENAME,
-                                                   PROJECT_CONFIG_FILENAME)
+from multiversx_sdk_cli.projects.constants import (
+    OLD_PROJECT_CONFIG_FILENAME,
+    PROJECT_CONFIG_FILENAME,
+)
 from multiversx_sdk_cli.projects.project_base import Project
 from multiversx_sdk_cli.projects.project_rust import ProjectRust
 

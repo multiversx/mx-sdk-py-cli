@@ -1,22 +1,31 @@
 from typing import Any, List, Optional, Protocol, Union
 
 from Cryptodome.Hash import keccak
-from multiversx_sdk import Address, AddressComputer, TransactionsFactoryConfig, AwaitingOptions, TransactionOnNetwork
-from multiversx_sdk import NetworkConfig
+from multiversx_sdk import (
+    Address,
+    AddressComputer,
+    AwaitingOptions,
+    NetworkConfig,
+    TransactionOnNetwork,
+    TransactionsFactoryConfig,
+)
 
 from multiversx_sdk_cli import cli_shared, utils
 from multiversx_sdk_cli.accounts import Account
 from multiversx_sdk_cli.config import get_address_hrp
 from multiversx_sdk_cli.constants import ADDRESS_ZERO_HEX
 from multiversx_sdk_cli.contracts import SmartContract
-from multiversx_sdk_cli.transactions import (compute_relayed_v1_data,
-                                             do_prepare_transaction)
+from multiversx_sdk_cli.transactions import (
+    compute_relayed_v1_data,
+    do_prepare_transaction,
+)
 
 MaxNumShards = 256
 ShardIdentiferLen = 2
 InitialDNSAddress = bytes([1] * 32)
 
 
+# fmt: off
 class INetworkProvider(Protocol):
     def query_contract(self, query: Any) -> Any:
         ...
@@ -28,18 +37,14 @@ class INetworkProvider(Protocol):
         self, transaction_hash: Union[bytes, str], options: Optional[AwaitingOptions] = None
     ) -> TransactionOnNetwork:
         ...
+# fmt: on
 
 
 def resolve(name: str, proxy: INetworkProvider) -> Address:
     name_arg = "0x{}".format(str.encode(name).hex())
     dns_address = dns_address_for_name(name)
 
-    response = _query_contract(
-        contract_address=dns_address,
-        proxy=proxy,
-        function="resolve",
-        args=[name_arg]
-    )
+    response = _query_contract(contract_address=dns_address, proxy=proxy, function="resolve", args=[name_arg])
 
     if len(response) == 0:
         return Address.new_from_hex(ADDRESS_ZERO_HEX, get_address_hrp())
@@ -56,7 +61,7 @@ def validate_name(name: str, shard_id: int, proxy: INetworkProvider):
         contract_address=dns_address,
         proxy=proxy,
         function="validateName",
-        args=[name_arg]
+        args=[name_arg],
     )
 
     response = response[0]
@@ -107,7 +112,7 @@ def registration_cost(shard_id: int, proxy: INetworkProvider) -> int:
         contract_address=dns_address,
         proxy=proxy,
         function="getRegistrationCost",
-        args=[]
+        args=[],
     )
 
     response = response[0]
@@ -122,12 +127,7 @@ def registration_cost(shard_id: int, proxy: INetworkProvider) -> int:
 def version(shard_id: int, proxy: INetworkProvider) -> str:
     dns_address = compute_dns_address_for_shard_id(shard_id)
 
-    response = _query_contract(
-        contract_address=dns_address,
-        proxy=proxy,
-        function="version",
-        args=[]
-    )
+    response = _query_contract(contract_address=dns_address, proxy=proxy, function="version", args=[])
 
     response = response[0]
     return bytearray.fromhex(response["returnDataParts"][0]).decode()
@@ -140,7 +140,7 @@ def dns_address_for_name(name: str) -> Address:
 
 
 def compute_dns_address_for_shard_id(shard_id: int) -> Address:
-    deployer_pubkey_prefix = InitialDNSAddress[:len(InitialDNSAddress) - ShardIdentiferLen]
+    deployer_pubkey_prefix = InitialDNSAddress[: len(InitialDNSAddress) - ShardIdentiferLen]
 
     deployer_pubkey = deployer_pubkey_prefix + bytes([0, shard_id])
     deployer = Account(address=Address(deployer_pubkey, get_address_hrp()))
@@ -165,5 +165,5 @@ def _query_contract(contract_address: Address, proxy: INetworkProvider, function
         proxy=proxy,
         function=function,
         arguments=args,
-        should_prepare_args=False
+        should_prepare_args=False,
     )

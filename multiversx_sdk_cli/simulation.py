@@ -1,13 +1,16 @@
 from collections import OrderedDict
 from typing import Any, Dict, Protocol
 
-from multiversx_sdk_cli.utils import ISerializable
 from multiversx_sdk import Transaction, TransactionOnNetwork
 
+from multiversx_sdk_cli.utils import ISerializable
 
+
+# fmt: off
 class INetworkProvider(Protocol):
     def simulate_transaction(self, transaction: Transaction) -> TransactionOnNetwork:
         ...
+# fmt: on
 
 
 class Simulation(ISerializable):
@@ -21,7 +24,7 @@ class Simulation(ISerializable):
         return dictionary
 
 
-class Simulator():
+class Simulator:
     def __init__(self, proxy: INetworkProvider) -> None:
         self.proxy = proxy
 

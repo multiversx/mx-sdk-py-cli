@@ -79,12 +79,7 @@ def _set_rpath(cmd_path: Path):
         return
 
     try:
-        subprocess.check_call([
-            "install_name_tool",
-            "-add_rpath",
-            "@loader_path",
-            cmd_path
-        ])
+        subprocess.check_call(["install_name_tool", "-add_rpath", "@loader_path", cmd_path])
     except Exception as e:
         # In most cases, this isn't critical (libraries might be found among the downloaded Go packages).
         logger.warning(f"Failed to set rpath of {cmd_path}: {e}")
