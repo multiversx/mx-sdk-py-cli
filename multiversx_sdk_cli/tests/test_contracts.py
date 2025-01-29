@@ -60,7 +60,7 @@ def test_contract_verification_create_request_signature():
 
     assert signature.hex() == "30111258cc42ea08e0c6a3e053cc7086a88d614b8b119a244904e9a19896c73295b2fe5c520a1cb07cfe20f687deef9f294a0a05071e85c78a70a448ea5f0605"
 
-
+@pytest.mark.only
 def test_prepare_args_for_factories():
     sc = SmartContract(TransactionsFactoryConfig("mock"))
     args = [
@@ -70,9 +70,9 @@ def test_prepare_args_for_factories():
     ]
 
     arguments = sc._prepare_args_for_factory(args)
-    assert arguments[0] == b"\x05"
-    assert arguments[1] == 123
-    assert arguments[2] is False
-    assert arguments[3] is True
-    assert arguments[4] == "test-string"
-    assert arguments[5].to_bech32() == "erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th"
+    assert arguments[0].get_payload() == b"\x05"
+    assert arguments[1].get_payload() == 123
+    assert arguments[2].get_payload() is False
+    assert arguments[3].get_payload() is True
+    assert arguments[4].get_payload() == "test-string"
+    assert arguments[5].get_payload() == Address.new_from_bech32("erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th").get_public_key()
