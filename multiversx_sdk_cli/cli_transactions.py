@@ -107,7 +107,7 @@ def send_transaction(args: Any):
 
     try:
         tx_hash = proxy.send_transaction(tx)
-        output.set_emitted_transaction_hash(tx_hash.hex())
+        output.set_emitted_transaction_hash(tx_hash)
     finally:
         output = output.set_emitted_transaction(tx).build()
         utils.dump_out_json(output, outfile=args.outfile)
@@ -120,7 +120,7 @@ def get_transaction(args: Any):
     config = get_config_for_network_providers()
     proxy = ProxyNetworkProvider(url=args.proxy, config=config)
 
-    transaction = proxy.get_transaction(args.hash)
+    transaction = proxy.get_transaction(args.hash, True)
     output = CLIOutputBuilder().set_transaction_on_network(transaction, omit_fields).build()
     utils.dump_out_json(output)
 
@@ -162,7 +162,7 @@ def relay_transaction(args: Any):
     tx = load_transaction_from_file(args.infile)
     relayer = cli_shared.prepare_relayer_account(args)
 
-    if tx.relayer != relayer.address:
+    if tx.relayer != relayer.address.to_bech32():
         raise IncorrectWalletError("Relayer wallet does not match the relayer's address set in the transaction.")
 
     tx.relayer_signature = bytes.fromhex(relayer.sign_transaction(tx))

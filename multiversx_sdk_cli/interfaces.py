@@ -1,7 +1,5 @@
 from typing import Any, Dict, Protocol
 
-from multiversx_sdk import Transaction
-
 
 class IAddress(Protocol):
     def to_hex(self) -> str:
@@ -32,7 +30,7 @@ class ITransaction(Protocol):
 
 
 class IAccount(Protocol):
-    def sign_transaction(self, transaction: Transaction) -> str:
+    def sign_transaction(self, transaction: ITransaction) -> str:
         ...
 
 

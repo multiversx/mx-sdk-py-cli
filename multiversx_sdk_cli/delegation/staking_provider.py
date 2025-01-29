@@ -2,30 +2,44 @@ from pathlib import Path
 from typing import Any, List, Protocol, Tuple
 
 from multiversx_sdk import (Address, DelegationTransactionsFactory,
-                            Transaction, TransactionsFactoryConfig, ValidatorPublicKey)
-from multiversx_sdk.abi import Serializer, BigUIntValue
+                            Transaction, ValidatorPublicKey)
+from multiversx_sdk.core.serializer import args_to_string
 
 from multiversx_sdk_cli.config import get_address_hrp
 from multiversx_sdk_cli.errors import BadUsage
+from multiversx_sdk_cli.interfaces import IAddress, ITransaction
 from multiversx_sdk_cli.validators.validators_file import ValidatorsFile
+
+
+class IConfig(Protocol):
+    chain_id: str
+    min_gas_limit: int
+    gas_limit_per_byte: int
+    gas_limit_stake: int
+    gas_limit_unstake: int
+    gas_limit_unbond: int
+    gas_limit_create_delegation_contract: int
+    gas_limit_delegation_operations: int
+    additional_gas_limit_per_validator_node: int
+    additional_gas_for_delegation_operations: int
 
 
 class IAccount(Protocol):
     @property
-    def address(self) -> Address:
+    def address(self) -> IAddress:
         ...
 
     nonce: int
 
-    def sign_transaction(self, transaction: Transaction) -> str:
+    def sign_transaction(self, transaction: ITransaction) -> str:
         ...
 
 
 class DelegationOperations:
-    def __init__(self, config: TransactionsFactoryConfig) -> None:
+    def __init__(self, config: IConfig) -> None:
         self._factory = DelegationTransactionsFactory(config)
 
-    def prepare_transaction_for_new_delegation_contract(self, owner: IAccount, args: Any) -> Transaction:
+    def prepare_transaction_for_new_delegation_contract(self, owner: IAccount, args: Any) -> ITransaction:
         tx = self._factory.create_transaction_for_new_delegation_contract(
             sender=owner.address,
             total_delegation_cap=int(args.total_delegation_cap),
@@ -44,7 +58,7 @@ class DelegationOperations:
 
         return tx
 
-    def prepare_transaction_for_adding_nodes(self, owner: IAccount, args: Any) -> Transaction:
+    def prepare_transaction_for_adding_nodes(self, owner: IAccount, args: Any) -> ITransaction:
         delegation_contract = Address.new_from_bech32(args.delegation_contract)
         public_keys, signed_messages = self._get_public_keys_and_signed_messages(args)
 
@@ -66,7 +80,7 @@ class DelegationOperations:
 
         return tx
 
-    def prepare_transaction_for_removing_nodes(self, owner: IAccount, args: Any) -> Transaction:
+    def prepare_transaction_for_removing_nodes(self, owner: IAccount, args: Any) -> ITransaction:
         delegation_contract = Address.new_from_bech32(args.delegation_contract)
 
         public_keys = self._load_validators_public_keys(args)
@@ -88,7 +102,7 @@ class DelegationOperations:
 
         return tx
 
-    def prepare_transaction_for_staking_nodes(self, owner: IAccount, args: Any) -> Transaction:
+    def prepare_transaction_for_staking_nodes(self, owner: IAccount, args: Any) -> ITransaction:
         delegation_contract = Address.new_from_bech32(args.delegation_contract)
 
         public_keys = self._load_validators_public_keys(args)
@@ -110,7 +124,7 @@ class DelegationOperations:
 
         return tx
 
-    def prepare_transaction_for_unbonding_nodes(self, owner: IAccount, args: Any) -> Transaction:
+    def prepare_transaction_for_unbonding_nodes(self, owner: IAccount, args: Any) -> ITransaction:
         delegation_contract = Address.new_from_bech32(args.delegation_contract)
 
         public_keys = self._load_validators_public_keys(args)
@@ -132,7 +146,7 @@ class DelegationOperations:
 
         return tx
 
-    def prepare_transaction_for_unstaking_nodes(self, owner: IAccount, args: Any) -> Transaction:
+    def prepare_transaction_for_unstaking_nodes(self, owner: IAccount, args: Any) -> ITransaction:
         delegation_contract = Address.new_from_bech32(args.delegation_contract)
 
         public_keys = self._load_validators_public_keys(args)
@@ -154,7 +168,7 @@ class DelegationOperations:
 
         return tx
 
-    def prepare_transaction_for_unjailing_nodes(self, owner: IAccount, args: Any) -> Transaction:
+    def prepare_transaction_for_unjailing_nodes(self, owner: IAccount, args: Any) -> ITransaction:
         delegation_contract = Address.new_from_bech32(args.delegation_contract)
 
         public_keys = self._load_validators_public_keys(args)
@@ -179,7 +193,7 @@ class DelegationOperations:
 
         return tx
 
-    def prepare_transaction_for_delegating(self, owner: IAccount, args: Any) -> Transaction:
+    def prepare_transaction_for_delegating(self, owner: IAccount, args: Any) -> ITransaction:
         delegation_contract = Address.new_from_bech32(args.delegation_contract)
 
         tx = self._factory.create_transaction_for_delegating(
@@ -199,7 +213,7 @@ class DelegationOperations:
 
         return tx
 
-    def prepare_transaction_for_claiming_rewards(self, owner: IAccount, args: Any) -> Transaction:
+    def prepare_transaction_for_claiming_rewards(self, owner: IAccount, args: Any) -> ITransaction:
         delegation_contract = Address.new_from_bech32(args.delegation_contract)
 
         tx = self._factory.create_transaction_for_claiming_rewards(
@@ -218,7 +232,7 @@ class DelegationOperations:
 
         return tx
 
-    def prepare_transaction_for_redelegating_rewards(self, owner: IAccount, args: Any) -> Transaction:
+    def prepare_transaction_for_redelegating_rewards(self, owner: IAccount, args: Any) -> ITransaction:
         delegation_contract = Address.new_from_bech32(args.delegation_contract)
 
         tx = self._factory.create_transaction_for_redelegating_rewards(
@@ -237,7 +251,7 @@ class DelegationOperations:
 
         return tx
 
-    def prepare_transaction_for_undelegating(self, owner: IAccount, args: Any) -> Transaction:
+    def prepare_transaction_for_undelegating(self, owner: IAccount, args: Any) -> ITransaction:
         delegation_contract = Address.new_from_bech32(args.delegation_contract)
 
         tx = self._factory.create_transaction_for_undelegating(
@@ -257,7 +271,7 @@ class DelegationOperations:
 
         return tx
 
-    def prepare_transaction_for_withdrawing(self, owner: IAccount, args: Any) -> Transaction:
+    def prepare_transaction_for_withdrawing(self, owner: IAccount, args: Any) -> ITransaction:
         delegation_contract = Address.new_from_bech32(args.delegation_contract)
 
         tx = self._factory.create_transaction_for_withdrawing(
@@ -276,7 +290,7 @@ class DelegationOperations:
 
         return tx
 
-    def prepare_transaction_for_changing_service_fee(self, owner: IAccount, args: Any) -> Transaction:
+    def prepare_transaction_for_changing_service_fee(self, owner: IAccount, args: Any) -> ITransaction:
         delegation_contract = Address.new_from_bech32(args.delegation_contract)
 
         tx = self._factory.create_transaction_for_changing_service_fee(
@@ -296,7 +310,7 @@ class DelegationOperations:
 
         return tx
 
-    def prepare_transaction_for_modifying_delegation_cap(self, owner: IAccount, args: Any) -> Transaction:
+    def prepare_transaction_for_modifying_delegation_cap(self, owner: IAccount, args: Any) -> ITransaction:
         delegation_contract = Address.new_from_bech32(args.delegation_contract)
 
         tx = self._factory.create_transaction_for_modifying_delegation_cap(
@@ -316,7 +330,7 @@ class DelegationOperations:
 
         return tx
 
-    def prepare_transaction_for_automatic_activation(self, owner: IAccount, args: Any) -> Transaction:
+    def prepare_transaction_for_automatic_activation(self, owner: IAccount, args: Any) -> ITransaction:
         delegation_contract = Address.new_from_bech32(args.delegation_contract)
 
         if args.set:
@@ -344,7 +358,7 @@ class DelegationOperations:
 
         return tx
 
-    def prepare_transaction_for_redelegate_cap(self, owner: IAccount, args: Any) -> Transaction:
+    def prepare_transaction_for_redelegate_cap(self, owner: IAccount, args: Any) -> ITransaction:
         delegation_contract = Address.new_from_bech32(args.delegation_contract)
 
         if args.set:
@@ -372,7 +386,7 @@ class DelegationOperations:
 
         return tx
 
-    def prepare_transaction_for_setting_metadata(self, owner: IAccount, args: Any) -> Transaction:
+    def prepare_transaction_for_setting_metadata(self, owner: IAccount, args: Any) -> ITransaction:
         delegation_contract = Address.new_from_bech32(args.delegation_contract)
 
         tx = self._factory.create_transaction_for_setting_metadata(
@@ -394,16 +408,14 @@ class DelegationOperations:
 
         return tx
 
-    def prepare_transaction_for_creating_delegation_contract_from_validator(self, owner: IAccount, args: Any) -> Transaction:
-        receiver = Address.new_from_hex("000000000000000000010000000000000000000000000000000000000004ffff", get_address_hrp())
+    def prepare_transaction_for_creating_delegation_contract_from_validator(self, owner: IAccount, args: Any) -> ITransaction:
+        receiver = Address.new_from_hex("000000000000000000010000000000000000000000000000000000000004ffff", get_address_hrp()).to_bech32()
         max_cap = int(args.max_cap)
         fee = int(args.fee)
-
-        serializer = Serializer()
-        data = "makeNewContractFromValidatorData@" + serializer.serialize([BigUIntValue(max_cap), BigUIntValue(fee)])
+        data = "makeNewContractFromValidatorData@" + args_to_string([max_cap, fee])
 
         tx = Transaction(
-            sender=owner.address,
+            sender=owner.address.to_bech32(),
             receiver=receiver,
             gas_limit=510000000,
             chain_id=self._factory.config.chain_id,
