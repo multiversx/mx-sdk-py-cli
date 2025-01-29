@@ -103,46 +103,6 @@ def setup_parser(args: List[str], subparsers: Any) -> Any:
     )
     sub.set_defaults(func=run_tests)
 
-    sub = cli_shared.add_command_subparser(
-        subparsers,
-        "contract",
-        "report",
-        "Print a detailed report of the smart contracts.",
-    )
-    sub.add_argument(
-        "--skip-build",
-        action="store_true",
-        default=False,
-        help="skips the step of building of the wasm contracts",
-    )
-    sub.add_argument(
-        "--skip-twiggy",
-        action="store_true",
-        default=False,
-        help="skips the steps of building the debug wasm files and running twiggy",
-    )
-    sub.add_argument(
-        "--output-format",
-        type=str,
-        default="text-markdown",
-        choices=["github-markdown", "text-markdown", "json"],
-        help="report output format (default: %(default)s)",
-    )
-    sub.add_argument(
-        "--output-file",
-        type=Path,
-        help="if specified, the output is written to a file, otherwise it's written to the standard output",
-    )
-    sub.add_argument(
-        "--compare",
-        type=Path,
-        nargs="+",
-        metavar=("report-1.json", "report-2.json"),
-        help="create a comparison from two or more reports",
-    )
-    _add_build_options_sc_meta(sub)
-    sub.set_defaults(func=do_report)
-
     output_description = CLIOutputBuilder.describe(
         with_contract=True, with_transaction_on_network=True, with_simulation=True
     )
@@ -556,16 +516,6 @@ def build(args: Any):
     show_warning(
         "The primary tool for building smart contracts is `sc-meta`. Try using the `sc-meta all build` command."
     )
-
-
-def do_report(args: Any):
-    deprecation_message = "`mxpy contract report` is deprecated. Please use `sc-meta report` instead."
-    logger.warning(deprecation_message)
-
-    args_dict = args.__dict__
-    projects.do_report(args, args_dict)
-
-    show_warning(deprecation_message)
 
 
 def run_tests(args: Any):
