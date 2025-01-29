@@ -1,17 +1,15 @@
 from typing import Any
 
+from multiversx_sdk import Transaction
 import requests
-from multiversx_sdk import TransactionsConverter
 
 from multiversx_sdk_cli.errors import GuardianServiceError
-from multiversx_sdk_cli.interfaces import ITransaction
 
 
-def cosign_transaction(transaction: ITransaction, service_url: str, guardian_code: str) -> ITransaction:
-    tx_converter = TransactionsConverter()
+def cosign_transaction(transaction: Transaction, service_url: str, guardian_code: str) -> Transaction:
     payload = {
         "code": f"{guardian_code}",
-        "transactions": [tx_converter.transaction_to_dictionary(transaction)]
+        "transactions": [transaction.to_dictionary()]
     }
 
     # we call sign-multiple-transactions to be allowed a bigger payload (e.g. deploying large contracts)
