@@ -5,9 +5,7 @@ types-requests
 prettytable
 types-prettytable
 ledgercomm[hid]
-semver
-requests-cache
 rich==13.3.4
 argcomplete==3.2.2
 
-multiversx-sdk==0.13.0
+multiversx-sdk==1.0.0

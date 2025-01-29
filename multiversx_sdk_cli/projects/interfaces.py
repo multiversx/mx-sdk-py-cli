@@ -2,7 +2,7 @@ from pathlib import Path
 from typing import Any
 
 
-class IProject():
+class IProject:
     def get_option(self, option_name: str) -> Any:
         return None
 

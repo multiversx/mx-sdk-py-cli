@@ -18,21 +18,15 @@ class ProjectRust(Project):
     def clean(self):
         env = self.get_env()
 
-        args = [
-            "sc-meta",
-            "all",
-            "clean",
-            "--path",
-            self.directory
-        ]
+        args = ["sc-meta", "all", "clean", "--path", self.directory]
 
         subprocess.check_call(args, env=env)
 
     def get_meta_folder(self):
-        return self.path / 'meta'
+        return self.path / "meta"
 
     def get_wasm_view_folder(self):
-        return self.path / 'wasm-view'
+        return self.path / "wasm-view"
 
     def perform_build(self):
         meta = self.has_meta()
@@ -42,21 +36,19 @@ class ProjectRust(Project):
         self.run_meta()
 
     def prepare_build_wasm_args(self, args: List[str]):
-        args.extend([
-            "--target=wasm32-unknown-unknown",
-            "--release",
-            "--out-dir",
-            self.get_output_folder()
-        ])
+        args.extend(
+            [
+                "--target=wasm32-unknown-unknown",
+                "--release",
+                "--out-dir",
+                self.get_output_folder(),
+            ]
+        )
 
     def run_meta(self):
         env = self.get_env()
 
-        args = [
-            "sc-meta",
-            "all",
-            "build"
-        ]
+        args = ["sc-meta", "all", "build"]
 
         args.extend(self.forwarded_args)
 
@@ -112,9 +104,11 @@ class ProjectRust(Project):
             "all",
             "build",
             "--wasm-symbols",
-            "--wasm-suffix", "dbg",
+            "--wasm-suffix",
+            "dbg",
             "--no-wasm-opt",
-            "--target-dir", target_dir
+            "--target-dir",
+            target_dir,
         ]
 
         try:

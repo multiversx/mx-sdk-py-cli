@@ -1,14 +1,21 @@
 from typing import Any, List
 
-from multiversx_sdk import Address, ProxyNetworkProvider
+from multiversx_sdk import ProxyNetworkProvider
 from prettytable import PrettyTable
 
 from multiversx_sdk_cli import cli_shared
-from multiversx_sdk_cli.constants import ADDRESS_ZERO_BECH32
-from multiversx_sdk_cli.dns import (compute_dns_address_for_shard_id,
-                                    dns_address_for_name, name_hash, register,
-                                    registration_cost, resolve, validate_name,
-                                    version)
+from multiversx_sdk_cli.config import get_config_for_network_providers
+from multiversx_sdk_cli.constants import ADDRESS_ZERO_HEX
+from multiversx_sdk_cli.dns import (
+    compute_dns_address_for_shard_id,
+    dns_address_for_name,
+    name_hash,
+    register,
+    registration_cost,
+    resolve,
+    validate_name,
+    version,
+)
 from multiversx_sdk_cli.errors import ArgumentsNotProvidedError
 
 
@@ -16,9 +23,14 @@ def setup_parser(args: List[str], subparsers: Any) -> Any:
     parser = cli_shared.add_group_subparser(subparsers, "dns", "Operations related to the Domain Name Service")
     subparsers = parser.add_subparsers()
 
-    sub = cli_shared.add_command_subparser(subparsers, "dns", "register", "Send a register transaction to the appropriate DNS contract from given user and with given name")
+    sub = cli_shared.add_command_subparser(
+        subparsers,
+        "dns",
+        "register",
+        "Send a register transaction to the appropriate DNS contract from given user and with given name",
+    )
     cli_shared.add_outfile_arg(sub)
-    cli_shared.add_broadcast_args(sub, relay=True)
+    cli_shared.add_broadcast_args(sub)
     cli_shared.add_wallet_args(args, sub)
     cli_shared.add_proxy_arg(sub)
     cli_shared.add_tx_args(args, sub, with_receiver=False, with_data=False)
@@ -31,35 +43,80 @@ def setup_parser(args: List[str], subparsers: Any) -> Any:
     cli_shared.add_proxy_arg(sub)
     sub.set_defaults(func=dns_resolve)
 
-    sub = cli_shared.add_command_subparser(subparsers, "dns", "validate-name", "Asks one of the DNS contracts to validate a name. Can be useful before registering it.")
+    sub = cli_shared.add_command_subparser(
+        subparsers,
+        "dns",
+        "validate-name",
+        "Asks one of the DNS contracts to validate a name. Can be useful before registering it.",
+    )
     _add_name_arg(sub)
-    sub.add_argument("--shard-id", type=int, default=0, help="shard id of the contract to call (default: %(default)s)")
+    sub.add_argument(
+        "--shard-id",
+        type=int,
+        default=0,
+        help="shard id of the contract to call (default: %(default)s)",
+    )
     cli_shared.add_proxy_arg(sub)
     sub.set_defaults(func=dns_validate_name)
 
-    sub = cli_shared.add_command_subparser(subparsers, "dns", "name-hash", "The hash of a name, as computed by a DNS smart contract")
+    sub = cli_shared.add_command_subparser(
+        subparsers,
+        "dns",
+        "name-hash",
+        "The hash of a name, as computed by a DNS smart contract",
+    )
     _add_name_arg(sub)
     sub.set_defaults(func=get_name_hash)
 
-    sub = cli_shared.add_command_subparser(subparsers, "dns", "registration-cost", "Gets the registration cost from a DNS smart contract, by default the one with shard id 0.")
-    sub.add_argument("--shard-id", type=int, default=0, help="shard id of the contract to call (default: %(default)s)")
+    sub = cli_shared.add_command_subparser(
+        subparsers,
+        "dns",
+        "registration-cost",
+        "Gets the registration cost from a DNS smart contract, by default the one with shard id 0.",
+    )
+    sub.add_argument(
+        "--shard-id",
+        type=int,
+        default=0,
+        help="shard id of the contract to call (default: %(default)s)",
+    )
     cli_shared.add_proxy_arg(sub)
     sub.set_defaults(func=get_registration_cost)
 
     sub = cli_shared.add_command_subparser(subparsers, "dns", "version", "Asks the contract for its version")
-    sub.add_argument("--shard-id", type=int, default=0, help="shard id of the contract to call (default: %(default)s)")
-    sub.add_argument("--all", action="store_true", default=False, help="prints a list of all DNS contracts and their current versions (default: %(default)s)")
+    sub.add_argument(
+        "--shard-id",
+        type=int,
+        default=0,
+        help="shard id of the contract to call (default: %(default)s)",
+    )
+    sub.add_argument(
+        "--all",
+        action="store_true",
+        default=False,
+        help="prints a list of all DNS contracts and their current versions (default: %(default)s)",
+    )
     cli_shared.add_proxy_arg(sub)
     sub.set_defaults(func=get_version)
 
     sub = cli_shared.add_command_subparser(subparsers, "dns", "dns-addresses", "Lists all 256 DNS contract addresses")
     sub.set_defaults(func=print_dns_addresses_table)
 
-    sub = cli_shared.add_command_subparser(subparsers, "dns", "dns-address-for-name", "DNS contract address (bech32) that corresponds to a name")
+    sub = cli_shared.add_command_subparser(
+        subparsers,
+        "dns",
+        "dns-address-for-name",
+        "DNS contract address (bech32) that corresponds to a name",
+    )
     _add_name_arg(sub)
     sub.set_defaults(func=get_dns_address_for_name)
 
-    sub = cli_shared.add_command_subparser(subparsers, "dns", "dns-address-for-name-hex", "DNS contract address (hex) that corresponds to a name")
+    sub = cli_shared.add_command_subparser(
+        subparsers,
+        "dns",
+        "dns-address-for-name-hex",
+        "DNS contract address (hex) that corresponds to a name",
+    )
     _add_name_arg(sub)
     sub.set_defaults(func=get_dns_address_for_name_hex)
 
@@ -79,14 +136,17 @@ def _ensure_proxy_is_provided(args: Any):
 def dns_resolve(args: Any):
     _ensure_proxy_is_provided(args)
 
-    addr = resolve(args.name, ProxyNetworkProvider(args.proxy))
-    if addr.to_hex() != Address.new_from_bech32(ADDRESS_ZERO_BECH32).to_hex():
+    config = get_config_for_network_providers()
+    addr = resolve(args.name, ProxyNetworkProvider(url=args.proxy, config=config))
+    if addr.to_hex() != ADDRESS_ZERO_HEX:
         print(addr.to_bech32())
 
 
 def dns_validate_name(args: Any):
     _ensure_proxy_is_provided(args)
-    validate_name(args.name, args.shard_id, ProxyNetworkProvider(args.proxy))
+
+    config = get_config_for_network_providers()
+    validate_name(args.name, args.shard_id, ProxyNetworkProvider(url=args.proxy, config=config))
 
 
 def get_name_hash(args: Any):
@@ -107,15 +167,25 @@ def get_dns_address_for_name_hex(args: Any):
 
 def get_registration_cost(args: Any):
     _ensure_proxy_is_provided(args)
-    print(registration_cost(args.shard_id, ProxyNetworkProvider(args.proxy)))
+
+    config = get_config_for_network_providers()
+    print(registration_cost(args.shard_id, ProxyNetworkProvider(url=args.proxy, config=config)))
 
 
 def get_version(args: Any):
     _ensure_proxy_is_provided(args)
 
-    proxy = ProxyNetworkProvider(args.proxy)
+    config = get_config_for_network_providers()
+    proxy = ProxyNetworkProvider(url=args.proxy, config=config)
     if args.all:
-        t = PrettyTable(['Shard ID', 'Contract address (bech32)', 'Contract address (hex)', 'Version'])
+        t = PrettyTable(
+            [
+                "Shard ID",
+                "Contract address (bech32)",
+                "Contract address (hex)",
+                "Version",
+            ]
+        )
         for shard_id in range(0, 256):
             address = compute_dns_address_for_shard_id(shard_id)
             v = version(shard_id, proxy)
@@ -127,7 +197,7 @@ def get_version(args: Any):
 
 
 def print_dns_addresses_table(args: Any):
-    t = PrettyTable(['Shard ID', 'Contract address (bech32)', 'Contract address (hex)'])
+    t = PrettyTable(["Shard ID", "Contract address (bech32)", "Contract address (hex)"])
     for shard_id in range(0, 256):
         address = compute_dns_address_for_shard_id(shard_id)
         t.add_row([shard_id, address.to_bech32(), address.to_hex()])

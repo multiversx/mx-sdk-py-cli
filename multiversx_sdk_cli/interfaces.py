@@ -1,6 +1,9 @@
-from typing import Any, Dict, Protocol, Sequence
+from typing import Any, Dict, Protocol
+
+from multiversx_sdk import Transaction
 
 
+# fmt: off
 class IAddress(Protocol):
     def to_hex(self) -> str:
         ...
@@ -26,14 +29,11 @@ class ITransaction(Protocol):
     signature: bytes
     guardian_signature: bytes
     relayer: str
-
-    @property
-    def inner_transactions(self) -> Sequence["ITransaction"]:
-        ...
+    relayer_signature: bytes
 
 
 class IAccount(Protocol):
-    def sign_transaction(self, transaction: ITransaction) -> str:
+    def sign_transaction(self, transaction: Transaction) -> str:
         ...
 
 

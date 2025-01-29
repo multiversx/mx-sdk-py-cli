@@ -38,10 +38,7 @@ def _build_validator_entry(nickname: str, account: Account, value: int) -> Dict[
         "supply": str(value),
         "balance": "0",
         "stakingvalue": str(value),
-        "delegation": {
-            "address": "",
-            "value": "0"
-        }
+        "delegation": {"address": "", "value": "0"},
     }
 
 
@@ -52,8 +49,5 @@ def _build_user_entry(nickname: str, account: Account, value: int) -> Dict[str, 
         "supply": str(value),
         "balance": str(value),
         "stakingvalue": "0",
-        "delegation": {
-            "address": "",
-            "value": "0"
-        }
+        "delegation": {"address": "", "value": "0"},
     }

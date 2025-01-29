@@ -40,7 +40,9 @@ class ValidatorsFile:
     def _load_validator_pem(self, validator: Dict[str, str]) -> ValidatorPEM:
         # Get path of "pemFile", make it absolute
         validator_pem = Path(validator.get("pemFile", "")).expanduser()
-        validator_pem = validator_pem if validator_pem.is_absolute() else self.validators_file_path.parent / validator_pem
+        validator_pem = (
+            validator_pem if validator_pem.is_absolute() else self.validators_file_path.parent / validator_pem
+        )
 
         return ValidatorPEM.from_file(validator_pem)
 

@@ -3,7 +3,7 @@ import requests
 
 
 class TestPlaygroundProxy:
-    @pytest.mark.skip('manual run only')
+    @pytest.mark.skip("manual run only")
     def test_do_request(self):
         # use a valid proxy address
         url = "http://localhost:8001"
@@ -14,7 +14,7 @@ class TestPlaygroundProxy:
         print(response.json())
         assert response is not None
 
-    @pytest.mark.skip('manual run only')
+    @pytest.mark.skip("manual run only")
     def test_do_request_node_status(self):
         # use a valid proxy address
         url = "http://localhost:8001"

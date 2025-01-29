@@ -16,20 +16,36 @@ def setup_parser(subparsers: Any) -> Any:
 
     sub = cli_shared.add_command_subparser(subparsers, "data", "parse", "Parses values from a given file")
     sub.add_argument("--file", required=True, help="path of the file to parse")
-    sub.add_argument("--expression", required=True, help="the Python-Dictionary expression to evaluate in order to extract the data")
+    sub.add_argument(
+        "--expression",
+        required=True,
+        help="the Python-Dictionary expression to evaluate in order to extract the data",
+    )
     sub.set_defaults(func=parse)
 
     sub = cli_shared.add_command_subparser(subparsers, "data", "store", "Stores a key-value pair within a partition")
     sub.add_argument("--key", required=True, help="the key")
     sub.add_argument("--value", required=True, help="the value to save")
     sub.add_argument("--partition", default="*", help="the storage partition (default: %(default)s)")
-    sub.add_argument("--use-global", action="store_true", default=False, help="use the global storage (default: %(default)s)")
+    sub.add_argument(
+        "--use-global",
+        action="store_true",
+        default=False,
+        help="use the global storage (default: %(default)s)",
+    )
     sub.set_defaults(func=store)
 
-    sub = cli_shared.add_command_subparser(subparsers, "data", "load", "Loads a key-value pair from a storage partition")
+    sub = cli_shared.add_command_subparser(
+        subparsers, "data", "load", "Loads a key-value pair from a storage partition"
+    )
     sub.add_argument("--key", required=True, help="the key")
     sub.add_argument("--partition", default="*", help="the storage partition (default: %(default)s)")
-    sub.add_argument("--use-global", action="store_true", default=False, help="use the global storage (default: %(default)s)")
+    sub.add_argument(
+        "--use-global",
+        action="store_true",
+        default=False,
+        help="use the global storage (default: %(default)s)",
+    )
     sub.set_defaults(func=load)
 
     parser.epilog = cli_shared.build_group_epilog(subparsers)
@@ -48,9 +64,7 @@ def parse(args: Any):
         raise errors.BadUsage(f"File isn't parsable: {file}")
 
     try:
-        result = eval(expression, {
-            "data": data
-        })
+        result = eval(expression, {"data": data})
     except KeyError:
         result = ""
 

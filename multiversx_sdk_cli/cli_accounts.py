@@ -4,6 +4,7 @@ from typing import Any
 from multiversx_sdk import Address, ProxyNetworkProvider
 
 from multiversx_sdk_cli import cli_shared, utils
+from multiversx_sdk_cli.config import get_config_for_network_providers
 
 logger = logging.getLogger("cli.accounts")
 
@@ -33,7 +34,8 @@ def _add_address_arg(sub: Any):
 def get_account(args: Any):
     proxy_url = args.proxy
     address = args.address
-    proxy = ProxyNetworkProvider(proxy_url)
+    config = get_config_for_network_providers()
+    proxy = ProxyNetworkProvider(url=proxy_url, config=config)
     account = proxy.get_account(Address.new_from_bech32(address))
 
     if args.balance:
@@ -43,4 +45,4 @@ def get_account(args: Any):
     elif args.username:
         print(account.username)
     else:
-        utils.dump_out_json(account.to_dictionary())
+        utils.dump_out_json(account.raw)

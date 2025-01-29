@@ -94,9 +94,11 @@ class BadInputError(KnownError):
 
 class ExternalProcessError(KnownError):
     def __init__(self, command_line: str, message: str):
-        super().__init__(f"""External process error:
+        super().__init__(
+            f"""External process error:
 Command line: {command_line}
-Output: {message}""")
+Output: {message}"""
+        )
 
 
 class UnknownConfigurationError(KnownError):
@@ -161,11 +163,7 @@ class ArgumentsNotProvidedError(KnownError):
 
 class ProxyError(KnownError):
     def __init__(self, message: str, url: str, data: str, code: str):
-        inner = {
-            "url": url,
-            "data": data,
-            "code": code
-        }
+        inner = {"url": url, "data": data, "code": code}
         super().__init__(message, inner)
 
 
@@ -180,5 +178,10 @@ class QueryContractError(KnownError):
 
 
 class NativeAuthClientError(KnownError):
+    def __init__(self, message: str):
+        super().__init__(message)
+
+
+class IncorrectWalletError(KnownError):
     def __init__(self, message: str):
         super().__init__(message)

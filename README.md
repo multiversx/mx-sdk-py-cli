@@ -8,7 +8,7 @@ Python Command Line Tools for interacting with Multivers<sup>X</sup>.
 [CLI](CLI.md)
 
 ## Distribution
-[mxpy-up](https://docs.multiversx.com/sdk-and-tools/sdk-py/installing-mxpy/) and [PyPi](https://pypi.org/project/multiversx-sdk-cli/#history)
+[pipx](https://docs.multiversx.com/sdk-and-tools/sdk-py/installing-mxpy/) [(PyPi)](https://pypi.org/project/multiversx-sdk-cli/#history)
 
 ## Development setup
 
@@ -33,6 +33,11 @@ Install development dependencies, as well:
 
 ```
 pip install -r ./requirements-dev.txt --upgrade
+```
+
+Allow `pre-commit` to automatically run on `git commit`:
+```
+pre-commit install
 ```
 
 Above, `requirements.txt` should mirror the **dependencies** section of `setup.py`.

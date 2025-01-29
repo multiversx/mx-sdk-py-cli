@@ -12,13 +12,13 @@ DEFAULT_API_URL = "https://api.multiversx.com"
 
 class NativeAuthClientConfig:
     def __init__(
-            self,
-            origin: str = '',
-            api_url: str = DEFAULT_API_URL,
-            expiry_seconds: int = DEFAULT_EXPIRY_TIME_IN_SECONDS,
-            block_hash_shard: Optional[int] = None,
-            gateway_url: Optional[str] = None,
-            extra_request_headers: Optional[Dict[str, str]] = None
+        self,
+        origin: str = "",
+        api_url: str = DEFAULT_API_URL,
+        expiry_seconds: int = DEFAULT_EXPIRY_TIME_IN_SECONDS,
+        block_hash_shard: Optional[int] = None,
+        gateway_url: Optional[str] = None,
+        extra_request_headers: Optional[Dict[str, str]] = None,
     ) -> None:
         self.origin = origin
         self.api_url = api_url
@@ -92,7 +92,7 @@ class NativeAuthClient:
         return response[0]["hash"]
 
     def _encode_value(self, string: str) -> str:
-        encoded = base64.b64encode(string.encode('utf-8')).decode('utf-8')
+        encoded = base64.b64encode(string.encode("utf-8")).decode("utf-8")
         return self._escape(encoded)
 
     def _escape(self, string: str) -> str:

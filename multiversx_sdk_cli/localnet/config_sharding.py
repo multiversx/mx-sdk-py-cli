@@ -4,10 +4,7 @@ from multiversx_sdk_cli.localnet.config_part import ConfigPart
 
 
 class Metashard(ConfigPart):
-    def __init__(self,
-                 consensus_size: int,
-                 num_observers: int,
-                 num_validators: int):
+    def __init__(self, consensus_size: int, num_observers: int, num_validators: int):
         self.consensus_size: int = consensus_size
         self.num_observers: int = num_observers
         self.num_validators: int = num_validators
@@ -22,11 +19,13 @@ class Metashard(ConfigPart):
 
 
 class RegularShards(ConfigPart):
-    def __init__(self,
-                 num_shards: int,
-                 consensus_size: int,
-                 num_observers_per_shard: int,
-                 num_validators_per_shard: int):
+    def __init__(
+        self,
+        num_shards: int,
+        consensus_size: int,
+        num_observers_per_shard: int,
+        num_validators_per_shard: int,
+    ):
         self.num_shards: int = num_shards
         self.consensus_size: int = consensus_size
         self.num_observers_per_shard: int = num_observers_per_shard
