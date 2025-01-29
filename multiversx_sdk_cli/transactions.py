@@ -2,12 +2,12 @@ import base64
 import json
 import logging
 import time
-from typing import Any, Dict, List, Optional, Protocol, TextIO, Union
+from typing import Any, Dict, List, Protocol, TextIO, Union
 
 from multiversx_sdk import (Address, Token, TokenComputer, TokenTransfer,
-                            Transaction, TransactionsConverter,
+                            Transaction,
                             TransactionsFactoryConfig,
-                            TransferTransactionsFactory, TransactionComputer)
+                            TransferTransactionsFactory, TransactionComputer, TransactionOnNetwork)
 
 from multiversx_sdk_cli import errors
 from multiversx_sdk_cli.accounts import Account, AccountBase, LedgerAccount
@@ -21,19 +21,11 @@ from multiversx_sdk_cli.ledger.ledger_functions import do_get_ledger_address
 logger = logging.getLogger("transactions")
 
 
-class ITransactionOnNetwork(Protocol):
-    hash: str
-    is_completed: Optional[bool]
-
-    def to_dictionary(self) -> Dict[str, Any]:
-        ...
-
-
 class INetworkProvider(Protocol):
-    def send_transaction(self, transaction: ITransaction) -> str:
+    def send_transaction(self, transaction: Transaction) -> bytes:
         ...
 
-    def get_transaction(self, tx_hash: str, with_process_status: Optional[bool] = False) -> ITransactionOnNetwork:
+    def get_transaction(self, transaction_hash: Union[bytes, str]) -> TransactionOnNetwork:
         ...
 
 
@@ -59,8 +51,8 @@ def do_prepare_transaction(args: Any) -> Transaction:
     else:
         # this is for transactions with no token transfers(egld/esdt); useful for setting the data field
         tx = Transaction(
-            sender=account.address.to_bech32(),
-            receiver=receiver.to_bech32(),
+            sender=account.address,
+            receiver=receiver,
             data=str(args.data).encode(),
             gas_limit=int(args.gas_limit),
             chain_id=args.chain
@@ -80,14 +72,14 @@ def do_prepare_transaction(args: Any) -> Transaction:
         tx_computer.apply_options_for_hash_signing(tx)
 
     if args.guardian:
-        tx.guardian = args.guardian
+        tx.guardian = Address.new_from_bech32(args.guardian)
 
     if args.relayer:
-        tx.relayer = args.relayer
+        tx.relayer = Address.new_from_bech32(args.relayer)
 
         try:
             relayer_account = load_relayer_account_from_args(args)
-            if relayer_account.address.to_bech32() != tx.relayer:
+            if relayer_account.address != tx.relayer:
                 raise IncorrectWalletError("")
 
             if isinstance(relayer_account, LedgerAccount):
@@ -181,7 +173,7 @@ def get_guardian_account_from_args(args: Any):
     return account
 
 
-def send_and_wait_for_result(transaction: ITransaction, proxy: INetworkProvider, timeout: int) -> ITransactionOnNetwork:
+def send_and_wait_for_result(transaction: Transaction, proxy: INetworkProvider, timeout: int) -> TransactionOnNetwork:
     if not transaction.signature:
         raise errors.TransactionIsNotSigned()
 
@@ -189,7 +181,7 @@ def send_and_wait_for_result(transaction: ITransaction, proxy: INetworkProvider,
     return txOnNetwork
 
 
-def _send_transaction_and_wait_for_result(proxy: INetworkProvider, payload: ITransaction, num_seconds_timeout: int = 100) -> ITransactionOnNetwork:
+def _send_transaction_and_wait_for_result(proxy: INetworkProvider, payload: Transaction, num_seconds_timeout: int = 100) -> TransactionOnNetwork:
     AWAIT_TRANSACTION_PERIOD = 5
 
     tx_hash = proxy.send_transaction(payload)
@@ -198,8 +190,8 @@ def _send_transaction_and_wait_for_result(proxy: INetworkProvider, payload: ITra
     for _ in range(0, num_periods_to_wait):
         time.sleep(AWAIT_TRANSACTION_PERIOD)
 
-        tx = proxy.get_transaction(tx_hash, True)
-        if tx.is_completed:
+        tx = proxy.get_transaction(tx_hash)
+        if tx.status.is_completed:
             return tx
         else:
             logger.info("Transaction not yet done.")
@@ -211,8 +203,8 @@ def tx_to_dictionary_as_inner_for_relayed_V1(tx: Transaction) -> Dict[str, Any]:
     dictionary: Dict[str, Any] = {}
 
     dictionary["nonce"] = tx.nonce
-    dictionary["sender"] = base64.b64encode(Address.new_from_bech32(tx.sender).get_public_key()).decode()
-    dictionary["receiver"] = base64.b64encode(Address.new_from_bech32(tx.receiver).get_public_key()).decode()
+    dictionary["sender"] = base64.b64encode(tx.sender.get_public_key()).decode()
+    dictionary["receiver"] = base64.b64encode(tx.receiver.get_public_key()).decode()
     dictionary["value"] = tx.value
     dictionary["gasPrice"] = tx.gas_price
     dictionary["gasLimit"] = tx.gas_limit
@@ -225,7 +217,7 @@ def tx_to_dictionary_as_inner_for_relayed_V1(tx: Transaction) -> Dict[str, Any]:
         dictionary["options"] = tx.options
 
     if tx.guardian:
-        guardian = Address.new_from_bech32(tx.guardian).to_hex()
+        guardian = tx.guardian.to_hex()
         dictionary["guardian"] = base64.b64encode(bytes.fromhex(guardian)).decode()
 
     if tx.guardian_signature:
@@ -255,6 +247,4 @@ def compute_relayed_v1_data(tx: Transaction) -> str:
 def load_transaction_from_file(f: TextIO) -> Transaction:
     data_json: bytes = f.read().encode()
     transaction_dictionary = json.loads(data_json).get("tx") or json.loads(data_json).get("emittedTransaction")
-
-    tx_converter = TransactionsConverter()
-    return tx_converter.dictionary_to_transaction(transaction_dictionary)
+    return Transaction.new_from_dictionary(transaction_dictionary)
