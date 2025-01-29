@@ -1,7 +1,9 @@
 from pathlib import Path
 
-from multiversx_sdk_cli.projects.constants import (OLD_PROJECT_CONFIG_FILENAME,
-                                                   PROJECT_CONFIG_FILENAME)
+from multiversx_sdk_cli.projects.constants import (
+    OLD_PROJECT_CONFIG_FILENAME,
+    PROJECT_CONFIG_FILENAME,
+)
 
 
 def migrate_project_config_file(project_path: Path):

@@ -24,14 +24,17 @@ class SignedMessage:
         message_computer = MessageComputer()
 
         verifier = UserVerifier.from_address(Address.new_from_bech32(self.address))
-        is_signed = verifier.verify(message_computer.compute_bytes_for_signing(verifiable_message), verifiable_message.signature)
+        is_signed = verifier.verify(
+            message_computer.compute_bytes_for_signing(verifiable_message),
+            verifiable_message.signature,
+        )
         return is_signed
 
     def to_dictionary(self) -> Dict[str, str]:
         return {
             "address": self.address,
             "message": self.message,
-            "signature": "0x" + self.signature
+            "signature": "0x" + self.signature,
         }
 
 

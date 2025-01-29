@@ -1,15 +1,21 @@
 from pathlib import Path
 from typing import Any, List, Protocol, Tuple
 
-from multiversx_sdk import (Address, DelegationTransactionsFactory,
-                            Transaction, TransactionsFactoryConfig, ValidatorPublicKey)
-from multiversx_sdk.abi import Serializer, BigUIntValue
+from multiversx_sdk import (
+    Address,
+    DelegationTransactionsFactory,
+    Transaction,
+    TransactionsFactoryConfig,
+    ValidatorPublicKey,
+)
+from multiversx_sdk.abi import BigUIntValue, Serializer
 
 from multiversx_sdk_cli.config import get_address_hrp
 from multiversx_sdk_cli.errors import BadUsage
 from multiversx_sdk_cli.validators.validators_file import ValidatorsFile
 
 
+# fmt: off
 class IAccount(Protocol):
     @property
     def address(self) -> Address:
@@ -19,6 +25,7 @@ class IAccount(Protocol):
 
     def sign_transaction(self, transaction: Transaction) -> str:
         ...
+# fmt: on
 
 
 class DelegationOperations:
@@ -30,7 +37,7 @@ class DelegationOperations:
             sender=owner.address,
             total_delegation_cap=int(args.total_delegation_cap),
             service_fee=int(args.service_fee),
-            amount=int(args.value)
+            amount=int(args.value),
         )
         tx.nonce = int(args.nonce)
         tx.version = int(args.version)
@@ -52,7 +59,7 @@ class DelegationOperations:
             sender=owner.address,
             delegation_contract=delegation_contract,
             public_keys=public_keys,
-            signed_messages=signed_messages
+            signed_messages=signed_messages,
         )
         tx.nonce = int(args.nonce)
         tx.version = int(args.version)
@@ -74,7 +81,7 @@ class DelegationOperations:
         tx = self._factory.create_transaction_for_removing_nodes(
             sender=owner.address,
             delegation_contract=delegation_contract,
-            public_keys=public_keys
+            public_keys=public_keys,
         )
         tx.nonce = int(args.nonce)
         tx.version = int(args.version)
@@ -96,7 +103,7 @@ class DelegationOperations:
         tx = self._factory.create_transaction_for_staking_nodes(
             sender=owner.address,
             delegation_contract=delegation_contract,
-            public_keys=public_keys
+            public_keys=public_keys,
         )
         tx.nonce = int(args.nonce)
         tx.version = int(args.version)
@@ -118,7 +125,7 @@ class DelegationOperations:
         tx = self._factory.create_transaction_for_unbonding_nodes(
             sender=owner.address,
             delegation_contract=delegation_contract,
-            public_keys=public_keys
+            public_keys=public_keys,
         )
         tx.nonce = int(args.nonce)
         tx.version = int(args.version)
@@ -140,7 +147,7 @@ class DelegationOperations:
         tx = self._factory.create_transaction_for_unstaking_nodes(
             sender=owner.address,
             delegation_contract=delegation_contract,
-            public_keys=public_keys
+            public_keys=public_keys,
         )
         tx.nonce = int(args.nonce)
         tx.version = int(args.version)
@@ -164,7 +171,7 @@ class DelegationOperations:
             sender=owner.address,
             delegation_contract=delegation_contract,
             public_keys=public_keys,
-            amount=amount
+            amount=amount,
         )
         tx.nonce = int(args.nonce)
         tx.version = int(args.version)
@@ -185,7 +192,7 @@ class DelegationOperations:
         tx = self._factory.create_transaction_for_delegating(
             sender=owner.address,
             delegation_contract=delegation_contract,
-            amount=int(args.value)
+            amount=int(args.value),
         )
         tx.nonce = int(args.nonce)
         tx.version = int(args.version)
@@ -203,8 +210,7 @@ class DelegationOperations:
         delegation_contract = Address.new_from_bech32(args.delegation_contract)
 
         tx = self._factory.create_transaction_for_claiming_rewards(
-            sender=owner.address,
-            delegation_contract=delegation_contract
+            sender=owner.address, delegation_contract=delegation_contract
         )
         tx.nonce = int(args.nonce)
         tx.version = int(args.version)
@@ -222,8 +228,7 @@ class DelegationOperations:
         delegation_contract = Address.new_from_bech32(args.delegation_contract)
 
         tx = self._factory.create_transaction_for_redelegating_rewards(
-            sender=owner.address,
-            delegation_contract=delegation_contract
+            sender=owner.address, delegation_contract=delegation_contract
         )
         tx.nonce = int(args.nonce)
         tx.version = int(args.version)
@@ -243,7 +248,7 @@ class DelegationOperations:
         tx = self._factory.create_transaction_for_undelegating(
             sender=owner.address,
             delegation_contract=delegation_contract,
-            amount=int(args.value)
+            amount=int(args.value),
         )
         tx.nonce = int(args.nonce)
         tx.version = int(args.version)
@@ -261,8 +266,7 @@ class DelegationOperations:
         delegation_contract = Address.new_from_bech32(args.delegation_contract)
 
         tx = self._factory.create_transaction_for_withdrawing(
-            sender=owner.address,
-            delegation_contract=delegation_contract
+            sender=owner.address, delegation_contract=delegation_contract
         )
         tx.nonce = int(args.nonce)
         tx.version = int(args.version)
@@ -282,7 +286,7 @@ class DelegationOperations:
         tx = self._factory.create_transaction_for_changing_service_fee(
             sender=owner.address,
             delegation_contract=delegation_contract,
-            service_fee=int(args.service_fee)
+            service_fee=int(args.service_fee),
         )
         tx.nonce = int(args.nonce)
         tx.version = int(args.version)
@@ -302,7 +306,7 @@ class DelegationOperations:
         tx = self._factory.create_transaction_for_modifying_delegation_cap(
             sender=owner.address,
             delegation_contract=delegation_contract,
-            delegation_cap=int(args.delegation_cap)
+            delegation_cap=int(args.delegation_cap),
         )
         tx.nonce = int(args.nonce)
         tx.version = int(args.version)
@@ -321,13 +325,11 @@ class DelegationOperations:
 
         if args.set:
             tx = self._factory.create_transaction_for_setting_automatic_activation(
-                sender=owner.address,
-                delegation_contract=delegation_contract
+                sender=owner.address, delegation_contract=delegation_contract
             )
         elif args.unset:
             tx = self._factory.create_transaction_for_unsetting_automatic_activation(
-                sender=owner.address,
-                delegation_contract=delegation_contract
+                sender=owner.address, delegation_contract=delegation_contract
             )
         else:
             raise BadUsage("Either `--set` or `--unset` should be provided")
@@ -349,13 +351,11 @@ class DelegationOperations:
 
         if args.set:
             tx = self._factory.create_transaction_for_setting_cap_check_on_redelegate_rewards(
-                sender=owner.address,
-                delegation_contract=delegation_contract
+                sender=owner.address, delegation_contract=delegation_contract
             )
         elif args.unset:
             tx = self._factory.create_transaction_for_unsetting_cap_check_on_redelegate_rewards(
-                sender=owner.address,
-                delegation_contract=delegation_contract
+                sender=owner.address, delegation_contract=delegation_contract
             )
         else:
             raise BadUsage("Either `--set` or `--unset` should be provided")
@@ -380,7 +380,7 @@ class DelegationOperations:
             delegation_contract=delegation_contract,
             name=args.name,
             website=args.website,
-            identifier=args.identifier
+            identifier=args.identifier,
         )
         tx.nonce = int(args.nonce)
         tx.version = int(args.version)
@@ -394,8 +394,13 @@ class DelegationOperations:
 
         return tx
 
-    def prepare_transaction_for_creating_delegation_contract_from_validator(self, owner: IAccount, args: Any) -> Transaction:
-        receiver = Address.new_from_hex("000000000000000000010000000000000000000000000000000000000004ffff", get_address_hrp())
+    def prepare_transaction_for_creating_delegation_contract_from_validator(
+        self, owner: IAccount, args: Any
+    ) -> Transaction:
+        receiver = Address.new_from_hex(
+            "000000000000000000010000000000000000000000000000000000000004ffff",
+            get_address_hrp(),
+        )
         max_cap = int(args.max_cap)
         fee = int(args.fee)
 
@@ -411,7 +416,7 @@ class DelegationOperations:
             nonce=int(args.nonce),
             version=int(args.version),
             options=int(args.options),
-            guardian=args.guardian
+            guardian=args.guardian,
         )
 
         if args.gas_limit:

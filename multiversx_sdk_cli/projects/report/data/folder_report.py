@@ -2,11 +2,15 @@ from pathlib import Path
 from typing import Any, List, Optional
 
 from multiversx_sdk_cli.projects.report.data.common import (
-    first_not_none, flatten_list_of_rows, merge_values_by_key)
+    first_not_none,
+    flatten_list_of_rows,
+    merge_values_by_key,
+)
 from multiversx_sdk_cli.projects.report.data.project_report import (
-    ProjectReport, merge_list_of_projects)
-from multiversx_sdk_cli.projects.report.format.format_options import \
-    FormatOptions
+    ProjectReport,
+    merge_list_of_projects,
+)
+from multiversx_sdk_cli.projects.report.format.format_options import FormatOptions
 
 
 class FolderReport:
@@ -15,15 +19,12 @@ class FolderReport:
         self.projects = projects
 
     def to_json(self) -> Any:
-        return {
-            'root_path': str(self.root_path),
-            'projects': self.projects
-        }
+        return {"root_path": str(self.root_path), "projects": self.projects}
 
     @staticmethod
-    def from_json(json: Any) -> 'FolderReport':
-        projects = [ProjectReport.from_json(project) for project in json['projects']]
-        return FolderReport(Path(json['root_path']), projects)
+    def from_json(json: Any) -> "FolderReport":
+        projects = [ProjectReport.from_json(project) for project in json["projects"]]
+        return FolderReport(Path(json["root_path"]), projects)
 
     def get_markdown_rows(self, format_options: FormatOptions) -> List[List[str]]:
         folder_row = [str(self.root_path)]

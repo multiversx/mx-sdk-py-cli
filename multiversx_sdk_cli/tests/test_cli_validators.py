@@ -1,6 +1,6 @@
-import pytest
-
 from pathlib import Path
+
+import pytest
 
 from multiversx_sdk_cli.cli import main
 
@@ -18,181 +18,290 @@ def test_stake():
     validators_json = testdata_path / "validators_ci.json"
 
     # Stake with recall nonce
-    return_code = main([
-        "validator", "stake",
-        "--pem", str(alice_pem),
-        "--value", "2500000000000000000000",
-        "--validators-file", str(validators_json),
-        "--reward-address", reward_address,
-        "--chain", "localnet",
-        "--proxy", "http://127.0.0.1:7950",
-        "--estimate-gas", "--recall-nonce"
-    ])
+    return_code = main(
+        [
+            "validator",
+            "stake",
+            "--pem",
+            str(alice_pem),
+            "--value",
+            "2500000000000000000000",
+            "--validators-file",
+            str(validators_json),
+            "--reward-address",
+            reward_address,
+            "--chain",
+            "localnet",
+            "--proxy",
+            "http://127.0.0.1:7950",
+            "--estimate-gas",
+            "--recall-nonce",
+        ]
+    )
     assert return_code == 0
 
     # Stake with provided nonce
-    return_code = main([
-        "validator", "stake",
-        "--pem", str(alice_pem),
-        "--value", "2500000000000000000000",
-        "--validators-file", str(validators_json),
-        "--reward-address", reward_address,
-        "--chain", "localnet",
-        "--proxy", "http://127.0.0.1:7950",
-        "--estimate-gas", "--nonce=0"
-    ])
+    return_code = main(
+        [
+            "validator",
+            "stake",
+            "--pem",
+            str(alice_pem),
+            "--value",
+            "2500000000000000000000",
+            "--validators-file",
+            str(validators_json),
+            "--reward-address",
+            reward_address,
+            "--chain",
+            "localnet",
+            "--proxy",
+            "http://127.0.0.1:7950",
+            "--estimate-gas",
+            "--nonce=0",
+        ]
+    )
     assert return_code == 0
 
 
 @pytest.mark.require_localnet
 def test_stake_top_up():
     # Stake with topUp
-    return_code = main([
-        "validator", "stake", "--top-up",
-        "--pem", str(alice_pem),
-        "--value", "2711000000000000000000",
-        "--chain", "localnet",
-        "--proxy", "http://127.0.0.1:7950",
-        "--estimate-gas", "--recall-nonce"
-    ])
+    return_code = main(
+        [
+            "validator",
+            "stake",
+            "--top-up",
+            "--pem",
+            str(alice_pem),
+            "--value",
+            "2711000000000000000000",
+            "--chain",
+            "localnet",
+            "--proxy",
+            "http://127.0.0.1:7950",
+            "--estimate-gas",
+            "--recall-nonce",
+        ]
+    )
     assert return_code == 0
 
 
 @pytest.mark.require_localnet
 def test_unstake():
     # Unstake
-    return_code = main([
-        "validator", "unstake",
-        "--pem", str(alice_pem),
-        "--nodes-public-key", bls_key,
-        "--chain", "localnet",
-        "--proxy", "http://127.0.0.1:7950",
-        "--estimate-gas", "--recall-nonce"
-    ])
+    return_code = main(
+        [
+            "validator",
+            "unstake",
+            "--pem",
+            str(alice_pem),
+            "--nodes-public-key",
+            bls_key,
+            "--chain",
+            "localnet",
+            "--proxy",
+            "http://127.0.0.1:7950",
+            "--estimate-gas",
+            "--recall-nonce",
+        ]
+    )
     assert return_code == 0
 
 
 @pytest.mark.require_localnet
 def test_unbond():
     # Unbond
-    return_code = main([
-        "validator", "unbond",
-        "--pem", str(alice_pem),
-        "--nodes-public-key", bls_key,
-        "--chain", "localnet",
-        "--proxy", "http://127.0.0.1:7950",
-        "--estimate-gas", "--recall-nonce"
-    ])
+    return_code = main(
+        [
+            "validator",
+            "unbond",
+            "--pem",
+            str(alice_pem),
+            "--nodes-public-key",
+            bls_key,
+            "--chain",
+            "localnet",
+            "--proxy",
+            "http://127.0.0.1:7950",
+            "--estimate-gas",
+            "--recall-nonce",
+        ]
+    )
     assert return_code == 0
 
 
 @pytest.mark.require_localnet
 def test_unjail():
     # Unjail
-    return_code = main([
-        "validator", "unjail",
-        "--pem", str(alice_pem),
-        "--value", "2500000000000000000000",
-        "--nodes-public-key", bls_key,
-        "--chain", "localnet",
-        "--proxy", "http://127.0.0.1:7950",
-        "--estimate-gas", "--recall-nonce"
-    ])
+    return_code = main(
+        [
+            "validator",
+            "unjail",
+            "--pem",
+            str(alice_pem),
+            "--value",
+            "2500000000000000000000",
+            "--nodes-public-key",
+            bls_key,
+            "--chain",
+            "localnet",
+            "--proxy",
+            "http://127.0.0.1:7950",
+            "--estimate-gas",
+            "--recall-nonce",
+        ]
+    )
     assert return_code == 0
 
 
 @pytest.mark.require_localnet
 def test_change_reward_address():
     # Change reward address
-    return_code = main([
-        "validator", "change-reward-address",
-        "--pem", str(alice_pem),
-        "--reward-address", reward_address,
-        "--chain", "localnet",
-        "--proxy", "http://127.0.0.1:7950",
-        "--estimate-gas", "--recall-nonce"
-    ])
+    return_code = main(
+        [
+            "validator",
+            "change-reward-address",
+            "--pem",
+            str(alice_pem),
+            "--reward-address",
+            reward_address,
+            "--chain",
+            "localnet",
+            "--proxy",
+            "http://127.0.0.1:7950",
+            "--estimate-gas",
+            "--recall-nonce",
+        ]
+    )
     assert return_code == 0
 
 
 @pytest.mark.require_localnet
 def test_unstake_nodes():
     # Unstake Nodes
-    return_code = main([
-        "validator", "unstake-nodes",
-        "--pem", str(alice_pem),
-        "--nodes-public-key", bls_key,
-        "--chain", "localnet",
-        "--proxy", "http://127.0.0.1:7950",
-        "--estimate-gas", "--recall-nonce"
-    ])
+    return_code = main(
+        [
+            "validator",
+            "unstake-nodes",
+            "--pem",
+            str(alice_pem),
+            "--nodes-public-key",
+            bls_key,
+            "--chain",
+            "localnet",
+            "--proxy",
+            "http://127.0.0.1:7950",
+            "--estimate-gas",
+            "--recall-nonce",
+        ]
+    )
     assert return_code == 0
 
 
 @pytest.mark.require_localnet
 def test_unstake_tokens():
     # Unstake Tokens
-    return_code = main([
-        "validator", "unstake-tokens",
-        "--pem", str(alice_pem),
-        "--unstake-value", "11000000000000000000",
-        "--chain", "localnet",
-        "--proxy", "http://127.0.0.1:7950",
-        "--estimate-gas", "--recall-nonce"
-    ])
+    return_code = main(
+        [
+            "validator",
+            "unstake-tokens",
+            "--pem",
+            str(alice_pem),
+            "--unstake-value",
+            "11000000000000000000",
+            "--chain",
+            "localnet",
+            "--proxy",
+            "http://127.0.0.1:7950",
+            "--estimate-gas",
+            "--recall-nonce",
+        ]
+    )
     assert return_code == 0
 
 
 @pytest.mark.require_localnet
 def test_unbond_nodes():
     # Unbond nodes
-    return_code = main([
-        "validator", "unbond-nodes",
-        "--pem", str(alice_pem),
-        "--nodes-public-keys", bls_key,
-        "--chain", "localnet",
-        "--proxy", "http://127.0.0.1:7950",
-        "--estimate-gas", "--recall-nonce"
-    ])
+    return_code = main(
+        [
+            "validator",
+            "unbond-nodes",
+            "--pem",
+            str(alice_pem),
+            "--nodes-public-keys",
+            bls_key,
+            "--chain",
+            "localnet",
+            "--proxy",
+            "http://127.0.0.1:7950",
+            "--estimate-gas",
+            "--recall-nonce",
+        ]
+    )
     assert return_code == 0
 
 
 @pytest.mark.require_localnet
 def test_unbond_tokens():
     # Unbond nodes
-    return_code = main([
-        "validator", "unbond-tokens",
-        "--pem", str(alice_pem),
-        "--unbond-value", "20000000000000000000",
-        "--chain", "localnet",
-        "--proxy", "http://127.0.0.1:7950",
-        "--estimate-gas", "--recall-nonce"
-    ])
+    return_code = main(
+        [
+            "validator",
+            "unbond-tokens",
+            "--pem",
+            str(alice_pem),
+            "--unbond-value",
+            "20000000000000000000",
+            "--chain",
+            "localnet",
+            "--proxy",
+            "http://127.0.0.1:7950",
+            "--estimate-gas",
+            "--recall-nonce",
+        ]
+    )
     assert return_code == 0
 
 
 @pytest.mark.require_localnet
 def test_clean_registration_data():
     # Clean registration data
-    return_code = main([
-        "validator", "clean-registered-data",
-        "--pem", str(alice_pem),
-        "--chain", "localnet",
-        "--proxy", "http://127.0.0.1:7950",
-        "--estimate-gas", "--recall-nonce"
-    ])
+    return_code = main(
+        [
+            "validator",
+            "clean-registered-data",
+            "--pem",
+            str(alice_pem),
+            "--chain",
+            "localnet",
+            "--proxy",
+            "http://127.0.0.1:7950",
+            "--estimate-gas",
+            "--recall-nonce",
+        ]
+    )
     assert return_code == 0
 
 
 @pytest.mark.require_localnet
 def test_re_stake_unstaked_nodes():
     # Clean registration data
-    return_code = main([
-        "validator", "restake-unstaked-nodes",
-        "--pem", str(alice_pem),
-        "--nodes-public-keys", bls_key,
-        "--chain", "localnet",
-        "--proxy", "http://127.0.0.1:7950",
-        "--estimate-gas", "--recall-nonce"
-    ])
+    return_code = main(
+        [
+            "validator",
+            "restake-unstaked-nodes",
+            "--pem",
+            str(alice_pem),
+            "--nodes-public-keys",
+            bls_key,
+            "--chain",
+            "localnet",
+            "--proxy",
+            "http://127.0.0.1:7950",
+            "--estimate-gas",
+            "--recall-nonce",
+        ]
+    )
     assert return_code == 0

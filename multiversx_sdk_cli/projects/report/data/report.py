@@ -1,11 +1,17 @@
 import functools
-from io import StringIO
 import json
+from io import StringIO
 from pathlib import Path
 from typing import Any, List
-from multiversx_sdk_cli.projects.report.data.folder_report import FolderReport, merge_list_of_folder_reports
 
-from multiversx_sdk_cli.projects.report.data.common import flatten_list_of_rows, merge_values
+from multiversx_sdk_cli.projects.report.data.common import (
+    flatten_list_of_rows,
+    merge_values,
+)
+from multiversx_sdk_cli.projects.report.data.folder_report import (
+    FolderReport,
+    merge_list_of_folder_reports,
+)
 from multiversx_sdk_cli.projects.report.format.change_type import ChangeType
 from multiversx_sdk_cli.projects.report.format.format_options import FormatOptions
 
@@ -16,19 +22,16 @@ class Report:
         self.folders = folders
 
     def to_json(self) -> Any:
-        return {
-            'features': self.feature_names,
-            'folders': self.folders
-        }
+        return {"features": self.feature_names, "folders": self.folders}
 
     @staticmethod
-    def from_json(json: Any) -> 'Report':
-        folders = [FolderReport.from_json(folder_report) for folder_report in json['folders']]
-        return Report(json['features'], folders)
+    def from_json(json: Any) -> "Report":
+        folders = [FolderReport.from_json(folder_report) for folder_report in json["folders"]]
+        return Report(json["features"], folders)
 
     @staticmethod
-    def load_from_file(report_json_path: Path) -> 'Report':
-        with open(report_json_path, 'r') as report_file:
+    def load_from_file(report_json_path: Path) -> "Report":
+        with open(report_json_path, "r") as report_file:
             report_json = json.load(report_file)
             return Report.from_json(report_json)
 
@@ -62,7 +65,7 @@ class Report:
 def _adjust_table_headers(table_headers: List[str], format_options: FormatOptions) -> None:
     if not format_options.github_flavor:
         return
-    NBSP = '\u00A0'
+    NBSP = "\u00a0"
     table_headers[0] = table_headers[0].ljust(60, NBSP)
     table_headers[1] = table_headers[1].rjust(40, NBSP)
     table_headers[2] = table_headers[2].rjust(30, NBSP)
@@ -92,7 +95,7 @@ def _justify_text_string(string: str, width: int) -> str:
 
 
 def _format_row_markdown(row: List[str], format_options: FormatOptions) -> str:
-    row += [''] * (4 - len(row))
+    row += [""] * (4 - len(row))
     if not format_options.github_flavor:
         row[0] = row[0].ljust(100)
         row[1] = _justify_text_string(row[1], 20)
@@ -104,4 +107,4 @@ def _format_row_markdown(row: List[str], format_options: FormatOptions) -> str:
 
 def _write_markdown_row(string: StringIO, row: List[str], format_options: FormatOptions):
     string.write(_format_row_markdown(row, format_options))
-    string.write('\n')
+    string.write("\n")

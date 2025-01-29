@@ -9,10 +9,7 @@ logger = logging.getLogger("ledger")
 
 
 def do_sign_transaction_with_ledger(
-        tx_payload: bytes,
-        account_index: int,
-        address_index: int,
-        sign_using_hash: bool
+    tx_payload: bytes, account_index: int, address_index: int, sign_using_hash: bool
 ) -> str:
     ledger_handler = LedgerApp()
     ledger_handler.set_address(account_index=account_index, address_index=address_index)
@@ -24,11 +21,7 @@ def do_sign_transaction_with_ledger(
     return signature
 
 
-def do_sign_message_with_ledger(
-        message_payload: bytes,
-        account_index: int,
-        address_index: int
-) -> str:
+def do_sign_message_with_ledger(message_payload: bytes, account_index: int, address_index: int) -> str:
     ledger_handler = LedgerApp()
     ledger_handler.set_address(account_index=account_index, address_index=address_index)
 

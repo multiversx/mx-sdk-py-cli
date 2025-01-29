@@ -4,11 +4,13 @@ from multiversx_sdk_cli.localnet.config_part import ConfigPart
 
 
 class General(ConfigPart):
-    def __init__(self,
-                 log_level: str,
-                 genesis_delay_seconds: int,
-                 rounds_per_epoch: int,
-                 round_duration_milliseconds: int):
+    def __init__(
+        self,
+        log_level: str,
+        genesis_delay_seconds: int,
+        rounds_per_epoch: int,
+        round_duration_milliseconds: int,
+    ):
         self.log_level: str = log_level
         self.genesis_delay_seconds: int = genesis_delay_seconds
         self.rounds_per_epoch: int = rounds_per_epoch

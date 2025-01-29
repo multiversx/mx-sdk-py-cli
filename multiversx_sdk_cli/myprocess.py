@@ -8,11 +8,23 @@ from multiversx_sdk_cli import errors
 logger = logging.getLogger("myprocess")
 
 
-def run_process(args: List[str], env: Any = None, dump_to_stdout: bool = True, cwd: Optional[Union[str, Path]] = None) -> str:
+def run_process(
+    args: List[str],
+    env: Any = None,
+    dump_to_stdout: bool = True,
+    cwd: Optional[Union[str, Path]] = None,
+) -> str:
     logger.info(f"run_process: {args}, in folder: {cwd}")
 
     try:
-        output = subprocess.check_output(args, shell=False, universal_newlines=True, stderr=subprocess.STDOUT, env=env, cwd=cwd)
+        output = subprocess.check_output(
+            args,
+            shell=False,
+            universal_newlines=True,
+            stderr=subprocess.STDOUT,
+            env=env,
+            cwd=cwd,
+        )
         logger.info("Successful run. Output:")
         if dump_to_stdout:
             print(output or "[No output]")

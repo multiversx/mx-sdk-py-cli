@@ -4,29 +4,36 @@ import logging
 import time
 from typing import Any, Dict, List, Protocol, TextIO, Union
 
-from multiversx_sdk import (Address, Token, TokenComputer, TokenTransfer,
-                            Transaction,
-                            TransactionsFactoryConfig,
-                            TransferTransactionsFactory, TransactionComputer, TransactionOnNetwork)
+from multiversx_sdk import (
+    Address,
+    Token,
+    TokenComputer,
+    TokenTransfer,
+    Transaction,
+    TransactionComputer,
+    TransactionOnNetwork,
+    TransactionsFactoryConfig,
+    TransferTransactionsFactory,
+)
 
 from multiversx_sdk_cli import errors
 from multiversx_sdk_cli.accounts import Account, AccountBase, LedgerAccount
-from multiversx_sdk_cli.cli_password import (load_guardian_password,
-                                             load_password)
+from multiversx_sdk_cli.cli_password import load_guardian_password, load_password
 from multiversx_sdk_cli.cosign_transaction import cosign_transaction
 from multiversx_sdk_cli.errors import IncorrectWalletError, NoWalletProvided
-from multiversx_sdk_cli.interfaces import ITransaction
 from multiversx_sdk_cli.ledger.ledger_functions import do_get_ledger_address
 
 logger = logging.getLogger("transactions")
 
 
+# fmt: off
 class INetworkProvider(Protocol):
     def send_transaction(self, transaction: Transaction) -> bytes:
         ...
 
     def get_transaction(self, transaction_hash: Union[bytes, str]) -> TransactionOnNetwork:
         ...
+# fmt: on
 
 
 def do_prepare_transaction(args: Any) -> Transaction:
@@ -46,7 +53,7 @@ def do_prepare_transaction(args: Any) -> Transaction:
             receiver=receiver,
             native_amount=native_amount,
             token_transfers=transfers,
-            data=str(args.data).encode()
+            data=str(args.data).encode(),
         )
     else:
         # this is for transactions with no token transfers(egld/esdt); useful for setting the data field
@@ -55,7 +62,7 @@ def do_prepare_transaction(args: Any) -> Transaction:
             receiver=receiver,
             data=str(args.data).encode(),
             gas_limit=int(args.gas_limit),
-            chain_id=args.chain
+            chain_id=args.chain,
         )
 
     tx.gas_limit = int(args.gas_limit)
@@ -108,7 +115,10 @@ def do_prepare_transaction(args: Any) -> Transaction:
 def load_sender_account_from_args(args: Any) -> Account:
     account = Account()
     if args.ledger:
-        account = LedgerAccount(account_index=args.ledger_account_index, address_index=args.ledger_address_index)
+        account = LedgerAccount(
+            account_index=args.ledger_account_index,
+            address_index=args.ledger_address_index,
+        )
     if args.pem:
         account = Account(pem_file=args.pem, pem_index=args.pem_index)
     elif args.keyfile:
@@ -120,7 +130,10 @@ def load_sender_account_from_args(args: Any) -> Account:
 
 def load_relayer_account_from_args(args: Any) -> Account:
     if args.relayer_ledger:
-        account = LedgerAccount(account_index=args.relayer_ledger_account_index, address_index=args.relayer_ledger_address_index)
+        account = LedgerAccount(
+            account_index=args.relayer_ledger_account_index,
+            address_index=args.relayer_ledger_address_index,
+        )
     if args.relayer_pem:
         account = Account(pem_file=args.relayer_pem, pem_index=args.relayer_pem_index)
     elif args.relayer_keyfile:
@@ -165,7 +178,10 @@ def get_guardian_account_from_args(args: Any):
         password = load_guardian_password(args)
         account = Account(key_file=args.guardian_keyfile, password=password)
     elif args.guardian_ledger:
-        address = do_get_ledger_address(account_index=args.guardian_ledger_account_index, address_index=args.guardian_ledger_address_index)
+        address = do_get_ledger_address(
+            account_index=args.guardian_ledger_account_index,
+            address_index=args.guardian_ledger_address_index,
+        )
         account = Account(address=Address.new_from_bech32(address))
     else:
         raise errors.NoWalletProvided()
@@ -181,7 +197,9 @@ def send_and_wait_for_result(transaction: Transaction, proxy: INetworkProvider, 
     return txOnNetwork
 
 
-def _send_transaction_and_wait_for_result(proxy: INetworkProvider, payload: Transaction, num_seconds_timeout: int = 100) -> TransactionOnNetwork:
+def _send_transaction_and_wait_for_result(
+    proxy: INetworkProvider, payload: Transaction, num_seconds_timeout: int = 100
+) -> TransactionOnNetwork:
     AWAIT_TRANSACTION_PERIOD = 5
 
     tx_hash = proxy.send_transaction(payload)
@@ -233,7 +251,7 @@ def tx_to_dictionary_as_inner_for_relayed_V1(tx: Transaction) -> Dict[str, Any]:
 
 
 def _dict_to_json(dictionary: Dict[str, Any]) -> bytes:
-    serialized = json.dumps(dictionary, separators=(',', ':')).encode("utf8")
+    serialized = json.dumps(dictionary, separators=(",", ":")).encode("utf8")
     return serialized
 
 

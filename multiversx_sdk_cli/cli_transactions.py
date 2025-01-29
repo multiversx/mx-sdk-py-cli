@@ -9,9 +9,11 @@ from multiversx_sdk_cli.cli_output import CLIOutputBuilder
 from multiversx_sdk_cli.config import get_config_for_network_providers
 from multiversx_sdk_cli.cosign_transaction import cosign_transaction
 from multiversx_sdk_cli.errors import IncorrectWalletError, NoWalletProvided
-from multiversx_sdk_cli.transactions import (compute_relayed_v1_data,
-                                             do_prepare_transaction,
-                                             load_transaction_from_file)
+from multiversx_sdk_cli.transactions import (
+    compute_relayed_v1_data,
+    do_prepare_transaction,
+    load_transaction_from_file,
+)
 
 logger = logging.getLogger("cli.transactions")
 
@@ -20,34 +22,65 @@ def setup_parser(args: List[str], subparsers: Any) -> Any:
     parser = cli_shared.add_group_subparser(subparsers, "tx", "Create and broadcast Transactions")
     subparsers = parser.add_subparsers()
 
-    sub = cli_shared.add_command_subparser(subparsers, "tx", "new", f"Create a new transaction.{CLIOutputBuilder.describe()}")
+    sub = cli_shared.add_command_subparser(
+        subparsers,
+        "tx",
+        "new",
+        f"Create a new transaction.{CLIOutputBuilder.describe()}",
+    )
     _add_common_arguments(args, sub)
     cli_shared.add_token_transfers_args(sub)
     cli_shared.add_outfile_arg(sub, what="signed transaction, hash")
     cli_shared.add_broadcast_args(sub, relay=True)
     cli_shared.add_proxy_arg(sub)
     cli_shared.add_guardian_wallet_args(args, sub)
-    sub.add_argument("--wait-result", action="store_true", default=False,
-                     help="signal to wait for the transaction result - only valid if --send is set")
-    sub.add_argument("--timeout", default=100, help="max num of seconds to wait for result"
-                                                    " - only valid if --wait-result is set")
+    sub.add_argument(
+        "--wait-result",
+        action="store_true",
+        default=False,
+        help="signal to wait for the transaction result - only valid if --send is set",
+    )
+    sub.add_argument(
+        "--timeout",
+        default=100,
+        help="max num of seconds to wait for result" " - only valid if --wait-result is set",
+    )
     sub.set_defaults(func=create_transaction)
 
-    sub = cli_shared.add_command_subparser(subparsers, "tx", "send", f"Send a previously saved transaction.{CLIOutputBuilder.describe()}")
+    sub = cli_shared.add_command_subparser(
+        subparsers,
+        "tx",
+        "send",
+        f"Send a previously saved transaction.{CLIOutputBuilder.describe()}",
+    )
     cli_shared.add_infile_arg(sub, what="a previously saved transaction")
     cli_shared.add_outfile_arg(sub, what="the hash")
     cli_shared.add_proxy_arg(sub)
     sub.set_defaults(func=send_transaction)
 
-    sub = cli_shared.add_command_subparser(subparsers, "tx", "get", f"Get a transaction.{CLIOutputBuilder.describe(with_emitted=False, with_transaction_on_network=True)}")
+    sub = cli_shared.add_command_subparser(
+        subparsers,
+        "tx",
+        "get",
+        f"Get a transaction.{CLIOutputBuilder.describe(with_emitted=False, with_transaction_on_network=True)}",
+    )
     sub.add_argument("--hash", required=True, help="the hash")
     sub.add_argument("--sender", required=False, help="the sender address")
-    sub.add_argument("--with-results", action="store_true", help="will also return the results of transaction")
+    sub.add_argument(
+        "--with-results",
+        action="store_true",
+        help="will also return the results of transaction",
+    )
     cli_shared.add_proxy_arg(sub)
     cli_shared.add_omit_fields_arg(sub)
     sub.set_defaults(func=get_transaction)
 
-    sub = cli_shared.add_command_subparser(subparsers, "tx", "sign", f"Sign a previously saved transaction.{CLIOutputBuilder.describe()}")
+    sub = cli_shared.add_command_subparser(
+        subparsers,
+        "tx",
+        "sign",
+        f"Sign a previously saved transaction.{CLIOutputBuilder.describe()}",
+    )
     cli_shared.add_wallet_args(args, sub)
     cli_shared.add_infile_arg(sub, what="a previously saved transaction")
     cli_shared.add_outfile_arg(sub, what="the signed transaction")
@@ -57,7 +90,12 @@ def setup_parser(args: List[str], subparsers: Any) -> Any:
     cli_shared.add_guardian_wallet_args(args, sub)
     sub.set_defaults(func=sign_transaction)
 
-    sub = cli_shared.add_command_subparser(subparsers, "tx", "relay", f"Relay a previously saved transaction.{CLIOutputBuilder.describe()}")
+    sub = cli_shared.add_command_subparser(
+        subparsers,
+        "tx",
+        "relay",
+        f"Relay a previously saved transaction.{CLIOutputBuilder.describe()}",
+    )
     cli_shared.add_relayed_v3_wallet_args(args, sub)
     cli_shared.add_infile_arg(sub, what="a previously saved transaction")
     cli_shared.add_outfile_arg(sub, what="the relayer signed transaction")

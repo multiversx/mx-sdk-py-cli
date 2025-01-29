@@ -146,18 +146,22 @@ class ConfigRoot(ConfigPart):
         nodes: List[Dict[str, Any]] = []
 
         for node in self.observers():
-            nodes.append({
-                "ShardId": int(node.shard),
-                "Address": node.api_address(),
-                "Type": "Observer"
-            })
+            nodes.append(
+                {
+                    "ShardId": int(node.shard),
+                    "Address": node.api_address(),
+                    "Type": "Observer",
+                }
+            )
 
         for node in self.validators():
-            nodes.append({
-                "ShardId": int(node.shard),
-                "Address": node.api_address(),
-                "Type": "Validator"
-            })
+            nodes.append(
+                {
+                    "ShardId": int(node.shard),
+                    "Address": node.api_address(),
+                    "Type": "Validator",
+                }
+            )
 
         return nodes
 

@@ -3,6 +3,7 @@ from typing import Any, Dict, Protocol
 from multiversx_sdk import Transaction
 
 
+# fmt: off
 class IAddress(Protocol):
     def to_hex(self) -> str:
         ...

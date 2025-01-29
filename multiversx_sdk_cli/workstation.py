@@ -30,7 +30,7 @@ def get_platform():
         "darwin": "osx",
         "win32": "windows",
         "cygwin": "windows",
-        "msys": "windows"
+        "msys": "windows",
     }
 
     platform = platforms.get(sys.platform)

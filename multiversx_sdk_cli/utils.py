@@ -8,8 +8,7 @@ import sys
 import tarfile
 import zipfile
 from pathlib import Path
-from typing import (Any, Dict, List, Optional, Protocol, Union,
-                    runtime_checkable)
+from typing import Any, Dict, List, Optional, Protocol, Union, runtime_checkable
 
 import toml
 
@@ -88,7 +87,7 @@ def read_lines(file: Path) -> List[str]:
 
 def read_binary_file(path: Path) -> bytes:
     try:
-        with open(path, 'rb') as binary_file:
+        with open(path, "rb") as binary_file:
             return binary_file.read()
     except Exception as err:
         raise errors.BadFile(str(path), err) from None
@@ -96,7 +95,7 @@ def read_binary_file(path: Path) -> bytes:
 
 def read_text_file(path: Path) -> str:
     try:
-        with open(path, 'r') as text_file:
+        with open(path, "r") as text_file:
             return text_file.read()
     except Exception as err:
         raise errors.BadFile(str(path), err) from None
@@ -200,10 +199,10 @@ def str_int_to_hex_str(number_str: str) -> str:
 
 
 def parse_keys(bls_public_keys: str):
-    keys = bls_public_keys.split(',')
-    parsed_keys = ''
+    keys = bls_public_keys.split(",")
+    parsed_keys = ""
     for key in keys:
-        parsed_keys += '@' + key
+        parsed_keys += "@" + key
     return parsed_keys, len(keys)
 
 

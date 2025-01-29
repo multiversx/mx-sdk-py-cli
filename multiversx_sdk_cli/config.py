@@ -110,7 +110,7 @@ def create_new_config(name: str, template: str):
         new_config = data["configurations"][template]
 
     data["active"] = name
-    data.setdefault('configurations', {})
+    data.setdefault("configurations", {})
     data["configurations"][name] = new_config
     write_file(data)
 
@@ -130,13 +130,13 @@ def _guard_valid_name(name: str):
 
 
 def _guard_valid_config_name(config: Any, name: str):
-    configurations = config.get('configurations', {})
+    configurations = config.get("configurations", {})
     if name not in configurations:
         raise errors.UnknownConfigurationError(name)
 
 
 def _guard_config_unique(config: Any, name: str):
-    configurations = config.get('configurations', {})
+    configurations = config.get("configurations", {})
     if name in configurations:
         raise errors.ConfigurationShouldBeUniqueError(name)
 
@@ -166,7 +166,7 @@ def get_defaults() -> Dict[str, Any]:
         "dependencies.testwallets.urlTemplate.windows": "https://github.com/multiversx/mx-sdk-testwallets/archive/{TAG}.tar.gz",
         "dependencies.wasm-opt.tag": "0.112.0",
         "github_api_token": "",
-        "default_address_hrp": "erd"
+        "default_address_hrp": "erd",
     }
 
 
@@ -216,7 +216,7 @@ def add_config_args(argv: List[str]) -> List[str]:
 def determine_final_args(argv: List[str], config_args: Dict[str, Any]) -> List[str]:
     extra_args: List[str] = []
     for key, value in config_args.items():
-        key_arg = f'--{key}'
+        key_arg = f"--{key}"
         # arguments from the command line override the config
         if key_arg in argv:
             continue
@@ -233,7 +233,7 @@ def determine_final_args(argv: List[str], config_args: Dict[str, Any]) -> List[s
 
     # the verbose flag is an exception since it has to go before the command and subcommand
     # eg. mxpy --verbose contract deploy
-    verbose_flag = '--verbose'
+    verbose_flag = "--verbose"
     pre_args = []
     if verbose_flag in extra_args:
         extra_args.remove(verbose_flag)

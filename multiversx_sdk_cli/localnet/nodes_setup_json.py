@@ -22,7 +22,7 @@ def build(config: ConfigRoot) -> Any:
     # Then, patch the list of initial nodes, so that higher indexes will become metachain nodes.
     num_metachain_nodes = config.metashard.num_validators
     num_nodes = len(initial_nodes)
-    initial_nodes = initial_nodes[num_nodes - num_metachain_nodes:] + initial_nodes[:num_nodes - num_metachain_nodes]
+    initial_nodes = initial_nodes[num_nodes - num_metachain_nodes :] + initial_nodes[: num_nodes - num_metachain_nodes]
 
     return {
         "startTime": config.genesis_time(),
@@ -35,5 +35,5 @@ def build(config: ConfigRoot) -> Any:
         "adaptivity": False,
         "chainID": CHAIN_ID,
         "minTransactionVersion": 1,
-        "initialNodes": initial_nodes
+        "initialNodes": initial_nodes,
     }
