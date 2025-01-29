@@ -397,7 +397,7 @@ def prepare_chain_id_in_args(args: Any):
         args.chain = proxy.get_network_config().chain_id
 
 
-def add_broadcast_args(sub: Any, simulate: bool = True, relay: bool = False):
+def add_broadcast_args(sub: Any, simulate: bool = True):
     sub.add_argument(
         "--send",
         action="store_true",
@@ -412,20 +412,9 @@ def add_broadcast_args(sub: Any, simulate: bool = True, relay: bool = False):
             default=False,
             help="whether to simulate the transaction (default: %(default)s)",
         )
-    if relay:
-        sub.add_argument(
-            "--relay",
-            action="store_true",
-            default=False,
-            help="whether to relay the transaction (default: %(default)s)",
-        )
 
 
 def check_broadcast_args(args: Any):
-    if hasattr(args, "relay") and args.relay and args.send:
-        raise errors.BadUsage(
-            "Cannot directly send a relayed transaction. Use 'mxpy tx new --relay' first, then 'mxpy tx send --data-file'"
-        )
     if args.send and args.simulate:
         raise errors.BadUsage("Cannot both 'simulate' and 'send' a transaction")
 
