@@ -2,11 +2,12 @@ import logging
 from pathlib import Path
 from typing import Any, Optional, Protocol
 
-from multiversx_sdk import (Address, Message, MessageComputer, Transaction,
-                            TransactionComputer, UserSigner, AccountOnNetwork)
+from multiversx_sdk import (Address, Message, MessageComputer,
+                            TransactionComputer, UserSigner)
+from multiversx_sdk.network_providers.accounts import AccountOnNetwork
 
 from multiversx_sdk_cli.config import get_address_hrp
-from multiversx_sdk_cli.interfaces import IAccount, IAddress
+from multiversx_sdk_cli.interfaces import IAccount, IAddress, ITransaction
 from multiversx_sdk_cli.ledger.config import compare_versions
 from multiversx_sdk_cli.ledger.ledger_app_handler import \
     SIGN_USING_HASH_VERSION
@@ -19,12 +20,20 @@ logger = logging.getLogger("accounts")
 
 
 class INetworkProvider(Protocol):
-    def get_account(self, address: Address) -> AccountOnNetwork:
+    def get_account(self, address: IAddress) -> AccountOnNetwork:
         ...
 
 
+class EmptyAddress(IAddress):
+    def to_hex(self) -> str:
+        return ""
+
+    def to_bech32(self) -> str:
+        return ""
+
+
 class AccountBase(IAccount):
-    def __init__(self, address: Any = Address.empty()) -> None:
+    def __init__(self, address: Any = EmptyAddress()) -> None:
         self.address = address
         self.nonce: int = 0
 
@@ -33,7 +42,7 @@ class AccountBase(IAccount):
         self.nonce = proxy.get_account(self.address).nonce
         logger.debug(f"AccountBase.sync_nonce() done: {self.nonce}")
 
-    def sign_transaction(self, transaction: Transaction) -> str:
+    def sign_transaction(self, transaction: ITransaction) -> str:
         raise NotImplementedError
 
     def sign_message(self, data: bytes) -> str:
@@ -58,7 +67,7 @@ class Account(AccountBase):
             self.signer = UserSigner.from_wallet(key_file_path, password)
             self.address = Address(self.signer.get_pubkey().buffer, get_address_hrp())
 
-    def sign_transaction(self, transaction: Transaction) -> str:
+    def sign_transaction(self, transaction: ITransaction) -> str:
         assert self.signer is not None
 
         transaction_computer = TransactionComputer()
@@ -84,7 +93,7 @@ class LedgerAccount(Account):
         self.address_index = address_index
         self.address = Address.new_from_bech32(do_get_ledger_address(account_index=account_index, address_index=address_index))
 
-    def sign_transaction(self, transaction: Transaction) -> str:
+    def sign_transaction(self, transaction: ITransaction) -> str:
         ledger_version = do_get_ledger_version()
         should_use_hash_signing = compare_versions(ledger_version, SIGN_USING_HASH_VERSION) >= 0
 

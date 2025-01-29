@@ -2,15 +2,17 @@ import logging
 from pathlib import Path
 from typing import Any, List, Optional, Protocol, Union
 
-from multiversx_sdk import (Address,
-                            SmartContractController, SmartContractQuery, SmartContractQueryResponse,
+from multiversx_sdk import (Address, QueryRunnerAdapter,
+                            SmartContractQueriesController,
                             SmartContractTransactionsFactory, Token,
-                            TokenComputer, TokenTransfer, Transaction, TransactionsFactoryConfig, TransactionOnNetwork, AwaitingOptions)
-from multiversx_sdk.abi import Abi, BytesValue, BigUIntValue, AddressValue, BoolValue, StringValue
+                            TokenComputer, TokenTransfer, Transaction,
+                            TransactionPayload)
+from multiversx_sdk.abi import Abi
 
 from multiversx_sdk_cli import errors
 from multiversx_sdk_cli.accounts import Account
 from multiversx_sdk_cli.config import get_address_hrp
+from multiversx_sdk_cli.interfaces import IAddress
 
 logger = logging.getLogger("contracts")
 
@@ -21,19 +23,31 @@ STR_PREFIX = "str:"
 
 
 class INetworkProvider(Protocol):
-    def query_contract(self, query: SmartContractQuery) -> SmartContractQueryResponse:
+    def query_contract(self, query: Any) -> 'IContractQueryResponse':
         ...
 
-    def await_transaction_completed(
-        self, transaction_hash: Union[bytes, str], options: Optional[AwaitingOptions] = None
-    ) -> TransactionOnNetwork:
+
+class IContractQueryResponse(Protocol):
+    return_data: List[str]
+    return_code: str
+    return_message: str
+    gas_used: int
+
+    def get_return_data_parts(self) -> List[bytes]:
         ...
+
+
+class IConfig(Protocol):
+    chain_id: str
+    min_gas_limit: int
+    gas_limit_per_byte: int
+    gas_limit_claim_developer_rewards: int
+    gas_limit_change_owner_address: int
 
 
 class SmartContract:
-    def __init__(self, config: TransactionsFactoryConfig, abi: Optional[Abi] = None):
+    def __init__(self, config: IConfig, abi: Optional[Abi] = None):
         self._abi = abi
-        self._config = config
         self._factory = SmartContractTransactionsFactory(config, abi)
 
     def prepare_deploy_transaction(self,
@@ -50,7 +64,7 @@ class SmartContract:
                                    nonce: int,
                                    version: int,
                                    options: int,
-                                   guardian: Address) -> Transaction:
+                                   guardian: str) -> Transaction:
         args = arguments if arguments else []
         if should_prepare_args:
             args = self._prepare_args_for_factory(args)
@@ -86,7 +100,7 @@ class SmartContract:
                                     nonce: int,
                                     version: int,
                                     options: int,
-                                    guardian: Address) -> Transaction:
+                                    guardian: str) -> Transaction:
         token_transfers = self._prepare_token_transfers(transfers) if transfers else []
 
         args = arguments if arguments else []
@@ -112,7 +126,7 @@ class SmartContract:
 
     def prepare_upgrade_transaction(self,
                                     owner: Account,
-                                    contract: Address,
+                                    contract: IAddress,
                                     bytecode: Path,
                                     arguments: Union[List[str], None],
                                     should_prepare_args: bool,
@@ -125,7 +139,7 @@ class SmartContract:
                                     nonce: int,
                                     version: int,
                                     options: int,
-                                    guardian: Address) -> Transaction:
+                                    guardian: str) -> Transaction:
         args = arguments if arguments else []
         if should_prepare_args:
             args = self._prepare_args_for_factory(args)
@@ -151,7 +165,7 @@ class SmartContract:
         return tx
 
     def query_contract(self,
-                       contract_address: Address,
+                       contract_address: IAddress,
                        proxy: INetworkProvider,
                        function: str,
                        arguments: Optional[List[Any]],
@@ -160,11 +174,12 @@ class SmartContract:
         if should_prepare_args:
             args = self._prepare_args_for_factory(args)
 
-        sc_query_controller = SmartContractController(self._config.chain_id, proxy, self._abi)
+        query_runner = QueryRunnerAdapter(proxy)
+        sc_query_controller = SmartContractQueriesController(query_runner, self._abi)
 
         try:
             response = sc_query_controller.query(
-                contract=contract_address,
+                contract=contract_address.to_bech32(),
                 function=function,
                 arguments=args
             )
@@ -193,17 +208,17 @@ class SmartContract:
 
         for arg in arguments:
             if arg.startswith(HEX_PREFIX):
-                args.append(BytesValue(self._hex_to_bytes(arg)))
+                args.append(self._hex_to_bytes(arg))
             elif arg.isnumeric():
-                args.append(BigUIntValue(int(arg)))
+                args.append(int(arg))
             elif arg.startswith(get_address_hrp()):
-                args.append(AddressValue.new_from_address(Address.new_from_bech32(arg)))
+                args.append(Address.new_from_bech32(arg))
             elif arg.lower() == FALSE_STR_LOWER:
-                args.append(BoolValue(False))
+                args.append(False)
             elif arg.lower() == TRUE_STR_LOWER:
-                args.append(BoolValue(True))
+                args.append(True)
             elif arg.startswith(STR_PREFIX):
-                args.append(StringValue(arg[len(STR_PREFIX):]))
+                args.append(arg[len(STR_PREFIX):])
             else:
                 raise errors.BadUserInput(f"Unknown argument type for argument: `{arg}`. Use `mxpy contract <sub-command> --help` to check all supported arguments")
 
@@ -216,13 +231,13 @@ class SmartContract:
         return bytes.fromhex(argument)
 
 
-def prepare_execute_transaction_data(function: str, arguments: List[Any]) -> str:
+def prepare_execute_transaction_data(function: str, arguments: List[Any]) -> TransactionPayload:
     tx_data = function
 
     for arg in arguments:
         tx_data += f"@{_prepare_argument(arg)}"
 
-    return tx_data
+    return TransactionPayload.from_str(tx_data)
 
 
 # only used for stake operations

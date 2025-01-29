@@ -3,10 +3,10 @@ import logging
 from collections import OrderedDict
 from typing import Any, Dict, List, Optional, Union
 
-from multiversx_sdk import Transaction, TransactionOnNetwork
+from multiversx_sdk import TransactionsConverter
 
 from multiversx_sdk_cli import utils
-from multiversx_sdk_cli.interfaces import IAddress
+from multiversx_sdk_cli.interfaces import IAddress, ITransaction
 from multiversx_sdk_cli.utils import ISerializable
 
 logger = logging.getLogger("cli.output")
@@ -15,10 +15,10 @@ logger = logging.getLogger("cli.output")
 class CLIOutputBuilder:
     def __init__(self) -> None:
         self.emitted_transaction_hash: Optional[str] = None
-        self.emitted_transaction: Union[Transaction, None] = None
+        self.emitted_transaction: Union[ITransaction, None] = None
         self.emitted_transaction_omitted_fields: List[str] = []
         self.contract_address: Union[IAddress, None] = None
-        self.transaction_on_network: Union[TransactionOnNetwork, None] = None
+        self.transaction_on_network: Union[ISerializable, None] = None
         self.transaction_on_network_omitted_fields: List[str] = []
         self.simulation_results: Union[ISerializable, None] = None
 
@@ -26,7 +26,7 @@ class CLIOutputBuilder:
         self.emitted_transaction_hash = hash
         return self
 
-    def set_emitted_transaction(self, emitted_transaction: Transaction, omitted_fields: List[str] = []):
+    def set_emitted_transaction(self, emitted_transaction: ITransaction, omitted_fields: List[str] = []):
         self.emitted_transaction = emitted_transaction
         self.emitted_transaction_omitted_fields = omitted_fields
         return self
@@ -35,10 +35,10 @@ class CLIOutputBuilder:
         self.contract_address = contract_address
         return self
 
-    def set_awaited_transaction(self, awaited_transaction: TransactionOnNetwork, omitted_fields: List[str] = []):
+    def set_awaited_transaction(self, awaited_transaction: ISerializable, omitted_fields: List[str] = []):
         return self.set_transaction_on_network(awaited_transaction, omitted_fields)
 
-    def set_transaction_on_network(self, transaction_on_network: TransactionOnNetwork, omitted_fields: List[str] = []):
+    def set_transaction_on_network(self, transaction_on_network: ISerializable, omitted_fields: List[str] = []):
         self.transaction_on_network = transaction_on_network
         self.transaction_on_network_omitted_fields = omitted_fields
         return self
@@ -51,7 +51,8 @@ class CLIOutputBuilder:
         output: Dict[str, Any] = OrderedDict()
 
         if self.emitted_transaction:
-            emitted_transaction_dict = self.emitted_transaction.to_dictionary()
+            tx_converter = TransactionsConverter()
+            emitted_transaction_dict = tx_converter.transaction_to_dictionary(self.emitted_transaction)
             emitted_transaction_hash = self.emitted_transaction_hash or ""
             emitted_transaction_data = self.emitted_transaction.data.decode()
             utils.omit_fields(emitted_transaction_dict, self.emitted_transaction_omitted_fields)
@@ -65,7 +66,7 @@ class CLIOutputBuilder:
             output["contractAddress"] = contract_address
 
         if self.transaction_on_network:
-            transaction_on_network_dict = self.transaction_on_network.raw
+            transaction_on_network_dict = self.transaction_on_network.to_dictionary()
             utils.omit_fields(transaction_on_network_dict, self.transaction_on_network_omitted_fields)
             output["transactionOnNetwork"] = transaction_on_network_dict
 

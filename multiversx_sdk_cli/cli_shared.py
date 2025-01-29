@@ -5,7 +5,7 @@ import sys
 from argparse import FileType
 from typing import Any, Dict, List, Text, cast
 
-from multiversx_sdk import Address, ProxyNetworkProvider, Transaction
+from multiversx_sdk import Address, ProxyNetworkProvider
 
 from multiversx_sdk_cli import config, errors, utils
 from multiversx_sdk_cli.accounts import Account, LedgerAccount
@@ -290,7 +290,7 @@ def check_options_for_guarded_tx(options: int):
         raise errors.BadUsage("Invalid guarded transaction's options. The second least significant bit must be set")
 
 
-def send_or_simulate(tx: Transaction, args: Any, dump_output: bool = True) -> CLIOutputBuilder:
+def send_or_simulate(tx: ITransaction, args: Any, dump_output: bool = True) -> CLIOutputBuilder:
     network_provider_config = config.get_config_for_network_providers()
     proxy = ProxyNetworkProvider(url=args.proxy, config=network_provider_config)
 
@@ -312,7 +312,7 @@ def send_or_simulate(tx: Transaction, args: Any, dump_output: bool = True) -> CL
             output_builder.set_awaited_transaction(transaction_on_network)
         elif send_only:
             hash = proxy.send_transaction(tx)
-            output_builder.set_emitted_transaction_hash(hash.hex())
+            output_builder.set_emitted_transaction_hash(hash)
         elif simulate:
             simulation = Simulator(proxy).run(tx)
             output_builder.set_simulation_results(simulation)
