@@ -15,10 +15,7 @@ from multiversx_sdk_cli.accounts import Account
 from multiversx_sdk_cli.config import get_address_hrp
 from multiversx_sdk_cli.constants import ADDRESS_ZERO_HEX
 from multiversx_sdk_cli.contracts import SmartContract
-from multiversx_sdk_cli.transactions import (
-    compute_relayed_v1_data,
-    do_prepare_transaction,
-)
+from multiversx_sdk_cli.transactions import do_prepare_transaction
 
 MaxNumShards = 256
 ShardIdentiferLen = 2
@@ -86,10 +83,6 @@ def register(args: Any):
     args.data = dns_register_data(args.name)
 
     tx = do_prepare_transaction(args)
-
-    if hasattr(args, "relay") and args.relay:
-        args.outfile.write(compute_relayed_v1_data(tx))
-        return
 
     cli_shared.send_or_simulate(tx, args)
 

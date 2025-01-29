@@ -202,7 +202,7 @@ def setup_parser(args: List[str], subparsers: Any) -> Any:
         default=100,
         help="max num of seconds to wait for result" " - only valid if --wait-result is set",
     )
-    cli_shared.add_broadcast_args(sub, relay=True)
+    cli_shared.add_broadcast_args(sub)
     cli_shared.add_guardian_wallet_args(args, sub)
 
     sub.set_defaults(func=call)

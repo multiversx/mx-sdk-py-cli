@@ -30,7 +30,7 @@ def setup_parser(args: List[str], subparsers: Any) -> Any:
         "Send a register transaction to the appropriate DNS contract from given user and with given name",
     )
     cli_shared.add_outfile_arg(sub)
-    cli_shared.add_broadcast_args(sub, relay=True)
+    cli_shared.add_broadcast_args(sub)
     cli_shared.add_wallet_args(args, sub)
     cli_shared.add_proxy_arg(sub)
     cli_shared.add_tx_args(args, sub, with_receiver=False, with_data=False)

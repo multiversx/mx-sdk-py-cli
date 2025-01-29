@@ -1,8 +1,7 @@
-import base64
 import json
 import logging
 import time
-from typing import Any, Dict, List, Protocol, TextIO, Union
+from typing import Any, List, Protocol, TextIO, Union
 
 from multiversx_sdk import (
     Address,
@@ -215,51 +214,6 @@ def _send_transaction_and_wait_for_result(
             logger.info("Transaction not yet done.")
 
     raise errors.KnownError("Took too long to get transaction.")
-
-
-def tx_to_dictionary_as_inner_for_relayed_V1(tx: Transaction) -> Dict[str, Any]:
-    dictionary: Dict[str, Any] = {}
-
-    dictionary["nonce"] = tx.nonce
-    dictionary["sender"] = base64.b64encode(tx.sender.get_public_key()).decode()
-    dictionary["receiver"] = base64.b64encode(tx.receiver.get_public_key()).decode()
-    dictionary["value"] = tx.value
-    dictionary["gasPrice"] = tx.gas_price
-    dictionary["gasLimit"] = tx.gas_limit
-    dictionary["data"] = base64.b64encode(tx.data).decode()
-    dictionary["signature"] = base64.b64encode(tx.signature).decode()
-    dictionary["chainID"] = base64.b64encode(tx.chain_id.encode()).decode()
-    dictionary["version"] = tx.version
-
-    if tx.options:
-        dictionary["options"] = tx.options
-
-    if tx.guardian:
-        guardian = tx.guardian.to_hex()
-        dictionary["guardian"] = base64.b64encode(bytes.fromhex(guardian)).decode()
-
-    if tx.guardian_signature:
-        dictionary["guardianSignature"] = base64.b64encode(tx.guardian_signature).decode()
-
-    if tx.sender_username:
-        dictionary["sndUserName"] = base64.b64encode(tx.sender_username.encode()).decode()
-
-    if tx.receiver_username:
-        dictionary["rcvUserName"] = base64.b64encode(tx.receiver_username.encode()).decode()
-
-    return dictionary
-
-
-def _dict_to_json(dictionary: Dict[str, Any]) -> bytes:
-    serialized = json.dumps(dictionary, separators=(",", ":")).encode("utf8")
-    return serialized
-
-
-def compute_relayed_v1_data(tx: Transaction) -> str:
-    inner_dictionary = tx_to_dictionary_as_inner_for_relayed_V1(tx)
-    serialized = _dict_to_json(inner_dictionary)
-    serialized_hex = serialized.hex()
-    return f"relayedTx@{serialized_hex}"
 
 
 def load_transaction_from_file(f: TextIO) -> Transaction:

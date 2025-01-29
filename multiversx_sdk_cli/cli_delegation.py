@@ -356,7 +356,7 @@ def _add_common_arguments(args: List[str], sub: Any):
     cli_shared.add_proxy_arg(sub)
     cli_shared.add_wallet_args(args, sub)
     cli_shared.add_tx_args(args, sub, with_receiver=False, with_data=False, with_estimate_gas=True)
-    cli_shared.add_broadcast_args(sub, relay=False)
+    cli_shared.add_broadcast_args(sub)
     cli_shared.add_outfile_arg(sub, what="signed transaction, hash")
     cli_shared.add_guardian_wallet_args(args, sub)
 
