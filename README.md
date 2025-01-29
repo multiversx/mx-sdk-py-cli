@@ -35,6 +35,11 @@ Install development dependencies, as well:
 pip install -r ./requirements-dev.txt --upgrade
 ```
 
+Allow `pre-commit` to automatically run on `git commit`:
+```
+pre-commit install
+```
+
 Above, `requirements.txt` should mirror the **dependencies** section of `setup.py`.
 
 If using VSCode, restart it or follow these steps:
