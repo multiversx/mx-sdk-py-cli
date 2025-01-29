@@ -60,7 +60,7 @@ def test_contract_verification_create_request_signature():
 
     assert signature.hex() == "30111258cc42ea08e0c6a3e053cc7086a88d614b8b119a244904e9a19896c73295b2fe5c520a1cb07cfe20f687deef9f294a0a05071e85c78a70a448ea5f0605"
 
-@pytest.mark.only
+
 def test_prepare_args_for_factories():
     sc = SmartContract(TransactionsFactoryConfig("mock"))
     args = [
