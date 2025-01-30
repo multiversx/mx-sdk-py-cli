@@ -6,7 +6,6 @@ from multiversx_sdk_cli import config, errors
 from multiversx_sdk_cli.dependencies.modules import (
     DependencyModule,
     GolangModule,
-    Rust,
     TestWalletsModule,
 )
 
@@ -51,7 +50,6 @@ def get_deps_dict() -> Dict[str, DependencyModule]:
 
 def get_all_deps() -> List[DependencyModule]:
     return [
-        Rust(key="rust"),
         GolangModule(key="golang"),
         TestWalletsModule(key="testwallets"),
     ]

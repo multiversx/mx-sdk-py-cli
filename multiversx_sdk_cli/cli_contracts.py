@@ -2,7 +2,7 @@ import json
 import logging
 import os
 from pathlib import Path
-from typing import Any, List, Tuple
+from typing import Any
 
 from multiversx_sdk import (
     Address,
@@ -13,25 +13,22 @@ from multiversx_sdk import (
 )
 from multiversx_sdk.abi import Abi
 
-from multiversx_sdk_cli import cli_shared, projects, utils
+from multiversx_sdk_cli import cli_shared, utils
 from multiversx_sdk_cli.cli_output import CLIOutputBuilder
 from multiversx_sdk_cli.config import get_config_for_network_providers
 from multiversx_sdk_cli.constants import NUMBER_OF_SHARDS
 from multiversx_sdk_cli.contract_verification import trigger_contract_verification
 from multiversx_sdk_cli.contracts import SmartContract
 from multiversx_sdk_cli.cosign_transaction import cosign_transaction
-from multiversx_sdk_cli.dependency_checker import check_if_rust_is_installed
 from multiversx_sdk_cli.docker import is_docker_installed, run_docker
 from multiversx_sdk_cli.errors import DockerMissingError, NoWalletProvided
 from multiversx_sdk_cli.interfaces import IAddress
-from multiversx_sdk_cli.projects.core import get_project_paths_recursively
-from multiversx_sdk_cli.projects.templates import Contract
-from multiversx_sdk_cli.ux import show_message, show_warning
+from multiversx_sdk_cli.ux import show_warning
 
 logger = logging.getLogger("cli.contracts")
 
 
-def setup_parser(args: List[str], subparsers: Any) -> Any:
+def setup_parser(args: list[str], subparsers: Any) -> Any:
     parser = cli_shared.add_group_subparser(
         subparsers,
         "contract",
@@ -40,72 +37,14 @@ def setup_parser(args: List[str], subparsers: Any) -> Any:
     subparsers = parser.add_subparsers()
 
     sub = cli_shared.add_command_subparser(
-        subparsers,
-        "contract",
-        "new",
-        "Create a new Smart Contract project based on a template.",
+        subparsers, "contract", "build", "Build a Smart Contract project. This command is DISABLED."
     )
-    sub.add_argument(
-        "--name",
-        help="The name of the contract. If missing, the name of the template will be used.",
-    )
-    sub.add_argument("--template", required=True, help="the template to use")
-    sub.add_argument("--tag", help="the framework version on which the contract should be created")
-    sub.add_argument(
-        "--path",
-        type=str,
-        default=os.getcwd(),
-        help="the parent directory of the project (default: current directory)",
-    )
-    sub.set_defaults(func=create)
-
-    sub = cli_shared.add_command_subparser(
-        subparsers,
-        "contract",
-        "templates",
-        "List the available Smart Contract templates.",
-    )
-    sub.add_argument("--tag", help="the sc-meta framework version referred to")
-    sub.set_defaults(func=list_templates)
-
-    sub = cli_shared.add_command_subparser(subparsers, "contract", "build", "Build a Smart Contract project.")
-    _add_build_options_sc_meta(sub)
     sub.set_defaults(func=build)
-
-    sub = cli_shared.add_command_subparser(subparsers, "contract", "clean", "Clean a Smart Contract project.")
-    sub.add_argument(
-        "--path",
-        default=os.getcwd(),
-        help="the project directory (default: current directory)",
-    )
-    sub.set_defaults(func=clean)
-
-    sub = cli_shared.add_command_subparser(subparsers, "contract", "test", "Run tests.")
-    sub.add_argument(
-        "--path",
-        default=os.getcwd(),
-        help="the directory of the contract (default: %(default)s)",
-    )
-    sub.add_argument(
-        "--go",
-        action="store_true",
-        help="this arg runs rust and go tests (default: false)",
-    )
-    sub.add_argument(
-        "--scen",
-        action="store_true",
-        help="this arg runs scenarios (default: false). If `--scen` and `--go` are both specified, scen overrides the go argument",
-    )
-    sub.add_argument(
-        "--nocapture",
-        action="store_true",
-        help="this arg prints the entire output of the vm (default: false)",
-    )
-    sub.set_defaults(func=run_tests)
 
     output_description = CLIOutputBuilder.describe(
         with_contract=True, with_transaction_on_network=True, with_simulation=True
     )
+
     sub = cli_shared.add_command_subparser(
         subparsers,
         "contract",
@@ -279,96 +218,6 @@ def _add_project_arg(sub: Any):
     )
 
 
-def _add_build_options_sc_meta(sub: Any):
-    sub.add_argument(
-        "--path",
-        default=os.getcwd(),
-        help="the project directory (default: current directory)",
-    )
-    sub.add_argument(
-        "--no-wasm-opt",
-        action="store_true",
-        default=False,
-        help="do not optimize wasm files after the build (default: %(default)s)",
-    )
-    sub.add_argument(
-        "--wasm-symbols",
-        action="store_true",
-        default=False,
-        help="for rust projects, does not strip the symbols from the wasm output. Useful for analysing the bytecode. Creates larger wasm files. Avoid in production (default: %(default)s)",
-    )
-    sub.add_argument(
-        "--wasm-name",
-        type=str,
-        help="for rust projects, optionally specify the name of the wasm bytecode output file",
-    )
-    sub.add_argument(
-        "--wasm-suffix",
-        type=str,
-        help="for rust projects, optionally specify the suffix of the wasm bytecode output file",
-    )
-    sub.add_argument(
-        "--target-dir",
-        type=str,
-        help="for rust projects, forward the parameter to Cargo",
-    )
-    sub.add_argument(
-        "--wat",
-        action="store_true",
-        help="also generate a WAT file when building",
-        default=False,
-    )
-    sub.add_argument(
-        "--mir",
-        action="store_true",
-        help="also emit MIR files when building",
-        default=False,
-    )
-    sub.add_argument(
-        "--llvm-ir",
-        action="store_true",
-        help="also emit LL (LLVM) files when building",
-        default=False,
-    )
-    sub.add_argument("--ignore", help="ignore all directories with these names. [default: target]")
-    sub.add_argument(
-        "--no-imports",
-        action="store_true",
-        default=False,
-        help="skips extracting the EI imports after building the contracts",
-    )
-    sub.add_argument(
-        "--no-abi-git-version",
-        action="store_true",
-        default=False,
-        help="skips loading the Git version into the ABI",
-    )
-    sub.add_argument(
-        "--twiggy-top",
-        action="store_true",
-        default=False,
-        help="generate a twiggy top report after building",
-    )
-    sub.add_argument(
-        "--twiggy-paths",
-        action="store_true",
-        default=False,
-        help="generate a twiggy paths report after building",
-    )
-    sub.add_argument(
-        "--twiggy-monos",
-        action="store_true",
-        default=False,
-        help="generate a twiggy monos report after building",
-    )
-    sub.add_argument(
-        "--twiggy-dominators",
-        action="store_true",
-        default=False,
-        help="generate a twiggy dominators report after building",
-    )
-
-
 def _add_build_options_args(sub: Any):
     sub.add_argument(
         "--debug",
@@ -475,52 +324,13 @@ def _add_metadata_arg(sub: Any):
     sub.set_defaults(metadata_upgradeable=True, metadata_payable=False)
 
 
-def list_templates(args: Any):
-    tag = args.tag
-    contract = Contract(tag)
-    templates = contract.get_contract_templates()
-    show_message(templates)
-
-
-def create(args: Any):
-    name = args.name
-    template = args.template
-    tag = args.tag
-    path = Path(args.path)
-
-    contract = Contract(tag, name, template, path)
-    contract.create_from_template()
-
-
-def get_project_paths(args: Any) -> List[Path]:
-    base_path = Path(args.project)
-    recursive = bool(args.recursive)
-    if recursive:
-        return get_project_paths_recursively(base_path)
-    return [base_path]
-
-
-def clean(args: Any):
-    check_if_rust_is_installed()
-    project_path = args.path
-    projects.clean_project(Path(project_path))
-
-
 def build(args: Any):
-    project_paths = [Path(args.path)]
-    arg_list = cli_shared.convert_args_object_to_args_list(args)
+    message = """This command cannot build smart contracts anymore.
 
-    for project in project_paths:
-        projects.build_project(project, arg_list)
-
-    show_warning(
-        "The primary tool for building smart contracts is `sc-meta`. Try using the `sc-meta all build` command."
-    )
-
-
-def run_tests(args: Any):
-    check_if_rust_is_installed()
-    projects.run_tests(args)
+The primary tool for building smart contracts is `sc-meta`.
+To install `sc-meta` check out the documentation: https://docs.multiversx.com/sdk-and-tools/troubleshooting/rust-setup.
+After installing, use the `sc-meta all build` command. To lear more about `sc-meta`, check out this page: https://docs.multiversx.com/developers/meta/sc-meta-cli/#calling-build."""
+    show_warning(message)
 
 
 def deploy(args: Any):
@@ -679,7 +489,7 @@ def query(args: Any):
     utils.dump_out_json(result)
 
 
-def _get_contract_arguments(args: Any) -> Tuple[List[Any], bool]:
+def _get_contract_arguments(args: Any) -> tuple[list[Any], bool]:
     json_args = json.loads(Path(args.arguments_file).expanduser().read_text()) if args.arguments_file else None
 
     if json_args and args.arguments:
