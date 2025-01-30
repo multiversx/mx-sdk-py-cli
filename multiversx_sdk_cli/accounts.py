@@ -27,6 +27,7 @@ from multiversx_sdk_cli.ledger.ledger_functions import (
 
 logger = logging.getLogger("accounts")
 
+
 # fmt: off
 class INetworkProvider(Protocol):
     def get_account(self, address: Address) -> AccountOnNetwork:
