@@ -2,7 +2,7 @@ import json
 import logging
 import os
 from pathlib import Path
-from typing import Any
+from typing import Any, Union
 
 from multiversx_sdk import (
     Address,
@@ -21,8 +21,8 @@ from multiversx_sdk_cli.contract_verification import trigger_contract_verificati
 from multiversx_sdk_cli.contracts import SmartContract
 from multiversx_sdk_cli.cosign_transaction import cosign_transaction
 from multiversx_sdk_cli.docker import is_docker_installed, run_docker
-from multiversx_sdk_cli.errors import DockerMissingError, NoWalletProvided
-from multiversx_sdk_cli.interfaces import IAddress
+from multiversx_sdk_cli.errors import DockerMissingError
+from multiversx_sdk_cli.interfaces import IAccount
 from multiversx_sdk_cli.ux import show_warning
 
 logger = logging.getLogger("cli.contracts")
@@ -32,14 +32,9 @@ def setup_parser(args: list[str], subparsers: Any) -> Any:
     parser = cli_shared.add_group_subparser(
         subparsers,
         "contract",
-        "Build, deploy, upgrade and interact with Smart Contracts",
+        "Deploy, upgrade and interact with Smart Contracts",
     )
     subparsers = parser.add_subparsers()
-
-    sub = cli_shared.add_command_subparser(
-        subparsers, "contract", "build", "Build a Smart Contract project. This command is DISABLED."
-    )
-    sub.set_defaults(func=build)
 
     output_description = CLIOutputBuilder.describe(
         with_contract=True, with_transaction_on_network=True, with_simulation=True
@@ -72,6 +67,7 @@ def setup_parser(args: list[str], subparsers: Any) -> Any:
     )
     cli_shared.add_broadcast_args(sub)
     cli_shared.add_guardian_wallet_args(args, sub)
+    cli_shared.add_relayed_v3_wallet_args(args, sub)
 
     sub.set_defaults(func=deploy)
 
@@ -103,6 +99,7 @@ def setup_parser(args: list[str], subparsers: Any) -> Any:
     )
     cli_shared.add_broadcast_args(sub)
     cli_shared.add_guardian_wallet_args(args, sub)
+    cli_shared.add_relayed_v3_wallet_args(args, sub)
 
     sub.set_defaults(func=call)
 
@@ -134,6 +131,7 @@ def setup_parser(args: list[str], subparsers: Any) -> Any:
     )
     cli_shared.add_broadcast_args(sub)
     cli_shared.add_guardian_wallet_args(args, sub)
+    cli_shared.add_relayed_v3_wallet_args(args, sub)
 
     sub.set_defaults(func=upgrade)
 
@@ -205,6 +203,11 @@ def setup_parser(args: list[str], subparsers: Any) -> Any:
     )
     sub.set_defaults(func=do_reproducible_build)
 
+    sub = cli_shared.add_command_subparser(
+        subparsers, "contract", "build", "Build a Smart Contract project. This command is DISABLED."
+    )
+    sub.set_defaults(func=build)
+
     parser.epilog = cli_shared.build_group_epilog(subparsers)
     return subparsers
 
@@ -274,7 +277,7 @@ def _add_contract_arg(sub: Any):
 
 
 def _add_contract_abi_arg(sub: Any):
-    sub.add_argument("--abi", type=str, help="the ABI of the Smart Contract")
+    sub.add_argument("--abi", type=str, help="the ABI file of the Smart Contract")
 
 
 def _add_function_arg(sub: Any):
@@ -338,9 +341,20 @@ def deploy(args: Any):
     cli_shared.check_guardian_and_options_args(args)
     cli_shared.check_broadcast_args(args)
     cli_shared.prepare_chain_id_in_args(args)
-    cli_shared.prepare_nonce_in_args(args)
 
     sender = cli_shared.prepare_account(args)
+
+    if not args.nonce:
+        nonce = cli_shared.get_current_nonce_for_address(sender.address, args.proxy)
+    else:
+        nonce = int(args.nonce)
+
+    guardian = cli_shared.load_guardian_account(args)
+    guardian_address = cli_shared.get_guardian_address(guardian, args)
+
+    relayer = cli_shared.load_relayer_account(args)
+    relayer_address = cli_shared.get_relayer_address(relayer, args)
+
     config = TransactionsFactoryConfig(args.chain)
     abi = Abi.load(Path(args.abi)) if args.abi else None
     contract = SmartContract(config, abi)
@@ -358,15 +372,17 @@ def deploy(args: Any):
         payable_by_sc=args.metadata_payable_by_sc,
         gas_limit=int(args.gas_limit),
         value=int(args.value),
-        nonce=int(args.nonce),
+        nonce=nonce,
         version=int(args.version),
         options=int(args.options),
-        guardian=args.guardian,
+        guardian=guardian_address,
+        relayer=relayer_address,
     )
-    tx = _sign_guarded_tx(args, tx)
+    tx = _sign_guarded_tx_if_guardian(guardian, args, tx)
+    _sign_relayed_tx_if_relayer(relayer, tx)
 
     address_computer = AddressComputer(NUMBER_OF_SHARDS)
-    contract_address = address_computer.compute_contract_address(deployer=sender.address, deployment_nonce=args.nonce)
+    contract_address = address_computer.compute_contract_address(deployer=sender.address, deployment_nonce=tx.nonce)
 
     logger.info("Contract address: %s", contract_address.to_bech32())
     utils.log_explorer_contract_address(args.chain, contract_address.to_bech32())
@@ -374,18 +390,18 @@ def deploy(args: Any):
     _send_or_simulate(tx, contract_address, args)
 
 
-def _sign_guarded_tx(args: Any, tx: Transaction) -> Transaction:
-    try:
-        guardian_account = cli_shared.prepare_guardian_account(args)
-    except NoWalletProvided:
-        guardian_account = None
-
-    if guardian_account:
-        tx.guardian_signature = bytes.fromhex(guardian_account.sign_transaction(tx))
-    elif args.guardian:
-        tx = cosign_transaction(tx, args.guardian_service_url, args.guardian_2fa_code)  # type: ignore
+def _sign_guarded_tx_if_guardian(guardian: Union[IAccount, None], args: Any, tx: Transaction) -> Transaction:
+    if guardian:
+        tx.guardian_signature = bytes.fromhex(guardian.sign_transaction(tx))
+    elif tx.guardian and args.guardian_service_url and args.guardian_2fa_code:
+        tx = cosign_transaction(tx, args.guardian_service_url, args.guardian_2fa_code)
 
     return tx
+
+
+def _sign_relayed_tx_if_relayer(relayer: Union[IAccount, None], tx: Transaction):
+    if relayer and tx.relayer:
+        tx.relayer_signature = bytes.fromhex(relayer.sign_transaction(tx))
 
 
 def call(args: Any):
@@ -393,9 +409,19 @@ def call(args: Any):
     cli_shared.check_guardian_and_options_args(args)
     cli_shared.check_broadcast_args(args)
     cli_shared.prepare_chain_id_in_args(args)
-    cli_shared.prepare_nonce_in_args(args)
 
     sender = cli_shared.prepare_account(args)
+
+    if not args.nonce:
+        nonce = cli_shared.get_current_nonce_for_address(sender.address, args.proxy)
+    else:
+        nonce = int(args.nonce)
+
+    guardian = cli_shared.load_guardian_account(args)
+    guardian_address = cli_shared.get_guardian_address(guardian, args)
+
+    relayer = cli_shared.load_relayer_account(args)
+    relayer_address = cli_shared.get_relayer_address(relayer, args)
 
     config = TransactionsFactoryConfig(args.chain)
     abi = Abi.load(Path(args.abi)) if args.abi else None
@@ -413,12 +439,14 @@ def call(args: Any):
         gas_limit=int(args.gas_limit),
         value=int(args.value),
         transfers=args.token_transfers,
-        nonce=int(args.nonce),
+        nonce=nonce,
         version=int(args.version),
         options=int(args.options),
-        guardian=args.guardian,
+        guardian=guardian_address,
+        relayer=relayer_address,
     )
-    tx = _sign_guarded_tx(args, tx)
+    tx = _sign_guarded_tx_if_guardian(guardian, args, tx)
+    _sign_relayed_tx_if_relayer(relayer, tx)
 
     _send_or_simulate(tx, contract_address, args)
 
@@ -428,9 +456,20 @@ def upgrade(args: Any):
     cli_shared.check_guardian_and_options_args(args)
     cli_shared.check_broadcast_args(args)
     cli_shared.prepare_chain_id_in_args(args)
-    cli_shared.prepare_nonce_in_args(args)
 
     sender = cli_shared.prepare_account(args)
+
+    if not args.nonce:
+        nonce = cli_shared.get_current_nonce_for_address(sender.address, args.proxy)
+    else:
+        nonce = int(args.nonce)
+
+    guardian = cli_shared.load_guardian_account(args)
+    guardian_address = cli_shared.get_guardian_address(guardian, args)
+
+    relayer = cli_shared.load_relayer_account(args)
+    relayer_address = cli_shared.get_relayer_address(relayer, args)
+
     config = TransactionsFactoryConfig(args.chain)
     abi = Abi.load(Path(args.abi)) if args.abi else None
     contract = SmartContract(config, abi)
@@ -450,12 +489,14 @@ def upgrade(args: Any):
         payable_by_sc=args.metadata_payable_by_sc,
         gas_limit=int(args.gas_limit),
         value=int(args.value),
-        nonce=int(args.nonce),
+        nonce=nonce,
         version=int(args.version),
         options=int(args.options),
-        guardian=args.guardian,
+        guardian=guardian_address,
+        relayer=relayer_address,
     )
-    tx = _sign_guarded_tx(args, tx)
+    tx = _sign_guarded_tx_if_guardian(guardian, args, tx)
+    _sign_relayed_tx_if_relayer(relayer, tx)
 
     _send_or_simulate(tx, contract_address, args)
 
@@ -463,11 +504,8 @@ def upgrade(args: Any):
 def query(args: Any):
     logger.debug("query")
 
-    # workaround so we can use the function below to set chainID
-    args.chain = ""
-    cli_shared.prepare_chain_id_in_args(args)
-
-    factory_config = TransactionsFactoryConfig(args.chain)
+    # we don't need chainID to query a contract; we use the provided proxy
+    factory_config = TransactionsFactoryConfig("")
     abi = Abi.load(Path(args.abi)) if args.abi else None
     contract = SmartContract(factory_config, abi)
 
@@ -504,14 +542,14 @@ def _get_contract_arguments(args: Any) -> tuple[list[Any], bool]:
         return args.arguments, True
 
 
-def _send_or_simulate(tx: Transaction, contract_address: IAddress, args: Any):
+def _send_or_simulate(tx: Transaction, contract_address: Address, args: Any):
     output_builder = cli_shared.send_or_simulate(tx, args, dump_output=False)
     output_builder.set_contract_address(contract_address)
     utils.dump_out_json(output_builder.build(), outfile=args.outfile)
 
 
 def verify(args: Any) -> None:
-    contract = Address.from_bech32(args.contract)
+    contract = Address.new_from_bech32(args.contract)
     verifier_url = args.verifier_url
 
     packaged_src = Path(args.packaged_src).expanduser().resolve()

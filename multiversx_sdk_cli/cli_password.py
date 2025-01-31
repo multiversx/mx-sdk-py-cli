@@ -14,3 +14,10 @@ def load_guardian_password(args: Any) -> str:
         with open(args.guardian_passfile) as pass_file:
             return pass_file.read().strip()
     return getpass("Keyfile's password: ")
+
+
+def load_relayer_password(args: Any) -> str:
+    if args.relayer_passfile:
+        with open(args.relayer_passfile) as pass_file:
+            return pass_file.read().strip()
+    return getpass("Keyfile's password: ")

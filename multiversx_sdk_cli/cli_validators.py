@@ -124,6 +124,7 @@ def _add_common_arguments(args: List[str], sub: Any):
     cli_shared.add_broadcast_args(sub)
     cli_shared.add_outfile_arg(sub, what="signed transaction, hash")
     cli_shared.add_guardian_wallet_args(args, sub)
+    cli_shared.add_relayed_v3_wallet_args(args, sub)
 
 
 def _add_nodes_arg(sub: Any):

@@ -3,14 +3,18 @@ import ast
 import copy
 import sys
 from argparse import FileType
-from typing import Any, Dict, List, Text, cast
+from typing import Any, Dict, List, Text, Union, cast
 
 from multiversx_sdk import Address, ProxyNetworkProvider, Transaction
 
 from multiversx_sdk_cli import config, errors, utils
 from multiversx_sdk_cli.accounts import Account, LedgerAccount
 from multiversx_sdk_cli.cli_output import CLIOutputBuilder
-from multiversx_sdk_cli.cli_password import load_guardian_password, load_password
+from multiversx_sdk_cli.cli_password import (
+    load_guardian_password,
+    load_password,
+    load_relayer_password,
+)
 from multiversx_sdk_cli.constants import (
     DEFAULT_TX_VERSION,
     TRANSACTION_OPTIONS_TX_GUARDED,
@@ -69,7 +73,6 @@ def add_tx_args(
     with_receiver: bool = True,
     with_data: bool = True,
     with_estimate_gas: bool = False,
-    with_relayer_wallet_args: bool = True,
 ):
     if with_nonce:
         sub.add_argument(
@@ -121,8 +124,6 @@ def add_tx_args(
     )
 
     sub.add_argument("--relayer", help="the bech32 address of the relayer")
-    if with_relayer_wallet_args:
-        add_relayed_v3_wallet_args(args, sub)
 
     add_guardian_args(sub)
 
@@ -360,6 +361,58 @@ def prepare_guardian_account(args: Any):
     return account
 
 
+def load_guardian_account(args: Any) -> Union[Account, None]:
+    if args.guardian_pem:
+        return Account(pem_file=args.guardian_pem, pem_index=args.guardian_pem_index)
+    elif args.guardian_keyfile:
+        password = load_guardian_password(args)
+        return Account(key_file=args.guardian_keyfile, password=password)
+    elif args.guardian_ledger:
+        address = do_get_ledger_address(
+            account_index=args.guardian_ledger_account_index,
+            address_index=args.guardian_ledger_address_index,
+        )
+        return Account(Address.new_from_bech32(address))
+
+    return None
+
+
+def get_guardian_address(guardian: Union[Account, None], args: Any) -> Union[Address, None]:
+    if guardian:
+        return guardian.address
+
+    if hasattr(args, "guardian") and args.guardian:
+        return Address.new_from_bech32(args.guardian)
+
+    return None
+
+
+def get_relayer_address(relayer: Union[Account, None], args: Any) -> Union[Address, None]:
+    if relayer:
+        return relayer.address
+
+    if hasattr(args, "relayer") and args.relayer:
+        return Address.new_from_bech32(args.relayer)
+
+    return None
+
+
+def load_relayer_account(args: Any) -> Union[Account, None]:
+    if args.relayer_pem:
+        return Account(pem_file=args.relayer_pem, pem_index=args.relayer_pem_index)
+    elif args.relayer_keyfile:
+        password = load_relayer_password(args)
+        return Account(key_file=args.relayer_keyfile, password=password)
+    elif args.relayer_ledger:
+        address = do_get_ledger_address(
+            account_index=args.relayer_ledger_account_index,
+            address_index=args.relayer_ledger_address_index,
+        )
+        return Account(Address.new_from_bech32(address))
+
+    return None
+
+
 def prepare_nonce_in_args(args: Any):
     if args.recall_nonce and not args.proxy:
         raise ArgumentsNotProvidedError("When using `--recall-nonce`, `--proxy` must be provided, as well")
@@ -369,6 +422,15 @@ def prepare_nonce_in_args(args: Any):
         network_provider_config = config.get_config_for_network_providers()
         account.sync_nonce(ProxyNetworkProvider(url=args.proxy, config=network_provider_config))
         args.nonce = account.nonce
+
+
+def get_current_nonce_for_address(address: Address, proxy_url: Union[str, None]) -> int:
+    if not proxy_url:
+        raise ArgumentsNotProvidedError("If `--nonce` is not explicitly provided, `--proxy` must be provided")
+
+    network_provider_config = config.get_config_for_network_providers()
+    proxy = ProxyNetworkProvider(url=proxy_url, config=network_provider_config)
+    return proxy.get_account(address).nonce
 
 
 def prepare_chain_id_in_args(args: Any):
