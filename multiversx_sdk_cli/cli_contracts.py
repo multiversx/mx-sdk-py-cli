@@ -378,8 +378,8 @@ def deploy(args: Any):
         guardian=guardian_address,
         relayer=relayer_address,
     )
-    tx = _sign_guarded_tx(guardian, args, tx)
-    _sign_tx_by_relayer(relayer, tx)
+    tx = _sign_guarded_tx_if_guardian(guardian, args, tx)
+    _sign_relayed_tx_if_relayer(relayer, tx)
 
     address_computer = AddressComputer(NUMBER_OF_SHARDS)
     contract_address = address_computer.compute_contract_address(deployer=sender.address, deployment_nonce=tx.nonce)
@@ -390,7 +390,7 @@ def deploy(args: Any):
     _send_or_simulate(tx, contract_address, args)
 
 
-def _sign_guarded_tx(guardian: Union[IAccount, None], args: Any, tx: Transaction) -> Transaction:
+def _sign_guarded_tx_if_guardian(guardian: Union[IAccount, None], args: Any, tx: Transaction) -> Transaction:
     if guardian:
         tx.guardian_signature = bytes.fromhex(guardian.sign_transaction(tx))
     elif tx.guardian and args.guardian_service_url and args.guardian_2fa_code:
@@ -399,7 +399,7 @@ def _sign_guarded_tx(guardian: Union[IAccount, None], args: Any, tx: Transaction
     return tx
 
 
-def _sign_tx_by_relayer(relayer: Union[IAccount, None], tx: Transaction):
+def _sign_relayed_tx_if_relayer(relayer: Union[IAccount, None], tx: Transaction):
     if relayer and tx.relayer:
         tx.relayer_signature = bytes.fromhex(relayer.sign_transaction(tx))
 
@@ -445,8 +445,8 @@ def call(args: Any):
         guardian=guardian_address,
         relayer=relayer_address,
     )
-    tx = _sign_guarded_tx(guardian, args, tx)
-    _sign_tx_by_relayer(relayer, tx)
+    tx = _sign_guarded_tx_if_guardian(guardian, args, tx)
+    _sign_relayed_tx_if_relayer(relayer, tx)
 
     _send_or_simulate(tx, contract_address, args)
 
@@ -495,8 +495,8 @@ def upgrade(args: Any):
         guardian=guardian_address,
         relayer=relayer_address,
     )
-    tx = _sign_guarded_tx(guardian, args, tx)
-    _sign_tx_by_relayer(relayer, tx)
+    tx = _sign_guarded_tx_if_guardian(guardian, args, tx)
+    _sign_relayed_tx_if_relayer(relayer, tx)
 
     _send_or_simulate(tx, contract_address, args)
 
