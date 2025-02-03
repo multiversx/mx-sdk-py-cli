@@ -1,8 +1,15 @@
-from typing import Dict
+from typing import Dict, Protocol
 
 from multiversx_sdk import Address, Message, MessageComputer, UserVerifier
 
-from multiversx_sdk_cli.accounts import Account
+
+# fmt: off
+class IAccount(Protocol):
+    address: Address
+
+    def sign_message(self, message: Message) -> bytes:
+        ...
+# fmt: off
 
 
 class SignedMessage:
@@ -38,6 +45,6 @@ class SignedMessage:
         }
 
 
-def sign_message(message: str, account: Account) -> SignedMessage:
-    signature = account.sign_message(message.encode())
-    return SignedMessage(account.address.to_bech32(), message, signature)
+def sign_message(message: str, account: IAccount) -> SignedMessage:
+    signature = account.sign_message(Message(message.encode()))
+    return SignedMessage(account.address.to_bech32(), message, signature.hex())

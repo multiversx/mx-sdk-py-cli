@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import Any, List, Protocol, Tuple
+from typing import Any, List, Tuple
 
 from multiversx_sdk import (
     Address,
@@ -12,20 +12,8 @@ from multiversx_sdk.abi import BigUIntValue, Serializer
 
 from multiversx_sdk_cli.config import get_address_hrp
 from multiversx_sdk_cli.errors import BadUsage
+from multiversx_sdk_cli.interfaces import IAccount
 from multiversx_sdk_cli.validators.validators_file import ValidatorsFile
-
-
-# fmt: off
-class IAccount(Protocol):
-    @property
-    def address(self) -> Address:
-        ...
-
-    nonce: int
-
-    def sign_transaction(self, transaction: Transaction) -> str:
-        ...
-# fmt: on
 
 
 class DelegationOperations:
@@ -47,7 +35,7 @@ class DelegationOperations:
         if args.gas_limit:
             tx.gas_limit = int(args.gas_limit)
 
-        tx.signature = bytes.fromhex(owner.sign_transaction(tx))
+        tx.signature = owner.sign_transaction(tx)
 
         return tx
 
@@ -69,7 +57,7 @@ class DelegationOperations:
         if args.gas_limit:
             tx.gas_limit = int(args.gas_limit)
 
-        tx.signature = bytes.fromhex(owner.sign_transaction(tx))
+        tx.signature = owner.sign_transaction(tx)
 
         return tx
 
@@ -91,7 +79,7 @@ class DelegationOperations:
         if args.gas_limit:
             tx.gas_limit = int(args.gas_limit)
 
-        tx.signature = bytes.fromhex(owner.sign_transaction(tx))
+        tx.signature = owner.sign_transaction(tx)
 
         return tx
 
@@ -113,7 +101,7 @@ class DelegationOperations:
         if args.gas_limit:
             tx.gas_limit = int(args.gas_limit)
 
-        tx.signature = bytes.fromhex(owner.sign_transaction(tx))
+        tx.signature = owner.sign_transaction(tx)
 
         return tx
 
@@ -135,7 +123,7 @@ class DelegationOperations:
         if args.gas_limit:
             tx.gas_limit = int(args.gas_limit)
 
-        tx.signature = bytes.fromhex(owner.sign_transaction(tx))
+        tx.signature = owner.sign_transaction(tx)
 
         return tx
 
@@ -157,7 +145,7 @@ class DelegationOperations:
         if args.gas_limit:
             tx.gas_limit = int(args.gas_limit)
 
-        tx.signature = bytes.fromhex(owner.sign_transaction(tx))
+        tx.signature = owner.sign_transaction(tx)
 
         return tx
 
@@ -182,7 +170,7 @@ class DelegationOperations:
         if args.gas_limit:
             tx.gas_limit = int(args.gas_limit)
 
-        tx.signature = bytes.fromhex(owner.sign_transaction(tx))
+        tx.signature = owner.sign_transaction(tx)
 
         return tx
 
@@ -202,7 +190,7 @@ class DelegationOperations:
         if args.gas_limit:
             tx.gas_limit = int(args.gas_limit)
 
-        tx.signature = bytes.fromhex(owner.sign_transaction(tx))
+        tx.signature = owner.sign_transaction(tx)
 
         return tx
 
@@ -220,7 +208,7 @@ class DelegationOperations:
         if args.gas_limit:
             tx.gas_limit = int(args.gas_limit)
 
-        tx.signature = bytes.fromhex(owner.sign_transaction(tx))
+        tx.signature = owner.sign_transaction(tx)
 
         return tx
 
@@ -238,7 +226,7 @@ class DelegationOperations:
         if args.gas_limit:
             tx.gas_limit = int(args.gas_limit)
 
-        tx.signature = bytes.fromhex(owner.sign_transaction(tx))
+        tx.signature = owner.sign_transaction(tx)
 
         return tx
 
@@ -258,7 +246,7 @@ class DelegationOperations:
         if args.gas_limit:
             tx.gas_limit = int(args.gas_limit)
 
-        tx.signature = bytes.fromhex(owner.sign_transaction(tx))
+        tx.signature = owner.sign_transaction(tx)
 
         return tx
 
@@ -276,7 +264,7 @@ class DelegationOperations:
         if args.gas_limit:
             tx.gas_limit = int(args.gas_limit)
 
-        tx.signature = bytes.fromhex(owner.sign_transaction(tx))
+        tx.signature = owner.sign_transaction(tx)
 
         return tx
 
@@ -296,7 +284,7 @@ class DelegationOperations:
         if args.gas_limit:
             tx.gas_limit = int(args.gas_limit)
 
-        tx.signature = bytes.fromhex(owner.sign_transaction(tx))
+        tx.signature = owner.sign_transaction(tx)
 
         return tx
 
@@ -316,7 +304,7 @@ class DelegationOperations:
         if args.gas_limit:
             tx.gas_limit = int(args.gas_limit)
 
-        tx.signature = bytes.fromhex(owner.sign_transaction(tx))
+        tx.signature = owner.sign_transaction(tx)
 
         return tx
 
@@ -342,7 +330,7 @@ class DelegationOperations:
         if args.gas_limit:
             tx.gas_limit = int(args.gas_limit)
 
-        tx.signature = bytes.fromhex(owner.sign_transaction(tx))
+        tx.signature = owner.sign_transaction(tx)
 
         return tx
 
@@ -368,7 +356,7 @@ class DelegationOperations:
         if args.gas_limit:
             tx.gas_limit = int(args.gas_limit)
 
-        tx.signature = bytes.fromhex(owner.sign_transaction(tx))
+        tx.signature = owner.sign_transaction(tx)
 
         return tx
 
@@ -390,7 +378,7 @@ class DelegationOperations:
         if args.gas_limit:
             tx.gas_limit = int(args.gas_limit)
 
-        tx.signature = bytes.fromhex(owner.sign_transaction(tx))
+        tx.signature = owner.sign_transaction(tx)
 
         return tx
 
@@ -422,7 +410,7 @@ class DelegationOperations:
         if args.gas_limit:
             tx.gas_limit = int(args.gas_limit)
 
-        tx.signature = bytes.fromhex(owner.sign_transaction(tx))
+        tx.signature = owner.sign_transaction(tx)
 
         return tx
 

@@ -6,9 +6,8 @@ from pathlib import Path
 from typing import Any, Dict, Optional, Tuple
 
 import requests
-from multiversx_sdk import Address
+from multiversx_sdk import Account, Address, Message
 
-from multiversx_sdk_cli.accounts import Account
 from multiversx_sdk_cli.errors import KnownError
 from multiversx_sdk_cli.utils import dump_out_json, read_json_file
 
@@ -114,10 +113,7 @@ def _create_request_signature(account: Account, contract_address: Address, reque
     hashed_payload: str = hashlib.sha256(request_payload).hexdigest()
     raw_data_to_sign = f"{contract_address.to_bech32()}{hashed_payload}"
 
-    signature_hex = account.sign_message(raw_data_to_sign.encode())
-    signature = bytes.fromhex(signature_hex)
-
-    return signature
+    return account.sign_message(Message(raw_data_to_sign.encode()))
 
 
 def query_status_with_task_id(url: str, task_id: str, interval: int = 10):

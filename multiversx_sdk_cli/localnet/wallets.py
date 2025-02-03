@@ -3,10 +3,9 @@ from collections import OrderedDict
 from pathlib import Path
 from typing import Dict, Tuple
 
-from multiversx_sdk import ValidatorPEM
+from multiversx_sdk import Account, ValidatorPEM
 
 from multiversx_sdk_cli import errors, utils
-from multiversx_sdk_cli.accounts import Account
 from multiversx_sdk_cli.workstation import get_tools_folder
 
 MAX_NUM_NODES = 12
@@ -36,7 +35,7 @@ def get_validator_wallets(num_validators: int) -> Dict[str, Account]:
     for i in range(0, num_validators):
         pem_file = get_validator_wallet_file(i)
         nickname = "validator{:02}".format(i)
-        account = Account(pem_file=str(pem_file))
+        account = Account.new_from_pem(file_path=pem_file)
         result[nickname] = account
 
     return result
@@ -52,7 +51,7 @@ def get_validators(num_validators: int) -> Dict[str, Tuple[str, Account]]:
 
         pem_file = get_validator_wallet_file(i)
         nickname = "validator{:02}".format(i)
-        account = Account(pem_file=str(pem_file))
+        account = Account.new_from_pem(file_path=pem_file)
         result[nickname] = (pubkey, account)
 
     return result
@@ -81,7 +80,7 @@ def get_users() -> Dict[str, Account]:
 
     for pem_file in sorted(utils.list_files(_get_users_folder(), ".pem")):
         nickname = Path(pem_file).stem
-        account = Account(pem_file=str(pem_file))
+        account = Account.new_from_pem(file_path=pem_file)
         result[nickname] = account
 
     return result

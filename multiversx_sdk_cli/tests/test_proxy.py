@@ -1,6 +1,5 @@
 from multiversx_sdk import Address, ProxyNetworkProvider
 
-from multiversx_sdk_cli.accounts import Account
 from multiversx_sdk_cli.cli import main
 from multiversx_sdk_cli.config import get_config_for_network_providers
 
@@ -20,11 +19,11 @@ def test_get_account():
 
 
 def test_sync_nonce():
-    account = Account(address=Address.new_from_bech32("erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th"))
+    account = Address.new_from_bech32("erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th")
     config = get_config_for_network_providers()
     proxy = ProxyNetworkProvider("https://testnet-api.multiversx.com", config=config)
-    account.sync_nonce(proxy)
-    assert True if account.nonce else False
+    nonce = proxy.get_account(account).nonce
+    assert True if nonce else False
 
 
 def test_query_contract():

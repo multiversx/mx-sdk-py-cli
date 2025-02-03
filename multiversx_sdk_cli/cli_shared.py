@@ -3,12 +3,18 @@ import ast
 import copy
 import sys
 from argparse import FileType
+from pathlib import Path
 from typing import Any, Dict, List, Text, Union, cast
 
-from multiversx_sdk import Address, ProxyNetworkProvider, Transaction
+from multiversx_sdk import (
+    Account,
+    Address,
+    LedgerAccount,
+    ProxyNetworkProvider,
+    Transaction,
+)
 
 from multiversx_sdk_cli import config, errors, utils
-from multiversx_sdk_cli.accounts import Account, LedgerAccount
 from multiversx_sdk_cli.cli_output import CLIOutputBuilder
 from multiversx_sdk_cli.cli_password import (
     load_guardian_password,
@@ -20,7 +26,7 @@ from multiversx_sdk_cli.constants import (
     TRANSACTION_OPTIONS_TX_GUARDED,
 )
 from multiversx_sdk_cli.errors import ArgumentsNotProvidedError
-from multiversx_sdk_cli.ledger.ledger_functions import do_get_ledger_address
+from multiversx_sdk_cli.interfaces import IAccount
 from multiversx_sdk_cli.simulation import Simulator
 from multiversx_sdk_cli.transactions import send_and_wait_for_result
 from multiversx_sdk_cli.utils import log_explorer_transaction
@@ -168,17 +174,17 @@ def add_wallet_args(args: List[str], sub: Any):
         help="🔑 a file containing keyfile's password, if keyfile provided",
     )
     sub.add_argument(
+        "--address-index",
+        type=int,
+        default=None,
+        help="🔑 the index of the address in the keyfile; should only be provided for keyfile of kind = mnemonic",
+    )
+    sub.add_argument(
         "--ledger",
         action="store_true",
         required=check_if_sign_method_required(args, "--ledger"),
         default=False,
         help="🔐 bool flag for signing transaction using ledger",
-    )
-    sub.add_argument(
-        "--ledger-account-index",
-        type=int,
-        default=0,
-        help="🔐 the index of the account when using Ledger",
     )
     sub.add_argument(
         "--ledger-address-index",
@@ -211,17 +217,17 @@ def add_guardian_wallet_args(args: List[str], sub: Any):
         help="🔑 a file containing keyfile's password, if keyfile provided",
     )
     sub.add_argument(
+        "--guardian-address-index",
+        type=int,
+        default=None,
+        help="🔑 the index of the address in the keyfile; should only be provided for keyfile of kind = mnemonic",
+    )
+    sub.add_argument(
         "--guardian-ledger",
         action="store_true",
         required=check_if_sign_method_required(args, "--guardian-ledger"),
         default=False,
         help="🔐 bool flag for signing transaction using ledger",
-    )
-    sub.add_argument(
-        "--guardian-ledger-account-index",
-        type=int,
-        default=0,
-        help="🔐 the index of the account when using Ledger",
     )
     sub.add_argument(
         "--guardian-ledger-address-index",
@@ -246,16 +252,16 @@ def add_relayed_v3_wallet_args(args: List[str], sub: Any):
         help="🔑 a file containing keyfile's password, if keyfile provided",
     )
     sub.add_argument(
+        "--relayer-address-index",
+        type=int,
+        default=None,
+        help="🔑 the index of the address in the keyfile; should only be provided for keyfile of kind = mnemonic",
+    )
+    sub.add_argument(
         "--relayer-ledger",
         action="store_true",
         default=False,
         help="🔐 bool flag for signing transaction using ledger",
-    )
-    sub.add_argument(
-        "--relayer-ledger-account-index",
-        type=int,
-        default=0,
-        help="🔐 the index of the account when using Ledger",
     )
     sub.add_argument(
         "--relayer-ledger-address-index",
@@ -310,74 +316,88 @@ def parse_omit_fields_arg(args: Any) -> List[str]:
 
 
 def prepare_account(args: Any):
+    hrp = config.get_address_hrp()
+
     if args.pem:
-        account = Account(pem_file=args.pem, pem_index=args.pem_index)
+        return Account.new_from_pem(file_path=Path(args.pem), index=args.pem_index, hrp=hrp)
     elif args.keyfile:
         password = load_password(args)
-        account = Account(key_file=args.keyfile, password=password)
-    elif args.ledger:
-        account = LedgerAccount(
-            account_index=args.ledger_account_index,
-            address_index=args.ledger_address_index,
+        account = Account.new_from_keystore(
+            file_path=Path(args.keyfile),
+            password=password,
+            address_index=args.address_index,
+            hrp=hrp,
         )
+    elif args.ledger:
+        account = LedgerAccount(address_index=args.ledger_address_index)
     else:
         raise errors.NoWalletProvided()
 
     return account
 
 
-def prepare_relayer_account(args: Any) -> Account:
+def prepare_relayer_account(args: Any) -> IAccount:
+    hrp = config.get_address_hrp()
+
     if args.relayer_ledger:
-        account = LedgerAccount(
-            account_index=args.relayer_ledger_account_index,
-            address_index=args.relayer_ledger_address_index,
-        )
+        account = LedgerAccount(address_index=args.relayer_ledger_address_index)
     if args.relayer_pem:
-        account = Account(pem_file=args.relayer_pem, pem_index=args.relayer_pem_index)
+        account = Account.new_from_pem(file_path=Path(args.relayer_pem), index=args.relayer_pem_index, hrp=hrp)
     elif args.relayer_keyfile:
         password = load_password(args)
-        account = Account(key_file=args.relayer_keyfile, password=password)
+        account = Account.new_from_keystore(
+            file_path=Path(args.relayer_keyfile),
+            password=password,
+            address_index=args.relayer_address_index,
+            hrp=hrp,
+        )
     else:
         raise errors.NoWalletProvided()
 
     return account
 
 
-def prepare_guardian_account(args: Any):
+def prepare_guardian_account(args: Any) -> IAccount:
+    hrp = config.get_address_hrp()
+
     if args.guardian_pem:
-        account = Account(pem_file=args.guardian_pem, pem_index=args.guardian_pem_index)
+        account = Account.new_from_pem(file_path=Path(args.guardian_pem), index=args.guardian_pem_index, hrp=hrp)
     elif args.guardian_keyfile:
         password = load_guardian_password(args)
-        account = Account(key_file=args.guardian_keyfile, password=password)
-    elif args.guardian_ledger:
-        address = do_get_ledger_address(
-            account_index=args.guardian_ledger_account_index,
-            address_index=args.guardian_ledger_address_index,
+        account = Account.new_from_keystore(
+            file_path=Path(args.guardian_keyfile),
+            password=password,
+            address_index=args.guardian_address_index,
+            hrp=hrp,
         )
-        account = Account(Address.new_from_bech32(address))
+    elif args.guardian_ledger:
+        account = LedgerAccount(address_index=args.relayer_ledger_address_index)
     else:
         raise errors.NoWalletProvided()
 
     return account
 
 
-def load_guardian_account(args: Any) -> Union[Account, None]:
+def load_guardian_account(args: Any) -> Union[IAccount, None]:
+    hrp = config.get_address_hrp()
+
     if args.guardian_pem:
-        return Account(pem_file=args.guardian_pem, pem_index=args.guardian_pem_index)
+        return Account.new_from_pem(file_path=Path(args.guardian_pem), index=args.guardian_pem_index, hrp=hrp)
     elif args.guardian_keyfile:
         password = load_guardian_password(args)
-        return Account(key_file=args.guardian_keyfile, password=password)
-    elif args.guardian_ledger:
-        address = do_get_ledger_address(
-            account_index=args.guardian_ledger_account_index,
-            address_index=args.guardian_ledger_address_index,
+        return Account.new_from_keystore(
+            file_path=Path(args.guardian_keyfile),
+            password=password,
+            address_index=args.guardian_address_index,
+            hrp=hrp,
         )
-        return Account(Address.new_from_bech32(address))
+    elif args.guardian_ledger:
+        return LedgerAccount(address_index=args.guardian_ledger_address_index)
 
     return None
 
 
-def get_guardian_address(guardian: Union[Account, None], args: Any) -> Union[Address, None]:
+def get_guardian_address(guardian: Union[IAccount, None], args: Any) -> Union[Address, None]:
     if guardian:
         return guardian.address
 
@@ -387,7 +407,7 @@ def get_guardian_address(guardian: Union[Account, None], args: Any) -> Union[Add
     return None
 
 
-def get_relayer_address(relayer: Union[Account, None], args: Any) -> Union[Address, None]:
+def get_relayer_address(relayer: Union[IAccount, None], args: Any) -> Union[Address, None]:
     if relayer:
         return relayer.address
 
@@ -397,18 +417,21 @@ def get_relayer_address(relayer: Union[Account, None], args: Any) -> Union[Addre
     return None
 
 
-def load_relayer_account(args: Any) -> Union[Account, None]:
+def load_relayer_account(args: Any) -> Union[IAccount, None]:
+    hrp = config.get_address_hrp()
+
     if args.relayer_pem:
-        return Account(pem_file=args.relayer_pem, pem_index=args.relayer_pem_index)
+        return Account.new_from_pem(file_path=Path(args.relayer_pem), index=args.relayer_pem_index, hrp=hrp)
     elif args.relayer_keyfile:
         password = load_relayer_password(args)
-        return Account(key_file=args.relayer_keyfile, password=password)
-    elif args.relayer_ledger:
-        address = do_get_ledger_address(
-            account_index=args.relayer_ledger_account_index,
-            address_index=args.relayer_ledger_address_index,
+        return Account.new_from_keystore(
+            file_path=Path(args.relayer_keyfile),
+            password=password,
+            address_index=args.relayer_address_index,
+            hrp=hrp,
         )
-        return Account(Address.new_from_bech32(address))
+    elif args.relayer_ledger:
+        return LedgerAccount(address_index=args.relayer_ledger_address_index)
 
     return None
 
@@ -420,8 +443,8 @@ def prepare_nonce_in_args(args: Any):
     if args.recall_nonce:
         account = prepare_account(args)
         network_provider_config = config.get_config_for_network_providers()
-        account.sync_nonce(ProxyNetworkProvider(url=args.proxy, config=network_provider_config))
-        args.nonce = account.nonce
+        proxy = ProxyNetworkProvider(url=args.proxy, config=network_provider_config)
+        args.nonce = proxy.get_account(account.address).nonce
 
 
 def get_current_nonce_for_address(address: Address, proxy_url: Union[str, None]) -> int:

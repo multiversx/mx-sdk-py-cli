@@ -2,9 +2,10 @@ import json
 import logging
 import os
 from pathlib import Path
-from typing import Any, Union
+from typing import Any, Union, cast
 
 from multiversx_sdk import (
+    Account,
     Address,
     AddressComputer,
     ProxyNetworkProvider,
@@ -392,7 +393,7 @@ def deploy(args: Any):
 
 def _sign_guarded_tx_if_guardian(guardian: Union[IAccount, None], args: Any, tx: Transaction) -> Transaction:
     if guardian:
-        tx.guardian_signature = bytes.fromhex(guardian.sign_transaction(tx))
+        tx.guardian_signature = guardian.sign_transaction(tx)
     elif tx.guardian and args.guardian_service_url and args.guardian_2fa_code:
         tx = cosign_transaction(tx, args.guardian_service_url, args.guardian_2fa_code)
 
@@ -401,7 +402,7 @@ def _sign_guarded_tx_if_guardian(guardian: Union[IAccount, None], args: Any, tx:
 
 def _sign_relayed_tx_if_relayer(relayer: Union[IAccount, None], tx: Transaction):
     if relayer and tx.relayer:
-        tx.relayer_signature = bytes.fromhex(relayer.sign_transaction(tx))
+        tx.relayer_signature = relayer.sign_transaction(tx)
 
 
 def call(args: Any):
@@ -555,6 +556,7 @@ def verify(args: Any) -> None:
     packaged_src = Path(args.packaged_src).expanduser().resolve()
 
     owner = cli_shared.prepare_account(args)
+    owner = cast(Account, owner)
     docker_image = args.docker_image
     contract_variant = args.contract_variant
 
