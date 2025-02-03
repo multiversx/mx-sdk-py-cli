@@ -26,7 +26,7 @@ dependencies = [
   "ledgercomm[hid]",
   "rich==13.3.4",
   "argcomplete==3.2.2",
-  { git = "https://github.com/multiversx/mx-sdk-py-cli.git", branch = "compute-bytes-for-signing" }
+  "multiversx-sdk[ledger]==1.0.0"
 ]
 
 [project.scripts]
