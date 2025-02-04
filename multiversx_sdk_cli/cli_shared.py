@@ -22,10 +22,11 @@ from multiversx_sdk_cli.cli_password import (
     load_relayer_password,
 )
 from multiversx_sdk_cli.constants import (
+    DEFAULT_GAS_PRICE,
     DEFAULT_TX_VERSION,
     TRANSACTION_OPTIONS_TX_GUARDED,
 )
-from multiversx_sdk_cli.errors import ArgumentsNotProvidedError
+from multiversx_sdk_cli.errors import ArgumentsNotProvidedError, IncorrectWalletError
 from multiversx_sdk_cli.interfaces import IAccount
 from multiversx_sdk_cli.simulation import Simulator
 from multiversx_sdk_cli.transactions import send_and_wait_for_result
@@ -85,6 +86,7 @@ def add_tx_args(
             "--nonce",
             type=int,
             required=not ("--recall-nonce" in args),
+            default=None,
             help="# the nonce for the transaction",
         )
         sub.add_argument(
@@ -100,10 +102,12 @@ def add_tx_args(
 
     sub.add_argument(
         "--gas-price",
-        default=config.DEFAULT_GAS_PRICE,
+        default=DEFAULT_GAS_PRICE,
+        type=int,
         help="⛽ the gas price (default: %(default)d)",
     )
-    sub.add_argument("--gas-limit", required=not ("--estimate-gas" in args), help="⛽ the gas limit")
+    sub.add_argument("--gas-limit", required=not ("--estimate-gas" in args), type=int, help="⛽ the gas limit")
+
     if with_estimate_gas:
         sub.add_argument(
             "--estimate-gas",
@@ -112,7 +116,7 @@ def add_tx_args(
             help="⛽ whether to estimate the gas limit (default: %(default)d)",
         )
 
-    sub.add_argument("--value", default="0", help="the value to transfer (default: %(default)s)")
+    sub.add_argument("--value", default="0", type=int, help="the value to transfer (default: %(default)s)")
 
     if with_data:
         sub.add_argument(
@@ -398,23 +402,23 @@ def load_guardian_account(args: Any) -> Union[IAccount, None]:
 
 
 def get_guardian_address(guardian: Union[IAccount, None], args: Any) -> Union[Address, None]:
-    if guardian:
-        return guardian.address
+    address_pem = guardian.address if guardian else None
+    address_arg = Address.new_from_bech32(args.guardian) if hasattr(args, "guardian") and args.guardian else None
 
-    if hasattr(args, "guardian") and args.guardian:
-        return Address.new_from_bech32(args.guardian)
+    if address_pem and address_arg and address_pem != address_arg:
+        raise IncorrectWalletError("Guardian wallet does not match the guardian's address set in the transaction.")
 
-    return None
+    return address_pem or address_arg
 
 
 def get_relayer_address(relayer: Union[IAccount, None], args: Any) -> Union[Address, None]:
-    if relayer:
-        return relayer.address
+    address_pem = relayer.address if relayer else None
+    address_arg = Address.new_from_bech32(args.relayer) if hasattr(args, "relayer") and args.relayer else None
 
-    if hasattr(args, "relayer") and args.relayer:
-        return Address.new_from_bech32(args.relayer)
+    if address_pem and address_arg and address_pem != address_arg:
+        raise IncorrectWalletError("Relayer wallet does not match the relayer's address set in the transaction.")
 
-    return None
+    return address_pem or address_arg
 
 
 def load_relayer_account(args: Any) -> Union[IAccount, None]:

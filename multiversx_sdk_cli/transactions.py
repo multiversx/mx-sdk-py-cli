@@ -2,7 +2,7 @@ import json
 import logging
 import time
 from pathlib import Path
-from typing import Any, List, Protocol, TextIO, Union
+from typing import Any, List, Optional, Protocol, TextIO, Union
 
 from multiversx_sdk import (
     Account,
@@ -35,6 +35,54 @@ class INetworkProvider(Protocol):
     def get_transaction(self, transaction_hash: Union[bytes, str]) -> TransactionOnNetwork:
         ...
 # fmt: on
+
+
+class TransactionsController:
+    def __init__(self, chain_id: str) -> None:
+        config = TransactionsFactoryConfig(chain_id)
+        self.factory = TransferTransactionsFactory(config)
+
+    def create_transaction_for_transfer(
+        self,
+        sender: Address,
+        receiver: Address,
+        native_amount: int,
+        gas_limt: int,
+        gas_price: int,
+        nonce: int,
+        version: int,
+        options: int,
+        token_transfers: Optional[list[TokenTransfer]] = None,
+        data: Optional[str] = None,
+        guardian: Optional[Address] = None,
+        relayer: Optional[Address] = None,
+    ) -> Transaction:
+        # if no value, token transfers or data provided, create plain transaction
+        if not native_amount and not token_transfers and not data:
+            transaction = Transaction(
+                sender=sender,
+                receiver=receiver,
+                gas_limit=gas_limt,
+                chain_id=self.factory.config.chain_id,
+            )
+        else:
+            transaction = self.factory.create_transaction_for_transfer(
+                sender=sender,
+                receiver=receiver,
+                native_amount=native_amount,
+                token_transfers=token_transfers,
+                data=data.encode() if data else None,
+            )
+
+        transaction.gas_limit = gas_limt
+        transaction.gas_price = gas_price
+        transaction.nonce = nonce
+        transaction.version = version
+        transaction.options = options
+        transaction.guardian = guardian
+        transaction.relayer = relayer
+
+        return transaction
 
 
 def do_prepare_transaction(args: Any) -> Transaction:
@@ -175,7 +223,7 @@ def sign_tx_by_guardian(args: Any, tx: Transaction, guardian_account: Union[IAcc
     if guardian_account:
         tx.guardian_signature = guardian_account.sign_transaction(tx)
     elif args.guardian:
-        tx = cosign_transaction(tx, args.guardian_service_url, args.guardian_2fa_code)  # type: ignore
+        cosign_transaction(tx, args.guardian_service_url, args.guardian_2fa_code)
 
     return tx
 

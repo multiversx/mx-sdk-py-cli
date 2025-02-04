@@ -294,5 +294,39 @@ def test_check_relayer_wallet_is_provided():
     assert return_code
 
 
+def test_create_plain_transaction(capsys: Any):
+    return_code = main(
+        [
+            "tx",
+            "new",
+            "--pem",
+            str(testdata_path / "alice.pem"),
+            "--receiver",
+            "erd1spyavw0956vq68xj8y4tenjpq2wd5a9p2c6j8gsz7ztyrnpxrruqzu66jx",
+            "--nonce",
+            "89",
+            "--gas-limit",
+            "50000",
+            "--chain",
+            "integration tests chain ID",
+        ]
+    )
+    assert return_code == 0
+
+    tx = _read_stdout(capsys)
+    tx_json = json.loads(tx)["emittedTransaction"]
+
+    assert tx_json["sender"] == "erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th"
+    assert tx_json["receiver"] == "erd1spyavw0956vq68xj8y4tenjpq2wd5a9p2c6j8gsz7ztyrnpxrruqzu66jx"
+    assert tx_json["chainID"] == "integration tests chain ID"
+    assert tx_json["gasLimit"] == 50000
+    assert tx_json["version"] == 2
+    assert tx_json["options"] == 0
+    assert (
+        tx_json["signature"]
+        == "210d3e75924858cde8c7f3020b38db32890a79101cadcb32dc04980e4f3a378a14e9517ff805881f6444efc61fb38b7dfcf3fee07d4b87fa254ee96b67681e02"
+    )
+
+
 def _read_stdout(capsys: Any) -> str:
     return capsys.readouterr().out.strip()

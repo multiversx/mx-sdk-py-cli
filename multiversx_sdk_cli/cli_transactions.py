@@ -1,23 +1,29 @@
 import logging
 from pathlib import Path
-from typing import Any, List
+from typing import Any
 
-from multiversx_sdk import ProxyNetworkProvider
+from multiversx_sdk import (
+    Address,
+    ProxyNetworkProvider,
+    Token,
+    TokenComputer,
+    TokenTransfer,
+)
 
-from multiversx_sdk_cli import cli_shared, utils
+from multiversx_sdk_cli import cli_shared, shared, utils
 from multiversx_sdk_cli.cli_output import CLIOutputBuilder
 from multiversx_sdk_cli.config import get_config_for_network_providers
 from multiversx_sdk_cli.cosign_transaction import cosign_transaction
 from multiversx_sdk_cli.errors import IncorrectWalletError, NoWalletProvided
 from multiversx_sdk_cli.transactions import (
-    do_prepare_transaction,
+    TransactionsController,
     load_transaction_from_file,
 )
 
 logger = logging.getLogger("cli.transactions")
 
 
-def setup_parser(args: List[str], subparsers: Any) -> Any:
+def setup_parser(args: list[str], subparsers: Any) -> Any:
     parser = cli_shared.add_group_subparser(subparsers, "tx", "Create and broadcast Transactions")
     subparsers = parser.add_subparsers()
 
@@ -109,31 +115,81 @@ def setup_parser(args: List[str], subparsers: Any) -> Any:
     return subparsers
 
 
-def _add_common_arguments(args: List[str], sub: Any):
+def _add_common_arguments(args: list[str], sub: Any):
     cli_shared.add_wallet_args(args, sub)
     cli_shared.add_tx_args(args, sub)
     sub.add_argument("--data-file", type=str, default=None, help="a file containing transaction data")
 
 
 def create_transaction(args: Any):
-    args = utils.as_object(args)
-
     cli_shared.check_guardian_and_options_args(args)
     cli_shared.check_broadcast_args(args)
     cli_shared.prepare_chain_id_in_args(args)
-    cli_shared.prepare_nonce_in_args(args)
+
+    sender = cli_shared.prepare_account(args)
+
+    if args.nonce is None:
+        nonce = cli_shared.get_current_nonce_for_address(sender.address, args.proxy)
+    else:
+        nonce = int(args.nonce)
 
     if args.data_file:
         args.data = Path(args.data_file).read_text()
 
-    tx = do_prepare_transaction(args)
+    guardian = cli_shared.load_guardian_account(args)
+    guardian_address = cli_shared.get_guardian_address(guardian, args)
+
+    relayer = cli_shared.load_relayer_account(args)
+    relayer_address = cli_shared.get_relayer_address(relayer, args)
+
+    native_amount = int(args.value)
+    transfers = getattr(args, "token_transfers", None)
+    transfers = prepare_token_transfers(transfers) if transfers else None
+
+    tx_controller = TransactionsController(args.chain)
+    tx = tx_controller.create_transaction_for_transfer(
+        sender=sender.address,
+        receiver=Address.new_from_bech32(args.receiver),
+        native_amount=native_amount,
+        gas_limt=args.gas_limit,
+        gas_price=args.gas_price,
+        nonce=nonce,
+        version=args.version,
+        options=args.options,
+        token_transfers=transfers,
+        data=args.data,
+        guardian=guardian_address,
+        relayer=relayer_address,
+    )
+
+    shared.set_options_for_guarded_transaction_if_needed(tx)
+    shared.set_options_for_hash_signing_if_needed(tx, sender, guardian, relayer)
+
+    tx.signature = sender.sign_transaction(tx)
+
+    shared.sign_guarded_transaction_if_guardian(tx, guardian, args.guardian_service_url, args.guardian_2fa_code)
+    shared.sign_relayed_transaction_if_relayer(tx, relayer)
 
     cli_shared.send_or_simulate(tx, args)
 
 
-def send_transaction(args: Any):
-    args = utils.as_object(args)
+def prepare_token_transfers(transfers: list[Any]) -> list[TokenTransfer]:
+    token_computer = TokenComputer()
+    token_transfers: list[TokenTransfer] = []
 
+    for i in range(0, len(transfers) - 1, 2):
+        identifier = transfers[i]
+        amount = int(transfers[i + 1])
+        nonce = token_computer.extract_nonce_from_extended_identifier(identifier)
+
+        token = Token(identifier, nonce)
+        transfer = TokenTransfer(token, amount)
+        token_transfers.append(transfer)
+
+    return token_transfers
+
+
+def send_transaction(args: Any):
     tx = load_transaction_from_file(args.infile)
     output = CLIOutputBuilder()
 
@@ -149,7 +205,7 @@ def send_transaction(args: Any):
 
 
 def get_transaction(args: Any):
-    args = utils.as_object(args)
+    # args = utils.as_object(args)
     omit_fields = cli_shared.parse_omit_fields_arg(args)
 
     config = get_config_for_network_providers()
@@ -161,8 +217,6 @@ def get_transaction(args: Any):
 
 
 def sign_transaction(args: Any):
-    args = utils.as_object(args)
-
     cli_shared.check_guardian_args(args)
     cli_shared.check_broadcast_args(args)
 
@@ -181,14 +235,12 @@ def sign_transaction(args: Any):
     if guardian_account:
         tx.guardian_signature = guardian_account.sign_transaction(tx)
     elif args.guardian:
-        tx = cosign_transaction(tx, args.guardian_service_url, args.guardian_2fa_code)
+        cosign_transaction(tx, args.guardian_service_url, args.guardian_2fa_code)
 
     cli_shared.send_or_simulate(tx, args)
 
 
 def relay_transaction(args: Any):
-    args = utils.as_object(args)
-
     if not _is_relayer_wallet_provided(args):
         raise NoWalletProvided()
 

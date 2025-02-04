@@ -345,7 +345,7 @@ def deploy(args: Any):
 
     sender = cli_shared.prepare_account(args)
 
-    if not args.nonce:
+    if args.nonce is None:
         nonce = cli_shared.get_current_nonce_for_address(sender.address, args.proxy)
     else:
         nonce = int(args.nonce)
@@ -395,7 +395,7 @@ def _sign_guarded_tx_if_guardian(guardian: Union[IAccount, None], args: Any, tx:
     if guardian:
         tx.guardian_signature = guardian.sign_transaction(tx)
     elif tx.guardian and args.guardian_service_url and args.guardian_2fa_code:
-        tx = cosign_transaction(tx, args.guardian_service_url, args.guardian_2fa_code)
+        cosign_transaction(tx, args.guardian_service_url, args.guardian_2fa_code)
 
     return tx
 
@@ -413,7 +413,7 @@ def call(args: Any):
 
     sender = cli_shared.prepare_account(args)
 
-    if not args.nonce:
+    if args.nonce is None:
         nonce = cli_shared.get_current_nonce_for_address(sender.address, args.proxy)
     else:
         nonce = int(args.nonce)
@@ -460,7 +460,7 @@ def upgrade(args: Any):
 
     sender = cli_shared.prepare_account(args)
 
-    if not args.nonce:
+    if args.nonce is None:
         nonce = cli_shared.get_current_nonce_for_address(sender.address, args.proxy)
     else:
         nonce = int(args.nonce)

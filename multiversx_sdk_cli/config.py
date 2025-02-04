@@ -10,11 +10,6 @@ SDK_PATH = Path("~/multiversx-sdk").expanduser().resolve()
 LOCAL_CONFIG_PATH = Path("mxpy.json").resolve()
 GLOBAL_CONFIG_PATH = SDK_PATH / "mxpy.json"
 
-DEFAULT_GAS_PRICE = 1000000000
-GAS_PER_DATA_BYTE = 1500
-MIN_GAS_LIMIT = 50000
-MAX_GAS_LIMIT = 600000000
-
 
 class MetaChainSystemSCsCost:
     STAKE = 5000000
