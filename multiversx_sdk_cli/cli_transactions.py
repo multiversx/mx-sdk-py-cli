@@ -33,6 +33,8 @@ def setup_parser(args: List[str], subparsers: Any) -> Any:
     cli_shared.add_broadcast_args(sub)
     cli_shared.add_proxy_arg(sub)
     cli_shared.add_guardian_wallet_args(args, sub)
+    cli_shared.add_relayed_v3_wallet_args(args, sub)
+
     sub.add_argument(
         "--wait-result",
         action="store_true",
@@ -87,6 +89,7 @@ def setup_parser(args: List[str], subparsers: Any) -> Any:
     cli_shared.add_proxy_arg(sub)
     cli_shared.add_guardian_args(sub)
     cli_shared.add_guardian_wallet_args(args, sub)
+    cli_shared.add_relayed_v3_wallet_args(args, sub)
     sub.set_defaults(func=sign_transaction)
 
     sub = cli_shared.add_command_subparser(

@@ -1,6 +1,6 @@
 import logging
 from pathlib import Path
-from typing import Any, List, Optional, Protocol, Union
+from typing import Any, Optional, Protocol, Union
 
 from multiversx_sdk import (
     Address,
@@ -59,7 +59,7 @@ class SmartContract:
         self,
         owner: Account,
         bytecode: Path,
-        arguments: Union[List[Any], None],
+        arguments: Union[list[Any], None],
         should_prepare_args: bool,
         upgradeable: bool,
         readable: bool,
@@ -70,7 +70,8 @@ class SmartContract:
         nonce: int,
         version: int,
         options: int,
-        guardian: Address,
+        guardian: Union[Address, None],
+        relayer: Union[Address, None],
     ) -> Transaction:
         args = arguments if arguments else []
         if should_prepare_args:
@@ -91,6 +92,7 @@ class SmartContract:
         tx.version = version
         tx.options = options
         tx.guardian = guardian
+        tx.relayer = relayer
         tx.signature = bytes.fromhex(owner.sign_transaction(tx))
 
         return tx
@@ -100,15 +102,16 @@ class SmartContract:
         caller: Account,
         contract: Address,
         function: str,
-        arguments: Union[List[Any], None],
+        arguments: Union[list[Any], None],
         should_prepare_args: bool,
         gas_limit: int,
         value: int,
-        transfers: Union[List[str], None],
+        transfers: Union[list[str], None],
         nonce: int,
         version: int,
         options: int,
-        guardian: Address,
+        guardian: Union[Address, None],
+        relayer: Union[Address, None],
     ) -> Transaction:
         token_transfers = self._prepare_token_transfers(transfers) if transfers else []
 
@@ -129,6 +132,7 @@ class SmartContract:
         tx.version = version
         tx.options = options
         tx.guardian = guardian
+        tx.relayer = relayer
         tx.signature = bytes.fromhex(caller.sign_transaction(tx))
 
         return tx
@@ -138,7 +142,7 @@ class SmartContract:
         owner: Account,
         contract: Address,
         bytecode: Path,
-        arguments: Union[List[str], None],
+        arguments: Union[list[str], None],
         should_prepare_args: bool,
         upgradeable: bool,
         readable: bool,
@@ -149,7 +153,8 @@ class SmartContract:
         nonce: int,
         version: int,
         options: int,
-        guardian: Address,
+        guardian: Union[Address, None],
+        relayer: Union[Address, None],
     ) -> Transaction:
         args = arguments if arguments else []
         if should_prepare_args:
@@ -171,6 +176,7 @@ class SmartContract:
         tx.version = version
         tx.options = options
         tx.guardian = guardian
+        tx.relayer = relayer
         tx.signature = bytes.fromhex(owner.sign_transaction(tx))
 
         return tx
@@ -180,9 +186,9 @@ class SmartContract:
         contract_address: Address,
         proxy: INetworkProvider,
         function: str,
-        arguments: Optional[List[Any]],
+        arguments: Optional[list[Any]],
         should_prepare_args: bool,
-    ) -> List[Any]:
+    ) -> list[Any]:
         args = arguments if arguments else []
         if should_prepare_args:
             args = self._prepare_args_for_factory(args)
@@ -196,9 +202,9 @@ class SmartContract:
 
         return response
 
-    def _prepare_token_transfers(self, transfers: List[str]) -> List[TokenTransfer]:
+    def _prepare_token_transfers(self, transfers: list[str]) -> list[TokenTransfer]:
         token_computer = TokenComputer()
-        token_transfers: List[TokenTransfer] = []
+        token_transfers: list[TokenTransfer] = []
 
         for i in range(0, len(transfers) - 1, 2):
             identifier = transfers[i]
@@ -211,8 +217,8 @@ class SmartContract:
 
         return token_transfers
 
-    def _prepare_args_for_factory(self, arguments: List[str]) -> List[Any]:
-        args: List[Any] = []
+    def _prepare_args_for_factory(self, arguments: list[str]) -> list[Any]:
+        args: list[Any] = []
 
         for arg in arguments:
             if arg.startswith(HEX_PREFIX):
@@ -241,7 +247,7 @@ class SmartContract:
         return bytes.fromhex(argument)
 
 
-def prepare_execute_transaction_data(function: str, arguments: List[Any]) -> str:
+def prepare_execute_transaction_data(function: str, arguments: list[Any]) -> str:
     tx_data = function
 
     for arg in arguments:
