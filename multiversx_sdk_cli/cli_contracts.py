@@ -2,10 +2,9 @@ import json
 import logging
 import os
 from pathlib import Path
-from typing import Any, Union, cast
+from typing import Any, Union
 
 from multiversx_sdk import (
-    Account,
     Address,
     AddressComputer,
     ProxyNetworkProvider,
@@ -556,7 +555,6 @@ def verify(args: Any) -> None:
     packaged_src = Path(args.packaged_src).expanduser().resolve()
 
     owner = cli_shared.prepare_account(args)
-    owner = cast(Account, owner)
     docker_image = args.docker_image
     contract_variant = args.contract_variant
 
