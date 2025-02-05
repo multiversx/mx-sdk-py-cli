@@ -1,12 +1,7 @@
 from typing import Any, List
 
-from multiversx_sdk import Address
-
-from multiversx_sdk_cli import cli_shared, shared, utils, validators
-from multiversx_sdk_cli.transactions import (
-    TransactionsController,
-    do_prepare_transaction,
-)
+from multiversx_sdk_cli import cli_shared, utils, validators
+from multiversx_sdk_cli.transactions import do_prepare_transaction
 
 
 def setup_parser(args: List[str], subparsers: Any) -> Any:
@@ -141,54 +136,11 @@ def _add_nodes_arg(sub: Any):
 
 
 def do_stake(args: Any):
-    # cli_shared.check_broadcast_args(args)
-    # cli_shared.prepare_nonce_in_args(args)
-    # cli_shared.prepare_chain_id_in_args(args)
-    # validators.prepare_args_for_stake(args)
-    # tx = do_prepare_transaction(args)
-
-    # cli_shared.send_or_simulate(tx, args)
-    cli_shared.check_guardian_and_options_args(args)
     cli_shared.check_broadcast_args(args)
+    cli_shared.prepare_nonce_in_args(args)
     cli_shared.prepare_chain_id_in_args(args)
-
-    sender = cli_shared.prepare_account(args)
-
-    if args.nonce is None:
-        nonce = cli_shared.get_current_nonce_for_address(sender.address, args.proxy)
-    else:
-        nonce = int(args.nonce)
-
-    guardian = cli_shared.load_guardian_account(args)
-    guardian_address = cli_shared.get_guardian_address(guardian, args)
-
-    relayer = cli_shared.load_relayer_account(args)
-    relayer_address = cli_shared.get_relayer_address(relayer, args)
-
-    native_amount = int(args.value)
-
-    tx_controller = TransactionsController(args.chain)
-    tx = tx_controller.create_transaction_for_transfer(
-        sender=sender.address,
-        receiver=Address.new_from_bech32(args.receiver),
-        native_amount=native_amount,
-        gas_limt=args.gas_limit,
-        gas_price=args.gas_price,
-        nonce=nonce,
-        version=args.version,
-        options=args.options,
-        data=args.data,
-        guardian=guardian_address,
-        relayer=relayer_address,
-    )
-
-    shared.set_options_for_guarded_transaction_if_needed(tx)
-    shared.set_options_for_hash_signing_if_needed(tx, sender, guardian, relayer)
-
-    tx.signature = sender.sign_transaction(tx)
-
-    shared.sign_guarded_transaction_if_guardian(tx, guardian, args.guardian_service_url, args.guardian_2fa_code)
-    shared.sign_relayed_transaction_if_relayer(tx, relayer)
+    validators.prepare_args_for_stake(args)
+    tx = do_prepare_transaction(args)
 
     cli_shared.send_or_simulate(tx, args)
 
