@@ -10,7 +10,7 @@ from multiversx_sdk import (
     TokenTransfer,
 )
 
-from multiversx_sdk_cli import cli_shared, shared, utils
+from multiversx_sdk_cli import cli_shared, utils
 from multiversx_sdk_cli.cli_output import CLIOutputBuilder
 from multiversx_sdk_cli.config import get_config_for_network_providers
 from multiversx_sdk_cli.cosign_transaction import cosign_transaction
@@ -147,8 +147,8 @@ def create_transaction(args: Any):
     transfers = prepare_token_transfers(transfers) if transfers else None
 
     tx_controller = TransactionsController(args.chain)
-    tx = tx_controller.create_transaction_for_transfer(
-        sender=sender.address,
+    tx = tx_controller.create_transaction(
+        sender=sender,
         receiver=Address.new_from_bech32(args.receiver),
         native_amount=native_amount,
         gas_limt=args.gas_limit,
@@ -158,17 +158,13 @@ def create_transaction(args: Any):
         options=args.options,
         token_transfers=transfers,
         data=args.data,
-        guardian=guardian_address,
-        relayer=relayer_address,
+        guardian_account=guardian,
+        guardian_address=guardian_address,
+        relayer_account=relayer,
+        relayer_address=relayer_address,
+        guardian_service_url=args.guardian_service_url,
+        guardian_2fa_code=args.guardian_2fa_code,
     )
-
-    shared.set_options_for_guarded_transaction_if_needed(tx)
-    shared.set_options_for_hash_signing_if_needed(tx, sender, guardian, relayer)
-
-    tx.signature = sender.sign_transaction(tx)
-
-    shared.sign_guarded_transaction_if_guardian(tx, guardian, args.guardian_service_url, args.guardian_2fa_code)
-    shared.sign_relayed_transaction_if_relayer(tx, relayer)
 
     cli_shared.send_or_simulate(tx, args)
 

@@ -19,6 +19,7 @@ from multiversx_sdk import (
 )
 
 from multiversx_sdk_cli import config, errors
+from multiversx_sdk_cli.base_transactions_controller import BaseTransactionsController
 from multiversx_sdk_cli.cli_password import load_guardian_password, load_password
 from multiversx_sdk_cli.cosign_transaction import cosign_transaction
 from multiversx_sdk_cli.errors import IncorrectWalletError, NoWalletProvided
@@ -37,14 +38,14 @@ class INetworkProvider(Protocol):
 # fmt: on
 
 
-class TransactionsController:
+class TransactionsController(BaseTransactionsController):
     def __init__(self, chain_id: str) -> None:
         config = TransactionsFactoryConfig(chain_id)
         self.factory = TransferTransactionsFactory(config)
 
-    def create_transaction_for_transfer(
+    def create_transaction(
         self,
-        sender: Address,
+        sender: IAccount,
         receiver: Address,
         native_amount: int,
         gas_limt: int,
@@ -54,20 +55,24 @@ class TransactionsController:
         options: int,
         token_transfers: Optional[list[TokenTransfer]] = None,
         data: Optional[str] = None,
-        guardian: Optional[Address] = None,
-        relayer: Optional[Address] = None,
+        guardian_account: Optional[IAccount] = None,
+        guardian_address: Optional[Address] = None,
+        relayer_account: Optional[IAccount] = None,
+        relayer_address: Optional[Address] = None,
+        guardian_service_url: str = "",
+        guardian_2fa_code: str = "",
     ) -> Transaction:
         # if no value, token transfers or data provided, create plain transaction
         if not native_amount and not token_transfers and not data:
             transaction = Transaction(
-                sender=sender,
+                sender=sender.address,
                 receiver=receiver,
                 gas_limit=gas_limt,
                 chain_id=self.factory.config.chain_id,
             )
         else:
             transaction = self.factory.create_transaction_for_transfer(
-                sender=sender,
+                sender=sender.address,
                 receiver=receiver,
                 native_amount=native_amount,
                 token_transfers=token_transfers,
@@ -79,8 +84,17 @@ class TransactionsController:
         transaction.nonce = nonce
         transaction.version = version
         transaction.options = options
-        transaction.guardian = guardian
-        transaction.relayer = relayer
+        transaction.guardian = guardian_address
+        transaction.relayer = relayer_address
+
+        self.sign_transaction(
+            transaction=transaction,
+            sender=sender,
+            guardian=guardian_account,
+            relayer=relayer_account,
+            guardian_service_url=guardian_service_url,
+            guardian_2fa_code=guardian_2fa_code,
+        )
 
         return transaction
 

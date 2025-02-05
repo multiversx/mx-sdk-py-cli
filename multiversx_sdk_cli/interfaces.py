@@ -25,7 +25,6 @@ class ITransaction(Protocol):
 
 
 class IAccount(Protocol):
-    use_hash_signing: bool
     address: Address
 
     def sign_transaction(self, transaction: Transaction) -> bytes:
