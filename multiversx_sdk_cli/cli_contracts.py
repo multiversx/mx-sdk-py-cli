@@ -2,7 +2,7 @@ import json
 import logging
 import os
 from pathlib import Path
-from typing import Any, Union, cast
+from typing import Any, cast
 
 from multiversx_sdk import (
     Account,
@@ -20,10 +20,8 @@ from multiversx_sdk_cli.config import get_config_for_network_providers
 from multiversx_sdk_cli.constants import NUMBER_OF_SHARDS
 from multiversx_sdk_cli.contract_verification import trigger_contract_verification
 from multiversx_sdk_cli.contracts import SmartContract
-from multiversx_sdk_cli.cosign_transaction import cosign_transaction
 from multiversx_sdk_cli.docker import is_docker_installed, run_docker
 from multiversx_sdk_cli.errors import DockerMissingError
-from multiversx_sdk_cli.interfaces import IAccount
 from multiversx_sdk_cli.ux import show_warning
 
 logger = logging.getLogger("cli.contracts")
@@ -376,11 +374,13 @@ def deploy(args: Any):
         nonce=nonce,
         version=int(args.version),
         options=int(args.options),
-        guardian=guardian_address,
-        relayer=relayer_address,
+        guardian_account=guardian,
+        guardian_address=guardian_address,
+        relayer_account=relayer,
+        relayer_address=relayer_address,
+        guardian_service_url=args.guardian_service_url,
+        guardian_2fa_code=args.guardian_2fa_code,
     )
-    tx = _sign_guarded_tx_if_guardian(guardian, args, tx)
-    _sign_relayed_tx_if_relayer(relayer, tx)
 
     address_computer = AddressComputer(NUMBER_OF_SHARDS)
     contract_address = address_computer.compute_contract_address(deployer=sender.address, deployment_nonce=tx.nonce)
@@ -389,20 +389,6 @@ def deploy(args: Any):
     utils.log_explorer_contract_address(args.chain, contract_address.to_bech32())
 
     _send_or_simulate(tx, contract_address, args)
-
-
-def _sign_guarded_tx_if_guardian(guardian: Union[IAccount, None], args: Any, tx: Transaction) -> Transaction:
-    if guardian:
-        tx.guardian_signature = guardian.sign_transaction(tx)
-    elif tx.guardian and args.guardian_service_url and args.guardian_2fa_code:
-        cosign_transaction(tx, args.guardian_service_url, args.guardian_2fa_code)
-
-    return tx
-
-
-def _sign_relayed_tx_if_relayer(relayer: Union[IAccount, None], tx: Transaction):
-    if relayer and tx.relayer:
-        tx.relayer_signature = relayer.sign_transaction(tx)
 
 
 def call(args: Any):
@@ -443,11 +429,13 @@ def call(args: Any):
         nonce=nonce,
         version=int(args.version),
         options=int(args.options),
-        guardian=guardian_address,
-        relayer=relayer_address,
+        guardian_account=guardian,
+        guardian_address=guardian_address,
+        relayer_account=relayer,
+        relayer_address=relayer_address,
+        guardian_service_url=args.guardian_service_url,
+        guardian_2fa_code=args.guardian_2fa_code,
     )
-    tx = _sign_guarded_tx_if_guardian(guardian, args, tx)
-    _sign_relayed_tx_if_relayer(relayer, tx)
 
     _send_or_simulate(tx, contract_address, args)
 
@@ -493,11 +481,13 @@ def upgrade(args: Any):
         nonce=nonce,
         version=int(args.version),
         options=int(args.options),
-        guardian=guardian_address,
-        relayer=relayer_address,
+        guardian_account=guardian,
+        guardian_address=guardian_address,
+        relayer_account=relayer,
+        relayer_address=relayer_address,
+        guardian_service_url=args.guardian_service_url,
+        guardian_2fa_code=args.guardian_2fa_code,
     )
-    tx = _sign_guarded_tx_if_guardian(guardian, args, tx)
-    _sign_relayed_tx_if_relayer(relayer, tx)
 
     _send_or_simulate(tx, contract_address, args)
 
