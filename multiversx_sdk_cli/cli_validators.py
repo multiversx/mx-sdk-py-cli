@@ -1,7 +1,10 @@
+from pathlib import Path
 from typing import Any, List
 
-from multiversx_sdk_cli import cli_shared, utils, validators
-from multiversx_sdk_cli.transactions import do_prepare_transaction
+from multiversx_sdk import Address
+
+from multiversx_sdk_cli import cli_shared, utils
+from multiversx_sdk_cli.validators.core import ValidatorsController
 
 
 def setup_parser(args: List[str], subparsers: Any) -> Any:
@@ -136,120 +139,547 @@ def _add_nodes_arg(sub: Any):
 
 
 def do_stake(args: Any):
+    cli_shared.check_guardian_and_options_args(args)
     cli_shared.check_broadcast_args(args)
-    cli_shared.prepare_nonce_in_args(args)
     cli_shared.prepare_chain_id_in_args(args)
-    validators.prepare_args_for_stake(args)
-    tx = do_prepare_transaction(args)
+
+    sender = cli_shared.prepare_account(args)
+
+    if args.nonce is None:
+        nonce = cli_shared.get_current_nonce_for_address(sender.address, args.proxy)
+    else:
+        nonce = int(args.nonce)
+
+    guardian = cli_shared.load_guardian_account(args)
+    guardian_address = cli_shared.get_guardian_address(guardian, args)
+
+    relayer = cli_shared.load_relayer_account(args)
+    relayer_address = cli_shared.get_relayer_address(relayer, args)
+
+    native_amount = int(args.value)
+    gas_limit = 0 if args.estimate_gas else args.gas_limit
+    rewards_address = Address.new_from_bech32(args.reward_address) if args.reward_address else None
+
+    controller = ValidatorsController(args.chain)
+
+    if args.top_up:
+        tx = controller.create_transaction_for_topping_up(
+            sender=sender,
+            native_amount=native_amount,
+            estimate_gas=args.estimate_gas,
+            gas_limit=gas_limit,
+            gas_price=args.gas_price,
+            nonce=nonce,
+            version=args.version,
+            options=args.options,
+            guardian_account=guardian,
+            guardian_address=guardian_address,
+            relayer_account=relayer,
+            relayer_address=relayer_address,
+            guardian_service_url=args.guardian_service_url,
+            guardian_2fa_code=args.guardian_2fa_code,
+        )
+    else:
+        validators_file = Path(args.validators_file)
+        tx = controller.create_transaction_for_staking(
+            sender=sender,
+            validators_file=validators_file,
+            native_amount=native_amount,
+            estimate_gas=args.estimate_gas,
+            gas_limit=gas_limit,
+            gas_price=args.gas_price,
+            nonce=nonce,
+            version=args.version,
+            options=args.options,
+            rewards_address=rewards_address,
+            guardian_account=guardian,
+            guardian_address=guardian_address,
+            relayer_account=relayer,
+            relayer_address=relayer_address,
+            guardian_service_url=args.guardian_service_url,
+            guardian_2fa_code=args.guardian_2fa_code,
+        )
 
     cli_shared.send_or_simulate(tx, args)
 
 
 def do_unstake(args: Any):
+    cli_shared.check_guardian_and_options_args(args)
     cli_shared.check_broadcast_args(args)
-    cli_shared.prepare_nonce_in_args(args)
     cli_shared.prepare_chain_id_in_args(args)
-    validators.prepare_args_for_unstake(args)
-    tx = do_prepare_transaction(args)
+
+    sender = cli_shared.prepare_account(args)
+
+    if args.nonce is None:
+        nonce = cli_shared.get_current_nonce_for_address(sender.address, args.proxy)
+    else:
+        nonce = int(args.nonce)
+
+    guardian = cli_shared.load_guardian_account(args)
+    guardian_address = cli_shared.get_guardian_address(guardian, args)
+
+    relayer = cli_shared.load_relayer_account(args)
+    relayer_address = cli_shared.get_relayer_address(relayer, args)
+
+    native_amount = int(args.value)
+    gas_limit = 0 if args.estimate_gas else args.gas_limit
+    keys = args.nodes_public_keys
+
+    controller = ValidatorsController(args.chain)
+    tx = controller.create_transaction_for_unstaking(
+        sender=sender,
+        keys=keys,
+        native_amount=native_amount,
+        estimate_gas=args.estimate_gas,
+        gas_limit=gas_limit,
+        gas_price=args.gas_price,
+        nonce=nonce,
+        version=args.version,
+        options=args.options,
+        guardian_account=guardian,
+        guardian_address=guardian_address,
+        relayer_account=relayer,
+        relayer_address=relayer_address,
+        guardian_service_url=args.guardian_service_url,
+        guardian_2fa_code=args.guardian_2fa_code,
+    )
 
     cli_shared.send_or_simulate(tx, args)
 
 
 def do_unjail(args: Any):
+    cli_shared.check_guardian_and_options_args(args)
     cli_shared.check_broadcast_args(args)
-    cli_shared.prepare_nonce_in_args(args)
     cli_shared.prepare_chain_id_in_args(args)
-    validators.prepare_args_for_unjail(args)
-    tx = do_prepare_transaction(args)
+
+    sender = cli_shared.prepare_account(args)
+
+    if args.nonce is None:
+        nonce = cli_shared.get_current_nonce_for_address(sender.address, args.proxy)
+    else:
+        nonce = int(args.nonce)
+
+    guardian = cli_shared.load_guardian_account(args)
+    guardian_address = cli_shared.get_guardian_address(guardian, args)
+
+    relayer = cli_shared.load_relayer_account(args)
+    relayer_address = cli_shared.get_relayer_address(relayer, args)
+
+    native_amount = int(args.value)
+    gas_limit = 0 if args.estimate_gas else args.gas_limit
+    keys = args.nodes_public_keys
+
+    controller = ValidatorsController(args.chain)
+    tx = controller.create_transaction_for_unjailing(
+        sender=sender,
+        keys=keys,
+        native_amount=native_amount,
+        estimate_gas=args.estimate_gas,
+        gas_limit=gas_limit,
+        gas_price=args.gas_price,
+        nonce=nonce,
+        version=args.version,
+        options=args.options,
+        guardian_account=guardian,
+        guardian_address=guardian_address,
+        relayer_account=relayer,
+        relayer_address=relayer_address,
+        guardian_service_url=args.guardian_service_url,
+        guardian_2fa_code=args.guardian_2fa_code,
+    )
 
     cli_shared.send_or_simulate(tx, args)
 
 
 def do_unbond(args: Any):
+    cli_shared.check_guardian_and_options_args(args)
     cli_shared.check_broadcast_args(args)
-    cli_shared.prepare_nonce_in_args(args)
     cli_shared.prepare_chain_id_in_args(args)
-    validators.prepare_args_for_unbond(args)
-    tx = do_prepare_transaction(args)
+
+    sender = cli_shared.prepare_account(args)
+
+    if args.nonce is None:
+        nonce = cli_shared.get_current_nonce_for_address(sender.address, args.proxy)
+    else:
+        nonce = int(args.nonce)
+
+    guardian = cli_shared.load_guardian_account(args)
+    guardian_address = cli_shared.get_guardian_address(guardian, args)
+
+    relayer = cli_shared.load_relayer_account(args)
+    relayer_address = cli_shared.get_relayer_address(relayer, args)
+
+    native_amount = int(args.value)
+    gas_limit = 0 if args.estimate_gas else args.gas_limit
+    keys = args.nodes_public_keys
+
+    controller = ValidatorsController(args.chain)
+    tx = controller.create_transaction_for_unbonding(
+        sender=sender,
+        keys=keys,
+        native_amount=native_amount,
+        estimate_gas=args.estimate_gas,
+        gas_limit=gas_limit,
+        gas_price=args.gas_price,
+        nonce=nonce,
+        version=args.version,
+        options=args.options,
+        guardian_account=guardian,
+        guardian_address=guardian_address,
+        relayer_account=relayer,
+        relayer_address=relayer_address,
+        guardian_service_url=args.guardian_service_url,
+        guardian_2fa_code=args.guardian_2fa_code,
+    )
 
     cli_shared.send_or_simulate(tx, args)
 
 
 def change_reward_address(args: Any):
+    cli_shared.check_guardian_and_options_args(args)
     cli_shared.check_broadcast_args(args)
-    cli_shared.prepare_nonce_in_args(args)
     cli_shared.prepare_chain_id_in_args(args)
-    validators.prepare_args_for_change_reward_address(args)
-    tx = do_prepare_transaction(args)
+
+    sender = cli_shared.prepare_account(args)
+
+    if args.nonce is None:
+        nonce = cli_shared.get_current_nonce_for_address(sender.address, args.proxy)
+    else:
+        nonce = int(args.nonce)
+
+    guardian = cli_shared.load_guardian_account(args)
+    guardian_address = cli_shared.get_guardian_address(guardian, args)
+
+    relayer = cli_shared.load_relayer_account(args)
+    relayer_address = cli_shared.get_relayer_address(relayer, args)
+
+    native_amount = int(args.value)
+    gas_limit = 0 if args.estimate_gas else args.gas_limit
+    rewards_address = Address.new_from_bech32(args.reward_address)
+
+    controller = ValidatorsController(args.chain)
+    tx = controller.create_transaction_for_changing_rewards_address(
+        sender=sender,
+        rewards_address=rewards_address,
+        native_amount=native_amount,
+        estimate_gas=args.estimate_gas,
+        gas_limit=gas_limit,
+        gas_price=args.gas_price,
+        nonce=nonce,
+        version=args.version,
+        options=args.options,
+        guardian_account=guardian,
+        guardian_address=guardian_address,
+        relayer_account=relayer,
+        relayer_address=relayer_address,
+        guardian_service_url=args.guardian_service_url,
+        guardian_2fa_code=args.guardian_2fa_code,
+    )
 
     cli_shared.send_or_simulate(tx, args)
 
 
 def do_claim(args: Any):
+    cli_shared.check_guardian_and_options_args(args)
     cli_shared.check_broadcast_args(args)
-    cli_shared.prepare_nonce_in_args(args)
     cli_shared.prepare_chain_id_in_args(args)
-    validators.prepare_args_for_claim(args)
-    tx = do_prepare_transaction(args)
+
+    sender = cli_shared.prepare_account(args)
+
+    if args.nonce is None:
+        nonce = cli_shared.get_current_nonce_for_address(sender.address, args.proxy)
+    else:
+        nonce = int(args.nonce)
+
+    guardian = cli_shared.load_guardian_account(args)
+    guardian_address = cli_shared.get_guardian_address(guardian, args)
+
+    relayer = cli_shared.load_relayer_account(args)
+    relayer_address = cli_shared.get_relayer_address(relayer, args)
+
+    native_amount = int(args.value)
+    gas_limit = 0 if args.estimate_gas else args.gas_limit
+
+    controller = ValidatorsController(args.chain)
+    tx = controller.create_transaction_for_claiming(
+        sender=sender,
+        native_amount=native_amount,
+        estimate_gas=args.estimate_gas,
+        gas_limit=gas_limit,
+        gas_price=args.gas_price,
+        nonce=nonce,
+        version=args.version,
+        options=args.options,
+        guardian_account=guardian,
+        guardian_address=guardian_address,
+        relayer_account=relayer,
+        relayer_address=relayer_address,
+        guardian_service_url=args.guardian_service_url,
+        guardian_2fa_code=args.guardian_2fa_code,
+    )
 
     cli_shared.send_or_simulate(tx, args)
 
 
 def do_unstake_nodes(args: Any):
+    cli_shared.check_guardian_and_options_args(args)
     cli_shared.check_broadcast_args(args)
-    cli_shared.prepare_nonce_in_args(args)
     cli_shared.prepare_chain_id_in_args(args)
-    validators.prepare_args_for_unstake_nodes(args)
-    tx = do_prepare_transaction(args)
+
+    sender = cli_shared.prepare_account(args)
+
+    if args.nonce is None:
+        nonce = cli_shared.get_current_nonce_for_address(sender.address, args.proxy)
+    else:
+        nonce = int(args.nonce)
+
+    guardian = cli_shared.load_guardian_account(args)
+    guardian_address = cli_shared.get_guardian_address(guardian, args)
+
+    relayer = cli_shared.load_relayer_account(args)
+    relayer_address = cli_shared.get_relayer_address(relayer, args)
+
+    native_amount = int(args.value)
+    gas_limit = 0 if args.estimate_gas else args.gas_limit
+
+    keys = args.nodes_public_keys
+
+    controller = ValidatorsController(args.chain)
+    tx = controller.create_transaction_for_unstaking_nodes(
+        sender=sender,
+        keys=keys,
+        native_amount=native_amount,
+        estimate_gas=args.estimate_gas,
+        gas_limit=gas_limit,
+        gas_price=args.gas_price,
+        nonce=nonce,
+        version=args.version,
+        options=args.options,
+        guardian_account=guardian,
+        guardian_address=guardian_address,
+        relayer_account=relayer,
+        relayer_address=relayer_address,
+        guardian_service_url=args.guardian_service_url,
+        guardian_2fa_code=args.guardian_2fa_code,
+    )
 
     cli_shared.send_or_simulate(tx, args)
 
 
 def do_unstake_tokens(args: Any):
+    cli_shared.check_guardian_and_options_args(args)
     cli_shared.check_broadcast_args(args)
-    cli_shared.prepare_nonce_in_args(args)
     cli_shared.prepare_chain_id_in_args(args)
-    validators.prepare_args_for_unstake_tokens(args)
-    tx = do_prepare_transaction(args)
+
+    sender = cli_shared.prepare_account(args)
+
+    if args.nonce is None:
+        nonce = cli_shared.get_current_nonce_for_address(sender.address, args.proxy)
+    else:
+        nonce = int(args.nonce)
+
+    guardian = cli_shared.load_guardian_account(args)
+    guardian_address = cli_shared.get_guardian_address(guardian, args)
+
+    relayer = cli_shared.load_relayer_account(args)
+    relayer_address = cli_shared.get_relayer_address(relayer, args)
+
+    native_amount = int(args.value)
+    value = int(args.unstake_value)
+    gas_limit = 0 if args.estimate_gas else args.gas_limit
+
+    controller = ValidatorsController(args.chain)
+    tx = controller.create_transaction_for_unstaking_tokens(
+        sender=sender,
+        value=value,
+        native_amount=native_amount,
+        estimate_gas=args.estimate_gas,
+        gas_limit=gas_limit,
+        gas_price=args.gas_price,
+        nonce=nonce,
+        version=args.version,
+        options=args.options,
+        guardian_account=guardian,
+        guardian_address=guardian_address,
+        relayer_account=relayer,
+        relayer_address=relayer_address,
+        guardian_service_url=args.guardian_service_url,
+        guardian_2fa_code=args.guardian_2fa_code,
+    )
 
     cli_shared.send_or_simulate(tx, args)
 
 
 def do_unbond_nodes(args: Any):
+    cli_shared.check_guardian_and_options_args(args)
     cli_shared.check_broadcast_args(args)
-    cli_shared.prepare_nonce_in_args(args)
     cli_shared.prepare_chain_id_in_args(args)
-    validators.prepare_args_for_unbond_nodes(args)
-    tx = do_prepare_transaction(args)
+
+    sender = cli_shared.prepare_account(args)
+
+    if args.nonce is None:
+        nonce = cli_shared.get_current_nonce_for_address(sender.address, args.proxy)
+    else:
+        nonce = int(args.nonce)
+
+    guardian = cli_shared.load_guardian_account(args)
+    guardian_address = cli_shared.get_guardian_address(guardian, args)
+
+    relayer = cli_shared.load_relayer_account(args)
+    relayer_address = cli_shared.get_relayer_address(relayer, args)
+
+    native_amount = int(args.value)
+    gas_limit = 0 if args.estimate_gas else args.gas_limit
+
+    keys = args.nodes_public_keys
+
+    controller = ValidatorsController(args.chain)
+    tx = controller.create_transaction_for_unbonding_nodes(
+        sender=sender,
+        keys=keys,
+        native_amount=native_amount,
+        estimate_gas=args.estimate_gas,
+        gas_limit=gas_limit,
+        gas_price=args.gas_price,
+        nonce=nonce,
+        version=args.version,
+        options=args.options,
+        guardian_account=guardian,
+        guardian_address=guardian_address,
+        relayer_account=relayer,
+        relayer_address=relayer_address,
+        guardian_service_url=args.guardian_service_url,
+        guardian_2fa_code=args.guardian_2fa_code,
+    )
 
     cli_shared.send_or_simulate(tx, args)
 
 
 def do_unbond_tokens(args: Any):
+    cli_shared.check_guardian_and_options_args(args)
     cli_shared.check_broadcast_args(args)
-    cli_shared.prepare_nonce_in_args(args)
     cli_shared.prepare_chain_id_in_args(args)
-    validators.prepare_args_for_unbond_tokens(args)
-    tx = do_prepare_transaction(args)
+
+    sender = cli_shared.prepare_account(args)
+
+    if args.nonce is None:
+        nonce = cli_shared.get_current_nonce_for_address(sender.address, args.proxy)
+    else:
+        nonce = int(args.nonce)
+
+    guardian = cli_shared.load_guardian_account(args)
+    guardian_address = cli_shared.get_guardian_address(guardian, args)
+
+    relayer = cli_shared.load_relayer_account(args)
+    relayer_address = cli_shared.get_relayer_address(relayer, args)
+
+    native_amount = int(args.value)
+    value = int(args.unbond_value)
+    gas_limit = 0 if args.estimate_gas else args.gas_limit
+
+    controller = ValidatorsController(args.chain)
+    tx = controller.create_transaction_for_unbonding_tokens(
+        sender=sender,
+        value=value,
+        native_amount=native_amount,
+        estimate_gas=args.estimate_gas,
+        gas_limit=gas_limit,
+        gas_price=args.gas_price,
+        nonce=nonce,
+        version=args.version,
+        options=args.options,
+        guardian_account=guardian,
+        guardian_address=guardian_address,
+        relayer_account=relayer,
+        relayer_address=relayer_address,
+        guardian_service_url=args.guardian_service_url,
+        guardian_2fa_code=args.guardian_2fa_code,
+    )
 
     cli_shared.send_or_simulate(tx, args)
 
 
 def do_clean_registered_data(args: Any):
+    cli_shared.check_guardian_and_options_args(args)
     cli_shared.check_broadcast_args(args)
-    cli_shared.prepare_nonce_in_args(args)
     cli_shared.prepare_chain_id_in_args(args)
-    validators.prepare_args_for_clean_registered_data(args)
-    tx = do_prepare_transaction(args)
+
+    sender = cli_shared.prepare_account(args)
+
+    if args.nonce is None:
+        nonce = cli_shared.get_current_nonce_for_address(sender.address, args.proxy)
+    else:
+        nonce = int(args.nonce)
+
+    guardian = cli_shared.load_guardian_account(args)
+    guardian_address = cli_shared.get_guardian_address(guardian, args)
+
+    relayer = cli_shared.load_relayer_account(args)
+    relayer_address = cli_shared.get_relayer_address(relayer, args)
+
+    native_amount = int(args.value)
+    gas_limit = 0 if args.estimate_gas else args.gas_limit
+
+    controller = ValidatorsController(args.chain)
+    tx = controller.create_transaction_for_cleaning_registered_data(
+        sender=sender,
+        native_amount=native_amount,
+        estimate_gas=args.estimate_gas,
+        gas_limit=gas_limit,
+        gas_price=args.gas_price,
+        nonce=nonce,
+        version=args.version,
+        options=args.options,
+        guardian_account=guardian,
+        guardian_address=guardian_address,
+        relayer_account=relayer,
+        relayer_address=relayer_address,
+        guardian_service_url=args.guardian_service_url,
+        guardian_2fa_code=args.guardian_2fa_code,
+    )
 
     cli_shared.send_or_simulate(tx, args)
 
 
 def do_restake_unstaked_nodes(args: Any):
+    cli_shared.check_guardian_and_options_args(args)
     cli_shared.check_broadcast_args(args)
-    cli_shared.prepare_nonce_in_args(args)
     cli_shared.prepare_chain_id_in_args(args)
-    validators.prepare_args_for_restake_unstaked_nodes(args)
-    tx = do_prepare_transaction(args)
+
+    sender = cli_shared.prepare_account(args)
+
+    if args.nonce is None:
+        nonce = cli_shared.get_current_nonce_for_address(sender.address, args.proxy)
+    else:
+        nonce = int(args.nonce)
+
+    guardian = cli_shared.load_guardian_account(args)
+    guardian_address = cli_shared.get_guardian_address(guardian, args)
+
+    relayer = cli_shared.load_relayer_account(args)
+    relayer_address = cli_shared.get_relayer_address(relayer, args)
+
+    native_amount = int(args.value)
+    gas_limit = 0 if args.estimate_gas else args.gas_limit
+    keys = args.nodes_public_keys
+
+    controller = ValidatorsController(args.chain)
+    tx = controller.create_transaction_for_restaking_unstaked_nodes(
+        sender=sender,
+        keys=keys,
+        native_amount=native_amount,
+        estimate_gas=args.estimate_gas,
+        gas_limit=gas_limit,
+        gas_price=args.gas_price,
+        nonce=nonce,
+        version=args.version,
+        options=args.options,
+        guardian_account=guardian,
+        guardian_address=guardian_address,
+        relayer_account=relayer,
+        relayer_address=relayer_address,
+        guardian_service_url=args.guardian_service_url,
+        guardian_2fa_code=args.guardian_2fa_code,
+    )
 
     cli_shared.send_or_simulate(tx, args)

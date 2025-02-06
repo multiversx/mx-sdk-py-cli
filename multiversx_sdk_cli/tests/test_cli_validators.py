@@ -52,12 +52,51 @@ def test_stake(capsys: Any):
     assert tx["options"] == 0
     assert (
         tx["signature"]
-        == "66c0a8334b4e9d2bcc87214762c2957c8b190c91db27f6bac43a9c309f5310a752d293796938c3c131e9e96836e00e62fabec64a1205b05822f634415f675909"
+        == "e9dd1159bc55bde84872f0595c9e24b0b210deb8cb02a1df7d7b0e1277436d2043437ffeaff540e11200c00417cf5ce396b3154f968ad62ab4359fb05a493b0d"
     )
     assert (
         data
-        == "stake@02@F8910E47CF9464777C912E6390758BB39715FFFCB861B184017920E4A807B42553F2F21E7F3914B81BCF58B66A72AB16D97013AE1CFF807CEFC977EF8CBF116258534B9E46D19528042D16EF8374404A89B184E0A4EE18C77C49E454D04EAE8D@1865870F7F69162A2DFEFD33FE232A9CA984C6F22D1EE3F6A5B34A8EB8C9F7319001F29D5A2EED85C1500ACA19FA4189@1B4E60E6D100CDF234D3427494DAC55FBAC49856CADC86BCB13A01B9BB05A0D9143E86C186C948E7AE9E52427C9523102EFE9019A2A9C06DB02993F2E3E6756576AE5A3EC7C235D548BC79DE1A6990E1120AE435CB48F7FC436C9F9098B92A0D@12B309791213AAC8AD9F34F0D912261E30F9AB060859E4D515E020A98B91D82A7CD334E4B504BB93D6B75347CCCD6318@B2A11555CE521E4944E09AB17549D85B487DCD26C84B5017A39E31A3670889BA"
+        == "stake@02@f8910e47cf9464777c912e6390758bb39715fffcb861b184017920e4a807b42553f2f21e7f3914b81bcf58b66a72ab16d97013ae1cff807cefc977ef8cbf116258534b9e46d19528042d16ef8374404a89b184e0a4ee18c77c49e454d04eae8d@1865870f7f69162a2dfefd33fe232a9ca984c6f22d1ee3f6a5b34a8eb8c9f7319001f29d5a2eed85c1500aca19fa4189@1b4e60e6d100cdf234d3427494dac55fbac49856cadc86bcb13a01b9bb05a0d9143e86c186c948e7ae9e52427c9523102efe9019a2a9c06db02993f2e3e6756576ae5a3ec7c235d548bc79de1a6990e1120ae435cb48f7fc436c9f9098b92a0d@12b309791213aac8ad9f34f0d912261e30f9ab060859e4d515e020a98b91d82a7cd334e4b504bb93d6b75347cccd6318@b2a11555ce521e4944e09ab17549d85b487dcd26c84b5017a39e31a3670889ba"
     )
+
+
+def test_top_up(capsys: Any):
+    return_code = main(
+        [
+            "validator",
+            "stake",
+            "--pem",
+            str(alice_pem),
+            "--value",
+            "2500000000000000000000",
+            "--top-up",
+            "--chain",
+            "localnet",
+            "--estimate-gas",
+            "--nonce=0",
+            "--reward-address",
+            "erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th",
+        ]
+    )
+    assert return_code == 0
+
+    output = get_output(capsys)
+    tx = output["emittedTransaction"]
+    data = output["emittedTransactionData"]
+
+    assert tx["sender"] == "erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th"
+    assert tx["receiver"] == "erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqplllst77y4l"
+    assert tx["value"] == "2500000000000000000000"
+    assert tx["nonce"] == 0
+    assert tx["gasLimit"] == 5057500
+    assert tx["chainID"] == "localnet"
+    assert tx["version"] == 2
+    assert tx["options"] == 0
+    assert (
+        tx["signature"]
+        == "ca4ebd1b9c92b0479351e9f84b0394ce15f529f4a5c056ab2dd37b923d7af81cbb7bfc8fbbea571843a797e3382795c0419f69ab357acbd9611899d39e449107"
+    )
+    assert data == "stake"
 
 
 def test_stake_with_relayer_and_guardian(capsys: Any):
@@ -106,15 +145,15 @@ def test_stake_with_relayer_and_guardian(capsys: Any):
     assert tx["relayer"] == "erd1cqqxak4wun7508e0yj9ng843r6hv4mzd0hhpjpsejkpn9wa9yq8sj7u2u5"
     assert (
         tx["signature"]
-        == "01bcfddf60d36c6f1fa6449640f3b4ed1755003b1c128b4d4b6e0a74f2c9edbee0e94a8f1058b9388cdbd97e7bd8fada3fc64bc7ed99f4239694f996b85f0108"
+        == "9ecca226c3e5913906a5f22971a0d84bb7a8c652e309ffab4073dea8bbd88caccc2ad9e33b6929f16acdedb676ad574ad66d520abd5b398469fa0cff3fc7ca03"
     )
     assert (
         tx["guardianSignature"]
-        == "dfbd3d7ed19d607085779fef911e77ca63cfddb159aa3338bad9209064d50f90a24aeeac8082ec3b424afb3054189aab11467c016bb0ba945a43e191a9073306"
+        == "12c1ee05d34282555d85f7786dc0e7ffbce960de88fb75ba81a237bd1f2cc175f50ee42e60b2857bf2cd49d02de12a4017f1c95f14910fcc27bc7cb16b41ce04"
     )
     assert (
         data
-        == "stake@02@F8910E47CF9464777C912E6390758BB39715FFFCB861B184017920E4A807B42553F2F21E7F3914B81BCF58B66A72AB16D97013AE1CFF807CEFC977EF8CBF116258534B9E46D19528042D16EF8374404A89B184E0A4EE18C77C49E454D04EAE8D@1865870F7F69162A2DFEFD33FE232A9CA984C6F22D1EE3F6A5B34A8EB8C9F7319001F29D5A2EED85C1500ACA19FA4189@1B4E60E6D100CDF234D3427494DAC55FBAC49856CADC86BCB13A01B9BB05A0D9143E86C186C948E7AE9E52427C9523102EFE9019A2A9C06DB02993F2E3E6756576AE5A3EC7C235D548BC79DE1A6990E1120AE435CB48F7FC436C9F9098B92A0D@12B309791213AAC8AD9F34F0D912261E30F9AB060859E4D515E020A98B91D82A7CD334E4B504BB93D6B75347CCCD6318@B2A11555CE521E4944E09AB17549D85B487DCD26C84B5017A39E31A3670889BA"
+        == "stake@02@f8910e47cf9464777c912e6390758bb39715fffcb861b184017920e4a807b42553f2f21e7f3914b81bcf58b66a72ab16d97013ae1cff807cefc977ef8cbf116258534b9e46d19528042d16ef8374404a89b184e0a4ee18c77c49e454d04eae8d@1865870f7f69162a2dfefd33fe232a9ca984c6f22d1ee3f6a5b34a8eb8c9f7319001f29d5a2eed85c1500aca19fa4189@1b4e60e6d100cdf234d3427494dac55fbac49856cadc86bcb13a01b9bb05a0d9143e86c186c948e7ae9e52427c9523102efe9019a2a9c06db02993f2e3e6756576ae5a3ec7c235d548bc79de1a6990e1120ae435cb48f7fc436c9f9098b92a0d@12b309791213aac8ad9f34f0d912261e30f9ab060859e4d515e020a98b91d82a7cd334e4b504bb93d6b75347cccd6318@b2a11555ce521e4944e09ab17549d85b487dcd26c84b5017a39e31a3670889ba"
     )
 
 
@@ -310,6 +349,40 @@ def test_change_reward_address(capsys: Any):
     assert data == "changeRewardAddress@b2a11555ce521e4944e09ab17549d85b487dcd26c84b5017a39e31a3670889ba"
 
 
+def test_claim(capsys: Any):
+    return_code = main(
+        [
+            "validator",
+            "claim",
+            "--pem",
+            str(alice_pem),
+            "--chain",
+            "localnet",
+            "--estimate-gas",
+            "--nonce=7",
+        ]
+    )
+    assert return_code == 0
+
+    output = get_output(capsys)
+    tx = output["emittedTransaction"]
+    data = output["emittedTransactionData"]
+
+    assert tx["sender"] == "erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th"
+    assert tx["receiver"] == "erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqplllst77y4l"
+    assert tx["value"] == "0"
+    assert tx["nonce"] == 7
+    assert tx["gasLimit"] == 5057500
+    assert tx["chainID"] == "localnet"
+    assert tx["version"] == 2
+    assert tx["options"] == 0
+    assert (
+        tx["signature"]
+        == "be19a2c0bf5ce1da5f72a7451bff57725161bb67a8b85e397d44570585e6b7ff40858b0d30fd9a12f06c70655b1c417389f25059e0a95dc76e488185cea68208"
+    )
+    assert data == "claim"
+
+
 def test_unstake_nodes(capsys: Any):
     return_code = main(
         [
@@ -374,15 +447,15 @@ def test_unstake_tokens(capsys: Any):
     assert tx["receiver"] == "erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqplllst77y4l"
     assert tx["value"] == "0"
     assert tx["nonce"] == 7
-    assert tx["gasLimit"] == 5101000
+    assert tx["gasLimit"] == 5095000
     assert tx["chainID"] == "localnet"
     assert tx["version"] == 2
     assert tx["options"] == 0
     assert (
         tx["signature"]
-        == "c9506332641dc0a45a71b4f8e256f3761151173de73b0e2fbe627afa487911c6905911c74a45e04c947938eb30e1bc785cdae83cbbd35f248c4519b7a3e6800f"
+        == "ed8e401e875d70bc3a62bf966fc8a9ecda2d49a851fe216f265176be5ab43040a85df55798dc828c928079573e2aa8dc52627e87c92824d8c91fdc3f3d195e0a"
     )
-    assert data == "unStakeTokens@000098a7d9b8314c0000"
+    assert data == "unStakeTokens@98a7d9b8314c0000"
 
 
 def test_unbond_nodes(capsys: Any):
@@ -449,15 +522,15 @@ def test_unbond_tokens(capsys: Any):
     assert tx["receiver"] == "erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqplllst77y4l"
     assert tx["value"] == "0"
     assert tx["nonce"] == 7
-    assert tx["gasLimit"] == 5099500
+    assert tx["gasLimit"] == 5096500
     assert tx["chainID"] == "localnet"
     assert tx["version"] == 2
     assert tx["options"] == 0
     assert (
         tx["signature"]
-        == "6eadd1d09700ba8fa8aedf01dcb6b44cb2551b59d65c2ab1ff8cac6bb0052a40a796b9ccb9d92439d6fdbd8536c7de5c5a28312ffef77ac9c1353f8236355206"
+        == "a7c96028a97d035c0068b9c2a4bbc4ee3b9613d81dfa4c388fd8a90e66f4e200e715e87a760c0a7d456f3b3a4dc225f760084477cb15ac690c9e1cb7c006f70d"
     )
-    assert data == "unBondTokens@0001158e460913d00000"
+    assert data == "unBondTokens@01158e460913d00000"
 
 
 def test_clean_registration_data(capsys: Any):

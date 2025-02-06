@@ -1,13 +1,21 @@
 import logging
 from pathlib import Path
-from typing import Any, List, Tuple, Union
+from typing import Any, Optional, Union
 
-from multiversx_sdk import Address, ValidatorPEM, ValidatorSigner
+from multiversx_sdk import Address, Transaction
+from multiversx_sdk.abi import (
+    AddressValue,
+    BigUIntValue,
+    BytesValue,
+    Serializer,
+    U32Value,
+)
 
-from multiversx_sdk_cli import cli_shared, utils
+from multiversx_sdk_cli import utils
 from multiversx_sdk_cli.config import MetaChainSystemSCsCost, get_address_hrp
 from multiversx_sdk_cli.constants import GAS_PER_DATA_BYTE, MIN_GAS_LIMIT
-from multiversx_sdk_cli.contracts import prepare_execute_transaction_data
+from multiversx_sdk_cli.interfaces import IAccount
+from multiversx_sdk_cli.transactions import TransactionsController
 from multiversx_sdk_cli.validators.validators_file import ValidatorsFile
 
 logger = logging.getLogger("validators")
@@ -15,165 +23,605 @@ logger = logging.getLogger("validators")
 VALIDATORS_SMART_CONTRACT_ADDRESS_HEX = "000000000000000000010000000000000000000000000000000000000001ffff"
 
 
-def prepare_args_for_stake(args: Any):
-    if args.top_up:
-        prepare_args_for_top_up(args)
-        return
+class ValidatorsController:
+    def __init__(self, chain_id: str) -> None:
+        self.transactions_controller = TransactionsController(chain_id)
+        self.serializer = Serializer()
 
-    node_operator = cli_shared.prepare_account(args)
+    def create_transaction_for_staking(
+        self,
+        sender: IAccount,
+        validators_file: Path,
+        native_amount: int,
+        estimate_gas: bool,
+        gas_limit: int,
+        gas_price: int,
+        nonce: int,
+        version: int,
+        options: int,
+        rewards_address: Optional[Address] = None,
+        guardian_account: Optional[IAccount] = None,
+        guardian_address: Optional[Address] = None,
+        relayer_account: Optional[IAccount] = None,
+        relayer_address: Optional[Address] = None,
+        guardian_service_url: str = "",
+        guardian_2fa_code: str = "",
+    ) -> Transaction:
+        validators = ValidatorsFile(validators_file)
+        data = self.prepare_transaction_data_for_stake(
+            node_operator=sender.address,
+            validators_file=validators,
+            rewards_address=rewards_address,
+        )
 
-    validators_file_path = Path(args.validators_file)
-    reward_address = Address.new_from_bech32(args.reward_address) if args.reward_address else None
+        if estimate_gas:
+            gas_limit = self.estimate_system_sc_call(data, MetaChainSystemSCsCost.STAKE, validators.get_num_of_nodes())
 
-    data, gas_limit = prepare_transaction_data_for_stake(node_operator.address, validators_file_path, reward_address)
-    args.data = data
-    args.receiver = Address.new_from_hex(VALIDATORS_SMART_CONTRACT_ADDRESS_HEX, get_address_hrp()).to_bech32()
+        receiver = Address.new_from_hex(VALIDATORS_SMART_CONTRACT_ADDRESS_HEX, get_address_hrp())
 
-    if args.estimate_gas:
-        args.gas_limit = gas_limit
+        return self.transactions_controller.create_transaction(
+            sender=sender,
+            receiver=receiver,
+            native_amount=native_amount,
+            gas_limt=gas_limit,
+            gas_price=gas_price,
+            nonce=nonce,
+            version=version,
+            options=options,
+            data=data,
+            guardian_account=guardian_account,
+            guardian_address=guardian_address,
+            relayer_account=relayer_account,
+            relayer_address=relayer_address,
+            guardian_service_url=guardian_service_url,
+            guardian_2fa_code=guardian_2fa_code,
+        )
 
+    def prepare_transaction_data_for_stake(
+        self,
+        node_operator: Address,
+        validators_file: ValidatorsFile,
+        rewards_address: Union[Address, None],
+    ) -> str:
+        num_of_nodes = validators_file.get_num_of_nodes()
 
-def prepare_transaction_data_for_stake(
-    node_operator_address: Address,
-    validators_file_path: Path,
-    reward_address: Union[Address, None],
-) -> Tuple[str, int]:
-    validators_file = ValidatorsFile(validators_file_path)
-    num_of_nodes = validators_file.get_num_of_nodes()
-    validators_list = validators_file.get_validators_list()
+        call_arguments: list[Any] = []
+        call_arguments.append(U32Value(num_of_nodes))
 
-    call_arguments: List[Any] = []
-    call_arguments.append(num_of_nodes)
+        validator_signers = validators_file.load_signers()
 
-    for validator in validators_list:
-        # Get path of "pemFile", make it absolute
-        validator_pem = Path(validator.get("pemFile")).expanduser()
-        validator_pem = validator_pem if validator_pem.is_absolute() else validators_file_path.parent / validator_pem
+        for validator in validator_signers:
+            signed_message = validator.sign(node_operator.get_public_key())
 
-        pem_file = ValidatorPEM.from_file(validator_pem)
+            call_arguments.append(BytesValue(validator.secret_key.generate_public_key().buffer))
+            call_arguments.append(BytesValue(signed_message))
 
-        validator_signer = ValidatorSigner(pem_file.secret_key)
-        signed_message = validator_signer.sign(node_operator_address.pubkey).hex()
+        if rewards_address:
+            call_arguments.append(AddressValue.new_from_address(rewards_address))
 
-        call_arguments.append(f"0x{pem_file.secret_key.generate_public_key().hex()}")
-        call_arguments.append(f"0x{signed_message}")
+        data = "stake@" + self.serializer.serialize(call_arguments)
+        return data
 
-    if reward_address:
-        call_arguments.append(f"0x{reward_address.to_hex()}")
+    def create_transaction_for_topping_up(
+        self,
+        sender: IAccount,
+        native_amount: int,
+        estimate_gas: bool,
+        gas_limit: int,
+        gas_price: int,
+        nonce: int,
+        version: int,
+        options: int,
+        guardian_account: Optional[IAccount] = None,
+        guardian_address: Optional[Address] = None,
+        relayer_account: Optional[IAccount] = None,
+        relayer_address: Optional[Address] = None,
+        guardian_service_url: str = "",
+        guardian_2fa_code: str = "",
+    ) -> Transaction:
+        data = "stake"
+        receiver = Address.new_from_hex(VALIDATORS_SMART_CONTRACT_ADDRESS_HEX, get_address_hrp())
 
-    data = prepare_execute_transaction_data("stake", call_arguments)
-    gas_limit = estimate_system_sc_call(str(data), MetaChainSystemSCsCost.STAKE, num_of_nodes)
+        if estimate_gas:
+            gas_limit = self.estimate_system_sc_call(data, MetaChainSystemSCsCost.STAKE, 1)
 
-    return str(data), gas_limit
+        return self.transactions_controller.create_transaction(
+            sender=sender,
+            receiver=receiver,
+            native_amount=native_amount,
+            gas_limt=gas_limit,
+            gas_price=gas_price,
+            nonce=nonce,
+            version=version,
+            options=options,
+            data=data,
+            guardian_account=guardian_account,
+            guardian_address=guardian_address,
+            relayer_account=relayer_account,
+            relayer_address=relayer_address,
+            guardian_service_url=guardian_service_url,
+            guardian_2fa_code=guardian_2fa_code,
+        )
 
+    def create_transaction_for_unstaking(
+        self,
+        sender: IAccount,
+        keys: str,
+        native_amount: int,
+        estimate_gas: bool,
+        gas_limit: int,
+        gas_price: int,
+        nonce: int,
+        version: int,
+        options: int,
+        guardian_account: Optional[IAccount] = None,
+        guardian_address: Optional[Address] = None,
+        relayer_account: Optional[IAccount] = None,
+        relayer_address: Optional[Address] = None,
+        guardian_service_url: str = "",
+        guardian_2fa_code: str = "",
+    ) -> Transaction:
+        parsed_keys, num_keys = utils.parse_keys(keys)
+        data = f"unStake{parsed_keys}"
 
-def prepare_args_for_top_up(args: Any):
-    args.data = "stake"
-    args.receiver = Address.new_from_hex(VALIDATORS_SMART_CONTRACT_ADDRESS_HEX, get_address_hrp()).to_bech32()
+        if estimate_gas:
+            gas_limit = self.estimate_system_sc_call(data, MetaChainSystemSCsCost.UNSTAKE, num_keys)
 
-    if args.estimate_gas:
-        args.gas_limit = estimate_system_sc_call(args.data, MetaChainSystemSCsCost.STAKE, 1)
+        receiver = Address.new_from_hex(VALIDATORS_SMART_CONTRACT_ADDRESS_HEX, get_address_hrp())
 
+        return self.transactions_controller.create_transaction(
+            sender=sender,
+            receiver=receiver,
+            native_amount=native_amount,
+            gas_limt=gas_limit,
+            gas_price=gas_price,
+            nonce=nonce,
+            version=version,
+            options=options,
+            data=data,
+            guardian_account=guardian_account,
+            guardian_address=guardian_address,
+            relayer_account=relayer_account,
+            relayer_address=relayer_address,
+            guardian_service_url=guardian_service_url,
+            guardian_2fa_code=guardian_2fa_code,
+        )
 
-def prepare_args_for_unstake(args: Any):
-    parsed_keys, num_keys = utils.parse_keys(args.nodes_public_keys)
-    args.data = "unStake" + parsed_keys
-    args.receiver = Address.new_from_hex(VALIDATORS_SMART_CONTRACT_ADDRESS_HEX, get_address_hrp()).to_bech32()
+    def create_transaction_for_unjailing(
+        self,
+        sender: IAccount,
+        keys: str,
+        native_amount: int,
+        estimate_gas: bool,
+        gas_limit: int,
+        gas_price: int,
+        nonce: int,
+        version: int,
+        options: int,
+        guardian_account: Optional[IAccount] = None,
+        guardian_address: Optional[Address] = None,
+        relayer_account: Optional[IAccount] = None,
+        relayer_address: Optional[Address] = None,
+        guardian_service_url: str = "",
+        guardian_2fa_code: str = "",
+    ) -> Transaction:
+        parsed_keys, num_keys = utils.parse_keys(keys)
+        data = f"unJail{parsed_keys}"
 
-    if args.estimate_gas:
-        args.gas_limit = estimate_system_sc_call(args.data, MetaChainSystemSCsCost.UNSTAKE, num_keys)
+        if estimate_gas:
+            gas_limit = self.estimate_system_sc_call(data, MetaChainSystemSCsCost.UNJAIL, num_keys)
 
+        receiver = Address.new_from_hex(VALIDATORS_SMART_CONTRACT_ADDRESS_HEX, get_address_hrp())
 
-def prepare_args_for_unbond(args: Any):
-    parsed_keys, num_keys = utils.parse_keys(args.nodes_public_keys)
-    args.data = "unBond" + parsed_keys
-    args.receiver = Address.new_from_hex(VALIDATORS_SMART_CONTRACT_ADDRESS_HEX, get_address_hrp()).to_bech32()
+        return self.transactions_controller.create_transaction(
+            sender=sender,
+            receiver=receiver,
+            native_amount=native_amount,
+            gas_limt=gas_limit,
+            gas_price=gas_price,
+            nonce=nonce,
+            version=version,
+            options=options,
+            data=data,
+            guardian_account=guardian_account,
+            guardian_address=guardian_address,
+            relayer_account=relayer_account,
+            relayer_address=relayer_address,
+            guardian_service_url=guardian_service_url,
+            guardian_2fa_code=guardian_2fa_code,
+        )
 
-    if args.estimate_gas:
-        args.gas_limit = estimate_system_sc_call(args.data, MetaChainSystemSCsCost.UNBOND, num_keys)
+    def create_transaction_for_unbonding(
+        self,
+        sender: IAccount,
+        keys: str,
+        native_amount: int,
+        estimate_gas: bool,
+        gas_limit: int,
+        gas_price: int,
+        nonce: int,
+        version: int,
+        options: int,
+        guardian_account: Optional[IAccount] = None,
+        guardian_address: Optional[Address] = None,
+        relayer_account: Optional[IAccount] = None,
+        relayer_address: Optional[Address] = None,
+        guardian_service_url: str = "",
+        guardian_2fa_code: str = "",
+    ) -> Transaction:
+        parsed_keys, num_keys = utils.parse_keys(keys)
+        data = f"unBond{parsed_keys}"
 
+        if estimate_gas:
+            gas_limit = self.estimate_system_sc_call(data, MetaChainSystemSCsCost.UNBOND, num_keys)
 
-def prepare_args_for_unjail(args: Any):
-    parsed_keys, num_keys = utils.parse_keys(args.nodes_public_keys)
-    args.data = "unJail" + parsed_keys
-    args.receiver = Address.new_from_hex(VALIDATORS_SMART_CONTRACT_ADDRESS_HEX, get_address_hrp()).to_bech32()
+        receiver = Address.new_from_hex(VALIDATORS_SMART_CONTRACT_ADDRESS_HEX, get_address_hrp())
 
-    if args.estimate_gas:
-        args.gas_limit = estimate_system_sc_call(args.data, MetaChainSystemSCsCost.UNJAIL, num_keys)
+        return self.transactions_controller.create_transaction(
+            sender=sender,
+            receiver=receiver,
+            native_amount=native_amount,
+            gas_limt=gas_limit,
+            gas_price=gas_price,
+            nonce=nonce,
+            version=version,
+            options=options,
+            data=data,
+            guardian_account=guardian_account,
+            guardian_address=guardian_address,
+            relayer_account=relayer_account,
+            relayer_address=relayer_address,
+            guardian_service_url=guardian_service_url,
+            guardian_2fa_code=guardian_2fa_code,
+        )
 
+    def create_transaction_for_changing_rewards_address(
+        self,
+        sender: IAccount,
+        rewards_address: Address,
+        native_amount: int,
+        estimate_gas: bool,
+        gas_limit: int,
+        gas_price: int,
+        nonce: int,
+        version: int,
+        options: int,
+        guardian_account: Optional[IAccount] = None,
+        guardian_address: Optional[Address] = None,
+        relayer_account: Optional[IAccount] = None,
+        relayer_address: Optional[Address] = None,
+        guardian_service_url: str = "",
+        guardian_2fa_code: str = "",
+    ) -> Transaction:
+        data = f"changeRewardAddress@{rewards_address.to_hex()}"
 
-def prepare_args_for_change_reward_address(args: Any):
-    reward_address = Address.new_from_bech32(args.reward_address)
-    args.data = "changeRewardAddress@" + reward_address.hex()
-    args.receiver = Address.new_from_hex(VALIDATORS_SMART_CONTRACT_ADDRESS_HEX, get_address_hrp()).to_bech32()
+        if estimate_gas:
+            gas_limit = self.estimate_system_sc_call(data, MetaChainSystemSCsCost.CHANGE_REWARD_ADDRESS)
 
-    if args.estimate_gas:
-        args.gas_limit = estimate_system_sc_call(args.data, MetaChainSystemSCsCost.CHANGE_REWARD_ADDRESS)
+        receiver = Address.new_from_hex(VALIDATORS_SMART_CONTRACT_ADDRESS_HEX, get_address_hrp())
 
+        return self.transactions_controller.create_transaction(
+            sender=sender,
+            receiver=receiver,
+            native_amount=native_amount,
+            gas_limt=gas_limit,
+            gas_price=gas_price,
+            nonce=nonce,
+            version=version,
+            options=options,
+            data=data,
+            guardian_account=guardian_account,
+            guardian_address=guardian_address,
+            relayer_account=relayer_account,
+            relayer_address=relayer_address,
+            guardian_service_url=guardian_service_url,
+            guardian_2fa_code=guardian_2fa_code,
+        )
 
-def prepare_args_for_claim(args: Any):
-    args.data = "claim"
-    args.receiver = Address.new_from_hex(VALIDATORS_SMART_CONTRACT_ADDRESS_HEX, get_address_hrp()).to_bech32()
+    def create_transaction_for_claiming(
+        self,
+        sender: IAccount,
+        native_amount: int,
+        estimate_gas: bool,
+        gas_limit: int,
+        gas_price: int,
+        nonce: int,
+        version: int,
+        options: int,
+        guardian_account: Optional[IAccount] = None,
+        guardian_address: Optional[Address] = None,
+        relayer_account: Optional[IAccount] = None,
+        relayer_address: Optional[Address] = None,
+        guardian_service_url: str = "",
+        guardian_2fa_code: str = "",
+    ) -> Transaction:
+        data = "claim"
 
-    if args.estimate_gas:
-        args.gas_limit = estimate_system_sc_call(args.data, MetaChainSystemSCsCost.CLAIM)
+        if estimate_gas:
+            gas_limit = self.estimate_system_sc_call(data, MetaChainSystemSCsCost.CLAIM)
 
+        receiver = Address.new_from_hex(VALIDATORS_SMART_CONTRACT_ADDRESS_HEX, get_address_hrp())
 
-def prepare_args_for_unstake_nodes(args: Any):
-    parsed_keys, num_keys = utils.parse_keys(args.nodes_public_keys)
-    args.data = "unStakeNodes" + parsed_keys
+        return self.transactions_controller.create_transaction(
+            sender=sender,
+            receiver=receiver,
+            native_amount=native_amount,
+            gas_limt=gas_limit,
+            gas_price=gas_price,
+            nonce=nonce,
+            version=version,
+            options=options,
+            data=data,
+            guardian_account=guardian_account,
+            guardian_address=guardian_address,
+            relayer_account=relayer_account,
+            relayer_address=relayer_address,
+            guardian_service_url=guardian_service_url,
+            guardian_2fa_code=guardian_2fa_code,
+        )
 
-    args.receiver = Address.new_from_hex(VALIDATORS_SMART_CONTRACT_ADDRESS_HEX, get_address_hrp()).to_bech32()
-    if args.estimate_gas:
-        args.gas_limit = estimate_system_sc_call(args.data, MetaChainSystemSCsCost.UNSTAKE, num_keys)
+    def create_transaction_for_unstaking_nodes(
+        self,
+        sender: IAccount,
+        keys: str,
+        native_amount: int,
+        estimate_gas: bool,
+        gas_limit: int,
+        gas_price: int,
+        nonce: int,
+        version: int,
+        options: int,
+        guardian_account: Optional[IAccount] = None,
+        guardian_address: Optional[Address] = None,
+        relayer_account: Optional[IAccount] = None,
+        relayer_address: Optional[Address] = None,
+        guardian_service_url: str = "",
+        guardian_2fa_code: str = "",
+    ) -> Transaction:
+        parsed_keys, num_keys = utils.parse_keys(keys)
+        data = f"unStakeNodes{parsed_keys}"
 
+        if estimate_gas:
+            gas_limit = self.estimate_system_sc_call(data, MetaChainSystemSCsCost.UNSTAKE, num_keys)
 
-def prepare_args_for_unstake_tokens(args: Any):
-    args.data = "unStakeTokens"
-    args.data += "@" + utils.str_int_to_hex_str(str(args.unstake_value))
+        receiver = Address.new_from_hex(VALIDATORS_SMART_CONTRACT_ADDRESS_HEX, get_address_hrp())
 
-    args.receiver = Address.new_from_hex(VALIDATORS_SMART_CONTRACT_ADDRESS_HEX, get_address_hrp()).to_bech32()
-    if args.estimate_gas:
-        args.gas_limit = estimate_system_sc_call(args.data, MetaChainSystemSCsCost.UNSTAKE_TOKENS)
+        return self.transactions_controller.create_transaction(
+            sender=sender,
+            receiver=receiver,
+            native_amount=native_amount,
+            gas_limt=gas_limit,
+            gas_price=gas_price,
+            nonce=nonce,
+            version=version,
+            options=options,
+            data=data,
+            guardian_account=guardian_account,
+            guardian_address=guardian_address,
+            relayer_account=relayer_account,
+            relayer_address=relayer_address,
+            guardian_service_url=guardian_service_url,
+            guardian_2fa_code=guardian_2fa_code,
+        )
 
+    def create_transaction_for_unstaking_tokens(
+        self,
+        sender: IAccount,
+        value: int,
+        native_amount: int,
+        estimate_gas: bool,
+        gas_limit: int,
+        gas_price: int,
+        nonce: int,
+        version: int,
+        options: int,
+        guardian_account: Optional[IAccount] = None,
+        guardian_address: Optional[Address] = None,
+        relayer_account: Optional[IAccount] = None,
+        relayer_address: Optional[Address] = None,
+        guardian_service_url: str = "",
+        guardian_2fa_code: str = "",
+    ) -> Transaction:
+        data = f"unStakeTokens@{self.serializer.serialize([BigUIntValue(value)])}"
 
-def prepare_args_for_unbond_nodes(args: Any):
-    parsed_keys, num_keys = utils.parse_keys(args.nodes_public_keys)
-    args.data = "unBondNodes" + parsed_keys
+        if estimate_gas:
+            gas_limit = self.estimate_system_sc_call(data, MetaChainSystemSCsCost.UNSTAKE_TOKENS)
 
-    args.receiver = Address.new_from_hex(VALIDATORS_SMART_CONTRACT_ADDRESS_HEX, get_address_hrp()).to_bech32()
-    if args.estimate_gas:
-        args.gas_limit = estimate_system_sc_call(args.data, MetaChainSystemSCsCost.UNBOND, num_keys)
+        receiver = Address.new_from_hex(VALIDATORS_SMART_CONTRACT_ADDRESS_HEX, get_address_hrp())
 
+        return self.transactions_controller.create_transaction(
+            sender=sender,
+            receiver=receiver,
+            native_amount=native_amount,
+            gas_limt=gas_limit,
+            gas_price=gas_price,
+            nonce=nonce,
+            version=version,
+            options=options,
+            data=data,
+            guardian_account=guardian_account,
+            guardian_address=guardian_address,
+            relayer_account=relayer_account,
+            relayer_address=relayer_address,
+            guardian_service_url=guardian_service_url,
+            guardian_2fa_code=guardian_2fa_code,
+        )
 
-def prepare_args_for_unbond_tokens(args: Any):
-    args.data = "unBondTokens"
-    args.data += "@" + utils.str_int_to_hex_str(str(args.unbond_value))
+    def create_transaction_for_unbonding_nodes(
+        self,
+        sender: IAccount,
+        keys: str,
+        native_amount: int,
+        estimate_gas: bool,
+        gas_limit: int,
+        gas_price: int,
+        nonce: int,
+        version: int,
+        options: int,
+        guardian_account: Optional[IAccount] = None,
+        guardian_address: Optional[Address] = None,
+        relayer_account: Optional[IAccount] = None,
+        relayer_address: Optional[Address] = None,
+        guardian_service_url: str = "",
+        guardian_2fa_code: str = "",
+    ) -> Transaction:
+        parsed_keys, num_keys = utils.parse_keys(keys)
+        data = f"unBondNodes{parsed_keys}"
 
-    args.receiver = Address.new_from_hex(VALIDATORS_SMART_CONTRACT_ADDRESS_HEX, get_address_hrp()).to_bech32()
-    if args.estimate_gas:
-        args.gas_limit = estimate_system_sc_call(args.data, MetaChainSystemSCsCost.UNBOND_TOKENS)
+        if estimate_gas:
+            gas_limit = self.estimate_system_sc_call(data, MetaChainSystemSCsCost.UNBOND, num_keys)
 
+        receiver = Address.new_from_hex(VALIDATORS_SMART_CONTRACT_ADDRESS_HEX, get_address_hrp())
 
-def prepare_args_for_clean_registered_data(args: Any):
-    args.data = "cleanRegisteredData"
+        return self.transactions_controller.create_transaction(
+            sender=sender,
+            receiver=receiver,
+            native_amount=native_amount,
+            gas_limt=gas_limit,
+            gas_price=gas_price,
+            nonce=nonce,
+            version=version,
+            options=options,
+            data=data,
+            guardian_account=guardian_account,
+            guardian_address=guardian_address,
+            relayer_account=relayer_account,
+            relayer_address=relayer_address,
+            guardian_service_url=guardian_service_url,
+            guardian_2fa_code=guardian_2fa_code,
+        )
 
-    args.receiver = Address.new_from_hex(VALIDATORS_SMART_CONTRACT_ADDRESS_HEX, get_address_hrp()).to_bech32()
-    if args.estimate_gas:
-        args.gas_limit = estimate_system_sc_call(args.data, MetaChainSystemSCsCost.STAKE)
+    def create_transaction_for_unbonding_tokens(
+        self,
+        sender: IAccount,
+        value: int,
+        native_amount: int,
+        estimate_gas: bool,
+        gas_limit: int,
+        gas_price: int,
+        nonce: int,
+        version: int,
+        options: int,
+        guardian_account: Optional[IAccount] = None,
+        guardian_address: Optional[Address] = None,
+        relayer_account: Optional[IAccount] = None,
+        relayer_address: Optional[Address] = None,
+        guardian_service_url: str = "",
+        guardian_2fa_code: str = "",
+    ) -> Transaction:
+        data = f"unBondTokens@{self.serializer.serialize([BigUIntValue(value)])}"
 
+        if estimate_gas:
+            gas_limit = self.estimate_system_sc_call(data, MetaChainSystemSCsCost.UNBOND_TOKENS)
 
-def prepare_args_for_restake_unstaked_nodes(args: Any):
-    parsed_keys, num_keys = utils.parse_keys(args.nodes_public_keys)
-    args.data = "reStakeUnStakedNodes" + parsed_keys
+        receiver = Address.new_from_hex(VALIDATORS_SMART_CONTRACT_ADDRESS_HEX, get_address_hrp())
 
-    args.receiver = Address.new_from_hex(VALIDATORS_SMART_CONTRACT_ADDRESS_HEX, get_address_hrp()).to_bech32()
-    if args.estimate_gas:
-        args.gas_limit = estimate_system_sc_call(args.data, MetaChainSystemSCsCost.STAKE, num_keys)
+        return self.transactions_controller.create_transaction(
+            sender=sender,
+            receiver=receiver,
+            native_amount=native_amount,
+            gas_limt=gas_limit,
+            gas_price=gas_price,
+            nonce=nonce,
+            version=version,
+            options=options,
+            data=data,
+            guardian_account=guardian_account,
+            guardian_address=guardian_address,
+            relayer_account=relayer_account,
+            relayer_address=relayer_address,
+            guardian_service_url=guardian_service_url,
+            guardian_2fa_code=guardian_2fa_code,
+        )
 
+    def create_transaction_for_cleaning_registered_data(
+        self,
+        sender: IAccount,
+        native_amount: int,
+        estimate_gas: bool,
+        gas_limit: int,
+        gas_price: int,
+        nonce: int,
+        version: int,
+        options: int,
+        guardian_account: Optional[IAccount] = None,
+        guardian_address: Optional[Address] = None,
+        relayer_account: Optional[IAccount] = None,
+        relayer_address: Optional[Address] = None,
+        guardian_service_url: str = "",
+        guardian_2fa_code: str = "",
+    ) -> Transaction:
+        data = "cleanRegisteredData"
 
-def estimate_system_sc_call(transaction_data: str, base_cost: int, factor: int = 1):
-    num_bytes = len(transaction_data)
-    gas_limit = MIN_GAS_LIMIT + num_bytes * GAS_PER_DATA_BYTE
-    gas_limit += factor * base_cost
-    return gas_limit
+        if estimate_gas:
+            gas_limit = self.estimate_system_sc_call(data, MetaChainSystemSCsCost.CLEAN_REGISTERED_DATA)
+
+        receiver = Address.new_from_hex(VALIDATORS_SMART_CONTRACT_ADDRESS_HEX, get_address_hrp())
+
+        return self.transactions_controller.create_transaction(
+            sender=sender,
+            receiver=receiver,
+            native_amount=native_amount,
+            gas_limt=gas_limit,
+            gas_price=gas_price,
+            nonce=nonce,
+            version=version,
+            options=options,
+            data=data,
+            guardian_account=guardian_account,
+            guardian_address=guardian_address,
+            relayer_account=relayer_account,
+            relayer_address=relayer_address,
+            guardian_service_url=guardian_service_url,
+            guardian_2fa_code=guardian_2fa_code,
+        )
+
+    def create_transaction_for_restaking_unstaked_nodes(
+        self,
+        sender: IAccount,
+        keys: str,
+        native_amount: int,
+        estimate_gas: bool,
+        gas_limit: int,
+        gas_price: int,
+        nonce: int,
+        version: int,
+        options: int,
+        guardian_account: Optional[IAccount] = None,
+        guardian_address: Optional[Address] = None,
+        relayer_account: Optional[IAccount] = None,
+        relayer_address: Optional[Address] = None,
+        guardian_service_url: str = "",
+        guardian_2fa_code: str = "",
+    ) -> Transaction:
+        parsed_keys, num_keys = utils.parse_keys(keys)
+        data = f"reStakeUnStakedNodes{parsed_keys}"
+
+        if estimate_gas:
+            gas_limit = self.estimate_system_sc_call(data, MetaChainSystemSCsCost.RE_STAKE_UNSTAKED_NODES, num_keys)
+
+        receiver = Address.new_from_hex(VALIDATORS_SMART_CONTRACT_ADDRESS_HEX, get_address_hrp())
+
+        return self.transactions_controller.create_transaction(
+            sender=sender,
+            receiver=receiver,
+            native_amount=native_amount,
+            gas_limt=gas_limit,
+            gas_price=gas_price,
+            nonce=nonce,
+            version=version,
+            options=options,
+            data=data,
+            guardian_account=guardian_account,
+            guardian_address=guardian_address,
+            relayer_account=relayer_account,
+            relayer_address=relayer_address,
+            guardian_service_url=guardian_service_url,
+            guardian_2fa_code=guardian_2fa_code,
+        )
+
+    def estimate_system_sc_call(self, transaction_data: str, base_cost: int, factor: int = 1):
+        num_bytes = len(transaction_data)
+        gas_limit = MIN_GAS_LIMIT + num_bytes * GAS_PER_DATA_BYTE
+        gas_limit += factor * base_cost
+        return gas_limit
