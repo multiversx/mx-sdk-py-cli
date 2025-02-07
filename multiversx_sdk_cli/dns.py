@@ -10,11 +10,11 @@ from multiversx_sdk import (
     TransactionsFactoryConfig,
 )
 
-from multiversx_sdk_cli import cli_shared, utils
+from multiversx_sdk_cli import cli_shared
 from multiversx_sdk_cli.config import get_address_hrp
 from multiversx_sdk_cli.constants import ADDRESS_ZERO_HEX
 from multiversx_sdk_cli.contracts import SmartContract
-from multiversx_sdk_cli.transactions import do_prepare_transaction
+from multiversx_sdk_cli.transactions import TransactionsController
 
 MaxNumShards = 256
 ShardIdentiferLen = 2
@@ -72,16 +72,47 @@ def validate_name(name: str, shard_id: int, proxy: INetworkProvider):
 
 
 def register(args: Any):
-    args = utils.as_object(args)
-
     cli_shared.check_guardian_and_options_args(args)
     cli_shared.check_broadcast_args(args)
-    cli_shared.prepare_nonce_in_args(args)
     cli_shared.prepare_chain_id_in_args(args)
-    args.receiver = dns_address_for_name(args.name).bech32()
-    args.data = dns_register_data(args.name)
 
-    tx = do_prepare_transaction(args)
+    sender = cli_shared.prepare_account(args)
+
+    if args.nonce is None:
+        nonce = cli_shared.get_current_nonce_for_address(sender.address, args.proxy)
+    else:
+        nonce = int(args.nonce)
+
+    guardian = cli_shared.load_guardian_account(args)
+    guardian_address = cli_shared.get_guardian_address(guardian, args)
+
+    relayer = cli_shared.load_relayer_account(args)
+    relayer_address = cli_shared.get_relayer_address(relayer, args)
+
+    native_amount = int(args.value)
+
+    receiver = dns_address_for_name(args.name)
+    data = dns_register_data(args.name)
+
+    controller = TransactionsController(args.chain)
+
+    tx = controller.create_transaction(
+        sender=sender,
+        receiver=receiver,
+        native_amount=native_amount,
+        gas_limit=args.gas_limit,
+        gas_price=args.gas_price,
+        nonce=nonce,
+        version=args.version,
+        options=args.options,
+        data=data,
+        guardian_account=guardian,
+        guardian_address=guardian_address,
+        relayer_account=relayer,
+        relayer_address=relayer_address,
+        guardian_service_url=args.guardian_service_url,
+        guardian_2fa_code=args.guardian_2fa_code,
+    )
 
     cli_shared.send_or_simulate(tx, args)
 
@@ -143,8 +174,8 @@ def compute_dns_address_for_shard_id(shard_id: int) -> Address:
 
 
 def dns_register_data(name: str) -> str:
-    name_enc: bytes = str.encode(name)
-    return "register@{}".format(name_enc.hex())
+    name_as_hex = str.encode(name).hex()
+    return f"register@{name_as_hex}"
 
 
 def _query_contract(contract_address: Address, proxy: INetworkProvider, function: str, args: List[Any]) -> List[Any]:
