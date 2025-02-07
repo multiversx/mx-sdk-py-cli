@@ -26,8 +26,8 @@ from multiversx_sdk.abi import (
 )
 
 from multiversx_sdk_cli import errors
-from multiversx_sdk_cli.accounts import Account
 from multiversx_sdk_cli.config import get_address_hrp
+from multiversx_sdk_cli.interfaces import IAccount
 
 logger = logging.getLogger("contracts")
 
@@ -57,7 +57,7 @@ class SmartContract:
 
     def prepare_deploy_transaction(
         self,
-        owner: Account,
+        owner: IAccount,
         bytecode: Path,
         arguments: Union[list[Any], None],
         should_prepare_args: bool,
@@ -93,13 +93,13 @@ class SmartContract:
         tx.options = options
         tx.guardian = guardian
         tx.relayer = relayer
-        tx.signature = bytes.fromhex(owner.sign_transaction(tx))
+        tx.signature = owner.sign_transaction(tx)
 
         return tx
 
     def prepare_execute_transaction(
         self,
-        caller: Account,
+        caller: IAccount,
         contract: Address,
         function: str,
         arguments: Union[list[Any], None],
@@ -133,13 +133,13 @@ class SmartContract:
         tx.options = options
         tx.guardian = guardian
         tx.relayer = relayer
-        tx.signature = bytes.fromhex(caller.sign_transaction(tx))
+        tx.signature = caller.sign_transaction(tx)
 
         return tx
 
     def prepare_upgrade_transaction(
         self,
-        owner: Account,
+        owner: IAccount,
         contract: Address,
         bytecode: Path,
         arguments: Union[list[str], None],
@@ -177,7 +177,7 @@ class SmartContract:
         tx.options = options
         tx.guardian = guardian
         tx.relayer = relayer
-        tx.signature = bytes.fromhex(owner.sign_transaction(tx))
+        tx.signature = owner.sign_transaction(tx)
 
         return tx
 

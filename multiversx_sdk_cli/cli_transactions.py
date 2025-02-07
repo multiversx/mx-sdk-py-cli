@@ -171,7 +171,7 @@ def sign_transaction(args: Any):
         cli_shared.check_options_for_guarded_tx(tx.options)
 
     account = cli_shared.prepare_account(args)
-    tx.signature = bytes.fromhex(account.sign_transaction(tx))
+    tx.signature = account.sign_transaction(tx)
 
     try:
         guardian_account = cli_shared.prepare_guardian_account(args)
@@ -179,7 +179,7 @@ def sign_transaction(args: Any):
         guardian_account = None
 
     if guardian_account:
-        tx.guardian_signature = bytes.fromhex(guardian_account.sign_transaction(tx))
+        tx.guardian_signature = guardian_account.sign_transaction(tx)
     elif args.guardian:
         tx = cosign_transaction(tx, args.guardian_service_url, args.guardian_2fa_code)
 
@@ -200,7 +200,7 @@ def relay_transaction(args: Any):
     if tx.relayer != relayer.address:
         raise IncorrectWalletError("Relayer wallet does not match the relayer's address set in the transaction.")
 
-    tx.relayer_signature = bytes.fromhex(relayer.sign_transaction(tx))
+    tx.relayer_signature = relayer.sign_transaction(tx)
 
     cli_shared.send_or_simulate(tx, args)
 

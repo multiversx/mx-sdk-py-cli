@@ -3,10 +3,9 @@ from pathlib import Path
 
 import pytest
 from Cryptodome.Hash import keccak
-from multiversx_sdk import Address, TransactionsFactoryConfig
+from multiversx_sdk import Account, Address, TransactionsFactoryConfig
 
 from multiversx_sdk_cli import errors
-from multiversx_sdk_cli.accounts import Account
 from multiversx_sdk_cli.contract_verification import _create_request_signature
 from multiversx_sdk_cli.contracts import SmartContract, _prepare_argument
 
@@ -54,7 +53,7 @@ def test_prepare_argument():
 
 
 def test_contract_verification_create_request_signature():
-    account = Account(pem_file=str(testdata_folder / "walletKey.pem"))
+    account = Account.new_from_pem(file_path=testdata_folder / "walletKey.pem")
     contract_address = Address.from_bech32("erd1qqqqqqqqqqqqqpgqeyj9g344pqguukajpcfqz9p0rfqgyg4l396qespdck")
     request_payload = b"test"
     signature = _create_request_signature(account, contract_address, request_payload)

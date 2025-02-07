@@ -3,12 +3,11 @@ import json
 import logging
 import time
 from pathlib import Path
-from typing import Any, Dict, Optional, Tuple
+from typing import Any, Optional, Protocol, Tuple
 
 import requests
-from multiversx_sdk import Address
+from multiversx_sdk import Address, Message
 
-from multiversx_sdk_cli.accounts import Account
 from multiversx_sdk_cli.errors import KnownError
 from multiversx_sdk_cli.utils import dump_out_json, read_json_file
 
@@ -18,11 +17,18 @@ HTTP_SUCCESS = 200
 logger = logging.getLogger("cli.contracts.verifier")
 
 
+# fmt: off
+class IAccount(Protocol):
+    def sign_message(self, message: Message) -> bytes:
+        ...
+# fmt: on
+
+
 class ContractVerificationRequest:
     def __init__(
         self,
         contract: Address,
-        source_code: Dict[str, Any],
+        source_code: dict[str, Any],
         signature: bytes,
         docker_image: str,
         contract_variant: Optional[str],
@@ -33,7 +39,7 @@ class ContractVerificationRequest:
         self.docker_image = docker_image
         self.contract_variant = contract_variant
 
-    def to_dictionary(self) -> Dict[str, Any]:
+    def to_dictionary(self) -> dict[str, Any]:
         return {
             "signature": self.signature.hex(),
             "payload": {
@@ -49,7 +55,7 @@ class ContractVerificationPayload:
     def __init__(
         self,
         contract: Address,
-        source_code: Dict[str, Any],
+        source_code: dict[str, Any],
         docker_image: str,
         contract_variant: Optional[str],
     ) -> None:
@@ -71,7 +77,7 @@ class ContractVerificationPayload:
 
 def trigger_contract_verification(
     packaged_source: Path,
-    owner: Account,
+    owner: IAccount,
     contract: Address,
     verifier_url: str,
     docker_image: str,
@@ -110,14 +116,11 @@ def trigger_contract_verification(
             query_status_with_task_id(verifier_url, task_id)
 
 
-def _create_request_signature(account: Account, contract_address: Address, request_payload: bytes) -> bytes:
+def _create_request_signature(account: IAccount, contract_address: Address, request_payload: bytes) -> bytes:
     hashed_payload: str = hashlib.sha256(request_payload).hexdigest()
     raw_data_to_sign = f"{contract_address.to_bech32()}{hashed_payload}"
 
-    signature_hex = account.sign_message(raw_data_to_sign.encode())
-    signature = bytes.fromhex(signature_hex)
-
-    return signature
+    return account.sign_message(Message(raw_data_to_sign.encode()))
 
 
 def query_status_with_task_id(url: str, task_id: str, interval: int = 10):
@@ -140,7 +143,7 @@ def query_status_with_task_id(url: str, task_id: str, interval: int = 10):
         time.sleep(interval)
 
 
-def _do_post(url: str, payload: Any) -> Tuple[int, str, Dict[str, Any]]:
+def _do_post(url: str, payload: Any) -> Tuple[int, str, dict[str, Any]]:
     logger.debug(f"_do_post() to {url}")
     response = requests.post(url, json=payload)
 
@@ -153,7 +156,7 @@ def _do_post(url: str, payload: Any) -> Tuple[int, str, Dict[str, Any]]:
         raise KnownError(f"Cannot parse response from {url}", error)
 
 
-def _do_get(url: str) -> Tuple[int, str, Dict[str, Any]]:
+def _do_get(url: str) -> Tuple[int, str, dict[str, Any]]:
     logger.debug(f"_do_get() from {url}")
     response = requests.get(url)
 

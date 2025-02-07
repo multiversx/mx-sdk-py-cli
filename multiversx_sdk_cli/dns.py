@@ -11,7 +11,6 @@ from multiversx_sdk import (
 )
 
 from multiversx_sdk_cli import cli_shared, utils
-from multiversx_sdk_cli.accounts import Account
 from multiversx_sdk_cli.config import get_address_hrp
 from multiversx_sdk_cli.constants import ADDRESS_ZERO_HEX
 from multiversx_sdk_cli.contracts import SmartContract
@@ -136,10 +135,10 @@ def compute_dns_address_for_shard_id(shard_id: int) -> Address:
     deployer_pubkey_prefix = InitialDNSAddress[: len(InitialDNSAddress) - ShardIdentiferLen]
 
     deployer_pubkey = deployer_pubkey_prefix + bytes([0, shard_id])
-    deployer = Account(address=Address(deployer_pubkey, get_address_hrp()))
-    deployer.nonce = 0
+    deployer = Address(deployer_pubkey, get_address_hrp())
+    nonce = 0
     address_computer = AddressComputer(number_of_shards=3)
-    contract_address = address_computer.compute_contract_address(deployer.address, deployer.nonce)
+    contract_address = address_computer.compute_contract_address(deployer, nonce)
     return contract_address
 
 

@@ -1,10 +1,13 @@
 import json
 import logging
 import time
+from pathlib import Path
 from typing import Any, List, Protocol, TextIO, Union
 
 from multiversx_sdk import (
+    Account,
     Address,
+    LedgerAccount,
     Token,
     TokenComputer,
     TokenTransfer,
@@ -15,12 +18,11 @@ from multiversx_sdk import (
     TransferTransactionsFactory,
 )
 
-from multiversx_sdk_cli import errors
-from multiversx_sdk_cli.accounts import Account, AccountBase, LedgerAccount
+from multiversx_sdk_cli import config, errors
 from multiversx_sdk_cli.cli_password import load_guardian_password, load_password
 from multiversx_sdk_cli.cosign_transaction import cosign_transaction
 from multiversx_sdk_cli.errors import IncorrectWalletError, NoWalletProvided
-from multiversx_sdk_cli.ledger.ledger_functions import do_get_ledger_address
+from multiversx_sdk_cli.interfaces import IAccount
 
 logger = logging.getLogger("transactions")
 
@@ -91,7 +93,7 @@ def do_prepare_transaction(args: Any) -> Transaction:
             if isinstance(relayer_account, LedgerAccount):
                 tx_computer.apply_options_for_hash_signing(tx)
 
-            tx.relayer_signature = bytes.fromhex(relayer_account.sign_transaction(tx))
+            tx.relayer_signature = relayer_account.sign_transaction(tx)
         except NoWalletProvided:
             logger.warning("Relayer wallet not provided. Transaction will not be signed by relayer.")
         except IncorrectWalletError:
@@ -105,39 +107,48 @@ def do_prepare_transaction(args: Any) -> Transaction:
     except NoWalletProvided:
         guardian_account = None
 
-    tx.signature = bytes.fromhex(account.sign_transaction(tx))
+    tx.signature = account.sign_transaction(tx)
     tx = sign_tx_by_guardian(args, tx, guardian_account)
 
     return tx
 
 
-def load_sender_account_from_args(args: Any) -> Account:
-    account = Account()
-    if args.ledger:
-        account = LedgerAccount(
-            account_index=args.ledger_account_index,
-            address_index=args.ledger_address_index,
-        )
+def load_sender_account_from_args(args: Any) -> IAccount:
+    hrp = config.get_address_hrp()
+
     if args.pem:
-        account = Account(pem_file=args.pem, pem_index=args.pem_index)
+        return Account.new_from_pem(file_path=Path(args.pem), index=args.pem_index, hrp=hrp)
     elif args.keyfile:
         password = load_password(args)
-        account = Account(key_file=args.keyfile, password=password)
+        account = Account.new_from_keystore(
+            file_path=Path(args.keyfile),
+            password=password,
+            address_index=args.address_index,
+            hrp=hrp,
+        )
+    elif args.ledger:
+        account = LedgerAccount(address_index=args.ledger_address_index)
+    else:
+        raise errors.NoWalletProvided()
 
     return account
 
 
-def load_relayer_account_from_args(args: Any) -> Account:
+def load_relayer_account_from_args(args: Any) -> IAccount:
+    hrp = config.get_address_hrp()
+
     if args.relayer_ledger:
-        account = LedgerAccount(
-            account_index=args.relayer_ledger_account_index,
-            address_index=args.relayer_ledger_address_index,
-        )
+        account = LedgerAccount(address_index=args.relayer_ledger_address_index)
     if args.relayer_pem:
-        account = Account(pem_file=args.relayer_pem, pem_index=args.relayer_pem_index)
+        account = Account.new_from_pem(file_path=Path(args.relayer_pem), index=args.relayer_pem_index, hrp=hrp)
     elif args.relayer_keyfile:
         password = load_password(args)
-        account = Account(key_file=args.relayer_keyfile, password=password)
+        account = Account.new_from_keystore(
+            file_path=Path(args.relayer_keyfile),
+            password=password,
+            address_index=args.relayer_address_index,
+            hrp=hrp,
+        )
     else:
         raise errors.NoWalletProvided()
 
@@ -160,9 +171,9 @@ def prepare_token_transfers(transfers: List[Any]) -> List[TokenTransfer]:
     return token_transfers
 
 
-def sign_tx_by_guardian(args: Any, tx: Transaction, guardian_account: Union[AccountBase, None]) -> Transaction:
+def sign_tx_by_guardian(args: Any, tx: Transaction, guardian_account: Union[IAccount, None]) -> Transaction:
     if guardian_account:
-        tx.guardian_signature = bytes.fromhex(guardian_account.sign_transaction(tx))
+        tx.guardian_signature = guardian_account.sign_transaction(tx)
     elif args.guardian:
         tx = cosign_transaction(tx, args.guardian_service_url, args.guardian_2fa_code)  # type: ignore
 
@@ -170,18 +181,21 @@ def sign_tx_by_guardian(args: Any, tx: Transaction, guardian_account: Union[Acco
 
 
 # TODO: this is duplicated code; a proper refactoring will come later
-def get_guardian_account_from_args(args: Any):
+def get_guardian_account_from_args(args: Any) -> IAccount:
+    hrp = config.get_address_hrp()
+
     if args.guardian_pem:
-        account = Account(pem_file=args.guardian_pem, pem_index=args.guardian_pem_index)
+        account = Account.new_from_pem(file_path=Path(args.guardian_pem), index=args.guardian_pem_index, hrp=hrp)
     elif args.guardian_keyfile:
         password = load_guardian_password(args)
-        account = Account(key_file=args.guardian_keyfile, password=password)
-    elif args.guardian_ledger:
-        address = do_get_ledger_address(
-            account_index=args.guardian_ledger_account_index,
-            address_index=args.guardian_ledger_address_index,
+        account = Account.new_from_keystore(
+            file_path=Path(args.guardian_keyfile),
+            password=password,
+            address_index=args.guardian_address_index,
+            hrp=hrp,
         )
-        account = Account(address=Address.new_from_bech32(address))
+    elif args.guardian_ledger:
+        account = LedgerAccount(address_index=args.relayer_ledger_address_index)
     else:
         raise errors.NoWalletProvided()
 

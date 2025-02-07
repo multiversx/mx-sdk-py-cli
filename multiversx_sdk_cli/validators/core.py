@@ -4,9 +4,7 @@ from typing import Any, List, Tuple, Union
 
 from multiversx_sdk import Address, ValidatorPEM, ValidatorSigner
 
-from multiversx_sdk_cli import utils
-from multiversx_sdk_cli.accounts import Account
-from multiversx_sdk_cli.cli_password import load_password
+from multiversx_sdk_cli import cli_shared, utils
 from multiversx_sdk_cli.config import (
     GAS_PER_DATA_BYTE,
     MIN_GAS_LIMIT,
@@ -14,7 +12,6 @@ from multiversx_sdk_cli.config import (
     get_address_hrp,
 )
 from multiversx_sdk_cli.contracts import prepare_execute_transaction_data
-from multiversx_sdk_cli.errors import BadUsage
 from multiversx_sdk_cli.validators.validators_file import ValidatorsFile
 
 logger = logging.getLogger("validators")
@@ -27,13 +24,7 @@ def prepare_args_for_stake(args: Any):
         prepare_args_for_top_up(args)
         return
 
-    if args.pem:
-        node_operator = Account(pem_file=args.pem)
-    elif args.keyfile:
-        password = load_password(args)
-        node_operator = Account(key_file=args.keyfile, password=password)
-    else:
-        raise BadUsage("cannot initialize node operator")
+    node_operator = cli_shared.prepare_account(args)
 
     validators_file_path = Path(args.validators_file)
     reward_address = Address.new_from_bech32(args.reward_address) if args.reward_address else None
