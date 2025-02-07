@@ -48,7 +48,7 @@ class TransactionsController(BaseTransactionsController):
         sender: IAccount,
         receiver: Address,
         native_amount: int,
-        gas_limt: int,
+        gas_limit: int,
         gas_price: int,
         nonce: int,
         version: int,
@@ -67,7 +67,7 @@ class TransactionsController(BaseTransactionsController):
             transaction = Transaction(
                 sender=sender.address,
                 receiver=receiver,
-                gas_limit=gas_limt,
+                gas_limit=gas_limit,
                 chain_id=self.factory.config.chain_id,
             )
         else:
@@ -79,7 +79,7 @@ class TransactionsController(BaseTransactionsController):
                 data=data.encode() if data else None,
             )
 
-        transaction.gas_limit = gas_limt
+        transaction.gas_limit = gas_limit
         transaction.gas_price = gas_price
         transaction.nonce = nonce
         transaction.version = version
