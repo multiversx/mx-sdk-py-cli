@@ -1,4 +1,4 @@
-from typing import Any, List, Optional, Protocol, Union
+from typing import Any, Optional, Protocol, Union
 
 from Cryptodome.Hash import keccak
 from multiversx_sdk import (
@@ -117,8 +117,8 @@ def register(args: Any):
     cli_shared.send_or_simulate(tx, args)
 
 
-def compute_all_dns_addresses() -> List[Address]:
-    addresses: List[Address] = []
+def compute_all_dns_addresses() -> list[Address]:
+    addresses: list[Address] = []
     for i in range(0, 256):
         addresses.append(compute_dns_address_for_shard_id(i))
     return addresses
@@ -178,7 +178,7 @@ def dns_register_data(name: str) -> str:
     return f"register@{name_as_hex}"
 
 
-def _query_contract(contract_address: Address, proxy: INetworkProvider, function: str, args: List[Any]) -> List[Any]:
+def _query_contract(contract_address: Address, proxy: INetworkProvider, function: str, args: list[Any]) -> list[Any]:
     chain_id = proxy.get_network_config().chain_id
     config = TransactionsFactoryConfig(chain_id)
     contract = SmartContract(config)

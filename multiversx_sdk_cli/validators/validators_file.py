@@ -1,6 +1,5 @@
 import json
 from pathlib import Path
-from typing import Dict, List
 
 from multiversx_sdk import ValidatorPEM, ValidatorPublicKey, ValidatorSigner
 
@@ -19,8 +18,8 @@ class ValidatorsFile:
     def get_validators_list(self):
         return self._validators_data.get("validators", [])
 
-    def load_signers(self) -> List[ValidatorSigner]:
-        signers: List[ValidatorSigner] = []
+    def load_signers(self) -> list[ValidatorSigner]:
+        signers: list[ValidatorSigner] = []
         for validator in self.get_validators_list():
             pem_file = self._load_validator_pem(validator)
             validator_signer = ValidatorSigner(pem_file.secret_key)
@@ -28,8 +27,8 @@ class ValidatorsFile:
 
         return signers
 
-    def load_public_keys(self) -> List[ValidatorPublicKey]:
-        public_keys: List[ValidatorPublicKey] = []
+    def load_public_keys(self) -> list[ValidatorPublicKey]:
+        public_keys: list[ValidatorPublicKey] = []
 
         for validator in self.get_validators_list():
             pem_file = self._load_validator_pem(validator)
@@ -37,7 +36,7 @@ class ValidatorsFile:
 
         return public_keys
 
-    def _load_validator_pem(self, validator: Dict[str, str]) -> ValidatorPEM:
+    def _load_validator_pem(self, validator: dict[str, str]) -> ValidatorPEM:
         # Get path of "pemFile", make it absolute
         validator_pem = Path(validator.get("pemFile", "")).expanduser()
         validator_pem = (
