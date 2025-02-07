@@ -54,8 +54,8 @@ class NativeAuthClient:
         round = self._get_current_round()
         url = f"{self.config.gateway_url}/blocks/by-round/{round}"
         response = self._execute_request(url)
-        blocks = response["data"]["blocks"]
-        block = [b for b in blocks if b["shard"] == self.config.block_hash_shard][0]
+        blocks: list[dict[str, Any]] = response["data"]["blocks"]
+        block: dict[str, str] = [b for b in blocks if b["shard"] == self.config.block_hash_shard][0]
         return block["hash"]
 
     def _get_current_round(self) -> int:
@@ -67,14 +67,14 @@ class NativeAuthClient:
 
         url = f"{self.config.gateway_url}/network/status/{self.config.block_hash_shard}"
         response = self._execute_request(url)
-        status = response["data"]["status"]
+        status: dict[str, int] = response["data"]["status"]
 
         return status["erd_current_round"]
 
     def _get_current_block_hash_using_api(self) -> str:
         try:
             url = f"{self.config.api_url}/blocks/latest?ttl={self.config.expiry_seconds}&fields=hash"
-            response = self._execute_request(url)
+            response: dict[str, str] = self._execute_request(url)
             if response["hash"]:
                 return response["hash"]
         except Exception:
@@ -88,7 +88,7 @@ class NativeAuthClient:
         if self.config.block_hash_shard:
             url += f"&shard={self.config.block_hash_shard}"
 
-        response = self._execute_request(url)
+        response: list[dict[str, str]] = self._execute_request(url)
         return response[0]["hash"]
 
     def _encode_value(self, string: str) -> str:

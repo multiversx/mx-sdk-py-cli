@@ -329,4 +329,5 @@ def test_create_plain_transaction(capsys: Any):
 
 
 def _read_stdout(capsys: Any) -> str:
-    return capsys.readouterr().out.strip()
+    stdout: str = capsys.readouterr().out.strip()
+    return stdout

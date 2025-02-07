@@ -326,30 +326,28 @@ def prepare_account(args: Any):
         return Account.new_from_pem(file_path=Path(args.pem), index=args.pem_index, hrp=hrp)
     elif args.keyfile:
         password = load_password(args)
-        account = Account.new_from_keystore(
+        return Account.new_from_keystore(
             file_path=Path(args.keyfile),
             password=password,
             address_index=args.address_index,
             hrp=hrp,
         )
     elif args.ledger:
-        account = LedgerAccount(address_index=args.ledger_address_index)
+        return LedgerAccount(address_index=args.ledger_address_index)
     else:
         raise errors.NoWalletProvided()
-
-    return account
 
 
 def prepare_relayer_account(args: Any) -> IAccount:
     hrp = config.get_address_hrp()
 
     if args.relayer_ledger:
-        account = LedgerAccount(address_index=args.relayer_ledger_address_index)
+        return LedgerAccount(address_index=args.relayer_ledger_address_index)
     if args.relayer_pem:
-        account = Account.new_from_pem(file_path=Path(args.relayer_pem), index=args.relayer_pem_index, hrp=hrp)
+        return Account.new_from_pem(file_path=Path(args.relayer_pem), index=args.relayer_pem_index, hrp=hrp)
     elif args.relayer_keyfile:
         password = load_password(args)
-        account = Account.new_from_keystore(
+        return Account.new_from_keystore(
             file_path=Path(args.relayer_keyfile),
             password=password,
             address_index=args.relayer_address_index,
@@ -358,28 +356,24 @@ def prepare_relayer_account(args: Any) -> IAccount:
     else:
         raise errors.NoWalletProvided()
 
-    return account
-
 
 def prepare_guardian_account(args: Any) -> IAccount:
     hrp = config.get_address_hrp()
 
     if args.guardian_pem:
-        account = Account.new_from_pem(file_path=Path(args.guardian_pem), index=args.guardian_pem_index, hrp=hrp)
+        return Account.new_from_pem(file_path=Path(args.guardian_pem), index=args.guardian_pem_index, hrp=hrp)
     elif args.guardian_keyfile:
         password = load_guardian_password(args)
-        account = Account.new_from_keystore(
+        return Account.new_from_keystore(
             file_path=Path(args.guardian_keyfile),
             password=password,
             address_index=args.guardian_address_index,
             hrp=hrp,
         )
     elif args.guardian_ledger:
-        account = LedgerAccount(address_index=args.relayer_ledger_address_index)
+        return LedgerAccount(address_index=args.relayer_ledger_address_index)
     else:
         raise errors.NoWalletProvided()
-
-    return account
 
 
 def load_guardian_account(args: Any) -> Union[IAccount, None]:

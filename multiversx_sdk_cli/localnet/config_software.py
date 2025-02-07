@@ -66,10 +66,10 @@ class SoftwareComponent(ConfigPart):
                     f"In configuration section '{self.get_name()}', resolution is '{self.resolution.value}', but 'local_path' is not a directory: {self.local_path}"
                 )
 
-    def get_archive_download_folder(self):
+    def get_archive_download_folder(self) -> Path:
         return self.archive_download_folder.expanduser().resolve()
 
-    def get_archive_extraction_folder(self):
+    def get_archive_extraction_folder(self) -> Path:
         return self.archive_extraction_folder.expanduser().resolve()
 
     def get_local_path(self):

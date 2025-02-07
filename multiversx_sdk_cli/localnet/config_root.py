@@ -7,6 +7,7 @@ import toml
 
 from multiversx_sdk_cli.localnet import config_default
 from multiversx_sdk_cli.localnet.config_part import ConfigPart
+from multiversx_sdk_cli.localnet.config_sharding import Metashard, RegularShards
 from multiversx_sdk_cli.localnet.constants import METACHAIN_ID
 from multiversx_sdk_cli.localnet.node import Node
 
@@ -14,6 +15,9 @@ logger = logging.getLogger("localnet")
 
 
 class ConfigRoot(ConfigPart):
+    shards: RegularShards
+    metashard: Metashard
+
     def __init__(self):
         self.general = config_default.general
         self.software = config_default.software
