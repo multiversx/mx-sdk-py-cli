@@ -151,7 +151,7 @@ def create_transaction(args: Any):
         sender=sender,
         receiver=Address.new_from_bech32(args.receiver),
         native_amount=native_amount,
-        gas_limt=args.gas_limit,
+        gas_limit=args.gas_limit,
         gas_price=args.gas_price,
         nonce=nonce,
         version=args.version,
