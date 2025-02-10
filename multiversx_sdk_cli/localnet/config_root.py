@@ -15,10 +15,10 @@ logger = logging.getLogger("localnet")
 
 
 class ConfigRoot(ConfigPart):
-    shards: RegularShards
-    metashard: Metashard
+    def __init__(self) -> None:
+        self.shards: RegularShards
+        self.metashard: Metashard
 
-    def __init__(self):
         self.general = config_default.general
         self.software = config_default.software
         self.metashard = config_default.metashard
