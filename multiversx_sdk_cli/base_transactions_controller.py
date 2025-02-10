@@ -13,7 +13,7 @@ class BaseTransactionsController:
     def sign_transaction(
         self,
         transaction: Transaction,
-        sender: IAccount,
+        sender: Optional[IAccount] = None,
         guardian: Optional[IAccount] = None,
         relayer: Optional[IAccount] = None,
         guardian_service_url: str = "",
@@ -23,7 +23,8 @@ class BaseTransactionsController:
         self._set_options_for_guarded_transaction_if_needed(transaction)
         self._set_options_for_hash_signing_if_needed(transaction, sender, guardian, relayer)
 
-        transaction.signature = sender.sign_transaction(transaction)
+        if sender:
+            transaction.signature = sender.sign_transaction(transaction)
 
         self._sign_guarded_transaction_if_guardian(
             transaction,
@@ -41,7 +42,7 @@ class BaseTransactionsController:
     def _set_options_for_hash_signing_if_needed(
         self,
         transaction: Transaction,
-        sender: IAccount,
+        sender: Union[IAccount, None],
         guardian: Union[IAccount, None],
         relayer: Union[IAccount, None],
     ):
