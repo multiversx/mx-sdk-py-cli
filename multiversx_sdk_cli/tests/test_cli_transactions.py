@@ -308,7 +308,7 @@ def test_create_plain_transaction(capsys: Any):
             "--gas-limit",
             "50000",
             "--chain",
-            "integration tests chain ID",
+            "test",
         ]
     )
     assert return_code == 0
@@ -318,13 +318,78 @@ def test_create_plain_transaction(capsys: Any):
 
     assert tx_json["sender"] == "erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th"
     assert tx_json["receiver"] == "erd1spyavw0956vq68xj8y4tenjpq2wd5a9p2c6j8gsz7ztyrnpxrruqzu66jx"
-    assert tx_json["chainID"] == "integration tests chain ID"
+    assert tx_json["chainID"] == "test"
     assert tx_json["gasLimit"] == 50000
     assert tx_json["version"] == 2
     assert tx_json["options"] == 0
     assert (
         tx_json["signature"]
-        == "210d3e75924858cde8c7f3020b38db32890a79101cadcb32dc04980e4f3a378a14e9517ff805881f6444efc61fb38b7dfcf3fee07d4b87fa254ee96b67681e02"
+        == "0cbb3cb4d6feaf9d2e6d17a529ddb5eeb0fd547af1dde65362beb6aaf54b78d90d429fa951b6ce7b52724be8da9737d7efaf13631816d034a2d7d1f5ae19510b"
+    )
+
+
+def test_sign_transaction(capsys: Any):
+    return_code = main(
+        [
+            "tx",
+            "new",
+            "--pem",
+            str(testdata_path / "alice.pem"),
+            "--receiver",
+            "erd1spyavw0956vq68xj8y4tenjpq2wd5a9p2c6j8gsz7ztyrnpxrruqzu66jx",
+            "--nonce",
+            "89",
+            "--gas-limit",
+            "50000",
+            "--chain",
+            "test",
+            "--outfile",
+            str(testdata_out / "transaction.json"),
+            "--guardian",
+            "erd1cqqxak4wun7508e0yj9ng843r6hv4mzd0hhpjpsejkpn9wa9yq8sj7u2u5",
+            "--relayer",
+            "erd1ssmsc9022udc8pdw7wk3hxw74jr900xg28vwpz3z60gep66fasasl2nkm4",
+        ]
+    )
+    assert return_code == 0
+    assert (testdata_out / "transaction.json").is_file()
+
+    return_code = main(
+        [
+            "tx",
+            "sign",
+            "--infile",
+            str(testdata_out / "transaction.json"),
+            "--guardian-pem",
+            str(testdata_path / "testUser.pem"),
+            "--relayer-pem",
+            str(testdata_path / "testUser2.pem"),
+        ]
+    )
+    assert return_code == 0
+
+    tx = _read_stdout(capsys)
+    tx_json = json.loads(tx)["emittedTransaction"]
+
+    assert tx_json["sender"] == "erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th"
+    assert tx_json["receiver"] == "erd1spyavw0956vq68xj8y4tenjpq2wd5a9p2c6j8gsz7ztyrnpxrruqzu66jx"
+    assert tx_json["chainID"] == "test"
+    assert tx_json["gasLimit"] == 50000
+    assert tx_json["version"] == 2
+    assert tx_json["options"] == 2
+    assert tx_json["guardian"] == "erd1cqqxak4wun7508e0yj9ng843r6hv4mzd0hhpjpsejkpn9wa9yq8sj7u2u5"
+    assert tx_json["relayer"] == "erd1ssmsc9022udc8pdw7wk3hxw74jr900xg28vwpz3z60gep66fasasl2nkm4"
+    assert (
+        tx_json["signature"]
+        == "96cd2db86f8f63e8fd40a3eb9a9a5a7b0e33a8c5879fe2feb6eba19657ddaf966f9c1d67bbb20c93dcea833a29531426414afe6b716142c9e4e82e7b87454b05"
+    )
+    assert (
+        tx_json["guardianSignature"]
+        == "3197aaa08cc5589c782928c3d123f38c03c5ddcecb666ce72d6751655c08fe2eb684592a165bc214044e549541d2dd3f2f209e7fab158e0adbf47f0af322200b"
+    )
+    assert (
+        tx_json["relayerSignature"]
+        == "01357f907ad0dd83d37a916d39aa4922d831279075f25a039bd9ebfc050eb67e72faeac07463bc1bc2c5e84711dd1ca9d0d21283664ba92c2036a2f01eae2c0d"
     )
 
 

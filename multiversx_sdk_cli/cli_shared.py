@@ -21,11 +21,7 @@ from multiversx_sdk_cli.cli_password import (
     load_password,
     load_relayer_password,
 )
-from multiversx_sdk_cli.constants import (
-    DEFAULT_GAS_PRICE,
-    DEFAULT_TX_VERSION,
-    TRANSACTION_OPTIONS_TX_GUARDED,
-)
+from multiversx_sdk_cli.constants import DEFAULT_GAS_PRICE, DEFAULT_TX_VERSION
 from multiversx_sdk_cli.errors import ArgumentsNotProvidedError, IncorrectWalletError
 from multiversx_sdk_cli.interfaces import IAccount
 from multiversx_sdk_cli.simulation import Simulator
@@ -156,10 +152,10 @@ def add_guardian_args(sub: Any):
     )
 
 
-def add_wallet_args(args: List[str], sub: Any):
+def add_wallet_args(args: List[str], sub: Any, skip_required_check: bool = False):
     sub.add_argument(
         "--pem",
-        required=check_if_sign_method_required(args, "--pem"),
+        required=check_if_sign_method_required(args, "--pem", skip_required_check),
         help="🔑 the PEM file, if keyfile not provided",
     )
     sub.add_argument(
@@ -170,7 +166,7 @@ def add_wallet_args(args: List[str], sub: Any):
     )
     sub.add_argument(
         "--keyfile",
-        required=check_if_sign_method_required(args, "--keyfile"),
+        required=check_if_sign_method_required(args, "--keyfile", skip_required_check),
         help="🔑 a JSON keyfile, if PEM not provided",
     )
     sub.add_argument(
@@ -186,7 +182,7 @@ def add_wallet_args(args: List[str], sub: Any):
     sub.add_argument(
         "--ledger",
         action="store_true",
-        required=check_if_sign_method_required(args, "--ledger"),
+        required=check_if_sign_method_required(args, "--ledger", skip_required_check),
         default=False,
         help="🔐 bool flag for signing transaction using ledger",
     )
@@ -202,7 +198,6 @@ def add_wallet_args(args: List[str], sub: Any):
 def add_guardian_wallet_args(args: List[str], sub: Any):
     sub.add_argument(
         "--guardian-pem",
-        required=check_if_sign_method_required(args, "--guardian-pem"),
         help="🔑 the PEM file, if keyfile not provided",
     )
     sub.add_argument(
@@ -213,7 +208,6 @@ def add_guardian_wallet_args(args: List[str], sub: Any):
     )
     sub.add_argument(
         "--guardian-keyfile",
-        required=check_if_sign_method_required(args, "--guardian-keyfile"),
         help="🔑 a JSON keyfile, if PEM not provided",
     )
     sub.add_argument(
@@ -229,7 +223,6 @@ def add_guardian_wallet_args(args: List[str], sub: Any):
     sub.add_argument(
         "--guardian-ledger",
         action="store_true",
-        required=check_if_sign_method_required(args, "--guardian-ledger"),
         default=False,
         help="🔐 bool flag for signing transaction using ledger",
     )
@@ -241,7 +234,6 @@ def add_guardian_wallet_args(args: List[str], sub: Any):
     )
 
 
-# Required check not properly working, same for guardian. Will be refactored in the future.
 def add_relayed_v3_wallet_args(args: List[str], sub: Any):
     sub.add_argument("--relayer-pem", help="🔑 the PEM file, if keyfile not provided")
     sub.add_argument(
@@ -376,6 +368,25 @@ def prepare_guardian_account(args: Any) -> IAccount:
         raise errors.NoWalletProvided()
 
 
+def load_sender_account(args: Any) -> Union[IAccount, None]:
+    hrp = config.get_address_hrp()
+
+    if args.pem:
+        return Account.new_from_pem(file_path=Path(args.pem), index=args.pem_index, hrp=hrp)
+    elif args.keyfile:
+        password = load_password(args)
+        return Account.new_from_keystore(
+            file_path=Path(args.keyfile),
+            password=password,
+            address_index=args.address_index,
+            hrp=hrp,
+        )
+    elif args.ledger:
+        return LedgerAccount(address_index=args.ledger_address_index)
+
+    return None
+
+
 def load_guardian_account(args: Any) -> Union[IAccount, None]:
     hrp = config.get_address_hrp()
 
@@ -396,23 +407,23 @@ def load_guardian_account(args: Any) -> Union[IAccount, None]:
 
 
 def get_guardian_address(guardian: Union[IAccount, None], args: Any) -> Union[Address, None]:
-    address_pem = guardian.address if guardian else None
-    address_arg = Address.new_from_bech32(args.guardian) if hasattr(args, "guardian") and args.guardian else None
+    address_from_account = guardian.address if guardian else None
+    address_from_args = Address.new_from_bech32(args.guardian) if hasattr(args, "guardian") and args.guardian else None
 
-    if address_pem and address_arg and address_pem != address_arg:
-        raise IncorrectWalletError("Guardian wallet does not match the guardian's address set in the transaction.")
+    if address_from_account and address_from_args and address_from_account != address_from_args:
+        raise IncorrectWalletError("Guardian wallet does not match the guardian's address set in the arguments.")
 
-    return address_pem or address_arg
+    return address_from_account or address_from_args
 
 
 def get_relayer_address(relayer: Union[IAccount, None], args: Any) -> Union[Address, None]:
-    address_pem = relayer.address if relayer else None
-    address_arg = Address.new_from_bech32(args.relayer) if hasattr(args, "relayer") and args.relayer else None
+    address_from_account = relayer.address if relayer else None
+    address_from_args = Address.new_from_bech32(args.relayer) if hasattr(args, "relayer") and args.relayer else None
 
-    if address_pem and address_arg and address_pem != address_arg:
-        raise IncorrectWalletError("Relayer wallet does not match the relayer's address set in the transaction.")
+    if address_from_account and address_from_args and address_from_account != address_from_args:
+        raise IncorrectWalletError("Relayer wallet does not match the relayer's address set in the arguments.")
 
-    return address_pem or address_arg
+    return address_from_account or address_from_args
 
 
 def load_relayer_account(args: Any) -> Union[IAccount, None]:
@@ -502,19 +513,10 @@ def check_broadcast_args(args: Any):
         raise errors.BadUsage("Cannot both 'simulate' and 'send' a transaction")
 
 
-def check_guardian_and_options_args(args: Any):
-    check_guardian_args(args)
-    if args.guardian:
-        check_options_for_guarded_tx(args.options)
-
-
 def check_guardian_args(args: Any):
     if args.guardian:
         if should_sign_with_cosigner_service(args) and should_sign_with_guardian_key(args):
             raise errors.BadUsage("Guarded tx should be signed using either a cosigning service or a guardian key")
-
-        if not should_sign_with_cosigner_service(args) and not should_sign_with_guardian_key(args):
-            raise errors.BadUsage("Missing guardian signing arguments")
 
 
 def should_sign_with_cosigner_service(args: Any) -> bool:
@@ -523,11 +525,6 @@ def should_sign_with_cosigner_service(args: Any) -> bool:
 
 def should_sign_with_guardian_key(args: Any) -> bool:
     return any([args.guardian_pem, args.guardian_keyfile, args.guardian_ledger])
-
-
-def check_options_for_guarded_tx(options: int):
-    if not options & TRANSACTION_OPTIONS_TX_GUARDED == TRANSACTION_OPTIONS_TX_GUARDED:
-        raise errors.BadUsage("Invalid guarded transaction's options. The second least significant bit must be set")
 
 
 def send_or_simulate(tx: Transaction, args: Any, dump_output: bool = True) -> CLIOutputBuilder:
@@ -571,7 +568,10 @@ def send_or_simulate(tx: Transaction, args: Any, dump_output: bool = True) -> CL
     return output_builder
 
 
-def check_if_sign_method_required(args: List[str], checked_method: str) -> bool:
+def check_if_sign_method_required(args: List[str], checked_method: str, skip_required_check: bool = False) -> bool:
+    if skip_required_check:
+        return False
+
     methods = ["--pem", "--keyfile", "--ledger"]
     rest_of_methods: List[str] = []
     for method in methods:

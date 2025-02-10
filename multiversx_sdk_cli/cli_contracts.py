@@ -336,7 +336,7 @@ After installing, use the `sc-meta all build` command. To lear more about `sc-me
 
 def deploy(args: Any):
     logger.debug("deploy")
-    cli_shared.check_guardian_and_options_args(args)
+    cli_shared.check_guardian_args(args)
     cli_shared.check_broadcast_args(args)
     cli_shared.prepare_chain_id_in_args(args)
 
@@ -392,7 +392,7 @@ def deploy(args: Any):
 
 def call(args: Any):
     logger.debug("call")
-    cli_shared.check_guardian_and_options_args(args)
+    cli_shared.check_guardian_args(args)
     cli_shared.check_broadcast_args(args)
     cli_shared.prepare_chain_id_in_args(args)
 
@@ -441,7 +441,7 @@ def call(args: Any):
 
 def upgrade(args: Any):
     logger.debug("upgrade")
-    cli_shared.check_guardian_and_options_args(args)
+    cli_shared.check_guardian_args(args)
     cli_shared.check_broadcast_args(args)
     cli_shared.prepare_chain_id_in_args(args)
 
