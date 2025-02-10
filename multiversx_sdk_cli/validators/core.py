@@ -5,12 +5,8 @@ from typing import Any, List, Tuple, Union
 from multiversx_sdk import Address, ValidatorPEM, ValidatorSigner
 
 from multiversx_sdk_cli import cli_shared, utils
-from multiversx_sdk_cli.config import (
-    GAS_PER_DATA_BYTE,
-    MIN_GAS_LIMIT,
-    MetaChainSystemSCsCost,
-    get_address_hrp,
-)
+from multiversx_sdk_cli.config import MetaChainSystemSCsCost, get_address_hrp
+from multiversx_sdk_cli.constants import GAS_PER_DATA_BYTE, MIN_GAS_LIMIT
 from multiversx_sdk_cli.contracts import prepare_execute_transaction_data
 from multiversx_sdk_cli.validators.validators_file import ValidatorsFile
 

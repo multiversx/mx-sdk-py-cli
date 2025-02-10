@@ -26,6 +26,7 @@ from multiversx_sdk.abi import (
 )
 
 from multiversx_sdk_cli import errors
+from multiversx_sdk_cli.base_transactions_controller import BaseTransactionsController
 from multiversx_sdk_cli.config import get_address_hrp
 from multiversx_sdk_cli.interfaces import IAccount
 
@@ -49,7 +50,7 @@ class INetworkProvider(Protocol):
 # fmt: on
 
 
-class SmartContract:
+class SmartContract(BaseTransactionsController):
     def __init__(self, config: TransactionsFactoryConfig, abi: Optional[Abi] = None):
         self._abi = abi
         self._config = config
@@ -70,8 +71,12 @@ class SmartContract:
         nonce: int,
         version: int,
         options: int,
-        guardian: Union[Address, None],
-        relayer: Union[Address, None],
+        guardian_account: Optional[IAccount] = None,
+        guardian_address: Optional[Address] = None,
+        relayer_account: Optional[IAccount] = None,
+        relayer_address: Optional[Address] = None,
+        guardian_service_url: str = "",
+        guardian_2fa_code: str = "",
     ) -> Transaction:
         args = arguments if arguments else []
         if should_prepare_args:
@@ -91,9 +96,17 @@ class SmartContract:
         tx.nonce = nonce
         tx.version = version
         tx.options = options
-        tx.guardian = guardian
-        tx.relayer = relayer
-        tx.signature = owner.sign_transaction(tx)
+        tx.guardian = guardian_address
+        tx.relayer = relayer_address
+
+        self.sign_transaction(
+            transaction=tx,
+            sender=owner,
+            guardian=guardian_account,
+            relayer=relayer_account,
+            guardian_service_url=guardian_service_url,
+            guardian_2fa_code=guardian_2fa_code,
+        )
 
         return tx
 
@@ -110,8 +123,12 @@ class SmartContract:
         nonce: int,
         version: int,
         options: int,
-        guardian: Union[Address, None],
-        relayer: Union[Address, None],
+        guardian_account: Optional[IAccount] = None,
+        guardian_address: Optional[Address] = None,
+        relayer_account: Optional[IAccount] = None,
+        relayer_address: Optional[Address] = None,
+        guardian_service_url: str = "",
+        guardian_2fa_code: str = "",
     ) -> Transaction:
         token_transfers = self._prepare_token_transfers(transfers) if transfers else []
 
@@ -131,9 +148,17 @@ class SmartContract:
         tx.nonce = nonce
         tx.version = version
         tx.options = options
-        tx.guardian = guardian
-        tx.relayer = relayer
-        tx.signature = caller.sign_transaction(tx)
+        tx.guardian = guardian_address
+        tx.relayer = relayer_address
+
+        self.sign_transaction(
+            transaction=tx,
+            sender=caller,
+            guardian=guardian_account,
+            relayer=relayer_account,
+            guardian_service_url=guardian_service_url,
+            guardian_2fa_code=guardian_2fa_code,
+        )
 
         return tx
 
@@ -153,8 +178,12 @@ class SmartContract:
         nonce: int,
         version: int,
         options: int,
-        guardian: Union[Address, None],
-        relayer: Union[Address, None],
+        guardian_account: Optional[IAccount] = None,
+        guardian_address: Optional[Address] = None,
+        relayer_account: Optional[IAccount] = None,
+        relayer_address: Optional[Address] = None,
+        guardian_service_url: str = "",
+        guardian_2fa_code: str = "",
     ) -> Transaction:
         args = arguments if arguments else []
         if should_prepare_args:
@@ -175,9 +204,17 @@ class SmartContract:
         tx.nonce = nonce
         tx.version = version
         tx.options = options
-        tx.guardian = guardian
-        tx.relayer = relayer
-        tx.signature = owner.sign_transaction(tx)
+        tx.guardian = guardian_address
+        tx.relayer = relayer_address
+
+        self.sign_transaction(
+            transaction=tx,
+            sender=owner,
+            guardian=guardian_account,
+            relayer=relayer_account,
+            guardian_service_url=guardian_service_url,
+            guardian_2fa_code=guardian_2fa_code,
+        )
 
         return tx
 

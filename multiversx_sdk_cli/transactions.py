@@ -2,7 +2,7 @@ import json
 import logging
 import time
 from pathlib import Path
-from typing import Any, List, Protocol, TextIO, Union
+from typing import Any, List, Optional, Protocol, TextIO, Union
 
 from multiversx_sdk import (
     Account,
@@ -19,6 +19,7 @@ from multiversx_sdk import (
 )
 
 from multiversx_sdk_cli import config, errors
+from multiversx_sdk_cli.base_transactions_controller import BaseTransactionsController
 from multiversx_sdk_cli.cli_password import load_guardian_password, load_password
 from multiversx_sdk_cli.cosign_transaction import cosign_transaction
 from multiversx_sdk_cli.errors import IncorrectWalletError, NoWalletProvided
@@ -35,6 +36,67 @@ class INetworkProvider(Protocol):
     def get_transaction(self, transaction_hash: Union[bytes, str]) -> TransactionOnNetwork:
         ...
 # fmt: on
+
+
+class TransactionsController(BaseTransactionsController):
+    def __init__(self, chain_id: str) -> None:
+        config = TransactionsFactoryConfig(chain_id)
+        self.factory = TransferTransactionsFactory(config)
+
+    def create_transaction(
+        self,
+        sender: IAccount,
+        receiver: Address,
+        native_amount: int,
+        gas_limit: int,
+        gas_price: int,
+        nonce: int,
+        version: int,
+        options: int,
+        token_transfers: Optional[list[TokenTransfer]] = None,
+        data: Optional[str] = None,
+        guardian_account: Optional[IAccount] = None,
+        guardian_address: Optional[Address] = None,
+        relayer_account: Optional[IAccount] = None,
+        relayer_address: Optional[Address] = None,
+        guardian_service_url: str = "",
+        guardian_2fa_code: str = "",
+    ) -> Transaction:
+        # if no value, token transfers or data provided, create plain transaction
+        if not native_amount and not token_transfers and not data:
+            transaction = Transaction(
+                sender=sender.address,
+                receiver=receiver,
+                gas_limit=gas_limit,
+                chain_id=self.factory.config.chain_id,
+            )
+        else:
+            transaction = self.factory.create_transaction_for_transfer(
+                sender=sender.address,
+                receiver=receiver,
+                native_amount=native_amount,
+                token_transfers=token_transfers,
+                data=data.encode() if data else None,
+            )
+
+        transaction.gas_limit = gas_limit
+        transaction.gas_price = gas_price
+        transaction.nonce = nonce
+        transaction.version = version
+        transaction.options = options
+        transaction.guardian = guardian_address
+        transaction.relayer = relayer_address
+
+        self.sign_transaction(
+            transaction=transaction,
+            sender=sender,
+            guardian=guardian_account,
+            relayer=relayer_account,
+            guardian_service_url=guardian_service_url,
+            guardian_2fa_code=guardian_2fa_code,
+        )
+
+        return transaction
 
 
 def do_prepare_transaction(args: Any) -> Transaction:
@@ -175,7 +237,7 @@ def sign_tx_by_guardian(args: Any, tx: Transaction, guardian_account: Union[IAcc
     if guardian_account:
         tx.guardian_signature = guardian_account.sign_transaction(tx)
     elif args.guardian:
-        tx = cosign_transaction(tx, args.guardian_service_url, args.guardian_2fa_code)  # type: ignore
+        cosign_transaction(tx, args.guardian_service_url, args.guardian_2fa_code)
 
     return tx
 

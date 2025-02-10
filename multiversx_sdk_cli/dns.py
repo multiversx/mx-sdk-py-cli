@@ -74,7 +74,7 @@ def validate_name(name: str, shard_id: int, proxy: INetworkProvider):
 def register(args: Any):
     args = utils.as_object(args)
 
-    cli_shared.check_guardian_and_options_args(args)
+    cli_shared.check_guardian_args(args)
     cli_shared.check_broadcast_args(args)
     cli_shared.prepare_nonce_in_args(args)
     cli_shared.prepare_chain_id_in_args(args)
