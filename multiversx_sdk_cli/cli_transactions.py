@@ -201,7 +201,6 @@ def send_transaction(args: Any):
 
 
 def get_transaction(args: Any):
-    # args = utils.as_object(args)
     omit_fields = cli_shared.parse_omit_fields_arg(args)
 
     config = get_config_for_network_providers()
@@ -231,6 +230,7 @@ def sign_transaction(args: Any):
     if guardian_account:
         tx.guardian_signature = guardian_account.sign_transaction(tx)
     elif args.guardian:
+        #  If the guardian account is provided, we sign locally. Otherwise, we reach for the trusted cosign service.
         cosign_transaction(tx, args.guardian_service_url, args.guardian_2fa_code)
 
     cli_shared.send_or_simulate(tx, args)
