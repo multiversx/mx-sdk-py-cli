@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import Any, List
+from typing import Any
 
 from multiversx_sdk import Address
 
@@ -7,7 +7,7 @@ from multiversx_sdk_cli import cli_shared, utils
 from multiversx_sdk_cli.validators.core import ValidatorsController
 
 
-def setup_parser(args: List[str], subparsers: Any) -> Any:
+def setup_parser(args: list[str], subparsers: Any) -> Any:
     parser = cli_shared.add_group_subparser(
         subparsers,
         "validator",
@@ -120,7 +120,7 @@ def setup_parser(args: List[str], subparsers: Any) -> Any:
     return subparsers
 
 
-def _add_common_arguments(args: List[str], sub: Any):
+def _add_common_arguments(args: list[str], sub: Any):
     cli_shared.add_proxy_arg(sub)
     cli_shared.add_wallet_args(args, sub)
     cli_shared.add_tx_args(args, sub, with_receiver=False, with_data=False, with_estimate_gas=True)
@@ -139,7 +139,7 @@ def _add_nodes_arg(sub: Any):
 
 
 def do_stake(args: Any):
-    cli_shared.check_guardian_and_options_args(args)
+    cli_shared.check_guardian_args(args)
     cli_shared.check_broadcast_args(args)
     cli_shared.prepare_chain_id_in_args(args)
 
@@ -204,7 +204,7 @@ def do_stake(args: Any):
 
 
 def do_unstake(args: Any):
-    cli_shared.check_guardian_and_options_args(args)
+    cli_shared.check_guardian_args(args)
     cli_shared.check_broadcast_args(args)
     cli_shared.prepare_chain_id_in_args(args)
 
@@ -248,7 +248,7 @@ def do_unstake(args: Any):
 
 
 def do_unjail(args: Any):
-    cli_shared.check_guardian_and_options_args(args)
+    cli_shared.check_guardian_args(args)
     cli_shared.check_broadcast_args(args)
     cli_shared.prepare_chain_id_in_args(args)
 
@@ -292,7 +292,7 @@ def do_unjail(args: Any):
 
 
 def do_unbond(args: Any):
-    cli_shared.check_guardian_and_options_args(args)
+    cli_shared.check_guardian_args(args)
     cli_shared.check_broadcast_args(args)
     cli_shared.prepare_chain_id_in_args(args)
 
@@ -336,7 +336,7 @@ def do_unbond(args: Any):
 
 
 def change_reward_address(args: Any):
-    cli_shared.check_guardian_and_options_args(args)
+    cli_shared.check_guardian_args(args)
     cli_shared.check_broadcast_args(args)
     cli_shared.prepare_chain_id_in_args(args)
 
@@ -380,7 +380,7 @@ def change_reward_address(args: Any):
 
 
 def do_claim(args: Any):
-    cli_shared.check_guardian_and_options_args(args)
+    cli_shared.check_guardian_args(args)
     cli_shared.check_broadcast_args(args)
     cli_shared.prepare_chain_id_in_args(args)
 
@@ -422,7 +422,7 @@ def do_claim(args: Any):
 
 
 def do_unstake_nodes(args: Any):
-    cli_shared.check_guardian_and_options_args(args)
+    cli_shared.check_guardian_args(args)
     cli_shared.check_broadcast_args(args)
     cli_shared.prepare_chain_id_in_args(args)
 
@@ -467,7 +467,7 @@ def do_unstake_nodes(args: Any):
 
 
 def do_unstake_tokens(args: Any):
-    cli_shared.check_guardian_and_options_args(args)
+    cli_shared.check_guardian_args(args)
     cli_shared.check_broadcast_args(args)
     cli_shared.prepare_chain_id_in_args(args)
 
@@ -511,7 +511,7 @@ def do_unstake_tokens(args: Any):
 
 
 def do_unbond_nodes(args: Any):
-    cli_shared.check_guardian_and_options_args(args)
+    cli_shared.check_guardian_args(args)
     cli_shared.check_broadcast_args(args)
     cli_shared.prepare_chain_id_in_args(args)
 
@@ -556,7 +556,7 @@ def do_unbond_nodes(args: Any):
 
 
 def do_unbond_tokens(args: Any):
-    cli_shared.check_guardian_and_options_args(args)
+    cli_shared.check_guardian_args(args)
     cli_shared.check_broadcast_args(args)
     cli_shared.prepare_chain_id_in_args(args)
 
@@ -600,7 +600,7 @@ def do_unbond_tokens(args: Any):
 
 
 def do_clean_registered_data(args: Any):
-    cli_shared.check_guardian_and_options_args(args)
+    cli_shared.check_guardian_args(args)
     cli_shared.check_broadcast_args(args)
     cli_shared.prepare_chain_id_in_args(args)
 
@@ -642,7 +642,7 @@ def do_clean_registered_data(args: Any):
 
 
 def do_restake_unstaked_nodes(args: Any):
-    cli_shared.check_guardian_and_options_args(args)
+    cli_shared.check_guardian_args(args)
     cli_shared.check_broadcast_args(args)
     cli_shared.prepare_chain_id_in_args(args)
 

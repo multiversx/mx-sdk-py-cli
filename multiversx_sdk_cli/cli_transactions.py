@@ -8,13 +8,14 @@ from multiversx_sdk import (
     Token,
     TokenComputer,
     TokenTransfer,
+    TransactionComputer,
 )
 
 from multiversx_sdk_cli import cli_shared, utils
+from multiversx_sdk_cli.base_transactions_controller import BaseTransactionsController
 from multiversx_sdk_cli.cli_output import CLIOutputBuilder
 from multiversx_sdk_cli.config import get_config_for_network_providers
-from multiversx_sdk_cli.cosign_transaction import cosign_transaction
-from multiversx_sdk_cli.errors import IncorrectWalletError, NoWalletProvided
+from multiversx_sdk_cli.errors import BadUsage, IncorrectWalletError, NoWalletProvided
 from multiversx_sdk_cli.transactions import (
     TransactionsController,
     load_transaction_from_file,
@@ -88,7 +89,8 @@ def setup_parser(args: list[str], subparsers: Any) -> Any:
         "sign",
         f"Sign a previously saved transaction.{CLIOutputBuilder.describe()}",
     )
-    cli_shared.add_wallet_args(args, sub)
+    # we add the wallet args, but don't make the args mandatory
+    cli_shared.add_wallet_args(args=args, sub=sub, skip_required_check=True)
     cli_shared.add_infile_arg(sub, what="a previously saved transaction")
     cli_shared.add_outfile_arg(sub, what="the signed transaction")
     cli_shared.add_broadcast_args(sub)
@@ -122,7 +124,7 @@ def _add_common_arguments(args: list[str], sub: Any):
 
 
 def create_transaction(args: Any):
-    cli_shared.check_guardian_and_options_args(args)
+    cli_shared.check_guardian_args(args)
     cli_shared.check_broadcast_args(args)
     cli_shared.prepare_chain_id_in_args(args)
 
@@ -201,7 +203,6 @@ def send_transaction(args: Any):
 
 
 def get_transaction(args: Any):
-    # args = utils.as_object(args)
     omit_fields = cli_shared.parse_omit_fields_arg(args)
 
     config = get_config_for_network_providers()
@@ -213,25 +214,36 @@ def get_transaction(args: Any):
 
 
 def sign_transaction(args: Any):
-    cli_shared.check_guardian_args(args)
     cli_shared.check_broadcast_args(args)
 
     tx = load_transaction_from_file(args.infile)
-    if args.guardian:
-        cli_shared.check_options_for_guarded_tx(tx.options)
 
-    account = cli_shared.prepare_account(args)
-    tx.signature = account.sign_transaction(tx)
+    sender = cli_shared.load_sender_account(args)
+    if sender and sender.address != tx.sender:
+        raise IncorrectWalletError("Sender's wallet does not match transaction's sender.")
 
-    try:
-        guardian_account = cli_shared.prepare_guardian_account(args)
-    except NoWalletProvided:
-        guardian_account = None
+    relayer = cli_shared.load_relayer_account(args)
+    if relayer and relayer.address != tx.relayer:
+        raise IncorrectWalletError("Relayer's wallet does not match transaction's relayer.")
 
-    if guardian_account:
-        tx.guardian_signature = guardian_account.sign_transaction(tx)
-    elif args.guardian:
-        cosign_transaction(tx, args.guardian_service_url, args.guardian_2fa_code)
+    guardian = cli_shared.load_guardian_account(args)
+    if guardian:
+        if guardian.address != tx.guardian:
+            raise IncorrectWalletError("Guardian's wallet does not match transaction's guardian.")
+
+        tx_computer = TransactionComputer()
+        if tx.guardian and not tx_computer.has_options_set_for_guarded_transaction(tx):
+            raise BadUsage("Guardian wallet provided but the transaction has incorrect options.")
+
+    tx_controller = BaseTransactionsController()
+    tx_controller.sign_transaction(
+        transaction=tx,
+        sender=sender,
+        guardian=guardian,
+        relayer=relayer,
+        guardian_service_url=args.guardian_service_url,
+        guardian_2fa_code=args.guardian_2fa_code,
+    )
 
     cli_shared.send_or_simulate(tx, args)
 

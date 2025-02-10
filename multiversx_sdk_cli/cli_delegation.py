@@ -363,7 +363,7 @@ def _add_common_arguments(args: List[str], sub: Any):
 
 
 def ensure_arguments_are_provided_and_prepared(args: Any):
-    cli_shared.check_guardian_and_options_args(args)
+    cli_shared.check_guardian_args(args)
     cli_shared.check_broadcast_args(args)
     cli_shared.prepare_chain_id_in_args(args)
     cli_shared.prepare_nonce_in_args(args)

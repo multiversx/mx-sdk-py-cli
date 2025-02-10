@@ -13,17 +13,18 @@ class BaseTransactionsController:
     def sign_transaction(
         self,
         transaction: Transaction,
-        sender: IAccount,
+        sender: Optional[IAccount] = None,
         guardian: Optional[IAccount] = None,
         relayer: Optional[IAccount] = None,
         guardian_service_url: str = "",
         guardian_2fa_code: str = "",
     ):
-        """Signs the transaction with the sender's account and if necessarry, signs with guardian's account and relayer's account. Also sets proper transaction options if needed."""
+        """Signs the transaction using the sender's account and, if required, additionally signs with the guardian's and relayer's accounts. Ensures the appropriate transaction options are set as needed."""
         self._set_options_for_guarded_transaction_if_needed(transaction)
         self._set_options_for_hash_signing_if_needed(transaction, sender, guardian, relayer)
 
-        transaction.signature = sender.sign_transaction(transaction)
+        if sender:
+            transaction.signature = sender.sign_transaction(transaction)
 
         self._sign_guarded_transaction_if_guardian(
             transaction,
@@ -41,7 +42,7 @@ class BaseTransactionsController:
     def _set_options_for_hash_signing_if_needed(
         self,
         transaction: Transaction,
-        sender: IAccount,
+        sender: Union[IAccount, None],
         guardian: Union[IAccount, None],
         relayer: Union[IAccount, None],
     ):
@@ -60,6 +61,7 @@ class BaseTransactionsController:
         guardian_service_url: str,
         guardian_2fa_code: str,
     ) -> Transaction:
+        #  If the guardian account is provided, we sign locally. Otherwise, we reach for the trusted cosign service.
         if guardian:
             transaction.guardian_signature = guardian.sign_transaction(transaction)
         elif transaction.guardian and guardian_service_url and guardian_2fa_code:

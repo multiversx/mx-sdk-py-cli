@@ -1,19 +1,16 @@
-from typing import Any, Optional, Protocol, Union
+from typing import Any, Protocol
 
 from Cryptodome.Hash import keccak
 from multiversx_sdk import (
     Address,
     AddressComputer,
-    AwaitingOptions,
-    NetworkConfig,
-    TransactionOnNetwork,
-    TransactionsFactoryConfig,
+    SmartContractQuery,
+    SmartContractQueryResponse,
 )
 
 from multiversx_sdk_cli import cli_shared
 from multiversx_sdk_cli.config import get_address_hrp
 from multiversx_sdk_cli.constants import ADDRESS_ZERO_HEX
-from multiversx_sdk_cli.contracts import SmartContract
 from multiversx_sdk_cli.transactions import TransactionsController
 
 MaxNumShards = 256
@@ -23,56 +20,42 @@ InitialDNSAddress = bytes([1] * 32)
 
 # fmt: off
 class INetworkProvider(Protocol):
-    def query_contract(self, query: Any) -> Any:
-        ...
-
-    def get_network_config(self) -> NetworkConfig:
-        ...
-
-    def await_transaction_completed(
-        self, transaction_hash: Union[bytes, str], options: Optional[AwaitingOptions] = None
-    ) -> TransactionOnNetwork:
+    def query_contract(self, query: SmartContractQuery) -> SmartContractQueryResponse:
         ...
 # fmt: on
 
 
 def resolve(name: str, proxy: INetworkProvider) -> Address:
-    name_arg = "0x{}".format(str.encode(name).hex())
     dns_address = dns_address_for_name(name)
 
-    response = _query_contract(contract_address=dns_address, proxy=proxy, function="resolve", args=[name_arg])
+    response = _query_contract(contract_address=dns_address, proxy=proxy, function="resolve", args=[name.encode()])
 
-    if len(response) == 0:
+    if len(response.return_data_parts) == 0:
         return Address.new_from_hex(ADDRESS_ZERO_HEX, get_address_hrp())
 
-    result = response[0].get("returnDataParts")[0]
-    return Address.new_from_hex(result, get_address_hrp())
+    result = response.return_data_parts[0]
+    return Address(result, get_address_hrp())
 
 
 def validate_name(name: str, shard_id: int, proxy: INetworkProvider):
-    name_arg = "0x{}".format(str.encode(name).hex())
     dns_address = compute_dns_address_for_shard_id(shard_id)
 
     response = _query_contract(
         contract_address=dns_address,
         proxy=proxy,
         function="validateName",
-        args=[name_arg],
+        args=[name.encode()],
     )
 
-    response = response[0]
-
-    return_code = response["returnCode"]
+    return_code: str = response.return_code
     if return_code == "ok":
         print(f"name [{name}] is valid")
     else:
         print(f"name [{name}] is invalid")
 
-    print(response)
-
 
 def register(args: Any):
-    cli_shared.check_guardian_and_options_args(args)
+    cli_shared.check_guardian_args(args)
     cli_shared.check_broadcast_args(args)
     cli_shared.prepare_chain_id_in_args(args)
 
@@ -138,22 +121,18 @@ def registration_cost(shard_id: int, proxy: INetworkProvider) -> int:
         args=[],
     )
 
-    response = response[0]
-
-    data = response["returnDataParts"][0]
+    data = response.return_data_parts[0]
     if not data:
         return 0
     else:
-        return int("0x{}".format(data))
+        return int.from_bytes(data, byteorder="big", signed=False)
 
 
 def version(shard_id: int, proxy: INetworkProvider) -> str:
     dns_address = compute_dns_address_for_shard_id(shard_id)
 
     response = _query_contract(contract_address=dns_address, proxy=proxy, function="version", args=[])
-
-    response = response[0]
-    return bytearray.fromhex(response["returnDataParts"][0]).decode()
+    return response.return_data_parts[0].decode()
 
 
 def dns_address_for_name(name: str) -> Address:
@@ -178,15 +157,11 @@ def dns_register_data(name: str) -> str:
     return f"register@{name_as_hex}"
 
 
-def _query_contract(contract_address: Address, proxy: INetworkProvider, function: str, args: list[Any]) -> list[Any]:
-    chain_id = proxy.get_network_config().chain_id
-    config = TransactionsFactoryConfig(chain_id)
-    contract = SmartContract(config)
-
-    return contract.query_contract(
-        contract_address=contract_address,
-        proxy=proxy,
-        function=function,
-        arguments=args,
-        should_prepare_args=False,
-    )
+def _query_contract(
+    contract_address: Address,
+    proxy: INetworkProvider,
+    function: str,
+    args: list[bytes],
+) -> SmartContractQueryResponse:
+    query = SmartContractQuery(contract=contract_address, function=function, arguments=args)
+    return proxy.query_contract(query)
