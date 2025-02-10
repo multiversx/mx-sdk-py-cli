@@ -57,16 +57,16 @@ def check(args: Any):
         if len(missing_dependencies):
             raise errors.DependenciesMissing(missing_dependencies)
         return
-    else:
-        module = dependencies.get_module_by_key(name)
-        tag_to_check: str = config.get_dependency_tag(module.key)
 
-        is_installed = check_module_is_installed(module, tag_to_check)
-        if is_installed and name != "rust":
-            logger.info(f"[{module.key} {tag_to_check}] is installed.")
-            return
-        elif not is_installed:
-            raise errors.DependencyMissing(module.key, tag_to_check)
+    module = dependencies.get_module_by_key(name)
+    tag_to_check = config.get_dependency_tag(module.key)
+
+    is_installed = check_module_is_installed(module, tag_to_check)
+    if is_installed:
+        logger.info(f"[{module.key} {tag_to_check}] is installed.")
+        return
+    elif not is_installed:
+        raise errors.DependencyMissing(module.key, tag_to_check)
 
 
 def check_module_is_installed(module: DependencyModule, tag_to_check: str) -> bool:

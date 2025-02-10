@@ -617,7 +617,8 @@ def test_contract_query(capsys: Any):
 
 
 def _read_stdout(capsys: Any) -> str:
-    return capsys.readouterr().out.strip()
+    stdout: str = capsys.readouterr().out.strip()
+    return stdout
 
 
 def get_contract_address(capsys: Any):
@@ -633,5 +634,5 @@ def get_query_response(capsys: Any):
 
 def get_transaction_data(capsys: Any) -> str:
     out = _read_stdout(capsys)
-    output = json.loads(out)
+    output: dict[str, str] = json.loads(out)
     return output["emittedTransactionData"]

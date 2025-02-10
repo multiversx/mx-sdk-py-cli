@@ -90,7 +90,7 @@ def setup_parser(args: list[str], subparsers: Any) -> Any:
         f"Sign a previously saved transaction.{CLIOutputBuilder.describe()}",
     )
     # we add the wallet args, but don't make the args mandatory
-    cli_shared.add_wallet_args(args, sub, True)
+    cli_shared.add_wallet_args(args=args, sub=sub, skip_required_check=True)
     cli_shared.add_infile_arg(sub, what="a previously saved transaction")
     cli_shared.add_outfile_arg(sub, what="the signed transaction")
     cli_shared.add_broadcast_args(sub)

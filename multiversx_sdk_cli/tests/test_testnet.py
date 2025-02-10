@@ -8,7 +8,7 @@ from multiversx_sdk_cli.localnet.config_software import SoftwareResolution
 sys.path = [os.getcwd() + "/.."] + sys.path
 
 
-def test_override_config():
+def test_override_config() -> None:
     config = ConfigRoot()
 
     # Check a few default values

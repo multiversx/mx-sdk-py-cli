@@ -318,30 +318,28 @@ def prepare_account(args: Any):
         return Account.new_from_pem(file_path=Path(args.pem), index=args.pem_index, hrp=hrp)
     elif args.keyfile:
         password = load_password(args)
-        account = Account.new_from_keystore(
+        return Account.new_from_keystore(
             file_path=Path(args.keyfile),
             password=password,
             address_index=args.address_index,
             hrp=hrp,
         )
     elif args.ledger:
-        account = LedgerAccount(address_index=args.ledger_address_index)
+        return LedgerAccount(address_index=args.ledger_address_index)
     else:
         raise errors.NoWalletProvided()
-
-    return account
 
 
 def prepare_relayer_account(args: Any) -> IAccount:
     hrp = config.get_address_hrp()
 
     if args.relayer_ledger:
-        account = LedgerAccount(address_index=args.relayer_ledger_address_index)
+        return LedgerAccount(address_index=args.relayer_ledger_address_index)
     if args.relayer_pem:
-        account = Account.new_from_pem(file_path=Path(args.relayer_pem), index=args.relayer_pem_index, hrp=hrp)
+        return Account.new_from_pem(file_path=Path(args.relayer_pem), index=args.relayer_pem_index, hrp=hrp)
     elif args.relayer_keyfile:
         password = load_password(args)
-        account = Account.new_from_keystore(
+        return Account.new_from_keystore(
             file_path=Path(args.relayer_keyfile),
             password=password,
             address_index=args.relayer_address_index,
@@ -350,28 +348,24 @@ def prepare_relayer_account(args: Any) -> IAccount:
     else:
         raise errors.NoWalletProvided()
 
-    return account
-
 
 def prepare_guardian_account(args: Any) -> IAccount:
     hrp = config.get_address_hrp()
 
     if args.guardian_pem:
-        account = Account.new_from_pem(file_path=Path(args.guardian_pem), index=args.guardian_pem_index, hrp=hrp)
+        return Account.new_from_pem(file_path=Path(args.guardian_pem), index=args.guardian_pem_index, hrp=hrp)
     elif args.guardian_keyfile:
         password = load_guardian_password(args)
-        account = Account.new_from_keystore(
+        return Account.new_from_keystore(
             file_path=Path(args.guardian_keyfile),
             password=password,
             address_index=args.guardian_address_index,
             hrp=hrp,
         )
     elif args.guardian_ledger:
-        account = LedgerAccount(address_index=args.relayer_ledger_address_index)
+        return LedgerAccount(address_index=args.relayer_ledger_address_index)
     else:
         raise errors.NoWalletProvided()
-
-    return account
 
 
 def load_sender_account(args: Any) -> Union[IAccount, None]:
@@ -416,7 +410,7 @@ def get_guardian_address(guardian: Union[IAccount, None], args: Any) -> Union[Ad
     address_from_account = guardian.address if guardian else None
     address_from_args = Address.new_from_bech32(args.guardian) if hasattr(args, "guardian") and args.guardian else None
 
-    if address_from_account and address_from_args and address_from_account != address_from_args:
+    if not _is_matching_address(address_from_account, address_from_args):
         raise IncorrectWalletError("Guardian wallet does not match the guardian's address set in the arguments.")
 
     return address_from_account or address_from_args
@@ -426,10 +420,16 @@ def get_relayer_address(relayer: Union[IAccount, None], args: Any) -> Union[Addr
     address_from_account = relayer.address if relayer else None
     address_from_args = Address.new_from_bech32(args.relayer) if hasattr(args, "relayer") and args.relayer else None
 
-    if address_from_account and address_from_args and address_from_account != address_from_args:
+    if not _is_matching_address(address_from_account, address_from_args):
         raise IncorrectWalletError("Relayer wallet does not match the relayer's address set in the arguments.")
 
     return address_from_account or address_from_args
+
+
+def _is_matching_address(account_address: Union[Address, None], args_address: Union[Address, None]) -> bool:
+    if account_address and args_address and account_address != args_address:
+        return False
+    return True
 
 
 def load_relayer_account(args: Any) -> Union[IAccount, None]:
