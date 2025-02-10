@@ -29,7 +29,6 @@ def resolve(name: str, proxy: INetworkProvider) -> Address:
     dns_address = dns_address_for_name(name)
 
     response = _query_contract(contract_address=dns_address, proxy=proxy, function="resolve", args=[name.encode()])
-    print(response.__dict__)
 
     if len(response.return_data_parts) == 0:
         return Address.new_from_hex(ADDRESS_ZERO_HEX, get_address_hrp())

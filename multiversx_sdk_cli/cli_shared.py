@@ -410,7 +410,7 @@ def get_guardian_address(guardian: Union[IAccount, None], args: Any) -> Union[Ad
     address_from_account = guardian.address if guardian else None
     address_from_args = Address.new_from_bech32(args.guardian) if hasattr(args, "guardian") and args.guardian else None
 
-    if address_from_account and address_from_args and address_from_account != address_from_args:
+    if not _is_matching_address(address_from_account, address_from_args):
         raise IncorrectWalletError("Guardian wallet does not match the guardian's address set in the arguments.")
 
     return address_from_account or address_from_args
@@ -420,10 +420,16 @@ def get_relayer_address(relayer: Union[IAccount, None], args: Any) -> Union[Addr
     address_from_account = relayer.address if relayer else None
     address_from_args = Address.new_from_bech32(args.relayer) if hasattr(args, "relayer") and args.relayer else None
 
-    if address_from_account and address_from_args and address_from_account != address_from_args:
+    if not _is_matching_address(address_from_account, address_from_args):
         raise IncorrectWalletError("Relayer wallet does not match the relayer's address set in the arguments.")
 
     return address_from_account or address_from_args
+
+
+def _is_matching_address(account_address: Union[Address, None], args_address: Union[Address, None]) -> bool:
+    if account_address and args_address and account_address != args_address:
+        return False
+    return True
 
 
 def load_relayer_account(args: Any) -> Union[IAccount, None]:
