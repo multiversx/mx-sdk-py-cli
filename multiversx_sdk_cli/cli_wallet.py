@@ -13,6 +13,7 @@ from multiversx_sdk import (
     UserWallet,
     ValidatorPEM,
     ValidatorSecretKey,
+    ValidatorSigner,
 )
 from multiversx_sdk.core.address import get_shard_of_pubkey
 
@@ -25,7 +26,11 @@ from multiversx_sdk_cli.errors import (
     KnownError,
     WalletGenerationError,
 )
-from multiversx_sdk_cli.sign_verify import SignedMessage, sign_message
+from multiversx_sdk_cli.sign_verify import (
+    SignedMessage,
+    sign_message,
+    sign_message_by_validator,
+)
 from multiversx_sdk_cli.ux import show_critical_error, show_message
 
 logger = logging.getLogger("cli.wallet")
@@ -151,11 +156,20 @@ def setup_parser(args: list[str], subparsers: Any) -> Any:
 
     sub = cli_shared.add_command_subparser(subparsers, "wallet", "sign-message", "Sign a message")
     sub.add_argument("--message", required=True, help="the message you want to sign")
-    cli_shared.add_wallet_args(args, sub)
+    cli_shared.add_wallet_args(args=args, sub=sub, skip_required_check=True)
+    sub.add_argument("--validator-pem", required=False, type=str, help="the path to a validator pem file")
+    sub.add_argument(
+        "--validator-index",
+        required=False,
+        type=int,
+        default=0,
+        help="the index of the validator in case the file contains multiple validators (default: %(default)s)",
+    )
     sub.set_defaults(func=sign_user_message)
 
     sub = cli_shared.add_command_subparser(subparsers, "wallet", "verify-message", "Verify a previously signed message")
-    sub.add_argument("--address", required=True, help="the bech32 address of the signer")
+    sub.add_argument("--address", help="the bech32 address of the signer")
+    sub.add_argument("--validator-pubkey", help="the hex string representing the validator's public key")
     sub.add_argument(
         "--message",
         required=True,
@@ -399,19 +413,40 @@ def do_bech32(args: Any):
 
 def sign_user_message(args: Any):
     message: str = args.message
-    account = cli_shared.prepare_account(args)
-    signed_message = sign_message(message, account)
+
+    if args.validator_pem:
+        path = Path(args.validator_pem).expanduser().resolve()
+        validator_signer = ValidatorSigner.from_pem_file(path, args.validator_index)
+        signed_message = sign_message_by_validator(message, validator_signer)
+    else:
+        account = cli_shared.prepare_account(args)
+        signed_message = sign_message(message, account)
+
     utils.dump_out_json(signed_message.to_dictionary())
 
 
 def verify_signed_message(args: Any):
     bech32_address = args.address
+    validator_pubkey = args.validator_pubkey
     message: str = args.message
     signature: str = args.signature
 
-    signed_message = SignedMessage(bech32_address, message, signature)
-    is_signed = signed_message.verify_signature()
-    if is_signed:
-        show_message(f"""SUCCESS: The message "{message}" was signed by {bech32_address}""")
+    if not bech32_address and not validator_pubkey:
+        raise BadUsage("You must provide either an address or a validator's public key")
+
+    if bech32_address and validator_pubkey:
+        raise BadUsage("You must provide ONLY one: either an address or a validator's public key, not both")
+
+    if validator_pubkey:
+        signed_message = SignedMessage(validator_pubkey, message, signature)
+        is_signed = signed_message.verify_validator_signature()
     else:
-        show_critical_error(f"""FAILED: The message "{message}" was NOT signed by {bech32_address}""")
+        signed_message = SignedMessage(bech32_address, message, signature)
+        is_signed = signed_message.verify_user_signature()
+
+    if is_signed:
+        show_message(f"""SUCCESS: The message "{message}" was signed by {bech32_address or validator_pubkey}""")
+    else:
+        show_critical_error(
+            f"""FAILED: The message "{message}" was NOT signed by {bech32_address or validator_pubkey}"""
+        )

@@ -1,6 +1,14 @@
 from typing import Dict, Protocol
 
-from multiversx_sdk import Address, Message, MessageComputer, UserVerifier
+from multiversx_sdk import (
+    Address,
+    Message,
+    MessageComputer,
+    UserVerifier,
+    ValidatorPublicKey,
+    ValidatorSigner,
+    ValidatorVerifier,
+)
 
 
 # fmt: off
@@ -25,12 +33,25 @@ class SignedMessage:
 
         self.signature = signature
 
-    def verify_signature(self) -> bool:
+    def verify_user_signature(self) -> bool:
         verifiable_message = Message(self.message.encode())
         verifiable_message.signature = bytes.fromhex(self.signature)
         message_computer = MessageComputer()
 
         verifier = UserVerifier.from_address(Address.new_from_bech32(self.address))
+        is_signed = verifier.verify(
+            message_computer.compute_bytes_for_signing(verifiable_message),
+            verifiable_message.signature,
+        )
+        return is_signed
+
+    def verify_validator_signature(self) -> bool:
+        verifiable_message = Message(self.message.encode())
+        verifiable_message.signature = bytes.fromhex(self.signature)
+        message_computer = MessageComputer()
+
+        validator_pubkey = ValidatorPublicKey(bytes.fromhex(self.address))
+        verifier = ValidatorVerifier(validator_pubkey)
         is_signed = verifier.verify(
             message_computer.compute_bytes_for_signing(verifiable_message),
             verifiable_message.signature,
@@ -48,3 +69,10 @@ class SignedMessage:
 def sign_message(message: str, account: IAccount) -> SignedMessage:
     signature = account.sign_message(Message(message.encode()))
     return SignedMessage(account.address.to_bech32(), message, signature.hex())
+
+
+def sign_message_by_validator(message: str, validator: ValidatorSigner) -> SignedMessage:
+    message_computer = MessageComputer()
+    serialized_message = message_computer.compute_bytes_for_signing(Message(message.encode()))
+    signature = validator.sign(serialized_message)
+    return SignedMessage(validator.get_pubkey().hex(), message, signature.hex())

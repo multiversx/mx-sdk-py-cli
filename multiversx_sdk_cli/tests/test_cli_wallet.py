@@ -144,6 +144,7 @@ def test_create_validator_wallet():
     assert return_code
 
     path = testdata_out_path / "validator.pem"
+    path.unlink(missing_ok=True)
     return_code = main(
         [
             "wallet",
@@ -390,6 +391,50 @@ def test_wallet_sign_message(capsys: Any):
         "message": "test",
         "signature": "0x7aff43cd6e3d880a65033bf0a1b16274854fd7dfa9fe5faa7fa9a665ee851afd4c449310f5f1697d348e42d1819eaef69080e33e7652d7393521ed50d7427a0e",
     }
+
+
+def test_validator_sign_and_verify_message(capsys: Any):
+    message = "test"
+    validator = testdata_path / "validator_01.pem"
+
+    return_code = main(
+        [
+            "wallet",
+            "sign-message",
+            "--message",
+            message,
+            "--validator-pem",
+            str(validator),
+        ]
+    )
+    assert not return_code
+
+    out = json.loads(_read_stdout(capsys))
+    assert out == {
+        "address": "f8910e47cf9464777c912e6390758bb39715fffcb861b184017920e4a807b42553f2f21e7f3914b81bcf58b66a72ab16d97013ae1cff807cefc977ef8cbf116258534b9e46d19528042d16ef8374404a89b184e0a4ee18c77c49e454d04eae8d",
+        "message": "test",
+        "signature": "0xeb06700ee0d9c083560f2312a12962fd95400a21f6b109721a5f937ad5ec21efbe5312f925aa16f2de4d24799cd04c91",
+    }
+
+    # Clear the captured content
+    capsys.readouterr()
+
+    return_code = main(
+        [
+            "wallet",
+            "verify-message",
+            "--validator-pubkey",
+            "f8910e47cf9464777c912e6390758bb39715fffcb861b184017920e4a807b42553f2f21e7f3914b81bcf58b66a72ab16d97013ae1cff807cefc977ef8cbf116258534b9e46d19528042d16ef8374404a89b184e0a4ee18c77c49e454d04eae8d",
+            "--message",
+            message,
+            "--signature",
+            "0xeb06700ee0d9c083560f2312a12962fd95400a21f6b109721a5f937ad5ec21efbe5312f925aa16f2de4d24799cd04c91",
+        ]
+    )
+    assert not return_code
+    out = _read_stdout(capsys)
+    text = """SUCCESS: The message "test" was signed by f8910e47cf9464777c912e6390758bb39715fffcb861b184017920e4a807b42553f2f21e7f3914b81bcf58b66a72ab16d97013ae1cff807cefc977ef8cbf116258534b9e46d19528042d16ef8374404a89b184e0a4ee18c77c49e454d04eae8d""".split()
+    assert all(out.find(word) for word in text)
 
 
 def test_verify_previously_signed_message(capsys: Any):
