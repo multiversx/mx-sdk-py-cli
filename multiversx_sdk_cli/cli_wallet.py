@@ -3,15 +3,28 @@ import json
 import logging
 import sys
 from pathlib import Path
-from typing import Any, List, Optional, Tuple
+from typing import Any, Optional, Union
 
-from multiversx_sdk import Address, Mnemonic, UserPEM, UserSecretKey, UserWallet
+from multiversx_sdk import (
+    Address,
+    Mnemonic,
+    UserPEM,
+    UserSecretKey,
+    UserWallet,
+    ValidatorPEM,
+    ValidatorSecretKey,
+)
 from multiversx_sdk.core.address import get_shard_of_pubkey
 
 from multiversx_sdk_cli import cli_shared, utils
 from multiversx_sdk_cli.config import get_address_hrp
 from multiversx_sdk_cli.constants import NUMBER_OF_SHARDS
-from multiversx_sdk_cli.errors import BadUserInput, KnownError, WalletGenerationError
+from multiversx_sdk_cli.errors import (
+    BadUsage,
+    BadUserInput,
+    KnownError,
+    WalletGenerationError,
+)
 from multiversx_sdk_cli.sign_verify import SignedMessage, sign_message
 from multiversx_sdk_cli.ux import show_critical_error, show_message
 
@@ -43,7 +56,7 @@ MAX_ITERATIONS_FOR_GENERATING_WALLET = 100
 CURRENT_SHARDS = [i for i in range(NUMBER_OF_SHARDS)]
 
 
-def setup_parser(args: List[str], subparsers: Any) -> Any:
+def setup_parser(args: list[str], subparsers: Any) -> Any:
     parser = cli_shared.add_group_subparser(
         subparsers,
         "wallet",
@@ -56,6 +69,12 @@ def setup_parser(args: List[str], subparsers: Any) -> Any:
         "wallet",
         "new",
         "Create a new wallet and print its mnemonic; optionally save as password-protected JSON (recommended) or PEM (not recommended)",
+    )
+    sub.add_argument(
+        "--validator-wallet",
+        help="Create a validator wallet. If flag is provided, only the `pem` format is supported. Address hrp and shard will be ignored if provided.",
+        action="store_true",
+        default=False,
     )
     sub.add_argument(
         "--format",
@@ -155,6 +174,11 @@ def wallet_new(args: Any):
     address_hrp = args.address_hrp
     shard = args.shard
 
+    if args.validator_wallet:
+        _ensure_correct_arguments_for_validator_wallet(format, outfile)
+        _generate_validator_wallet(outfile)
+        return
+
     if shard is not None:
         mnemonic = _generate_mnemonic_with_shard_constraint(shard)
     else:
@@ -166,11 +190,11 @@ def wallet_new(args: Any):
     if format is None:
         return
     if outfile is None:
-        raise KnownError("The --outfile option is required when --format is specified.")
+        raise BadUsage("The `--outfile` argument is required when `--format` is specified.")
 
     outfile = Path(outfile).expanduser().resolve()
     if outfile.exists():
-        raise KnownError(f"File already exists, will not overwrite: {outfile}")
+        raise BadUserInput(f"File already exists, will not overwrite: {outfile}")
 
     if format == WALLET_FORMAT_RAW_MNEMONIC:
         outfile.write_text(mnemonic.get_text())
@@ -190,13 +214,34 @@ def wallet_new(args: Any):
         pem_file = UserPEM(address.to_bech32(), secret_key)
         pem_file.save(outfile)
     else:
-        raise KnownError(f"Unknown format: {format}")
+        raise BadUsage(f"Unknown format: {format}")
 
     logger.info(f"Wallet ({format}) saved: {outfile}")
 
 
-def _generate_mnemonic_with_shard_constraint(shard: int) -> Mnemonic:
+def _generate_validator_wallet(outfile: str):
+    path = Path(outfile).expanduser().resolve()
+    secret_key = ValidatorSecretKey.generate()
+    public_key = secret_key.generate_public_key()
+    validator_pem = ValidatorPEM(label=public_key.hex(), secret_key=secret_key)
+    validator_pem.save(path)
 
+    logger.info(f"Validator wallet saved: {str(path)}")
+
+
+def _ensure_correct_arguments_for_validator_wallet(format: str, outfile: Union[str, None]):
+    if format != WALLET_FORMAT_PEM:
+        raise BadUsage("Only PEM format supported for validator wallet")
+
+    if outfile is None:
+        raise BadUsage("The `--outfile` argument is required")
+
+    path = Path(outfile).expanduser().resolve()
+    if path.exists():
+        raise BadUserInput(f"File already exists, will not overwrite: {str(path)}")
+
+
+def _generate_mnemonic_with_shard_constraint(shard: int) -> Mnemonic:
     if shard not in CURRENT_SHARDS:
         raise BadUserInput(f"Wrong shard provided. Choose between {CURRENT_SHARDS}")
 
@@ -241,7 +286,7 @@ def convert_wallet(args: Any):
 
 def _load_wallet(
     input_text: str, in_format: str, address_index: int
-) -> Tuple[Optional[Mnemonic], Optional[UserSecretKey]]:
+) -> tuple[Optional[Mnemonic], Optional[UserSecretKey]]:
     if in_format == WALLET_FORMAT_RAW_MNEMONIC:
         input_text = " ".join(input_text.split())
         mnemonic = Mnemonic(input_text)

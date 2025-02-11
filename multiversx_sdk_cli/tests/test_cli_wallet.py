@@ -3,7 +3,14 @@ import json
 from pathlib import Path
 from typing import Any
 
-from multiversx_sdk import Address, AddressComputer, Mnemonic, UserPEM, UserWallet
+from multiversx_sdk import (
+    Address,
+    AddressComputer,
+    Mnemonic,
+    UserPEM,
+    UserWallet,
+    ValidatorPEM,
+)
 
 from multiversx_sdk_cli.cli import main
 
@@ -124,6 +131,36 @@ def test_wallet_new_as_keystore_with_secret_key(capsys: Any, monkeypatch: Any):
     expected_secret_key = Mnemonic(_read_stdout_mnemonic(capsys)).derive_key(0)
     actual_secret_key = UserWallet.load_secret_key(outfile, "password")
     assert actual_secret_key.hex() == expected_secret_key.hex()
+
+
+def test_create_validator_wallet():
+    return_code = main(["wallet", "new", "--validator-wallet"])
+    assert return_code
+
+    return_code = main(["wallet", "new", "--validator-wallet", "--format", "pem"])
+    assert return_code
+
+    return_code = main(["wallet", "new", "--validator-wallet", "--outfile", str(testdata_out_path / "validator.pem")])
+    assert return_code
+
+    path = testdata_out_path / "validator.pem"
+    return_code = main(
+        [
+            "wallet",
+            "new",
+            "--validator-wallet",
+            "--format",
+            "pem",
+            "--outfile",
+            str(path),
+        ]
+    )
+    assert not return_code
+    assert path.is_file()
+
+    wallet = ValidatorPEM.from_file(path)
+    assert wallet.label
+    assert wallet.secret_key
 
 
 def test_wallet_convert_raw_mnemonic_to_pem():
