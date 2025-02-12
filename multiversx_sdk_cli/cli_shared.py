@@ -292,7 +292,7 @@ def add_omit_fields_arg(sub: Any):
         default="[]",
         type=str,
         required=False,
-        help="omit fields in the output payload (default: %(default)s)",
+        help="omit fields in the output payload (default: %(default)s); fields should be passed as a string containing a list of fields (e.g. \"['field1', 'field2']\")",
     )
 
 
