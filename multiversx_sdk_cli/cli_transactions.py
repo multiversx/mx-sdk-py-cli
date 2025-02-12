@@ -73,12 +73,6 @@ def setup_parser(args: list[str], subparsers: Any) -> Any:
         f"Get a transaction.{CLIOutputBuilder.describe(with_emitted=False, with_transaction_on_network=True)}",
     )
     sub.add_argument("--hash", required=True, help="the hash")
-    sub.add_argument("--sender", required=False, help="the sender address")
-    sub.add_argument(
-        "--with-results",
-        action="store_true",
-        help="will also return the results of transaction",
-    )
     cli_shared.add_proxy_arg(sub)
     cli_shared.add_omit_fields_arg(sub)
     sub.set_defaults(func=get_transaction)
@@ -203,6 +197,9 @@ def send_transaction(args: Any):
 
 
 def get_transaction(args: Any):
+    if not args.proxy:
+        raise BadUsage("Proxy argument not provided")
+
     omit_fields = cli_shared.parse_omit_fields_arg(args)
 
     config = get_config_for_network_providers()
