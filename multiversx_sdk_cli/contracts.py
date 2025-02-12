@@ -280,71 +280,10 @@ class SmartContract(BaseTransactionsController):
     def _hex_to_bytes(self, arg: str):
         argument = arg[len(HEX_PREFIX) :]
         argument = argument.upper()
-        argument = ensure_even_length(argument)
+        argument = self.ensure_even_length(argument)
         return bytes.fromhex(argument)
 
-
-def prepare_execute_transaction_data(function: str, arguments: list[Any]) -> str:
-    tx_data = function
-
-    for arg in arguments:
-        tx_data += f"@{_prepare_argument(arg)}"
-
-    return tx_data
-
-
-# only used for stake operations
-def _prepare_argument(argument: Any):
-    as_str = str(argument)
-    as_hex = _to_hex(as_str)
-    return as_hex
-
-
-def _to_hex(arg: str):
-    if arg.startswith(HEX_PREFIX):
-        return _prepare_hexadecimal(arg)
-
-    if arg.isnumeric():
-        return _prepare_decimal(arg)
-    elif arg.startswith(get_address_hrp()):
-        addr = Address.from_bech32(arg)
-        return _prepare_hexadecimal(f"{HEX_PREFIX}{addr.hex()}")
-    elif arg.lower() == FALSE_STR_LOWER or arg.lower() == TRUE_STR_LOWER:
-        as_str = f"{HEX_PREFIX}01" if arg.lower() == TRUE_STR_LOWER else f"{HEX_PREFIX}00"
-        return _prepare_hexadecimal(as_str)
-    elif arg.startswith(STR_PREFIX):
-        as_hex = f"{HEX_PREFIX}{arg[len(STR_PREFIX):].encode('ascii').hex()}"
-        return _prepare_hexadecimal(as_hex)
-    else:
-        raise Exception(f"could not convert {arg} to hex")
-
-
-def _prepare_hexadecimal(argument: str) -> str:
-    argument = argument[len(HEX_PREFIX) :]
-    argument = argument.upper()
-    argument = ensure_even_length(argument)
-
-    if argument == "":
-        return ""
-
-    try:
-        _ = int(argument, 16)
-    except ValueError:
-        raise errors.UnknownArgumentFormat(argument)
-    return argument
-
-
-def _prepare_decimal(argument: str) -> str:
-    if not argument.isnumeric():
-        raise errors.UnknownArgumentFormat(argument)
-
-    as_number = int(argument)
-    as_hexstring = hex(as_number)[len(HEX_PREFIX) :]
-    as_hexstring = ensure_even_length(as_hexstring)
-    return as_hexstring.upper()
-
-
-def ensure_even_length(string: str) -> str:
-    if len(string) % 2 == 1:
-        return "0" + string
-    return string
+    def ensure_even_length(self, string: str) -> str:
+        if len(string) % 2 == 1:
+            return "0" + string
+        return string
