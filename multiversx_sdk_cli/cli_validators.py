@@ -139,22 +139,10 @@ def _add_nodes_arg(sub: Any):
 
 
 def do_stake(args: Any):
-    cli_shared.check_guardian_args(args)
-    cli_shared.check_broadcast_args(args)
-    cli_shared.prepare_chain_id_in_args(args)
-
-    sender = cli_shared.prepare_account(args)
-
-    if args.nonce is None:
-        nonce = cli_shared.get_current_nonce_for_address(sender.address, args.proxy)
-    else:
-        nonce = int(args.nonce)
-
-    guardian = cli_shared.load_guardian_account(args)
-    guardian_address = cli_shared.get_guardian_address(guardian, args)
-
-    relayer = cli_shared.load_relayer_account(args)
-    relayer_address = cli_shared.get_relayer_address(relayer, args)
+    validate_args(args)
+    sender, nonce = prepare_sender(args)
+    guardian, guardian_address = prepare_guardian(args)
+    relayer, relayer_address = prepare_relayer(args)
 
     native_amount = int(args.value)
     gas_limit = 0 if args.estimate_gas else args.gas_limit
@@ -203,23 +191,39 @@ def do_stake(args: Any):
     cli_shared.send_or_simulate(tx, args)
 
 
-def do_unstake(args: Any):
+def validate_args(args: Any) -> None:
     cli_shared.check_guardian_args(args)
     cli_shared.check_broadcast_args(args)
     cli_shared.prepare_chain_id_in_args(args)
 
+
+def prepare_sender(args: Any):
     sender = cli_shared.prepare_account(args)
+    nonce = (
+        int(args.nonce)
+        if args.nonce is not None
+        else cli_shared.get_current_nonce_for_address(sender.address, args.proxy)
+    )
+    return sender, nonce
 
-    if args.nonce is None:
-        nonce = cli_shared.get_current_nonce_for_address(sender.address, args.proxy)
-    else:
-        nonce = int(args.nonce)
 
+def prepare_guardian(args: Any):
     guardian = cli_shared.load_guardian_account(args)
     guardian_address = cli_shared.get_guardian_address(guardian, args)
+    return guardian, guardian_address
 
+
+def prepare_relayer(args: Any):
     relayer = cli_shared.load_relayer_account(args)
     relayer_address = cli_shared.get_relayer_address(relayer, args)
+    return relayer, relayer_address
+
+
+def do_unstake(args: Any):
+    validate_args(args)
+    sender, nonce = prepare_sender(args)
+    guardian, guardian_address = prepare_guardian(args)
+    relayer, relayer_address = prepare_relayer(args)
 
     native_amount = int(args.value)
     gas_limit = 0 if args.estimate_gas else args.gas_limit
@@ -248,22 +252,10 @@ def do_unstake(args: Any):
 
 
 def do_unjail(args: Any):
-    cli_shared.check_guardian_args(args)
-    cli_shared.check_broadcast_args(args)
-    cli_shared.prepare_chain_id_in_args(args)
-
-    sender = cli_shared.prepare_account(args)
-
-    if args.nonce is None:
-        nonce = cli_shared.get_current_nonce_for_address(sender.address, args.proxy)
-    else:
-        nonce = int(args.nonce)
-
-    guardian = cli_shared.load_guardian_account(args)
-    guardian_address = cli_shared.get_guardian_address(guardian, args)
-
-    relayer = cli_shared.load_relayer_account(args)
-    relayer_address = cli_shared.get_relayer_address(relayer, args)
+    validate_args(args)
+    sender, nonce = prepare_sender(args)
+    guardian, guardian_address = prepare_guardian(args)
+    relayer, relayer_address = prepare_relayer(args)
 
     native_amount = int(args.value)
     gas_limit = 0 if args.estimate_gas else args.gas_limit
@@ -292,22 +284,10 @@ def do_unjail(args: Any):
 
 
 def do_unbond(args: Any):
-    cli_shared.check_guardian_args(args)
-    cli_shared.check_broadcast_args(args)
-    cli_shared.prepare_chain_id_in_args(args)
-
-    sender = cli_shared.prepare_account(args)
-
-    if args.nonce is None:
-        nonce = cli_shared.get_current_nonce_for_address(sender.address, args.proxy)
-    else:
-        nonce = int(args.nonce)
-
-    guardian = cli_shared.load_guardian_account(args)
-    guardian_address = cli_shared.get_guardian_address(guardian, args)
-
-    relayer = cli_shared.load_relayer_account(args)
-    relayer_address = cli_shared.get_relayer_address(relayer, args)
+    validate_args(args)
+    sender, nonce = prepare_sender(args)
+    guardian, guardian_address = prepare_guardian(args)
+    relayer, relayer_address = prepare_relayer(args)
 
     native_amount = int(args.value)
     gas_limit = 0 if args.estimate_gas else args.gas_limit
@@ -336,22 +316,10 @@ def do_unbond(args: Any):
 
 
 def change_reward_address(args: Any):
-    cli_shared.check_guardian_args(args)
-    cli_shared.check_broadcast_args(args)
-    cli_shared.prepare_chain_id_in_args(args)
-
-    sender = cli_shared.prepare_account(args)
-
-    if args.nonce is None:
-        nonce = cli_shared.get_current_nonce_for_address(sender.address, args.proxy)
-    else:
-        nonce = int(args.nonce)
-
-    guardian = cli_shared.load_guardian_account(args)
-    guardian_address = cli_shared.get_guardian_address(guardian, args)
-
-    relayer = cli_shared.load_relayer_account(args)
-    relayer_address = cli_shared.get_relayer_address(relayer, args)
+    validate_args(args)
+    sender, nonce = prepare_sender(args)
+    guardian, guardian_address = prepare_guardian(args)
+    relayer, relayer_address = prepare_relayer(args)
 
     native_amount = int(args.value)
     gas_limit = 0 if args.estimate_gas else args.gas_limit
@@ -380,22 +348,10 @@ def change_reward_address(args: Any):
 
 
 def do_claim(args: Any):
-    cli_shared.check_guardian_args(args)
-    cli_shared.check_broadcast_args(args)
-    cli_shared.prepare_chain_id_in_args(args)
-
-    sender = cli_shared.prepare_account(args)
-
-    if args.nonce is None:
-        nonce = cli_shared.get_current_nonce_for_address(sender.address, args.proxy)
-    else:
-        nonce = int(args.nonce)
-
-    guardian = cli_shared.load_guardian_account(args)
-    guardian_address = cli_shared.get_guardian_address(guardian, args)
-
-    relayer = cli_shared.load_relayer_account(args)
-    relayer_address = cli_shared.get_relayer_address(relayer, args)
+    validate_args(args)
+    sender, nonce = prepare_sender(args)
+    guardian, guardian_address = prepare_guardian(args)
+    relayer, relayer_address = prepare_relayer(args)
 
     native_amount = int(args.value)
     gas_limit = 0 if args.estimate_gas else args.gas_limit
@@ -422,22 +378,10 @@ def do_claim(args: Any):
 
 
 def do_unstake_nodes(args: Any):
-    cli_shared.check_guardian_args(args)
-    cli_shared.check_broadcast_args(args)
-    cli_shared.prepare_chain_id_in_args(args)
-
-    sender = cli_shared.prepare_account(args)
-
-    if args.nonce is None:
-        nonce = cli_shared.get_current_nonce_for_address(sender.address, args.proxy)
-    else:
-        nonce = int(args.nonce)
-
-    guardian = cli_shared.load_guardian_account(args)
-    guardian_address = cli_shared.get_guardian_address(guardian, args)
-
-    relayer = cli_shared.load_relayer_account(args)
-    relayer_address = cli_shared.get_relayer_address(relayer, args)
+    validate_args(args)
+    sender, nonce = prepare_sender(args)
+    guardian, guardian_address = prepare_guardian(args)
+    relayer, relayer_address = prepare_relayer(args)
 
     native_amount = int(args.value)
     gas_limit = 0 if args.estimate_gas else args.gas_limit
@@ -467,22 +411,10 @@ def do_unstake_nodes(args: Any):
 
 
 def do_unstake_tokens(args: Any):
-    cli_shared.check_guardian_args(args)
-    cli_shared.check_broadcast_args(args)
-    cli_shared.prepare_chain_id_in_args(args)
-
-    sender = cli_shared.prepare_account(args)
-
-    if args.nonce is None:
-        nonce = cli_shared.get_current_nonce_for_address(sender.address, args.proxy)
-    else:
-        nonce = int(args.nonce)
-
-    guardian = cli_shared.load_guardian_account(args)
-    guardian_address = cli_shared.get_guardian_address(guardian, args)
-
-    relayer = cli_shared.load_relayer_account(args)
-    relayer_address = cli_shared.get_relayer_address(relayer, args)
+    validate_args(args)
+    sender, nonce = prepare_sender(args)
+    guardian, guardian_address = prepare_guardian(args)
+    relayer, relayer_address = prepare_relayer(args)
 
     native_amount = int(args.value)
     value = int(args.unstake_value)
@@ -511,22 +443,10 @@ def do_unstake_tokens(args: Any):
 
 
 def do_unbond_nodes(args: Any):
-    cli_shared.check_guardian_args(args)
-    cli_shared.check_broadcast_args(args)
-    cli_shared.prepare_chain_id_in_args(args)
-
-    sender = cli_shared.prepare_account(args)
-
-    if args.nonce is None:
-        nonce = cli_shared.get_current_nonce_for_address(sender.address, args.proxy)
-    else:
-        nonce = int(args.nonce)
-
-    guardian = cli_shared.load_guardian_account(args)
-    guardian_address = cli_shared.get_guardian_address(guardian, args)
-
-    relayer = cli_shared.load_relayer_account(args)
-    relayer_address = cli_shared.get_relayer_address(relayer, args)
+    validate_args(args)
+    sender, nonce = prepare_sender(args)
+    guardian, guardian_address = prepare_guardian(args)
+    relayer, relayer_address = prepare_relayer(args)
 
     native_amount = int(args.value)
     gas_limit = 0 if args.estimate_gas else args.gas_limit
@@ -556,22 +476,10 @@ def do_unbond_nodes(args: Any):
 
 
 def do_unbond_tokens(args: Any):
-    cli_shared.check_guardian_args(args)
-    cli_shared.check_broadcast_args(args)
-    cli_shared.prepare_chain_id_in_args(args)
-
-    sender = cli_shared.prepare_account(args)
-
-    if args.nonce is None:
-        nonce = cli_shared.get_current_nonce_for_address(sender.address, args.proxy)
-    else:
-        nonce = int(args.nonce)
-
-    guardian = cli_shared.load_guardian_account(args)
-    guardian_address = cli_shared.get_guardian_address(guardian, args)
-
-    relayer = cli_shared.load_relayer_account(args)
-    relayer_address = cli_shared.get_relayer_address(relayer, args)
+    validate_args(args)
+    sender, nonce = prepare_sender(args)
+    guardian, guardian_address = prepare_guardian(args)
+    relayer, relayer_address = prepare_relayer(args)
 
     native_amount = int(args.value)
     value = int(args.unbond_value)
@@ -600,22 +508,10 @@ def do_unbond_tokens(args: Any):
 
 
 def do_clean_registered_data(args: Any):
-    cli_shared.check_guardian_args(args)
-    cli_shared.check_broadcast_args(args)
-    cli_shared.prepare_chain_id_in_args(args)
-
-    sender = cli_shared.prepare_account(args)
-
-    if args.nonce is None:
-        nonce = cli_shared.get_current_nonce_for_address(sender.address, args.proxy)
-    else:
-        nonce = int(args.nonce)
-
-    guardian = cli_shared.load_guardian_account(args)
-    guardian_address = cli_shared.get_guardian_address(guardian, args)
-
-    relayer = cli_shared.load_relayer_account(args)
-    relayer_address = cli_shared.get_relayer_address(relayer, args)
+    validate_args(args)
+    sender, nonce = prepare_sender(args)
+    guardian, guardian_address = prepare_guardian(args)
+    relayer, relayer_address = prepare_relayer(args)
 
     native_amount = int(args.value)
     gas_limit = 0 if args.estimate_gas else args.gas_limit
@@ -642,22 +538,10 @@ def do_clean_registered_data(args: Any):
 
 
 def do_restake_unstaked_nodes(args: Any):
-    cli_shared.check_guardian_args(args)
-    cli_shared.check_broadcast_args(args)
-    cli_shared.prepare_chain_id_in_args(args)
-
-    sender = cli_shared.prepare_account(args)
-
-    if args.nonce is None:
-        nonce = cli_shared.get_current_nonce_for_address(sender.address, args.proxy)
-    else:
-        nonce = int(args.nonce)
-
-    guardian = cli_shared.load_guardian_account(args)
-    guardian_address = cli_shared.get_guardian_address(guardian, args)
-
-    relayer = cli_shared.load_relayer_account(args)
-    relayer_address = cli_shared.get_relayer_address(relayer, args)
+    validate_args(args)
+    sender, nonce = prepare_sender(args)
+    guardian, guardian_address = prepare_guardian(args)
+    relayer, relayer_address = prepare_relayer(args)
 
     native_amount = int(args.value)
     gas_limit = 0 if args.estimate_gas else args.gas_limit

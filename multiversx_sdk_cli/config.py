@@ -25,7 +25,7 @@ class MetaChainSystemSCsCost:
     UNSTAKE_TOKENS = 5000000
     UNBOND_TOKENS = 5000000
     CLEAN_REGISTERED_DATA = 5000000
-    RE_STAKE_UNSTAKED_NODES = 5000000
+    RESTAKE_UNSTAKED_NODES = 5000000
 
 
 def get_dependency_resolution(key: str) -> str:
