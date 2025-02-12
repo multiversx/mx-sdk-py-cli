@@ -598,7 +598,7 @@ class ValidatorsController:
         data = f"reStakeUnStakedNodes{parsed_keys}"
 
         if estimate_gas:
-            gas_limit = self.estimate_system_sc_call(data, MetaChainSystemSCsCost.RE_STAKE_UNSTAKED_NODES, num_keys)
+            gas_limit = self.estimate_system_sc_call(data, MetaChainSystemSCsCost.RESTAKE_UNSTAKED_NODES, num_keys)
 
         receiver = Address.new_from_hex(VALIDATORS_SMART_CONTRACT_ADDRESS_HEX, get_address_hrp())
 
