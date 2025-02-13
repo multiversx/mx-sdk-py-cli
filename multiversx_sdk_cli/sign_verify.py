@@ -1,6 +1,13 @@
-from typing import Dict, Protocol
+from typing import Protocol
 
-from multiversx_sdk import Address, Message, MessageComputer, UserVerifier
+from multiversx_sdk import (
+    Address,
+    Message,
+    MessageComputer,
+    UserVerifier,
+    ValidatorPublicKey,
+    ValidatorSigner,
+)
 
 
 # fmt: off
@@ -25,7 +32,7 @@ class SignedMessage:
 
         self.signature = signature
 
-    def verify_signature(self) -> bool:
+    def verify_user_signature(self) -> bool:
         verifiable_message = Message(self.message.encode())
         verifiable_message.signature = bytes.fromhex(self.signature)
         message_computer = MessageComputer()
@@ -37,7 +44,14 @@ class SignedMessage:
         )
         return is_signed
 
-    def to_dictionary(self) -> Dict[str, str]:
+    def verify_validator_signature(self) -> bool:
+        validator_pubkey = ValidatorPublicKey(bytes.fromhex(self.address))
+        return validator_pubkey.verify(
+            self.message.encode(),
+            bytes.fromhex(self.signature),
+        )
+
+    def to_dictionary(self) -> dict[str, str]:
         return {
             "address": self.address,
             "message": self.message,
@@ -48,3 +62,8 @@ class SignedMessage:
 def sign_message(message: str, account: IAccount) -> SignedMessage:
     signature = account.sign_message(Message(message.encode()))
     return SignedMessage(account.address.to_bech32(), message, signature.hex())
+
+
+def sign_message_by_validator(message: str, validator: ValidatorSigner) -> SignedMessage:
+    signature = validator.sign(message.encode())
+    return SignedMessage(validator.get_pubkey().hex(), message, signature.hex())

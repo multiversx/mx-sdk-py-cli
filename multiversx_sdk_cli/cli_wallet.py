@@ -3,7 +3,7 @@ import json
 import logging
 import sys
 from pathlib import Path
-from typing import Any, List, Optional, Tuple
+from typing import Any, Optional
 
 from multiversx_sdk import Address, Mnemonic, UserPEM, UserSecretKey, UserWallet
 from multiversx_sdk.core.address import get_shard_of_pubkey
@@ -11,7 +11,12 @@ from multiversx_sdk.core.address import get_shard_of_pubkey
 from multiversx_sdk_cli import cli_shared, utils
 from multiversx_sdk_cli.config import get_address_hrp
 from multiversx_sdk_cli.constants import NUMBER_OF_SHARDS
-from multiversx_sdk_cli.errors import BadUserInput, KnownError, WalletGenerationError
+from multiversx_sdk_cli.errors import (
+    BadUsage,
+    BadUserInput,
+    KnownError,
+    WalletGenerationError,
+)
 from multiversx_sdk_cli.sign_verify import SignedMessage, sign_message
 from multiversx_sdk_cli.ux import show_critical_error, show_message
 
@@ -43,7 +48,7 @@ MAX_ITERATIONS_FOR_GENERATING_WALLET = 100
 CURRENT_SHARDS = [i for i in range(NUMBER_OF_SHARDS)]
 
 
-def setup_parser(args: List[str], subparsers: Any) -> Any:
+def setup_parser(args: list[str], subparsers: Any) -> Any:
     parser = cli_shared.add_group_subparser(
         subparsers,
         "wallet",
@@ -132,7 +137,7 @@ def setup_parser(args: List[str], subparsers: Any) -> Any:
 
     sub = cli_shared.add_command_subparser(subparsers, "wallet", "sign-message", "Sign a message")
     sub.add_argument("--message", required=True, help="the message you want to sign")
-    cli_shared.add_wallet_args(args, sub)
+    cli_shared.add_wallet_args(args=args, sub=sub, skip_required_check=True)
     sub.set_defaults(func=sign_user_message)
 
     sub = cli_shared.add_command_subparser(subparsers, "wallet", "verify-message", "Verify a previously signed message")
@@ -166,11 +171,11 @@ def wallet_new(args: Any):
     if format is None:
         return
     if outfile is None:
-        raise KnownError("The --outfile option is required when --format is specified.")
+        raise BadUsage("The `--outfile` argument is required when `--format` is specified.")
 
     outfile = Path(outfile).expanduser().resolve()
     if outfile.exists():
-        raise KnownError(f"File already exists, will not overwrite: {outfile}")
+        raise BadUserInput(f"File already exists, will not overwrite: {outfile}")
 
     if format == WALLET_FORMAT_RAW_MNEMONIC:
         outfile.write_text(mnemonic.get_text())
@@ -190,13 +195,12 @@ def wallet_new(args: Any):
         pem_file = UserPEM(address.to_bech32(), secret_key)
         pem_file.save(outfile)
     else:
-        raise KnownError(f"Unknown format: {format}")
+        raise BadUsage(f"Unknown format: {format}")
 
     logger.info(f"Wallet ({format}) saved: {outfile}")
 
 
 def _generate_mnemonic_with_shard_constraint(shard: int) -> Mnemonic:
-
     if shard not in CURRENT_SHARDS:
         raise BadUserInput(f"Wrong shard provided. Choose between {CURRENT_SHARDS}")
 
@@ -241,7 +245,7 @@ def convert_wallet(args: Any):
 
 def _load_wallet(
     input_text: str, in_format: str, address_index: int
-) -> Tuple[Optional[Mnemonic], Optional[UserSecretKey]]:
+) -> tuple[Optional[Mnemonic], Optional[UserSecretKey]]:
     if in_format == WALLET_FORMAT_RAW_MNEMONIC:
         input_text = " ".join(input_text.split())
         mnemonic = Mnemonic(input_text)
@@ -354,8 +358,10 @@ def do_bech32(args: Any):
 
 def sign_user_message(args: Any):
     message: str = args.message
+
     account = cli_shared.prepare_account(args)
     signed_message = sign_message(message, account)
+
     utils.dump_out_json(signed_message.to_dictionary())
 
 
@@ -365,7 +371,8 @@ def verify_signed_message(args: Any):
     signature: str = args.signature
 
     signed_message = SignedMessage(bech32_address, message, signature)
-    is_signed = signed_message.verify_signature()
+    is_signed = signed_message.verify_user_signature()
+
     if is_signed:
         show_message(f"""SUCCESS: The message "{message}" was signed by {bech32_address}""")
     else:

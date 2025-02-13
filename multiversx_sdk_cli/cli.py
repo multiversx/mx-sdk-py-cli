@@ -20,6 +20,7 @@ import multiversx_sdk_cli.cli_faucet
 import multiversx_sdk_cli.cli_ledger
 import multiversx_sdk_cli.cli_localnet
 import multiversx_sdk_cli.cli_transactions
+import multiversx_sdk_cli.cli_validator_wallet
 import multiversx_sdk_cli.cli_validators
 import multiversx_sdk_cli.cli_wallet
 import multiversx_sdk_cli.version
@@ -112,6 +113,7 @@ See:
     commands.append(multiversx_sdk_cli.cli_accounts.setup_parser(subparsers))
     commands.append(multiversx_sdk_cli.cli_ledger.setup_parser(subparsers))
     commands.append(multiversx_sdk_cli.cli_wallet.setup_parser(args, subparsers))
+    commands.append(multiversx_sdk_cli.cli_validator_wallet.setup_parser(args, subparsers))
     commands.append(multiversx_sdk_cli.cli_deps.setup_parser(subparsers))
     commands.append(multiversx_sdk_cli.cli_config.setup_parser(subparsers))
     commands.append(multiversx_sdk_cli.cli_localnet.setup_parser(args, subparsers))
