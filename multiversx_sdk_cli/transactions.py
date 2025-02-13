@@ -133,7 +133,7 @@ def transaction_event_to_dictionary(event: TransactionEvent) -> dict[str, Any]:
         "identifier": event.identifier,
         "topics": [topic.hex() for topic in event.topics],
         "data": event.data.decode(),
-        "additional_data": [data.decode() for data in event.additional_data],
+        "additional_data": [data.hex() for data in event.additional_data],
     }
 
 
