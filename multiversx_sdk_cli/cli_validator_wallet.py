@@ -38,7 +38,7 @@ def setup_parser(args: list[str], subparsers: Any) -> Any:
     sub.add_argument("--message", required=True, help="the message you want to sign")
     sub.add_argument("--pem", required=True, type=str, help="the path to a validator pem file")
     sub.add_argument(
-        "--validator-index",
+        "--index",
         required=False,
         type=int,
         default=0,
@@ -91,7 +91,7 @@ def create_new_wallet(args: Any):
 
 def sign_message(args: Any):
     path = Path(args.pem).expanduser().resolve()
-    validator_signer = ValidatorSigner.from_pem_file(path, args.validator_index)
+    validator_signer = ValidatorSigner.from_pem_file(path, args.index)
     signed_message = sign_message_by_validator(args.message, validator_signer)
 
     utils.dump_out_json(signed_message.to_dictionary())
