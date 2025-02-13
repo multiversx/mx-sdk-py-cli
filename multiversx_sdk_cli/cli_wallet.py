@@ -3,18 +3,9 @@ import json
 import logging
 import sys
 from pathlib import Path
-from typing import Any, Optional, Union
+from typing import Any, Optional
 
-from multiversx_sdk import (
-    Address,
-    Mnemonic,
-    UserPEM,
-    UserSecretKey,
-    UserWallet,
-    ValidatorPEM,
-    ValidatorSecretKey,
-    ValidatorSigner,
-)
+from multiversx_sdk import Address, Mnemonic, UserPEM, UserSecretKey, UserWallet
 from multiversx_sdk.core.address import get_shard_of_pubkey
 
 from multiversx_sdk_cli import cli_shared, utils
@@ -26,11 +17,7 @@ from multiversx_sdk_cli.errors import (
     KnownError,
     WalletGenerationError,
 )
-from multiversx_sdk_cli.sign_verify import (
-    SignedMessage,
-    sign_message,
-    sign_message_by_validator,
-)
+from multiversx_sdk_cli.sign_verify import SignedMessage, sign_message
 from multiversx_sdk_cli.ux import show_critical_error, show_message
 
 logger = logging.getLogger("cli.wallet")
@@ -74,12 +61,6 @@ def setup_parser(args: list[str], subparsers: Any) -> Any:
         "wallet",
         "new",
         "Create a new wallet and print its mnemonic; optionally save as password-protected JSON (recommended) or PEM (not recommended)",
-    )
-    sub.add_argument(
-        "--validator-wallet",
-        help="Create a validator wallet. If flag is provided, only the `pem` format is supported. Address hrp and shard will be ignored if provided.",
-        action="store_true",
-        default=False,
     )
     sub.add_argument(
         "--format",
@@ -157,19 +138,10 @@ def setup_parser(args: list[str], subparsers: Any) -> Any:
     sub = cli_shared.add_command_subparser(subparsers, "wallet", "sign-message", "Sign a message")
     sub.add_argument("--message", required=True, help="the message you want to sign")
     cli_shared.add_wallet_args(args=args, sub=sub, skip_required_check=True)
-    sub.add_argument("--validator-pem", required=False, type=str, help="the path to a validator pem file")
-    sub.add_argument(
-        "--validator-index",
-        required=False,
-        type=int,
-        default=0,
-        help="the index of the validator in case the file contains multiple validators (default: %(default)s)",
-    )
     sub.set_defaults(func=sign_user_message)
 
     sub = cli_shared.add_command_subparser(subparsers, "wallet", "verify-message", "Verify a previously signed message")
-    sub.add_argument("--address", help="the bech32 address of the signer")
-    sub.add_argument("--validator-pubkey", help="the hex string representing the validator's public key")
+    sub.add_argument("--address", required=True, help="the bech32 address of the signer")
     sub.add_argument(
         "--message",
         required=True,
@@ -187,11 +159,6 @@ def wallet_new(args: Any):
     outfile = args.outfile
     address_hrp = args.address_hrp
     shard = args.shard
-
-    if args.validator_wallet:
-        _ensure_correct_arguments_for_validator_wallet(format, outfile)
-        _generate_validator_wallet(outfile)
-        return
 
     if shard is not None:
         mnemonic = _generate_mnemonic_with_shard_constraint(shard)
@@ -231,28 +198,6 @@ def wallet_new(args: Any):
         raise BadUsage(f"Unknown format: {format}")
 
     logger.info(f"Wallet ({format}) saved: {outfile}")
-
-
-def _generate_validator_wallet(outfile: str):
-    path = Path(outfile).expanduser().resolve()
-    secret_key = ValidatorSecretKey.generate()
-    public_key = secret_key.generate_public_key()
-    validator_pem = ValidatorPEM(label=public_key.hex(), secret_key=secret_key)
-    validator_pem.save(path)
-
-    logger.info(f"Validator wallet saved: {str(path)}")
-
-
-def _ensure_correct_arguments_for_validator_wallet(format: str, outfile: Union[str, None]):
-    if format != WALLET_FORMAT_PEM:
-        raise BadUsage("Only PEM format supported for validator wallet")
-
-    if outfile is None:
-        raise BadUsage("The `--outfile` argument is required")
-
-    path = Path(outfile).expanduser().resolve()
-    if path.exists():
-        raise BadUserInput(f"File already exists, will not overwrite: {str(path)}")
 
 
 def _generate_mnemonic_with_shard_constraint(shard: int) -> Mnemonic:
@@ -414,39 +359,21 @@ def do_bech32(args: Any):
 def sign_user_message(args: Any):
     message: str = args.message
 
-    if args.validator_pem:
-        path = Path(args.validator_pem).expanduser().resolve()
-        validator_signer = ValidatorSigner.from_pem_file(path, args.validator_index)
-        signed_message = sign_message_by_validator(message, validator_signer)
-    else:
-        account = cli_shared.prepare_account(args)
-        signed_message = sign_message(message, account)
+    account = cli_shared.prepare_account(args)
+    signed_message = sign_message(message, account)
 
     utils.dump_out_json(signed_message.to_dictionary())
 
 
 def verify_signed_message(args: Any):
     bech32_address = args.address
-    validator_pubkey = args.validator_pubkey
     message: str = args.message
     signature: str = args.signature
 
-    if not bech32_address and not validator_pubkey:
-        raise BadUsage("You must provide either an address or a validator's public key")
-
-    if bech32_address and validator_pubkey:
-        raise BadUsage("You must provide ONLY one: either an address or a validator's public key, not both")
-
-    if validator_pubkey:
-        signed_message = SignedMessage(validator_pubkey, message, signature)
-        is_signed = signed_message.verify_validator_signature()
-    else:
-        signed_message = SignedMessage(bech32_address, message, signature)
-        is_signed = signed_message.verify_user_signature()
+    signed_message = SignedMessage(bech32_address, message, signature)
+    is_signed = signed_message.verify_user_signature()
 
     if is_signed:
-        show_message(f"""SUCCESS: The message "{message}" was signed by {bech32_address or validator_pubkey}""")
+        show_message(f"""SUCCESS: The message "{message}" was signed by {bech32_address}""")
     else:
-        show_critical_error(
-            f"""FAILED: The message "{message}" was NOT signed by {bech32_address or validator_pubkey}"""
-        )
+        show_critical_error(f"""FAILED: The message "{message}" was NOT signed by {bech32_address}""")
