@@ -69,17 +69,6 @@ def setup_parser(args: list[str], subparsers: Any) -> Any:
     sub = cli_shared.add_command_subparser(
         subparsers,
         "tx",
-        "get",
-        f"Get a transaction.{CLIOutputBuilder.describe(with_emitted=False, with_transaction_on_network=True)}",
-    )
-    sub.add_argument("--hash", required=True, help="the hash")
-    cli_shared.add_proxy_arg(sub)
-    cli_shared.add_omit_fields_arg(sub)
-    sub.set_defaults(func=get_transaction)
-
-    sub = cli_shared.add_command_subparser(
-        subparsers,
-        "tx",
         "sign",
         f"Sign a previously saved transaction.{CLIOutputBuilder.describe()}",
     )
@@ -194,20 +183,6 @@ def send_transaction(args: Any):
     finally:
         output = output.set_emitted_transaction(tx).build()
         utils.dump_out_json(output, outfile=args.outfile)
-
-
-def get_transaction(args: Any):
-    if not args.proxy:
-        raise BadUsage("Proxy argument not provided")
-
-    omit_fields = cli_shared.parse_omit_fields_arg(args)
-
-    config = get_config_for_network_providers()
-    proxy = ProxyNetworkProvider(url=args.proxy, config=config)
-
-    transaction = proxy.get_transaction(args.hash)
-    output = CLIOutputBuilder().set_transaction_on_network(transaction, omit_fields).build()
-    utils.dump_out_json(output)
 
 
 def sign_transaction(args: Any):
