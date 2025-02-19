@@ -44,7 +44,7 @@ class BasicEncoder(json.JSONEncoder):
         return super().default(o)
 
 
-def omit_fields(data: Any, fields: List[str] = []):
+def omit_fields(data: Any, fields: List[str] = []) -> dict[str, Any]:
     if isinstance(data, dict):
         for field in fields:
             data.pop(field, None)
