@@ -349,12 +349,7 @@ def deploy(args: Any):
     ensure_broadcast_args(args)
     ensure_chain_id_args(args)
 
-    sender = cli_shared.prepare_account(args)
-
-    if args.nonce is None:
-        nonce = cli_shared.get_current_nonce_for_address(sender.address, args.proxy)
-    else:
-        nonce = int(args.nonce)
+    sender, nonce = cli_shared.prepare_sender(args)
 
     guardian = cli_shared.load_guardian_account(args)
     guardian_address = cli_shared.get_guardian_address(guardian, args)
@@ -409,12 +404,7 @@ def call(args: Any):
     ensure_broadcast_args(args)
     ensure_chain_id_args(args)
 
-    sender = cli_shared.prepare_account(args)
-
-    if args.nonce is None:
-        nonce = cli_shared.get_current_nonce_for_address(sender.address, args.proxy)
-    else:
-        nonce = int(args.nonce)
+    sender, nonce = cli_shared.prepare_sender(args)
 
     guardian = cli_shared.load_guardian_account(args)
     guardian_address = cli_shared.get_guardian_address(guardian, args)
@@ -462,12 +452,7 @@ def upgrade(args: Any):
     ensure_broadcast_args(args)
     ensure_chain_id_args(args)
 
-    sender = cli_shared.prepare_account(args)
-
-    if args.nonce is None:
-        nonce = cli_shared.get_current_nonce_for_address(sender.address, args.proxy)
-    else:
-        nonce = int(args.nonce)
+    sender, nonce = cli_shared.prepare_sender(args)
 
     guardian = cli_shared.load_guardian_account(args)
     guardian_address = cli_shared.get_guardian_address(guardian, args)

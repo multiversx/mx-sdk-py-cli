@@ -32,7 +32,6 @@ def test_stake(capsys: Any):
             reward_address,
             "--chain",
             "localnet",
-            "--estimate-gas",
             "--nonce=0",
         ]
     )
@@ -72,7 +71,6 @@ def test_top_up(capsys: Any):
             "--top-up",
             "--chain",
             "localnet",
-            "--estimate-gas",
             "--nonce=0",
             "--reward-address",
             "erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th",
@@ -116,7 +114,6 @@ def test_stake_with_relayer_and_guardian(capsys: Any):
             reward_address,
             "--chain",
             "localnet",
-            "--estimate-gas",
             "--nonce=0",
             "--options=2",
             "--relayer",
@@ -169,7 +166,6 @@ def test_stake_top_up(capsys: Any):
             "2711000000000000000000",
             "--chain",
             "localnet",
-            "--estimate-gas",
             "--nonce=7",
         ]
     )
@@ -205,7 +201,6 @@ def test_unstake(capsys: Any):
             bls_key,
             "--chain",
             "localnet",
-            "--estimate-gas",
             "--nonce=7",
         ]
     )
@@ -244,7 +239,6 @@ def test_unbond(capsys: Any):
             bls_key,
             "--chain",
             "localnet",
-            "--estimate-gas",
             "--nonce=7",
         ]
     )
@@ -285,7 +279,6 @@ def test_unjail(capsys: Any):
             bls_key,
             "--chain",
             "localnet",
-            "--estimate-gas",
             "--nonce=7",
         ]
     )
@@ -324,7 +317,6 @@ def test_change_reward_address(capsys: Any):
             reward_address,
             "--chain",
             "localnet",
-            "--estimate-gas",
             "--nonce=7",
         ]
     )
@@ -358,7 +350,6 @@ def test_claim(capsys: Any):
             str(alice_pem),
             "--chain",
             "localnet",
-            "--estimate-gas",
             "--nonce=7",
         ]
     )
@@ -394,7 +385,6 @@ def test_unstake_nodes(capsys: Any):
             bls_key,
             "--chain",
             "localnet",
-            "--estimate-gas",
             "--nonce=7",
         ]
     )
@@ -433,7 +423,6 @@ def test_unstake_tokens(capsys: Any):
             "11000000000000000000",
             "--chain",
             "localnet",
-            "--estimate-gas",
             "--nonce=7",
         ]
     )
@@ -469,7 +458,6 @@ def test_unbond_nodes(capsys: Any):
             bls_key,
             "--chain",
             "localnet",
-            "--estimate-gas",
             "--nonce=7",
         ]
     )
@@ -508,7 +496,6 @@ def test_unbond_tokens(capsys: Any):
             "20000000000000000000",
             "--chain",
             "localnet",
-            "--estimate-gas",
             "--nonce=7",
         ]
     )
@@ -542,7 +529,6 @@ def test_clean_registration_data(capsys: Any):
             str(alice_pem),
             "--chain",
             "localnet",
-            "--estimate-gas",
             "--nonce=7",
         ]
     )
@@ -578,7 +564,6 @@ def test_re_stake_unstaked_nodes(capsys: Any):
             bls_key,
             "--chain",
             "localnet",
-            "--estimate-gas",
             "--nonce=7",
         ]
     )

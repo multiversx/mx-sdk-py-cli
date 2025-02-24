@@ -33,7 +33,6 @@ class ValidatorsController:
         sender: IAccount,
         validators_file: Path,
         native_amount: int,
-        estimate_gas: bool,
         gas_limit: int,
         gas_price: int,
         nonce: int,
@@ -54,7 +53,7 @@ class ValidatorsController:
             rewards_address=rewards_address,
         )
 
-        if estimate_gas:
+        if not gas_limit:
             gas_limit = self.estimate_system_sc_call(data, MetaChainSystemSCsCost.STAKE, validators.get_num_of_nodes())
 
         receiver = Address.new_from_hex(VALIDATORS_SMART_CONTRACT_ADDRESS_HEX, get_address_hrp())
@@ -106,7 +105,6 @@ class ValidatorsController:
         self,
         sender: IAccount,
         native_amount: int,
-        estimate_gas: bool,
         gas_limit: int,
         gas_price: int,
         nonce: int,
@@ -122,7 +120,7 @@ class ValidatorsController:
         data = "stake"
         receiver = Address.new_from_hex(VALIDATORS_SMART_CONTRACT_ADDRESS_HEX, get_address_hrp())
 
-        if estimate_gas:
+        if not gas_limit:
             gas_limit = self.estimate_system_sc_call(data, MetaChainSystemSCsCost.STAKE, 1)
 
         return self.transactions_controller.create_transaction(
@@ -148,7 +146,6 @@ class ValidatorsController:
         sender: IAccount,
         keys: str,
         native_amount: int,
-        estimate_gas: bool,
         gas_limit: int,
         gas_price: int,
         nonce: int,
@@ -164,7 +161,7 @@ class ValidatorsController:
         parsed_keys, num_keys = utils.parse_keys(keys)
         data = f"unStake{parsed_keys}"
 
-        if estimate_gas:
+        if not gas_limit:
             gas_limit = self.estimate_system_sc_call(data, MetaChainSystemSCsCost.UNSTAKE, num_keys)
 
         receiver = Address.new_from_hex(VALIDATORS_SMART_CONTRACT_ADDRESS_HEX, get_address_hrp())
@@ -192,7 +189,6 @@ class ValidatorsController:
         sender: IAccount,
         keys: str,
         native_amount: int,
-        estimate_gas: bool,
         gas_limit: int,
         gas_price: int,
         nonce: int,
@@ -208,7 +204,7 @@ class ValidatorsController:
         parsed_keys, num_keys = utils.parse_keys(keys)
         data = f"unJail{parsed_keys}"
 
-        if estimate_gas:
+        if not gas_limit:
             gas_limit = self.estimate_system_sc_call(data, MetaChainSystemSCsCost.UNJAIL, num_keys)
 
         receiver = Address.new_from_hex(VALIDATORS_SMART_CONTRACT_ADDRESS_HEX, get_address_hrp())
@@ -236,7 +232,6 @@ class ValidatorsController:
         sender: IAccount,
         keys: str,
         native_amount: int,
-        estimate_gas: bool,
         gas_limit: int,
         gas_price: int,
         nonce: int,
@@ -252,7 +247,7 @@ class ValidatorsController:
         parsed_keys, num_keys = utils.parse_keys(keys)
         data = f"unBond{parsed_keys}"
 
-        if estimate_gas:
+        if not gas_limit:
             gas_limit = self.estimate_system_sc_call(data, MetaChainSystemSCsCost.UNBOND, num_keys)
 
         receiver = Address.new_from_hex(VALIDATORS_SMART_CONTRACT_ADDRESS_HEX, get_address_hrp())
@@ -280,7 +275,6 @@ class ValidatorsController:
         sender: IAccount,
         rewards_address: Address,
         native_amount: int,
-        estimate_gas: bool,
         gas_limit: int,
         gas_price: int,
         nonce: int,
@@ -295,7 +289,7 @@ class ValidatorsController:
     ) -> Transaction:
         data = f"changeRewardAddress@{rewards_address.to_hex()}"
 
-        if estimate_gas:
+        if not gas_limit:
             gas_limit = self.estimate_system_sc_call(data, MetaChainSystemSCsCost.CHANGE_REWARD_ADDRESS)
 
         receiver = Address.new_from_hex(VALIDATORS_SMART_CONTRACT_ADDRESS_HEX, get_address_hrp())
@@ -322,7 +316,6 @@ class ValidatorsController:
         self,
         sender: IAccount,
         native_amount: int,
-        estimate_gas: bool,
         gas_limit: int,
         gas_price: int,
         nonce: int,
@@ -337,7 +330,7 @@ class ValidatorsController:
     ) -> Transaction:
         data = "claim"
 
-        if estimate_gas:
+        if not gas_limit:
             gas_limit = self.estimate_system_sc_call(data, MetaChainSystemSCsCost.CLAIM)
 
         receiver = Address.new_from_hex(VALIDATORS_SMART_CONTRACT_ADDRESS_HEX, get_address_hrp())
@@ -365,7 +358,6 @@ class ValidatorsController:
         sender: IAccount,
         keys: str,
         native_amount: int,
-        estimate_gas: bool,
         gas_limit: int,
         gas_price: int,
         nonce: int,
@@ -381,7 +373,7 @@ class ValidatorsController:
         parsed_keys, num_keys = utils.parse_keys(keys)
         data = f"unStakeNodes{parsed_keys}"
 
-        if estimate_gas:
+        if not gas_limit:
             gas_limit = self.estimate_system_sc_call(data, MetaChainSystemSCsCost.UNSTAKE, num_keys)
 
         receiver = Address.new_from_hex(VALIDATORS_SMART_CONTRACT_ADDRESS_HEX, get_address_hrp())
@@ -409,7 +401,6 @@ class ValidatorsController:
         sender: IAccount,
         value: int,
         native_amount: int,
-        estimate_gas: bool,
         gas_limit: int,
         gas_price: int,
         nonce: int,
@@ -424,7 +415,7 @@ class ValidatorsController:
     ) -> Transaction:
         data = f"unStakeTokens@{self.serializer.serialize([BigUIntValue(value)])}"
 
-        if estimate_gas:
+        if not gas_limit:
             gas_limit = self.estimate_system_sc_call(data, MetaChainSystemSCsCost.UNSTAKE_TOKENS)
 
         receiver = Address.new_from_hex(VALIDATORS_SMART_CONTRACT_ADDRESS_HEX, get_address_hrp())
@@ -452,7 +443,6 @@ class ValidatorsController:
         sender: IAccount,
         keys: str,
         native_amount: int,
-        estimate_gas: bool,
         gas_limit: int,
         gas_price: int,
         nonce: int,
@@ -468,7 +458,7 @@ class ValidatorsController:
         parsed_keys, num_keys = utils.parse_keys(keys)
         data = f"unBondNodes{parsed_keys}"
 
-        if estimate_gas:
+        if not gas_limit:
             gas_limit = self.estimate_system_sc_call(data, MetaChainSystemSCsCost.UNBOND, num_keys)
 
         receiver = Address.new_from_hex(VALIDATORS_SMART_CONTRACT_ADDRESS_HEX, get_address_hrp())
@@ -496,7 +486,6 @@ class ValidatorsController:
         sender: IAccount,
         value: int,
         native_amount: int,
-        estimate_gas: bool,
         gas_limit: int,
         gas_price: int,
         nonce: int,
@@ -511,7 +500,7 @@ class ValidatorsController:
     ) -> Transaction:
         data = f"unBondTokens@{self.serializer.serialize([BigUIntValue(value)])}"
 
-        if estimate_gas:
+        if not gas_limit:
             gas_limit = self.estimate_system_sc_call(data, MetaChainSystemSCsCost.UNBOND_TOKENS)
 
         receiver = Address.new_from_hex(VALIDATORS_SMART_CONTRACT_ADDRESS_HEX, get_address_hrp())
@@ -538,7 +527,6 @@ class ValidatorsController:
         self,
         sender: IAccount,
         native_amount: int,
-        estimate_gas: bool,
         gas_limit: int,
         gas_price: int,
         nonce: int,
@@ -553,7 +541,7 @@ class ValidatorsController:
     ) -> Transaction:
         data = "cleanRegisteredData"
 
-        if estimate_gas:
+        if not gas_limit:
             gas_limit = self.estimate_system_sc_call(data, MetaChainSystemSCsCost.CLEAN_REGISTERED_DATA)
 
         receiver = Address.new_from_hex(VALIDATORS_SMART_CONTRACT_ADDRESS_HEX, get_address_hrp())
@@ -581,7 +569,6 @@ class ValidatorsController:
         sender: IAccount,
         keys: str,
         native_amount: int,
-        estimate_gas: bool,
         gas_limit: int,
         gas_price: int,
         nonce: int,
@@ -597,7 +584,7 @@ class ValidatorsController:
         parsed_keys, num_keys = utils.parse_keys(keys)
         data = f"reStakeUnStakedNodes{parsed_keys}"
 
-        if estimate_gas:
+        if not gas_limit:
             gas_limit = self.estimate_system_sc_call(data, MetaChainSystemSCsCost.RESTAKE_UNSTAKED_NODES, num_keys)
 
         receiver = Address.new_from_hex(VALIDATORS_SMART_CONTRACT_ADDRESS_HEX, get_address_hrp())

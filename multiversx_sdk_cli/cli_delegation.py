@@ -13,8 +13,9 @@ from multiversx_sdk_cli import cli_shared, errors, utils
 from multiversx_sdk_cli.args_validation import (
     ensure_broadcast_args,
     ensure_chain_id_args,
+    ensure_nonce_args,
     ensure_proxy_argument,
-    ensure_required_transaction_args_are_provided,
+    ensure_receiver_args,
     ensure_wallet_args_are_provided,
 )
 from multiversx_sdk_cli.config import get_config_for_network_providers
@@ -378,51 +379,27 @@ def setup_parser(args: list[str], subparsers: Any) -> Any:
 def _add_common_arguments(args: list[str], sub: Any):
     cli_shared.add_proxy_arg(sub)
     cli_shared.add_wallet_args(args, sub)
-    cli_shared.add_tx_args(args, sub, with_receiver=False, with_data=False, with_estimate_gas=True)
+    cli_shared.add_tx_args(args, sub, with_receiver=False, with_data=False)
     cli_shared.add_broadcast_args(sub)
     cli_shared.add_outfile_arg(sub, what="signed transaction, hash")
     cli_shared.add_guardian_wallet_args(args, sub)
     cli_shared.add_relayed_v3_wallet_args(args, sub)
 
 
-def ensure_arguments_are_provided_and_prepared(args: Any):
-    cli_shared.check_guardian_args(args)
-    cli_shared.check_broadcast_args(args)
-    cli_shared.prepare_chain_id_in_args(args)
-    cli_shared.prepare_nonce_in_args(args)
-
-
-def prepare_sender(args: Any):
-    sender = cli_shared.prepare_account(args)
-    nonce = (
-        int(args.nonce)
-        if args.nonce is not None
-        else cli_shared.get_current_nonce_for_address(sender.address, args.proxy)
-    )
-    return sender, nonce
-
-
-def prepare_guardian(args: Any):
-    guardian = cli_shared.load_guardian_account(args)
-    guardian_address = cli_shared.get_guardian_address(guardian, args)
-    return guardian, guardian_address
-
-
-def prepare_relayer(args: Any):
-    relayer = cli_shared.load_relayer_account(args)
-    relayer_address = cli_shared.get_relayer_address(relayer, args)
-    return relayer, relayer_address
-
-
-def do_create_delegation_contract(args: Any):
-    ensure_required_transaction_args_are_provided(args)
+def _ensure_required_args(args: Any):
+    ensure_nonce_args(args)
+    ensure_receiver_args(args)
     ensure_wallet_args_are_provided(args)
     ensure_broadcast_args(args)
     ensure_chain_id_args(args)
 
-    sender, nonce = prepare_sender(args)
-    guardian, guardian_address = prepare_guardian(args)
-    relayer, relayer_address = prepare_relayer(args)
+
+def do_create_delegation_contract(args: Any):
+    _ensure_required_args(args)
+
+    sender, nonce = cli_shared.prepare_sender(args)
+    guardian, guardian_address = cli_shared.prepare_guardian(args)
+    relayer, relayer_address = cli_shared.prepare_relayer(args)
 
     chain_id = cli_shared.get_chain_id(args.chain, args.proxy)
     config = TransactionsFactoryConfig(chain_id)
@@ -469,20 +446,17 @@ def get_contract_address_by_deploy_tx_hash(args: Any):
 
 
 def add_new_nodes(args: Any):
-    ensure_required_transaction_args_are_provided(args)
-    ensure_wallet_args_are_provided(args)
-    ensure_broadcast_args(args)
-    ensure_chain_id_args(args)
+    _ensure_required_args(args)
 
-    sender, nonce = prepare_sender(args)
-    guardian, guardian_address = prepare_guardian(args)
-    relayer, relayer_address = prepare_relayer(args)
+    sender, nonce = cli_shared.prepare_sender(args)
+    guardian, guardian_address = cli_shared.prepare_guardian(args)
+    relayer, relayer_address = cli_shared.prepare_relayer(args)
 
     chain_id = cli_shared.get_chain_id(args.chain, args.proxy)
     config = TransactionsFactoryConfig(chain_id)
     delegation = DelegationOperations(config)
 
-    gas_limit = 0 if args.estimate_gas else args.gas_limit
+    gas_limit = args.gas_limit if args.gas_limit else 0
     public_keys, signed_messages = _get_public_keys_and_signed_messages(args)
 
     tx = delegation.prepare_transaction_for_adding_nodes(
@@ -526,21 +500,18 @@ def _get_public_keys_and_signed_messages(args: Any) -> tuple[list[ValidatorPubli
 
 
 def remove_nodes(args: Any):
+    _ensure_required_args(args)
     _check_if_either_bls_keys_or_validators_file_are_provided(args)
-    ensure_required_transaction_args_are_provided(args)
-    ensure_wallet_args_are_provided(args)
-    ensure_broadcast_args(args)
-    ensure_chain_id_args(args)
 
-    sender, nonce = prepare_sender(args)
-    guardian, guardian_address = prepare_guardian(args)
-    relayer, relayer_address = prepare_relayer(args)
+    sender, nonce = cli_shared.prepare_sender(args)
+    guardian, guardian_address = cli_shared.prepare_guardian(args)
+    relayer, relayer_address = cli_shared.prepare_relayer(args)
 
     chain_id = cli_shared.get_chain_id(args.chain, args.proxy)
     config = TransactionsFactoryConfig(chain_id)
     delegation = DelegationOperations(config)
 
-    gas_limit = 0 if args.estimate_gas else args.gas_limit
+    gas_limit = args.gas_limit if args.gas_limit else 0
     public_keys = _load_validators_public_keys(args)
 
     tx = delegation.prepare_transaction_for_removing_nodes(
@@ -584,21 +555,18 @@ def _parse_public_bls_keys(public_bls_keys: str) -> list[ValidatorPublicKey]:
 
 
 def stake_nodes(args: Any):
+    _ensure_required_args(args)
     _check_if_either_bls_keys_or_validators_file_are_provided(args)
-    ensure_required_transaction_args_are_provided(args)
-    ensure_wallet_args_are_provided(args)
-    ensure_broadcast_args(args)
-    ensure_chain_id_args(args)
 
-    sender, nonce = prepare_sender(args)
-    guardian, guardian_address = prepare_guardian(args)
-    relayer, relayer_address = prepare_relayer(args)
+    sender, nonce = cli_shared.prepare_sender(args)
+    guardian, guardian_address = cli_shared.prepare_guardian(args)
+    relayer, relayer_address = cli_shared.prepare_relayer(args)
 
     chain_id = cli_shared.get_chain_id(args.chain, args.proxy)
     config = TransactionsFactoryConfig(chain_id)
     delegation = DelegationOperations(config)
 
-    gas_limit = 0 if args.estimate_gas else args.gas_limit
+    gas_limit = args.gas_limit if args.gas_limit else 0
     public_keys = _load_validators_public_keys(args)
 
     tx = delegation.prepare_transaction_for_staking_nodes(
@@ -631,21 +599,18 @@ def _check_if_either_bls_keys_or_validators_file_are_provided(args: Any):
 
 
 def unbond_nodes(args: Any):
+    _ensure_required_args(args)
     _check_if_either_bls_keys_or_validators_file_are_provided(args)
-    ensure_required_transaction_args_are_provided(args)
-    ensure_wallet_args_are_provided(args)
-    ensure_broadcast_args(args)
-    ensure_chain_id_args(args)
 
-    sender, nonce = prepare_sender(args)
-    guardian, guardian_address = prepare_guardian(args)
-    relayer, relayer_address = prepare_relayer(args)
+    sender, nonce = cli_shared.prepare_sender(args)
+    guardian, guardian_address = cli_shared.prepare_guardian(args)
+    relayer, relayer_address = cli_shared.prepare_relayer(args)
 
     chain_id = cli_shared.get_chain_id(args.chain, args.proxy)
     config = TransactionsFactoryConfig(chain_id)
     delegation = DelegationOperations(config)
 
-    gas_limit = 0 if args.estimate_gas else args.gas_limit
+    gas_limit = args.gas_limit if args.gas_limit else 0
     public_keys = _load_validators_public_keys(args)
 
     tx = delegation.prepare_transaction_for_unbonding_nodes(
@@ -670,21 +635,18 @@ def unbond_nodes(args: Any):
 
 
 def unstake_nodes(args: Any):
+    _ensure_required_args(args)
     _check_if_either_bls_keys_or_validators_file_are_provided(args)
-    ensure_required_transaction_args_are_provided(args)
-    ensure_wallet_args_are_provided(args)
-    ensure_broadcast_args(args)
-    ensure_chain_id_args(args)
 
-    sender, nonce = prepare_sender(args)
-    guardian, guardian_address = prepare_guardian(args)
-    relayer, relayer_address = prepare_relayer(args)
+    sender, nonce = cli_shared.prepare_sender(args)
+    guardian, guardian_address = cli_shared.prepare_guardian(args)
+    relayer, relayer_address = cli_shared.prepare_relayer(args)
 
     chain_id = cli_shared.get_chain_id(args.chain, args.proxy)
     config = TransactionsFactoryConfig(chain_id)
     delegation = DelegationOperations(config)
 
-    gas_limit = 0 if args.estimate_gas else args.gas_limit
+    gas_limit = args.gas_limit if args.gas_limit else 0
     public_keys = _load_validators_public_keys(args)
 
     tx = delegation.prepare_transaction_for_unstaking_nodes(
@@ -709,21 +671,18 @@ def unstake_nodes(args: Any):
 
 
 def unjail_nodes(args: Any):
+    _ensure_required_args(args)
     _check_if_either_bls_keys_or_validators_file_are_provided(args)
-    ensure_required_transaction_args_are_provided(args)
-    ensure_wallet_args_are_provided(args)
-    ensure_broadcast_args(args)
-    ensure_chain_id_args(args)
 
-    sender, nonce = prepare_sender(args)
-    guardian, guardian_address = prepare_guardian(args)
-    relayer, relayer_address = prepare_relayer(args)
+    sender, nonce = cli_shared.prepare_sender(args)
+    guardian, guardian_address = cli_shared.prepare_guardian(args)
+    relayer, relayer_address = cli_shared.prepare_relayer(args)
 
     chain_id = cli_shared.get_chain_id(args.chain, args.proxy)
     config = TransactionsFactoryConfig(chain_id)
     delegation = DelegationOperations(config)
 
-    gas_limit = 0 if args.estimate_gas else args.gas_limit
+    gas_limit = args.gas_limit if args.gas_limit else 0
     public_keys = _load_validators_public_keys(args)
 
     tx = delegation.prepare_transaction_for_unjailing_nodes(
@@ -748,16 +707,13 @@ def unjail_nodes(args: Any):
 
 
 def delegate(args: Any):
-    ensure_required_transaction_args_are_provided(args)
-    ensure_wallet_args_are_provided(args)
-    ensure_broadcast_args(args)
-    ensure_chain_id_args(args)
+    _ensure_required_args(args)
 
-    sender, nonce = prepare_sender(args)
-    guardian, guardian_address = prepare_guardian(args)
-    relayer, relayer_address = prepare_relayer(args)
+    sender, nonce = cli_shared.prepare_sender(args)
+    guardian, guardian_address = cli_shared.prepare_guardian(args)
+    relayer, relayer_address = cli_shared.prepare_relayer(args)
 
-    gas_limit = 0 if args.estimate_gas else args.gas_limit
+    gas_limit = args.gas_limit if args.gas_limit else 0
 
     value = int(args.value)
     if value < MINIMUM_AMOUNT_TO_DELEGATE:
@@ -788,20 +744,17 @@ def delegate(args: Any):
 
 
 def claim_rewards(args: Any):
-    ensure_required_transaction_args_are_provided(args)
-    ensure_wallet_args_are_provided(args)
-    ensure_broadcast_args(args)
-    ensure_chain_id_args(args)
+    _ensure_required_args(args)
 
-    sender, nonce = prepare_sender(args)
-    guardian, guardian_address = prepare_guardian(args)
-    relayer, relayer_address = prepare_relayer(args)
+    sender, nonce = cli_shared.prepare_sender(args)
+    guardian, guardian_address = cli_shared.prepare_guardian(args)
+    relayer, relayer_address = cli_shared.prepare_relayer(args)
 
     chain_id = cli_shared.get_chain_id(args.chain, args.proxy)
     config = TransactionsFactoryConfig(chain_id)
     delegation = DelegationOperations(config)
 
-    gas_limit = 0 if args.estimate_gas else args.gas_limit
+    gas_limit = args.gas_limit if args.gas_limit else 0
 
     tx = delegation.prepare_transaction_for_claiming_rewards(
         owner=sender,
@@ -823,20 +776,17 @@ def claim_rewards(args: Any):
 
 
 def redelegate_rewards(args: Any):
-    ensure_required_transaction_args_are_provided(args)
-    ensure_wallet_args_are_provided(args)
-    ensure_broadcast_args(args)
-    ensure_chain_id_args(args)
+    _ensure_required_args(args)
 
-    sender, nonce = prepare_sender(args)
-    guardian, guardian_address = prepare_guardian(args)
-    relayer, relayer_address = prepare_relayer(args)
+    sender, nonce = cli_shared.prepare_sender(args)
+    guardian, guardian_address = cli_shared.prepare_guardian(args)
+    relayer, relayer_address = cli_shared.prepare_relayer(args)
 
     chain_id = cli_shared.get_chain_id(args.chain, args.proxy)
     config = TransactionsFactoryConfig(chain_id)
     delegation = DelegationOperations(config)
 
-    gas_limit = 0 if args.estimate_gas else args.gas_limit
+    gas_limit = args.gas_limit if args.gas_limit else 0
 
     tx = delegation.prepare_transaction_for_redelegating_rewards(
         owner=sender,
@@ -858,16 +808,13 @@ def redelegate_rewards(args: Any):
 
 
 def undelegate(args: Any):
-    ensure_required_transaction_args_are_provided(args)
-    ensure_wallet_args_are_provided(args)
-    ensure_broadcast_args(args)
-    ensure_chain_id_args(args)
+    _ensure_required_args(args)
 
-    sender, nonce = prepare_sender(args)
-    guardian, guardian_address = prepare_guardian(args)
-    relayer, relayer_address = prepare_relayer(args)
+    sender, nonce = cli_shared.prepare_sender(args)
+    guardian, guardian_address = cli_shared.prepare_guardian(args)
+    relayer, relayer_address = cli_shared.prepare_relayer(args)
 
-    gas_limit = 0 if args.estimate_gas else args.gas_limit
+    gas_limit = args.gas_limit if args.gas_limit else 0
 
     value = int(args.value)
     if value < MINIMUM_AMOUNT_TO_DELEGATE:
@@ -898,16 +845,13 @@ def undelegate(args: Any):
 
 
 def withdraw(args: Any):
-    ensure_required_transaction_args_are_provided(args)
-    ensure_wallet_args_are_provided(args)
-    ensure_broadcast_args(args)
-    ensure_chain_id_args(args)
+    _ensure_required_args(args)
 
-    sender, nonce = prepare_sender(args)
-    guardian, guardian_address = prepare_guardian(args)
-    relayer, relayer_address = prepare_relayer(args)
+    sender, nonce = cli_shared.prepare_sender(args)
+    guardian, guardian_address = cli_shared.prepare_guardian(args)
+    relayer, relayer_address = cli_shared.prepare_relayer(args)
 
-    gas_limit = 0 if args.estimate_gas else args.gas_limit
+    gas_limit = args.gas_limit if args.gas_limit else 0
 
     chain_id = cli_shared.get_chain_id(args.chain, args.proxy)
     config = TransactionsFactoryConfig(chain_id)
@@ -934,16 +878,13 @@ def withdraw(args: Any):
 
 
 def change_service_fee(args: Any):
-    ensure_required_transaction_args_are_provided(args)
-    ensure_wallet_args_are_provided(args)
-    ensure_broadcast_args(args)
-    ensure_chain_id_args(args)
+    _ensure_required_args(args)
 
-    sender, nonce = prepare_sender(args)
-    guardian, guardian_address = prepare_guardian(args)
-    relayer, relayer_address = prepare_relayer(args)
+    sender, nonce = cli_shared.prepare_sender(args)
+    guardian, guardian_address = cli_shared.prepare_guardian(args)
+    relayer, relayer_address = cli_shared.prepare_relayer(args)
 
-    gas_limit = 0 if args.estimate_gas else args.gas_limit
+    gas_limit = args.gas_limit if args.gas_limit else 0
 
     chain_id = cli_shared.get_chain_id(args.chain, args.proxy)
     config = TransactionsFactoryConfig(chain_id)
@@ -971,16 +912,13 @@ def change_service_fee(args: Any):
 
 
 def modify_delegation_cap(args: Any):
-    ensure_required_transaction_args_are_provided(args)
-    ensure_wallet_args_are_provided(args)
-    ensure_broadcast_args(args)
-    ensure_chain_id_args(args)
+    _ensure_required_args(args)
 
-    sender, nonce = prepare_sender(args)
-    guardian, guardian_address = prepare_guardian(args)
-    relayer, relayer_address = prepare_relayer(args)
+    sender, nonce = cli_shared.prepare_sender(args)
+    guardian, guardian_address = cli_shared.prepare_guardian(args)
+    relayer, relayer_address = cli_shared.prepare_relayer(args)
 
-    gas_limit = 0 if args.estimate_gas else args.gas_limit
+    gas_limit = args.gas_limit if args.gas_limit else 0
 
     chain_id = cli_shared.get_chain_id(args.chain, args.proxy)
     config = TransactionsFactoryConfig(chain_id)
@@ -1008,16 +946,13 @@ def modify_delegation_cap(args: Any):
 
 
 def automatic_activation(args: Any):
-    ensure_required_transaction_args_are_provided(args)
-    ensure_wallet_args_are_provided(args)
-    ensure_broadcast_args(args)
-    ensure_chain_id_args(args)
+    _ensure_required_args(args)
 
-    sender, nonce = prepare_sender(args)
-    guardian, guardian_address = prepare_guardian(args)
-    relayer, relayer_address = prepare_relayer(args)
+    sender, nonce = cli_shared.prepare_sender(args)
+    guardian, guardian_address = cli_shared.prepare_guardian(args)
+    relayer, relayer_address = cli_shared.prepare_relayer(args)
 
-    gas_limit = 0 if args.estimate_gas else args.gas_limit
+    gas_limit = args.gas_limit if args.gas_limit else 0
 
     chain_id = cli_shared.get_chain_id(args.chain, args.proxy)
     config = TransactionsFactoryConfig(chain_id)
@@ -1046,16 +981,13 @@ def automatic_activation(args: Any):
 
 
 def redelegate_cap(args: Any):
-    ensure_required_transaction_args_are_provided(args)
-    ensure_wallet_args_are_provided(args)
-    ensure_broadcast_args(args)
-    ensure_chain_id_args(args)
+    _ensure_required_args(args)
 
-    sender, nonce = prepare_sender(args)
-    guardian, guardian_address = prepare_guardian(args)
-    relayer, relayer_address = prepare_relayer(args)
+    sender, nonce = cli_shared.prepare_sender(args)
+    guardian, guardian_address = cli_shared.prepare_guardian(args)
+    relayer, relayer_address = cli_shared.prepare_relayer(args)
 
-    gas_limit = 0 if args.estimate_gas else args.gas_limit
+    gas_limit = args.gas_limit if args.gas_limit else 0
 
     chain_id = cli_shared.get_chain_id(args.chain, args.proxy)
     config = TransactionsFactoryConfig(chain_id)
@@ -1084,16 +1016,13 @@ def redelegate_cap(args: Any):
 
 
 def set_metadata(args: Any):
-    ensure_required_transaction_args_are_provided(args)
-    ensure_wallet_args_are_provided(args)
-    ensure_broadcast_args(args)
-    ensure_chain_id_args(args)
+    _ensure_required_args(args)
 
-    sender, nonce = prepare_sender(args)
-    guardian, guardian_address = prepare_guardian(args)
-    relayer, relayer_address = prepare_relayer(args)
+    sender, nonce = cli_shared.prepare_sender(args)
+    guardian, guardian_address = cli_shared.prepare_guardian(args)
+    relayer, relayer_address = cli_shared.prepare_relayer(args)
 
-    gas_limit = 0 if args.estimate_gas else args.gas_limit
+    gas_limit = args.gas_limit if args.gas_limit else 0
 
     chain_id = cli_shared.get_chain_id(args.chain, args.proxy)
     config = TransactionsFactoryConfig(chain_id)
@@ -1123,16 +1052,13 @@ def set_metadata(args: Any):
 
 
 def make_new_contract_from_validator_data(args: Any):
-    ensure_required_transaction_args_are_provided(args)
-    ensure_wallet_args_are_provided(args)
-    ensure_broadcast_args(args)
-    ensure_chain_id_args(args)
+    _ensure_required_args(args)
 
-    sender, nonce = prepare_sender(args)
-    guardian, guardian_address = prepare_guardian(args)
-    relayer, relayer_address = prepare_relayer(args)
+    sender, nonce = cli_shared.prepare_sender(args)
+    guardian, guardian_address = cli_shared.prepare_guardian(args)
+    relayer, relayer_address = cli_shared.prepare_relayer(args)
 
-    gas_limit = 0 if args.estimate_gas else args.gas_limit
+    gas_limit = args.gas_limit if args.gas_limit else 0
 
     chain_id = cli_shared.get_chain_id(args.chain, args.proxy)
     config = TransactionsFactoryConfig(chain_id)
