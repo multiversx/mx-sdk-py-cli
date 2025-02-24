@@ -149,12 +149,6 @@ def add_wallet_args(args: list[str], sub: Any):
         help="🔑 the PEM file, if keyfile not provided",
     )
     sub.add_argument(
-        "--pem-index",
-        type=int,
-        default=0,
-        help="🔑 the index in the PEM file (default: %(default)s)",
-    )
-    sub.add_argument(
         "--keyfile",
         required=False,
         help="🔑 a JSON keyfile, if PEM not provided",
@@ -164,12 +158,6 @@ def add_wallet_args(args: list[str], sub: Any):
         help="🔑 a file containing keyfile's password, if keyfile provided",
     )
     sub.add_argument(
-        "--address-index",
-        type=int,
-        default=None,
-        help="🔑 the index of the address in the keyfile; should only be provided for keyfile of kind = mnemonic",
-    )
-    sub.add_argument(
         "--ledger",
         action="store_true",
         required=False,
@@ -177,10 +165,10 @@ def add_wallet_args(args: list[str], sub: Any):
         help="🔐 bool flag for signing transaction using ledger",
     )
     sub.add_argument(
-        "--ledger-address-index",
+        "--index",
         type=int,
         default=0,
-        help="🔐 the index of the address when using Ledger",
+        help="🔑 the address index; can be used for PEM files, keyfiles of type mnemonic or Ledger devices (default: %(default)s)",
     )
     sub.add_argument("--sender-username", required=False, help="🖄 the username of the sender")
 
@@ -191,12 +179,6 @@ def add_guardian_wallet_args(args: list[str], sub: Any):
         help="🔑 the PEM file, if keyfile not provided",
     )
     sub.add_argument(
-        "--guardian-pem-index",
-        type=int,
-        default=0,
-        help="🔑 the index in the PEM file (default: %(default)s)",
-    )
-    sub.add_argument(
         "--guardian-keyfile",
         help="🔑 a JSON keyfile, if PEM not provided",
     )
@@ -205,43 +187,25 @@ def add_guardian_wallet_args(args: list[str], sub: Any):
         help="🔑 a file containing keyfile's password, if keyfile provided",
     )
     sub.add_argument(
-        "--guardian-address-index",
-        type=int,
-        default=None,
-        help="🔑 the index of the address in the keyfile; should only be provided for keyfile of kind = mnemonic",
-    )
-    sub.add_argument(
         "--guardian-ledger",
         action="store_true",
         default=False,
         help="🔐 bool flag for signing transaction using ledger",
     )
     sub.add_argument(
-        "--guardian-ledger-address-index",
+        "--guardian-index",
         type=int,
         default=0,
-        help="🔐 the index of the address when using Ledger",
+        help="🔑 the address index; can be used for PEM files, keyfiles of type mnemonic or Ledger devices (default: %(default)s)",
     )
 
 
 def add_relayed_v3_wallet_args(args: list[str], sub: Any):
     sub.add_argument("--relayer-pem", help="🔑 the PEM file, if keyfile not provided")
-    sub.add_argument(
-        "--relayer-pem-index",
-        type=int,
-        default=0,
-        help="🔑 the index in the PEM file (default: %(default)s)",
-    )
     sub.add_argument("--relayer-keyfile", help="🔑 a JSON keyfile, if PEM not provided")
     sub.add_argument(
         "--relayer-passfile",
         help="🔑 a file containing keyfile's password, if keyfile provided",
-    )
-    sub.add_argument(
-        "--relayer-address-index",
-        type=int,
-        default=None,
-        help="🔑 the index of the address in the keyfile; should only be provided for keyfile of kind = mnemonic",
     )
     sub.add_argument(
         "--relayer-ledger",
@@ -250,10 +214,10 @@ def add_relayed_v3_wallet_args(args: list[str], sub: Any):
         help="🔐 bool flag for signing transaction using ledger",
     )
     sub.add_argument(
-        "--relayer-ledger-address-index",
+        "--relayer-index",
         type=int,
         default=0,
-        help="🔐 the index of the address when using Ledger",
+        help="🔑 the address index; can be used for PEM files, keyfiles of type mnemonic or Ledger devices (default: %(default)s)",
     )
 
 
@@ -305,17 +269,17 @@ def prepare_account(args: Any):
     hrp = config.get_address_hrp()
 
     if args.pem:
-        return Account.new_from_pem(file_path=Path(args.pem), index=args.pem_index, hrp=hrp)
+        return Account.new_from_pem(file_path=Path(args.pem), index=args.index, hrp=hrp)
     elif args.keyfile:
         password = load_password(args)
         return Account.new_from_keystore(
             file_path=Path(args.keyfile),
             password=password,
-            address_index=args.address_index,
+            address_index=args.index,
             hrp=hrp,
         )
     elif args.ledger:
-        return LedgerAccount(address_index=args.ledger_address_index)
+        return LedgerAccount(address_index=args.index)
     else:
         raise errors.NoWalletProvided()
 
@@ -324,17 +288,17 @@ def load_guardian_account(args: Any) -> Union[IAccount, None]:
     hrp = config.get_address_hrp()
 
     if args.guardian_pem:
-        return Account.new_from_pem(file_path=Path(args.guardian_pem), index=args.guardian_pem_index, hrp=hrp)
+        return Account.new_from_pem(file_path=Path(args.guardian_pem), index=args.guardian_index, hrp=hrp)
     elif args.guardian_keyfile:
         password = load_guardian_password(args)
         return Account.new_from_keystore(
             file_path=Path(args.guardian_keyfile),
             password=password,
-            address_index=args.guardian_address_index,
+            address_index=args.guardian_index,
             hrp=hrp,
         )
     elif args.guardian_ledger:
-        return LedgerAccount(address_index=args.guardian_ledger_address_index)
+        return LedgerAccount(address_index=args.guardian_index)
 
     return None
 
@@ -369,17 +333,17 @@ def load_relayer_account(args: Any) -> Union[IAccount, None]:
     hrp = config.get_address_hrp()
 
     if args.relayer_pem:
-        return Account.new_from_pem(file_path=Path(args.relayer_pem), index=args.relayer_pem_index, hrp=hrp)
+        return Account.new_from_pem(file_path=Path(args.relayer_pem), index=args.relayer_index, hrp=hrp)
     elif args.relayer_keyfile:
         password = load_relayer_password(args)
         return Account.new_from_keystore(
             file_path=Path(args.relayer_keyfile),
             password=password,
-            address_index=args.relayer_address_index,
+            address_index=args.relayer_index,
             hrp=hrp,
         )
     elif args.relayer_ledger:
-        return LedgerAccount(address_index=args.relayer_ledger_address_index)
+        return LedgerAccount(address_index=args.relayer_index)
 
     return None
 
