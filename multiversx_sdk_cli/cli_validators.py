@@ -5,10 +5,10 @@ from multiversx_sdk import Address
 
 from multiversx_sdk_cli import cli_shared, utils
 from multiversx_sdk_cli.args_validation import (
-    ensure_broadcast_args,
-    ensure_chain_id_args,
-    ensure_required_transaction_args_are_provided,
     ensure_wallet_args_are_provided,
+    validate_broadcast_args,
+    validate_chain_id_args,
+    validate_transaction_args,
 )
 from multiversx_sdk_cli.validators.core import ValidatorsController
 
@@ -198,10 +198,10 @@ def do_stake(args: Any):
 
 
 def validate_args(args: Any) -> None:
-    ensure_required_transaction_args_are_provided(args)
+    validate_transaction_args(args)
     ensure_wallet_args_are_provided(args)
-    ensure_broadcast_args(args)
-    ensure_chain_id_args(args)
+    validate_broadcast_args(args)
+    validate_chain_id_args(args)
 
 
 def prepare_sender(args: Any):
