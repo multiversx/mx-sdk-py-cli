@@ -11,11 +11,11 @@ from multiversx_sdk import (
 
 from multiversx_sdk_cli import cli_shared, errors, utils
 from multiversx_sdk_cli.args_validation import (
-    ensure_broadcast_args,
-    ensure_chain_id_args,
-    ensure_proxy_argument,
-    ensure_required_transaction_args_are_provided,
     ensure_wallet_args_are_provided,
+    validate_broadcast_args,
+    validate_chain_id_args,
+    validate_proxy_argument,
+    validate_transaction_args,
 )
 from multiversx_sdk_cli.config import get_config_for_network_providers
 from multiversx_sdk_cli.delegation import DelegationOperations
@@ -415,10 +415,10 @@ def prepare_relayer(args: Any):
 
 
 def do_create_delegation_contract(args: Any):
-    ensure_required_transaction_args_are_provided(args)
+    validate_transaction_args(args)
     ensure_wallet_args_are_provided(args)
-    ensure_broadcast_args(args)
-    ensure_chain_id_args(args)
+    validate_broadcast_args(args)
+    validate_chain_id_args(args)
 
     sender, nonce = prepare_sender(args)
     guardian, guardian_address = prepare_guardian(args)
@@ -452,7 +452,7 @@ def do_create_delegation_contract(args: Any):
 
 
 def get_contract_address_by_deploy_tx_hash(args: Any):
-    ensure_proxy_argument(args)
+    validate_proxy_argument(args)
 
     config = get_config_for_network_providers()
     proxy = ProxyNetworkProvider(url=args.proxy, config=config)
@@ -469,10 +469,10 @@ def get_contract_address_by_deploy_tx_hash(args: Any):
 
 
 def add_new_nodes(args: Any):
-    ensure_required_transaction_args_are_provided(args)
+    validate_transaction_args(args)
     ensure_wallet_args_are_provided(args)
-    ensure_broadcast_args(args)
-    ensure_chain_id_args(args)
+    validate_broadcast_args(args)
+    validate_chain_id_args(args)
 
     sender, nonce = prepare_sender(args)
     guardian, guardian_address = prepare_guardian(args)
@@ -527,10 +527,10 @@ def _get_public_keys_and_signed_messages(args: Any) -> tuple[list[ValidatorPubli
 
 def remove_nodes(args: Any):
     _check_if_either_bls_keys_or_validators_file_are_provided(args)
-    ensure_required_transaction_args_are_provided(args)
+    validate_transaction_args(args)
     ensure_wallet_args_are_provided(args)
-    ensure_broadcast_args(args)
-    ensure_chain_id_args(args)
+    validate_broadcast_args(args)
+    validate_chain_id_args(args)
 
     sender, nonce = prepare_sender(args)
     guardian, guardian_address = prepare_guardian(args)
@@ -585,10 +585,10 @@ def _parse_public_bls_keys(public_bls_keys: str) -> list[ValidatorPublicKey]:
 
 def stake_nodes(args: Any):
     _check_if_either_bls_keys_or_validators_file_are_provided(args)
-    ensure_required_transaction_args_are_provided(args)
+    validate_transaction_args(args)
     ensure_wallet_args_are_provided(args)
-    ensure_broadcast_args(args)
-    ensure_chain_id_args(args)
+    validate_broadcast_args(args)
+    validate_chain_id_args(args)
 
     sender, nonce = prepare_sender(args)
     guardian, guardian_address = prepare_guardian(args)
@@ -632,10 +632,10 @@ def _check_if_either_bls_keys_or_validators_file_are_provided(args: Any):
 
 def unbond_nodes(args: Any):
     _check_if_either_bls_keys_or_validators_file_are_provided(args)
-    ensure_required_transaction_args_are_provided(args)
+    validate_transaction_args(args)
     ensure_wallet_args_are_provided(args)
-    ensure_broadcast_args(args)
-    ensure_chain_id_args(args)
+    validate_broadcast_args(args)
+    validate_chain_id_args(args)
 
     sender, nonce = prepare_sender(args)
     guardian, guardian_address = prepare_guardian(args)
@@ -671,10 +671,10 @@ def unbond_nodes(args: Any):
 
 def unstake_nodes(args: Any):
     _check_if_either_bls_keys_or_validators_file_are_provided(args)
-    ensure_required_transaction_args_are_provided(args)
+    validate_transaction_args(args)
     ensure_wallet_args_are_provided(args)
-    ensure_broadcast_args(args)
-    ensure_chain_id_args(args)
+    validate_broadcast_args(args)
+    validate_chain_id_args(args)
 
     sender, nonce = prepare_sender(args)
     guardian, guardian_address = prepare_guardian(args)
@@ -710,10 +710,10 @@ def unstake_nodes(args: Any):
 
 def unjail_nodes(args: Any):
     _check_if_either_bls_keys_or_validators_file_are_provided(args)
-    ensure_required_transaction_args_are_provided(args)
+    validate_transaction_args(args)
     ensure_wallet_args_are_provided(args)
-    ensure_broadcast_args(args)
-    ensure_chain_id_args(args)
+    validate_broadcast_args(args)
+    validate_chain_id_args(args)
 
     sender, nonce = prepare_sender(args)
     guardian, guardian_address = prepare_guardian(args)
@@ -748,10 +748,10 @@ def unjail_nodes(args: Any):
 
 
 def delegate(args: Any):
-    ensure_required_transaction_args_are_provided(args)
+    validate_transaction_args(args)
     ensure_wallet_args_are_provided(args)
-    ensure_broadcast_args(args)
-    ensure_chain_id_args(args)
+    validate_broadcast_args(args)
+    validate_chain_id_args(args)
 
     sender, nonce = prepare_sender(args)
     guardian, guardian_address = prepare_guardian(args)
@@ -788,10 +788,10 @@ def delegate(args: Any):
 
 
 def claim_rewards(args: Any):
-    ensure_required_transaction_args_are_provided(args)
+    validate_transaction_args(args)
     ensure_wallet_args_are_provided(args)
-    ensure_broadcast_args(args)
-    ensure_chain_id_args(args)
+    validate_broadcast_args(args)
+    validate_chain_id_args(args)
 
     sender, nonce = prepare_sender(args)
     guardian, guardian_address = prepare_guardian(args)
@@ -823,10 +823,10 @@ def claim_rewards(args: Any):
 
 
 def redelegate_rewards(args: Any):
-    ensure_required_transaction_args_are_provided(args)
+    validate_transaction_args(args)
     ensure_wallet_args_are_provided(args)
-    ensure_broadcast_args(args)
-    ensure_chain_id_args(args)
+    validate_broadcast_args(args)
+    validate_chain_id_args(args)
 
     sender, nonce = prepare_sender(args)
     guardian, guardian_address = prepare_guardian(args)
@@ -858,10 +858,10 @@ def redelegate_rewards(args: Any):
 
 
 def undelegate(args: Any):
-    ensure_required_transaction_args_are_provided(args)
+    validate_transaction_args(args)
     ensure_wallet_args_are_provided(args)
-    ensure_broadcast_args(args)
-    ensure_chain_id_args(args)
+    validate_broadcast_args(args)
+    validate_chain_id_args(args)
 
     sender, nonce = prepare_sender(args)
     guardian, guardian_address = prepare_guardian(args)
@@ -898,10 +898,10 @@ def undelegate(args: Any):
 
 
 def withdraw(args: Any):
-    ensure_required_transaction_args_are_provided(args)
+    validate_transaction_args(args)
     ensure_wallet_args_are_provided(args)
-    ensure_broadcast_args(args)
-    ensure_chain_id_args(args)
+    validate_broadcast_args(args)
+    validate_chain_id_args(args)
 
     sender, nonce = prepare_sender(args)
     guardian, guardian_address = prepare_guardian(args)
@@ -934,10 +934,10 @@ def withdraw(args: Any):
 
 
 def change_service_fee(args: Any):
-    ensure_required_transaction_args_are_provided(args)
+    validate_transaction_args(args)
     ensure_wallet_args_are_provided(args)
-    ensure_broadcast_args(args)
-    ensure_chain_id_args(args)
+    validate_broadcast_args(args)
+    validate_chain_id_args(args)
 
     sender, nonce = prepare_sender(args)
     guardian, guardian_address = prepare_guardian(args)
@@ -971,10 +971,10 @@ def change_service_fee(args: Any):
 
 
 def modify_delegation_cap(args: Any):
-    ensure_required_transaction_args_are_provided(args)
+    validate_transaction_args(args)
     ensure_wallet_args_are_provided(args)
-    ensure_broadcast_args(args)
-    ensure_chain_id_args(args)
+    validate_broadcast_args(args)
+    validate_chain_id_args(args)
 
     sender, nonce = prepare_sender(args)
     guardian, guardian_address = prepare_guardian(args)
@@ -1008,10 +1008,10 @@ def modify_delegation_cap(args: Any):
 
 
 def automatic_activation(args: Any):
-    ensure_required_transaction_args_are_provided(args)
+    validate_transaction_args(args)
     ensure_wallet_args_are_provided(args)
-    ensure_broadcast_args(args)
-    ensure_chain_id_args(args)
+    validate_broadcast_args(args)
+    validate_chain_id_args(args)
 
     sender, nonce = prepare_sender(args)
     guardian, guardian_address = prepare_guardian(args)
@@ -1046,10 +1046,10 @@ def automatic_activation(args: Any):
 
 
 def redelegate_cap(args: Any):
-    ensure_required_transaction_args_are_provided(args)
+    validate_transaction_args(args)
     ensure_wallet_args_are_provided(args)
-    ensure_broadcast_args(args)
-    ensure_chain_id_args(args)
+    validate_broadcast_args(args)
+    validate_chain_id_args(args)
 
     sender, nonce = prepare_sender(args)
     guardian, guardian_address = prepare_guardian(args)
@@ -1084,10 +1084,10 @@ def redelegate_cap(args: Any):
 
 
 def set_metadata(args: Any):
-    ensure_required_transaction_args_are_provided(args)
+    validate_transaction_args(args)
     ensure_wallet_args_are_provided(args)
-    ensure_broadcast_args(args)
-    ensure_chain_id_args(args)
+    validate_broadcast_args(args)
+    validate_chain_id_args(args)
 
     sender, nonce = prepare_sender(args)
     guardian, guardian_address = prepare_guardian(args)
@@ -1123,10 +1123,10 @@ def set_metadata(args: Any):
 
 
 def make_new_contract_from_validator_data(args: Any):
-    ensure_required_transaction_args_are_provided(args)
+    validate_transaction_args(args)
     ensure_wallet_args_are_provided(args)
-    ensure_broadcast_args(args)
-    ensure_chain_id_args(args)
+    validate_broadcast_args(args)
+    validate_chain_id_args(args)
 
     sender, nonce = prepare_sender(args)
     guardian, guardian_address = prepare_guardian(args)

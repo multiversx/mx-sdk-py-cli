@@ -59,7 +59,7 @@ def validate_broadcast_args(args: Any):
         raise InvalidArgumentsError("Cannot both 'simulate' and 'send' a transaction")
 
     if args.send or args.simulate:
-        ensure_proxy_argument(args)
+        validate_proxy_argument(args)
 
 
 def validate_chain_id_args(args: Any):
@@ -67,6 +67,6 @@ def validate_chain_id_args(args: Any):
         raise InvalidArgumentsError("Either --chain or --proxy must be provided")
 
 
-def validate_proxy_argment(args: Any):
+def validate_proxy_argument(args: Any):
     if not args.proxy:
         raise InvalidArgumentsError("--proxy must be provided")

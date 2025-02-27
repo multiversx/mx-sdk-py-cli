@@ -18,7 +18,7 @@ from multiversx_sdk_cli.args_validation import (
     ensure_wallet_args_are_provided,
     validate_broadcast_args,
     validate_chain_id_args,
-    validate_proxy_argment,
+    validate_proxy_argument,
     validate_transaction_args,
 )
 from multiversx_sdk_cli.cli_output import CLIOutputBuilder
@@ -513,7 +513,7 @@ def upgrade(args: Any):
 def query(args: Any):
     logger.debug("query")
 
-    validate_proxy_argment(args)
+    validate_proxy_argument(args)
 
     # we don't need chainID to query a contract; we use the provided proxy
     factory_config = TransactionsFactoryConfig("")

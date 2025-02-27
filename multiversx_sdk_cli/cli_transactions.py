@@ -17,7 +17,7 @@ from multiversx_sdk_cli.args_validation import (
     ensure_wallet_args_are_provided,
     validate_broadcast_args,
     validate_chain_id_args,
-    validate_proxy_argment,
+    validate_proxy_argument,
     validate_transaction_args,
 )
 from multiversx_sdk_cli.base_transactions_controller import BaseTransactionsController
@@ -181,7 +181,7 @@ def prepare_token_transfers(transfers: list[Any]) -> list[TokenTransfer]:
 
 
 def send_transaction(args: Any):
-    validate_proxy_argment(args)
+    validate_proxy_argument(args)
 
     tx = load_transaction_from_file(args.infile)
     output = CLIOutputBuilder()
