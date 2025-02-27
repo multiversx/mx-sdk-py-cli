@@ -510,10 +510,10 @@ def get_chain_id(chain_id: str, proxy_url: str) -> str:
 
     if chain_id:
         return chain_id
-    else:
-        network_provider_config = config.get_config_for_network_providers()
-        proxy = ProxyNetworkProvider(url=proxy_url, config=network_provider_config)
-        return proxy.get_network_config().chain_id
+
+    network_provider_config = config.get_config_for_network_providers()
+    proxy = ProxyNetworkProvider(url=proxy_url, config=network_provider_config)
+    return proxy.get_network_config().chain_id
 
 
 def add_broadcast_args(sub: Any, simulate: bool = True):
