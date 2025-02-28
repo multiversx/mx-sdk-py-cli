@@ -13,6 +13,8 @@ from multiversx_sdk_cli import workstation
 from multiversx_sdk_cli.localnet.config_root import ConfigRoot
 from multiversx_sdk_cli.localnet.constants import \
     NETWORK_MONITORING_INTERVAL_IN_SECONDS
+from multiversx_sdk_cli.localnet.step_config import \
+    copy_binaries_into_localnet_workspace
 
 logger = logging.getLogger("localnet")
 
@@ -37,6 +39,17 @@ def start(configfile: Path, stop_after_seconds: int):
 
 async def do_start(configfile: Path, stop_after_seconds: int):
     config = ConfigRoot.from_file(configfile)
+
+    logger.info("Copy (overwrite) binaries, in case they've changed between restarts.")
+
+    try:
+        # Do this on a best-effort basis.
+        # Though useful (e.g. when the developer is using "resolution" = "local" and works with the Protocol itself),
+        # this step is not strictly necessary, and might even fail in some cases
+        # (e.g. when localnet is embedded in a Docker container and some cleanup procedures are performed upon setting up the localnet).
+        copy_binaries_into_localnet_workspace(config)
+    except Exception as e:
+        logger.warning(f"Error while copying binaries: {e}")
 
     display_api_table(config)
 
