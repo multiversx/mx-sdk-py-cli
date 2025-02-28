@@ -21,8 +21,6 @@ from multiversx_sdk_cli.config import get_config_for_network_providers
 from multiversx_sdk_cli.delegation import DelegationOperations
 from multiversx_sdk_cli.validators.validators_file import ValidatorsFile
 
-MINIMUM_AMOUNT_TO_DELEGATE = 1_000_000_000_000_000_000  # 1 EGLD
-
 
 def setup_parser(args: list[str], subparsers: Any) -> Any:
     parser = cli_shared.add_group_subparser(subparsers, "staking-provider", "Staking provider omnitool")
@@ -758,10 +756,7 @@ def delegate(args: Any):
     relayer, relayer_address = prepare_relayer(args)
 
     gas_limit = 0 if args.estimate_gas else args.gas_limit
-
     value = int(args.value)
-    if value < MINIMUM_AMOUNT_TO_DELEGATE:
-        errors.BadUserInput(f"Value must be greater than {MINIMUM_AMOUNT_TO_DELEGATE} (1 EGLD)")
 
     chain_id = cli_shared.get_chain_id(args.chain, args.proxy)
     config = TransactionsFactoryConfig(chain_id)
@@ -868,10 +863,7 @@ def undelegate(args: Any):
     relayer, relayer_address = prepare_relayer(args)
 
     gas_limit = 0 if args.estimate_gas else args.gas_limit
-
     value = int(args.value)
-    if value < MINIMUM_AMOUNT_TO_DELEGATE:
-        errors.BadUserInput(f"Value must be greater than {MINIMUM_AMOUNT_TO_DELEGATE} (1 EGLD)")
 
     chain_id = cli_shared.get_chain_id(args.chain, args.proxy)
     config = TransactionsFactoryConfig(chain_id)
