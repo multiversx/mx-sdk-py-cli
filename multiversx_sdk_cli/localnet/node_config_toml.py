@@ -31,16 +31,20 @@ def patch_config(data: ConfigDict, config: ConfigRoot):
     data['VirtualMachine']['Querying']['WasmVMVersions'] = [{'StartEpoch': 0, 'Version': '*'}]
 
     # Adjust "ChainParametersByEpoch" (for Andromeda)
-    chain_parameters_by_epoch = data.get('ChainParametersByEpoch', [])
+    chain_parameters_by_epoch = data['GeneralSettings'].get('ChainParametersByEpoch', [])
 
     if chain_parameters_by_epoch:
-        # For convenience, we set the activation epoch to 0
-        chain_parameters_by_epoch["EnableEpoch"] = 0
-        chain_parameters_by_epoch["RoundDuration"] = config.general.round_duration_milliseconds
-        chain_parameters_by_epoch["ShardConsensusGroupSize"] = config.shards.consensus_size
-        chain_parameters_by_epoch["ShardMinNumNodes"] = config.shards.num_validators_per_shard
-        chain_parameters_by_epoch["MetachainConsensusGroupSize"] = config.metashard.consensus_size
-        chain_parameters_by_epoch["MetachainMinNumNodes"] = config.metashard.num_validators
+        # For convenience, keep a single entry ...
+        chain_parameters_by_epoch.clear()
+        chain_parameters_by_epoch.append({})
+
+        # ... and set the activation epoch to 0
+        chain_parameters_by_epoch[0]["EnableEpoch"] = 0
+        chain_parameters_by_epoch[0]["RoundDuration"] = config.general.round_duration_milliseconds
+        chain_parameters_by_epoch[0]["ShardConsensusGroupSize"] = config.shards.consensus_size
+        chain_parameters_by_epoch[0]["ShardMinNumNodes"] = config.shards.num_validators_per_shard
+        chain_parameters_by_epoch[0]["MetachainConsensusGroupSize"] = config.metashard.consensus_size
+        chain_parameters_by_epoch[0]["MetachainMinNumNodes"] = config.metashard.num_validators
 
 
 def patch_api(data: ConfigDict, config: ConfigRoot):

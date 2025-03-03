@@ -75,6 +75,7 @@ async def do_start(configfile: Path, stop_after_seconds: int):
             "--log-save",
             f"--log-level={loglevel}",
             "--log-logger-name",
+            "--log-correlation",
             f"--destination-shard-as-observer={observer.shard}",
             f"--rest-api-interface={observer.api_interface()}",
             "--operation-mode=historical-balances"
@@ -88,6 +89,7 @@ async def do_start(configfile: Path, stop_after_seconds: int):
             "--log-save",
             f"--log-level={loglevel}",
             "--log-logger-name",
+            "--log-correlation",
             f"--rest-api-interface={validator.api_interface()}"
         ], cwd=validator.folder, delay=NODES_START_DELAY))
 
