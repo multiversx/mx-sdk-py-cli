@@ -383,21 +383,21 @@ def _add_common_arguments(args: list[str], sub: Any):
     cli_shared.add_relayed_v3_wallet_args(args, sub)
 
 
-def ensure_arguments_are_provided_and_prepared(args: Any):
-    cli_shared.check_guardian_args(args)
-    cli_shared.check_broadcast_args(args)
-    cli_shared.prepare_chain_id_in_args(args)
-    cli_shared.prepare_nonce_in_args(args)
+def validate_arguments(args: Any):
+    validate_transaction_args(args)
+    ensure_wallet_args_are_provided(args)
+    validate_broadcast_args(args)
+    validate_chain_id_args(args)
 
 
 def prepare_sender(args: Any):
     sender = cli_shared.prepare_account(args)
-    nonce = (
+    sender.nonce = (
         int(args.nonce)
         if args.nonce is not None
         else cli_shared.get_current_nonce_for_address(sender.address, args.proxy)
     )
-    return sender, nonce
+    return sender
 
 
 def prepare_guardian(args: Any):
@@ -412,21 +412,22 @@ def prepare_relayer(args: Any):
     return relayer, relayer_address
 
 
-def do_create_delegation_contract(args: Any):
-    validate_transaction_args(args)
-    ensure_wallet_args_are_provided(args)
-    validate_broadcast_args(args)
-    validate_chain_id_args(args)
-
-    sender, nonce = prepare_sender(args)
-    guardian, guardian_address = prepare_guardian(args)
-    relayer, relayer_address = prepare_relayer(args)
-
+def _get_delegation_controller(args: Any):
     chain_id = cli_shared.get_chain_id(args.chain, args.proxy)
     config = TransactionsFactoryConfig(chain_id)
     delegation = DelegationOperations(config)
+    return delegation
+
+
+def do_create_delegation_contract(args: Any):
+    validate_arguments(args)
+
+    sender = prepare_sender(args)
+    guardian, guardian_address = prepare_guardian(args)
+    relayer, relayer_address = prepare_relayer(args)
 
     gas_limit = args.gas_limit if args.gas_limit else 0
+    delegation = _get_delegation_controller(args)
 
     tx = delegation.prepare_transaction_for_new_delegation_contract(
         owner=sender,
@@ -435,7 +436,7 @@ def do_create_delegation_contract(args: Any):
         service_fee=int(args.service_fee),
         gas_limit=gas_limit,
         gas_price=int(args.gas_price),
-        nonce=nonce,
+        nonce=sender.nonce,
         version=int(args.version),
         options=int(args.options),
         guardian_account=guardian,
@@ -467,22 +468,16 @@ def get_contract_address_by_deploy_tx_hash(args: Any):
 
 
 def add_new_nodes(args: Any):
-    validate_transaction_args(args)
-    ensure_wallet_args_are_provided(args)
-    validate_broadcast_args(args)
-    validate_chain_id_args(args)
+    validate_arguments(args)
 
-    sender, nonce = prepare_sender(args)
+    sender = prepare_sender(args)
     guardian, guardian_address = prepare_guardian(args)
     relayer, relayer_address = prepare_relayer(args)
-
-    chain_id = cli_shared.get_chain_id(args.chain, args.proxy)
-    config = TransactionsFactoryConfig(chain_id)
-    delegation = DelegationOperations(config)
 
     gas_limit = 0 if args.estimate_gas else args.gas_limit
     public_keys, signed_messages = _get_public_keys_and_signed_messages(args)
 
+    delegation = _get_delegation_controller(args)
     tx = delegation.prepare_transaction_for_adding_nodes(
         owner=sender,
         delegation_contract=Address.new_from_bech32(args.delegation_contract),
@@ -491,7 +486,7 @@ def add_new_nodes(args: Any):
         gas_limit=gas_limit,
         gas_price=int(args.gas_price),
         value=int(args.value),
-        nonce=nonce,
+        nonce=sender.nonce,
         version=int(args.version),
         options=int(args.options),
         guardian_account=guardian,
@@ -525,22 +520,16 @@ def _get_public_keys_and_signed_messages(args: Any) -> tuple[list[ValidatorPubli
 
 def remove_nodes(args: Any):
     _check_if_either_bls_keys_or_validators_file_are_provided(args)
-    validate_transaction_args(args)
-    ensure_wallet_args_are_provided(args)
-    validate_broadcast_args(args)
-    validate_chain_id_args(args)
+    validate_arguments(args)
 
-    sender, nonce = prepare_sender(args)
+    sender = prepare_sender(args)
     guardian, guardian_address = prepare_guardian(args)
     relayer, relayer_address = prepare_relayer(args)
-
-    chain_id = cli_shared.get_chain_id(args.chain, args.proxy)
-    config = TransactionsFactoryConfig(chain_id)
-    delegation = DelegationOperations(config)
 
     gas_limit = 0 if args.estimate_gas else args.gas_limit
     public_keys = _load_validators_public_keys(args)
 
+    delegation = _get_delegation_controller(args)
     tx = delegation.prepare_transaction_for_removing_nodes(
         owner=sender,
         delegation_contract=Address.new_from_bech32(args.delegation_contract),
@@ -548,7 +537,7 @@ def remove_nodes(args: Any):
         gas_limit=gas_limit,
         gas_price=int(args.gas_price),
         value=int(args.value),
-        nonce=nonce,
+        nonce=sender.nonce,
         version=int(args.version),
         options=int(args.options),
         guardian_account=guardian,
@@ -583,22 +572,16 @@ def _parse_public_bls_keys(public_bls_keys: str) -> list[ValidatorPublicKey]:
 
 def stake_nodes(args: Any):
     _check_if_either_bls_keys_or_validators_file_are_provided(args)
-    validate_transaction_args(args)
-    ensure_wallet_args_are_provided(args)
-    validate_broadcast_args(args)
-    validate_chain_id_args(args)
+    validate_arguments(args)
 
-    sender, nonce = prepare_sender(args)
+    sender = prepare_sender(args)
     guardian, guardian_address = prepare_guardian(args)
     relayer, relayer_address = prepare_relayer(args)
-
-    chain_id = cli_shared.get_chain_id(args.chain, args.proxy)
-    config = TransactionsFactoryConfig(chain_id)
-    delegation = DelegationOperations(config)
 
     gas_limit = 0 if args.estimate_gas else args.gas_limit
     public_keys = _load_validators_public_keys(args)
 
+    delegation = _get_delegation_controller(args)
     tx = delegation.prepare_transaction_for_staking_nodes(
         owner=sender,
         delegation_contract=Address.new_from_bech32(args.delegation_contract),
@@ -606,7 +589,7 @@ def stake_nodes(args: Any):
         gas_limit=gas_limit,
         gas_price=int(args.gas_price),
         value=int(args.value),
-        nonce=nonce,
+        nonce=sender.nonce,
         version=int(args.version),
         options=int(args.options),
         guardian_account=guardian,
@@ -630,22 +613,16 @@ def _check_if_either_bls_keys_or_validators_file_are_provided(args: Any):
 
 def unbond_nodes(args: Any):
     _check_if_either_bls_keys_or_validators_file_are_provided(args)
-    validate_transaction_args(args)
-    ensure_wallet_args_are_provided(args)
-    validate_broadcast_args(args)
-    validate_chain_id_args(args)
+    validate_arguments(args)
 
-    sender, nonce = prepare_sender(args)
+    sender = prepare_sender(args)
     guardian, guardian_address = prepare_guardian(args)
     relayer, relayer_address = prepare_relayer(args)
-
-    chain_id = cli_shared.get_chain_id(args.chain, args.proxy)
-    config = TransactionsFactoryConfig(chain_id)
-    delegation = DelegationOperations(config)
 
     gas_limit = 0 if args.estimate_gas else args.gas_limit
     public_keys = _load_validators_public_keys(args)
 
+    delegation = _get_delegation_controller(args)
     tx = delegation.prepare_transaction_for_unbonding_nodes(
         owner=sender,
         delegation_contract=Address.new_from_bech32(args.delegation_contract),
@@ -653,7 +630,7 @@ def unbond_nodes(args: Any):
         gas_limit=gas_limit,
         gas_price=int(args.gas_price),
         value=int(args.value),
-        nonce=nonce,
+        nonce=sender.nonce,
         version=int(args.version),
         options=int(args.options),
         guardian_account=guardian,
@@ -669,22 +646,16 @@ def unbond_nodes(args: Any):
 
 def unstake_nodes(args: Any):
     _check_if_either_bls_keys_or_validators_file_are_provided(args)
-    validate_transaction_args(args)
-    ensure_wallet_args_are_provided(args)
-    validate_broadcast_args(args)
-    validate_chain_id_args(args)
+    validate_arguments(args)
 
-    sender, nonce = prepare_sender(args)
+    sender = prepare_sender(args)
     guardian, guardian_address = prepare_guardian(args)
     relayer, relayer_address = prepare_relayer(args)
-
-    chain_id = cli_shared.get_chain_id(args.chain, args.proxy)
-    config = TransactionsFactoryConfig(chain_id)
-    delegation = DelegationOperations(config)
 
     gas_limit = 0 if args.estimate_gas else args.gas_limit
     public_keys = _load_validators_public_keys(args)
 
+    delegation = _get_delegation_controller(args)
     tx = delegation.prepare_transaction_for_unstaking_nodes(
         owner=sender,
         delegation_contract=Address.new_from_bech32(args.delegation_contract),
@@ -692,7 +663,7 @@ def unstake_nodes(args: Any):
         gas_limit=gas_limit,
         gas_price=int(args.gas_price),
         value=int(args.value),
-        nonce=nonce,
+        nonce=sender.nonce,
         version=int(args.version),
         options=int(args.options),
         guardian_account=guardian,
@@ -708,22 +679,16 @@ def unstake_nodes(args: Any):
 
 def unjail_nodes(args: Any):
     _check_if_either_bls_keys_or_validators_file_are_provided(args)
-    validate_transaction_args(args)
-    ensure_wallet_args_are_provided(args)
-    validate_broadcast_args(args)
-    validate_chain_id_args(args)
+    validate_arguments(args)
 
-    sender, nonce = prepare_sender(args)
+    sender = prepare_sender(args)
     guardian, guardian_address = prepare_guardian(args)
     relayer, relayer_address = prepare_relayer(args)
-
-    chain_id = cli_shared.get_chain_id(args.chain, args.proxy)
-    config = TransactionsFactoryConfig(chain_id)
-    delegation = DelegationOperations(config)
 
     gas_limit = 0 if args.estimate_gas else args.gas_limit
     public_keys = _load_validators_public_keys(args)
 
+    delegation = _get_delegation_controller(args)
     tx = delegation.prepare_transaction_for_unjailing_nodes(
         owner=sender,
         delegation_contract=Address.new_from_bech32(args.delegation_contract),
@@ -731,7 +696,7 @@ def unjail_nodes(args: Any):
         gas_limit=gas_limit,
         gas_price=int(args.gas_price),
         value=int(args.value),
-        nonce=nonce,
+        nonce=sender.nonce,
         version=int(args.version),
         options=int(args.options),
         guardian_account=guardian,
@@ -746,29 +711,23 @@ def unjail_nodes(args: Any):
 
 
 def delegate(args: Any):
-    validate_transaction_args(args)
-    ensure_wallet_args_are_provided(args)
-    validate_broadcast_args(args)
-    validate_chain_id_args(args)
+    validate_arguments(args)
 
-    sender, nonce = prepare_sender(args)
+    sender = prepare_sender(args)
     guardian, guardian_address = prepare_guardian(args)
     relayer, relayer_address = prepare_relayer(args)
 
     gas_limit = 0 if args.estimate_gas else args.gas_limit
     value = int(args.value)
 
-    chain_id = cli_shared.get_chain_id(args.chain, args.proxy)
-    config = TransactionsFactoryConfig(chain_id)
-    delegation = DelegationOperations(config)
-
+    delegation = _get_delegation_controller(args)
     tx = delegation.prepare_transaction_for_delegating(
         owner=sender,
         delegation_contract=Address.new_from_bech32(args.delegation_contract),
         gas_limit=gas_limit,
         gas_price=int(args.gas_price),
         value=value,
-        nonce=nonce,
+        nonce=sender.nonce,
         version=int(args.version),
         options=int(args.options),
         guardian_account=guardian,
@@ -783,28 +742,22 @@ def delegate(args: Any):
 
 
 def claim_rewards(args: Any):
-    validate_transaction_args(args)
-    ensure_wallet_args_are_provided(args)
-    validate_broadcast_args(args)
-    validate_chain_id_args(args)
+    validate_arguments(args)
 
-    sender, nonce = prepare_sender(args)
+    sender = prepare_sender(args)
     guardian, guardian_address = prepare_guardian(args)
     relayer, relayer_address = prepare_relayer(args)
 
-    chain_id = cli_shared.get_chain_id(args.chain, args.proxy)
-    config = TransactionsFactoryConfig(chain_id)
-    delegation = DelegationOperations(config)
-
     gas_limit = 0 if args.estimate_gas else args.gas_limit
 
+    delegation = _get_delegation_controller(args)
     tx = delegation.prepare_transaction_for_claiming_rewards(
         owner=sender,
         delegation_contract=Address.new_from_bech32(args.delegation_contract),
         gas_limit=gas_limit,
         gas_price=int(args.gas_price),
         value=int(args.value),
-        nonce=nonce,
+        nonce=sender.nonce,
         version=int(args.version),
         options=int(args.options),
         guardian_account=guardian,
@@ -818,28 +771,22 @@ def claim_rewards(args: Any):
 
 
 def redelegate_rewards(args: Any):
-    validate_transaction_args(args)
-    ensure_wallet_args_are_provided(args)
-    validate_broadcast_args(args)
-    validate_chain_id_args(args)
+    validate_arguments(args)
 
-    sender, nonce = prepare_sender(args)
+    sender = prepare_sender(args)
     guardian, guardian_address = prepare_guardian(args)
     relayer, relayer_address = prepare_relayer(args)
 
-    chain_id = cli_shared.get_chain_id(args.chain, args.proxy)
-    config = TransactionsFactoryConfig(chain_id)
-    delegation = DelegationOperations(config)
-
     gas_limit = 0 if args.estimate_gas else args.gas_limit
 
+    delegation = _get_delegation_controller(args)
     tx = delegation.prepare_transaction_for_redelegating_rewards(
         owner=sender,
         delegation_contract=Address.new_from_bech32(args.delegation_contract),
         gas_limit=gas_limit,
         gas_price=int(args.gas_price),
         value=int(args.value),
-        nonce=nonce,
+        nonce=sender.nonce,
         version=int(args.version),
         options=int(args.options),
         guardian_account=guardian,
@@ -853,29 +800,23 @@ def redelegate_rewards(args: Any):
 
 
 def undelegate(args: Any):
-    validate_transaction_args(args)
-    ensure_wallet_args_are_provided(args)
-    validate_broadcast_args(args)
-    validate_chain_id_args(args)
+    validate_arguments(args)
 
-    sender, nonce = prepare_sender(args)
+    sender = prepare_sender(args)
     guardian, guardian_address = prepare_guardian(args)
     relayer, relayer_address = prepare_relayer(args)
 
     gas_limit = 0 if args.estimate_gas else args.gas_limit
     value = int(args.value)
 
-    chain_id = cli_shared.get_chain_id(args.chain, args.proxy)
-    config = TransactionsFactoryConfig(chain_id)
-    delegation = DelegationOperations(config)
-
+    delegation = _get_delegation_controller(args)
     tx = delegation.prepare_transaction_for_undelegating(
         owner=sender,
         delegation_contract=Address.new_from_bech32(args.delegation_contract),
         gas_limit=gas_limit,
         gas_price=int(args.gas_price),
         value=value,
-        nonce=nonce,
+        nonce=sender.nonce,
         version=int(args.version),
         options=int(args.options),
         guardian_account=guardian,
@@ -890,28 +831,22 @@ def undelegate(args: Any):
 
 
 def withdraw(args: Any):
-    validate_transaction_args(args)
-    ensure_wallet_args_are_provided(args)
-    validate_broadcast_args(args)
-    validate_chain_id_args(args)
+    validate_arguments(args)
 
-    sender, nonce = prepare_sender(args)
+    sender = prepare_sender(args)
     guardian, guardian_address = prepare_guardian(args)
     relayer, relayer_address = prepare_relayer(args)
 
     gas_limit = 0 if args.estimate_gas else args.gas_limit
 
-    chain_id = cli_shared.get_chain_id(args.chain, args.proxy)
-    config = TransactionsFactoryConfig(chain_id)
-    delegation = DelegationOperations(config)
-
+    delegation = _get_delegation_controller(args)
     tx = delegation.prepare_transaction_for_withdrawing(
         owner=sender,
         delegation_contract=Address.new_from_bech32(args.delegation_contract),
         gas_limit=gas_limit,
         gas_price=int(args.gas_price),
         value=int(args.value),
-        nonce=nonce,
+        nonce=sender.nonce,
         version=int(args.version),
         options=int(args.options),
         guardian_account=guardian,
@@ -926,21 +861,15 @@ def withdraw(args: Any):
 
 
 def change_service_fee(args: Any):
-    validate_transaction_args(args)
-    ensure_wallet_args_are_provided(args)
-    validate_broadcast_args(args)
-    validate_chain_id_args(args)
+    validate_arguments(args)
 
-    sender, nonce = prepare_sender(args)
+    sender = prepare_sender(args)
     guardian, guardian_address = prepare_guardian(args)
     relayer, relayer_address = prepare_relayer(args)
 
     gas_limit = 0 if args.estimate_gas else args.gas_limit
 
-    chain_id = cli_shared.get_chain_id(args.chain, args.proxy)
-    config = TransactionsFactoryConfig(chain_id)
-    delegation = DelegationOperations(config)
-
+    delegation = _get_delegation_controller(args)
     tx = delegation.prepare_transaction_for_changing_service_fee(
         owner=sender,
         delegation_contract=Address.new_from_bech32(args.delegation_contract),
@@ -948,7 +877,7 @@ def change_service_fee(args: Any):
         gas_limit=gas_limit,
         gas_price=int(args.gas_price),
         value=int(args.value),
-        nonce=nonce,
+        nonce=sender.nonce,
         version=int(args.version),
         options=int(args.options),
         guardian_account=guardian,
@@ -963,21 +892,15 @@ def change_service_fee(args: Any):
 
 
 def modify_delegation_cap(args: Any):
-    validate_transaction_args(args)
-    ensure_wallet_args_are_provided(args)
-    validate_broadcast_args(args)
-    validate_chain_id_args(args)
+    validate_arguments(args)
 
-    sender, nonce = prepare_sender(args)
+    sender = prepare_sender(args)
     guardian, guardian_address = prepare_guardian(args)
     relayer, relayer_address = prepare_relayer(args)
 
     gas_limit = 0 if args.estimate_gas else args.gas_limit
 
-    chain_id = cli_shared.get_chain_id(args.chain, args.proxy)
-    config = TransactionsFactoryConfig(chain_id)
-    delegation = DelegationOperations(config)
-
+    delegation = _get_delegation_controller(args)
     tx = delegation.prepare_transaction_for_modifying_delegation_cap(
         owner=sender,
         delegation_contract=Address.new_from_bech32(args.delegation_contract),
@@ -985,7 +908,7 @@ def modify_delegation_cap(args: Any):
         gas_limit=gas_limit,
         gas_price=int(args.gas_price),
         value=int(args.value),
-        nonce=nonce,
+        nonce=sender.nonce,
         version=int(args.version),
         options=int(args.options),
         guardian_account=guardian,
@@ -1000,21 +923,15 @@ def modify_delegation_cap(args: Any):
 
 
 def automatic_activation(args: Any):
-    validate_transaction_args(args)
-    ensure_wallet_args_are_provided(args)
-    validate_broadcast_args(args)
-    validate_chain_id_args(args)
+    validate_arguments(args)
 
-    sender, nonce = prepare_sender(args)
+    sender = prepare_sender(args)
     guardian, guardian_address = prepare_guardian(args)
     relayer, relayer_address = prepare_relayer(args)
 
     gas_limit = 0 if args.estimate_gas else args.gas_limit
 
-    chain_id = cli_shared.get_chain_id(args.chain, args.proxy)
-    config = TransactionsFactoryConfig(chain_id)
-    delegation = DelegationOperations(config)
-
+    delegation = _get_delegation_controller(args)
     tx = delegation.prepare_transaction_for_automatic_activation(
         owner=sender,
         delegation_contract=Address.new_from_bech32(args.delegation_contract),
@@ -1023,7 +940,7 @@ def automatic_activation(args: Any):
         gas_limit=gas_limit,
         gas_price=int(args.gas_price),
         value=int(args.value),
-        nonce=nonce,
+        nonce=sender.nonce,
         version=int(args.version),
         options=int(args.options),
         guardian_account=guardian,
@@ -1038,21 +955,15 @@ def automatic_activation(args: Any):
 
 
 def redelegate_cap(args: Any):
-    validate_transaction_args(args)
-    ensure_wallet_args_are_provided(args)
-    validate_broadcast_args(args)
-    validate_chain_id_args(args)
+    validate_arguments(args)
 
-    sender, nonce = prepare_sender(args)
+    sender = prepare_sender(args)
     guardian, guardian_address = prepare_guardian(args)
     relayer, relayer_address = prepare_relayer(args)
 
     gas_limit = 0 if args.estimate_gas else args.gas_limit
 
-    chain_id = cli_shared.get_chain_id(args.chain, args.proxy)
-    config = TransactionsFactoryConfig(chain_id)
-    delegation = DelegationOperations(config)
-
+    delegation = _get_delegation_controller(args)
     tx = delegation.prepare_transaction_for_redelegate_cap(
         owner=sender,
         delegation_contract=Address.new_from_bech32(args.delegation_contract),
@@ -1061,7 +972,7 @@ def redelegate_cap(args: Any):
         gas_limit=gas_limit,
         gas_price=int(args.gas_price),
         value=int(args.value),
-        nonce=nonce,
+        nonce=sender.nonce,
         version=int(args.version),
         options=int(args.options),
         guardian_account=guardian,
@@ -1076,21 +987,15 @@ def redelegate_cap(args: Any):
 
 
 def set_metadata(args: Any):
-    validate_transaction_args(args)
-    ensure_wallet_args_are_provided(args)
-    validate_broadcast_args(args)
-    validate_chain_id_args(args)
+    validate_arguments(args)
 
-    sender, nonce = prepare_sender(args)
+    sender = prepare_sender(args)
     guardian, guardian_address = prepare_guardian(args)
     relayer, relayer_address = prepare_relayer(args)
 
     gas_limit = 0 if args.estimate_gas else args.gas_limit
 
-    chain_id = cli_shared.get_chain_id(args.chain, args.proxy)
-    config = TransactionsFactoryConfig(chain_id)
-    delegation = DelegationOperations(config)
-
+    delegation = _get_delegation_controller(args)
     tx = delegation.prepare_transaction_for_setting_metadata(
         owner=sender,
         delegation_contract=Address.new_from_bech32(args.delegation_contract),
@@ -1100,7 +1005,7 @@ def set_metadata(args: Any):
         gas_limit=gas_limit,
         gas_price=int(args.gas_price),
         value=int(args.value),
-        nonce=nonce,
+        nonce=sender.nonce,
         version=int(args.version),
         options=int(args.options),
         guardian_account=guardian,
@@ -1115,21 +1020,15 @@ def set_metadata(args: Any):
 
 
 def make_new_contract_from_validator_data(args: Any):
-    validate_transaction_args(args)
-    ensure_wallet_args_are_provided(args)
-    validate_broadcast_args(args)
-    validate_chain_id_args(args)
+    validate_arguments(args)
 
-    sender, nonce = prepare_sender(args)
+    sender = prepare_sender(args)
     guardian, guardian_address = prepare_guardian(args)
     relayer, relayer_address = prepare_relayer(args)
 
     gas_limit = 0 if args.estimate_gas else args.gas_limit
 
-    chain_id = cli_shared.get_chain_id(args.chain, args.proxy)
-    config = TransactionsFactoryConfig(chain_id)
-    delegation = DelegationOperations(config)
-
+    delegation = _get_delegation_controller(args)
     tx = delegation.prepare_transaction_for_creating_delegation_contract_from_validator(
         owner=sender,
         max_cap=args.max_cap,
@@ -1137,7 +1036,7 @@ def make_new_contract_from_validator_data(args: Any):
         gas_limit=gas_limit,
         gas_price=int(args.gas_price),
         value=int(args.value),
-        nonce=nonce,
+        nonce=sender.nonce,
         version=int(args.version),
         options=int(args.options),
         guardian_account=guardian,
