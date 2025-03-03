@@ -5,11 +5,11 @@ from multiversx_sdk import Address
 
 from multiversx_sdk_cli import cli_shared, utils
 from multiversx_sdk_cli.args_validation import (
-    ensure_broadcast_args,
-    ensure_chain_id_args,
-    ensure_nonce_args,
-    ensure_receiver_args,
     ensure_wallet_args_are_provided,
+    validate_broadcast_args,
+    validate_chain_id_args,
+    validate_nonce_args,
+    validate_receiver_args,
 )
 from multiversx_sdk_cli.validators.core import ValidatorsController
 
@@ -145,9 +145,17 @@ def _add_nodes_arg(sub: Any):
     )
 
 
+def validate_args(args: Any) -> None:
+    validate_nonce_args(args)
+    validate_receiver_args(args)
+    ensure_wallet_args_are_provided(args)
+    validate_broadcast_args(args)
+    validate_chain_id_args(args)
+
+
 def do_stake(args: Any):
     validate_args(args)
-    sender, nonce = cli_shared.prepare_sender(args)
+    sender = cli_shared.prepare_sender(args)
     guardian, guardian_address = cli_shared.prepare_guardian(args)
     relayer, relayer_address = cli_shared.prepare_relayer(args)
 
@@ -163,7 +171,7 @@ def do_stake(args: Any):
             native_amount=native_amount,
             gas_limit=gas_limit,
             gas_price=args.gas_price,
-            nonce=nonce,
+            nonce=sender.nonce,
             version=args.version,
             options=args.options,
             guardian_account=guardian,
@@ -181,7 +189,7 @@ def do_stake(args: Any):
             native_amount=native_amount,
             gas_limit=gas_limit,
             gas_price=args.gas_price,
-            nonce=nonce,
+            nonce=sender.nonce,
             version=args.version,
             options=args.options,
             rewards_address=rewards_address,
@@ -196,17 +204,9 @@ def do_stake(args: Any):
     cli_shared.send_or_simulate(tx, args)
 
 
-def validate_args(args: Any) -> None:
-    ensure_nonce_args(args)
-    ensure_receiver_args(args)
-    ensure_wallet_args_are_provided(args)
-    ensure_broadcast_args(args)
-    ensure_chain_id_args(args)
-
-
 def do_unstake(args: Any):
     validate_args(args)
-    sender, nonce = cli_shared.prepare_sender(args)
+    sender = cli_shared.prepare_sender(args)
     guardian, guardian_address = cli_shared.prepare_guardian(args)
     relayer, relayer_address = cli_shared.prepare_relayer(args)
 
@@ -221,7 +221,7 @@ def do_unstake(args: Any):
         native_amount=native_amount,
         gas_limit=gas_limit,
         gas_price=args.gas_price,
-        nonce=nonce,
+        nonce=sender.nonce,
         version=args.version,
         options=args.options,
         guardian_account=guardian,
@@ -237,7 +237,7 @@ def do_unstake(args: Any):
 
 def do_unjail(args: Any):
     validate_args(args)
-    sender, nonce = cli_shared.prepare_sender(args)
+    sender = cli_shared.prepare_sender(args)
     guardian, guardian_address = cli_shared.prepare_guardian(args)
     relayer, relayer_address = cli_shared.prepare_relayer(args)
 
@@ -252,7 +252,7 @@ def do_unjail(args: Any):
         native_amount=native_amount,
         gas_limit=gas_limit,
         gas_price=args.gas_price,
-        nonce=nonce,
+        nonce=sender.nonce,
         version=args.version,
         options=args.options,
         guardian_account=guardian,
@@ -268,7 +268,7 @@ def do_unjail(args: Any):
 
 def do_unbond(args: Any):
     validate_args(args)
-    sender, nonce = cli_shared.prepare_sender(args)
+    sender = cli_shared.prepare_sender(args)
     guardian, guardian_address = cli_shared.prepare_guardian(args)
     relayer, relayer_address = cli_shared.prepare_relayer(args)
 
@@ -283,7 +283,7 @@ def do_unbond(args: Any):
         native_amount=native_amount,
         gas_limit=gas_limit,
         gas_price=args.gas_price,
-        nonce=nonce,
+        nonce=sender.nonce,
         version=args.version,
         options=args.options,
         guardian_account=guardian,
@@ -299,7 +299,7 @@ def do_unbond(args: Any):
 
 def change_reward_address(args: Any):
     validate_args(args)
-    sender, nonce = cli_shared.prepare_sender(args)
+    sender = cli_shared.prepare_sender(args)
     guardian, guardian_address = cli_shared.prepare_guardian(args)
     relayer, relayer_address = cli_shared.prepare_relayer(args)
 
@@ -314,7 +314,7 @@ def change_reward_address(args: Any):
         native_amount=native_amount,
         gas_limit=gas_limit,
         gas_price=args.gas_price,
-        nonce=nonce,
+        nonce=sender.nonce,
         version=args.version,
         options=args.options,
         guardian_account=guardian,
@@ -330,7 +330,7 @@ def change_reward_address(args: Any):
 
 def do_claim(args: Any):
     validate_args(args)
-    sender, nonce = cli_shared.prepare_sender(args)
+    sender = cli_shared.prepare_sender(args)
     guardian, guardian_address = cli_shared.prepare_guardian(args)
     relayer, relayer_address = cli_shared.prepare_relayer(args)
 
@@ -343,7 +343,7 @@ def do_claim(args: Any):
         native_amount=native_amount,
         gas_limit=gas_limit,
         gas_price=args.gas_price,
-        nonce=nonce,
+        nonce=sender.nonce,
         version=args.version,
         options=args.options,
         guardian_account=guardian,
@@ -359,7 +359,7 @@ def do_claim(args: Any):
 
 def do_unstake_nodes(args: Any):
     validate_args(args)
-    sender, nonce = cli_shared.prepare_sender(args)
+    sender = cli_shared.prepare_sender(args)
     guardian, guardian_address = cli_shared.prepare_guardian(args)
     relayer, relayer_address = cli_shared.prepare_relayer(args)
 
@@ -375,7 +375,7 @@ def do_unstake_nodes(args: Any):
         native_amount=native_amount,
         gas_limit=gas_limit,
         gas_price=args.gas_price,
-        nonce=nonce,
+        nonce=sender.nonce,
         version=args.version,
         options=args.options,
         guardian_account=guardian,
@@ -391,7 +391,7 @@ def do_unstake_nodes(args: Any):
 
 def do_unstake_tokens(args: Any):
     validate_args(args)
-    sender, nonce = cli_shared.prepare_sender(args)
+    sender = cli_shared.prepare_sender(args)
     guardian, guardian_address = cli_shared.prepare_guardian(args)
     relayer, relayer_address = cli_shared.prepare_relayer(args)
 
@@ -406,7 +406,7 @@ def do_unstake_tokens(args: Any):
         native_amount=native_amount,
         gas_limit=gas_limit,
         gas_price=args.gas_price,
-        nonce=nonce,
+        nonce=sender.nonce,
         version=args.version,
         options=args.options,
         guardian_account=guardian,
@@ -422,7 +422,7 @@ def do_unstake_tokens(args: Any):
 
 def do_unbond_nodes(args: Any):
     validate_args(args)
-    sender, nonce = cli_shared.prepare_sender(args)
+    sender = cli_shared.prepare_sender(args)
     guardian, guardian_address = cli_shared.prepare_guardian(args)
     relayer, relayer_address = cli_shared.prepare_relayer(args)
 
@@ -438,7 +438,7 @@ def do_unbond_nodes(args: Any):
         native_amount=native_amount,
         gas_limit=gas_limit,
         gas_price=args.gas_price,
-        nonce=nonce,
+        nonce=sender.nonce,
         version=args.version,
         options=args.options,
         guardian_account=guardian,
@@ -454,7 +454,7 @@ def do_unbond_nodes(args: Any):
 
 def do_unbond_tokens(args: Any):
     validate_args(args)
-    sender, nonce = cli_shared.prepare_sender(args)
+    sender = cli_shared.prepare_sender(args)
     guardian, guardian_address = cli_shared.prepare_guardian(args)
     relayer, relayer_address = cli_shared.prepare_relayer(args)
 
@@ -469,7 +469,7 @@ def do_unbond_tokens(args: Any):
         native_amount=native_amount,
         gas_limit=gas_limit,
         gas_price=args.gas_price,
-        nonce=nonce,
+        nonce=sender.nonce,
         version=args.version,
         options=args.options,
         guardian_account=guardian,
@@ -485,7 +485,7 @@ def do_unbond_tokens(args: Any):
 
 def do_clean_registered_data(args: Any):
     validate_args(args)
-    sender, nonce = cli_shared.prepare_sender(args)
+    sender = cli_shared.prepare_sender(args)
     guardian, guardian_address = cli_shared.prepare_guardian(args)
     relayer, relayer_address = cli_shared.prepare_relayer(args)
 
@@ -498,7 +498,7 @@ def do_clean_registered_data(args: Any):
         native_amount=native_amount,
         gas_limit=gas_limit,
         gas_price=args.gas_price,
-        nonce=nonce,
+        nonce=sender.nonce,
         version=args.version,
         options=args.options,
         guardian_account=guardian,
@@ -514,7 +514,7 @@ def do_clean_registered_data(args: Any):
 
 def do_restake_unstaked_nodes(args: Any):
     validate_args(args)
-    sender, nonce = cli_shared.prepare_sender(args)
+    sender = cli_shared.prepare_sender(args)
     guardian, guardian_address = cli_shared.prepare_guardian(args)
     relayer, relayer_address = cli_shared.prepare_relayer(args)
 
@@ -529,7 +529,7 @@ def do_restake_unstaked_nodes(args: Any):
         native_amount=native_amount,
         gas_limit=gas_limit,
         gas_price=args.gas_price,
-        nonce=nonce,
+        nonce=sender.nonce,
         version=args.version,
         options=args.options,
         guardian_account=guardian,

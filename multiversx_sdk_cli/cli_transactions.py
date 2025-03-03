@@ -13,13 +13,13 @@ from multiversx_sdk import (
 
 from multiversx_sdk_cli import cli_shared, utils
 from multiversx_sdk_cli.args_validation import (
-    ensure_broadcast_args,
-    ensure_chain_id_args,
-    ensure_nonce_args,
-    ensure_proxy_argument,
-    ensure_receiver_args,
     ensure_relayer_wallet_args_are_provided,
     ensure_wallet_args_are_provided,
+    validate_broadcast_args,
+    validate_chain_id_args,
+    validate_nonce_args,
+    validate_proxy_argument,
+    validate_receiver_args,
 )
 from multiversx_sdk_cli.base_transactions_controller import BaseTransactionsController
 from multiversx_sdk_cli.cli_output import CLIOutputBuilder
@@ -115,13 +115,13 @@ def _add_common_arguments(args: list[str], sub: Any):
 
 
 def create_transaction(args: Any):
-    ensure_nonce_args(args)
-    ensure_receiver_args(args)
+    validate_nonce_args(args)
+    validate_receiver_args(args)
     ensure_wallet_args_are_provided(args)
-    ensure_broadcast_args(args)
-    ensure_chain_id_args(args)
+    validate_broadcast_args(args)
+    validate_chain_id_args(args)
 
-    sender, nonce = cli_shared.prepare_sender(args)
+    sender = cli_shared.prepare_sender(args)
 
     if args.data_file:
         args.data = Path(args.data_file).read_text()
@@ -147,7 +147,7 @@ def create_transaction(args: Any):
         native_amount=native_amount,
         gas_limit=gas_limit,
         gas_price=args.gas_price,
-        nonce=nonce,
+        nonce=sender.nonce,
         version=args.version,
         options=args.options,
         token_transfers=transfers,
@@ -180,7 +180,7 @@ def prepare_token_transfers(transfers: list[Any]) -> list[TokenTransfer]:
 
 
 def send_transaction(args: Any):
-    ensure_proxy_argument(args)
+    validate_proxy_argument(args)
 
     tx = load_transaction_from_file(args.infile)
     output = CLIOutputBuilder()
@@ -197,7 +197,7 @@ def send_transaction(args: Any):
 
 
 def sign_transaction(args: Any):
-    ensure_broadcast_args(args)
+    validate_broadcast_args(args)
 
     tx = load_transaction_from_file(args.infile)
 
@@ -237,7 +237,7 @@ def sign_transaction(args: Any):
 
 def relay_transaction(args: Any):
     ensure_relayer_wallet_args_are_provided(args)
-    ensure_broadcast_args(args)
+    validate_broadcast_args(args)
 
     tx = load_transaction_from_file(args.infile)
 
