@@ -750,10 +750,6 @@ def claim_rewards(args: Any):
     guardian, guardian_address = cli_shared.prepare_guardian(args)
     relayer, relayer_address = cli_shared.prepare_relayer(args)
 
-    chain_id = cli_shared.get_chain_id(args.chain, args.proxy)
-    config = TransactionsFactoryConfig(chain_id)
-    delegation = DelegationOperations(config)
-
     gas_limit = args.gas_limit if args.gas_limit else 0
 
     delegation = _get_delegation_controller(args)
@@ -782,10 +778,6 @@ def redelegate_rewards(args: Any):
     sender = cli_shared.prepare_sender(args)
     guardian, guardian_address = cli_shared.prepare_guardian(args)
     relayer, relayer_address = cli_shared.prepare_relayer(args)
-
-    chain_id = cli_shared.get_chain_id(args.chain, args.proxy)
-    config = TransactionsFactoryConfig(chain_id)
-    delegation = DelegationOperations(config)
 
     gas_limit = args.gas_limit if args.gas_limit else 0
 

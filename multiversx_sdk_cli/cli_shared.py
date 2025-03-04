@@ -472,7 +472,7 @@ def send_or_simulate(tx: Transaction, args: Any, dump_output: bool = True) -> CL
 
 
 def prepare_sender(args: Any):
-    """Reurns a tuple containing the sender's account and the account nonce.
+    """Returns the sender's account.
     If no account was provided, will raise an exception."""
     sender = prepare_account(args)
     sender.nonce = (
