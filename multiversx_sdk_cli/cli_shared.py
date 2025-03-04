@@ -74,7 +74,6 @@ def add_tx_args(
     with_nonce: bool = True,
     with_receiver: bool = True,
     with_data: bool = True,
-    with_estimate_gas: bool = False,
 ):
     if with_nonce:
         sub.add_argument(
@@ -102,14 +101,6 @@ def add_tx_args(
         help="⛽ the gas price (default: %(default)d)",
     )
     sub.add_argument("--gas-limit", required=False, type=int, help="⛽ the gas limit")
-
-    if with_estimate_gas:
-        sub.add_argument(
-            "--estimate-gas",
-            action="store_true",
-            default=False,
-            help="⛽ whether to estimate the gas limit (default: %(default)d)",
-        )
 
     sub.add_argument("--value", default="0", type=int, help="the value to transfer (default: %(default)s)")
 
@@ -329,63 +320,6 @@ def prepare_account(args: Any):
         raise errors.NoWalletProvided()
 
 
-def prepare_relayer_account(args: Any) -> IAccount:
-    hrp = config.get_address_hrp()
-
-    if args.relayer_ledger:
-        return LedgerAccount(address_index=args.relayer_ledger_address_index)
-    if args.relayer_pem:
-        return Account.new_from_pem(file_path=Path(args.relayer_pem), index=args.relayer_pem_index, hrp=hrp)
-    elif args.relayer_keyfile:
-        password = load_password(args)
-        return Account.new_from_keystore(
-            file_path=Path(args.relayer_keyfile),
-            password=password,
-            address_index=args.relayer_address_index,
-            hrp=hrp,
-        )
-    else:
-        raise errors.NoWalletProvided()
-
-
-def prepare_guardian_account(args: Any) -> IAccount:
-    hrp = config.get_address_hrp()
-
-    if args.guardian_pem:
-        return Account.new_from_pem(file_path=Path(args.guardian_pem), index=args.guardian_pem_index, hrp=hrp)
-    elif args.guardian_keyfile:
-        password = load_guardian_password(args)
-        return Account.new_from_keystore(
-            file_path=Path(args.guardian_keyfile),
-            password=password,
-            address_index=args.guardian_address_index,
-            hrp=hrp,
-        )
-    elif args.guardian_ledger:
-        return LedgerAccount(address_index=args.relayer_ledger_address_index)
-    else:
-        raise errors.NoWalletProvided()
-
-
-def load_sender_account(args: Any) -> Union[IAccount, None]:
-    hrp = config.get_address_hrp()
-
-    if args.pem:
-        return Account.new_from_pem(file_path=Path(args.pem), index=args.pem_index, hrp=hrp)
-    elif args.keyfile:
-        password = load_password(args)
-        return Account.new_from_keystore(
-            file_path=Path(args.keyfile),
-            password=password,
-            address_index=args.address_index,
-            hrp=hrp,
-        )
-    elif args.ledger:
-        return LedgerAccount(address_index=args.ledger_address_index)
-
-    return None
-
-
 def load_guardian_account(args: Any) -> Union[IAccount, None]:
     hrp = config.get_address_hrp()
 
@@ -450,17 +384,6 @@ def load_relayer_account(args: Any) -> Union[IAccount, None]:
     return None
 
 
-def prepare_nonce_in_args(args: Any):
-    if args.recall_nonce and not args.proxy:
-        raise ArgumentsNotProvidedError("When using `--recall-nonce`, `--proxy` must be provided, as well")
-
-    if args.recall_nonce:
-        account = prepare_account(args)
-        network_provider_config = config.get_config_for_network_providers()
-        proxy = ProxyNetworkProvider(url=args.proxy, config=network_provider_config)
-        args.nonce = proxy.get_account(account.address).nonce
-
-
 def get_current_nonce_for_address(address: Address, proxy_url: Union[str, None]) -> int:
     if not proxy_url:
         raise ArgumentsNotProvidedError("If `--nonce` is not explicitly provided, `--proxy` must be provided")
@@ -468,32 +391,6 @@ def get_current_nonce_for_address(address: Address, proxy_url: Union[str, None])
     network_provider_config = config.get_config_for_network_providers()
     proxy = ProxyNetworkProvider(url=proxy_url, config=network_provider_config)
     return proxy.get_account(address).nonce
-
-
-def prepare_chain_id_in_args(args: Any):
-    if not args.chain and not args.proxy:
-        raise ArgumentsNotProvidedError("chain ID cannot be decided: `--chain` or `--proxy` should be provided")
-
-    if args.chain and args.proxy:
-        network_provider_config = config.get_config_for_network_providers()
-        proxy = ProxyNetworkProvider(url=args.proxy, config=network_provider_config)
-        fetched_chain_id = proxy.get_network_config().chain_id
-
-        if args.chain != fetched_chain_id:
-            show_warning(
-                f"The chain ID you have provided does not match the chain ID you got from the proxy. Will use the proxy's value: '{fetched_chain_id}'"
-            )
-            args.chain = fetched_chain_id
-            return
-        # if the CLI provided chain ID is correct, we do not patch the arguments
-        return
-
-    if args.chain:
-        return
-    elif args.proxy:
-        network_provider_config = config.get_config_for_network_providers()
-        proxy = ProxyNetworkProvider(url=args.proxy, config=network_provider_config)
-        args.chain = proxy.get_network_config().chain_id
 
 
 def get_chain_id(chain_id: str, proxy_url: str) -> str:
@@ -531,25 +428,6 @@ def add_broadcast_args(sub: Any, simulate: bool = True):
             default=False,
             help="whether to simulate the transaction (default: %(default)s)",
         )
-
-
-def check_broadcast_args(args: Any):
-    if args.send and args.simulate:
-        raise errors.BadUsage("Cannot both 'simulate' and 'send' a transaction")
-
-
-def check_guardian_args(args: Any):
-    if args.guardian:
-        if should_sign_with_cosigner_service(args) and should_sign_with_guardian_key(args):
-            raise errors.BadUsage("Guarded tx should be signed using either a cosigning service or a guardian key")
-
-
-def should_sign_with_cosigner_service(args: Any) -> bool:
-    return all([args.guardian_service_url, args.guardian_2fa_code])
-
-
-def should_sign_with_guardian_key(args: Any) -> bool:
-    return any([args.guardian_pem, args.guardian_keyfile, args.guardian_ledger])
 
 
 def send_or_simulate(tx: Transaction, args: Any, dump_output: bool = True) -> CLIOutputBuilder:
@@ -591,3 +469,29 @@ def send_or_simulate(tx: Transaction, args: Any, dump_output: bool = True) -> CL
             )
 
     return output_builder
+
+
+def prepare_sender(args: Any):
+    """Returns the sender's account.
+    If no account was provided, will raise an exception."""
+    sender = prepare_account(args)
+    sender.nonce = (
+        int(args.nonce) if args.nonce is not None else get_current_nonce_for_address(sender.address, args.proxy)
+    )
+    return sender
+
+
+def prepare_guardian(args: Any):
+    """Reurns a tuple containing the guardians's account and the account's address.
+    If no account or address were provided, will return (None, None)."""
+    guardian = load_guardian_account(args)
+    guardian_address = get_guardian_address(guardian, args)
+    return guardian, guardian_address
+
+
+def prepare_relayer(args: Any):
+    """Reurns a tuple containing the relayer's account and the account's address.
+    If no account or address were provided, will return (None, None)."""
+    relayer = load_relayer_account(args)
+    relayer_address = get_relayer_address(relayer, args)
+    return relayer, relayer_address

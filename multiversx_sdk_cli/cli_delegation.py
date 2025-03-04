@@ -14,8 +14,9 @@ from multiversx_sdk_cli.args_validation import (
     ensure_wallet_args_are_provided,
     validate_broadcast_args,
     validate_chain_id_args,
+    validate_nonce_args,
     validate_proxy_argument,
-    validate_transaction_args,
+    validate_receiver_args,
 )
 from multiversx_sdk_cli.config import get_config_for_network_providers
 from multiversx_sdk_cli.delegation import DelegationOperations
@@ -376,7 +377,7 @@ def setup_parser(args: list[str], subparsers: Any) -> Any:
 def _add_common_arguments(args: list[str], sub: Any):
     cli_shared.add_proxy_arg(sub)
     cli_shared.add_wallet_args(args, sub)
-    cli_shared.add_tx_args(args, sub, with_receiver=False, with_data=False, with_estimate_gas=True)
+    cli_shared.add_tx_args(args, sub, with_receiver=False, with_data=False)
     cli_shared.add_broadcast_args(sub)
     cli_shared.add_outfile_arg(sub, what="signed transaction, hash")
     cli_shared.add_guardian_wallet_args(args, sub)
@@ -384,7 +385,8 @@ def _add_common_arguments(args: list[str], sub: Any):
 
 
 def validate_arguments(args: Any):
-    validate_transaction_args(args)
+    validate_nonce_args(args)
+    validate_receiver_args(args)
     ensure_wallet_args_are_provided(args)
     validate_broadcast_args(args)
     validate_chain_id_args(args)
@@ -422,9 +424,9 @@ def _get_delegation_controller(args: Any):
 def do_create_delegation_contract(args: Any):
     validate_arguments(args)
 
-    sender = prepare_sender(args)
-    guardian, guardian_address = prepare_guardian(args)
-    relayer, relayer_address = prepare_relayer(args)
+    sender = cli_shared.prepare_sender(args)
+    guardian, guardian_address = cli_shared.prepare_guardian(args)
+    relayer, relayer_address = cli_shared.prepare_relayer(args)
 
     gas_limit = args.gas_limit if args.gas_limit else 0
     delegation = _get_delegation_controller(args)
@@ -470,11 +472,11 @@ def get_contract_address_by_deploy_tx_hash(args: Any):
 def add_new_nodes(args: Any):
     validate_arguments(args)
 
-    sender = prepare_sender(args)
-    guardian, guardian_address = prepare_guardian(args)
-    relayer, relayer_address = prepare_relayer(args)
+    sender = cli_shared.prepare_sender(args)
+    guardian, guardian_address = cli_shared.prepare_guardian(args)
+    relayer, relayer_address = cli_shared.prepare_relayer(args)
 
-    gas_limit = 0 if args.estimate_gas else args.gas_limit
+    gas_limit = args.gas_limit if args.gas_limit else 0
     public_keys, signed_messages = _get_public_keys_and_signed_messages(args)
 
     delegation = _get_delegation_controller(args)
@@ -519,14 +521,14 @@ def _get_public_keys_and_signed_messages(args: Any) -> tuple[list[ValidatorPubli
 
 
 def remove_nodes(args: Any):
-    _check_if_either_bls_keys_or_validators_file_are_provided(args)
     validate_arguments(args)
+    _check_if_either_bls_keys_or_validators_file_are_provided(args)
 
-    sender = prepare_sender(args)
-    guardian, guardian_address = prepare_guardian(args)
-    relayer, relayer_address = prepare_relayer(args)
+    sender = cli_shared.prepare_sender(args)
+    guardian, guardian_address = cli_shared.prepare_guardian(args)
+    relayer, relayer_address = cli_shared.prepare_relayer(args)
 
-    gas_limit = 0 if args.estimate_gas else args.gas_limit
+    gas_limit = args.gas_limit if args.gas_limit else 0
     public_keys = _load_validators_public_keys(args)
 
     delegation = _get_delegation_controller(args)
@@ -574,11 +576,11 @@ def stake_nodes(args: Any):
     _check_if_either_bls_keys_or_validators_file_are_provided(args)
     validate_arguments(args)
 
-    sender = prepare_sender(args)
-    guardian, guardian_address = prepare_guardian(args)
-    relayer, relayer_address = prepare_relayer(args)
+    sender = cli_shared.prepare_sender(args)
+    guardian, guardian_address = cli_shared.prepare_guardian(args)
+    relayer, relayer_address = cli_shared.prepare_relayer(args)
 
-    gas_limit = 0 if args.estimate_gas else args.gas_limit
+    gas_limit = args.gas_limit if args.gas_limit else 0
     public_keys = _load_validators_public_keys(args)
 
     delegation = _get_delegation_controller(args)
@@ -615,11 +617,11 @@ def unbond_nodes(args: Any):
     _check_if_either_bls_keys_or_validators_file_are_provided(args)
     validate_arguments(args)
 
-    sender = prepare_sender(args)
-    guardian, guardian_address = prepare_guardian(args)
-    relayer, relayer_address = prepare_relayer(args)
+    sender = cli_shared.prepare_sender(args)
+    guardian, guardian_address = cli_shared.prepare_guardian(args)
+    relayer, relayer_address = cli_shared.prepare_relayer(args)
 
-    gas_limit = 0 if args.estimate_gas else args.gas_limit
+    gas_limit = args.gas_limit if args.gas_limit else 0
     public_keys = _load_validators_public_keys(args)
 
     delegation = _get_delegation_controller(args)
@@ -648,11 +650,11 @@ def unstake_nodes(args: Any):
     _check_if_either_bls_keys_or_validators_file_are_provided(args)
     validate_arguments(args)
 
-    sender = prepare_sender(args)
-    guardian, guardian_address = prepare_guardian(args)
-    relayer, relayer_address = prepare_relayer(args)
+    sender = cli_shared.prepare_sender(args)
+    guardian, guardian_address = cli_shared.prepare_guardian(args)
+    relayer, relayer_address = cli_shared.prepare_relayer(args)
 
-    gas_limit = 0 if args.estimate_gas else args.gas_limit
+    gas_limit = args.gas_limit if args.gas_limit else 0
     public_keys = _load_validators_public_keys(args)
 
     delegation = _get_delegation_controller(args)
@@ -681,11 +683,11 @@ def unjail_nodes(args: Any):
     _check_if_either_bls_keys_or_validators_file_are_provided(args)
     validate_arguments(args)
 
-    sender = prepare_sender(args)
-    guardian, guardian_address = prepare_guardian(args)
-    relayer, relayer_address = prepare_relayer(args)
+    sender = cli_shared.prepare_sender(args)
+    guardian, guardian_address = cli_shared.prepare_guardian(args)
+    relayer, relayer_address = cli_shared.prepare_relayer(args)
 
-    gas_limit = 0 if args.estimate_gas else args.gas_limit
+    gas_limit = args.gas_limit if args.gas_limit else 0
     public_keys = _load_validators_public_keys(args)
 
     delegation = _get_delegation_controller(args)
@@ -713,11 +715,11 @@ def unjail_nodes(args: Any):
 def delegate(args: Any):
     validate_arguments(args)
 
-    sender = prepare_sender(args)
-    guardian, guardian_address = prepare_guardian(args)
-    relayer, relayer_address = prepare_relayer(args)
+    sender = cli_shared.prepare_sender(args)
+    guardian, guardian_address = cli_shared.prepare_guardian(args)
+    relayer, relayer_address = cli_shared.prepare_relayer(args)
 
-    gas_limit = 0 if args.estimate_gas else args.gas_limit
+    gas_limit = args.gas_limit if args.gas_limit else 0
     value = int(args.value)
 
     delegation = _get_delegation_controller(args)
@@ -744,11 +746,11 @@ def delegate(args: Any):
 def claim_rewards(args: Any):
     validate_arguments(args)
 
-    sender = prepare_sender(args)
-    guardian, guardian_address = prepare_guardian(args)
-    relayer, relayer_address = prepare_relayer(args)
+    sender = cli_shared.prepare_sender(args)
+    guardian, guardian_address = cli_shared.prepare_guardian(args)
+    relayer, relayer_address = cli_shared.prepare_relayer(args)
 
-    gas_limit = 0 if args.estimate_gas else args.gas_limit
+    gas_limit = args.gas_limit if args.gas_limit else 0
 
     delegation = _get_delegation_controller(args)
     tx = delegation.prepare_transaction_for_claiming_rewards(
@@ -773,11 +775,11 @@ def claim_rewards(args: Any):
 def redelegate_rewards(args: Any):
     validate_arguments(args)
 
-    sender = prepare_sender(args)
-    guardian, guardian_address = prepare_guardian(args)
-    relayer, relayer_address = prepare_relayer(args)
+    sender = cli_shared.prepare_sender(args)
+    guardian, guardian_address = cli_shared.prepare_guardian(args)
+    relayer, relayer_address = cli_shared.prepare_relayer(args)
 
-    gas_limit = 0 if args.estimate_gas else args.gas_limit
+    gas_limit = args.gas_limit if args.gas_limit else 0
 
     delegation = _get_delegation_controller(args)
     tx = delegation.prepare_transaction_for_redelegating_rewards(
@@ -802,11 +804,11 @@ def redelegate_rewards(args: Any):
 def undelegate(args: Any):
     validate_arguments(args)
 
-    sender = prepare_sender(args)
-    guardian, guardian_address = prepare_guardian(args)
-    relayer, relayer_address = prepare_relayer(args)
+    sender = cli_shared.prepare_sender(args)
+    guardian, guardian_address = cli_shared.prepare_guardian(args)
+    relayer, relayer_address = cli_shared.prepare_relayer(args)
 
-    gas_limit = 0 if args.estimate_gas else args.gas_limit
+    gas_limit = args.gas_limit if args.gas_limit else 0
     value = int(args.value)
 
     delegation = _get_delegation_controller(args)
@@ -833,11 +835,11 @@ def undelegate(args: Any):
 def withdraw(args: Any):
     validate_arguments(args)
 
-    sender = prepare_sender(args)
-    guardian, guardian_address = prepare_guardian(args)
-    relayer, relayer_address = prepare_relayer(args)
+    sender = cli_shared.prepare_sender(args)
+    guardian, guardian_address = cli_shared.prepare_guardian(args)
+    relayer, relayer_address = cli_shared.prepare_relayer(args)
 
-    gas_limit = 0 if args.estimate_gas else args.gas_limit
+    gas_limit = args.gas_limit if args.gas_limit else 0
 
     delegation = _get_delegation_controller(args)
     tx = delegation.prepare_transaction_for_withdrawing(
@@ -863,11 +865,11 @@ def withdraw(args: Any):
 def change_service_fee(args: Any):
     validate_arguments(args)
 
-    sender = prepare_sender(args)
-    guardian, guardian_address = prepare_guardian(args)
-    relayer, relayer_address = prepare_relayer(args)
+    sender = cli_shared.prepare_sender(args)
+    guardian, guardian_address = cli_shared.prepare_guardian(args)
+    relayer, relayer_address = cli_shared.prepare_relayer(args)
 
-    gas_limit = 0 if args.estimate_gas else args.gas_limit
+    gas_limit = args.gas_limit if args.gas_limit else 0
 
     delegation = _get_delegation_controller(args)
     tx = delegation.prepare_transaction_for_changing_service_fee(
@@ -894,11 +896,11 @@ def change_service_fee(args: Any):
 def modify_delegation_cap(args: Any):
     validate_arguments(args)
 
-    sender = prepare_sender(args)
-    guardian, guardian_address = prepare_guardian(args)
-    relayer, relayer_address = prepare_relayer(args)
+    sender = cli_shared.prepare_sender(args)
+    guardian, guardian_address = cli_shared.prepare_guardian(args)
+    relayer, relayer_address = cli_shared.prepare_relayer(args)
 
-    gas_limit = 0 if args.estimate_gas else args.gas_limit
+    gas_limit = args.gas_limit if args.gas_limit else 0
 
     delegation = _get_delegation_controller(args)
     tx = delegation.prepare_transaction_for_modifying_delegation_cap(
@@ -925,11 +927,11 @@ def modify_delegation_cap(args: Any):
 def automatic_activation(args: Any):
     validate_arguments(args)
 
-    sender = prepare_sender(args)
-    guardian, guardian_address = prepare_guardian(args)
-    relayer, relayer_address = prepare_relayer(args)
+    sender = cli_shared.prepare_sender(args)
+    guardian, guardian_address = cli_shared.prepare_guardian(args)
+    relayer, relayer_address = cli_shared.prepare_relayer(args)
 
-    gas_limit = 0 if args.estimate_gas else args.gas_limit
+    gas_limit = args.gas_limit if args.gas_limit else 0
 
     delegation = _get_delegation_controller(args)
     tx = delegation.prepare_transaction_for_automatic_activation(
@@ -957,11 +959,11 @@ def automatic_activation(args: Any):
 def redelegate_cap(args: Any):
     validate_arguments(args)
 
-    sender = prepare_sender(args)
-    guardian, guardian_address = prepare_guardian(args)
-    relayer, relayer_address = prepare_relayer(args)
+    sender = cli_shared.prepare_sender(args)
+    guardian, guardian_address = cli_shared.prepare_guardian(args)
+    relayer, relayer_address = cli_shared.prepare_relayer(args)
 
-    gas_limit = 0 if args.estimate_gas else args.gas_limit
+    gas_limit = args.gas_limit if args.gas_limit else 0
 
     delegation = _get_delegation_controller(args)
     tx = delegation.prepare_transaction_for_redelegate_cap(
@@ -989,11 +991,11 @@ def redelegate_cap(args: Any):
 def set_metadata(args: Any):
     validate_arguments(args)
 
-    sender = prepare_sender(args)
-    guardian, guardian_address = prepare_guardian(args)
-    relayer, relayer_address = prepare_relayer(args)
+    sender = cli_shared.prepare_sender(args)
+    guardian, guardian_address = cli_shared.prepare_guardian(args)
+    relayer, relayer_address = cli_shared.prepare_relayer(args)
 
-    gas_limit = 0 if args.estimate_gas else args.gas_limit
+    gas_limit = args.gas_limit if args.gas_limit else 0
 
     delegation = _get_delegation_controller(args)
     tx = delegation.prepare_transaction_for_setting_metadata(
@@ -1022,11 +1024,11 @@ def set_metadata(args: Any):
 def make_new_contract_from_validator_data(args: Any):
     validate_arguments(args)
 
-    sender = prepare_sender(args)
-    guardian, guardian_address = prepare_guardian(args)
-    relayer, relayer_address = prepare_relayer(args)
+    sender = cli_shared.prepare_sender(args)
+    guardian, guardian_address = cli_shared.prepare_guardian(args)
+    relayer, relayer_address = cli_shared.prepare_relayer(args)
 
-    gas_limit = 0 if args.estimate_gas else args.gas_limit
+    gas_limit = args.gas_limit if args.gas_limit else 0
 
     delegation = _get_delegation_controller(args)
     tx = delegation.prepare_transaction_for_creating_delegation_contract_from_validator(

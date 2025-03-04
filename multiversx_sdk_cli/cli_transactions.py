@@ -17,13 +17,14 @@ from multiversx_sdk_cli.args_validation import (
     ensure_wallet_args_are_provided,
     validate_broadcast_args,
     validate_chain_id_args,
+    validate_nonce_args,
     validate_proxy_argument,
-    validate_transaction_args,
+    validate_receiver_args,
 )
 from multiversx_sdk_cli.base_transactions_controller import BaseTransactionsController
 from multiversx_sdk_cli.cli_output import CLIOutputBuilder
 from multiversx_sdk_cli.config import get_config_for_network_providers
-from multiversx_sdk_cli.errors import BadUsage, IncorrectWalletError
+from multiversx_sdk_cli.errors import BadUsage, IncorrectWalletError, NoWalletProvided
 from multiversx_sdk_cli.transactions import (
     TransactionsController,
     load_transaction_from_file,
@@ -114,17 +115,13 @@ def _add_common_arguments(args: list[str], sub: Any):
 
 
 def create_transaction(args: Any):
-    validate_transaction_args(args)
+    validate_nonce_args(args)
+    validate_receiver_args(args)
     ensure_wallet_args_are_provided(args)
     validate_broadcast_args(args)
     validate_chain_id_args(args)
 
-    sender = cli_shared.prepare_account(args)
-
-    if args.nonce is None:
-        nonce = cli_shared.get_current_nonce_for_address(sender.address, args.proxy)
-    else:
-        nonce = int(args.nonce)
+    sender = cli_shared.prepare_sender(args)
 
     if args.data_file:
         args.data = Path(args.data_file).read_text()
@@ -136,6 +133,8 @@ def create_transaction(args: Any):
     relayer_address = cli_shared.get_relayer_address(relayer, args)
 
     native_amount = int(args.value)
+    gas_limit = int(args.gas_limit) if args.gas_limit else 0
+
     transfers = getattr(args, "token_transfers", None)
     transfers = prepare_token_transfers(transfers) if transfers else None
 
@@ -146,9 +145,9 @@ def create_transaction(args: Any):
         sender=sender,
         receiver=Address.new_from_bech32(args.receiver),
         native_amount=native_amount,
-        gas_limit=args.gas_limit,
+        gas_limit=gas_limit,
         gas_price=args.gas_price,
-        nonce=nonce,
+        nonce=sender.nonce,
         version=args.version,
         options=args.options,
         token_transfers=transfers,
@@ -202,7 +201,11 @@ def sign_transaction(args: Any):
 
     tx = load_transaction_from_file(args.infile)
 
-    sender = cli_shared.load_sender_account(args)
+    try:
+        sender = cli_shared.prepare_account(args)
+    except NoWalletProvided:
+        sender = None
+
     if sender and sender.address != tx.sender:
         raise IncorrectWalletError("Sender's wallet does not match transaction's sender.")
 
@@ -237,7 +240,10 @@ def relay_transaction(args: Any):
     validate_broadcast_args(args)
 
     tx = load_transaction_from_file(args.infile)
-    relayer = cli_shared.prepare_relayer_account(args)
+
+    relayer = cli_shared.load_relayer_account(args)
+    if relayer is None:
+        raise NoWalletProvided()
 
     if tx.relayer != relayer.address:
         raise IncorrectWalletError("Relayer wallet does not match the relayer's address set in the transaction.")

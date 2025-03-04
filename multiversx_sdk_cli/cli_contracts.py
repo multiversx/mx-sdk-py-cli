@@ -349,12 +349,7 @@ def deploy(args: Any):
     validate_broadcast_args(args)
     validate_chain_id_args(args)
 
-    sender = cli_shared.prepare_account(args)
-
-    if args.nonce is None:
-        nonce = cli_shared.get_current_nonce_for_address(sender.address, args.proxy)
-    else:
-        nonce = int(args.nonce)
+    sender = cli_shared.prepare_sender(args)
 
     guardian = cli_shared.load_guardian_account(args)
     guardian_address = cli_shared.get_guardian_address(guardian, args)
@@ -381,7 +376,7 @@ def deploy(args: Any):
         payable_by_sc=args.metadata_payable_by_sc,
         gas_limit=int(args.gas_limit),
         value=int(args.value),
-        nonce=nonce,
+        nonce=sender.nonce,
         version=int(args.version),
         options=int(args.options),
         guardian_account=guardian,
@@ -409,12 +404,7 @@ def call(args: Any):
     validate_broadcast_args(args)
     validate_chain_id_args(args)
 
-    sender = cli_shared.prepare_account(args)
-
-    if args.nonce is None:
-        nonce = cli_shared.get_current_nonce_for_address(sender.address, args.proxy)
-    else:
-        nonce = int(args.nonce)
+    sender = cli_shared.prepare_sender(args)
 
     guardian = cli_shared.load_guardian_account(args)
     guardian_address = cli_shared.get_guardian_address(guardian, args)
@@ -440,7 +430,7 @@ def call(args: Any):
         gas_limit=int(args.gas_limit),
         value=int(args.value),
         transfers=args.token_transfers,
-        nonce=nonce,
+        nonce=sender.nonce,
         version=int(args.version),
         options=int(args.options),
         guardian_account=guardian,
@@ -462,12 +452,7 @@ def upgrade(args: Any):
     validate_broadcast_args(args)
     validate_chain_id_args(args)
 
-    sender = cli_shared.prepare_account(args)
-
-    if args.nonce is None:
-        nonce = cli_shared.get_current_nonce_for_address(sender.address, args.proxy)
-    else:
-        nonce = int(args.nonce)
+    sender = cli_shared.prepare_sender(args)
 
     guardian = cli_shared.load_guardian_account(args)
     guardian_address = cli_shared.get_guardian_address(guardian, args)
@@ -496,7 +481,7 @@ def upgrade(args: Any):
         payable_by_sc=args.metadata_payable_by_sc,
         gas_limit=int(args.gas_limit),
         value=int(args.value),
-        nonce=nonce,
+        nonce=sender.nonce,
         version=int(args.version),
         options=int(args.options),
         guardian_account=guardian,

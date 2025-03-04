@@ -21,7 +21,6 @@ def test_create_new_delegation_contract(capsys: Any):
             str(alice),
             "--nonce",
             "7",
-            "--estimate-gas",
             "--value",
             "1250000000000000000000",
             "--total-delegation-cap",
@@ -57,7 +56,6 @@ def test_create_new_delegation_contract_with_provided_gas_limit(capsys: Any):
             str(alice),
             "--nonce",
             "7",
-            "--estimate-gas",
             "--value",
             "1250000000000000000000",
             "--total-delegation-cap",
@@ -103,7 +101,6 @@ def test_add_nodes(capsys: Any):
             "T",
             "--nonce",
             "7",
-            "--estimate-gas",
         ]
     )
     tx = get_transaction(capsys)
@@ -176,7 +173,6 @@ def test_remove_nodes_with_bls_keys(capsys: Any):
             "T",
             "--nonce",
             "7",
-            "--estimate-gas",
         ]
     )
     tx = get_transaction(capsys)
@@ -207,7 +203,6 @@ def test_remove_nodes_with_validators_file(capsys: Any):
             "T",
             "--nonce",
             "7",
-            "--estimate-gas",
         ]
     )
     tx = get_transaction(capsys)
@@ -238,7 +233,6 @@ def test_stake_nodes_with_bls_keys(capsys: Any):
             "T",
             "--nonce",
             "7",
-            "--estimate-gas",
         ]
     )
     tx = get_transaction(capsys)
@@ -269,7 +263,6 @@ def test_stake_nodes_with_validators_file(capsys: Any):
             "T",
             "--nonce",
             "7",
-            "--estimate-gas",
         ]
     )
     tx = get_transaction(capsys)
@@ -300,7 +293,6 @@ def test_unbond_nodes(capsys: Any):
             "T",
             "--nonce",
             "7",
-            "--estimate-gas",
         ]
     )
     tx = get_transaction(capsys)
@@ -331,7 +323,6 @@ def test_unstake_nodes(capsys: Any):
             "T",
             "--nonce",
             "7",
-            "--estimate-gas",
         ]
     )
     tx = get_transaction(capsys)
@@ -364,7 +355,6 @@ def test_unjail_nodes(capsys: Any):
             "T",
             "--nonce",
             "7",
-            "--estimate-gas",
         ]
     )
     tx = get_transaction(capsys)
@@ -396,7 +386,6 @@ def test_change_service_fee(capsys: Any):
             "T",
             "--nonce",
             "7",
-            "--estimate-gas",
         ]
     )
     tx = get_transaction(capsys)
@@ -424,7 +413,6 @@ def test_modify_delegation_cap(capsys: Any):
             "T",
             "--nonce",
             "7",
-            "--estimate-gas",
         ]
     )
     tx = get_transaction(capsys)
@@ -449,7 +437,6 @@ def test_automatic_activation(capsys: Any):
             str(alice),
             "--nonce",
             "7",
-            "--estimate-gas",
             "--chain",
             "T",
         ]
@@ -477,7 +464,6 @@ def test_automatic_activation(capsys: Any):
             str(alice),
             "--nonce",
             "7",
-            "--estimate-gas",
             "--chain",
             "T",
         ]
@@ -504,7 +490,6 @@ def test_redelegate_cap(capsys: Any):
             str(alice),
             "--nonce",
             "7",
-            "--estimate-gas",
             "--chain",
             "T",
         ]
@@ -532,7 +517,6 @@ def test_redelegate_cap(capsys: Any):
             str(alice),
             "--nonce",
             "7",
-            "--estimate-gas",
             "--chain",
             "T",
         ]
@@ -564,7 +548,6 @@ def test_set_metadata(capsys: Any):
             str(alice),
             "--nonce",
             "7",
-            "--estimate-gas",
             "--chain",
             "T",
         ]
@@ -592,7 +575,6 @@ def test_create_delegation_contract_from_validator(capsys: Any):
             str(alice),
             "--nonce",
             "7",
-            "--estimate-gas",
             "--chain",
             "T",
         ]
@@ -620,7 +602,6 @@ def test_delegate(capsys: Any):
             str(alice),
             "--nonce",
             "7",
-            "--estimate-gas",
             "--chain",
             "T",
         ]
@@ -646,7 +627,6 @@ def test_claim_rewards(capsys: Any):
             str(alice),
             "--nonce",
             "7",
-            "--estimate-gas",
             "--chain",
             "T",
         ]
@@ -672,7 +652,6 @@ def test_redelegate_rewards(capsys: Any):
             str(alice),
             "--nonce",
             "7",
-            "--estimate-gas",
             "--chain",
             "T",
         ]
@@ -700,7 +679,6 @@ def test_undelegate(capsys: Any):
             str(alice),
             "--nonce",
             "7",
-            "--estimate-gas",
             "--chain",
             "T",
         ]
@@ -726,7 +704,6 @@ def test_withdraw(capsys: Any):
             str(alice),
             "--nonce",
             "7",
-            "--estimate-gas",
             "--chain",
             "T",
         ]

@@ -4,12 +4,12 @@ from multiversx_sdk_cli.errors import InvalidArgumentsError
 
 
 def validate_transaction_args(args: Any):
-    _validate_nonce_args(args)
-    _validate_receiver_args(args)
-    _validate_gas_limit_args(args)
+    validate_nonce_args(args)
+    validate_receiver_args(args)
+    validate_gas_limit_args(args)
 
 
-def _validate_nonce_args(args: Any):
+def validate_nonce_args(args: Any):
     """If nonce is not provided, ensure that recall_nonce is provided. If recall_nonce is provided, ensure that proxy is provided."""
     if hasattr(args, "nonce") and args.nonce is None:
         if not args.recall_nonce:
@@ -19,17 +19,16 @@ def _validate_nonce_args(args: Any):
             raise InvalidArgumentsError("--proxy must be provided if --recall-nonce is used")
 
 
-def _validate_receiver_args(args: Any):
+def validate_receiver_args(args: Any):
     """Ensure that receiver is provided."""
     if hasattr(args, "receiver") and not args.receiver:
         raise InvalidArgumentsError("--receiver must be provided")
 
 
-def _validate_gas_limit_args(args: Any):
+def validate_gas_limit_args(args: Any):
     """Ensure that gas_limit is provided."""
     if hasattr(args, "gas_limit") and not args.gas_limit:
-        if hasattr(args, "estimate_gas") and not args.estimate_gas:
-            raise InvalidArgumentsError("If --gas-limit not provided, --estimate-gas must be provided")
+        raise InvalidArgumentsError("--gas-limit must be provided")
 
 
 def ensure_wallet_args_are_provided(args: Any):

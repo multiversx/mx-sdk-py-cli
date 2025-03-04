@@ -17,6 +17,7 @@ from multiversx_sdk import (
 
 from multiversx_sdk_cli import errors
 from multiversx_sdk_cli.base_transactions_controller import BaseTransactionsController
+from multiversx_sdk_cli.constants import MIN_GAS_LIMIT
 from multiversx_sdk_cli.interfaces import IAccount
 
 logger = logging.getLogger("transactions")
@@ -61,7 +62,7 @@ class TransactionsController(BaseTransactionsController):
             transaction = Transaction(
                 sender=sender.address,
                 receiver=receiver,
-                gas_limit=gas_limit,
+                gas_limit=MIN_GAS_LIMIT,
                 chain_id=self.factory.config.chain_id,
             )
         else:
@@ -73,7 +74,9 @@ class TransactionsController(BaseTransactionsController):
                 data=data.encode() if data else None,
             )
 
-        transaction.gas_limit = gas_limit
+        if gas_limit:
+            transaction.gas_limit = gas_limit
+
         transaction.gas_price = gas_price
         transaction.nonce = nonce
         transaction.version = version

@@ -66,12 +66,7 @@ def register(args: Any):
     validate_broadcast_args(args)
     validate_chain_id_args(args)
 
-    sender = cli_shared.prepare_account(args)
-
-    if args.nonce is None:
-        nonce = cli_shared.get_current_nonce_for_address(sender.address, args.proxy)
-    else:
-        nonce = int(args.nonce)
+    sender = cli_shared.prepare_sender(args)
 
     guardian = cli_shared.load_guardian_account(args)
     guardian_address = cli_shared.get_guardian_address(guardian, args)
@@ -93,7 +88,7 @@ def register(args: Any):
         native_amount=native_amount,
         gas_limit=args.gas_limit,
         gas_price=args.gas_price,
-        nonce=nonce,
+        nonce=sender.nonce,
         version=args.version,
         options=args.options,
         data=data,
