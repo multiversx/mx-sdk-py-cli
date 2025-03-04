@@ -371,10 +371,10 @@ def get_chain_id(chain_id: str, proxy_url: str) -> str:
 
     if chain_id:
         return chain_id
-    else:
-        network_provider_config = config.get_config_for_network_providers()
-        proxy = ProxyNetworkProvider(url=proxy_url, config=network_provider_config)
-        return proxy.get_network_config().chain_id
+
+    network_provider_config = config.get_config_for_network_providers()
+    proxy = ProxyNetworkProvider(url=proxy_url, config=network_provider_config)
+    return proxy.get_network_config().chain_id
 
 
 def add_broadcast_args(sub: Any, simulate: bool = True):
@@ -436,11 +436,13 @@ def send_or_simulate(tx: Transaction, args: Any, dump_output: bool = True) -> CL
 
 
 def prepare_sender(args: Any):
-    """Reurns a tuple containing the sender's account and the account nonce.
+    """Returns the sender's account.
     If no account was provided, will raise an exception."""
     sender = prepare_account(args)
-    nonce = int(args.nonce) if args.nonce is not None else get_current_nonce_for_address(sender.address, args.proxy)
-    return sender, nonce
+    sender.nonce = (
+        int(args.nonce) if args.nonce is not None else get_current_nonce_for_address(sender.address, args.proxy)
+    )
+    return sender
 
 
 def prepare_guardian(args: Any):

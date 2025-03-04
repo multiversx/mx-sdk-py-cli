@@ -15,11 +15,11 @@ from multiversx_sdk.abi import Abi
 
 from multiversx_sdk_cli import cli_shared, utils
 from multiversx_sdk_cli.args_validation import (
-    ensure_broadcast_args,
-    ensure_chain_id_args,
-    ensure_proxy_argument,
-    ensure_required_transaction_args_are_provided,
     ensure_wallet_args_are_provided,
+    validate_broadcast_args,
+    validate_chain_id_args,
+    validate_proxy_argument,
+    validate_transaction_args,
 )
 from multiversx_sdk_cli.cli_output import CLIOutputBuilder
 from multiversx_sdk_cli.config import get_config_for_network_providers
@@ -344,12 +344,12 @@ After installing, use the `sc-meta all build` command. To lear more about `sc-me
 def deploy(args: Any):
     logger.debug("deploy")
 
-    ensure_required_transaction_args_are_provided(args)
+    validate_transaction_args(args)
     ensure_wallet_args_are_provided(args)
-    ensure_broadcast_args(args)
-    ensure_chain_id_args(args)
+    validate_broadcast_args(args)
+    validate_chain_id_args(args)
 
-    sender, nonce = cli_shared.prepare_sender(args)
+    sender = cli_shared.prepare_sender(args)
 
     guardian = cli_shared.load_guardian_account(args)
     guardian_address = cli_shared.get_guardian_address(guardian, args)
@@ -376,7 +376,7 @@ def deploy(args: Any):
         payable_by_sc=args.metadata_payable_by_sc,
         gas_limit=int(args.gas_limit),
         value=int(args.value),
-        nonce=nonce,
+        nonce=sender.nonce,
         version=int(args.version),
         options=int(args.options),
         guardian_account=guardian,
@@ -399,12 +399,12 @@ def deploy(args: Any):
 def call(args: Any):
     logger.debug("call")
 
-    ensure_required_transaction_args_are_provided(args)
+    validate_transaction_args(args)
     ensure_wallet_args_are_provided(args)
-    ensure_broadcast_args(args)
-    ensure_chain_id_args(args)
+    validate_broadcast_args(args)
+    validate_chain_id_args(args)
 
-    sender, nonce = cli_shared.prepare_sender(args)
+    sender = cli_shared.prepare_sender(args)
 
     guardian = cli_shared.load_guardian_account(args)
     guardian_address = cli_shared.get_guardian_address(guardian, args)
@@ -430,7 +430,7 @@ def call(args: Any):
         gas_limit=int(args.gas_limit),
         value=int(args.value),
         transfers=args.token_transfers,
-        nonce=nonce,
+        nonce=sender.nonce,
         version=int(args.version),
         options=int(args.options),
         guardian_account=guardian,
@@ -447,12 +447,12 @@ def call(args: Any):
 def upgrade(args: Any):
     logger.debug("upgrade")
 
-    ensure_required_transaction_args_are_provided(args)
+    validate_transaction_args(args)
     ensure_wallet_args_are_provided(args)
-    ensure_broadcast_args(args)
-    ensure_chain_id_args(args)
+    validate_broadcast_args(args)
+    validate_chain_id_args(args)
 
-    sender, nonce = cli_shared.prepare_sender(args)
+    sender = cli_shared.prepare_sender(args)
 
     guardian = cli_shared.load_guardian_account(args)
     guardian_address = cli_shared.get_guardian_address(guardian, args)
@@ -481,7 +481,7 @@ def upgrade(args: Any):
         payable_by_sc=args.metadata_payable_by_sc,
         gas_limit=int(args.gas_limit),
         value=int(args.value),
-        nonce=nonce,
+        nonce=sender.nonce,
         version=int(args.version),
         options=int(args.options),
         guardian_account=guardian,
@@ -498,7 +498,7 @@ def upgrade(args: Any):
 def query(args: Any):
     logger.debug("query")
 
-    ensure_proxy_argument(args)
+    validate_proxy_argument(args)
 
     # we don't need chainID to query a contract; we use the provided proxy
     factory_config = TransactionsFactoryConfig("")
