@@ -415,7 +415,7 @@ def test_sign_and_verify_message_with_multi_address_pem(capsys: Any):
             message,
             "--pem",
             str(multi_address_pem_path),
-            "--pem-index",
+            "--sender-wallet-index",
             "0",
         ]
     )
@@ -454,7 +454,7 @@ def test_sign_and_verify_message_with_multi_address_pem(capsys: Any):
             message,
             "--pem",
             str(multi_address_pem_path),
-            "--pem-index",
+            "--sender-wallet-index",
             "1",
         ]
     )
@@ -493,7 +493,7 @@ def test_sign_and_verify_message_with_multi_address_pem(capsys: Any):
             message,
             "--pem",
             str(multi_address_pem_path),
-            "--pem-index",
+            "--sender-wallet-index",
             "2",
         ]
     )
