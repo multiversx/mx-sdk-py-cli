@@ -15,7 +15,7 @@ bls_key = "e7beaa95b3877f47348df4dd1cb578a4f7cabf7a20bfeefe5cdd263878ff132b765e0
 
 @pytest.mark.require_localnet
 def test_stake():
-    validators_json = testdata_path / "validators_ci.json"
+    validators_json = testdata_path / "validators_ci.pem"
 
     # Stake with recall nonce
     return_code = main(
