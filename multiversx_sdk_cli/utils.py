@@ -11,8 +11,6 @@ from typing import Any, Optional, Protocol, Union, runtime_checkable
 
 import toml
 
-from multiversx_sdk_cli import errors
-
 logger = logging.getLogger("utils")
 
 
@@ -43,12 +41,9 @@ class BasicEncoder(json.JSONEncoder):
         return super().default(o)
 
 
-def omit_fields(data: Any, fields: list[str] = []) -> dict[str, Any]:
-    if isinstance(data, dict):
-        for field in fields:
-            data.pop(field, None)
-        return data
-    raise errors.ProgrammingError("omit_fields: only dictionaries are supported.")
+def omit_fields(data: dict[str, Any], fields: list[str] = []) -> None:
+    for field in fields:
+        data.pop(field, None)
 
 
 def untar(archive_path: Path, destination_folder: Path) -> None:
