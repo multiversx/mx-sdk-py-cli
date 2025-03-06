@@ -9,7 +9,7 @@ alice = parent / "testdata" / "alice.pem"
 
 first_bls_key = "f8910e47cf9464777c912e6390758bb39715fffcb861b184017920e4a807b42553f2f21e7f3914b81bcf58b66a72ab16d97013ae1cff807cefc977ef8cbf116258534b9e46d19528042d16ef8374404a89b184e0a4ee18c77c49e454d04eae8d"
 second_bls_key = "1b4e60e6d100cdf234d3427494dac55fbac49856cadc86bcb13a01b9bb05a0d9143e86c186c948e7ae9e52427c9523102efe9019a2a9c06db02993f2e3e6756576ae5a3ec7c235d548bc79de1a6990e1120ae435cb48f7fc436c9f9098b92a0d"
-validators_file = parent / "testdata" / "validators_file.json"
+validators_file = parent / "testdata" / "validators_file.pem"
 
 
 def test_create_new_delegation_contract(capsys: Any):
@@ -85,7 +85,7 @@ def test_create_new_delegation_contract_with_provided_gas_limit(capsys: Any):
 
 
 def test_add_nodes(capsys: Any):
-    validators_file = parent / "testdata" / "validators.json"
+    validators_file = parent / "testdata" / "validators.pem"
 
     main(
         [
@@ -121,7 +121,7 @@ def test_add_nodes(capsys: Any):
 
 
 def test_add_nodes_with_gas_limit(capsys: Any):
-    validators_file = parent / "testdata" / "validators.json"
+    validators_file = parent / "testdata" / "validators.pem"
 
     main(
         [

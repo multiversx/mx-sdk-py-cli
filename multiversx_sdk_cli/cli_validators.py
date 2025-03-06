@@ -1,7 +1,7 @@
 from pathlib import Path
 from typing import Any
 
-from multiversx_sdk import Address
+from multiversx_sdk import Address, ValidatorPublicKey, ValidatorsSigners
 
 from multiversx_sdk_cli import cli_shared, utils
 from multiversx_sdk_cli.args_validation import (
@@ -11,7 +11,7 @@ from multiversx_sdk_cli.args_validation import (
     validate_nonce_args,
     validate_receiver_args,
 )
-from multiversx_sdk_cli.validators.core import ValidatorsController
+from multiversx_sdk_cli.validators import ValidatorsController
 
 
 def setup_parser(args: list[str], subparsers: Any) -> Any:
@@ -28,7 +28,7 @@ def setup_parser(args: list[str], subparsers: Any) -> Any:
     sub.add_argument(
         "--validators-file",
         required=not (utils.is_arg_present(args, "--top-up")),
-        help="a JSON file describing the Nodes",
+        help="a PEM file describing the nodes; can contain multiple nodes",
     )
     sub.add_argument(
         "--top-up",
@@ -163,7 +163,7 @@ def do_stake(args: Any):
     gas_limit = args.gas_limit if args.gas_limit else 0
     rewards_address = Address.new_from_bech32(args.reward_address) if args.reward_address else None
 
-    controller = ValidatorsController(args.chain)
+    controller = _get_validators_controller(args)
 
     if args.top_up:
         tx = controller.create_transaction_for_topping_up(
@@ -182,10 +182,10 @@ def do_stake(args: Any):
             guardian_2fa_code=args.guardian_2fa_code,
         )
     else:
-        validators_file = Path(args.validators_file)
+        validators_file = _load_validators_signers(args.validators_file)
         tx = controller.create_transaction_for_staking(
             sender=sender,
-            validators_file=validators_file,
+            validators=validators_file,
             native_amount=native_amount,
             gas_limit=gas_limit,
             gas_price=args.gas_price,
@@ -204,6 +204,28 @@ def do_stake(args: Any):
     cli_shared.send_or_simulate(tx, args)
 
 
+def _get_validators_controller(args: Any):
+    chain_id = cli_shared.get_chain_id(args.chain, args.proxy)
+    validators = ValidatorsController(chain_id)
+    return validators
+
+
+def _load_validators_signers(validators_pem: str) -> ValidatorsSigners:
+    validators_file_path = Path(validators_pem).expanduser()
+    validators_file = ValidatorsSigners.new_from_pem(validators_file_path)
+    return validators_file
+
+
+def _parse_public_bls_keys(public_bls_keys: str) -> list[ValidatorPublicKey]:
+    keys = public_bls_keys.split(",")
+    validator_public_keys: list[ValidatorPublicKey] = []
+
+    for key in keys:
+        validator_public_keys.append(ValidatorPublicKey(bytes.fromhex(key)))
+
+    return validator_public_keys
+
+
 def do_unstake(args: Any):
     validate_args(args)
     sender = cli_shared.prepare_sender(args)
@@ -212,9 +234,9 @@ def do_unstake(args: Any):
 
     native_amount = int(args.value)
     gas_limit = args.gas_limit if args.gas_limit else 0
-    keys = args.nodes_public_keys
+    keys = _parse_public_bls_keys(args.nodes_public_keys)
 
-    controller = ValidatorsController(args.chain)
+    controller = _get_validators_controller(args)
     tx = controller.create_transaction_for_unstaking(
         sender=sender,
         keys=keys,
@@ -243,9 +265,9 @@ def do_unjail(args: Any):
 
     native_amount = int(args.value)
     gas_limit = args.gas_limit if args.gas_limit else 0
-    keys = args.nodes_public_keys
+    keys = _parse_public_bls_keys(args.nodes_public_keys)
 
-    controller = ValidatorsController(args.chain)
+    controller = _get_validators_controller(args)
     tx = controller.create_transaction_for_unjailing(
         sender=sender,
         keys=keys,
@@ -274,9 +296,9 @@ def do_unbond(args: Any):
 
     native_amount = int(args.value)
     gas_limit = args.gas_limit if args.gas_limit else 0
-    keys = args.nodes_public_keys
+    keys = _parse_public_bls_keys(args.nodes_public_keys)
 
-    controller = ValidatorsController(args.chain)
+    controller = _get_validators_controller(args)
     tx = controller.create_transaction_for_unbonding(
         sender=sender,
         keys=keys,
@@ -307,7 +329,7 @@ def change_reward_address(args: Any):
     gas_limit = args.gas_limit if args.gas_limit else 0
     rewards_address = Address.new_from_bech32(args.reward_address)
 
-    controller = ValidatorsController(args.chain)
+    controller = _get_validators_controller(args)
     tx = controller.create_transaction_for_changing_rewards_address(
         sender=sender,
         rewards_address=rewards_address,
@@ -337,7 +359,7 @@ def do_claim(args: Any):
     native_amount = int(args.value)
     gas_limit = args.gas_limit if args.gas_limit else 0
 
-    controller = ValidatorsController(args.chain)
+    controller = _get_validators_controller(args)
     tx = controller.create_transaction_for_claiming(
         sender=sender,
         native_amount=native_amount,
@@ -366,9 +388,9 @@ def do_unstake_nodes(args: Any):
     native_amount = int(args.value)
     gas_limit = args.gas_limit if args.gas_limit else 0
 
-    keys = args.nodes_public_keys
+    keys = _parse_public_bls_keys(args.nodes_public_keys)
 
-    controller = ValidatorsController(args.chain)
+    controller = _get_validators_controller(args)
     tx = controller.create_transaction_for_unstaking_nodes(
         sender=sender,
         keys=keys,
@@ -399,7 +421,7 @@ def do_unstake_tokens(args: Any):
     value = int(args.unstake_value)
     gas_limit = args.gas_limit if args.gas_limit else 0
 
-    controller = ValidatorsController(args.chain)
+    controller = _get_validators_controller(args)
     tx = controller.create_transaction_for_unstaking_tokens(
         sender=sender,
         value=value,
@@ -429,9 +451,9 @@ def do_unbond_nodes(args: Any):
     native_amount = int(args.value)
     gas_limit = args.gas_limit if args.gas_limit else 0
 
-    keys = args.nodes_public_keys
+    keys = _parse_public_bls_keys(args.nodes_public_keys)
 
-    controller = ValidatorsController(args.chain)
+    controller = _get_validators_controller(args)
     tx = controller.create_transaction_for_unbonding_nodes(
         sender=sender,
         keys=keys,
@@ -462,7 +484,7 @@ def do_unbond_tokens(args: Any):
     value = int(args.unbond_value)
     gas_limit = args.gas_limit if args.gas_limit else 0
 
-    controller = ValidatorsController(args.chain)
+    controller = _get_validators_controller(args)
     tx = controller.create_transaction_for_unbonding_tokens(
         sender=sender,
         value=value,
@@ -492,7 +514,7 @@ def do_clean_registered_data(args: Any):
     native_amount = int(args.value)
     gas_limit = args.gas_limit if args.gas_limit else 0
 
-    controller = ValidatorsController(args.chain)
+    controller = _get_validators_controller(args)
     tx = controller.create_transaction_for_cleaning_registered_data(
         sender=sender,
         native_amount=native_amount,
@@ -520,9 +542,9 @@ def do_restake_unstaked_nodes(args: Any):
 
     native_amount = int(args.value)
     gas_limit = args.gas_limit if args.gas_limit else 0
-    keys = args.nodes_public_keys
+    keys = _parse_public_bls_keys(args.nodes_public_keys)
 
-    controller = ValidatorsController(args.chain)
+    controller = _get_validators_controller(args)
     tx = controller.create_transaction_for_restaking_unstaked_nodes(
         sender=sender,
         keys=keys,
