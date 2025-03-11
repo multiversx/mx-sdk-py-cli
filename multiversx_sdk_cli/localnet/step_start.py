@@ -71,6 +71,7 @@ async def do_start(configfile: Path, stop_after_seconds: int):
     for observer in config.observers():
         to_run.append(run([
             "./node",
+            f"--display-name=observer-{observer.shard}-{observer.index}",
             "--use-log-view",
             "--log-save",
             f"--log-level={loglevel}",
@@ -85,6 +86,7 @@ async def do_start(configfile: Path, stop_after_seconds: int):
     for validator in config.validators():
         to_run.append(run([
             "./node",
+            f"--display-name=validator-{validator.index}",
             "--use-log-view",
             "--log-save",
             f"--log-level={loglevel}",
