@@ -16,7 +16,7 @@ guardian = testdata_path / "testUser2.pem"
 
 
 def test_stake(capsys: Any):
-    validators_json = testdata_path / "validators_file.json"
+    validators_pem = testdata_path / "validators_file.pem"
 
     return_code = main(
         [
@@ -26,8 +26,8 @@ def test_stake(capsys: Any):
             str(alice_pem),
             "--value",
             "2500000000000000000000",
-            "--validators-file",
-            str(validators_json),
+            "--validators-pem",
+            str(validators_pem),
             "--reward-address",
             reward_address,
             "--chain",
@@ -98,7 +98,7 @@ def test_top_up(capsys: Any):
 
 
 def test_stake_with_relayer_and_guardian(capsys: Any):
-    validators_json = testdata_path / "validators_file.json"
+    validators_pem = testdata_path / "validators_file.pem"
 
     return_code = main(
         [
@@ -108,8 +108,8 @@ def test_stake_with_relayer_and_guardian(capsys: Any):
             str(alice_pem),
             "--value",
             "2500000000000000000000",
-            "--validators-file",
-            str(validators_json),
+            "--validators-pem",
+            str(validators_pem),
             "--reward-address",
             reward_address,
             "--chain",
