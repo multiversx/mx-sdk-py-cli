@@ -64,7 +64,7 @@ def setup_parser(args: list[str], subparsers: Any) -> Any:
         "Add new nodes must be called by the contract owner",
     )
     sub.add_argument(
-        "--validators-file", required=True, type=str, help="a PEM file describing the Nodes; can contain multiple nodes"
+        "--validators-pem", required=True, type=str, help="a PEM file holding the BLS keys; can contain multiple nodes"
     )
     sub.add_argument(
         "--delegation-contract",
@@ -82,8 +82,8 @@ def setup_parser(args: list[str], subparsers: Any) -> Any:
         "remove-nodes",
         "Remove nodes must be called by the contract owner",
     )
-    sub.add_argument("--bls-keys", help="a list with the bls keys of the nodes")
-    sub.add_argument("--validators-file", type=str, help="a PEM file describing the Nodes; can contain multiple nodes")
+    sub.add_argument("--bls-keys", help="a list with the bls keys of the nodes as CSV (addrA,addrB)")
+    sub.add_argument("--validators-pem", type=str, help="a PEM file holding the BLS keys; can contain multiple nodes")
     sub.add_argument(
         "--delegation-contract",
         required=True,
@@ -100,8 +100,8 @@ def setup_parser(args: list[str], subparsers: Any) -> Any:
         "stake-nodes",
         "Stake nodes must be called by the contract owner",
     )
-    sub.add_argument("--bls-keys", help="a list with the bls keys of the nodes")
-    sub.add_argument("--validators-file", type=str, help="a PEM file describing the Nodes; can contain multiple nodes")
+    sub.add_argument("--bls-keys", help="a list with the bls keys of the nodes as CSV (addrA,addrB)")
+    sub.add_argument("--validators-pem", type=str, help="a PEM file holding the BLS keys; can contain multiple nodes")
     sub.add_argument(
         "--delegation-contract",
         required=True,
@@ -118,8 +118,8 @@ def setup_parser(args: list[str], subparsers: Any) -> Any:
         "unbond-nodes",
         "Unbond nodes must be called by the contract owner",
     )
-    sub.add_argument("--bls-keys", help="a list with the bls keys of the nodes")
-    sub.add_argument("--validators-file", type=str, help="a PEM file describing the Nodes; can contain multiple nodes")
+    sub.add_argument("--bls-keys", help="a list with the bls keys of the nodes as CSV (addrA,addrB)")
+    sub.add_argument("--validators-pem", type=str, help="a PEM file holding the BLS keys; can contain multiple nodes")
     sub.add_argument(
         "--delegation-contract",
         required=True,
@@ -135,8 +135,8 @@ def setup_parser(args: list[str], subparsers: Any) -> Any:
         "unstake-nodes",
         "Unstake nodes must be called by the contract owner",
     )
-    sub.add_argument("--bls-keys", help="a list with the bls keys of the nodes")
-    sub.add_argument("--validators-file", type=str, help="a PEM file describing the Nodes; can contain multiple nodes")
+    sub.add_argument("--bls-keys", help="a list with the bls keys of the nodes as CSV (addrA,addrB)")
+    sub.add_argument("--validators-pem", type=str, help="a PEM file holding the BLS keys; can contain multiple nodes")
     sub.add_argument(
         "--delegation-contract",
         required=True,
@@ -152,8 +152,8 @@ def setup_parser(args: list[str], subparsers: Any) -> Any:
         "unjail-nodes",
         "Unjail nodes must be called by the contract owner",
     )
-    sub.add_argument("--bls-keys", help="a list with the bls keys of the nodes")
-    sub.add_argument("--validators-file", type=str, help="a PEM file describing the Nodes; can contain multiple nodes")
+    sub.add_argument("--bls-keys", help="a list with the bls keys of the nodes as CSV (addrA,addrB)")
+    sub.add_argument("--validators-pem", type=str, help="a PEM file holding the BLS keys; can contain multiple nodes")
     sub.add_argument(
         "--delegation-contract",
         required=True,
@@ -505,7 +505,7 @@ def add_new_nodes(args: Any):
 
 
 def _get_public_keys_and_signed_messages(args: Any) -> tuple[list[ValidatorPublicKey], list[bytes]]:
-    validators_file_path = Path(args.validators_file).expanduser()
+    validators_file_path = Path(args.validators_pem).expanduser()
     validators_file = ValidatorsSigners.new_from_pem(validators_file_path)
     signers = validators_file.get_signers()
 
@@ -559,7 +559,7 @@ def _load_validators_public_keys(args: Any) -> list[ValidatorPublicKey]:
     if args.bls_keys:
         return _parse_public_bls_keys(args.bls_keys)
 
-    validators_file_path = Path(args.validators_file).expanduser()
+    validators_file_path = Path(args.validators_pem).expanduser()
     validators_file = ValidatorsSigners.new_from_pem(validators_file_path)
     return validators_file.get_public_keys()
 
@@ -609,10 +609,10 @@ def stake_nodes(args: Any):
 
 def _check_if_either_bls_keys_or_validators_file_are_provided(args: Any):
     bls_keys = args.bls_keys
-    validators_file = args.validators_file
+    validators_file = args.validators_pem
 
     if not bls_keys and not validators_file:
-        raise errors.BadUsage("No bls keys or validators file provided. Use either `--bls-keys` or `--validators-file`")
+        raise errors.BadUsage("No bls keys or validators file provided. Use either `--bls-keys` or `--validators-pem`")
 
 
 def unbond_nodes(args: Any):

@@ -91,7 +91,7 @@ def test_add_nodes(capsys: Any):
         [
             "staking-provider",
             "add-nodes",
-            "--validators-file",
+            "--validators-pem",
             str(validators_file),
             "--delegation-contract",
             "erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqthllllsy5r6rh",
@@ -127,7 +127,7 @@ def test_add_nodes_with_gas_limit(capsys: Any):
         [
             "staking-provider",
             "add-nodes",
-            "--validators-file",
+            "--validators-pem",
             str(validators_file),
             "--delegation-contract",
             "erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqthllllsy5r6rh",
@@ -193,7 +193,7 @@ def test_remove_nodes_with_validators_file(capsys: Any):
         [
             "staking-provider",
             "remove-nodes",
-            "--validators-file",
+            "--validators-pem",
             str(validators_file),
             "--delegation-contract",
             "erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqthllllsy5r6rh",
@@ -223,7 +223,7 @@ def test_stake_nodes_with_bls_keys(capsys: Any):
         [
             "staking-provider",
             "stake-nodes",
-            "--validators-file",
+            "--validators-pem",
             str(validators_file),
             "--delegation-contract",
             "erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqthllllsy5r6rh",

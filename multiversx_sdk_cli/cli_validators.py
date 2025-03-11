@@ -26,7 +26,7 @@ def setup_parser(args: list[str], subparsers: Any) -> Any:
     _add_common_arguments(args, sub)
     sub.add_argument("--reward-address", default="", help="the reward address")
     sub.add_argument(
-        "--validators-file",
+        "--validators-pem",
         required=not (utils.is_arg_present(args, "--top-up")),
         help="a PEM file describing the nodes; can contain multiple nodes",
     )
@@ -34,7 +34,7 @@ def setup_parser(args: list[str], subparsers: Any) -> Any:
         "--top-up",
         action="store_true",
         default=False,
-        required=not (utils.is_arg_present(args, "--validators-file")),
+        required=not (utils.is_arg_present(args, "--validators-pem")),
         help="Stake value for top up",
     )
     sub.set_defaults(func=do_stake)
@@ -182,10 +182,10 @@ def do_stake(args: Any):
             guardian_2fa_code=args.guardian_2fa_code,
         )
     else:
-        validators_file = _load_validators_signers(args.validators_file)
+        validators_signers = _load_validators_signers(args.validators_pem)
         tx = controller.create_transaction_for_staking(
             sender=sender,
-            validators=validators_file,
+            validators=validators_signers,
             native_amount=native_amount,
             gas_limit=gas_limit,
             gas_price=args.gas_price,
@@ -212,8 +212,7 @@ def _get_validators_controller(args: Any):
 
 def _load_validators_signers(validators_pem: str) -> ValidatorsSigners:
     validators_file_path = Path(validators_pem).expanduser()
-    validators_file = ValidatorsSigners.new_from_pem(validators_file_path)
-    return validators_file
+    return ValidatorsSigners.new_from_pem(validators_file_path)
 
 
 def _parse_public_bls_keys(public_bls_keys: str) -> list[ValidatorPublicKey]:
