@@ -1,10 +1,10 @@
 import json
 import logging
-import time
 from typing import Any, Optional, Protocol, TextIO, Union
 
 from multiversx_sdk import (
     Address,
+    AwaitingOptions,
     SmartContractResult,
     TokenTransfer,
     Transaction,
@@ -23,12 +23,18 @@ from multiversx_sdk_cli.interfaces import IAccount
 logger = logging.getLogger("transactions")
 
 
+ONE_SECOND_IN_MILLISECONDS = 1000
+
+
 # fmt: off
 class INetworkProvider(Protocol):
     def send_transaction(self, transaction: Transaction) -> bytes:
         ...
 
     def get_transaction(self, transaction_hash: Union[bytes, str]) -> TransactionOnNetwork:
+        ...
+
+    def await_transaction_completed(self, transaction_hash: Union[bytes, str], options: Optional[AwaitingOptions] = None) -> TransactionOnNetwork:
         ...
 # fmt: on
 
@@ -100,28 +106,12 @@ def send_and_wait_for_result(transaction: Transaction, proxy: INetworkProvider, 
     if not transaction.signature:
         raise errors.TransactionIsNotSigned()
 
-    txOnNetwork = _send_transaction_and_wait_for_result(proxy, transaction, timeout)
-    return txOnNetwork
+    options = AwaitingOptions(timeout_in_milliseconds=timeout * ONE_SECOND_IN_MILLISECONDS)
 
+    tx_hash = proxy.send_transaction(transaction)
+    tx_on_network = proxy.await_transaction_completed(tx_hash, options)
 
-def _send_transaction_and_wait_for_result(
-    proxy: INetworkProvider, payload: Transaction, num_seconds_timeout: int = 100
-) -> TransactionOnNetwork:
-    AWAIT_TRANSACTION_PERIOD = 5
-
-    tx_hash = proxy.send_transaction(payload)
-    num_periods_to_wait = int(num_seconds_timeout / AWAIT_TRANSACTION_PERIOD)
-
-    for _ in range(0, num_periods_to_wait):
-        time.sleep(AWAIT_TRANSACTION_PERIOD)
-
-        tx = proxy.get_transaction(tx_hash)
-        if tx.status.is_completed:
-            return tx
-        else:
-            logger.info("Transaction not yet done.")
-
-    raise errors.KnownError("Took too long to get transaction.")
+    return tx_on_network
 
 
 def load_transaction_from_file(f: TextIO) -> Transaction:
