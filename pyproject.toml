@@ -19,6 +19,9 @@ classifiers = [
     "Intended Audience :: Developers"
 ]
 
+[tool.hatch.metadata]
+allow-direct-references = true
+
 dependencies = [
   "toml>=0.10.2",
   "requests>=2.32.0,<3.0.0",
