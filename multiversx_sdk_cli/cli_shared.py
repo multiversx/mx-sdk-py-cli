@@ -22,6 +22,7 @@ from multiversx_sdk_cli.cli_password import (
 )
 from multiversx_sdk_cli.constants import DEFAULT_GAS_PRICE, DEFAULT_TX_VERSION
 from multiversx_sdk_cli.errors import ArgumentsNotProvidedError, IncorrectWalletError
+from multiversx_sdk_cli.guardian_relayer_data import GuardianRelayerData
 from multiversx_sdk_cli.interfaces import IAccount
 from multiversx_sdk_cli.simulation import Simulator
 from multiversx_sdk_cli.transactions import send_and_wait_for_result
@@ -118,28 +119,10 @@ def add_tx_args(
         default=DEFAULT_TX_VERSION,
         help="the transaction version (default: %(default)s)",
     )
+    sub.add_argument("--options", type=int, default=0, help="the transaction options (default: %(default)s)")
 
-    sub.add_argument("--relayer", help="the bech32 address of the relayer")
-
-    add_guardian_args(sub)
-
-    sub.add_argument("--options", type=int, default=0, help="the transaction options (default: 0)")
-
-
-def add_guardian_args(sub: Any):
-    sub.add_argument("--guardian", type=str, help="the address of the guradian", default="")
-    sub.add_argument(
-        "--guardian-service-url",
-        type=str,
-        help="the url of the guardian service",
-        default="",
-    )
-    sub.add_argument(
-        "--guardian-2fa-code",
-        type=str,
-        help="the 2fa code for the guardian",
-        default="",
-    )
+    sub.add_argument("--relayer", type=str, help="the bech32 address of the relayer", default="")
+    sub.add_argument("--guardian", type=str, help="the bech32 address of the guradian", default="")
 
 
 def add_wallet_args(args: list[str], sub: Any):
@@ -174,6 +157,18 @@ def add_wallet_args(args: list[str], sub: Any):
 
 
 def add_guardian_wallet_args(args: list[str], sub: Any):
+    sub.add_argument(
+        "--guardian-service-url",
+        type=str,
+        help="the url of the guardian service",
+        default="",
+    )
+    sub.add_argument(
+        "--guardian-2fa-code",
+        type=str,
+        help="the 2fa code for the guardian",
+        default="",
+    )
     sub.add_argument(
         "--guardian-pem",
         help="🔑 the PEM file, if keyfile not provided",
@@ -313,6 +308,33 @@ def get_guardian_address(guardian: Union[IAccount, None], args: Any) -> Union[Ad
     return address_from_account or address_from_args
 
 
+# check if account is guarded, api/proxy agnostic
+# check if guardian is active
+# get guardian address
+# get guardian service (if TCS have the url ready)
+
+# def fetch_guardian_address_from_the_network(address: str, proxy_url: str) -> Address:
+#     network_provider_config = config.get_config_for_network_providers()
+#     proxy = ProxyNetworkProvider(url=proxy_url, config=network_provider_config)
+#     return proxy.get_account(Address.new_from_bech32(address)).address
+
+
+def fetch_guardian_info(address: str, proxy_url: str) -> Union[tuple[Address, str], None]:
+    network_provider_config = config.get_config_for_network_providers()
+    proxy = ProxyNetworkProvider(url=proxy_url, config=network_provider_config)
+
+    response = proxy.do_get_generic(f"/address/{address}/guardian-data").to_dictionary()
+    guardian_data = response.get("guardianData", {})
+
+    if not bool(guardian_data.get("guarded", "")):
+        return None
+
+    guardian_address = Address.new_from_bech32(guardian_data.get("address", ""))
+    service_url = guardian_data.get("serviceUID", "")
+
+    return None
+
+
 def get_relayer_address(relayer: Union[IAccount, None], args: Any) -> Union[Address, None]:
     address_from_account = relayer.address if relayer else None
     address_from_args = Address.new_from_bech32(args.relayer) if hasattr(args, "relayer") and args.relayer else None
@@ -445,7 +467,7 @@ def prepare_sender(args: Any):
     return sender
 
 
-def prepare_guardian(args: Any):
+def prepare_guardian(args: Any) -> tuple[Union[IAccount, None], Union[Address, None]]:
     """Reurns a tuple containing the guardians's account and the account's address.
     If no account or address were provided, will return (None, None)."""
     guardian = load_guardian_account(args)
@@ -453,9 +475,20 @@ def prepare_guardian(args: Any):
     return guardian, guardian_address
 
 
-def prepare_relayer(args: Any):
+def prepare_relayer(args: Any) -> tuple[Union[IAccount, None], Union[Address, None]]:
     """Reurns a tuple containing the relayer's account and the account's address.
     If no account or address were provided, will return (None, None)."""
     relayer = load_relayer_account(args)
     relayer_address = get_relayer_address(relayer, args)
     return relayer, relayer_address
+
+
+def prepare_guardian_relayer_data(args: Any) -> GuardianRelayerData:
+    guardian, guardian_address = prepare_guardian(args)
+    relayer, relayer_address = prepare_relayer(args)
+    return GuardianRelayerData(
+        guardian=guardian,
+        guardian_address=guardian_address,
+        relayer=relayer,
+        relayer_address=relayer_address,
+    )

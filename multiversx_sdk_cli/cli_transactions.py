@@ -86,7 +86,6 @@ def setup_parser(args: list[str], subparsers: Any) -> Any:
     cli_shared.add_outfile_arg(sub, what="the signed transaction")
     cli_shared.add_broadcast_args(sub)
     cli_shared.add_proxy_arg(sub)
-    cli_shared.add_guardian_args(sub)
     cli_shared.add_guardian_wallet_args(args, sub)
     cli_shared.add_relayed_v3_wallet_args(args, sub)
     sub.set_defaults(func=sign_transaction)
