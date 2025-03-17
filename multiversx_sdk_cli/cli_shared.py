@@ -345,7 +345,12 @@ def get_guardian_and_relayer_data(sender: str, args: Any) -> GuardianRelayerData
         relayer_address=relayer_address,
     )
 
-    _get_guardian_data_from_network(sender, args, guardian_and_relayer_data)
+    if guardian_and_relayer_data.guardian_address:
+        guardian_and_relayer_data.guardian_service_url = args.guardian_service_url
+        guardian_and_relayer_data.guardian_2fa_code = args.guardian_2fa_code
+    else:
+        _get_guardian_data_from_network(sender, args, guardian_and_relayer_data)
+
     return guardian_and_relayer_data
 
 
@@ -353,18 +358,17 @@ def _get_guardian_data_from_network(sender: str, args: Any, guardian_and_relayer
     """Updates the `guardian_and_relayer_data` parameter, that is later used."""
 
     # if guardian not provided, get guardian from the network
-    if not guardian_and_relayer_data.guardian_address:
-        guardian_data = _get_guardian_data(sender, args.proxy)
+    guardian_data = _get_guardian_data(sender, args.proxy)
 
-        if guardian_data:
-            guardian_and_relayer_data.guardian_address = Address.new_from_bech32(guardian_data["guardian_address"])
+    if guardian_data:
+        guardian_and_relayer_data.guardian_address = Address.new_from_bech32(guardian_data["guardian_address"])
 
-            # if tcs is used, set url, else get service url from args
-            tcs_url = guardian_data["cosigner_service_url"]
-            guardian_and_relayer_data.guardian_service_url = tcs_url if tcs_url else args.guardian_service_url
+        # if tcs is used, set url, else get service url from args
+        tcs_url = guardian_data["cosigner_service_url"]
+        guardian_and_relayer_data.guardian_service_url = tcs_url if tcs_url else args.guardian_service_url
 
-        if guardian_and_relayer_data.guardian_service_url:
-            guardian_and_relayer_data.guardian_2fa_code = _get_2fa_code(args)
+    if guardian_and_relayer_data.guardian_service_url:
+        guardian_and_relayer_data.guardian_2fa_code = _get_2fa_code(args)
 
 
 def _get_guardian_data(address: str, proxy_url: str) -> Union[dict[str, str], None]:
