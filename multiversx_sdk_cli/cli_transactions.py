@@ -121,15 +121,13 @@ def create_transaction(args: Any):
     validate_chain_id_args(args)
 
     sender = cli_shared.prepare_sender(args)
+    guardian_and_relayer_data = cli_shared.get_guardian_and_relayer_data(
+        sender=sender.address.to_bech32(),
+        args=args,
+    )
 
     if args.data_file:
         args.data = Path(args.data_file).read_text()
-
-    guardian = cli_shared.load_guardian_account(args)
-    guardian_address = cli_shared.get_guardian_address(guardian, args)
-
-    relayer = cli_shared.load_relayer_account(args)
-    relayer_address = cli_shared.get_relayer_address(relayer, args)
 
     native_amount = int(args.value)
     gas_limit = int(args.gas_limit) if args.gas_limit else 0
@@ -151,12 +149,7 @@ def create_transaction(args: Any):
         options=args.options,
         token_transfers=transfers,
         data=args.data,
-        guardian_account=guardian,
-        guardian_address=guardian_address,
-        relayer_account=relayer,
-        relayer_address=relayer_address,
-        guardian_service_url=args.guardian_service_url,
-        guardian_2fa_code=args.guardian_2fa_code,
+        guardian_and_relayer_data=guardian_and_relayer_data,
     )
 
     cli_shared.send_or_simulate(tx, args)

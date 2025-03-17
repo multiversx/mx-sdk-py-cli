@@ -2,6 +2,7 @@ from pathlib import Path
 
 from multiversx_sdk import Account, Address
 
+from multiversx_sdk_cli.guardian_relayer_data import GuardianRelayerData
 from multiversx_sdk_cli.transactions import TransactionsController
 
 testdata = Path(__file__).parent / "testdata"
@@ -12,6 +13,7 @@ class TestTransactionsController:
     alice = Account.new_from_pem(testdata / "alice.pem")
 
     def test_create_transaction_without_data_and_value(self):
+        guardian_relayer_data = GuardianRelayerData()
         transaction = self.controller.create_transaction(
             sender=self.alice,
             receiver=Address.new_from_bech32("erd1cqqxak4wun7508e0yj9ng843r6hv4mzd0hhpjpsejkpn9wa9yq8sj7u2u5"),
@@ -21,6 +23,7 @@ class TestTransactionsController:
             nonce=7,
             version=2,
             options=0,
+            guardian_and_relayer_data=guardian_relayer_data,
         )
 
         assert transaction.sender == self.alice.address
@@ -43,6 +46,7 @@ class TestTransactionsController:
         )
 
     def test_create_transfer_transaction(self):
+        guardian_relayer_data = GuardianRelayerData()
         transaction = self.controller.create_transaction(
             sender=self.alice,
             receiver=Address.new_from_bech32("erd1cqqxak4wun7508e0yj9ng843r6hv4mzd0hhpjpsejkpn9wa9yq8sj7u2u5"),
@@ -52,6 +56,7 @@ class TestTransactionsController:
             nonce=7,
             version=2,
             options=0,
+            guardian_and_relayer_data=guardian_relayer_data,
         )
 
         assert transaction.sender == self.alice.address
@@ -74,6 +79,7 @@ class TestTransactionsController:
         )
 
     def test_create_transaction_with_data(self):
+        guardian_relayer_data = GuardianRelayerData()
         transaction = self.controller.create_transaction(
             sender=self.alice,
             receiver=Address.new_from_bech32("erd1cqqxak4wun7508e0yj9ng843r6hv4mzd0hhpjpsejkpn9wa9yq8sj7u2u5"),
@@ -84,6 +90,7 @@ class TestTransactionsController:
             version=2,
             options=0,
             data="testdata",
+            guardian_and_relayer_data=guardian_relayer_data,
         )
 
         assert transaction.sender == self.alice.address
@@ -106,6 +113,11 @@ class TestTransactionsController:
         )
 
     def test_create_guarded_transaction(self):
+        guardian_relayer_data = GuardianRelayerData(
+            guardian=Account.new_from_pem(testdata / "testUser2.pem"),
+            guardian_address=Address.new_from_bech32("erd1ssmsc9022udc8pdw7wk3hxw74jr900xg28vwpz3z60gep66fasasl2nkm4"),
+        )
+
         transaction = self.controller.create_transaction(
             sender=self.alice,
             receiver=Address.new_from_bech32("erd1cqqxak4wun7508e0yj9ng843r6hv4mzd0hhpjpsejkpn9wa9yq8sj7u2u5"),
@@ -116,8 +128,7 @@ class TestTransactionsController:
             version=2,
             options=0,
             data="testdata",
-            guardian_address=Address.new_from_bech32("erd1ssmsc9022udc8pdw7wk3hxw74jr900xg28vwpz3z60gep66fasasl2nkm4"),
-            guardian_account=Account.new_from_pem(testdata / "testUser2.pem"),
+            guardian_and_relayer_data=guardian_relayer_data,
         )
 
         assert transaction.sender == self.alice.address
@@ -146,6 +157,11 @@ class TestTransactionsController:
         )
 
     def test_create_relayed_transaction(self):
+        guardian_relayer_data = GuardianRelayerData(
+            relayer=Account.new_from_pem(testdata / "testUser2.pem"),
+            relayer_address=Address.new_from_bech32("erd1ssmsc9022udc8pdw7wk3hxw74jr900xg28vwpz3z60gep66fasasl2nkm4"),
+        )
+
         transaction = self.controller.create_transaction(
             sender=self.alice,
             receiver=Address.new_from_bech32("erd1cqqxak4wun7508e0yj9ng843r6hv4mzd0hhpjpsejkpn9wa9yq8sj7u2u5"),
@@ -156,8 +172,7 @@ class TestTransactionsController:
             version=2,
             options=0,
             data="testdata",
-            relayer_address=Address.new_from_bech32("erd1ssmsc9022udc8pdw7wk3hxw74jr900xg28vwpz3z60gep66fasasl2nkm4"),
-            relayer_account=Account.new_from_pem(testdata / "testUser2.pem"),
+            guardian_and_relayer_data=guardian_relayer_data,
         )
 
         assert transaction.sender == self.alice.address
@@ -186,6 +201,13 @@ class TestTransactionsController:
         )
 
     def test_create_guarded_relayed_transaction(self):
+        guardian_relayer_data = GuardianRelayerData(
+            guardian=Account.new_from_pem(testdata / "testUser.pem"),
+            guardian_address=Address.new_from_bech32("erd1cqqxak4wun7508e0yj9ng843r6hv4mzd0hhpjpsejkpn9wa9yq8sj7u2u5"),
+            relayer=Account.new_from_pem(testdata / "testUser2.pem"),
+            relayer_address=Address.new_from_bech32("erd1ssmsc9022udc8pdw7wk3hxw74jr900xg28vwpz3z60gep66fasasl2nkm4"),
+        )
+
         transaction = self.controller.create_transaction(
             sender=self.alice,
             receiver=Address.new_from_bech32("erd1cqqxak4wun7508e0yj9ng843r6hv4mzd0hhpjpsejkpn9wa9yq8sj7u2u5"),
@@ -196,10 +218,7 @@ class TestTransactionsController:
             version=2,
             options=0,
             data="testdata",
-            guardian_address=Address.new_from_bech32("erd1cqqxak4wun7508e0yj9ng843r6hv4mzd0hhpjpsejkpn9wa9yq8sj7u2u5"),
-            guardian_account=Account.new_from_pem(testdata / "testUser.pem"),
-            relayer_address=Address.new_from_bech32("erd1ssmsc9022udc8pdw7wk3hxw74jr900xg28vwpz3z60gep66fasasl2nkm4"),
-            relayer_account=Account.new_from_pem(testdata / "testUser2.pem"),
+            guardian_and_relayer_data=guardian_relayer_data,
         )
 
         assert transaction.sender == self.alice.address

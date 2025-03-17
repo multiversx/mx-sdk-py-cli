@@ -134,7 +134,7 @@ def test_stake_with_relayer_and_guardian(capsys: Any):
     assert tx["receiver"] == "erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqplllst77y4l"
     assert tx["value"] == "2500000000000000000000"
     assert tx["nonce"] == 0
-    assert tx["gasLimit"] == 11029500
+    assert tx["gasLimit"] == 11129500
     assert tx["chainID"] == "localnet"
     assert tx["version"] == 2
     assert tx["options"] == 2
@@ -142,11 +142,11 @@ def test_stake_with_relayer_and_guardian(capsys: Any):
     assert tx["relayer"] == "erd1cqqxak4wun7508e0yj9ng843r6hv4mzd0hhpjpsejkpn9wa9yq8sj7u2u5"
     assert (
         tx["signature"]
-        == "9ecca226c3e5913906a5f22971a0d84bb7a8c652e309ffab4073dea8bbd88caccc2ad9e33b6929f16acdedb676ad574ad66d520abd5b398469fa0cff3fc7ca03"
+        == "87e80ebb4bb31837a268ec209353615e77ecf8799353dff9a7c6c78f049d7a3ebca715840db14428e98925fc3b8b9137dbbe35ea33affe2420fa3b2f1e701d06"
     )
     assert (
         tx["guardianSignature"]
-        == "12c1ee05d34282555d85f7786dc0e7ffbce960de88fb75ba81a237bd1f2cc175f50ee42e60b2857bf2cd49d02de12a4017f1c95f14910fcc27bc7cb16b41ce04"
+        == "afb5e45bec458dae4b5ab80f8c6048a15faaeb2bcfaad90e6707de62bf3a931b440835ae8ec1dd767d52a5ed290583fe73b5302801ecfcd8e7c5908fdbf9b001"
     )
     assert (
         data

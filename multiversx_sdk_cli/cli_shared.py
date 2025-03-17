@@ -20,14 +20,35 @@ from multiversx_sdk_cli.cli_password import (
     load_password,
     load_relayer_password,
 )
-from multiversx_sdk_cli.constants import DEFAULT_GAS_PRICE, DEFAULT_TX_VERSION
-from multiversx_sdk_cli.errors import ArgumentsNotProvidedError, IncorrectWalletError
+from multiversx_sdk_cli.constants import (
+    DEFAULT_GAS_PRICE,
+    DEFAULT_TX_VERSION,
+    TCS_SERVICE_ID,
+)
+from multiversx_sdk_cli.errors import (
+    ArgumentsNotProvidedError,
+    BadUsage,
+    IncorrectWalletError,
+)
 from multiversx_sdk_cli.guardian_relayer_data import GuardianRelayerData
 from multiversx_sdk_cli.interfaces import IAccount
 from multiversx_sdk_cli.simulation import Simulator
 from multiversx_sdk_cli.transactions import send_and_wait_for_result
 from multiversx_sdk_cli.utils import log_explorer_transaction
 from multiversx_sdk_cli.ux import show_warning
+
+trusted_cosigner_service_url_by_chain_id = {
+    "1": "https://tools.multiversx.com/guardian",
+    "D": "https://devnet-tools.multiversx.com/guardian",
+    "T": "https://testnet-tools.multiversx.com/guardian",
+}
+
+
+def get_trusted_cosigner_service_url_by_chain_id(chain_id: str) -> str:
+    try:
+        return trusted_cosigner_service_url_by_chain_id[chain_id]
+    except:
+        raise BadUsage(f"Could not get Trusted Cosigner Service Url. No match found for chain id: {chain_id}")
 
 
 def wider_help_formatter(prog: Text):
@@ -308,31 +329,84 @@ def get_guardian_address(guardian: Union[IAccount, None], args: Any) -> Union[Ad
     return address_from_account or address_from_args
 
 
-# check if account is guarded, api/proxy agnostic
-# check if guardian is active
-# get guardian address
-# get guardian service (if TCS have the url ready)
+def get_guardian_and_relayer_data(sender: str, args: Any) -> GuardianRelayerData:
+    guardian = load_guardian_account(args)
 
-# def fetch_guardian_address_from_the_network(address: str, proxy_url: str) -> Address:
-#     network_provider_config = config.get_config_for_network_providers()
-#     proxy = ProxyNetworkProvider(url=proxy_url, config=network_provider_config)
-#     return proxy.get_account(Address.new_from_bech32(address)).address
+    # get guardian address from account or from cli args
+    guardian_address = get_guardian_address(guardian, args)
+
+    relayer = load_relayer_account(args)
+    relayer_address = get_relayer_address(relayer, args)
+
+    guardian_and_relayer_data = GuardianRelayerData(
+        guardian=guardian,
+        guardian_address=guardian_address,
+        relayer=relayer,
+        relayer_address=relayer_address,
+    )
+
+    _get_guardian_data_from_network(sender, args, guardian_and_relayer_data)
+    return guardian_and_relayer_data
 
 
-def fetch_guardian_info(address: str, proxy_url: str) -> Union[tuple[Address, str], None]:
-    network_provider_config = config.get_config_for_network_providers()
-    proxy = ProxyNetworkProvider(url=proxy_url, config=network_provider_config)
+def _get_guardian_data_from_network(sender: str, args: Any, guardian_and_relayer_data: GuardianRelayerData):
+    """Updates the `guardian_and_relayer_data` parameter, that is later used."""
 
-    response = proxy.do_get_generic(f"/address/{address}/guardian-data").to_dictionary()
-    guardian_data = response.get("guardianData", {})
+    # if guardian not provided, get guardian from the network
+    if not guardian_and_relayer_data.guardian_address:
+        guardian_data = _get_guardian_data(sender, args.proxy)
+
+        if guardian_data:
+            guardian_and_relayer_data.guardian_address = Address.new_from_bech32(guardian_data["guardian_address"])
+
+            # if tcs is used, set url, else get service url from args
+            tcs_url = guardian_data["cosigner_service_url"]
+            guardian_and_relayer_data.guardian_service_url = tcs_url if tcs_url else args.guardian_service_url
+
+        if guardian_and_relayer_data.guardian_service_url:
+            guardian_and_relayer_data.guardian_2fa_code = _get_2fa_code(args)
+
+
+def _get_guardian_data(address: str, proxy_url: str) -> Union[dict[str, str], None]:
+    if not proxy_url:
+        return None
+
+    guardian_data = _fetch_guardian_data(address, proxy_url)
 
     if not bool(guardian_data.get("guarded", "")):
         return None
 
-    guardian_address = Address.new_from_bech32(guardian_data.get("address", ""))
-    service_url = guardian_data.get("serviceUID", "")
+    active_guardian = guardian_data.get("activeGuardian", {})
 
-    return None
+    guardian_address = active_guardian.get("address", "")
+    service_id = active_guardian.get("serviceUID", "")
+
+    cosigner_service_url = ""
+
+    if service_id == TCS_SERVICE_ID:
+        chain_id = _fetch_chain_id(proxy_url)
+        cosigner_service_url = get_trusted_cosigner_service_url_by_chain_id(chain_id)
+
+    return {
+        "guardian_address": guardian_address,
+        "cosigner_service_url": cosigner_service_url,
+    }
+
+
+def _fetch_guardian_data(address: str, proxy_url: str) -> dict[str, Any]:
+    network_provider_config = config.get_config_for_network_providers()
+    proxy = ProxyNetworkProvider(url=proxy_url, config=network_provider_config)
+
+    response = proxy.do_get_generic(f"/address/{address}/guardian-data").to_dictionary()
+    guardian_data: dict[str, Any] = response.get("guardianData", {})
+    return guardian_data
+
+
+def _get_2fa_code(args: Any) -> str:
+    code: str = args.guardian_2fa_code
+    if not code:
+        code = input("Please enter the two factor authentication code: ")
+    return code
 
 
 def get_relayer_address(relayer: Union[IAccount, None], args: Any) -> Union[Address, None]:
@@ -381,9 +455,7 @@ def get_current_nonce_for_address(address: Address, proxy_url: Union[str, None])
 
 def get_chain_id(chain_id: str, proxy_url: str) -> str:
     if chain_id and proxy_url:
-        network_provider_config = config.get_config_for_network_providers()
-        proxy = ProxyNetworkProvider(url=proxy_url, config=network_provider_config)
-        fetched_chain_id = proxy.get_network_config().chain_id
+        fetched_chain_id = _fetch_chain_id(proxy_url)
 
         if chain_id != fetched_chain_id:
             show_warning(
@@ -394,6 +466,10 @@ def get_chain_id(chain_id: str, proxy_url: str) -> str:
     if chain_id:
         return chain_id
 
+    return _fetch_chain_id(proxy_url)
+
+
+def _fetch_chain_id(proxy_url: str) -> str:
     network_provider_config = config.get_config_for_network_providers()
     proxy = ProxyNetworkProvider(url=proxy_url, config=network_provider_config)
     return proxy.get_network_config().chain_id

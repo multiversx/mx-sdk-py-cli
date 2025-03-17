@@ -10,6 +10,7 @@ from multiversx_sdk import (
 )
 
 from multiversx_sdk_cli.base_transactions_controller import BaseTransactionsController
+from multiversx_sdk_cli.guardian_relayer_data import GuardianRelayerData
 from multiversx_sdk_cli.interfaces import IAccount
 from multiversx_sdk_cli.transactions import TransactionsController
 
@@ -29,13 +30,8 @@ class ValidatorsController(BaseTransactionsController):
         nonce: int,
         version: int,
         options: int,
+        guardian_and_relayer_data: GuardianRelayerData,
         rewards_address: Optional[Address] = None,
-        guardian_account: Optional[IAccount] = None,
-        guardian_address: Optional[Address] = None,
-        relayer_account: Optional[IAccount] = None,
-        relayer_address: Optional[Address] = None,
-        guardian_service_url: str = "",
-        guardian_2fa_code: str = "",
     ) -> Transaction:
         transaction = self.factory.create_transaction_for_staking(
             sender=sender.address,
@@ -47,8 +43,10 @@ class ValidatorsController(BaseTransactionsController):
         transaction.nonce = nonce
         transaction.version = version
         transaction.options = options
-        transaction.guardian = guardian_address
-        transaction.relayer = relayer_address
+        transaction.guardian = guardian_and_relayer_data.guardian_address
+        transaction.relayer = guardian_and_relayer_data.relayer_address
+
+        self.add_extra_gas_limit_if_required(transaction)
 
         if gas_limit:
             transaction.gas_limit = gas_limit
@@ -56,10 +54,10 @@ class ValidatorsController(BaseTransactionsController):
         self.sign_transaction(
             transaction=transaction,
             sender=sender,
-            guardian=guardian_account,
-            relayer=relayer_account,
-            guardian_service_url=guardian_service_url,
-            guardian_2fa_code=guardian_2fa_code,
+            guardian=guardian_and_relayer_data.guardian,
+            relayer=guardian_and_relayer_data.relayer,
+            guardian_service_url=guardian_and_relayer_data.guardian_service_url,
+            guardian_2fa_code=guardian_and_relayer_data.guardian_2fa_code,
         )
 
         return transaction
@@ -73,12 +71,7 @@ class ValidatorsController(BaseTransactionsController):
         nonce: int,
         version: int,
         options: int,
-        guardian_account: Optional[IAccount] = None,
-        guardian_address: Optional[Address] = None,
-        relayer_account: Optional[IAccount] = None,
-        relayer_address: Optional[Address] = None,
-        guardian_service_url: str = "",
-        guardian_2fa_code: str = "",
+        guardian_and_relayer_data: GuardianRelayerData,
     ) -> Transaction:
         transaction = self.factory.create_transaction_for_topping_up(
             sender=sender.address,
@@ -88,8 +81,10 @@ class ValidatorsController(BaseTransactionsController):
         transaction.nonce = nonce
         transaction.version = version
         transaction.options = options
-        transaction.guardian = guardian_address
-        transaction.relayer = relayer_address
+        transaction.guardian = guardian_and_relayer_data.guardian_address
+        transaction.relayer = guardian_and_relayer_data.relayer_address
+
+        self.add_extra_gas_limit_if_required(transaction)
 
         if gas_limit:
             transaction.gas_limit = gas_limit
@@ -97,10 +92,10 @@ class ValidatorsController(BaseTransactionsController):
         self.sign_transaction(
             transaction=transaction,
             sender=sender,
-            guardian=guardian_account,
-            relayer=relayer_account,
-            guardian_service_url=guardian_service_url,
-            guardian_2fa_code=guardian_2fa_code,
+            guardian=guardian_and_relayer_data.guardian,
+            relayer=guardian_and_relayer_data.relayer,
+            guardian_service_url=guardian_and_relayer_data.guardian_service_url,
+            guardian_2fa_code=guardian_and_relayer_data.guardian_2fa_code,
         )
 
         return transaction
@@ -115,12 +110,7 @@ class ValidatorsController(BaseTransactionsController):
         nonce: int,
         version: int,
         options: int,
-        guardian_account: Optional[IAccount] = None,
-        guardian_address: Optional[Address] = None,
-        relayer_account: Optional[IAccount] = None,
-        relayer_address: Optional[Address] = None,
-        guardian_service_url: str = "",
-        guardian_2fa_code: str = "",
+        guardian_and_relayer_data: GuardianRelayerData,
     ) -> Transaction:
         transaction = self.factory.create_transaction_for_unstaking(
             sender=sender.address,
@@ -131,8 +121,10 @@ class ValidatorsController(BaseTransactionsController):
         transaction.nonce = nonce
         transaction.version = version
         transaction.options = options
-        transaction.guardian = guardian_address
-        transaction.relayer = relayer_address
+        transaction.guardian = guardian_and_relayer_data.guardian_address
+        transaction.relayer = guardian_and_relayer_data.relayer_address
+
+        self.add_extra_gas_limit_if_required(transaction)
 
         if gas_limit:
             transaction.gas_limit = gas_limit
@@ -140,10 +132,10 @@ class ValidatorsController(BaseTransactionsController):
         self.sign_transaction(
             transaction=transaction,
             sender=sender,
-            guardian=guardian_account,
-            relayer=relayer_account,
-            guardian_service_url=guardian_service_url,
-            guardian_2fa_code=guardian_2fa_code,
+            guardian=guardian_and_relayer_data.guardian,
+            relayer=guardian_and_relayer_data.relayer,
+            guardian_service_url=guardian_and_relayer_data.guardian_service_url,
+            guardian_2fa_code=guardian_and_relayer_data.guardian_2fa_code,
         )
 
         return transaction
@@ -158,12 +150,7 @@ class ValidatorsController(BaseTransactionsController):
         nonce: int,
         version: int,
         options: int,
-        guardian_account: Optional[IAccount] = None,
-        guardian_address: Optional[Address] = None,
-        relayer_account: Optional[IAccount] = None,
-        relayer_address: Optional[Address] = None,
-        guardian_service_url: str = "",
-        guardian_2fa_code: str = "",
+        guardian_and_relayer_data: GuardianRelayerData,
     ) -> Transaction:
         transaction = self.factory.create_transaction_for_unjailing(
             sender=sender.address,
@@ -174,8 +161,10 @@ class ValidatorsController(BaseTransactionsController):
         transaction.nonce = nonce
         transaction.version = version
         transaction.options = options
-        transaction.guardian = guardian_address
-        transaction.relayer = relayer_address
+        transaction.guardian = guardian_and_relayer_data.guardian_address
+        transaction.relayer = guardian_and_relayer_data.relayer_address
+
+        self.add_extra_gas_limit_if_required(transaction)
 
         if gas_limit:
             transaction.gas_limit = gas_limit
@@ -183,10 +172,10 @@ class ValidatorsController(BaseTransactionsController):
         self.sign_transaction(
             transaction=transaction,
             sender=sender,
-            guardian=guardian_account,
-            relayer=relayer_account,
-            guardian_service_url=guardian_service_url,
-            guardian_2fa_code=guardian_2fa_code,
+            guardian=guardian_and_relayer_data.guardian,
+            relayer=guardian_and_relayer_data.relayer,
+            guardian_service_url=guardian_and_relayer_data.guardian_service_url,
+            guardian_2fa_code=guardian_and_relayer_data.guardian_2fa_code,
         )
 
         return transaction
@@ -201,12 +190,7 @@ class ValidatorsController(BaseTransactionsController):
         nonce: int,
         version: int,
         options: int,
-        guardian_account: Optional[IAccount] = None,
-        guardian_address: Optional[Address] = None,
-        relayer_account: Optional[IAccount] = None,
-        relayer_address: Optional[Address] = None,
-        guardian_service_url: str = "",
-        guardian_2fa_code: str = "",
+        guardian_and_relayer_data: GuardianRelayerData,
     ) -> Transaction:
         transaction = self.factory.create_transaction_for_unbonding(
             sender=sender.address,
@@ -217,8 +201,10 @@ class ValidatorsController(BaseTransactionsController):
         transaction.nonce = nonce
         transaction.version = version
         transaction.options = options
-        transaction.guardian = guardian_address
-        transaction.relayer = relayer_address
+        transaction.guardian = guardian_and_relayer_data.guardian_address
+        transaction.relayer = guardian_and_relayer_data.relayer_address
+
+        self.add_extra_gas_limit_if_required(transaction)
 
         if gas_limit:
             transaction.gas_limit = gas_limit
@@ -226,10 +212,10 @@ class ValidatorsController(BaseTransactionsController):
         self.sign_transaction(
             transaction=transaction,
             sender=sender,
-            guardian=guardian_account,
-            relayer=relayer_account,
-            guardian_service_url=guardian_service_url,
-            guardian_2fa_code=guardian_2fa_code,
+            guardian=guardian_and_relayer_data.guardian,
+            relayer=guardian_and_relayer_data.relayer,
+            guardian_service_url=guardian_and_relayer_data.guardian_service_url,
+            guardian_2fa_code=guardian_and_relayer_data.guardian_2fa_code,
         )
 
         return transaction
@@ -244,12 +230,7 @@ class ValidatorsController(BaseTransactionsController):
         nonce: int,
         version: int,
         options: int,
-        guardian_account: Optional[IAccount] = None,
-        guardian_address: Optional[Address] = None,
-        relayer_account: Optional[IAccount] = None,
-        relayer_address: Optional[Address] = None,
-        guardian_service_url: str = "",
-        guardian_2fa_code: str = "",
+        guardian_and_relayer_data: GuardianRelayerData,
     ) -> Transaction:
         transaction = self.factory.create_transaction_for_changing_rewards_address(
             sender=sender.address,
@@ -260,8 +241,10 @@ class ValidatorsController(BaseTransactionsController):
         transaction.nonce = nonce
         transaction.version = version
         transaction.options = options
-        transaction.guardian = guardian_address
-        transaction.relayer = relayer_address
+        transaction.guardian = guardian_and_relayer_data.guardian_address
+        transaction.relayer = guardian_and_relayer_data.relayer_address
+
+        self.add_extra_gas_limit_if_required(transaction)
 
         if gas_limit:
             transaction.gas_limit = gas_limit
@@ -269,10 +252,10 @@ class ValidatorsController(BaseTransactionsController):
         self.sign_transaction(
             transaction=transaction,
             sender=sender,
-            guardian=guardian_account,
-            relayer=relayer_account,
-            guardian_service_url=guardian_service_url,
-            guardian_2fa_code=guardian_2fa_code,
+            guardian=guardian_and_relayer_data.guardian,
+            relayer=guardian_and_relayer_data.relayer,
+            guardian_service_url=guardian_and_relayer_data.guardian_service_url,
+            guardian_2fa_code=guardian_and_relayer_data.guardian_2fa_code,
         )
 
         return transaction
@@ -286,12 +269,7 @@ class ValidatorsController(BaseTransactionsController):
         nonce: int,
         version: int,
         options: int,
-        guardian_account: Optional[IAccount] = None,
-        guardian_address: Optional[Address] = None,
-        relayer_account: Optional[IAccount] = None,
-        relayer_address: Optional[Address] = None,
-        guardian_service_url: str = "",
-        guardian_2fa_code: str = "",
+        guardian_and_relayer_data: GuardianRelayerData,
     ) -> Transaction:
         transaction = self.factory.create_transaction_for_claiming(
             sender=sender.address,
@@ -301,8 +279,10 @@ class ValidatorsController(BaseTransactionsController):
         transaction.nonce = nonce
         transaction.version = version
         transaction.options = options
-        transaction.guardian = guardian_address
-        transaction.relayer = relayer_address
+        transaction.guardian = guardian_and_relayer_data.guardian_address
+        transaction.relayer = guardian_and_relayer_data.relayer_address
+
+        self.add_extra_gas_limit_if_required(transaction)
 
         if gas_limit:
             transaction.gas_limit = gas_limit
@@ -310,10 +290,10 @@ class ValidatorsController(BaseTransactionsController):
         self.sign_transaction(
             transaction=transaction,
             sender=sender,
-            guardian=guardian_account,
-            relayer=relayer_account,
-            guardian_service_url=guardian_service_url,
-            guardian_2fa_code=guardian_2fa_code,
+            guardian=guardian_and_relayer_data.guardian,
+            relayer=guardian_and_relayer_data.relayer,
+            guardian_service_url=guardian_and_relayer_data.guardian_service_url,
+            guardian_2fa_code=guardian_and_relayer_data.guardian_2fa_code,
         )
 
         return transaction
@@ -328,12 +308,7 @@ class ValidatorsController(BaseTransactionsController):
         nonce: int,
         version: int,
         options: int,
-        guardian_account: Optional[IAccount] = None,
-        guardian_address: Optional[Address] = None,
-        relayer_account: Optional[IAccount] = None,
-        relayer_address: Optional[Address] = None,
-        guardian_service_url: str = "",
-        guardian_2fa_code: str = "",
+        guardian_and_relayer_data: GuardianRelayerData,
     ) -> Transaction:
         transaction = self.factory.create_transaction_for_unstaking_nodes(
             sender=sender.address,
@@ -344,8 +319,10 @@ class ValidatorsController(BaseTransactionsController):
         transaction.nonce = nonce
         transaction.version = version
         transaction.options = options
-        transaction.guardian = guardian_address
-        transaction.relayer = relayer_address
+        transaction.guardian = guardian_and_relayer_data.guardian_address
+        transaction.relayer = guardian_and_relayer_data.relayer_address
+
+        self.add_extra_gas_limit_if_required(transaction)
 
         if gas_limit:
             transaction.gas_limit = gas_limit
@@ -353,10 +330,10 @@ class ValidatorsController(BaseTransactionsController):
         self.sign_transaction(
             transaction=transaction,
             sender=sender,
-            guardian=guardian_account,
-            relayer=relayer_account,
-            guardian_service_url=guardian_service_url,
-            guardian_2fa_code=guardian_2fa_code,
+            guardian=guardian_and_relayer_data.guardian,
+            relayer=guardian_and_relayer_data.relayer,
+            guardian_service_url=guardian_and_relayer_data.guardian_service_url,
+            guardian_2fa_code=guardian_and_relayer_data.guardian_2fa_code,
         )
 
         return transaction
@@ -371,12 +348,7 @@ class ValidatorsController(BaseTransactionsController):
         nonce: int,
         version: int,
         options: int,
-        guardian_account: Optional[IAccount] = None,
-        guardian_address: Optional[Address] = None,
-        relayer_account: Optional[IAccount] = None,
-        relayer_address: Optional[Address] = None,
-        guardian_service_url: str = "",
-        guardian_2fa_code: str = "",
+        guardian_and_relayer_data: GuardianRelayerData,
     ) -> Transaction:
         transaction = self.factory.create_transaction_for_unstaking_tokens(
             sender=sender.address,
@@ -387,8 +359,10 @@ class ValidatorsController(BaseTransactionsController):
         transaction.nonce = nonce
         transaction.version = version
         transaction.options = options
-        transaction.guardian = guardian_address
-        transaction.relayer = relayer_address
+        transaction.guardian = guardian_and_relayer_data.guardian_address
+        transaction.relayer = guardian_and_relayer_data.relayer_address
+
+        self.add_extra_gas_limit_if_required(transaction)
 
         if gas_limit:
             transaction.gas_limit = gas_limit
@@ -396,10 +370,10 @@ class ValidatorsController(BaseTransactionsController):
         self.sign_transaction(
             transaction=transaction,
             sender=sender,
-            guardian=guardian_account,
-            relayer=relayer_account,
-            guardian_service_url=guardian_service_url,
-            guardian_2fa_code=guardian_2fa_code,
+            guardian=guardian_and_relayer_data.guardian,
+            relayer=guardian_and_relayer_data.relayer,
+            guardian_service_url=guardian_and_relayer_data.guardian_service_url,
+            guardian_2fa_code=guardian_and_relayer_data.guardian_2fa_code,
         )
 
         return transaction
@@ -414,12 +388,7 @@ class ValidatorsController(BaseTransactionsController):
         nonce: int,
         version: int,
         options: int,
-        guardian_account: Optional[IAccount] = None,
-        guardian_address: Optional[Address] = None,
-        relayer_account: Optional[IAccount] = None,
-        relayer_address: Optional[Address] = None,
-        guardian_service_url: str = "",
-        guardian_2fa_code: str = "",
+        guardian_and_relayer_data: GuardianRelayerData,
     ) -> Transaction:
         transaction = self.factory.create_transaction_for_unbonding_nodes(
             sender=sender.address,
@@ -430,8 +399,10 @@ class ValidatorsController(BaseTransactionsController):
         transaction.nonce = nonce
         transaction.version = version
         transaction.options = options
-        transaction.guardian = guardian_address
-        transaction.relayer = relayer_address
+        transaction.guardian = guardian_and_relayer_data.guardian_address
+        transaction.relayer = guardian_and_relayer_data.relayer_address
+
+        self.add_extra_gas_limit_if_required(transaction)
 
         if gas_limit:
             transaction.gas_limit = gas_limit
@@ -439,10 +410,10 @@ class ValidatorsController(BaseTransactionsController):
         self.sign_transaction(
             transaction=transaction,
             sender=sender,
-            guardian=guardian_account,
-            relayer=relayer_account,
-            guardian_service_url=guardian_service_url,
-            guardian_2fa_code=guardian_2fa_code,
+            guardian=guardian_and_relayer_data.guardian,
+            relayer=guardian_and_relayer_data.relayer,
+            guardian_service_url=guardian_and_relayer_data.guardian_service_url,
+            guardian_2fa_code=guardian_and_relayer_data.guardian_2fa_code,
         )
 
         return transaction
@@ -457,12 +428,7 @@ class ValidatorsController(BaseTransactionsController):
         nonce: int,
         version: int,
         options: int,
-        guardian_account: Optional[IAccount] = None,
-        guardian_address: Optional[Address] = None,
-        relayer_account: Optional[IAccount] = None,
-        relayer_address: Optional[Address] = None,
-        guardian_service_url: str = "",
-        guardian_2fa_code: str = "",
+        guardian_and_relayer_data: GuardianRelayerData,
     ) -> Transaction:
         transaction = self.factory.create_transaction_for_unbonding_tokens(
             sender=sender.address,
@@ -473,8 +439,10 @@ class ValidatorsController(BaseTransactionsController):
         transaction.nonce = nonce
         transaction.version = version
         transaction.options = options
-        transaction.guardian = guardian_address
-        transaction.relayer = relayer_address
+        transaction.guardian = guardian_and_relayer_data.guardian_address
+        transaction.relayer = guardian_and_relayer_data.relayer_address
+
+        self.add_extra_gas_limit_if_required(transaction)
 
         if gas_limit:
             transaction.gas_limit = gas_limit
@@ -482,10 +450,10 @@ class ValidatorsController(BaseTransactionsController):
         self.sign_transaction(
             transaction=transaction,
             sender=sender,
-            guardian=guardian_account,
-            relayer=relayer_account,
-            guardian_service_url=guardian_service_url,
-            guardian_2fa_code=guardian_2fa_code,
+            guardian=guardian_and_relayer_data.guardian,
+            relayer=guardian_and_relayer_data.relayer,
+            guardian_service_url=guardian_and_relayer_data.guardian_service_url,
+            guardian_2fa_code=guardian_and_relayer_data.guardian_2fa_code,
         )
 
         return transaction
@@ -499,12 +467,7 @@ class ValidatorsController(BaseTransactionsController):
         nonce: int,
         version: int,
         options: int,
-        guardian_account: Optional[IAccount] = None,
-        guardian_address: Optional[Address] = None,
-        relayer_account: Optional[IAccount] = None,
-        relayer_address: Optional[Address] = None,
-        guardian_service_url: str = "",
-        guardian_2fa_code: str = "",
+        guardian_and_relayer_data: GuardianRelayerData,
     ) -> Transaction:
         transaction = self.factory.create_transaction_for_cleaning_registered_data(
             sender=sender.address,
@@ -514,8 +477,10 @@ class ValidatorsController(BaseTransactionsController):
         transaction.nonce = nonce
         transaction.version = version
         transaction.options = options
-        transaction.guardian = guardian_address
-        transaction.relayer = relayer_address
+        transaction.guardian = guardian_and_relayer_data.guardian_address
+        transaction.relayer = guardian_and_relayer_data.relayer_address
+
+        self.add_extra_gas_limit_if_required(transaction)
 
         if gas_limit:
             transaction.gas_limit = gas_limit
@@ -523,10 +488,10 @@ class ValidatorsController(BaseTransactionsController):
         self.sign_transaction(
             transaction=transaction,
             sender=sender,
-            guardian=guardian_account,
-            relayer=relayer_account,
-            guardian_service_url=guardian_service_url,
-            guardian_2fa_code=guardian_2fa_code,
+            guardian=guardian_and_relayer_data.guardian,
+            relayer=guardian_and_relayer_data.relayer,
+            guardian_service_url=guardian_and_relayer_data.guardian_service_url,
+            guardian_2fa_code=guardian_and_relayer_data.guardian_2fa_code,
         )
 
         return transaction
@@ -541,12 +506,7 @@ class ValidatorsController(BaseTransactionsController):
         nonce: int,
         version: int,
         options: int,
-        guardian_account: Optional[IAccount] = None,
-        guardian_address: Optional[Address] = None,
-        relayer_account: Optional[IAccount] = None,
-        relayer_address: Optional[Address] = None,
-        guardian_service_url: str = "",
-        guardian_2fa_code: str = "",
+        guardian_and_relayer_data: GuardianRelayerData,
     ) -> Transaction:
         transaction = self.factory.create_transaction_for_restaking_unstaked_nodes(
             sender=sender.address,
@@ -557,8 +517,10 @@ class ValidatorsController(BaseTransactionsController):
         transaction.nonce = nonce
         transaction.version = version
         transaction.options = options
-        transaction.guardian = guardian_address
-        transaction.relayer = relayer_address
+        transaction.guardian = guardian_and_relayer_data.guardian_address
+        transaction.relayer = guardian_and_relayer_data.relayer_address
+
+        self.add_extra_gas_limit_if_required(transaction)
 
         if gas_limit:
             transaction.gas_limit = gas_limit
@@ -566,10 +528,10 @@ class ValidatorsController(BaseTransactionsController):
         self.sign_transaction(
             transaction=transaction,
             sender=sender,
-            guardian=guardian_account,
-            relayer=relayer_account,
-            guardian_service_url=guardian_service_url,
-            guardian_2fa_code=guardian_2fa_code,
+            guardian=guardian_and_relayer_data.guardian,
+            relayer=guardian_and_relayer_data.relayer,
+            guardian_service_url=guardian_and_relayer_data.guardian_service_url,
+            guardian_2fa_code=guardian_and_relayer_data.guardian_2fa_code,
         )
 
         return transaction
