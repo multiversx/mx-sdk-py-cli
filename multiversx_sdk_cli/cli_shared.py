@@ -143,7 +143,7 @@ def add_tx_args(
     sub.add_argument("--options", type=int, default=0, help="the transaction options (default: %(default)s)")
 
     sub.add_argument("--relayer", type=str, help="the bech32 address of the relayer", default="")
-    sub.add_argument("--guardian", type=str, help="the bech32 address of the guradian", default="")
+    sub.add_argument("--guardian", type=str, help="the bech32 address of the guardian", default="")
 
 
 def add_wallet_args(args: list[str], sub: Any):
