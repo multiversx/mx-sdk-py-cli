@@ -7,5 +7,4 @@ ledgercomm[hid]
 rich==13.3.4
 argcomplete==3.2.2
 
-# multiversx-sdk[ledger]==1.1.0
-git+https://github.com/multiversx/mx-sdk-py@feat/next#egg=multiversx_sdk
+multiversx-sdk[ledger]==1.2.0
