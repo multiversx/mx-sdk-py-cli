@@ -36,6 +36,8 @@ HEX_PREFIX = "0x"
 FALSE_STR_LOWER = "false"
 TRUE_STR_LOWER = "true"
 STR_PREFIX = "str:"
+ADDRESS_PREFIX = "addr:"
+MAINCHAIN_ADDRESS_HRP = "erd"
 
 
 # fmt: off
@@ -262,6 +264,14 @@ class SmartContract(BaseTransactionsController):
                 args.append(BytesValue(self._hex_to_bytes(arg)))
             elif arg.isnumeric():
                 args.append(BigUIntValue(int(arg)))
+            elif arg.startswith(ADDRESS_PREFIX):
+                args.append(AddressValue.new_from_address(Address.new_from_bech32(arg[len(ADDRESS_PREFIX) :])))
+            elif arg.startswith(MAINCHAIN_ADDRESS_HRP):
+                # this flow will be removed in the future
+                logger.warning(
+                    "Address argument has no prefix. This flow will be removed in the future. Please provide each address using the `addr:` prefix. (e.g. --arguments addr:erd1...)"
+                )
+                args.append(AddressValue.new_from_address(Address.new_from_bech32(arg)))
             elif arg.startswith(get_address_hrp()):
                 args.append(AddressValue.new_from_address(Address.new_from_bech32(arg)))
             elif arg.lower() == FALSE_STR_LOWER:
