@@ -1,7 +1,7 @@
 import logging
 import subprocess
 from pathlib import Path
-from typing import Any, List, Optional, Union
+from typing import Any, Optional, Union
 
 from multiversx_sdk_cli import errors
 
@@ -9,7 +9,7 @@ logger = logging.getLogger("myprocess")
 
 
 def run_process(
-    args: List[str],
+    args: list[str],
     env: Any = None,
     dump_to_stdout: bool = True,
     cwd: Optional[Union[str, Path]] = None,
