@@ -7,6 +7,7 @@ import sys
 import tarfile
 import zipfile
 from pathlib import Path
+from types import SimpleNamespace
 from typing import Any, Optional, Protocol, Union, runtime_checkable
 
 import toml
@@ -38,6 +39,9 @@ class BasicEncoder(json.JSONEncoder):
             return o.to_dictionary()
         if isinstance(o, bytes):
             return o.hex()
+        # needed because sdk-py returns SimpleNamespace objects that the json library does not know to serialize
+        if isinstance(o, SimpleNamespace):
+            return o.__dict__
         return super().default(o)
 
 
