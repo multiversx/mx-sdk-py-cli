@@ -1,5 +1,3 @@
-from typing import Optional
-
 from multiversx_sdk import (
     Address,
     DelegationTransactionsFactory,
@@ -12,6 +10,7 @@ from multiversx_sdk.abi import BigUIntValue, Serializer
 from multiversx_sdk_cli.base_transactions_controller import BaseTransactionsController
 from multiversx_sdk_cli.config import get_address_hrp
 from multiversx_sdk_cli.errors import BadUsage
+from multiversx_sdk_cli.guardian_relayer_data import GuardianRelayerData
 from multiversx_sdk_cli.interfaces import IAccount
 
 DELEGATION_MANAGER_SC_ADDRESS_HEX = "000000000000000000010000000000000000000000000000000000000004ffff"
@@ -32,12 +31,7 @@ class DelegationOperations(BaseTransactionsController):
         nonce: int,
         version: int,
         options: int,
-        guardian_account: Optional[IAccount] = None,
-        guardian_address: Optional[Address] = None,
-        relayer_account: Optional[IAccount] = None,
-        relayer_address: Optional[Address] = None,
-        guardian_service_url: str = "",
-        guardian_2fa_code: str = "",
+        guardian_and_relayer_data: GuardianRelayerData,
     ) -> Transaction:
         tx = self._factory.create_transaction_for_new_delegation_contract(
             sender=owner.address,
@@ -49,8 +43,10 @@ class DelegationOperations(BaseTransactionsController):
         tx.nonce = nonce
         tx.version = version
         tx.options = options
-        tx.guardian = guardian_address
-        tx.relayer = relayer_address
+        tx.guardian = guardian_and_relayer_data.guardian_address
+        tx.relayer = guardian_and_relayer_data.relayer_address
+
+        self.add_extra_gas_limit_if_required(tx)
 
         if gas_limit:
             tx.gas_limit = gas_limit
@@ -58,10 +54,10 @@ class DelegationOperations(BaseTransactionsController):
         self.sign_transaction(
             transaction=tx,
             sender=owner,
-            guardian=guardian_account,
-            relayer=relayer_account,
-            guardian_service_url=guardian_service_url,
-            guardian_2fa_code=guardian_2fa_code,
+            guardian=guardian_and_relayer_data.guardian,
+            relayer=guardian_and_relayer_data.relayer,
+            guardian_service_url=guardian_and_relayer_data.guardian_service_url,
+            guardian_2fa_code=guardian_and_relayer_data.guardian_2fa_code,
         )
 
         return tx
@@ -78,12 +74,7 @@ class DelegationOperations(BaseTransactionsController):
         nonce: int,
         version: int,
         options: int,
-        guardian_account: Optional[IAccount] = None,
-        guardian_address: Optional[Address] = None,
-        relayer_account: Optional[IAccount] = None,
-        relayer_address: Optional[Address] = None,
-        guardian_service_url: str = "",
-        guardian_2fa_code: str = "",
+        guardian_and_relayer_data: GuardianRelayerData,
     ) -> Transaction:
         tx = self._factory.create_transaction_for_adding_nodes(
             sender=owner.address,
@@ -96,8 +87,10 @@ class DelegationOperations(BaseTransactionsController):
         tx.nonce = nonce
         tx.version = version
         tx.options = options
-        tx.guardian = guardian_address
-        tx.relayer = relayer_address
+        tx.guardian = guardian_and_relayer_data.guardian_address
+        tx.relayer = guardian_and_relayer_data.relayer_address
+
+        self.add_extra_gas_limit_if_required(tx)
 
         if gas_limit:
             tx.gas_limit = gas_limit
@@ -105,10 +98,10 @@ class DelegationOperations(BaseTransactionsController):
         self.sign_transaction(
             transaction=tx,
             sender=owner,
-            guardian=guardian_account,
-            relayer=relayer_account,
-            guardian_service_url=guardian_service_url,
-            guardian_2fa_code=guardian_2fa_code,
+            guardian=guardian_and_relayer_data.guardian,
+            relayer=guardian_and_relayer_data.relayer,
+            guardian_service_url=guardian_and_relayer_data.guardian_service_url,
+            guardian_2fa_code=guardian_and_relayer_data.guardian_2fa_code,
         )
 
         return tx
@@ -124,12 +117,7 @@ class DelegationOperations(BaseTransactionsController):
         nonce: int,
         version: int,
         options: int,
-        guardian_account: Optional[IAccount] = None,
-        guardian_address: Optional[Address] = None,
-        relayer_account: Optional[IAccount] = None,
-        relayer_address: Optional[Address] = None,
-        guardian_service_url: str = "",
-        guardian_2fa_code: str = "",
+        guardian_and_relayer_data: GuardianRelayerData,
     ) -> Transaction:
         tx = self._factory.create_transaction_for_removing_nodes(
             sender=owner.address,
@@ -141,8 +129,10 @@ class DelegationOperations(BaseTransactionsController):
         tx.nonce = nonce
         tx.version = version
         tx.options = options
-        tx.guardian = guardian_address
-        tx.relayer = relayer_address
+        tx.guardian = guardian_and_relayer_data.guardian_address
+        tx.relayer = guardian_and_relayer_data.relayer_address
+
+        self.add_extra_gas_limit_if_required(tx)
 
         if gas_limit:
             tx.gas_limit = gas_limit
@@ -150,10 +140,10 @@ class DelegationOperations(BaseTransactionsController):
         self.sign_transaction(
             transaction=tx,
             sender=owner,
-            guardian=guardian_account,
-            relayer=relayer_account,
-            guardian_service_url=guardian_service_url,
-            guardian_2fa_code=guardian_2fa_code,
+            guardian=guardian_and_relayer_data.guardian,
+            relayer=guardian_and_relayer_data.relayer,
+            guardian_service_url=guardian_and_relayer_data.guardian_service_url,
+            guardian_2fa_code=guardian_and_relayer_data.guardian_2fa_code,
         )
 
         return tx
@@ -169,12 +159,7 @@ class DelegationOperations(BaseTransactionsController):
         nonce: int,
         version: int,
         options: int,
-        guardian_account: Optional[IAccount] = None,
-        guardian_address: Optional[Address] = None,
-        relayer_account: Optional[IAccount] = None,
-        relayer_address: Optional[Address] = None,
-        guardian_service_url: str = "",
-        guardian_2fa_code: str = "",
+        guardian_and_relayer_data: GuardianRelayerData,
     ) -> Transaction:
         tx = self._factory.create_transaction_for_staking_nodes(
             sender=owner.address,
@@ -186,8 +171,10 @@ class DelegationOperations(BaseTransactionsController):
         tx.nonce = nonce
         tx.version = version
         tx.options = options
-        tx.guardian = guardian_address
-        tx.relayer = relayer_address
+        tx.guardian = guardian_and_relayer_data.guardian_address
+        tx.relayer = guardian_and_relayer_data.relayer_address
+
+        self.add_extra_gas_limit_if_required(tx)
 
         if gas_limit:
             tx.gas_limit = gas_limit
@@ -195,10 +182,10 @@ class DelegationOperations(BaseTransactionsController):
         self.sign_transaction(
             transaction=tx,
             sender=owner,
-            guardian=guardian_account,
-            relayer=relayer_account,
-            guardian_service_url=guardian_service_url,
-            guardian_2fa_code=guardian_2fa_code,
+            guardian=guardian_and_relayer_data.guardian,
+            relayer=guardian_and_relayer_data.relayer,
+            guardian_service_url=guardian_and_relayer_data.guardian_service_url,
+            guardian_2fa_code=guardian_and_relayer_data.guardian_2fa_code,
         )
 
         return tx
@@ -214,12 +201,7 @@ class DelegationOperations(BaseTransactionsController):
         nonce: int,
         version: int,
         options: int,
-        guardian_account: Optional[IAccount] = None,
-        guardian_address: Optional[Address] = None,
-        relayer_account: Optional[IAccount] = None,
-        relayer_address: Optional[Address] = None,
-        guardian_service_url: str = "",
-        guardian_2fa_code: str = "",
+        guardian_and_relayer_data: GuardianRelayerData,
     ) -> Transaction:
         tx = self._factory.create_transaction_for_unbonding_nodes(
             sender=owner.address,
@@ -231,8 +213,10 @@ class DelegationOperations(BaseTransactionsController):
         tx.nonce = nonce
         tx.version = version
         tx.options = options
-        tx.guardian = guardian_address
-        tx.relayer = relayer_address
+        tx.guardian = guardian_and_relayer_data.guardian_address
+        tx.relayer = guardian_and_relayer_data.relayer_address
+
+        self.add_extra_gas_limit_if_required(tx)
 
         if gas_limit:
             tx.gas_limit = gas_limit
@@ -240,10 +224,10 @@ class DelegationOperations(BaseTransactionsController):
         self.sign_transaction(
             transaction=tx,
             sender=owner,
-            guardian=guardian_account,
-            relayer=relayer_account,
-            guardian_service_url=guardian_service_url,
-            guardian_2fa_code=guardian_2fa_code,
+            guardian=guardian_and_relayer_data.guardian,
+            relayer=guardian_and_relayer_data.relayer,
+            guardian_service_url=guardian_and_relayer_data.guardian_service_url,
+            guardian_2fa_code=guardian_and_relayer_data.guardian_2fa_code,
         )
 
         return tx
@@ -259,12 +243,7 @@ class DelegationOperations(BaseTransactionsController):
         nonce: int,
         version: int,
         options: int,
-        guardian_account: Optional[IAccount] = None,
-        guardian_address: Optional[Address] = None,
-        relayer_account: Optional[IAccount] = None,
-        relayer_address: Optional[Address] = None,
-        guardian_service_url: str = "",
-        guardian_2fa_code: str = "",
+        guardian_and_relayer_data: GuardianRelayerData,
     ) -> Transaction:
         tx = self._factory.create_transaction_for_unstaking_nodes(
             sender=owner.address,
@@ -276,8 +255,10 @@ class DelegationOperations(BaseTransactionsController):
         tx.nonce = nonce
         tx.version = version
         tx.options = options
-        tx.guardian = guardian_address
-        tx.relayer = relayer_address
+        tx.guardian = guardian_and_relayer_data.guardian_address
+        tx.relayer = guardian_and_relayer_data.relayer_address
+
+        self.add_extra_gas_limit_if_required(tx)
 
         if gas_limit:
             tx.gas_limit = gas_limit
@@ -285,10 +266,10 @@ class DelegationOperations(BaseTransactionsController):
         self.sign_transaction(
             transaction=tx,
             sender=owner,
-            guardian=guardian_account,
-            relayer=relayer_account,
-            guardian_service_url=guardian_service_url,
-            guardian_2fa_code=guardian_2fa_code,
+            guardian=guardian_and_relayer_data.guardian,
+            relayer=guardian_and_relayer_data.relayer,
+            guardian_service_url=guardian_and_relayer_data.guardian_service_url,
+            guardian_2fa_code=guardian_and_relayer_data.guardian_2fa_code,
         )
 
         return tx
@@ -304,12 +285,7 @@ class DelegationOperations(BaseTransactionsController):
         nonce: int,
         version: int,
         options: int,
-        guardian_account: Optional[IAccount] = None,
-        guardian_address: Optional[Address] = None,
-        relayer_account: Optional[IAccount] = None,
-        relayer_address: Optional[Address] = None,
-        guardian_service_url: str = "",
-        guardian_2fa_code: str = "",
+        guardian_and_relayer_data: GuardianRelayerData,
     ) -> Transaction:
         tx = self._factory.create_transaction_for_unjailing_nodes(
             sender=owner.address,
@@ -321,8 +297,10 @@ class DelegationOperations(BaseTransactionsController):
         tx.nonce = nonce
         tx.version = version
         tx.options = options
-        tx.guardian = guardian_address
-        tx.relayer = relayer_address
+        tx.guardian = guardian_and_relayer_data.guardian_address
+        tx.relayer = guardian_and_relayer_data.relayer_address
+
+        self.add_extra_gas_limit_if_required(tx)
 
         if gas_limit:
             tx.gas_limit = gas_limit
@@ -330,10 +308,10 @@ class DelegationOperations(BaseTransactionsController):
         self.sign_transaction(
             transaction=tx,
             sender=owner,
-            guardian=guardian_account,
-            relayer=relayer_account,
-            guardian_service_url=guardian_service_url,
-            guardian_2fa_code=guardian_2fa_code,
+            guardian=guardian_and_relayer_data.guardian,
+            relayer=guardian_and_relayer_data.relayer,
+            guardian_service_url=guardian_and_relayer_data.guardian_service_url,
+            guardian_2fa_code=guardian_and_relayer_data.guardian_2fa_code,
         )
 
         return tx
@@ -348,12 +326,7 @@ class DelegationOperations(BaseTransactionsController):
         nonce: int,
         version: int,
         options: int,
-        guardian_account: Optional[IAccount] = None,
-        guardian_address: Optional[Address] = None,
-        relayer_account: Optional[IAccount] = None,
-        relayer_address: Optional[Address] = None,
-        guardian_service_url: str = "",
-        guardian_2fa_code: str = "",
+        guardian_and_relayer_data: GuardianRelayerData,
     ) -> Transaction:
         tx = self._factory.create_transaction_for_delegating(
             sender=owner.address,
@@ -364,8 +337,10 @@ class DelegationOperations(BaseTransactionsController):
         tx.nonce = nonce
         tx.version = version
         tx.options = options
-        tx.guardian = guardian_address
-        tx.relayer = relayer_address
+        tx.guardian = guardian_and_relayer_data.guardian_address
+        tx.relayer = guardian_and_relayer_data.relayer_address
+
+        self.add_extra_gas_limit_if_required(tx)
 
         if gas_limit:
             tx.gas_limit = gas_limit
@@ -373,10 +348,10 @@ class DelegationOperations(BaseTransactionsController):
         self.sign_transaction(
             transaction=tx,
             sender=owner,
-            guardian=guardian_account,
-            relayer=relayer_account,
-            guardian_service_url=guardian_service_url,
-            guardian_2fa_code=guardian_2fa_code,
+            guardian=guardian_and_relayer_data.guardian,
+            relayer=guardian_and_relayer_data.relayer,
+            guardian_service_url=guardian_and_relayer_data.guardian_service_url,
+            guardian_2fa_code=guardian_and_relayer_data.guardian_2fa_code,
         )
 
         return tx
@@ -391,12 +366,7 @@ class DelegationOperations(BaseTransactionsController):
         nonce: int,
         version: int,
         options: int,
-        guardian_account: Optional[IAccount] = None,
-        guardian_address: Optional[Address] = None,
-        relayer_account: Optional[IAccount] = None,
-        relayer_address: Optional[Address] = None,
-        guardian_service_url: str = "",
-        guardian_2fa_code: str = "",
+        guardian_and_relayer_data: GuardianRelayerData,
     ) -> Transaction:
         tx = self._factory.create_transaction_for_claiming_rewards(
             sender=owner.address, delegation_contract=delegation_contract
@@ -406,8 +376,10 @@ class DelegationOperations(BaseTransactionsController):
         tx.nonce = nonce
         tx.version = version
         tx.options = options
-        tx.guardian = guardian_address
-        tx.relayer = relayer_address
+        tx.guardian = guardian_and_relayer_data.guardian_address
+        tx.relayer = guardian_and_relayer_data.relayer_address
+
+        self.add_extra_gas_limit_if_required(tx)
 
         if gas_limit:
             tx.gas_limit = gas_limit
@@ -415,10 +387,10 @@ class DelegationOperations(BaseTransactionsController):
         self.sign_transaction(
             transaction=tx,
             sender=owner,
-            guardian=guardian_account,
-            relayer=relayer_account,
-            guardian_service_url=guardian_service_url,
-            guardian_2fa_code=guardian_2fa_code,
+            guardian=guardian_and_relayer_data.guardian,
+            relayer=guardian_and_relayer_data.relayer,
+            guardian_service_url=guardian_and_relayer_data.guardian_service_url,
+            guardian_2fa_code=guardian_and_relayer_data.guardian_2fa_code,
         )
 
         return tx
@@ -433,12 +405,7 @@ class DelegationOperations(BaseTransactionsController):
         nonce: int,
         version: int,
         options: int,
-        guardian_account: Optional[IAccount] = None,
-        guardian_address: Optional[Address] = None,
-        relayer_account: Optional[IAccount] = None,
-        relayer_address: Optional[Address] = None,
-        guardian_service_url: str = "",
-        guardian_2fa_code: str = "",
+        guardian_and_relayer_data: GuardianRelayerData,
     ) -> Transaction:
         tx = self._factory.create_transaction_for_redelegating_rewards(
             sender=owner.address, delegation_contract=delegation_contract
@@ -448,8 +415,10 @@ class DelegationOperations(BaseTransactionsController):
         tx.nonce = nonce
         tx.version = version
         tx.options = options
-        tx.guardian = guardian_address
-        tx.relayer = relayer_address
+        tx.guardian = guardian_and_relayer_data.guardian_address
+        tx.relayer = guardian_and_relayer_data.relayer_address
+
+        self.add_extra_gas_limit_if_required(tx)
 
         if gas_limit:
             tx.gas_limit = gas_limit
@@ -457,10 +426,10 @@ class DelegationOperations(BaseTransactionsController):
         self.sign_transaction(
             transaction=tx,
             sender=owner,
-            guardian=guardian_account,
-            relayer=relayer_account,
-            guardian_service_url=guardian_service_url,
-            guardian_2fa_code=guardian_2fa_code,
+            guardian=guardian_and_relayer_data.guardian,
+            relayer=guardian_and_relayer_data.relayer,
+            guardian_service_url=guardian_and_relayer_data.guardian_service_url,
+            guardian_2fa_code=guardian_and_relayer_data.guardian_2fa_code,
         )
 
         return tx
@@ -475,12 +444,7 @@ class DelegationOperations(BaseTransactionsController):
         nonce: int,
         version: int,
         options: int,
-        guardian_account: Optional[IAccount] = None,
-        guardian_address: Optional[Address] = None,
-        relayer_account: Optional[IAccount] = None,
-        relayer_address: Optional[Address] = None,
-        guardian_service_url: str = "",
-        guardian_2fa_code: str = "",
+        guardian_and_relayer_data: GuardianRelayerData,
     ) -> Transaction:
         tx = self._factory.create_transaction_for_undelegating(
             sender=owner.address,
@@ -491,8 +455,10 @@ class DelegationOperations(BaseTransactionsController):
         tx.nonce = nonce
         tx.version = version
         tx.options = options
-        tx.guardian = guardian_address
-        tx.relayer = relayer_address
+        tx.guardian = guardian_and_relayer_data.guardian_address
+        tx.relayer = guardian_and_relayer_data.relayer_address
+
+        self.add_extra_gas_limit_if_required(tx)
 
         if gas_limit:
             tx.gas_limit = gas_limit
@@ -500,10 +466,10 @@ class DelegationOperations(BaseTransactionsController):
         self.sign_transaction(
             transaction=tx,
             sender=owner,
-            guardian=guardian_account,
-            relayer=relayer_account,
-            guardian_service_url=guardian_service_url,
-            guardian_2fa_code=guardian_2fa_code,
+            guardian=guardian_and_relayer_data.guardian,
+            relayer=guardian_and_relayer_data.relayer,
+            guardian_service_url=guardian_and_relayer_data.guardian_service_url,
+            guardian_2fa_code=guardian_and_relayer_data.guardian_2fa_code,
         )
 
         return tx
@@ -518,12 +484,7 @@ class DelegationOperations(BaseTransactionsController):
         nonce: int,
         version: int,
         options: int,
-        guardian_account: Optional[IAccount] = None,
-        guardian_address: Optional[Address] = None,
-        relayer_account: Optional[IAccount] = None,
-        relayer_address: Optional[Address] = None,
-        guardian_service_url: str = "",
-        guardian_2fa_code: str = "",
+        guardian_and_relayer_data: GuardianRelayerData,
     ) -> Transaction:
         tx = self._factory.create_transaction_for_withdrawing(
             sender=owner.address, delegation_contract=delegation_contract
@@ -533,8 +494,10 @@ class DelegationOperations(BaseTransactionsController):
         tx.nonce = nonce
         tx.version = version
         tx.options = options
-        tx.guardian = guardian_address
-        tx.relayer = relayer_address
+        tx.guardian = guardian_and_relayer_data.guardian_address
+        tx.relayer = guardian_and_relayer_data.relayer_address
+
+        self.add_extra_gas_limit_if_required(tx)
 
         if gas_limit:
             tx.gas_limit = gas_limit
@@ -542,10 +505,10 @@ class DelegationOperations(BaseTransactionsController):
         self.sign_transaction(
             transaction=tx,
             sender=owner,
-            guardian=guardian_account,
-            relayer=relayer_account,
-            guardian_service_url=guardian_service_url,
-            guardian_2fa_code=guardian_2fa_code,
+            guardian=guardian_and_relayer_data.guardian,
+            relayer=guardian_and_relayer_data.relayer,
+            guardian_service_url=guardian_and_relayer_data.guardian_service_url,
+            guardian_2fa_code=guardian_and_relayer_data.guardian_2fa_code,
         )
 
         return tx
@@ -561,12 +524,7 @@ class DelegationOperations(BaseTransactionsController):
         nonce: int,
         version: int,
         options: int,
-        guardian_account: Optional[IAccount] = None,
-        guardian_address: Optional[Address] = None,
-        relayer_account: Optional[IAccount] = None,
-        relayer_address: Optional[Address] = None,
-        guardian_service_url: str = "",
-        guardian_2fa_code: str = "",
+        guardian_and_relayer_data: GuardianRelayerData,
     ) -> Transaction:
         tx = self._factory.create_transaction_for_changing_service_fee(
             sender=owner.address,
@@ -578,8 +536,10 @@ class DelegationOperations(BaseTransactionsController):
         tx.nonce = nonce
         tx.version = version
         tx.options = options
-        tx.guardian = guardian_address
-        tx.relayer = relayer_address
+        tx.guardian = guardian_and_relayer_data.guardian_address
+        tx.relayer = guardian_and_relayer_data.relayer_address
+
+        self.add_extra_gas_limit_if_required(tx)
 
         if gas_limit:
             tx.gas_limit = gas_limit
@@ -587,10 +547,10 @@ class DelegationOperations(BaseTransactionsController):
         self.sign_transaction(
             transaction=tx,
             sender=owner,
-            guardian=guardian_account,
-            relayer=relayer_account,
-            guardian_service_url=guardian_service_url,
-            guardian_2fa_code=guardian_2fa_code,
+            guardian=guardian_and_relayer_data.guardian,
+            relayer=guardian_and_relayer_data.relayer,
+            guardian_service_url=guardian_and_relayer_data.guardian_service_url,
+            guardian_2fa_code=guardian_and_relayer_data.guardian_2fa_code,
         )
 
         return tx
@@ -606,12 +566,7 @@ class DelegationOperations(BaseTransactionsController):
         nonce: int,
         version: int,
         options: int,
-        guardian_account: Optional[IAccount] = None,
-        guardian_address: Optional[Address] = None,
-        relayer_account: Optional[IAccount] = None,
-        relayer_address: Optional[Address] = None,
-        guardian_service_url: str = "",
-        guardian_2fa_code: str = "",
+        guardian_and_relayer_data: GuardianRelayerData,
     ) -> Transaction:
         tx = self._factory.create_transaction_for_modifying_delegation_cap(
             sender=owner.address,
@@ -623,8 +578,10 @@ class DelegationOperations(BaseTransactionsController):
         tx.nonce = nonce
         tx.version = version
         tx.options = options
-        tx.guardian = guardian_address
-        tx.relayer = relayer_address
+        tx.guardian = guardian_and_relayer_data.guardian_address
+        tx.relayer = guardian_and_relayer_data.relayer_address
+
+        self.add_extra_gas_limit_if_required(tx)
 
         if gas_limit:
             tx.gas_limit = gas_limit
@@ -632,10 +589,10 @@ class DelegationOperations(BaseTransactionsController):
         self.sign_transaction(
             transaction=tx,
             sender=owner,
-            guardian=guardian_account,
-            relayer=relayer_account,
-            guardian_service_url=guardian_service_url,
-            guardian_2fa_code=guardian_2fa_code,
+            guardian=guardian_and_relayer_data.guardian,
+            relayer=guardian_and_relayer_data.relayer,
+            guardian_service_url=guardian_and_relayer_data.guardian_service_url,
+            guardian_2fa_code=guardian_and_relayer_data.guardian_2fa_code,
         )
 
         return tx
@@ -652,12 +609,7 @@ class DelegationOperations(BaseTransactionsController):
         nonce: int,
         version: int,
         options: int,
-        guardian_account: Optional[IAccount] = None,
-        guardian_address: Optional[Address] = None,
-        relayer_account: Optional[IAccount] = None,
-        relayer_address: Optional[Address] = None,
-        guardian_service_url: str = "",
-        guardian_2fa_code: str = "",
+        guardian_and_relayer_data: GuardianRelayerData,
     ) -> Transaction:
         if set and unset:
             raise BadUsage("Cannot set and unset at the same time")
@@ -678,8 +630,10 @@ class DelegationOperations(BaseTransactionsController):
         tx.nonce = nonce
         tx.version = version
         tx.options = options
-        tx.guardian = guardian_address
-        tx.relayer = relayer_address
+        tx.guardian = guardian_and_relayer_data.guardian_address
+        tx.relayer = guardian_and_relayer_data.relayer_address
+
+        self.add_extra_gas_limit_if_required(tx)
 
         if gas_limit:
             tx.gas_limit = gas_limit
@@ -687,10 +641,10 @@ class DelegationOperations(BaseTransactionsController):
         self.sign_transaction(
             transaction=tx,
             sender=owner,
-            guardian=guardian_account,
-            relayer=relayer_account,
-            guardian_service_url=guardian_service_url,
-            guardian_2fa_code=guardian_2fa_code,
+            guardian=guardian_and_relayer_data.guardian,
+            relayer=guardian_and_relayer_data.relayer,
+            guardian_service_url=guardian_and_relayer_data.guardian_service_url,
+            guardian_2fa_code=guardian_and_relayer_data.guardian_2fa_code,
         )
 
         return tx
@@ -707,12 +661,7 @@ class DelegationOperations(BaseTransactionsController):
         nonce: int,
         version: int,
         options: int,
-        guardian_account: Optional[IAccount] = None,
-        guardian_address: Optional[Address] = None,
-        relayer_account: Optional[IAccount] = None,
-        relayer_address: Optional[Address] = None,
-        guardian_service_url: str = "",
-        guardian_2fa_code: str = "",
+        guardian_and_relayer_data: GuardianRelayerData,
     ) -> Transaction:
         if set and unset:
             raise BadUsage("Cannot set and unset at the same time")
@@ -733,8 +682,10 @@ class DelegationOperations(BaseTransactionsController):
         tx.nonce = nonce
         tx.version = version
         tx.options = options
-        tx.guardian = guardian_address
-        tx.relayer = relayer_address
+        tx.guardian = guardian_and_relayer_data.guardian_address
+        tx.relayer = guardian_and_relayer_data.relayer_address
+
+        self.add_extra_gas_limit_if_required(tx)
 
         if gas_limit:
             tx.gas_limit = gas_limit
@@ -742,10 +693,10 @@ class DelegationOperations(BaseTransactionsController):
         self.sign_transaction(
             transaction=tx,
             sender=owner,
-            guardian=guardian_account,
-            relayer=relayer_account,
-            guardian_service_url=guardian_service_url,
-            guardian_2fa_code=guardian_2fa_code,
+            guardian=guardian_and_relayer_data.guardian,
+            relayer=guardian_and_relayer_data.relayer,
+            guardian_service_url=guardian_and_relayer_data.guardian_service_url,
+            guardian_2fa_code=guardian_and_relayer_data.guardian_2fa_code,
         )
 
         return tx
@@ -763,12 +714,7 @@ class DelegationOperations(BaseTransactionsController):
         nonce: int,
         version: int,
         options: int,
-        guardian_account: Optional[IAccount] = None,
-        guardian_address: Optional[Address] = None,
-        relayer_account: Optional[IAccount] = None,
-        relayer_address: Optional[Address] = None,
-        guardian_service_url: str = "",
-        guardian_2fa_code: str = "",
+        guardian_and_relayer_data: GuardianRelayerData,
     ) -> Transaction:
         tx = self._factory.create_transaction_for_setting_metadata(
             sender=owner.address,
@@ -782,8 +728,10 @@ class DelegationOperations(BaseTransactionsController):
         tx.nonce = nonce
         tx.version = version
         tx.options = options
-        tx.guardian = guardian_address
-        tx.relayer = relayer_address
+        tx.guardian = guardian_and_relayer_data.guardian_address
+        tx.relayer = guardian_and_relayer_data.relayer_address
+
+        self.add_extra_gas_limit_if_required(tx)
 
         if gas_limit:
             tx.gas_limit = gas_limit
@@ -791,10 +739,10 @@ class DelegationOperations(BaseTransactionsController):
         self.sign_transaction(
             transaction=tx,
             sender=owner,
-            guardian=guardian_account,
-            relayer=relayer_account,
-            guardian_service_url=guardian_service_url,
-            guardian_2fa_code=guardian_2fa_code,
+            guardian=guardian_and_relayer_data.guardian,
+            relayer=guardian_and_relayer_data.relayer,
+            guardian_service_url=guardian_and_relayer_data.guardian_service_url,
+            guardian_2fa_code=guardian_and_relayer_data.guardian_2fa_code,
         )
 
         return tx
@@ -811,12 +759,7 @@ class DelegationOperations(BaseTransactionsController):
         nonce: int,
         version: int,
         options: int,
-        guardian_account: Optional[IAccount] = None,
-        guardian_address: Optional[Address] = None,
-        relayer_account: Optional[IAccount] = None,
-        relayer_address: Optional[Address] = None,
-        guardian_service_url: str = "",
-        guardian_2fa_code: str = "",
+        guardian_and_relayer_data: GuardianRelayerData,
     ) -> Transaction:
         receiver = Address.new_from_hex(DELEGATION_MANAGER_SC_ADDRESS_HEX, get_address_hrp())
 
@@ -834,8 +777,8 @@ class DelegationOperations(BaseTransactionsController):
             nonce=nonce,
             version=version,
             options=options,
-            guardian=guardian_address,
-            relayer=relayer_address,
+            guardian=guardian_and_relayer_data.guardian_address,
+            relayer=guardian_and_relayer_data.relayer_address,
             gas_price=gas_price,
             value=value,
         )
@@ -846,10 +789,10 @@ class DelegationOperations(BaseTransactionsController):
         self.sign_transaction(
             transaction=tx,
             sender=owner,
-            guardian=guardian_account,
-            relayer=relayer_account,
-            guardian_service_url=guardian_service_url,
-            guardian_2fa_code=guardian_2fa_code,
+            guardian=guardian_and_relayer_data.guardian,
+            relayer=guardian_and_relayer_data.relayer,
+            guardian_service_url=guardian_and_relayer_data.guardian_service_url,
+            guardian_2fa_code=guardian_and_relayer_data.guardian_2fa_code,
         )
 
         return tx
