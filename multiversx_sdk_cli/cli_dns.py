@@ -200,7 +200,6 @@ def get_version(args: Any):
 
 def print_dns_addresses_table(args: Any):
     table = Table(title="DNS Addresses")
-
     table.add_column("Shard ID")
     table.add_column("Contract address (bech32)")
     table.add_column("Contract address (hex)")
