@@ -1,6 +1,6 @@
 import logging
 from pathlib import Path
-from typing import Any, List
+from typing import Any
 
 from multiversx_sdk_cli import cli_shared, ux
 from multiversx_sdk_cli.constants import ONE_YEAR_IN_SECONDS
@@ -17,7 +17,7 @@ from multiversx_sdk_cli.localnet import (
 logger = logging.getLogger("cli.localnet")
 
 
-def setup_parser(args: List[str], subparsers: Any) -> Any:
+def setup_parser(args: list[str], subparsers: Any) -> Any:
     parser = cli_shared.add_group_subparser(subparsers, "localnet", "Set up, start and control localnets")
     subparsers = parser.add_subparsers()
 

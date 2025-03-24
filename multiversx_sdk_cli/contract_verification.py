@@ -3,7 +3,7 @@ import json
 import logging
 import time
 from pathlib import Path
-from typing import Any, Optional, Protocol, Tuple
+from typing import Any, Optional, Protocol
 
 import requests
 from multiversx_sdk import Address, Message
@@ -143,7 +143,7 @@ def query_status_with_task_id(url: str, task_id: str, interval: int = 10):
         time.sleep(interval)
 
 
-def _do_post(url: str, payload: Any) -> Tuple[int, str, dict[str, Any]]:
+def _do_post(url: str, payload: Any) -> tuple[int, str, dict[str, Any]]:
     logger.debug(f"_do_post() to {url}")
     response = requests.post(url, json=payload)
 
@@ -156,7 +156,7 @@ def _do_post(url: str, payload: Any) -> Tuple[int, str, dict[str, Any]]:
         raise KnownError(f"Cannot parse response from {url}", error)
 
 
-def _do_get(url: str) -> Tuple[int, str, dict[str, Any]]:
+def _do_get(url: str) -> tuple[int, str, dict[str, Any]]:
     logger.debug(f"_do_get() from {url}")
     response = requests.get(url)
 

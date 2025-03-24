@@ -40,7 +40,7 @@ Allow `pre-commit` to automatically run on `git commit`:
 pre-commit install
 ```
 
-Above, `requirements.txt` should mirror the **dependencies** section of `setup.py`.
+Above, `requirements.txt` should mirror the **dependencies** section of `pyproject.toml`.
 
 If using VSCode, restart it or follow these steps:
  - `Ctrl + Shift + P`

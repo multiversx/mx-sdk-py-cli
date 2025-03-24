@@ -1,4 +1,4 @@
-from typing import Any, List
+from typing import Any
 
 from multiversx_sdk import ProxyNetworkProvider
 from prettytable import PrettyTable
@@ -19,7 +19,7 @@ from multiversx_sdk_cli.dns import (
 from multiversx_sdk_cli.errors import ArgumentsNotProvidedError
 
 
-def setup_parser(args: List[str], subparsers: Any) -> Any:
+def setup_parser(args: list[str], subparsers: Any) -> Any:
     parser = cli_shared.add_group_subparser(subparsers, "dns", "Operations related to the Domain Name Service")
     subparsers = parser.add_subparsers()
 
@@ -190,7 +190,7 @@ def get_version(args: Any):
         for shard_id in range(0, 256):
             address = compute_dns_address_for_shard_id(shard_id)
             v = version(shard_id, proxy)
-            t.add_row([shard_id, address.to_bech32(), address.to_hex(), v])
+            t.add_row([shard_id, address.to_bech32(), address.to_hex(), v])  # type: ignore
         print(t)
     else:
         shard_id = int(args.shard_id)
@@ -201,5 +201,5 @@ def print_dns_addresses_table(args: Any):
     t = PrettyTable(["Shard ID", "Contract address (bech32)", "Contract address (hex)"])
     for shard_id in range(0, 256):
         address = compute_dns_address_for_shard_id(shard_id)
-        t.add_row([shard_id, address.to_bech32(), address.to_hex()])
+        t.add_row([shard_id, address.to_bech32(), address.to_hex()])  # type: ignore
     print(t)

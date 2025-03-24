@@ -1,4 +1,4 @@
-from typing import Any, List, Tuple, Union
+from typing import Any, Union
 
 
 class KnownError(Exception):
@@ -38,7 +38,7 @@ class DependencyMissing(KnownError):
 
 
 class DependenciesMissing(KnownError):
-    def __init__(self, dependencies: List[Tuple[str, str]]):
+    def __init__(self, dependencies: list[tuple[str, str]]):
         message = "Dependencies missing: \n"
 
         for dependency in dependencies:

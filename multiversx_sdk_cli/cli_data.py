@@ -1,7 +1,7 @@
 import logging
 import os
 from pathlib import Path
-from typing import Any, Dict
+from typing import Any
 
 from multiversx_sdk_cli import cli_shared, errors, utils, workstation
 
@@ -101,16 +101,16 @@ def load(args: Any):
     print(value)
 
 
-def _read_file(use_global: bool) -> Dict[str, Any]:
+def _read_file(use_global: bool) -> dict[str, Any]:
     filename = _get_filename(use_global)
 
     if not os.path.isfile(filename):
         return dict()
-    data: Dict[str, Any] = utils.read_json_file(filename)
+    data: dict[str, Any] = utils.read_json_file(filename)
     return data
 
 
-def _write_file(use_global: bool, data: Dict[str, Any]):
+def _write_file(use_global: bool, data: dict[str, Any]):
     filename = _get_filename(use_global)
 
     utils.write_json_file(str(filename), data)

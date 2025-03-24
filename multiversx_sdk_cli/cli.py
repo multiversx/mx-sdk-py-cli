@@ -3,7 +3,7 @@ import argparse
 import logging
 import sys
 from argparse import ArgumentParser
-from typing import Any, List
+from typing import Any
 
 import argcomplete
 from multiversx_sdk import LibraryConfig
@@ -28,7 +28,7 @@ from multiversx_sdk_cli import config, errors, utils, ux
 logger = logging.getLogger("cli")
 
 
-def main(cli_args: List[str] = sys.argv[1:]):
+def main(cli_args: list[str] = sys.argv[1:]):
     try:
         _do_main(cli_args)
     except errors.KnownError as err:
@@ -41,7 +41,7 @@ def main(cli_args: List[str] = sys.argv[1:]):
     return 0
 
 
-def _do_main(cli_args: List[str]):
+def _do_main(cli_args: list[str]):
     utils.ensure_folder(config.SDK_PATH)
     argv_with_config_args = config.add_config_args(cli_args)
     parser = setup_parser(argv_with_config_args)
@@ -72,7 +72,7 @@ def _do_main(cli_args: List[str]):
         args.func(args)
 
 
-def setup_parser(args: List[str]):
+def setup_parser(args: list[str]):
     parser = ArgumentParser(
         prog="mxpy",
         usage="mxpy [-h] [-v] [--verbose] COMMAND-GROUP [-h] COMMAND ...",
@@ -104,7 +104,7 @@ See:
     parser.add_argument("--verbose", action="store_true", default=False)
 
     subparsers = parser.add_subparsers()
-    commands: List[Any] = []
+    commands: list[Any] = []
 
     commands.append(multiversx_sdk_cli.cli_contracts.setup_parser(args, subparsers))
     commands.append(multiversx_sdk_cli.cli_transactions.setup_parser(args, subparsers))
