@@ -143,7 +143,7 @@ def add_tx_args(
     sub.add_argument("--options", type=int, default=0, help="the transaction options (default: %(default)s)")
 
     sub.add_argument("--relayer", type=str, help="the bech32 address of the relayer", default="")
-    sub.add_argument("--guardian", type=str, help="the bech32 address of the guradian", default="")
+    sub.add_argument("--guardian", type=str, help="the bech32 address of the guardian", default="")
 
 
 def add_wallet_args(args: list[str], sub: Any):
@@ -368,7 +368,7 @@ def _get_guardian_data_from_network(sender: str, args: Any, guardian_and_relayer
         guardian_and_relayer_data.guardian_service_url = tcs_url if tcs_url else args.guardian_service_url
 
     if guardian_and_relayer_data.guardian_service_url:
-        guardian_and_relayer_data.guardian_2fa_code = _get_2fa_code(args)
+        guardian_and_relayer_data.guardian_2fa_code = _ask_for_2fa_code(args)
 
 
 def _get_guardian_data(address: str, proxy_url: str) -> Union[dict[str, str], None]:
@@ -406,7 +406,7 @@ def _fetch_guardian_data(address: str, proxy_url: str) -> dict[str, Any]:
     return guardian_data
 
 
-def _get_2fa_code(args: Any) -> str:
+def _ask_for_2fa_code(args: Any) -> str:
     code: str = args.guardian_2fa_code
     if not code:
         code = input("Please enter the two factor authentication code: ")
