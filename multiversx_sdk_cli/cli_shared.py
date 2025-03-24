@@ -159,7 +159,7 @@ def add_wallet_args(args: list[str], sub: Any):
     )
     sub.add_argument(
         "--passfile",
-        help="🔑 a file containing keyfile's password, if keyfile provided",
+        help="🔑 a file containing keyfile's password, if keyfile provided. If not provided, you'll be prompted to enter the password.",
     )
     sub.add_argument(
         "--ledger",
@@ -200,7 +200,7 @@ def add_guardian_wallet_args(args: list[str], sub: Any):
     )
     sub.add_argument(
         "--guardian-passfile",
-        help="🔑 a file containing keyfile's password, if keyfile provided",
+        help="🔑 a file containing keyfile's password, if keyfile provided. If not provided, you'll be prompted to enter the password.",
     )
     sub.add_argument(
         "--guardian-ledger",
@@ -221,7 +221,7 @@ def add_relayed_v3_wallet_args(args: list[str], sub: Any):
     sub.add_argument("--relayer-keyfile", help="🔑 a JSON keyfile, if PEM not provided")
     sub.add_argument(
         "--relayer-passfile",
-        help="🔑 a file containing keyfile's password, if keyfile provided",
+        help="🔑 a file containing keyfile's password, if keyfile provided. If not provided, you'll be prompted to enter the password.",
     )
     sub.add_argument(
         "--relayer-ledger",
@@ -288,10 +288,12 @@ def prepare_account(args: Any):
         return Account.new_from_pem(file_path=Path(args.pem), index=args.sender_wallet_index, hrp=hrp)
     elif args.keyfile:
         password = load_password(args)
+        index = args.sender_wallet_index if args.sender_wallet_index != 0 else None
+
         return Account.new_from_keystore(
             file_path=Path(args.keyfile),
             password=password,
-            address_index=args.sender_wallet_index,
+            address_index=index,
             hrp=hrp,
         )
     elif args.ledger:
@@ -307,10 +309,12 @@ def load_guardian_account(args: Any) -> Union[IAccount, None]:
         return Account.new_from_pem(file_path=Path(args.guardian_pem), index=args.guardian_wallet_index, hrp=hrp)
     elif args.guardian_keyfile:
         password = load_guardian_password(args)
+        index = args.guardian_wallet_index if args.guardian_wallet_index != 0 else None
+
         return Account.new_from_keystore(
             file_path=Path(args.guardian_keyfile),
             password=password,
-            address_index=args.guardian_wallet_index,
+            address_index=index,
             hrp=hrp,
         )
     elif args.guardian_ledger:
@@ -436,10 +440,12 @@ def load_relayer_account(args: Any) -> Union[IAccount, None]:
         return Account.new_from_pem(file_path=Path(args.relayer_pem), index=args.relayer_wallet_index, hrp=hrp)
     elif args.relayer_keyfile:
         password = load_relayer_password(args)
+        index = args.relayer_wallet_index if args.relayer_wallet_index != 0 else None
+
         return Account.new_from_keystore(
             file_path=Path(args.relayer_keyfile),
             password=password,
-            address_index=args.relayer_wallet_index,
+            address_index=index,
             hrp=hrp,
         )
     elif args.relayer_ledger:
