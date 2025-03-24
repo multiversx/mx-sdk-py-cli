@@ -28,6 +28,7 @@ from multiversx_sdk.abi import (
 from multiversx_sdk_cli import errors
 from multiversx_sdk_cli.base_transactions_controller import BaseTransactionsController
 from multiversx_sdk_cli.config import get_address_hrp
+from multiversx_sdk_cli.guardian_relayer_data import GuardianRelayerData
 from multiversx_sdk_cli.interfaces import IAccount
 
 logger = logging.getLogger("contracts")
@@ -73,12 +74,7 @@ class SmartContract(BaseTransactionsController):
         nonce: int,
         version: int,
         options: int,
-        guardian_account: Optional[IAccount] = None,
-        guardian_address: Optional[Address] = None,
-        relayer_account: Optional[IAccount] = None,
-        relayer_address: Optional[Address] = None,
-        guardian_service_url: str = "",
-        guardian_2fa_code: str = "",
+        guardian_and_relayer_data: GuardianRelayerData,
     ) -> Transaction:
         args = arguments if arguments else []
         if should_prepare_args:
@@ -98,16 +94,16 @@ class SmartContract(BaseTransactionsController):
         tx.nonce = nonce
         tx.version = version
         tx.options = options
-        tx.guardian = guardian_address
-        tx.relayer = relayer_address
+        tx.guardian = guardian_and_relayer_data.guardian_address
+        tx.relayer = guardian_and_relayer_data.relayer_address
 
         self.sign_transaction(
             transaction=tx,
             sender=owner,
-            guardian=guardian_account,
-            relayer=relayer_account,
-            guardian_service_url=guardian_service_url,
-            guardian_2fa_code=guardian_2fa_code,
+            guardian=guardian_and_relayer_data.guardian,
+            relayer=guardian_and_relayer_data.relayer,
+            guardian_service_url=guardian_and_relayer_data.guardian_service_url,
+            guardian_2fa_code=guardian_and_relayer_data.guardian_2fa_code,
         )
 
         return tx
@@ -125,12 +121,7 @@ class SmartContract(BaseTransactionsController):
         nonce: int,
         version: int,
         options: int,
-        guardian_account: Optional[IAccount] = None,
-        guardian_address: Optional[Address] = None,
-        relayer_account: Optional[IAccount] = None,
-        relayer_address: Optional[Address] = None,
-        guardian_service_url: str = "",
-        guardian_2fa_code: str = "",
+        guardian_and_relayer_data: GuardianRelayerData,
     ) -> Transaction:
         token_transfers = self._prepare_token_transfers(transfers) if transfers else []
 
@@ -150,16 +141,16 @@ class SmartContract(BaseTransactionsController):
         tx.nonce = nonce
         tx.version = version
         tx.options = options
-        tx.guardian = guardian_address
-        tx.relayer = relayer_address
+        tx.guardian = guardian_and_relayer_data.guardian_address
+        tx.relayer = guardian_and_relayer_data.relayer_address
 
         self.sign_transaction(
             transaction=tx,
             sender=caller,
-            guardian=guardian_account,
-            relayer=relayer_account,
-            guardian_service_url=guardian_service_url,
-            guardian_2fa_code=guardian_2fa_code,
+            guardian=guardian_and_relayer_data.guardian,
+            relayer=guardian_and_relayer_data.relayer,
+            guardian_service_url=guardian_and_relayer_data.guardian_service_url,
+            guardian_2fa_code=guardian_and_relayer_data.guardian_2fa_code,
         )
 
         return tx
@@ -180,12 +171,7 @@ class SmartContract(BaseTransactionsController):
         nonce: int,
         version: int,
         options: int,
-        guardian_account: Optional[IAccount] = None,
-        guardian_address: Optional[Address] = None,
-        relayer_account: Optional[IAccount] = None,
-        relayer_address: Optional[Address] = None,
-        guardian_service_url: str = "",
-        guardian_2fa_code: str = "",
+        guardian_and_relayer_data: GuardianRelayerData,
     ) -> Transaction:
         args = arguments if arguments else []
         if should_prepare_args:
@@ -206,16 +192,16 @@ class SmartContract(BaseTransactionsController):
         tx.nonce = nonce
         tx.version = version
         tx.options = options
-        tx.guardian = guardian_address
-        tx.relayer = relayer_address
+        tx.guardian = guardian_and_relayer_data.guardian_address
+        tx.relayer = guardian_and_relayer_data.relayer_address
 
         self.sign_transaction(
             transaction=tx,
             sender=owner,
-            guardian=guardian_account,
-            relayer=relayer_account,
-            guardian_service_url=guardian_service_url,
-            guardian_2fa_code=guardian_2fa_code,
+            guardian=guardian_and_relayer_data.guardian,
+            relayer=guardian_and_relayer_data.relayer,
+            guardian_service_url=guardian_and_relayer_data.guardian_service_url,
+            guardian_2fa_code=guardian_and_relayer_data.guardian_2fa_code,
         )
 
         return tx
