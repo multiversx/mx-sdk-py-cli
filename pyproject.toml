@@ -22,7 +22,6 @@ classifiers = [
 dependencies = [
   "toml>=0.10.2",
   "requests>=2.32.0,<3.0.0",
-  "prettytable",
   "ledgercomm[hid]",
   "rich==13.3.4",
   "argcomplete==3.2.2",

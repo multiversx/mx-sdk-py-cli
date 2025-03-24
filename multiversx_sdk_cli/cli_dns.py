@@ -1,7 +1,8 @@
 from typing import Any
 
 from multiversx_sdk import ProxyNetworkProvider
-from prettytable import PrettyTable
+from rich.console import Console
+from rich.table import Table
 
 from multiversx_sdk_cli import cli_shared
 from multiversx_sdk_cli.config import get_config_for_network_providers
@@ -179,27 +180,33 @@ def get_version(args: Any):
     config = get_config_for_network_providers()
     proxy = ProxyNetworkProvider(url=args.proxy, config=config)
     if args.all:
-        t = PrettyTable(
-            [
-                "Shard ID",
-                "Contract address (bech32)",
-                "Contract address (hex)",
-                "Version",
-            ]
-        )
+        table = Table(title="DNS Version")
+        table.add_column("Shard ID")
+        table.add_column("Contract address (bech32)")
+        table.add_column("Contract address (hex)")
+        table.add_column("Version")
+
         for shard_id in range(0, 256):
             address = compute_dns_address_for_shard_id(shard_id)
             v = version(shard_id, proxy)
-            t.add_row([shard_id, address.to_bech32(), address.to_hex(), v])  # type: ignore
-        print(t)
+            table.add_row(str(shard_id), address.to_bech32(), address.to_hex(), v)
+
+        console = Console()
+        console.print(table)
     else:
         shard_id = int(args.shard_id)
         print(version(shard_id, proxy))
 
 
 def print_dns_addresses_table(args: Any):
-    t = PrettyTable(["Shard ID", "Contract address (bech32)", "Contract address (hex)"])
+    table = Table(title="DNS Addresses")
+    table.add_column("Shard ID")
+    table.add_column("Contract address (bech32)")
+    table.add_column("Contract address (hex)")
+
     for shard_id in range(0, 256):
         address = compute_dns_address_for_shard_id(shard_id)
-        t.add_row([shard_id, address.to_bech32(), address.to_hex()])  # type: ignore
-    print(t)
+        table.add_row(str(shard_id), address.to_bech32(), address.to_hex())
+
+    console = Console()
+    console.print(table)
