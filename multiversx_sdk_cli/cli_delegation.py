@@ -427,8 +427,10 @@ def do_create_delegation_contract(args: Any):
     validate_arguments(args)
 
     sender = cli_shared.prepare_sender(args)
-    guardian, guardian_address = cli_shared.prepare_guardian(args)
-    relayer, relayer_address = cli_shared.prepare_relayer(args)
+    guardian_and_relayer_data = cli_shared.get_guardian_and_relayer_data(
+        sender=sender.address.to_bech32(),
+        args=args,
+    )
 
     gas_limit = args.gas_limit if args.gas_limit else 0
     delegation = _get_delegation_controller(args)
@@ -443,12 +445,7 @@ def do_create_delegation_contract(args: Any):
         nonce=sender.nonce,
         version=int(args.version),
         options=int(args.options),
-        guardian_account=guardian,
-        guardian_address=guardian_address,
-        relayer_account=relayer,
-        relayer_address=relayer_address,
-        guardian_service_url=args.guardian_service_url,
-        guardian_2fa_code=args.guardian_2fa_code,
+        guardian_and_relayer_data=guardian_and_relayer_data,
     )
 
     cli_shared.send_or_simulate(tx, args)
@@ -475,8 +472,10 @@ def add_new_nodes(args: Any):
     validate_arguments(args)
 
     sender = cli_shared.prepare_sender(args)
-    guardian, guardian_address = cli_shared.prepare_guardian(args)
-    relayer, relayer_address = cli_shared.prepare_relayer(args)
+    guardian_and_relayer_data = cli_shared.get_guardian_and_relayer_data(
+        sender=sender.address.to_bech32(),
+        args=args,
+    )
 
     gas_limit = args.gas_limit if args.gas_limit else 0
     public_keys, signed_messages = _get_public_keys_and_signed_messages(args)
@@ -493,12 +492,7 @@ def add_new_nodes(args: Any):
         nonce=sender.nonce,
         version=int(args.version),
         options=int(args.options),
-        guardian_account=guardian,
-        guardian_address=guardian_address,
-        relayer_account=relayer,
-        relayer_address=relayer_address,
-        guardian_service_url=args.guardian_service_url,
-        guardian_2fa_code=args.guardian_2fa_code,
+        guardian_and_relayer_data=guardian_and_relayer_data,
     )
 
     cli_shared.send_or_simulate(tx, args)
@@ -527,8 +521,10 @@ def remove_nodes(args: Any):
     _check_if_either_bls_keys_or_validators_file_are_provided(args)
 
     sender = cli_shared.prepare_sender(args)
-    guardian, guardian_address = cli_shared.prepare_guardian(args)
-    relayer, relayer_address = cli_shared.prepare_relayer(args)
+    guardian_and_relayer_data = cli_shared.get_guardian_and_relayer_data(
+        sender=sender.address.to_bech32(),
+        args=args,
+    )
 
     gas_limit = args.gas_limit if args.gas_limit else 0
     public_keys = _load_validators_public_keys(args)
@@ -544,12 +540,7 @@ def remove_nodes(args: Any):
         nonce=sender.nonce,
         version=int(args.version),
         options=int(args.options),
-        guardian_account=guardian,
-        guardian_address=guardian_address,
-        relayer_account=relayer,
-        relayer_address=relayer_address,
-        guardian_service_url=args.guardian_service_url,
-        guardian_2fa_code=args.guardian_2fa_code,
+        guardian_and_relayer_data=guardian_and_relayer_data,
     )
 
     cli_shared.send_or_simulate(tx, args)
@@ -579,8 +570,10 @@ def stake_nodes(args: Any):
     validate_arguments(args)
 
     sender = cli_shared.prepare_sender(args)
-    guardian, guardian_address = cli_shared.prepare_guardian(args)
-    relayer, relayer_address = cli_shared.prepare_relayer(args)
+    guardian_and_relayer_data = cli_shared.get_guardian_and_relayer_data(
+        sender=sender.address.to_bech32(),
+        args=args,
+    )
 
     gas_limit = args.gas_limit if args.gas_limit else 0
     public_keys = _load_validators_public_keys(args)
@@ -596,12 +589,7 @@ def stake_nodes(args: Any):
         nonce=sender.nonce,
         version=int(args.version),
         options=int(args.options),
-        guardian_account=guardian,
-        guardian_address=guardian_address,
-        relayer_account=relayer,
-        relayer_address=relayer_address,
-        guardian_service_url=args.guardian_service_url,
-        guardian_2fa_code=args.guardian_2fa_code,
+        guardian_and_relayer_data=guardian_and_relayer_data,
     )
 
     cli_shared.send_or_simulate(tx, args)
@@ -620,8 +608,10 @@ def unbond_nodes(args: Any):
     validate_arguments(args)
 
     sender = cli_shared.prepare_sender(args)
-    guardian, guardian_address = cli_shared.prepare_guardian(args)
-    relayer, relayer_address = cli_shared.prepare_relayer(args)
+    guardian_and_relayer_data = cli_shared.get_guardian_and_relayer_data(
+        sender=sender.address.to_bech32(),
+        args=args,
+    )
 
     gas_limit = args.gas_limit if args.gas_limit else 0
     public_keys = _load_validators_public_keys(args)
@@ -637,12 +627,7 @@ def unbond_nodes(args: Any):
         nonce=sender.nonce,
         version=int(args.version),
         options=int(args.options),
-        guardian_account=guardian,
-        guardian_address=guardian_address,
-        relayer_account=relayer,
-        relayer_address=relayer_address,
-        guardian_service_url=args.guardian_service_url,
-        guardian_2fa_code=args.guardian_2fa_code,
+        guardian_and_relayer_data=guardian_and_relayer_data,
     )
 
     cli_shared.send_or_simulate(tx, args)
@@ -653,8 +638,10 @@ def unstake_nodes(args: Any):
     validate_arguments(args)
 
     sender = cli_shared.prepare_sender(args)
-    guardian, guardian_address = cli_shared.prepare_guardian(args)
-    relayer, relayer_address = cli_shared.prepare_relayer(args)
+    guardian_and_relayer_data = cli_shared.get_guardian_and_relayer_data(
+        sender=sender.address.to_bech32(),
+        args=args,
+    )
 
     gas_limit = args.gas_limit if args.gas_limit else 0
     public_keys = _load_validators_public_keys(args)
@@ -670,12 +657,7 @@ def unstake_nodes(args: Any):
         nonce=sender.nonce,
         version=int(args.version),
         options=int(args.options),
-        guardian_account=guardian,
-        guardian_address=guardian_address,
-        relayer_account=relayer,
-        relayer_address=relayer_address,
-        guardian_service_url=args.guardian_service_url,
-        guardian_2fa_code=args.guardian_2fa_code,
+        guardian_and_relayer_data=guardian_and_relayer_data,
     )
 
     cli_shared.send_or_simulate(tx, args)
@@ -686,8 +668,10 @@ def unjail_nodes(args: Any):
     validate_arguments(args)
 
     sender = cli_shared.prepare_sender(args)
-    guardian, guardian_address = cli_shared.prepare_guardian(args)
-    relayer, relayer_address = cli_shared.prepare_relayer(args)
+    guardian_and_relayer_data = cli_shared.get_guardian_and_relayer_data(
+        sender=sender.address.to_bech32(),
+        args=args,
+    )
 
     gas_limit = args.gas_limit if args.gas_limit else 0
     public_keys = _load_validators_public_keys(args)
@@ -703,12 +687,7 @@ def unjail_nodes(args: Any):
         nonce=sender.nonce,
         version=int(args.version),
         options=int(args.options),
-        guardian_account=guardian,
-        guardian_address=guardian_address,
-        relayer_account=relayer,
-        relayer_address=relayer_address,
-        guardian_service_url=args.guardian_service_url,
-        guardian_2fa_code=args.guardian_2fa_code,
+        guardian_and_relayer_data=guardian_and_relayer_data,
     )
 
     cli_shared.send_or_simulate(tx, args)
@@ -718,8 +697,10 @@ def delegate(args: Any):
     validate_arguments(args)
 
     sender = cli_shared.prepare_sender(args)
-    guardian, guardian_address = cli_shared.prepare_guardian(args)
-    relayer, relayer_address = cli_shared.prepare_relayer(args)
+    guardian_and_relayer_data = cli_shared.get_guardian_and_relayer_data(
+        sender=sender.address.to_bech32(),
+        args=args,
+    )
 
     gas_limit = args.gas_limit if args.gas_limit else 0
     value = int(args.value)
@@ -734,12 +715,7 @@ def delegate(args: Any):
         nonce=sender.nonce,
         version=int(args.version),
         options=int(args.options),
-        guardian_account=guardian,
-        guardian_address=guardian_address,
-        relayer_account=relayer,
-        relayer_address=relayer_address,
-        guardian_service_url=args.guardian_service_url,
-        guardian_2fa_code=args.guardian_2fa_code,
+        guardian_and_relayer_data=guardian_and_relayer_data,
     )
 
     cli_shared.send_or_simulate(tx, args)
@@ -749,8 +725,10 @@ def claim_rewards(args: Any):
     validate_arguments(args)
 
     sender = cli_shared.prepare_sender(args)
-    guardian, guardian_address = cli_shared.prepare_guardian(args)
-    relayer, relayer_address = cli_shared.prepare_relayer(args)
+    guardian_and_relayer_data = cli_shared.get_guardian_and_relayer_data(
+        sender=sender.address.to_bech32(),
+        args=args,
+    )
 
     gas_limit = args.gas_limit if args.gas_limit else 0
 
@@ -764,12 +742,7 @@ def claim_rewards(args: Any):
         nonce=sender.nonce,
         version=int(args.version),
         options=int(args.options),
-        guardian_account=guardian,
-        guardian_address=guardian_address,
-        relayer_account=relayer,
-        relayer_address=relayer_address,
-        guardian_service_url=args.guardian_service_url,
-        guardian_2fa_code=args.guardian_2fa_code,
+        guardian_and_relayer_data=guardian_and_relayer_data,
     )
     cli_shared.send_or_simulate(tx, args)
 
@@ -778,8 +751,10 @@ def redelegate_rewards(args: Any):
     validate_arguments(args)
 
     sender = cli_shared.prepare_sender(args)
-    guardian, guardian_address = cli_shared.prepare_guardian(args)
-    relayer, relayer_address = cli_shared.prepare_relayer(args)
+    guardian_and_relayer_data = cli_shared.get_guardian_and_relayer_data(
+        sender=sender.address.to_bech32(),
+        args=args,
+    )
 
     gas_limit = args.gas_limit if args.gas_limit else 0
 
@@ -793,12 +768,7 @@ def redelegate_rewards(args: Any):
         nonce=sender.nonce,
         version=int(args.version),
         options=int(args.options),
-        guardian_account=guardian,
-        guardian_address=guardian_address,
-        relayer_account=relayer,
-        relayer_address=relayer_address,
-        guardian_service_url=args.guardian_service_url,
-        guardian_2fa_code=args.guardian_2fa_code,
+        guardian_and_relayer_data=guardian_and_relayer_data,
     )
     cli_shared.send_or_simulate(tx, args)
 
@@ -807,8 +777,10 @@ def undelegate(args: Any):
     validate_arguments(args)
 
     sender = cli_shared.prepare_sender(args)
-    guardian, guardian_address = cli_shared.prepare_guardian(args)
-    relayer, relayer_address = cli_shared.prepare_relayer(args)
+    guardian_and_relayer_data = cli_shared.get_guardian_and_relayer_data(
+        sender=sender.address.to_bech32(),
+        args=args,
+    )
 
     gas_limit = args.gas_limit if args.gas_limit else 0
     value = int(args.value)
@@ -823,12 +795,7 @@ def undelegate(args: Any):
         nonce=sender.nonce,
         version=int(args.version),
         options=int(args.options),
-        guardian_account=guardian,
-        guardian_address=guardian_address,
-        relayer_account=relayer,
-        relayer_address=relayer_address,
-        guardian_service_url=args.guardian_service_url,
-        guardian_2fa_code=args.guardian_2fa_code,
+        guardian_and_relayer_data=guardian_and_relayer_data,
     )
 
     cli_shared.send_or_simulate(tx, args)
@@ -838,8 +805,10 @@ def withdraw(args: Any):
     validate_arguments(args)
 
     sender = cli_shared.prepare_sender(args)
-    guardian, guardian_address = cli_shared.prepare_guardian(args)
-    relayer, relayer_address = cli_shared.prepare_relayer(args)
+    guardian_and_relayer_data = cli_shared.get_guardian_and_relayer_data(
+        sender=sender.address.to_bech32(),
+        args=args,
+    )
 
     gas_limit = args.gas_limit if args.gas_limit else 0
 
@@ -853,12 +822,7 @@ def withdraw(args: Any):
         nonce=sender.nonce,
         version=int(args.version),
         options=int(args.options),
-        guardian_account=guardian,
-        guardian_address=guardian_address,
-        relayer_account=relayer,
-        relayer_address=relayer_address,
-        guardian_service_url=args.guardian_service_url,
-        guardian_2fa_code=args.guardian_2fa_code,
+        guardian_and_relayer_data=guardian_and_relayer_data,
     )
 
     cli_shared.send_or_simulate(tx, args)
@@ -868,8 +832,10 @@ def change_service_fee(args: Any):
     validate_arguments(args)
 
     sender = cli_shared.prepare_sender(args)
-    guardian, guardian_address = cli_shared.prepare_guardian(args)
-    relayer, relayer_address = cli_shared.prepare_relayer(args)
+    guardian_and_relayer_data = cli_shared.get_guardian_and_relayer_data(
+        sender=sender.address.to_bech32(),
+        args=args,
+    )
 
     gas_limit = args.gas_limit if args.gas_limit else 0
 
@@ -884,12 +850,7 @@ def change_service_fee(args: Any):
         nonce=sender.nonce,
         version=int(args.version),
         options=int(args.options),
-        guardian_account=guardian,
-        guardian_address=guardian_address,
-        relayer_account=relayer,
-        relayer_address=relayer_address,
-        guardian_service_url=args.guardian_service_url,
-        guardian_2fa_code=args.guardian_2fa_code,
+        guardian_and_relayer_data=guardian_and_relayer_data,
     )
 
     cli_shared.send_or_simulate(tx, args)
@@ -899,8 +860,10 @@ def modify_delegation_cap(args: Any):
     validate_arguments(args)
 
     sender = cli_shared.prepare_sender(args)
-    guardian, guardian_address = cli_shared.prepare_guardian(args)
-    relayer, relayer_address = cli_shared.prepare_relayer(args)
+    guardian_and_relayer_data = cli_shared.get_guardian_and_relayer_data(
+        sender=sender.address.to_bech32(),
+        args=args,
+    )
 
     gas_limit = args.gas_limit if args.gas_limit else 0
 
@@ -915,12 +878,7 @@ def modify_delegation_cap(args: Any):
         nonce=sender.nonce,
         version=int(args.version),
         options=int(args.options),
-        guardian_account=guardian,
-        guardian_address=guardian_address,
-        relayer_account=relayer,
-        relayer_address=relayer_address,
-        guardian_service_url=args.guardian_service_url,
-        guardian_2fa_code=args.guardian_2fa_code,
+        guardian_and_relayer_data=guardian_and_relayer_data,
     )
 
     cli_shared.send_or_simulate(tx, args)
@@ -930,8 +888,10 @@ def automatic_activation(args: Any):
     validate_arguments(args)
 
     sender = cli_shared.prepare_sender(args)
-    guardian, guardian_address = cli_shared.prepare_guardian(args)
-    relayer, relayer_address = cli_shared.prepare_relayer(args)
+    guardian_and_relayer_data = cli_shared.get_guardian_and_relayer_data(
+        sender=sender.address.to_bech32(),
+        args=args,
+    )
 
     gas_limit = args.gas_limit if args.gas_limit else 0
 
@@ -947,12 +907,7 @@ def automatic_activation(args: Any):
         nonce=sender.nonce,
         version=int(args.version),
         options=int(args.options),
-        guardian_account=guardian,
-        guardian_address=guardian_address,
-        relayer_account=relayer,
-        relayer_address=relayer_address,
-        guardian_service_url=args.guardian_service_url,
-        guardian_2fa_code=args.guardian_2fa_code,
+        guardian_and_relayer_data=guardian_and_relayer_data,
     )
 
     cli_shared.send_or_simulate(tx, args)
@@ -962,8 +917,10 @@ def redelegate_cap(args: Any):
     validate_arguments(args)
 
     sender = cli_shared.prepare_sender(args)
-    guardian, guardian_address = cli_shared.prepare_guardian(args)
-    relayer, relayer_address = cli_shared.prepare_relayer(args)
+    guardian_and_relayer_data = cli_shared.get_guardian_and_relayer_data(
+        sender=sender.address.to_bech32(),
+        args=args,
+    )
 
     gas_limit = args.gas_limit if args.gas_limit else 0
 
@@ -979,12 +936,7 @@ def redelegate_cap(args: Any):
         nonce=sender.nonce,
         version=int(args.version),
         options=int(args.options),
-        guardian_account=guardian,
-        guardian_address=guardian_address,
-        relayer_account=relayer,
-        relayer_address=relayer_address,
-        guardian_service_url=args.guardian_service_url,
-        guardian_2fa_code=args.guardian_2fa_code,
+        guardian_and_relayer_data=guardian_and_relayer_data,
     )
 
     cli_shared.send_or_simulate(tx, args)
@@ -994,8 +946,10 @@ def set_metadata(args: Any):
     validate_arguments(args)
 
     sender = cli_shared.prepare_sender(args)
-    guardian, guardian_address = cli_shared.prepare_guardian(args)
-    relayer, relayer_address = cli_shared.prepare_relayer(args)
+    guardian_and_relayer_data = cli_shared.get_guardian_and_relayer_data(
+        sender=sender.address.to_bech32(),
+        args=args,
+    )
 
     gas_limit = args.gas_limit if args.gas_limit else 0
 
@@ -1012,12 +966,7 @@ def set_metadata(args: Any):
         nonce=sender.nonce,
         version=int(args.version),
         options=int(args.options),
-        guardian_account=guardian,
-        guardian_address=guardian_address,
-        relayer_account=relayer,
-        relayer_address=relayer_address,
-        guardian_service_url=args.guardian_service_url,
-        guardian_2fa_code=args.guardian_2fa_code,
+        guardian_and_relayer_data=guardian_and_relayer_data,
     )
 
     cli_shared.send_or_simulate(tx, args)
@@ -1027,8 +976,10 @@ def make_new_contract_from_validator_data(args: Any):
     validate_arguments(args)
 
     sender = cli_shared.prepare_sender(args)
-    guardian, guardian_address = cli_shared.prepare_guardian(args)
-    relayer, relayer_address = cli_shared.prepare_relayer(args)
+    guardian_and_relayer_data = cli_shared.get_guardian_and_relayer_data(
+        sender=sender.address.to_bech32(),
+        args=args,
+    )
 
     gas_limit = args.gas_limit if args.gas_limit else 0
 
@@ -1043,12 +994,7 @@ def make_new_contract_from_validator_data(args: Any):
         nonce=sender.nonce,
         version=int(args.version),
         options=int(args.options),
-        guardian_account=guardian,
-        guardian_address=guardian_address,
-        relayer_account=relayer,
-        relayer_address=relayer_address,
-        guardian_service_url=args.guardian_service_url,
-        guardian_2fa_code=args.guardian_2fa_code,
+        guardian_and_relayer_data=guardian_and_relayer_data,
     )
 
     cli_shared.send_or_simulate(tx, args)

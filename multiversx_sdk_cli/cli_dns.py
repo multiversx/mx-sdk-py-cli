@@ -1,4 +1,4 @@
-from typing import Any, List
+from typing import Any
 
 from multiversx_sdk import ProxyNetworkProvider
 from rich.console import Console
@@ -20,7 +20,7 @@ from multiversx_sdk_cli.dns import (
 from multiversx_sdk_cli.errors import ArgumentsNotProvidedError
 
 
-def setup_parser(args: List[str], subparsers: Any) -> Any:
+def setup_parser(args: list[str], subparsers: Any) -> Any:
     parser = cli_shared.add_group_subparser(subparsers, "dns", "Operations related to the Domain Name Service")
     subparsers = parser.add_subparsers()
 

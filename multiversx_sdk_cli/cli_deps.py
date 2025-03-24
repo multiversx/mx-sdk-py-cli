@@ -1,5 +1,5 @@
 import logging
-from typing import Any, List, Tuple
+from typing import Any
 
 from multiversx_sdk_cli import cli_shared, config, dependencies, errors
 from multiversx_sdk_cli.dependencies.install import get_deps_dict
@@ -45,7 +45,7 @@ def check(args: Any):
 
     if name == "all":
         all_dependencies = dependencies.get_all_deps()
-        missing_dependencies: List[Tuple[str, str]] = []
+        missing_dependencies: list[tuple[str, str]] = []
 
         for dependency in all_dependencies:
             tag_to_check: str = config.get_dependency_tag(dependency.key)

@@ -1,6 +1,6 @@
 import os
 from pathlib import Path
-from typing import Any, Dict, List
+from typing import Any
 
 from multiversx_sdk import NetworkProviderConfig
 
@@ -81,12 +81,12 @@ def delete_value(name: str):
     write_file(data)
 
 
-def get_active() -> Dict[str, Any]:
+def get_active() -> dict[str, Any]:
     data = read_file()
     configs = data.get("configurations", {})
     active_config_name: str = data.get("active", "default")
-    empty_config: Dict[str, Any] = dict()
-    result: Dict[str, Any] = configs.get(active_config_name, empty_config)
+    empty_config: dict[str, Any] = dict()
+    result: dict[str, Any] = configs.get(active_config_name, empty_config)
 
     return result
 
@@ -143,7 +143,7 @@ def _guard_valid_config_deletion(name: str):
         raise errors.ConfigurationProtectedError(name)
 
 
-def get_defaults() -> Dict[str, Any]:
+def get_defaults() -> dict[str, Any]:
     return {
         "dependencies.vmtools.tag": "v1.5.24",
         "dependencies.vmtools.urlTemplate.linux": "https://github.com/multiversx/mx-chain-vm-go/archive/{TAG}.tar.gz",
@@ -179,20 +179,20 @@ def resolve_config_path() -> Path:
     return GLOBAL_CONFIG_PATH
 
 
-def read_file() -> Dict[str, Any]:
+def read_file() -> dict[str, Any]:
     config_path = resolve_config_path()
     if config_path.exists():
-        data: Dict[str, Any] = utils.read_json_file(config_path)
+        data: dict[str, Any] = utils.read_json_file(config_path)
         return data
     return dict()
 
 
-def write_file(data: Dict[str, Any]):
+def write_file(data: dict[str, Any]):
     config_path = resolve_config_path()
     utils.write_json_file(str(config_path), data)
 
 
-def add_config_args(argv: List[str]) -> List[str]:
+def add_config_args(argv: list[str]) -> list[str]:
     try:
         command, subcommand, *_ = argv
     except ValueError:
@@ -210,8 +210,8 @@ def add_config_args(argv: List[str]) -> List[str]:
     return final_args
 
 
-def determine_final_args(argv: List[str], config_args: Dict[str, Any]) -> List[str]:
-    extra_args: List[str] = []
+def determine_final_args(argv: list[str], config_args: dict[str, Any]) -> list[str]:
+    extra_args: list[str] = []
     for key, value in config_args.items():
         key_arg = f"--{key}"
         # arguments from the command line override the config
@@ -222,9 +222,9 @@ def determine_final_args(argv: List[str], config_args: Dict[str, Any]) -> List[s
         extra_args.append(key_arg)
         if value is True:
             continue
-        if isinstance(value, List):
-            for item in value:
-                extra_args.append(str(item))
+        if isinstance(value, list):
+            for item in value:  # type: ignore
+                extra_args.append(str(item))  # type: ignore
         else:
             extra_args.append(str(value))
 

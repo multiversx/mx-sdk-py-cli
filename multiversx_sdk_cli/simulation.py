@@ -1,5 +1,5 @@
 from collections import OrderedDict
-from typing import Any, Dict, Protocol
+from typing import Any, Protocol
 
 from multiversx_sdk import Transaction, TransactionOnNetwork
 
@@ -17,8 +17,8 @@ class Simulation(ISerializable):
     def __init__(self, simulate_response: TransactionOnNetwork) -> None:
         self.simulation_response = simulate_response
 
-    def to_dictionary(self) -> Dict[str, Any]:
-        dictionary: Dict[str, Any] = OrderedDict()
+    def to_dictionary(self) -> dict[str, Any]:
+        dictionary: dict[str, Any] = OrderedDict()
         dictionary["execution"] = self.simulation_response.raw
 
         return dictionary

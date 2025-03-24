@@ -156,8 +156,10 @@ def validate_args(args: Any) -> None:
 def do_stake(args: Any):
     validate_args(args)
     sender = cli_shared.prepare_sender(args)
-    guardian, guardian_address = cli_shared.prepare_guardian(args)
-    relayer, relayer_address = cli_shared.prepare_relayer(args)
+    guardian_and_relayer_data = cli_shared.get_guardian_and_relayer_data(
+        sender=sender.address.to_bech32(),
+        args=args,
+    )
 
     native_amount = int(args.value)
     gas_limit = args.gas_limit if args.gas_limit else 0
@@ -174,12 +176,7 @@ def do_stake(args: Any):
             nonce=sender.nonce,
             version=args.version,
             options=args.options,
-            guardian_account=guardian,
-            guardian_address=guardian_address,
-            relayer_account=relayer,
-            relayer_address=relayer_address,
-            guardian_service_url=args.guardian_service_url,
-            guardian_2fa_code=args.guardian_2fa_code,
+            guardian_and_relayer_data=guardian_and_relayer_data,
         )
     else:
         validators_signers = _load_validators_signers(args.validators_pem)
@@ -193,12 +190,7 @@ def do_stake(args: Any):
             version=args.version,
             options=args.options,
             rewards_address=rewards_address,
-            guardian_account=guardian,
-            guardian_address=guardian_address,
-            relayer_account=relayer,
-            relayer_address=relayer_address,
-            guardian_service_url=args.guardian_service_url,
-            guardian_2fa_code=args.guardian_2fa_code,
+            guardian_and_relayer_data=guardian_and_relayer_data,
         )
 
     cli_shared.send_or_simulate(tx, args)
@@ -228,8 +220,10 @@ def _parse_public_bls_keys(public_bls_keys: str) -> list[ValidatorPublicKey]:
 def do_unstake(args: Any):
     validate_args(args)
     sender = cli_shared.prepare_sender(args)
-    guardian, guardian_address = cli_shared.prepare_guardian(args)
-    relayer, relayer_address = cli_shared.prepare_relayer(args)
+    guardian_and_relayer_data = cli_shared.get_guardian_and_relayer_data(
+        sender=sender.address.to_bech32(),
+        args=args,
+    )
 
     native_amount = int(args.value)
     gas_limit = args.gas_limit if args.gas_limit else 0
@@ -245,12 +239,7 @@ def do_unstake(args: Any):
         nonce=sender.nonce,
         version=args.version,
         options=args.options,
-        guardian_account=guardian,
-        guardian_address=guardian_address,
-        relayer_account=relayer,
-        relayer_address=relayer_address,
-        guardian_service_url=args.guardian_service_url,
-        guardian_2fa_code=args.guardian_2fa_code,
+        guardian_and_relayer_data=guardian_and_relayer_data,
     )
 
     cli_shared.send_or_simulate(tx, args)
@@ -259,8 +248,10 @@ def do_unstake(args: Any):
 def do_unjail(args: Any):
     validate_args(args)
     sender = cli_shared.prepare_sender(args)
-    guardian, guardian_address = cli_shared.prepare_guardian(args)
-    relayer, relayer_address = cli_shared.prepare_relayer(args)
+    guardian_and_relayer_data = cli_shared.get_guardian_and_relayer_data(
+        sender=sender.address.to_bech32(),
+        args=args,
+    )
 
     native_amount = int(args.value)
     gas_limit = args.gas_limit if args.gas_limit else 0
@@ -276,12 +267,7 @@ def do_unjail(args: Any):
         nonce=sender.nonce,
         version=args.version,
         options=args.options,
-        guardian_account=guardian,
-        guardian_address=guardian_address,
-        relayer_account=relayer,
-        relayer_address=relayer_address,
-        guardian_service_url=args.guardian_service_url,
-        guardian_2fa_code=args.guardian_2fa_code,
+        guardian_and_relayer_data=guardian_and_relayer_data,
     )
 
     cli_shared.send_or_simulate(tx, args)
@@ -290,8 +276,10 @@ def do_unjail(args: Any):
 def do_unbond(args: Any):
     validate_args(args)
     sender = cli_shared.prepare_sender(args)
-    guardian, guardian_address = cli_shared.prepare_guardian(args)
-    relayer, relayer_address = cli_shared.prepare_relayer(args)
+    guardian_and_relayer_data = cli_shared.get_guardian_and_relayer_data(
+        sender=sender.address.to_bech32(),
+        args=args,
+    )
 
     native_amount = int(args.value)
     gas_limit = args.gas_limit if args.gas_limit else 0
@@ -307,12 +295,7 @@ def do_unbond(args: Any):
         nonce=sender.nonce,
         version=args.version,
         options=args.options,
-        guardian_account=guardian,
-        guardian_address=guardian_address,
-        relayer_account=relayer,
-        relayer_address=relayer_address,
-        guardian_service_url=args.guardian_service_url,
-        guardian_2fa_code=args.guardian_2fa_code,
+        guardian_and_relayer_data=guardian_and_relayer_data,
     )
 
     cli_shared.send_or_simulate(tx, args)
@@ -321,8 +304,10 @@ def do_unbond(args: Any):
 def change_reward_address(args: Any):
     validate_args(args)
     sender = cli_shared.prepare_sender(args)
-    guardian, guardian_address = cli_shared.prepare_guardian(args)
-    relayer, relayer_address = cli_shared.prepare_relayer(args)
+    guardian_and_relayer_data = cli_shared.get_guardian_and_relayer_data(
+        sender=sender.address.to_bech32(),
+        args=args,
+    )
 
     native_amount = int(args.value)
     gas_limit = args.gas_limit if args.gas_limit else 0
@@ -338,12 +323,7 @@ def change_reward_address(args: Any):
         nonce=sender.nonce,
         version=args.version,
         options=args.options,
-        guardian_account=guardian,
-        guardian_address=guardian_address,
-        relayer_account=relayer,
-        relayer_address=relayer_address,
-        guardian_service_url=args.guardian_service_url,
-        guardian_2fa_code=args.guardian_2fa_code,
+        guardian_and_relayer_data=guardian_and_relayer_data,
     )
 
     cli_shared.send_or_simulate(tx, args)
@@ -352,8 +332,10 @@ def change_reward_address(args: Any):
 def do_claim(args: Any):
     validate_args(args)
     sender = cli_shared.prepare_sender(args)
-    guardian, guardian_address = cli_shared.prepare_guardian(args)
-    relayer, relayer_address = cli_shared.prepare_relayer(args)
+    guardian_and_relayer_data = cli_shared.get_guardian_and_relayer_data(
+        sender=sender.address.to_bech32(),
+        args=args,
+    )
 
     native_amount = int(args.value)
     gas_limit = args.gas_limit if args.gas_limit else 0
@@ -367,12 +349,7 @@ def do_claim(args: Any):
         nonce=sender.nonce,
         version=args.version,
         options=args.options,
-        guardian_account=guardian,
-        guardian_address=guardian_address,
-        relayer_account=relayer,
-        relayer_address=relayer_address,
-        guardian_service_url=args.guardian_service_url,
-        guardian_2fa_code=args.guardian_2fa_code,
+        guardian_and_relayer_data=guardian_and_relayer_data,
     )
 
     cli_shared.send_or_simulate(tx, args)
@@ -381,8 +358,10 @@ def do_claim(args: Any):
 def do_unstake_nodes(args: Any):
     validate_args(args)
     sender = cli_shared.prepare_sender(args)
-    guardian, guardian_address = cli_shared.prepare_guardian(args)
-    relayer, relayer_address = cli_shared.prepare_relayer(args)
+    guardian_and_relayer_data = cli_shared.get_guardian_and_relayer_data(
+        sender=sender.address.to_bech32(),
+        args=args,
+    )
 
     native_amount = int(args.value)
     gas_limit = args.gas_limit if args.gas_limit else 0
@@ -399,12 +378,7 @@ def do_unstake_nodes(args: Any):
         nonce=sender.nonce,
         version=args.version,
         options=args.options,
-        guardian_account=guardian,
-        guardian_address=guardian_address,
-        relayer_account=relayer,
-        relayer_address=relayer_address,
-        guardian_service_url=args.guardian_service_url,
-        guardian_2fa_code=args.guardian_2fa_code,
+        guardian_and_relayer_data=guardian_and_relayer_data,
     )
 
     cli_shared.send_or_simulate(tx, args)
@@ -413,8 +387,10 @@ def do_unstake_nodes(args: Any):
 def do_unstake_tokens(args: Any):
     validate_args(args)
     sender = cli_shared.prepare_sender(args)
-    guardian, guardian_address = cli_shared.prepare_guardian(args)
-    relayer, relayer_address = cli_shared.prepare_relayer(args)
+    guardian_and_relayer_data = cli_shared.get_guardian_and_relayer_data(
+        sender=sender.address.to_bech32(),
+        args=args,
+    )
 
     native_amount = int(args.value)
     value = int(args.unstake_value)
@@ -430,12 +406,7 @@ def do_unstake_tokens(args: Any):
         nonce=sender.nonce,
         version=args.version,
         options=args.options,
-        guardian_account=guardian,
-        guardian_address=guardian_address,
-        relayer_account=relayer,
-        relayer_address=relayer_address,
-        guardian_service_url=args.guardian_service_url,
-        guardian_2fa_code=args.guardian_2fa_code,
+        guardian_and_relayer_data=guardian_and_relayer_data,
     )
 
     cli_shared.send_or_simulate(tx, args)
@@ -444,8 +415,10 @@ def do_unstake_tokens(args: Any):
 def do_unbond_nodes(args: Any):
     validate_args(args)
     sender = cli_shared.prepare_sender(args)
-    guardian, guardian_address = cli_shared.prepare_guardian(args)
-    relayer, relayer_address = cli_shared.prepare_relayer(args)
+    guardian_and_relayer_data = cli_shared.get_guardian_and_relayer_data(
+        sender=sender.address.to_bech32(),
+        args=args,
+    )
 
     native_amount = int(args.value)
     gas_limit = args.gas_limit if args.gas_limit else 0
@@ -462,12 +435,7 @@ def do_unbond_nodes(args: Any):
         nonce=sender.nonce,
         version=args.version,
         options=args.options,
-        guardian_account=guardian,
-        guardian_address=guardian_address,
-        relayer_account=relayer,
-        relayer_address=relayer_address,
-        guardian_service_url=args.guardian_service_url,
-        guardian_2fa_code=args.guardian_2fa_code,
+        guardian_and_relayer_data=guardian_and_relayer_data,
     )
 
     cli_shared.send_or_simulate(tx, args)
@@ -476,8 +444,10 @@ def do_unbond_nodes(args: Any):
 def do_unbond_tokens(args: Any):
     validate_args(args)
     sender = cli_shared.prepare_sender(args)
-    guardian, guardian_address = cli_shared.prepare_guardian(args)
-    relayer, relayer_address = cli_shared.prepare_relayer(args)
+    guardian_and_relayer_data = cli_shared.get_guardian_and_relayer_data(
+        sender=sender.address.to_bech32(),
+        args=args,
+    )
 
     native_amount = int(args.value)
     value = int(args.unbond_value)
@@ -493,12 +463,7 @@ def do_unbond_tokens(args: Any):
         nonce=sender.nonce,
         version=args.version,
         options=args.options,
-        guardian_account=guardian,
-        guardian_address=guardian_address,
-        relayer_account=relayer,
-        relayer_address=relayer_address,
-        guardian_service_url=args.guardian_service_url,
-        guardian_2fa_code=args.guardian_2fa_code,
+        guardian_and_relayer_data=guardian_and_relayer_data,
     )
 
     cli_shared.send_or_simulate(tx, args)
@@ -507,8 +472,10 @@ def do_unbond_tokens(args: Any):
 def do_clean_registered_data(args: Any):
     validate_args(args)
     sender = cli_shared.prepare_sender(args)
-    guardian, guardian_address = cli_shared.prepare_guardian(args)
-    relayer, relayer_address = cli_shared.prepare_relayer(args)
+    guardian_and_relayer_data = cli_shared.get_guardian_and_relayer_data(
+        sender=sender.address.to_bech32(),
+        args=args,
+    )
 
     native_amount = int(args.value)
     gas_limit = args.gas_limit if args.gas_limit else 0
@@ -522,12 +489,7 @@ def do_clean_registered_data(args: Any):
         nonce=sender.nonce,
         version=args.version,
         options=args.options,
-        guardian_account=guardian,
-        guardian_address=guardian_address,
-        relayer_account=relayer,
-        relayer_address=relayer_address,
-        guardian_service_url=args.guardian_service_url,
-        guardian_2fa_code=args.guardian_2fa_code,
+        guardian_and_relayer_data=guardian_and_relayer_data,
     )
 
     cli_shared.send_or_simulate(tx, args)
@@ -536,8 +498,10 @@ def do_clean_registered_data(args: Any):
 def do_restake_unstaked_nodes(args: Any):
     validate_args(args)
     sender = cli_shared.prepare_sender(args)
-    guardian, guardian_address = cli_shared.prepare_guardian(args)
-    relayer, relayer_address = cli_shared.prepare_relayer(args)
+    guardian_and_relayer_data = cli_shared.get_guardian_and_relayer_data(
+        sender=sender.address.to_bech32(),
+        args=args,
+    )
 
     native_amount = int(args.value)
     gas_limit = args.gas_limit if args.gas_limit else 0
@@ -553,12 +517,7 @@ def do_restake_unstaked_nodes(args: Any):
         nonce=sender.nonce,
         version=args.version,
         options=args.options,
-        guardian_account=guardian,
-        guardian_address=guardian_address,
-        relayer_account=relayer,
-        relayer_address=relayer_address,
-        guardian_service_url=args.guardian_service_url,
-        guardian_2fa_code=args.guardian_2fa_code,
+        guardian_and_relayer_data=guardian_and_relayer_data,
     )
 
     cli_shared.send_or_simulate(tx, args)
