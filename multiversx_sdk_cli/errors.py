@@ -62,29 +62,9 @@ class BadDirectory(KnownError):
         super().__init__(f"Bad directory: {directory}")
 
 
-class BadFile(KnownError):
-    def __init__(self, filename: str, inner: Any = None):
-        super().__init__(f"Bad file: {filename}.", inner)
-
-
-class NotSupportedProject(KnownError):
-    def __init__(self, directory: str):
-        super().__init__(f"Directory is not a supported project: {directory}")
-
-
 class PlatformNotSupported(KnownError):
     def __init__(self, action_or_item: str, platform: str):
         super().__init__(f"[{action_or_item}] is not supported on platform [{platform}].")
-
-
-class BuildError(KnownError):
-    def __init__(self, message: str):
-        super().__init__(f"Build error: {message}.")
-
-
-class UnknownArgumentFormat(KnownError):
-    def __init__(self, argument: Any):
-        super().__init__(f"Cannot handle non-hex, non-number arguments yet: {argument}.")
 
 
 class BadInputError(KnownError):
@@ -126,11 +106,6 @@ class BadUsage(KnownError):
         super().__init__(f"Bad usage: {message}.")
 
 
-class CannotReadValidatorsData(KnownError):
-    def __init__(self):
-        super(CannotReadValidatorsData, self).__init__("cannot read validators data")
-
-
 class TransactionIsNotSigned(KnownError):
     def __init__(self):
         super().__init__("Transaction is not signed.")
@@ -139,11 +114,6 @@ class TransactionIsNotSigned(KnownError):
 class NoWalletProvided(KnownError):
     def __init__(self):
         super().__init__("No wallet provided.")
-
-
-class LedgerError(KnownError):
-    def __init__(self, message: str):
-        super().__init__("Ledger error: " + message)
 
 
 class DockerMissingError(KnownError):
@@ -159,12 +129,6 @@ class GuardianServiceError(KnownError):
 class ArgumentsNotProvidedError(KnownError):
     def __init__(self, message: str):
         super().__init__(message)
-
-
-class ProxyError(KnownError):
-    def __init__(self, message: str, url: str, data: str, code: str):
-        inner = {"url": url, "data": data, "code": code}
-        super().__init__(message, inner)
 
 
 class WalletGenerationError(KnownError):
