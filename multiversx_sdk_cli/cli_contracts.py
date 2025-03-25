@@ -350,12 +350,10 @@ def deploy(args: Any):
     validate_chain_id_args(args)
 
     sender = cli_shared.prepare_sender(args)
-
-    guardian = cli_shared.load_guardian_account(args)
-    guardian_address = cli_shared.get_guardian_address(guardian, args)
-
-    relayer = cli_shared.load_relayer_account(args)
-    relayer_address = cli_shared.get_relayer_address(relayer, args)
+    guardian_and_relayer_data = cli_shared.get_guardian_and_relayer_data(
+        sender=sender.address.to_bech32(),
+        args=args,
+    )
 
     chain_id = cli_shared.get_chain_id(args.chain, args.proxy)
     config = TransactionsFactoryConfig(chain_id)
@@ -379,12 +377,7 @@ def deploy(args: Any):
         nonce=sender.nonce,
         version=int(args.version),
         options=int(args.options),
-        guardian_account=guardian,
-        guardian_address=guardian_address,
-        relayer_account=relayer,
-        relayer_address=relayer_address,
-        guardian_service_url=args.guardian_service_url,
-        guardian_2fa_code=args.guardian_2fa_code,
+        guardian_and_relayer_data=guardian_and_relayer_data,
     )
 
     address_computer = AddressComputer(NUMBER_OF_SHARDS)
@@ -405,12 +398,10 @@ def call(args: Any):
     validate_chain_id_args(args)
 
     sender = cli_shared.prepare_sender(args)
-
-    guardian = cli_shared.load_guardian_account(args)
-    guardian_address = cli_shared.get_guardian_address(guardian, args)
-
-    relayer = cli_shared.load_relayer_account(args)
-    relayer_address = cli_shared.get_relayer_address(relayer, args)
+    guardian_and_relayer_data = cli_shared.get_guardian_and_relayer_data(
+        sender=sender.address.to_bech32(),
+        args=args,
+    )
 
     chain_id = cli_shared.get_chain_id(args.chain, args.proxy)
     config = TransactionsFactoryConfig(chain_id)
@@ -433,12 +424,7 @@ def call(args: Any):
         nonce=sender.nonce,
         version=int(args.version),
         options=int(args.options),
-        guardian_account=guardian,
-        guardian_address=guardian_address,
-        relayer_account=relayer,
-        relayer_address=relayer_address,
-        guardian_service_url=args.guardian_service_url,
-        guardian_2fa_code=args.guardian_2fa_code,
+        guardian_and_relayer_data=guardian_and_relayer_data,
     )
 
     _send_or_simulate(tx, contract_address, args)
@@ -453,12 +439,10 @@ def upgrade(args: Any):
     validate_chain_id_args(args)
 
     sender = cli_shared.prepare_sender(args)
-
-    guardian = cli_shared.load_guardian_account(args)
-    guardian_address = cli_shared.get_guardian_address(guardian, args)
-
-    relayer = cli_shared.load_relayer_account(args)
-    relayer_address = cli_shared.get_relayer_address(relayer, args)
+    guardian_and_relayer_data = cli_shared.get_guardian_and_relayer_data(
+        sender=sender.address.to_bech32(),
+        args=args,
+    )
 
     chain_id = cli_shared.get_chain_id(args.chain, args.proxy)
     config = TransactionsFactoryConfig(chain_id)
@@ -484,12 +468,7 @@ def upgrade(args: Any):
         nonce=sender.nonce,
         version=int(args.version),
         options=int(args.options),
-        guardian_account=guardian,
-        guardian_address=guardian_address,
-        relayer_account=relayer,
-        relayer_address=relayer_address,
-        guardian_service_url=args.guardian_service_url,
-        guardian_2fa_code=args.guardian_2fa_code,
+        guardian_and_relayer_data=guardian_and_relayer_data,
     )
 
     _send_or_simulate(tx, contract_address, args)

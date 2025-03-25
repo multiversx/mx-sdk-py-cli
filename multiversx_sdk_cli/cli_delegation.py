@@ -394,28 +394,6 @@ def validate_arguments(args: Any):
     validate_chain_id_args(args)
 
 
-def prepare_sender(args: Any):
-    sender = cli_shared.prepare_account(args)
-    sender.nonce = (
-        int(args.nonce)
-        if args.nonce is not None
-        else cli_shared.get_current_nonce_for_address(sender.address, args.proxy)
-    )
-    return sender
-
-
-def prepare_guardian(args: Any):
-    guardian = cli_shared.load_guardian_account(args)
-    guardian_address = cli_shared.get_guardian_address(guardian, args)
-    return guardian, guardian_address
-
-
-def prepare_relayer(args: Any):
-    relayer = cli_shared.load_relayer_account(args)
-    relayer_address = cli_shared.get_relayer_address(relayer, args)
-    return relayer, relayer_address
-
-
 def _get_delegation_controller(args: Any):
     chain_id = cli_shared.get_chain_id(args.chain, args.proxy)
     config = TransactionsFactoryConfig(chain_id)
