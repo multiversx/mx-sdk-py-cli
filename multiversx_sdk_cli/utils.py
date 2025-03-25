@@ -3,24 +3,21 @@ import logging
 import os
 import pathlib
 import shutil
-import stat
 import sys
 import tarfile
 import zipfile
 from pathlib import Path
-from typing import (Any, Dict, List, Optional, Protocol, Union,
-                    runtime_checkable)
+from types import SimpleNamespace
+from typing import Any, Optional, Protocol, Union, runtime_checkable
 
 import toml
-
-from multiversx_sdk_cli import errors
 
 logger = logging.getLogger("utils")
 
 
 @runtime_checkable
 class ISerializable(Protocol):
-    def to_dictionary(self) -> Dict[str, Any]:
+    def to_dictionary(self) -> dict[str, Any]:
         return self.__dict__
 
 
@@ -42,15 +39,15 @@ class BasicEncoder(json.JSONEncoder):
             return o.to_dictionary()
         if isinstance(o, bytes):
             return o.hex()
+        # needed because sdk-py returns SimpleNamespace objects that the json library does not know to serialize
+        if isinstance(o, SimpleNamespace):
+            return o.__dict__
         return super().default(o)
 
 
-def omit_fields(data: Any, fields: List[str] = []):
-    if isinstance(data, dict):
-        for field in fields:
-            data.pop(field, None)
-        return data
-    raise errors.ProgrammingError("omit_fields: only dictionaries are supported.")
+def omit_fields(data: dict[str, Any], fields: list[str] = []) -> None:
+    for field in fields:
+        data.pop(field, None)
 
 
 def untar(archive_path: Path, destination_folder: Path) -> None:
@@ -78,28 +75,12 @@ def ensure_folder(folder: Union[str, Path]):
     pathlib.Path(folder).mkdir(parents=True, exist_ok=True)
 
 
-def read_lines(file: Path) -> List[str]:
+def read_lines(file: Path) -> list[str]:
     with open(file) as f:
         lines = f.readlines()
     lines = [line.strip() for line in lines]
     lines = [line for line in lines if line]
     return lines
-
-
-def read_binary_file(path: Path) -> bytes:
-    try:
-        with open(path, 'rb') as binary_file:
-            return binary_file.read()
-    except Exception as err:
-        raise errors.BadFile(str(path), err) from None
-
-
-def read_text_file(path: Path) -> str:
-    try:
-        with open(path, 'r') as text_file:
-            return text_file.read()
-    except Exception as err:
-        raise errors.BadFile(str(path), err) from None
 
 
 def write_file(file_path: Path, text: str):
@@ -134,24 +115,13 @@ def dump_out_json(data: Any, outfile: Any = None):
     outfile.write("\n")
 
 
-def prettify_json_file(filename: str):
-    data = read_json_file(filename)
-    write_json_file(filename, data)
-
-
-def get_subfolders(folder: Path) -> List[str]:
+def get_subfolders(folder: Path) -> list[str]:
     return [item.name for item in os.scandir(folder) if item.is_dir() and not item.name.startswith(".")]
 
 
-def mark_executable(file: str) -> None:
-    logger.debug(f"Mark [{file}] as executable")
-    st = os.stat(file)
-    os.chmod(file, st.st_mode | stat.S_IEXEC)
-
-
-def list_files(folder: Path, suffix: Optional[str] = None) -> List[Path]:
+def list_files(folder: Path, suffix: Optional[str] = None) -> list[Path]:
     folder = folder.expanduser()
-    files: List[Path] = [folder / file for file in os.listdir(folder)]
+    files: list[Path] = [folder / file for file in os.listdir(folder)]
     files = [file for file in files if file.is_file()]
 
     if suffix:
@@ -170,16 +140,7 @@ def symlink(real: str, link: str) -> None:
     os.symlink(real, link)
 
 
-def as_object(data: Object) -> Object:
-    if isinstance(data, dict):
-        result = Object()
-        result.__dict__.update(data)
-        return result
-
-    return data
-
-
-def is_arg_present(args: List[str], key: str) -> bool:
+def is_arg_present(args: list[str], key: str) -> bool:
     for arg in args:
         if arg.find("--data") != -1:
             continue
@@ -187,24 +148,6 @@ def is_arg_present(args: List[str], key: str) -> bool:
             return True
 
     return False
-
-
-def str_int_to_hex_str(number_str: str) -> str:
-    num_of_bytes = 1
-    if len(number_str) > 2:
-        num_of_bytes = int(len(number_str) / 2)
-    int_str = int(number_str)
-    int_bytes = int_str.to_bytes(num_of_bytes, byteorder="big")
-    bytes_str = int_bytes.hex()
-    return bytes_str
-
-
-def parse_keys(bls_public_keys: str):
-    keys = bls_public_keys.split(',')
-    parsed_keys = ''
-    for key in keys:
-        parsed_keys += '@' + key
-    return parsed_keys, len(keys)
 
 
 def log_explorer(chain: str, name: str, path: str, details: str):

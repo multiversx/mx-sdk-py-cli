@@ -1,7 +1,7 @@
 import logging
 import os
 from pathlib import Path
-from typing import Any, Dict
+from typing import Any
 
 from multiversx_sdk_cli import cli_shared, errors, utils, workstation
 
@@ -16,20 +16,36 @@ def setup_parser(subparsers: Any) -> Any:
 
     sub = cli_shared.add_command_subparser(subparsers, "data", "parse", "Parses values from a given file")
     sub.add_argument("--file", required=True, help="path of the file to parse")
-    sub.add_argument("--expression", required=True, help="the Python-Dictionary expression to evaluate in order to extract the data")
+    sub.add_argument(
+        "--expression",
+        required=True,
+        help="the Python-Dictionary expression to evaluate in order to extract the data",
+    )
     sub.set_defaults(func=parse)
 
     sub = cli_shared.add_command_subparser(subparsers, "data", "store", "Stores a key-value pair within a partition")
     sub.add_argument("--key", required=True, help="the key")
     sub.add_argument("--value", required=True, help="the value to save")
     sub.add_argument("--partition", default="*", help="the storage partition (default: %(default)s)")
-    sub.add_argument("--use-global", action="store_true", default=False, help="use the global storage (default: %(default)s)")
+    sub.add_argument(
+        "--use-global",
+        action="store_true",
+        default=False,
+        help="use the global storage (default: %(default)s)",
+    )
     sub.set_defaults(func=store)
 
-    sub = cli_shared.add_command_subparser(subparsers, "data", "load", "Loads a key-value pair from a storage partition")
+    sub = cli_shared.add_command_subparser(
+        subparsers, "data", "load", "Loads a key-value pair from a storage partition"
+    )
     sub.add_argument("--key", required=True, help="the key")
     sub.add_argument("--partition", default="*", help="the storage partition (default: %(default)s)")
-    sub.add_argument("--use-global", action="store_true", default=False, help="use the global storage (default: %(default)s)")
+    sub.add_argument(
+        "--use-global",
+        action="store_true",
+        default=False,
+        help="use the global storage (default: %(default)s)",
+    )
     sub.set_defaults(func=load)
 
     parser.epilog = cli_shared.build_group_epilog(subparsers)
@@ -48,9 +64,7 @@ def parse(args: Any):
         raise errors.BadUsage(f"File isn't parsable: {file}")
 
     try:
-        result = eval(expression, {
-            "data": data
-        })
+        result = eval(expression, {"data": data})
     except KeyError:
         result = ""
 
@@ -87,16 +101,16 @@ def load(args: Any):
     print(value)
 
 
-def _read_file(use_global: bool) -> Dict[str, Any]:
+def _read_file(use_global: bool) -> dict[str, Any]:
     filename = _get_filename(use_global)
 
     if not os.path.isfile(filename):
         return dict()
-    data: Dict[str, Any] = utils.read_json_file(filename)
+    data: dict[str, Any] = utils.read_json_file(filename)
     return data
 
 
-def _write_file(use_global: bool, data: Dict[str, Any]):
+def _write_file(use_global: bool, data: dict[str, Any]):
     filename = _get_filename(use_global)
 
     utils.write_json_file(str(filename), data)

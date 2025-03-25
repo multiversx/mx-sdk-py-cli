@@ -3,15 +3,17 @@ from pathlib import Path
 from typing import Dict, List
 
 from multiversx_sdk_cli import config, errors
-from multiversx_sdk_cli.dependencies.modules import (DependencyModule,
-                                                     GolangModule, Rust,
-                                                     TestWalletsModule)
+from multiversx_sdk_cli.dependencies.modules import (
+    DependencyModule,
+    GolangModule,
+    TestWalletsModule,
+)
 
 logger = logging.getLogger("install")
 
 
 def install_module(key: str, overwrite: bool = False):
-    if key == 'all':
+    if key == "all":
         modules = get_all_deps()
     else:
         modules = [get_module_by_key(key)]
@@ -48,13 +50,12 @@ def get_deps_dict() -> Dict[str, DependencyModule]:
 
 def get_all_deps() -> List[DependencyModule]:
     return [
-        Rust(key="rust"),
         GolangModule(key="golang"),
-        TestWalletsModule(key="testwallets")
+        TestWalletsModule(key="testwallets"),
     ]
 
 
 def get_golang() -> GolangModule:
-    golang = get_module_by_key('golang')
+    golang = get_module_by_key("golang")
     assert isinstance(golang, GolangModule)
     return golang

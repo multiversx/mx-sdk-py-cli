@@ -1,4 +1,4 @@
-from typing import Any, List, Tuple, Union
+from typing import Any, Union
 
 
 class KnownError(Exception):
@@ -38,7 +38,7 @@ class DependencyMissing(KnownError):
 
 
 class DependenciesMissing(KnownError):
-    def __init__(self, dependencies: List[Tuple[str, str]]):
+    def __init__(self, dependencies: list[tuple[str, str]]):
         message = "Dependencies missing: \n"
 
         for dependency in dependencies:
@@ -94,9 +94,11 @@ class BadInputError(KnownError):
 
 class ExternalProcessError(KnownError):
     def __init__(self, command_line: str, message: str):
-        super().__init__(f"""External process error:
+        super().__init__(
+            f"""External process error:
 Command line: {command_line}
-Output: {message}""")
+Output: {message}"""
+        )
 
 
 class UnknownConfigurationError(KnownError):
@@ -161,11 +163,7 @@ class ArgumentsNotProvidedError(KnownError):
 
 class ProxyError(KnownError):
     def __init__(self, message: str, url: str, data: str, code: str):
-        inner = {
-            "url": url,
-            "data": data,
-            "code": code
-        }
+        inner = {"url": url, "data": data, "code": code}
         super().__init__(message, inner)
 
 
@@ -179,11 +177,11 @@ class QueryContractError(KnownError):
         super().__init__(message, str(inner))
 
 
-class NativeAuthClientError(KnownError):
+class IncorrectWalletError(KnownError):
     def __init__(self, message: str):
         super().__init__(message)
 
 
-class IncorrectWalletError(KnownError):
+class InvalidArgumentsError(KnownError):
     def __init__(self, message: str):
         super().__init__(message)

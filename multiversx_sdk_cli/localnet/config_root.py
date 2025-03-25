@@ -7,6 +7,7 @@ import toml
 
 from multiversx_sdk_cli.localnet import config_default
 from multiversx_sdk_cli.localnet.config_part import ConfigPart
+from multiversx_sdk_cli.localnet.config_sharding import Metashard, RegularShards
 from multiversx_sdk_cli.localnet.constants import METACHAIN_ID
 from multiversx_sdk_cli.localnet.node import Node
 
@@ -14,11 +15,11 @@ logger = logging.getLogger("localnet")
 
 
 class ConfigRoot(ConfigPart):
-    def __init__(self):
+    def __init__(self) -> None:
         self.general = config_default.general
         self.software = config_default.software
-        self.metashard = config_default.metashard
-        self.shards = config_default.shards
+        self.metashard: Metashard = config_default.metashard
+        self.shards: RegularShards = config_default.shards
         self.networking = config_default.networking
 
     def get_name(self) -> str:
@@ -146,18 +147,22 @@ class ConfigRoot(ConfigPart):
         nodes: List[Dict[str, Any]] = []
 
         for node in self.observers():
-            nodes.append({
-                "ShardId": int(node.shard),
-                "Address": node.api_address(),
-                "Type": "Observer"
-            })
+            nodes.append(
+                {
+                    "ShardId": int(node.shard),
+                    "Address": node.api_address(),
+                    "Type": "Observer",
+                }
+            )
 
         for node in self.validators():
-            nodes.append({
-                "ShardId": int(node.shard),
-                "Address": node.api_address(),
-                "Type": "Validator"
-            })
+            nodes.append(
+                {
+                    "ShardId": int(node.shard),
+                    "Address": node.api_address(),
+                    "Type": "Validator",
+                }
+            )
 
         return nodes
 

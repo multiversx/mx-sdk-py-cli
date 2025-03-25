@@ -18,11 +18,12 @@ jobs:
       matrix:
         os: [ubuntu-latest, macos-latest]
         python-version: [3.11]
+      max-parallel: 1  # This ensures jobs run sequentially, not concurrently
 
     steps:
       - uses: actions/checkout@v2
       - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.python-version }}
       - name: Install dependencies
@@ -36,10 +37,14 @@ jobs:
           export PYTHONPATH=.
           python3 -m multiversx_sdk_cli.cli config new test
           python3 -m multiversx_sdk_cli.cli config set github_api_token ${{ secrets.GITHUB_TOKEN }}
+      - name: Install Rust
+        uses: actions-rust-lang/setup-rust-toolchain@v1
+        with:
+          toolchain: stable
+          target: wasm32-unknown-unknown
       - name: Setup test dependencies
         run: |
           python3 -m multiversx_sdk_cli.cli deps install testwallets
-          python3 -m multiversx_sdk_cli.cli deps install rust
       - name: Run unit tests
         run: |
           export PYTHONPATH=.

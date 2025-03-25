@@ -1,7 +1,7 @@
 import json
 from http.server import BaseHTTPRequestHandler, HTTPServer
 
-HOST = 'localhost'
+HOST = "localhost"
 PORT = 7777
 
 
@@ -12,18 +12,18 @@ class HTTP(BaseHTTPRequestHandler):
         self.end_headers()
 
         if self.path == "/initialise":
-            response = {'token': 7890}
-            self.wfile.write(bytes(json.dumps(response), 'utf-8'))
+            response = {"token": 7890}
+            self.wfile.write(bytes(json.dumps(response), "utf-8"))
 
         if self.path == "/verify":
-            response = {'status': 'sent to verification'}
-            self.wfile.write(bytes(json.dumps(response), 'utf-8'))
+            response = {"status": "sent to verification"}
+            self.wfile.write(bytes(json.dumps(response), "utf-8"))
 
 
 server = HTTPServer((HOST, PORT), HTTP)
-print('Server running...')
+print("Server running...")
 
 server.serve_forever()
 server.server_close()
 
-print('Server closed!')
+print("Server closed!")

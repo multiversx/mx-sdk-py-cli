@@ -1,22 +1,21 @@
 import logging
 import os
-import platform
 import shutil
 from os import path
 from pathlib import Path
-from typing import Dict, List, Optional
+from typing import Optional
 
-from multiversx_sdk_cli import (config, dependencies, downloader, errors,
-                                myprocess, utils, workstation)
+from multiversx_sdk_cli import config, downloader, errors, utils, workstation
 from multiversx_sdk_cli.dependencies.resolution import (
-    DependencyResolution, get_dependency_resolution)
-from multiversx_sdk_cli.ux import show_message, show_warning
+    DependencyResolution,
+    get_dependency_resolution,
+)
 
 logger = logging.getLogger("modules")
 
 
 class DependencyModule:
-    def __init__(self, key: str, aliases: List[str] = []):
+    def __init__(self, key: str, aliases: list[str] = []):
         self.key = key
         self.aliases = aliases
 
@@ -55,7 +54,7 @@ class DependencyModule:
     def is_installed(self, tag: str) -> bool:
         raise NotImplementedError()
 
-    def get_env(self) -> Dict[str, str]:
+    def get_env(self) -> dict[str, str]:
         raise NotImplementedError()
 
     def get_resolution(self) -> DependencyResolution:
@@ -63,11 +62,13 @@ class DependencyModule:
 
 
 class StandaloneModule(DependencyModule):
-    def __init__(self,
-                 key: str,
-                 aliases: List[str] = [],
-                 repo_name: Optional[str] = None,
-                 organisation: Optional[str] = None):
+    def __init__(
+        self,
+        key: str,
+        aliases: list[str] = [],
+        repo_name: Optional[str] = None,
+        organisation: Optional[str] = None,
+    ):
         super().__init__(key, aliases)
         self.archive_type = "tar.gz"
         self.repo_name = repo_name
@@ -113,8 +114,8 @@ class StandaloneModule(DependencyModule):
             tag_no_v = tag_no_v[1:]
         assert isinstance(self.repo_name, str)
 
-        source_folder_option_1 = self.get_directory(tag) / f'{self.repo_name}-{tag_no_v}'
-        source_folder_option_2 = self.get_directory(tag) / f'{self.repo_name}-{tag}'
+        source_folder_option_1 = self.get_directory(tag) / f"{self.repo_name}-{tag_no_v}"
+        source_folder_option_2 = self.get_directory(tag) / f"{self.repo_name}-{tag}"
         return source_folder_option_1 if source_folder_option_1.exists() else source_folder_option_2
 
     def get_parent_directory(self) -> Path:
@@ -155,7 +156,7 @@ class GolangModule(StandaloneModule):
 
         raise errors.BadDependencyResolution(self.key, resolution)
 
-    def get_env(self) -> Dict[str, str]:
+    def get_env(self) -> dict[str, str]:
         resolution = self.get_resolution()
         directory = self.get_directory(config.get_dependency_tag(self.key))
         parent_directory = self.get_parent_directory()
@@ -165,7 +166,7 @@ class GolangModule(StandaloneModule):
                 "PATH": os.environ.get("PATH", ""),
                 "GOPATH": os.environ.get("GOPATH", ""),
                 "GOCACHE": os.environ.get("GOCACHE", ""),
-                "GOROOT": os.environ.get("GOROOT", "")
+                "GOROOT": os.environ.get("GOROOT", ""),
             }
         if resolution == DependencyResolution.SDK:
             current_path = os.environ.get("PATH", "")
@@ -178,180 +179,13 @@ class GolangModule(StandaloneModule):
                 "PATH": f"{(directory / 'go' / 'bin')}:{current_path_without_go}",
                 "GOPATH": str(self.get_gopath()),
                 "GOCACHE": str(parent_directory / "GOCACHE"),
-                "GOROOT": str(directory / "go")
+                "GOROOT": str(directory / "go"),
             }
 
         raise errors.BadDependencyResolution(self.key, resolution)
 
     def get_gopath(self) -> Path:
         return self.get_parent_directory() / "GOPATH"
-
-
-class Rust(DependencyModule):
-    def is_installed(self, tag: str) -> bool:
-        which_rustc = shutil.which("rustc")
-        which_cargo = shutil.which("cargo")
-        which_sc_meta = shutil.which("sc-meta")
-        which_mx_scenario_go = shutil.which("mx-scenario-go")
-        which_wasm_opt = shutil.which("wasm-opt")
-        which_twiggy = shutil.which("twiggy")
-        logger.info(f"which rustc: {which_rustc}")
-        logger.info(f"which cargo: {which_cargo}")
-        logger.info(f"which sc-meta: {which_sc_meta}")
-        logger.info(f"which mx-scenario-go: {which_mx_scenario_go}")
-        logger.info(f"which wasm-opt: {which_wasm_opt}")
-        logger.info(f"which twiggy: {which_twiggy}")
-
-        dependencies = [which_rustc, which_cargo, which_sc_meta, which_wasm_opt, which_twiggy]
-        installed = all(dependency is not None for dependency in dependencies)
-
-        if installed:
-            actual_version_installed = self._get_actual_installed_version()
-
-            if tag in actual_version_installed:
-                logger.info(f"[{self.key} {tag}] is installed.")
-            elif "not found" in actual_version_installed:
-                show_warning("You have installed Rust without using `rustup`.")
-            else:
-                show_warning(f"The Rust version you have installed does not match the recommended version.\nInstalled [{actual_version_installed}], expected [{tag}].")
-
-        return installed
-
-    def _get_actual_installed_version(self) -> str:
-        args = ["rustup", "default"]
-        output = myprocess.run_process(args, dump_to_stdout=False)
-        return output.strip()
-
-    def install(self, overwrite: bool) -> None:
-        self._check_install_env(apply_correction=overwrite)
-
-        module = dependencies.get_module_by_key("rust")
-        tag: str = config.get_dependency_tag(module.key)
-
-        if not overwrite:
-            show_warning(f"We recommend using rust {tag}. If you'd like to overwrite your current version please run `mxpy deps install rust --overwrite`.")
-        logger.info(f"install: key={self.key}, tag={tag}, overwrite={overwrite}")
-
-        if overwrite:
-            logger.info("Overwriting the current rust version...")
-        elif self.is_installed(""):
-            return
-
-        self._install_rust(tag)
-        self._install_sc_meta()
-        self._install_wasm_opt()
-        self._install_twiggy()
-        show_message("To ensure sc-meta functions correctly, please install all the required dependencies by executing the following command: `sc-meta install all`.")
-
-    def _check_install_env(self, apply_correction: bool = True):
-        """
-        See https://rust-lang.github.io/rustup/installation/index.html#choosing-where-to-install.
-        """
-
-        current_cargo_home = os.environ.get("CARGO_HOME", None)
-        current_rustup_home = os.environ.get("RUSTUP_HOME", None)
-        if current_cargo_home:
-            show_warning(f"""CARGO_HOME variable is set to: {current_cargo_home}.
-This may cause problems with the installation.""")
-
-            if apply_correction:
-                show_warning("CARGO_HOME will be temporarily unset.")
-                os.environ["CARGO_HOME"] = ""
-
-        if current_rustup_home:
-            show_warning(f"""RUSTUP_HOME variable is set to: {current_rustup_home}.
-This may cause problems with the installation of rust.""")
-
-            if apply_correction:
-                show_warning("RUSTUP_HOME will be temporarily unset.")
-                os.environ["RUSTUP_HOME"] = ""
-
-    def _install_rust(self, tag: str) -> None:
-        installer_url = self._get_installer_url()
-        installer_path = self._get_installer_path()
-
-        downloader.download(installer_url, str(installer_path))
-        utils.mark_executable(str(installer_path))
-
-        if tag:
-            toolchain = tag
-        else:
-            toolchain = "stable"
-
-        args = [str(installer_path), "--verbose", "--default-toolchain", toolchain, "--profile",
-                "minimal", "--target", "wasm32-unknown-unknown", "-y"]
-
-        logger.info("Installing rust.")
-        myprocess.run_process(args)
-
-    def _install_sc_meta(self):
-        logger.info("Installing multiversx-sc-meta.")
-        tag = config.get_dependency_tag("sc-meta")
-        args = ["cargo", "install", "multiversx-sc-meta", "--locked"]
-
-        if tag:
-            args.extend(["--version", tag])
-
-        myprocess.run_process(args, env=self.get_cargo_env())
-
-    def _install_wasm_opt(self):
-        logger.info("Installing wasm-opt. This may take a while.")
-        tag = config.get_dependency_tag("wasm-opt")
-        args = ["cargo", "install", "wasm-opt", "--version", tag]
-        myprocess.run_process(args, env=self.get_cargo_env())
-
-    def _install_twiggy(self):
-        logger.info("Installing twiggy.")
-        tag = config.get_dependency_tag("twiggy")
-        args = ["cargo", "install", "twiggy"]
-
-        if tag:
-            args.extend(["--version", tag])
-
-        myprocess.run_process(args, env=self.get_cargo_env())
-
-    def _install_sc_meta_deps(self):
-        # this is needed for sc-meta to run the tests
-        # if os is Windows skip installation
-        os = platform.system().lower()
-        if os == "windows":
-            logger.warning("`sc-meta install all` command is not supported on windows")
-            return
-
-        logger.info("Installing sc-meta dependencies.")
-        args = ["sc-meta", "install", "all"]
-        myprocess.run_process(args)
-
-    def _get_installer_url(self) -> str:
-        if workstation.is_windows():
-            return "https://win.rustup.rs"
-        return "https://sh.rustup.rs"
-
-    def _get_installer_path(self) -> Path:
-        tools_folder = workstation.get_tools_folder()
-
-        if workstation.is_windows():
-            return tools_folder / "rustup-init.exe"
-        return tools_folder / "rustup.sh"
-
-    def uninstall(self, tag: str):
-        directory = self.get_directory("")
-        if os.path.isdir(directory):
-            shutil.rmtree(directory)
-
-    def get_directory(self, tag: str) -> Path:
-        tools_folder = workstation.get_tools_folder()
-        return tools_folder / "vendor-rust"
-
-    def get_env(self) -> Dict[str, str]:
-        return dict(os.environ)
-
-    def get_cargo_env(self) -> Dict[str, str]:
-        env = self.get_env()
-        cargo = Path("~/.cargo/bin").expanduser()
-        path = env["PATH"]
-        env["PATH"] = f"{str(cargo)}:{path}"
-        return env
 
 
 class TestWalletsModule(StandaloneModule):

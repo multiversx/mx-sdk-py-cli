@@ -3,17 +3,20 @@ import json
 import logging
 import sys
 from pathlib import Path
-from typing import Any, List, Optional, Tuple
+from typing import Any, Optional
 
-from multiversx_sdk import (Address, Mnemonic, UserPEM, UserSecretKey,
-                            UserWallet)
+from multiversx_sdk import Address, Mnemonic, UserPEM, UserSecretKey, UserWallet
 from multiversx_sdk.core.address import get_shard_of_pubkey
 
 from multiversx_sdk_cli import cli_shared, utils
 from multiversx_sdk_cli.config import get_address_hrp
 from multiversx_sdk_cli.constants import NUMBER_OF_SHARDS
-from multiversx_sdk_cli.errors import (BadUserInput, KnownError,
-                                       WalletGenerationError)
+from multiversx_sdk_cli.errors import (
+    BadUsage,
+    BadUserInput,
+    KnownError,
+    WalletGenerationError,
+)
 from multiversx_sdk_cli.sign_verify import SignedMessage, sign_message
 from multiversx_sdk_cli.ux import show_critical_error, show_message
 
@@ -45,11 +48,11 @@ MAX_ITERATIONS_FOR_GENERATING_WALLET = 100
 CURRENT_SHARDS = [i for i in range(NUMBER_OF_SHARDS)]
 
 
-def setup_parser(args: List[str], subparsers: Any) -> Any:
+def setup_parser(args: list[str], subparsers: Any) -> Any:
     parser = cli_shared.add_group_subparser(
         subparsers,
         "wallet",
-        "Create wallet, derive secret key from mnemonic, bech32 address helpers etc."
+        "Create wallet, derive secret key from mnemonic, bech32 address helpers etc.",
     )
     subparsers = parser.add_subparsers()
 
@@ -57,59 +60,93 @@ def setup_parser(args: List[str], subparsers: Any) -> Any:
         subparsers,
         "wallet",
         "new",
-        "Create a new wallet and print its mnemonic; optionally save as password-protected JSON (recommended) or PEM (not recommended)"
+        "Create a new wallet and print its mnemonic; optionally save as password-protected JSON (recommended) or PEM (not recommended)",
     )
-    sub.add_argument("--format", choices=WALLET_FORMATS, help="the format of the generated wallet file (default: %(default)s)", default=None)
-    sub.add_argument("--outfile", help="the output path and base file name for the generated wallet files (default: %(default)s)", type=str)
-    sub.add_argument("--address-hrp", help=f"the human-readable part of the address, when format is {WALLET_FORMAT_KEYSTORE_SECRET_KEY} or {WALLET_FORMAT_PEM} (default: %(default)s)", type=str, default=get_address_hrp())
-    sub.add_argument("--shard", type=int, help="the shard in which the address will be generated; (default: random)")
+    sub.add_argument(
+        "--format",
+        choices=WALLET_FORMATS,
+        help="the format of the generated wallet file (default: %(default)s)",
+        default=None,
+    )
+    sub.add_argument(
+        "--outfile",
+        help="the output path and base file name for the generated wallet files (default: %(default)s)",
+        type=str,
+    )
+    sub.add_argument(
+        "--address-hrp",
+        help=f"the human-readable part of the address, when format is {WALLET_FORMAT_KEYSTORE_SECRET_KEY} or {WALLET_FORMAT_PEM} (default: %(default)s)",
+        type=str,
+        default=get_address_hrp(),
+    )
+    sub.add_argument(
+        "--shard",
+        type=int,
+        help="the shard in which the address will be generated; (default: random)",
+    )
     sub.set_defaults(func=wallet_new)
 
     sub = cli_shared.add_command_subparser(
-        subparsers,
-        "wallet",
-        "convert",
-        "Convert a wallet from one format to another"
+        subparsers, "wallet", "convert", "Convert a wallet from one format to another"
     )
     sub.add_argument("--infile", help="path to the input file")
     sub.add_argument("--outfile", help="path to the output file")
-    sub.add_argument("--in-format", required=True, choices=WALLET_FORMATS, help="the format of the input file")
-    sub.add_argument("--out-format", required=True, choices=WALLET_FORMATS_AND_ADDRESSES, help="the format of the output file")
-    sub.add_argument("--address-index", help=f"the address index, if input format is {WALLET_FORMAT_RAW_MNEMONIC}, {WALLET_FORMAT_KEYSTORE_MNEMONIC} or {WALLET_FORMAT_PEM} (with multiple entries) and the output format is {WALLET_FORMAT_KEYSTORE_SECRET_KEY} or {WALLET_FORMAT_PEM}", type=int, default=0)
-    sub.add_argument("--address-hrp", help=f"the human-readable part of the address, when the output format is {WALLET_FORMAT_KEYSTORE_SECRET_KEY} or {WALLET_FORMAT_PEM} (default: %(default)s)", type=str, default=get_address_hrp())
+    sub.add_argument(
+        "--in-format",
+        required=True,
+        choices=WALLET_FORMATS,
+        help="the format of the input file",
+    )
+    sub.add_argument(
+        "--out-format",
+        required=True,
+        choices=WALLET_FORMATS_AND_ADDRESSES,
+        help="the format of the output file",
+    )
+    sub.add_argument(
+        "--address-index",
+        help=f"the address index, if input format is {WALLET_FORMAT_RAW_MNEMONIC}, {WALLET_FORMAT_KEYSTORE_MNEMONIC} or {WALLET_FORMAT_PEM} (with multiple entries) and the output format is {WALLET_FORMAT_KEYSTORE_SECRET_KEY} or {WALLET_FORMAT_PEM}",
+        type=int,
+        default=0,
+    )
+    sub.add_argument(
+        "--address-hrp",
+        help=f"the human-readable part of the address, when the output format is {WALLET_FORMAT_KEYSTORE_SECRET_KEY} or {WALLET_FORMAT_PEM} (default: %(default)s)",
+        type=str,
+        default=get_address_hrp(),
+    )
     sub.set_defaults(func=convert_wallet)
 
     sub = cli_shared.add_command_subparser(
         subparsers,
         "wallet",
         "bech32",
-        "Helper for encoding and decoding bech32 addresses"
+        "Helper for encoding and decoding bech32 addresses",
     )
     sub.add_argument("value", help="the value to encode or decode")
     group = sub.add_mutually_exclusive_group(required=True)
     group.add_argument("--encode", action="store_true", help="whether to encode")
     group.add_argument("--decode", action="store_true", help="whether to decode")
-    sub.add_argument("--hrp", type=str, help="the human readable part; only used for encoding to bech32 (default: %(default)s)", default=get_address_hrp())
+    sub.add_argument(
+        "--hrp",
+        type=str,
+        help="the human readable part; only used for encoding to bech32 (default: %(default)s)",
+        default=get_address_hrp(),
+    )
     sub.set_defaults(func=do_bech32)
 
-    sub = cli_shared.add_command_subparser(
-        subparsers,
-        "wallet",
-        "sign-message",
-        "Sign a message"
-    )
+    sub = cli_shared.add_command_subparser(subparsers, "wallet", "sign-message", "Sign a message")
     sub.add_argument("--message", required=True, help="the message you want to sign")
-    cli_shared.add_wallet_args(args, sub)
+    cli_shared.add_wallet_args(args=args, sub=sub)
     sub.set_defaults(func=sign_user_message)
 
-    sub = cli_shared.add_command_subparser(
-        subparsers,
-        "wallet",
-        "verify-message",
-        "Verify a previously signed message"
-    )
+    sub = cli_shared.add_command_subparser(subparsers, "wallet", "verify-message", "Verify a previously signed message")
     sub.add_argument("--address", required=True, help="the bech32 address of the signer")
-    sub.add_argument("--message", required=True, help="the previously signed message(readable text, as it was signed)")
+    sub.add_argument(
+        "--message",
+        required=True,
+        help="the previously signed message(readable text, as it was signed)",
+    )
     sub.add_argument("--signature", required=True, help="the signature in hex format")
     sub.set_defaults(func=verify_signed_message)
 
@@ -134,11 +171,11 @@ def wallet_new(args: Any):
     if format is None:
         return
     if outfile is None:
-        raise KnownError("The --outfile option is required when --format is specified.")
+        raise BadUsage("The `--outfile` argument is required when `--format` is specified.")
 
     outfile = Path(outfile).expanduser().resolve()
     if outfile.exists():
-        raise KnownError(f"File already exists, will not overwrite: {outfile}")
+        raise BadUserInput(f"File already exists, will not overwrite: {outfile}")
 
     if format == WALLET_FORMAT_RAW_MNEMONIC:
         outfile.write_text(mnemonic.get_text())
@@ -158,13 +195,12 @@ def wallet_new(args: Any):
         pem_file = UserPEM(address.to_bech32(), secret_key)
         pem_file.save(outfile)
     else:
-        raise KnownError(f"Unknown format: {format}")
+        raise BadUsage(f"Unknown format: {format}")
 
     logger.info(f"Wallet ({format}) saved: {outfile}")
 
 
 def _generate_mnemonic_with_shard_constraint(shard: int) -> Mnemonic:
-
     if shard not in CURRENT_SHARDS:
         raise BadUserInput(f"Wrong shard provided. Choose between {CURRENT_SHARDS}")
 
@@ -207,7 +243,9 @@ def convert_wallet(args: Any):
         print(output_text)
 
 
-def _load_wallet(input_text: str, in_format: str, address_index: int) -> Tuple[Optional[Mnemonic], Optional[UserSecretKey]]:
+def _load_wallet(
+    input_text: str, in_format: str, address_index: int
+) -> tuple[Optional[Mnemonic], Optional[UserSecretKey]]:
     if in_format == WALLET_FORMAT_RAW_MNEMONIC:
         input_text = " ".join(input_text.split())
         mnemonic = Mnemonic(input_text)
@@ -229,15 +267,17 @@ def _load_wallet(input_text: str, in_format: str, address_index: int) -> Tuple[O
         secret_key = UserPEM.from_text(input_text, address_index).secret_key
         return None, secret_key
 
-    raise KnownError(f"Cannot load wallet, unknown input format: <{in_format}>. Make sure to use one of following: {WALLET_FORMATS}.")
+    raise KnownError(
+        f"Cannot load wallet, unknown input format: <{in_format}>. Make sure to use one of following: {WALLET_FORMATS}."
+    )
 
 
 def _create_wallet_content(
-        out_format: str,
-        mnemonic: Optional[Mnemonic],
-        secret_key: Optional[UserSecretKey],
-        address_index: int,
-        address_hrp: str
+    out_format: str,
+    mnemonic: Optional[Mnemonic],
+    secret_key: Optional[UserSecretKey],
+    address_index: int,
+    address_hrp: str,
 ) -> str:
     if out_format == WALLET_FORMAT_RAW_MNEMONIC:
         if mnemonic is None:
@@ -295,7 +335,9 @@ def _create_wallet_content(
 
         return secret_key.hex()
 
-    raise KnownError(f"Cannot create wallet, unknown output format: <{out_format}>. Make sure to use one of following: {WALLET_FORMATS}.")
+    raise KnownError(
+        f"Cannot create wallet, unknown output format: <{out_format}>. Make sure to use one of following: {WALLET_FORMATS}."
+    )
 
 
 def do_bech32(args: Any):
@@ -316,8 +358,10 @@ def do_bech32(args: Any):
 
 def sign_user_message(args: Any):
     message: str = args.message
+
     account = cli_shared.prepare_account(args)
     signed_message = sign_message(message, account)
+
     utils.dump_out_json(signed_message.to_dictionary())
 
 
@@ -327,7 +371,8 @@ def verify_signed_message(args: Any):
     signature: str = args.signature
 
     signed_message = SignedMessage(bech32_address, message, signature)
-    is_signed = signed_message.verify_signature()
+    is_signed = signed_message.verify_user_signature()
+
     if is_signed:
         show_message(f"""SUCCESS: The message "{message}" was signed by {bech32_address}""")
     else:

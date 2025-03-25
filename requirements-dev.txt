@@ -2,3 +2,6 @@ pytest
 flake8
 autopep8
 pytest-mock
+pre-commit
+black
+mypy

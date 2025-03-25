@@ -1,6 +1,6 @@
 import os
 from pathlib import Path
-from typing import Any, Dict, List
+from typing import Any
 
 from multiversx_sdk import NetworkProviderConfig
 
@@ -9,11 +9,6 @@ from multiversx_sdk_cli import errors, utils
 SDK_PATH = Path("~/multiversx-sdk").expanduser().resolve()
 LOCAL_CONFIG_PATH = Path("mxpy.json").resolve()
 GLOBAL_CONFIG_PATH = SDK_PATH / "mxpy.json"
-
-DEFAULT_GAS_PRICE = 1000000000
-GAS_PER_DATA_BYTE = 1500
-MIN_GAS_LIMIT = 50000
-MAX_GAS_LIMIT = 600000000
 
 
 class MetaChainSystemSCsCost:
@@ -29,6 +24,8 @@ class MetaChainSystemSCsCost:
     DELEGATION_OPS = 1000000
     UNSTAKE_TOKENS = 5000000
     UNBOND_TOKENS = 5000000
+    CLEAN_REGISTERED_DATA = 5000000
+    RESTAKE_UNSTAKED_NODES = 5000000
 
 
 def get_dependency_resolution(key: str) -> str:
@@ -84,12 +81,12 @@ def delete_value(name: str):
     write_file(data)
 
 
-def get_active() -> Dict[str, Any]:
+def get_active() -> dict[str, Any]:
     data = read_file()
     configs = data.get("configurations", {})
     active_config_name: str = data.get("active", "default")
-    empty_config: Dict[str, Any] = dict()
-    result: Dict[str, Any] = configs.get(active_config_name, empty_config)
+    empty_config: dict[str, Any] = dict()
+    result: dict[str, Any] = configs.get(active_config_name, empty_config)
 
     return result
 
@@ -110,7 +107,7 @@ def create_new_config(name: str, template: str):
         new_config = data["configurations"][template]
 
     data["active"] = name
-    data.setdefault('configurations', {})
+    data.setdefault("configurations", {})
     data["configurations"][name] = new_config
     write_file(data)
 
@@ -130,13 +127,13 @@ def _guard_valid_name(name: str):
 
 
 def _guard_valid_config_name(config: Any, name: str):
-    configurations = config.get('configurations', {})
+    configurations = config.get("configurations", {})
     if name not in configurations:
         raise errors.UnknownConfigurationError(name)
 
 
 def _guard_config_unique(config: Any, name: str):
-    configurations = config.get('configurations', {})
+    configurations = config.get("configurations", {})
     if name in configurations:
         raise errors.ConfigurationShouldBeUniqueError(name)
 
@@ -146,7 +143,7 @@ def _guard_valid_config_deletion(name: str):
         raise errors.ConfigurationProtectedError(name)
 
 
-def get_defaults() -> Dict[str, Any]:
+def get_defaults() -> dict[str, Any]:
     return {
         "dependencies.vmtools.tag": "v1.5.24",
         "dependencies.vmtools.urlTemplate.linux": "https://github.com/multiversx/mx-chain-vm-go/archive/{TAG}.tar.gz",
@@ -166,7 +163,7 @@ def get_defaults() -> Dict[str, Any]:
         "dependencies.testwallets.urlTemplate.windows": "https://github.com/multiversx/mx-sdk-testwallets/archive/{TAG}.tar.gz",
         "dependencies.wasm-opt.tag": "0.112.0",
         "github_api_token": "",
-        "default_address_hrp": "erd"
+        "default_address_hrp": "erd",
     }
 
 
@@ -182,20 +179,20 @@ def resolve_config_path() -> Path:
     return GLOBAL_CONFIG_PATH
 
 
-def read_file() -> Dict[str, Any]:
+def read_file() -> dict[str, Any]:
     config_path = resolve_config_path()
     if config_path.exists():
-        data: Dict[str, Any] = utils.read_json_file(config_path)
+        data: dict[str, Any] = utils.read_json_file(config_path)
         return data
     return dict()
 
 
-def write_file(data: Dict[str, Any]):
+def write_file(data: dict[str, Any]):
     config_path = resolve_config_path()
     utils.write_json_file(str(config_path), data)
 
 
-def add_config_args(argv: List[str]) -> List[str]:
+def add_config_args(argv: list[str]) -> list[str]:
     try:
         command, subcommand, *_ = argv
     except ValueError:
@@ -213,10 +210,10 @@ def add_config_args(argv: List[str]) -> List[str]:
     return final_args
 
 
-def determine_final_args(argv: List[str], config_args: Dict[str, Any]) -> List[str]:
-    extra_args: List[str] = []
+def determine_final_args(argv: list[str], config_args: dict[str, Any]) -> list[str]:
+    extra_args: list[str] = []
     for key, value in config_args.items():
-        key_arg = f'--{key}'
+        key_arg = f"--{key}"
         # arguments from the command line override the config
         if key_arg in argv:
             continue
@@ -225,15 +222,15 @@ def determine_final_args(argv: List[str], config_args: Dict[str, Any]) -> List[s
         extra_args.append(key_arg)
         if value is True:
             continue
-        if isinstance(value, List):
-            for item in value:
-                extra_args.append(str(item))
+        if isinstance(value, list):
+            for item in value:  # type: ignore
+                extra_args.append(str(item))  # type: ignore
         else:
             extra_args.append(str(value))
 
     # the verbose flag is an exception since it has to go before the command and subcommand
     # eg. mxpy --verbose contract deploy
-    verbose_flag = '--verbose'
+    verbose_flag = "--verbose"
     pre_args = []
     if verbose_flag in extra_args:
         extra_args.remove(verbose_flag)

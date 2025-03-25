@@ -2,7 +2,6 @@ import logging
 import os
 import subprocess
 from pathlib import Path
-from typing import List
 
 from multiversx_sdk_cli.errors import KnownError
 
@@ -23,16 +22,16 @@ def is_docker_installed():
 
 
 def run_docker(
-        image: str,
-        project_path: Path,
-        contract: str,
-        output_path: Path,
-        no_wasm_opt: bool,
-        docker_interactive: bool,
-        docker_tty: bool,
-        no_default_platform: bool
+    image: str,
+    project_path: Path,
+    contract: str,
+    output_path: Path,
+    no_wasm_opt: bool,
+    docker_interactive: bool,
+    docker_tty: bool,
+    no_default_platform: bool,
 ):
-    docker_mount_args: List[str] = ["--volume", f"{output_path}:/output"]
+    docker_mount_args: list[str] = ["--volume", f"{output_path}:/output"]
 
     if project_path:
         docker_mount_args.extend(["--volume", f"{project_path}:/project"])
@@ -51,7 +50,7 @@ def run_docker(
     docker_args += ["--user", f"{str(os.getuid())}:{str(os.getgid())}"]
     docker_args += ["--rm", image]
 
-    entrypoint_args: List[str] = []
+    entrypoint_args: list[str] = []
 
     if project_path:
         entrypoint_args.extend(["--project", "project"])

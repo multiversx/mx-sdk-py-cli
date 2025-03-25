@@ -12,10 +12,7 @@ class SoftwareResolution(Enum):
 
 
 class Software(ConfigPart):
-    def __init__(
-            self,
-            mx_chain_go: 'SoftwareChainGo',
-            mx_chain_proxy_go: 'SoftwareChainProxyGo'):
+    def __init__(self, mx_chain_go: "SoftwareChainGo", mx_chain_proxy_go: "SoftwareChainProxyGo"):
         self.mx_chain_go = mx_chain_go
         self.mx_chain_proxy_go = mx_chain_proxy_go
 
@@ -34,12 +31,14 @@ class Software(ConfigPart):
 
 
 class SoftwareComponent(ConfigPart):
-    def __init__(self,
-                 resolution: SoftwareResolution,
-                 archive_url: str,
-                 archive_download_folder: Path,
-                 archive_extraction_folder: Path,
-                 local_path: Path):
+    def __init__(
+        self,
+        resolution: SoftwareResolution,
+        archive_url: str,
+        archive_download_folder: Path,
+        archive_extraction_folder: Path,
+        local_path: Path,
+    ):
         self.resolution: SoftwareResolution = resolution
         self.archive_url: str = archive_url
         self.archive_download_folder: Path = archive_download_folder
@@ -58,15 +57,19 @@ class SoftwareComponent(ConfigPart):
     def _verify(self):
         if self.resolution == SoftwareResolution.Remote:
             if not self.archive_url:
-                raise KnownError(f"In configuration section '{self.get_name()}', resolution is '{self.resolution.value}', but 'archive_url' is bad (empty)")
+                raise KnownError(
+                    f"In configuration section '{self.get_name()}', resolution is '{self.resolution.value}', but 'archive_url' is bad (empty)"
+                )
         if self.resolution == SoftwareResolution.Local:
             if not self.get_local_path().is_dir():
-                raise KnownError(f"In configuration section '{self.get_name()}', resolution is '{self.resolution.value}', but 'local_path' is not a directory: {self.local_path}")
+                raise KnownError(
+                    f"In configuration section '{self.get_name()}', resolution is '{self.resolution.value}', but 'local_path' is not a directory: {self.local_path}"
+                )
 
-    def get_archive_download_folder(self):
+    def get_archive_download_folder(self) -> Path:
         return self.archive_download_folder.expanduser().resolve()
 
-    def get_archive_extraction_folder(self):
+    def get_archive_extraction_folder(self) -> Path:
         return self.archive_extraction_folder.expanduser().resolve()
 
     def get_local_path(self):

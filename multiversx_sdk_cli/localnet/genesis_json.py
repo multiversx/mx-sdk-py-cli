@@ -1,6 +1,7 @@
 from typing import Any, Dict, List
 
-from multiversx_sdk_cli.accounts import Account
+from multiversx_sdk import Account
+
 from multiversx_sdk_cli.localnet import wallets
 from multiversx_sdk_cli.localnet.config_root import ConfigRoot
 from multiversx_sdk_cli.localnet.genesis import is_last_user
@@ -38,10 +39,7 @@ def _build_validator_entry(nickname: str, account: Account, value: int) -> Dict[
         "supply": str(value),
         "balance": "0",
         "stakingvalue": str(value),
-        "delegation": {
-            "address": "",
-            "value": "0"
-        }
+        "delegation": {"address": "", "value": "0"},
     }
 
 
@@ -52,8 +50,5 @@ def _build_user_entry(nickname: str, account: Account, value: int) -> Dict[str, 
         "supply": str(value),
         "balance": str(value),
         "stakingvalue": "0",
-        "delegation": {
-            "address": "",
-            "value": "0"
-        }
+        "delegation": {"address": "", "value": "0"},
     }
