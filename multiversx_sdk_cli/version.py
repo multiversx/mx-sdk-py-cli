@@ -25,4 +25,7 @@ def _get_version_from_pyproject() -> str:
 
 
 def _get_version_from_metadata() -> str:
-    return importlib.metadata.version("multiversx_sdk_cli")
+    try:
+        return importlib.metadata.version("multiversx_sdk_cli")
+    except:
+        return importlib.metadata.version("mxpy")
