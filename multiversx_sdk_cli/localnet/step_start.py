@@ -78,6 +78,7 @@ async def do_start(configfile: Path, stop_after_seconds: int):
             run(
                 [
                     "./node",
+                    f"--display-name=observer-{observer.shard}-{observer.index}",
                     "--use-log-view",
                     "--log-save",
                     f"--log-level={loglevel}",
@@ -97,10 +98,12 @@ async def do_start(configfile: Path, stop_after_seconds: int):
             run(
                 [
                     "./node",
+                    f"--display-name=validator-{validator.index}",
                     "--use-log-view",
                     "--log-save",
                     f"--log-level={loglevel}",
                     "--log-logger-name",
+                    "--log-correlation",
                     f"--rest-api-interface={validator.api_interface()}",
                 ],
                 cwd=validator.folder,
