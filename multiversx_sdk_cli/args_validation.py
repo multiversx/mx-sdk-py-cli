@@ -10,13 +10,11 @@ def validate_transaction_args(args: Any):
 
 
 def validate_nonce_args(args: Any):
-    """If nonce is not provided, ensure that recall_nonce is provided. If recall_nonce is provided, ensure that proxy is provided."""
+    """If nonce is not provided, ensure that proxy is provided."""
     if hasattr(args, "nonce") and args.nonce is None:
-        if not args.recall_nonce:
-            raise InvalidArgumentsError("Either --nonce or --recall-nonce must be provided")
 
         if hasattr(args, "proxy") and not args.proxy:
-            raise InvalidArgumentsError("--proxy must be provided if --recall-nonce is used")
+            raise InvalidArgumentsError("--proxy must be provided if --nonce is not provided")
 
 
 def validate_receiver_args(args: Any):
