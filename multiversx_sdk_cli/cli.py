@@ -67,7 +67,7 @@ def _do_main(cli_args: list[str]):
     LibraryConfig.default_address_hrp = default_hrp
 
     if hasattr(args, "recall_nonce") and args.recall_nonce:
-        logger.warning("The --recall-nonce flag is DEPRECATED. The nonce is fetched from the network by deafult.")
+        logger.warning("The --recall-nonce flag is DEPRECATED. The nonce is fetched from the network by default.")
 
     if not hasattr(args, "func"):
         parser.print_help()
