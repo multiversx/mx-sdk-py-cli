@@ -103,13 +103,13 @@ def add_tx_args(
             type=int,
             required=False,
             default=None,
-            help="# the nonce for the transaction. The nonce is fetched from the network if --proxy is provided.",
+            help="# the nonce for the transaction. If not provided, is fetched from the network.",
         )
         sub.add_argument(
             "--recall-nonce",
             action="store_true",
             default=False,
-            help="⭮ whether to recall the nonce when creating the transaction (default: %(default)s). This argument is OBSOLETE. The nonce is fetched from the network if --proxy is provided.",
+            help="⭮ whether to recall the nonce when creating the transaction (default: %(default)s). This argument is OBSOLETE.",
         )
 
     if with_receiver:
