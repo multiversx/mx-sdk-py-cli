@@ -8,6 +8,7 @@ from typing import Any, Text, Union, cast
 from multiversx_sdk import (
     Account,
     Address,
+    ApiNetworkProvider,
     LedgerAccount,
     ProxyNetworkProvider,
     Transaction,
@@ -282,7 +283,7 @@ def parse_omit_fields_arg(args: Any) -> list[str]:
 
 
 def prepare_account(args: Any):
-    hrp = config.get_address_hrp()
+    hrp = _get_address_hrp(args)
 
     if args.pem:
         return Account.new_from_pem(file_path=Path(args.pem), index=args.sender_wallet_index, hrp=hrp)
@@ -302,8 +303,39 @@ def prepare_account(args: Any):
         raise errors.NoWalletProvided()
 
 
+def _get_address_hrp(args: Any) -> str:
+    """If proxy is provided, fetch the hrp from the network, otherwise get the hrp from config"""
+    hrp: str = ""
+
+    if hasattr(args, "proxy") and args.proxy:
+        hrp = _get_hrp_from_proxy(args)
+    elif hasattr(args, "api") and args.api:
+        hrp = _get_hrp_from_api(args)
+
+    if hrp:
+        return hrp
+
+    return config.get_address_hrp()
+
+
+def _get_hrp_from_proxy(args: Any) -> str:
+    network_provider_config = config.get_config_for_network_providers()
+    proxy = ProxyNetworkProvider(url=args.proxy, config=network_provider_config)
+    network_config = proxy.get_network_config()
+    hrp: str = network_config.raw.get("erd_address_hrp", "")
+    return hrp
+
+
+def _get_hrp_from_api(args: Any) -> str:
+    network_provider_config = config.get_config_for_network_providers()
+    proxy = ApiNetworkProvider(url=args.api, config=network_provider_config)
+    network_config = proxy.get_network_config()
+    hrp: str = network_config.raw.get("erd_address_hrp", "")
+    return hrp
+
+
 def load_guardian_account(args: Any) -> Union[IAccount, None]:
-    hrp = config.get_address_hrp()
+    hrp = _get_address_hrp(args)
 
     if args.guardian_pem:
         return Account.new_from_pem(file_path=Path(args.guardian_pem), index=args.guardian_wallet_index, hrp=hrp)
@@ -434,7 +466,7 @@ def _is_matching_address(account_address: Union[Address, None], args_address: Un
 
 
 def load_relayer_account(args: Any) -> Union[IAccount, None]:
-    hrp = config.get_address_hrp()
+    hrp = _get_address_hrp(args)
 
     if args.relayer_pem:
         return Account.new_from_pem(file_path=Path(args.relayer_pem), index=args.relayer_wallet_index, hrp=hrp)

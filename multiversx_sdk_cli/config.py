@@ -57,7 +57,7 @@ def get_value(name: str) -> str:
     return value
 
 
-def get_address_hrp():
+def get_address_hrp() -> str:
     return get_value("default_address_hrp")
 
 

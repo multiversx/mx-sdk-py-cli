@@ -28,7 +28,7 @@ def setup_parser(args: list[str], subparsers: Any) -> Any:
     sub = cli_shared.add_command_subparser(subparsers, "faucet", "request", "Request xEGLD.")
     cli_shared.add_wallet_args(args, sub)
     sub.add_argument("--chain", choices=["D", "T"], help="the chain identifier")
-    sub.add_argument("--api-url", type=str, help="custom api url for the native auth client")
+    sub.add_argument("--api", type=str, help="custom api url for the native auth client")
     sub.add_argument("--wallet-url", type=str, help="custom wallet url to call the faucet from")
     sub.set_defaults(func=faucet)
 
@@ -75,12 +75,12 @@ def get_wallet_and_api_urls(args: Any) -> tuple[str, str]:
 
 def get_custom_wallet_and_api_urls(args: Any) -> tuple[str, str]:
     wallet = args.wallet_url
-    api = args.api_url
+    api = args.api
 
     if not wallet:
         raise ArgumentsNotProvidedError("--wallet-url not provided")
 
     if not api:
-        raise ArgumentsNotProvidedError("--api-url not provided")
+        raise ArgumentsNotProvidedError("--api not provided")
 
     return wallet, api
