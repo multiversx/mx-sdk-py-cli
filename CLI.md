@@ -3031,5 +3031,7 @@ options:
                                              or Ledger devices (default: 0)
   --sender-username SENDER_USERNAME          🖄 the username of the sender
   --chain {D,T}                              the chain identifier
+  --api API                                  custom api url for the native auth client
+  --wallet-url WALLET_URL                    custom wallet url to call the faucet from
 
 ```
