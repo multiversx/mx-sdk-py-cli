@@ -176,6 +176,9 @@ def add_wallet_args(args: list[str], sub: Any):
         help="🔑 the address index; can be used for PEM files, keyfiles of type mnemonic or Ledger devices (default: %(default)s)",
     )
     sub.add_argument("--sender-username", required=False, help="🖄 the username of the sender")
+    sub.add_argument(
+        "--hrp", required=False, type=str, help="The hrp used to convert the address to its bech32 representation"
+    )
 
 
 def add_guardian_wallet_args(args: list[str], sub: Any):
@@ -304,9 +307,11 @@ def prepare_account(args: Any):
 
 
 def _get_address_hrp(args: Any) -> str:
-    """If proxy is provided, fetch the hrp from the network, otherwise get the hrp from config"""
-    hrp: str = ""
+    """Use hrp provided by the user. If not provided, fetch from network. If proxy not provided, get hrp from config."""
+    if hasattr(args, "hrp") and args.hrp:
+        return args.hrp
 
+    hrp: str = ""
     if hasattr(args, "proxy") and args.proxy:
         hrp = _get_hrp_from_proxy(args)
     elif hasattr(args, "api") and args.api:
