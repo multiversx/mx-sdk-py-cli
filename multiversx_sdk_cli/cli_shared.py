@@ -305,7 +305,7 @@ def prepare_account(args: Any):
 
 def _get_address_hrp(args: Any) -> str:
     """If proxy is provided, fetch the hrp from the network, otherwise get the hrp from config"""
-    hrp = ""
+    hrp: str = ""
 
     if hasattr(args, "proxy") and args.proxy:
         hrp = _get_hrp_from_proxy(args)
@@ -322,7 +322,7 @@ def _get_hrp_from_proxy(args: Any) -> str:
     network_provider_config = config.get_config_for_network_providers()
     proxy = ProxyNetworkProvider(url=args.proxy, config=network_provider_config)
     network_config = proxy.get_network_config()
-    hrp = network_config.raw.get("erd_address_hrp", "")
+    hrp: str = network_config.raw.get("erd_address_hrp", "")
     return hrp
 
 
@@ -330,7 +330,7 @@ def _get_hrp_from_api(args: Any) -> str:
     network_provider_config = config.get_config_for_network_providers()
     proxy = ApiNetworkProvider(url=args.api, config=network_provider_config)
     network_config = proxy.get_network_config()
-    hrp = network_config.raw.get("erd_address_hrp", "")
+    hrp: str = network_config.raw.get("erd_address_hrp", "")
     return hrp
 
 
