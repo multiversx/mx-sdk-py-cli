@@ -30,7 +30,6 @@ def setup_parser(args: list[str], subparsers: Any) -> Any:
     sub.add_argument("--chain", choices=["D", "T"], help="the chain identifier")
     sub.add_argument("--api", type=str, help="custom api url for the native auth client")
     sub.add_argument("--wallet-url", type=str, help="custom wallet url to call the faucet from")
-    sub.add_argument("--hrp", type=str, help="The hrp used to convert the address to its bech32 representation")
     sub.set_defaults(func=faucet)
 
     parser.epilog = cli_shared.build_group_epilog(subparsers)
