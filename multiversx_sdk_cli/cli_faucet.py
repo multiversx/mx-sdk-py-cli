@@ -6,7 +6,7 @@ from typing import Any
 from multiversx_sdk import Message, NativeAuthClient, NativeAuthClientConfig
 
 from multiversx_sdk_cli import cli_shared
-from multiversx_sdk_cli.errors import BadUserInput
+from multiversx_sdk_cli.errors import ArgumentsNotProvidedError, BadUserInput
 
 logger = logging.getLogger("cli.faucet")
 
@@ -27,7 +27,9 @@ def setup_parser(args: list[str], subparsers: Any) -> Any:
 
     sub = cli_shared.add_command_subparser(subparsers, "faucet", "request", "Request xEGLD.")
     cli_shared.add_wallet_args(args, sub)
-    sub.add_argument("--chain", required=True, choices=["D", "T"], help="the chain identifier")
+    sub.add_argument("--chain", choices=["D", "T"], help="the chain identifier")
+    sub.add_argument("--api", type=str, help="custom api url for the native auth client")
+    sub.add_argument("--wallet-url", type=str, help="custom wallet url to call the faucet from")
     sub.set_defaults(func=faucet)
 
     parser.epilog = cli_shared.build_group_epilog(subparsers)
@@ -59,6 +61,9 @@ def call_web_wallet_faucet(wallet_url: str, access_token: str):
 def get_wallet_and_api_urls(args: Any) -> tuple[str, str]:
     chain: str = args.chain
 
+    if not chain:
+        return get_custom_wallet_and_api_urls(args)
+
     if chain.upper() == "D":
         return WebWalletUrls.DEVNET.value, ApiUrls.DEVNET.value
 
@@ -66,3 +71,16 @@ def get_wallet_and_api_urls(args: Any) -> tuple[str, str]:
         return WebWalletUrls.TESTNET.value, ApiUrls.TESTNET.value
 
     raise BadUserInput("Invalid chain id. Choose between 'D' for devnet and 'T' for testnet.")
+
+
+def get_custom_wallet_and_api_urls(args: Any) -> tuple[str, str]:
+    wallet = args.wallet_url
+    api = args.api
+
+    if not wallet:
+        raise ArgumentsNotProvidedError("--wallet-url not provided")
+
+    if not api:
+        raise ArgumentsNotProvidedError("--api not provided")
+
+    return wallet, api

@@ -8,6 +8,7 @@ from typing import Any, Text, Union, cast
 from multiversx_sdk import (
     Account,
     Address,
+    ApiNetworkProvider,
     LedgerAccount,
     ProxyNetworkProvider,
     Transaction,
@@ -103,13 +104,13 @@ def add_tx_args(
             type=int,
             required=False,
             default=None,
-            help="# the nonce for the transaction",
+            help="# the nonce for the transaction. If not provided, is fetched from the network.",
         )
         sub.add_argument(
             "--recall-nonce",
             action="store_true",
             default=False,
-            help="⭮ whether to recall the nonce when creating the transaction (default: %(default)s)",
+            help="⭮ whether to recall the nonce when creating the transaction (default: %(default)s). This argument is OBSOLETE.",
         )
 
     if with_receiver:
@@ -175,6 +176,9 @@ def add_wallet_args(args: list[str], sub: Any):
         help="🔑 the address index; can be used for PEM files, keyfiles of type mnemonic or Ledger devices (default: %(default)s)",
     )
     sub.add_argument("--sender-username", required=False, help="🖄 the username of the sender")
+    sub.add_argument(
+        "--hrp", required=False, type=str, help="The hrp used to convert the address to its bech32 representation"
+    )
 
 
 def add_guardian_wallet_args(args: list[str], sub: Any):
@@ -282,7 +286,7 @@ def parse_omit_fields_arg(args: Any) -> list[str]:
 
 
 def prepare_account(args: Any):
-    hrp = config.get_address_hrp()
+    hrp = _get_address_hrp(args)
 
     if args.pem:
         return Account.new_from_pem(file_path=Path(args.pem), index=args.sender_wallet_index, hrp=hrp)
@@ -302,8 +306,43 @@ def prepare_account(args: Any):
         raise errors.NoWalletProvided()
 
 
+def _get_address_hrp(args: Any) -> str:
+    """Use hrp provided by the user. If not provided, fetch from network. If proxy not provided, get hrp from config."""
+    hrp: str = ""
+
+    if hasattr(args, "hrp") and args.hrp:
+        hrp = args.hrp
+        return hrp
+
+    if hasattr(args, "proxy") and args.proxy:
+        hrp = _get_hrp_from_proxy(args)
+    elif hasattr(args, "api") and args.api:
+        hrp = _get_hrp_from_api(args)
+
+    if hrp:
+        return hrp
+
+    return config.get_address_hrp()
+
+
+def _get_hrp_from_proxy(args: Any) -> str:
+    network_provider_config = config.get_config_for_network_providers()
+    proxy = ProxyNetworkProvider(url=args.proxy, config=network_provider_config)
+    network_config = proxy.get_network_config()
+    hrp: str = network_config.raw.get("erd_address_hrp", "")
+    return hrp
+
+
+def _get_hrp_from_api(args: Any) -> str:
+    network_provider_config = config.get_config_for_network_providers()
+    proxy = ApiNetworkProvider(url=args.api, config=network_provider_config)
+    network_config = proxy.get_network_config()
+    hrp: str = network_config.raw.get("erd_address_hrp", "")
+    return hrp
+
+
 def load_guardian_account(args: Any) -> Union[IAccount, None]:
-    hrp = config.get_address_hrp()
+    hrp = _get_address_hrp(args)
 
     if args.guardian_pem:
         return Account.new_from_pem(file_path=Path(args.guardian_pem), index=args.guardian_wallet_index, hrp=hrp)
@@ -434,7 +473,7 @@ def _is_matching_address(account_address: Union[Address, None], args_address: Un
 
 
 def load_relayer_account(args: Any) -> Union[IAccount, None]:
-    hrp = config.get_address_hrp()
+    hrp = _get_address_hrp(args)
 
     if args.relayer_pem:
         return Account.new_from_pem(file_path=Path(args.relayer_pem), index=args.relayer_wallet_index, hrp=hrp)

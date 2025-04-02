@@ -130,9 +130,10 @@ options:
                                                  mnemonic or Ledger devices (default: 0)
   --sender-username SENDER_USERNAME              🖄 the username of the sender
   --proxy PROXY                                  🔗 the URL of the proxy
-  --nonce NONCE                                  # the nonce for the transaction
+  --nonce NONCE                                  # the nonce for the transaction. If not provided, is fetched from the
+                                                 network.
   --recall-nonce                                 ⭮ whether to recall the nonce when creating the transaction (default:
-                                                 False)
+                                                 False). This argument is OBSOLETE.
   --gas-price GAS_PRICE                          ⛽ the gas price (default: 1000000000)
   --gas-limit GAS_LIMIT                          ⛽ the gas limit
   --value VALUE                                  the value to transfer (default: 0)
@@ -222,9 +223,10 @@ options:
                                                   mnemonic or Ledger devices (default: 0)
   --sender-username SENDER_USERNAME               🖄 the username of the sender
   --proxy PROXY                                   🔗 the URL of the proxy
-  --nonce NONCE                                   # the nonce for the transaction
+  --nonce NONCE                                   # the nonce for the transaction. If not provided, is fetched from the
+                                                  network.
   --recall-nonce                                  ⭮ whether to recall the nonce when creating the transaction (default:
-                                                  False)
+                                                  False). This argument is OBSOLETE.
   --gas-price GAS_PRICE                           ⛽ the gas price (default: 1000000000)
   --gas-limit GAS_LIMIT                           ⛽ the gas limit
   --value VALUE                                   the value to transfer (default: 0)
@@ -324,9 +326,10 @@ options:
                                                  mnemonic or Ledger devices (default: 0)
   --sender-username SENDER_USERNAME              🖄 the username of the sender
   --proxy PROXY                                  🔗 the URL of the proxy
-  --nonce NONCE                                  # the nonce for the transaction
+  --nonce NONCE                                  # the nonce for the transaction. If not provided, is fetched from the
+                                                 network.
   --recall-nonce                                 ⭮ whether to recall the nonce when creating the transaction (default:
-                                                 False)
+                                                 False). This argument is OBSOLETE.
   --gas-price GAS_PRICE                          ⛽ the gas price (default: 1000000000)
   --gas-limit GAS_LIMIT                          ⛽ the gas limit
   --value VALUE                                  the value to transfer (default: 0)
@@ -501,9 +504,10 @@ options:
   --sender-wallet-index SENDER_WALLET_INDEX       🔑 the address index; can be used for PEM files, keyfiles of type
                                                   mnemonic or Ledger devices (default: 0)
   --sender-username SENDER_USERNAME               🖄 the username of the sender
-  --nonce NONCE                                   # the nonce for the transaction
+  --nonce NONCE                                   # the nonce for the transaction. If not provided, is fetched from the
+                                                  network.
   --recall-nonce                                  ⭮ whether to recall the nonce when creating the transaction (default:
-                                                  False)
+                                                  False). This argument is OBSOLETE.
   --receiver RECEIVER                             🖄 the address of the receiver
   --receiver-username RECEIVER_USERNAME           🖄 the username of the receiver
   --gas-price GAS_PRICE                           ⛽ the gas price (default: 1000000000)
@@ -720,9 +724,10 @@ options:
   --sender-wallet-index SENDER_WALLET_INDEX      🔑 the address index; can be used for PEM files, keyfiles of type
                                                  mnemonic or Ledger devices (default: 0)
   --sender-username SENDER_USERNAME              🖄 the username of the sender
-  --nonce NONCE                                  # the nonce for the transaction
+  --nonce NONCE                                  # the nonce for the transaction. If not provided, is fetched from the
+                                                 network.
   --recall-nonce                                 ⭮ whether to recall the nonce when creating the transaction (default:
-                                                 False)
+                                                 False). This argument is OBSOLETE.
   --gas-price GAS_PRICE                          ⛽ the gas price (default: 1000000000)
   --gas-limit GAS_LIMIT                          ⛽ the gas limit
   --value VALUE                                  the value to transfer (default: 0)
@@ -775,9 +780,10 @@ options:
   --sender-wallet-index SENDER_WALLET_INDEX      🔑 the address index; can be used for PEM files, keyfiles of type
                                                  mnemonic or Ledger devices (default: 0)
   --sender-username SENDER_USERNAME              🖄 the username of the sender
-  --nonce NONCE                                  # the nonce for the transaction
+  --nonce NONCE                                  # the nonce for the transaction. If not provided, is fetched from the
+                                                 network.
   --recall-nonce                                 ⭮ whether to recall the nonce when creating the transaction (default:
-                                                 False)
+                                                 False). This argument is OBSOLETE.
   --gas-price GAS_PRICE                          ⛽ the gas price (default: 1000000000)
   --gas-limit GAS_LIMIT                          ⛽ the gas limit
   --value VALUE                                  the value to transfer (default: 0)
@@ -828,9 +834,10 @@ options:
   --sender-wallet-index SENDER_WALLET_INDEX      🔑 the address index; can be used for PEM files, keyfiles of type
                                                  mnemonic or Ledger devices (default: 0)
   --sender-username SENDER_USERNAME              🖄 the username of the sender
-  --nonce NONCE                                  # the nonce for the transaction
+  --nonce NONCE                                  # the nonce for the transaction. If not provided, is fetched from the
+                                                 network.
   --recall-nonce                                 ⭮ whether to recall the nonce when creating the transaction (default:
-                                                 False)
+                                                 False). This argument is OBSOLETE.
   --gas-price GAS_PRICE                          ⛽ the gas price (default: 1000000000)
   --gas-limit GAS_LIMIT                          ⛽ the gas limit
   --value VALUE                                  the value to transfer (default: 0)
@@ -881,9 +888,10 @@ options:
   --sender-wallet-index SENDER_WALLET_INDEX      🔑 the address index; can be used for PEM files, keyfiles of type
                                                  mnemonic or Ledger devices (default: 0)
   --sender-username SENDER_USERNAME              🖄 the username of the sender
-  --nonce NONCE                                  # the nonce for the transaction
+  --nonce NONCE                                  # the nonce for the transaction. If not provided, is fetched from the
+                                                 network.
   --recall-nonce                                 ⭮ whether to recall the nonce when creating the transaction (default:
-                                                 False)
+                                                 False). This argument is OBSOLETE.
   --gas-price GAS_PRICE                          ⛽ the gas price (default: 1000000000)
   --gas-limit GAS_LIMIT                          ⛽ the gas limit
   --value VALUE                                  the value to transfer (default: 0)
@@ -934,9 +942,10 @@ options:
   --sender-wallet-index SENDER_WALLET_INDEX      🔑 the address index; can be used for PEM files, keyfiles of type
                                                  mnemonic or Ledger devices (default: 0)
   --sender-username SENDER_USERNAME              🖄 the username of the sender
-  --nonce NONCE                                  # the nonce for the transaction
+  --nonce NONCE                                  # the nonce for the transaction. If not provided, is fetched from the
+                                                 network.
   --recall-nonce                                 ⭮ whether to recall the nonce when creating the transaction (default:
-                                                 False)
+                                                 False). This argument is OBSOLETE.
   --gas-price GAS_PRICE                          ⛽ the gas price (default: 1000000000)
   --gas-limit GAS_LIMIT                          ⛽ the gas limit
   --value VALUE                                  the value to transfer (default: 0)
@@ -987,9 +996,10 @@ options:
   --sender-wallet-index SENDER_WALLET_INDEX      🔑 the address index; can be used for PEM files, keyfiles of type
                                                  mnemonic or Ledger devices (default: 0)
   --sender-username SENDER_USERNAME              🖄 the username of the sender
-  --nonce NONCE                                  # the nonce for the transaction
+  --nonce NONCE                                  # the nonce for the transaction. If not provided, is fetched from the
+                                                 network.
   --recall-nonce                                 ⭮ whether to recall the nonce when creating the transaction (default:
-                                                 False)
+                                                 False). This argument is OBSOLETE.
   --gas-price GAS_PRICE                          ⛽ the gas price (default: 1000000000)
   --gas-limit GAS_LIMIT                          ⛽ the gas limit
   --value VALUE                                  the value to transfer (default: 0)
@@ -1039,9 +1049,10 @@ options:
   --sender-wallet-index SENDER_WALLET_INDEX      🔑 the address index; can be used for PEM files, keyfiles of type
                                                  mnemonic or Ledger devices (default: 0)
   --sender-username SENDER_USERNAME              🖄 the username of the sender
-  --nonce NONCE                                  # the nonce for the transaction
+  --nonce NONCE                                  # the nonce for the transaction. If not provided, is fetched from the
+                                                 network.
   --recall-nonce                                 ⭮ whether to recall the nonce when creating the transaction (default:
-                                                 False)
+                                                 False). This argument is OBSOLETE.
   --gas-price GAS_PRICE                          ⛽ the gas price (default: 1000000000)
   --gas-limit GAS_LIMIT                          ⛽ the gas limit
   --value VALUE                                  the value to transfer (default: 0)
@@ -1092,9 +1103,10 @@ options:
   --sender-wallet-index SENDER_WALLET_INDEX      🔑 the address index; can be used for PEM files, keyfiles of type
                                                  mnemonic or Ledger devices (default: 0)
   --sender-username SENDER_USERNAME              🖄 the username of the sender
-  --nonce NONCE                                  # the nonce for the transaction
+  --nonce NONCE                                  # the nonce for the transaction. If not provided, is fetched from the
+                                                 network.
   --recall-nonce                                 ⭮ whether to recall the nonce when creating the transaction (default:
-                                                 False)
+                                                 False). This argument is OBSOLETE.
   --gas-price GAS_PRICE                          ⛽ the gas price (default: 1000000000)
   --gas-limit GAS_LIMIT                          ⛽ the gas limit
   --value VALUE                                  the value to transfer (default: 0)
@@ -1145,9 +1157,10 @@ options:
   --sender-wallet-index SENDER_WALLET_INDEX      🔑 the address index; can be used for PEM files, keyfiles of type
                                                  mnemonic or Ledger devices (default: 0)
   --sender-username SENDER_USERNAME              🖄 the username of the sender
-  --nonce NONCE                                  # the nonce for the transaction
+  --nonce NONCE                                  # the nonce for the transaction. If not provided, is fetched from the
+                                                 network.
   --recall-nonce                                 ⭮ whether to recall the nonce when creating the transaction (default:
-                                                 False)
+                                                 False). This argument is OBSOLETE.
   --gas-price GAS_PRICE                          ⛽ the gas price (default: 1000000000)
   --gas-limit GAS_LIMIT                          ⛽ the gas limit
   --value VALUE                                  the value to transfer (default: 0)
@@ -1198,9 +1211,10 @@ options:
   --sender-wallet-index SENDER_WALLET_INDEX      🔑 the address index; can be used for PEM files, keyfiles of type
                                                  mnemonic or Ledger devices (default: 0)
   --sender-username SENDER_USERNAME              🖄 the username of the sender
-  --nonce NONCE                                  # the nonce for the transaction
+  --nonce NONCE                                  # the nonce for the transaction. If not provided, is fetched from the
+                                                 network.
   --recall-nonce                                 ⭮ whether to recall the nonce when creating the transaction (default:
-                                                 False)
+                                                 False). This argument is OBSOLETE.
   --gas-price GAS_PRICE                          ⛽ the gas price (default: 1000000000)
   --gas-limit GAS_LIMIT                          ⛽ the gas limit
   --value VALUE                                  the value to transfer (default: 0)
@@ -1251,9 +1265,10 @@ options:
   --sender-wallet-index SENDER_WALLET_INDEX      🔑 the address index; can be used for PEM files, keyfiles of type
                                                  mnemonic or Ledger devices (default: 0)
   --sender-username SENDER_USERNAME              🖄 the username of the sender
-  --nonce NONCE                                  # the nonce for the transaction
+  --nonce NONCE                                  # the nonce for the transaction. If not provided, is fetched from the
+                                                 network.
   --recall-nonce                                 ⭮ whether to recall the nonce when creating the transaction (default:
-                                                 False)
+                                                 False). This argument is OBSOLETE.
   --gas-price GAS_PRICE                          ⛽ the gas price (default: 1000000000)
   --gas-limit GAS_LIMIT                          ⛽ the gas limit
   --value VALUE                                  the value to transfer (default: 0)
@@ -1303,9 +1318,10 @@ options:
   --sender-wallet-index SENDER_WALLET_INDEX      🔑 the address index; can be used for PEM files, keyfiles of type
                                                  mnemonic or Ledger devices (default: 0)
   --sender-username SENDER_USERNAME              🖄 the username of the sender
-  --nonce NONCE                                  # the nonce for the transaction
+  --nonce NONCE                                  # the nonce for the transaction. If not provided, is fetched from the
+                                                 network.
   --recall-nonce                                 ⭮ whether to recall the nonce when creating the transaction (default:
-                                                 False)
+                                                 False). This argument is OBSOLETE.
   --gas-price GAS_PRICE                          ⛽ the gas price (default: 1000000000)
   --gas-limit GAS_LIMIT                          ⛽ the gas limit
   --value VALUE                                  the value to transfer (default: 0)
@@ -1395,9 +1411,10 @@ options:
   --sender-wallet-index SENDER_WALLET_INDEX      🔑 the address index; can be used for PEM files, keyfiles of type
                                                  mnemonic or Ledger devices (default: 0)
   --sender-username SENDER_USERNAME              🖄 the username of the sender
-  --nonce NONCE                                  # the nonce for the transaction
+  --nonce NONCE                                  # the nonce for the transaction. If not provided, is fetched from the
+                                                 network.
   --recall-nonce                                 ⭮ whether to recall the nonce when creating the transaction (default:
-                                                 False)
+                                                 False). This argument is OBSOLETE.
   --gas-price GAS_PRICE                          ⛽ the gas price (default: 1000000000)
   --gas-limit GAS_LIMIT                          ⛽ the gas limit
   --value VALUE                                  the value to transfer (default: 0)
@@ -1466,9 +1483,10 @@ options:
   --sender-wallet-index SENDER_WALLET_INDEX      🔑 the address index; can be used for PEM files, keyfiles of type
                                                  mnemonic or Ledger devices (default: 0)
   --sender-username SENDER_USERNAME              🖄 the username of the sender
-  --nonce NONCE                                  # the nonce for the transaction
+  --nonce NONCE                                  # the nonce for the transaction. If not provided, is fetched from the
+                                                 network.
   --recall-nonce                                 ⭮ whether to recall the nonce when creating the transaction (default:
-                                                 False)
+                                                 False). This argument is OBSOLETE.
   --gas-price GAS_PRICE                          ⛽ the gas price (default: 1000000000)
   --gas-limit GAS_LIMIT                          ⛽ the gas limit
   --value VALUE                                  the value to transfer (default: 0)
@@ -1521,9 +1539,10 @@ options:
   --sender-wallet-index SENDER_WALLET_INDEX      🔑 the address index; can be used for PEM files, keyfiles of type
                                                  mnemonic or Ledger devices (default: 0)
   --sender-username SENDER_USERNAME              🖄 the username of the sender
-  --nonce NONCE                                  # the nonce for the transaction
+  --nonce NONCE                                  # the nonce for the transaction. If not provided, is fetched from the
+                                                 network.
   --recall-nonce                                 ⭮ whether to recall the nonce when creating the transaction (default:
-                                                 False)
+                                                 False). This argument is OBSOLETE.
   --gas-price GAS_PRICE                          ⛽ the gas price (default: 1000000000)
   --gas-limit GAS_LIMIT                          ⛽ the gas limit
   --value VALUE                                  the value to transfer (default: 0)
@@ -1576,9 +1595,10 @@ options:
   --sender-wallet-index SENDER_WALLET_INDEX      🔑 the address index; can be used for PEM files, keyfiles of type
                                                  mnemonic or Ledger devices (default: 0)
   --sender-username SENDER_USERNAME              🖄 the username of the sender
-  --nonce NONCE                                  # the nonce for the transaction
+  --nonce NONCE                                  # the nonce for the transaction. If not provided, is fetched from the
+                                                 network.
   --recall-nonce                                 ⭮ whether to recall the nonce when creating the transaction (default:
-                                                 False)
+                                                 False). This argument is OBSOLETE.
   --gas-price GAS_PRICE                          ⛽ the gas price (default: 1000000000)
   --gas-limit GAS_LIMIT                          ⛽ the gas limit
   --value VALUE                                  the value to transfer (default: 0)
@@ -1631,9 +1651,10 @@ options:
   --sender-wallet-index SENDER_WALLET_INDEX      🔑 the address index; can be used for PEM files, keyfiles of type
                                                  mnemonic or Ledger devices (default: 0)
   --sender-username SENDER_USERNAME              🖄 the username of the sender
-  --nonce NONCE                                  # the nonce for the transaction
+  --nonce NONCE                                  # the nonce for the transaction. If not provided, is fetched from the
+                                                 network.
   --recall-nonce                                 ⭮ whether to recall the nonce when creating the transaction (default:
-                                                 False)
+                                                 False). This argument is OBSOLETE.
   --gas-price GAS_PRICE                          ⛽ the gas price (default: 1000000000)
   --gas-limit GAS_LIMIT                          ⛽ the gas limit
   --value VALUE                                  the value to transfer (default: 0)
@@ -1686,9 +1707,10 @@ options:
   --sender-wallet-index SENDER_WALLET_INDEX      🔑 the address index; can be used for PEM files, keyfiles of type
                                                  mnemonic or Ledger devices (default: 0)
   --sender-username SENDER_USERNAME              🖄 the username of the sender
-  --nonce NONCE                                  # the nonce for the transaction
+  --nonce NONCE                                  # the nonce for the transaction. If not provided, is fetched from the
+                                                 network.
   --recall-nonce                                 ⭮ whether to recall the nonce when creating the transaction (default:
-                                                 False)
+                                                 False). This argument is OBSOLETE.
   --gas-price GAS_PRICE                          ⛽ the gas price (default: 1000000000)
   --gas-limit GAS_LIMIT                          ⛽ the gas limit
   --value VALUE                                  the value to transfer (default: 0)
@@ -1741,9 +1763,10 @@ options:
   --sender-wallet-index SENDER_WALLET_INDEX      🔑 the address index; can be used for PEM files, keyfiles of type
                                                  mnemonic or Ledger devices (default: 0)
   --sender-username SENDER_USERNAME              🖄 the username of the sender
-  --nonce NONCE                                  # the nonce for the transaction
+  --nonce NONCE                                  # the nonce for the transaction. If not provided, is fetched from the
+                                                 network.
   --recall-nonce                                 ⭮ whether to recall the nonce when creating the transaction (default:
-                                                 False)
+                                                 False). This argument is OBSOLETE.
   --gas-price GAS_PRICE                          ⛽ the gas price (default: 1000000000)
   --gas-limit GAS_LIMIT                          ⛽ the gas limit
   --value VALUE                                  the value to transfer (default: 0)
@@ -1794,9 +1817,10 @@ options:
   --sender-wallet-index SENDER_WALLET_INDEX      🔑 the address index; can be used for PEM files, keyfiles of type
                                                  mnemonic or Ledger devices (default: 0)
   --sender-username SENDER_USERNAME              🖄 the username of the sender
-  --nonce NONCE                                  # the nonce for the transaction
+  --nonce NONCE                                  # the nonce for the transaction. If not provided, is fetched from the
+                                                 network.
   --recall-nonce                                 ⭮ whether to recall the nonce when creating the transaction (default:
-                                                 False)
+                                                 False). This argument is OBSOLETE.
   --gas-price GAS_PRICE                          ⛽ the gas price (default: 1000000000)
   --gas-limit GAS_LIMIT                          ⛽ the gas limit
   --value VALUE                                  the value to transfer (default: 0)
@@ -1847,9 +1871,10 @@ options:
   --sender-wallet-index SENDER_WALLET_INDEX      🔑 the address index; can be used for PEM files, keyfiles of type
                                                  mnemonic or Ledger devices (default: 0)
   --sender-username SENDER_USERNAME              🖄 the username of the sender
-  --nonce NONCE                                  # the nonce for the transaction
+  --nonce NONCE                                  # the nonce for the transaction. If not provided, is fetched from the
+                                                 network.
   --recall-nonce                                 ⭮ whether to recall the nonce when creating the transaction (default:
-                                                 False)
+                                                 False). This argument is OBSOLETE.
   --gas-price GAS_PRICE                          ⛽ the gas price (default: 1000000000)
   --gas-limit GAS_LIMIT                          ⛽ the gas limit
   --value VALUE                                  the value to transfer (default: 0)
@@ -1900,9 +1925,10 @@ options:
   --sender-wallet-index SENDER_WALLET_INDEX      🔑 the address index; can be used for PEM files, keyfiles of type
                                                  mnemonic or Ledger devices (default: 0)
   --sender-username SENDER_USERNAME              🖄 the username of the sender
-  --nonce NONCE                                  # the nonce for the transaction
+  --nonce NONCE                                  # the nonce for the transaction. If not provided, is fetched from the
+                                                 network.
   --recall-nonce                                 ⭮ whether to recall the nonce when creating the transaction (default:
-                                                 False)
+                                                 False). This argument is OBSOLETE.
   --gas-price GAS_PRICE                          ⛽ the gas price (default: 1000000000)
   --gas-limit GAS_LIMIT                          ⛽ the gas limit
   --value VALUE                                  the value to transfer (default: 0)
@@ -1953,9 +1979,10 @@ options:
   --sender-wallet-index SENDER_WALLET_INDEX      🔑 the address index; can be used for PEM files, keyfiles of type
                                                  mnemonic or Ledger devices (default: 0)
   --sender-username SENDER_USERNAME              🖄 the username of the sender
-  --nonce NONCE                                  # the nonce for the transaction
+  --nonce NONCE                                  # the nonce for the transaction. If not provided, is fetched from the
+                                                 network.
   --recall-nonce                                 ⭮ whether to recall the nonce when creating the transaction (default:
-                                                 False)
+                                                 False). This argument is OBSOLETE.
   --gas-price GAS_PRICE                          ⛽ the gas price (default: 1000000000)
   --gas-limit GAS_LIMIT                          ⛽ the gas limit
   --value VALUE                                  the value to transfer (default: 0)
@@ -2006,9 +2033,10 @@ options:
   --sender-wallet-index SENDER_WALLET_INDEX      🔑 the address index; can be used for PEM files, keyfiles of type
                                                  mnemonic or Ledger devices (default: 0)
   --sender-username SENDER_USERNAME              🖄 the username of the sender
-  --nonce NONCE                                  # the nonce for the transaction
+  --nonce NONCE                                  # the nonce for the transaction. If not provided, is fetched from the
+                                                 network.
   --recall-nonce                                 ⭮ whether to recall the nonce when creating the transaction (default:
-                                                 False)
+                                                 False). This argument is OBSOLETE.
   --gas-price GAS_PRICE                          ⛽ the gas price (default: 1000000000)
   --gas-limit GAS_LIMIT                          ⛽ the gas limit
   --value VALUE                                  the value to transfer (default: 0)
@@ -2060,9 +2088,10 @@ options:
   --sender-wallet-index SENDER_WALLET_INDEX      🔑 the address index; can be used for PEM files, keyfiles of type
                                                  mnemonic or Ledger devices (default: 0)
   --sender-username SENDER_USERNAME              🖄 the username of the sender
-  --nonce NONCE                                  # the nonce for the transaction
+  --nonce NONCE                                  # the nonce for the transaction. If not provided, is fetched from the
+                                                 network.
   --recall-nonce                                 ⭮ whether to recall the nonce when creating the transaction (default:
-                                                 False)
+                                                 False). This argument is OBSOLETE.
   --gas-price GAS_PRICE                          ⛽ the gas price (default: 1000000000)
   --gas-limit GAS_LIMIT                          ⛽ the gas limit
   --value VALUE                                  the value to transfer (default: 0)
@@ -2114,9 +2143,10 @@ options:
   --sender-wallet-index SENDER_WALLET_INDEX      🔑 the address index; can be used for PEM files, keyfiles of type
                                                  mnemonic or Ledger devices (default: 0)
   --sender-username SENDER_USERNAME              🖄 the username of the sender
-  --nonce NONCE                                  # the nonce for the transaction
+  --nonce NONCE                                  # the nonce for the transaction. If not provided, is fetched from the
+                                                 network.
   --recall-nonce                                 ⭮ whether to recall the nonce when creating the transaction (default:
-                                                 False)
+                                                 False). This argument is OBSOLETE.
   --gas-price GAS_PRICE                          ⛽ the gas price (default: 1000000000)
   --gas-limit GAS_LIMIT                          ⛽ the gas limit
   --value VALUE                                  the value to transfer (default: 0)
@@ -2169,9 +2199,10 @@ options:
   --sender-wallet-index SENDER_WALLET_INDEX      🔑 the address index; can be used for PEM files, keyfiles of type
                                                  mnemonic or Ledger devices (default: 0)
   --sender-username SENDER_USERNAME              🖄 the username of the sender
-  --nonce NONCE                                  # the nonce for the transaction
+  --nonce NONCE                                  # the nonce for the transaction. If not provided, is fetched from the
+                                                 network.
   --recall-nonce                                 ⭮ whether to recall the nonce when creating the transaction (default:
-                                                 False)
+                                                 False). This argument is OBSOLETE.
   --gas-price GAS_PRICE                          ⛽ the gas price (default: 1000000000)
   --gas-limit GAS_LIMIT                          ⛽ the gas limit
   --value VALUE                                  the value to transfer (default: 0)
@@ -2224,9 +2255,10 @@ options:
   --sender-wallet-index SENDER_WALLET_INDEX      🔑 the address index; can be used for PEM files, keyfiles of type
                                                  mnemonic or Ledger devices (default: 0)
   --sender-username SENDER_USERNAME              🖄 the username of the sender
-  --nonce NONCE                                  # the nonce for the transaction
+  --nonce NONCE                                  # the nonce for the transaction. If not provided, is fetched from the
+                                                 network.
   --recall-nonce                                 ⭮ whether to recall the nonce when creating the transaction (default:
-                                                 False)
+                                                 False). This argument is OBSOLETE.
   --gas-price GAS_PRICE                          ⛽ the gas price (default: 1000000000)
   --gas-limit GAS_LIMIT                          ⛽ the gas limit
   --value VALUE                                  the value to transfer (default: 0)
@@ -2280,9 +2312,10 @@ options:
   --sender-wallet-index SENDER_WALLET_INDEX      🔑 the address index; can be used for PEM files, keyfiles of type
                                                  mnemonic or Ledger devices (default: 0)
   --sender-username SENDER_USERNAME              🖄 the username of the sender
-  --nonce NONCE                                  # the nonce for the transaction
+  --nonce NONCE                                  # the nonce for the transaction. If not provided, is fetched from the
+                                                 network.
   --recall-nonce                                 ⭮ whether to recall the nonce when creating the transaction (default:
-                                                 False)
+                                                 False). This argument is OBSOLETE.
   --gas-price GAS_PRICE                          ⛽ the gas price (default: 1000000000)
   --gas-limit GAS_LIMIT                          ⛽ the gas limit
   --value VALUE                                  the value to transfer (default: 0)
@@ -2336,9 +2369,10 @@ options:
   --sender-wallet-index SENDER_WALLET_INDEX      🔑 the address index; can be used for PEM files, keyfiles of type
                                                  mnemonic or Ledger devices (default: 0)
   --sender-username SENDER_USERNAME              🖄 the username of the sender
-  --nonce NONCE                                  # the nonce for the transaction
+  --nonce NONCE                                  # the nonce for the transaction. If not provided, is fetched from the
+                                                 network.
   --recall-nonce                                 ⭮ whether to recall the nonce when creating the transaction (default:
-                                                 False)
+                                                 False). This argument is OBSOLETE.
   --gas-price GAS_PRICE                          ⛽ the gas price (default: 1000000000)
   --gas-limit GAS_LIMIT                          ⛽ the gas limit
   --value VALUE                                  the value to transfer (default: 0)
@@ -2997,5 +3031,7 @@ options:
                                              or Ledger devices (default: 0)
   --sender-username SENDER_USERNAME          🖄 the username of the sender
   --chain {D,T}                              the chain identifier
+  --api API                                  custom api url for the native auth client
+  --wallet-url WALLET_URL                    custom wallet url to call the faucet from
 
 ```
