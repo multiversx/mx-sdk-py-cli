@@ -308,10 +308,12 @@ def prepare_account(args: Any):
 
 def _get_address_hrp(args: Any) -> str:
     """Use hrp provided by the user. If not provided, fetch from network. If proxy not provided, get hrp from config."""
-    if hasattr(args, "hrp") and args.hrp:
-        return args.hrp
-
     hrp: str = ""
+
+    if hasattr(args, "hrp") and args.hrp:
+        hrp = args.hrp
+        return hrp
+
     if hasattr(args, "proxy") and args.proxy:
         hrp = _get_hrp_from_proxy(args)
     elif hasattr(args, "api") and args.api:
