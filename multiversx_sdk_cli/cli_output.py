@@ -6,7 +6,6 @@ from typing import Any, Optional, Union
 from multiversx_sdk import Address, Transaction, TransactionOnNetwork
 
 from multiversx_sdk_cli import utils
-from multiversx_sdk_cli.transactions import transaction_on_network_to_dictionary
 from multiversx_sdk_cli.utils import ISerializable
 
 logger = logging.getLogger("cli.output")
@@ -36,7 +35,8 @@ class CLIOutputBuilder:
         return self
 
     def set_awaited_transaction(self, awaited_transaction: TransactionOnNetwork, omitted_fields: list[str] = []):
-        return self.set_transaction_on_network(awaited_transaction, omitted_fields)
+        self.set_transaction_on_network(awaited_transaction, omitted_fields)
+        self.set_emitted_transaction_hash(awaited_transaction.hash.hex())
 
     def set_transaction_on_network(
         self,
@@ -69,7 +69,7 @@ class CLIOutputBuilder:
             output["contractAddress"] = contract_address
 
         if self.transaction_on_network:
-            transaction_on_network_dict = transaction_on_network_to_dictionary(self.transaction_on_network)
+            transaction_on_network_dict = self.transaction_on_network.raw
             utils.omit_fields(transaction_on_network_dict, self.transaction_on_network_omitted_fields)
             output["transactionOnNetwork"] = transaction_on_network_dict
 
