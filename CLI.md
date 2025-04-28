@@ -58,7 +58,7 @@ usage: mxpy contract COMMAND [-h] ...
 Deploy, upgrade and interact with Smart Contracts
 
 COMMANDS:
-  {deploy,call,upgrade,query,verify,reproducible-build,build}
+  {deploy,call,upgrade,query,verify,unverify,reproducible-build,build}
 
 OPTIONS:
   -h, --help            show this help message and exit
@@ -71,6 +71,7 @@ call                           Interact with a Smart Contract (execute function)
 upgrade                        Upgrade a previously-deployed Smart Contract.
 query                          Query a Smart Contract (call a pure function)
 verify                         Verify the authenticity of the code of a deployed Smart Contract
+unverify                       Unverify a previously verified Smart Contract
 reproducible-build             Build a Smart Contract and get the same output as a previously built Smart Contract
 build                          Build a Smart Contract project. This command is DISABLED.
 
@@ -129,6 +130,7 @@ options:
   --sender-wallet-index SENDER_WALLET_INDEX      🔑 the address index; can be used for PEM files, keyfiles of type
                                                  mnemonic or Ledger devices (default: 0)
   --sender-username SENDER_USERNAME              🖄 the username of the sender
+  --hrp HRP                                      The hrp used to convert the address to its bech32 representation
   --proxy PROXY                                  🔗 the URL of the proxy
   --nonce NONCE                                  # the nonce for the transaction. If not provided, is fetched from the
                                                  network.
@@ -222,6 +224,7 @@ options:
   --sender-wallet-index SENDER_WALLET_INDEX       🔑 the address index; can be used for PEM files, keyfiles of type
                                                   mnemonic or Ledger devices (default: 0)
   --sender-username SENDER_USERNAME               🖄 the username of the sender
+  --hrp HRP                                       The hrp used to convert the address to its bech32 representation
   --proxy PROXY                                   🔗 the URL of the proxy
   --nonce NONCE                                   # the nonce for the transaction. If not provided, is fetched from the
                                                   network.
@@ -325,6 +328,7 @@ options:
   --sender-wallet-index SENDER_WALLET_INDEX      🔑 the address index; can be used for PEM files, keyfiles of type
                                                  mnemonic or Ledger devices (default: 0)
   --sender-username SENDER_USERNAME              🖄 the username of the sender
+  --hrp HRP                                      The hrp used to convert the address to its bech32 representation
   --proxy PROXY                                  🔗 the URL of the proxy
   --nonce NONCE                                  # the nonce for the transaction. If not provided, is fetched from the
                                                  network.
@@ -416,6 +420,7 @@ options:
   --sender-wallet-index SENDER_WALLET_INDEX  🔑 the address index; can be used for PEM files, keyfiles of type mnemonic
                                              or Ledger devices (default: 0)
   --sender-username SENDER_USERNAME          🖄 the username of the sender
+  --hrp HRP                                  The hrp used to convert the address to its bech32 representation
 
 ```
 ### Contract.ReproducibleBuild
@@ -504,6 +509,7 @@ options:
   --sender-wallet-index SENDER_WALLET_INDEX       🔑 the address index; can be used for PEM files, keyfiles of type
                                                   mnemonic or Ledger devices (default: 0)
   --sender-username SENDER_USERNAME               🖄 the username of the sender
+  --hrp HRP                                       The hrp used to convert the address to its bech32 representation
   --nonce NONCE                                   # the nonce for the transaction. If not provided, is fetched from the
                                                   network.
   --recall-nonce                                  ⭮ whether to recall the nonce when creating the transaction (default:
@@ -610,6 +616,7 @@ options:
   --sender-wallet-index SENDER_WALLET_INDEX      🔑 the address index; can be used for PEM files, keyfiles of type
                                                  mnemonic or Ledger devices (default: 0)
   --sender-username SENDER_USERNAME              🖄 the username of the sender
+  --hrp HRP                                      The hrp used to convert the address to its bech32 representation
   --infile INFILE                                input file (a previously saved transaction)
   --outfile OUTFILE                              where to save the output (the signed transaction) (default: stdout)
   --send                                         ✓ whether to broadcast the transaction (default: False)
@@ -724,6 +731,7 @@ options:
   --sender-wallet-index SENDER_WALLET_INDEX      🔑 the address index; can be used for PEM files, keyfiles of type
                                                  mnemonic or Ledger devices (default: 0)
   --sender-username SENDER_USERNAME              🖄 the username of the sender
+  --hrp HRP                                      The hrp used to convert the address to its bech32 representation
   --nonce NONCE                                  # the nonce for the transaction. If not provided, is fetched from the
                                                  network.
   --recall-nonce                                 ⭮ whether to recall the nonce when creating the transaction (default:
@@ -780,6 +788,7 @@ options:
   --sender-wallet-index SENDER_WALLET_INDEX      🔑 the address index; can be used for PEM files, keyfiles of type
                                                  mnemonic or Ledger devices (default: 0)
   --sender-username SENDER_USERNAME              🖄 the username of the sender
+  --hrp HRP                                      The hrp used to convert the address to its bech32 representation
   --nonce NONCE                                  # the nonce for the transaction. If not provided, is fetched from the
                                                  network.
   --recall-nonce                                 ⭮ whether to recall the nonce when creating the transaction (default:
@@ -834,6 +843,7 @@ options:
   --sender-wallet-index SENDER_WALLET_INDEX      🔑 the address index; can be used for PEM files, keyfiles of type
                                                  mnemonic or Ledger devices (default: 0)
   --sender-username SENDER_USERNAME              🖄 the username of the sender
+  --hrp HRP                                      The hrp used to convert the address to its bech32 representation
   --nonce NONCE                                  # the nonce for the transaction. If not provided, is fetched from the
                                                  network.
   --recall-nonce                                 ⭮ whether to recall the nonce when creating the transaction (default:
@@ -888,6 +898,7 @@ options:
   --sender-wallet-index SENDER_WALLET_INDEX      🔑 the address index; can be used for PEM files, keyfiles of type
                                                  mnemonic or Ledger devices (default: 0)
   --sender-username SENDER_USERNAME              🖄 the username of the sender
+  --hrp HRP                                      The hrp used to convert the address to its bech32 representation
   --nonce NONCE                                  # the nonce for the transaction. If not provided, is fetched from the
                                                  network.
   --recall-nonce                                 ⭮ whether to recall the nonce when creating the transaction (default:
@@ -942,6 +953,7 @@ options:
   --sender-wallet-index SENDER_WALLET_INDEX      🔑 the address index; can be used for PEM files, keyfiles of type
                                                  mnemonic or Ledger devices (default: 0)
   --sender-username SENDER_USERNAME              🖄 the username of the sender
+  --hrp HRP                                      The hrp used to convert the address to its bech32 representation
   --nonce NONCE                                  # the nonce for the transaction. If not provided, is fetched from the
                                                  network.
   --recall-nonce                                 ⭮ whether to recall the nonce when creating the transaction (default:
@@ -996,6 +1008,7 @@ options:
   --sender-wallet-index SENDER_WALLET_INDEX      🔑 the address index; can be used for PEM files, keyfiles of type
                                                  mnemonic or Ledger devices (default: 0)
   --sender-username SENDER_USERNAME              🖄 the username of the sender
+  --hrp HRP                                      The hrp used to convert the address to its bech32 representation
   --nonce NONCE                                  # the nonce for the transaction. If not provided, is fetched from the
                                                  network.
   --recall-nonce                                 ⭮ whether to recall the nonce when creating the transaction (default:
@@ -1049,6 +1062,7 @@ options:
   --sender-wallet-index SENDER_WALLET_INDEX      🔑 the address index; can be used for PEM files, keyfiles of type
                                                  mnemonic or Ledger devices (default: 0)
   --sender-username SENDER_USERNAME              🖄 the username of the sender
+  --hrp HRP                                      The hrp used to convert the address to its bech32 representation
   --nonce NONCE                                  # the nonce for the transaction. If not provided, is fetched from the
                                                  network.
   --recall-nonce                                 ⭮ whether to recall the nonce when creating the transaction (default:
@@ -1103,6 +1117,7 @@ options:
   --sender-wallet-index SENDER_WALLET_INDEX      🔑 the address index; can be used for PEM files, keyfiles of type
                                                  mnemonic or Ledger devices (default: 0)
   --sender-username SENDER_USERNAME              🖄 the username of the sender
+  --hrp HRP                                      The hrp used to convert the address to its bech32 representation
   --nonce NONCE                                  # the nonce for the transaction. If not provided, is fetched from the
                                                  network.
   --recall-nonce                                 ⭮ whether to recall the nonce when creating the transaction (default:
@@ -1157,6 +1172,7 @@ options:
   --sender-wallet-index SENDER_WALLET_INDEX      🔑 the address index; can be used for PEM files, keyfiles of type
                                                  mnemonic or Ledger devices (default: 0)
   --sender-username SENDER_USERNAME              🖄 the username of the sender
+  --hrp HRP                                      The hrp used to convert the address to its bech32 representation
   --nonce NONCE                                  # the nonce for the transaction. If not provided, is fetched from the
                                                  network.
   --recall-nonce                                 ⭮ whether to recall the nonce when creating the transaction (default:
@@ -1211,6 +1227,7 @@ options:
   --sender-wallet-index SENDER_WALLET_INDEX      🔑 the address index; can be used for PEM files, keyfiles of type
                                                  mnemonic or Ledger devices (default: 0)
   --sender-username SENDER_USERNAME              🖄 the username of the sender
+  --hrp HRP                                      The hrp used to convert the address to its bech32 representation
   --nonce NONCE                                  # the nonce for the transaction. If not provided, is fetched from the
                                                  network.
   --recall-nonce                                 ⭮ whether to recall the nonce when creating the transaction (default:
@@ -1265,6 +1282,7 @@ options:
   --sender-wallet-index SENDER_WALLET_INDEX      🔑 the address index; can be used for PEM files, keyfiles of type
                                                  mnemonic or Ledger devices (default: 0)
   --sender-username SENDER_USERNAME              🖄 the username of the sender
+  --hrp HRP                                      The hrp used to convert the address to its bech32 representation
   --nonce NONCE                                  # the nonce for the transaction. If not provided, is fetched from the
                                                  network.
   --recall-nonce                                 ⭮ whether to recall the nonce when creating the transaction (default:
@@ -1318,6 +1336,7 @@ options:
   --sender-wallet-index SENDER_WALLET_INDEX      🔑 the address index; can be used for PEM files, keyfiles of type
                                                  mnemonic or Ledger devices (default: 0)
   --sender-username SENDER_USERNAME              🖄 the username of the sender
+  --hrp HRP                                      The hrp used to convert the address to its bech32 representation
   --nonce NONCE                                  # the nonce for the transaction. If not provided, is fetched from the
                                                  network.
   --recall-nonce                                 ⭮ whether to recall the nonce when creating the transaction (default:
@@ -1411,6 +1430,7 @@ options:
   --sender-wallet-index SENDER_WALLET_INDEX      🔑 the address index; can be used for PEM files, keyfiles of type
                                                  mnemonic or Ledger devices (default: 0)
   --sender-username SENDER_USERNAME              🖄 the username of the sender
+  --hrp HRP                                      The hrp used to convert the address to its bech32 representation
   --nonce NONCE                                  # the nonce for the transaction. If not provided, is fetched from the
                                                  network.
   --recall-nonce                                 ⭮ whether to recall the nonce when creating the transaction (default:
@@ -1483,6 +1503,7 @@ options:
   --sender-wallet-index SENDER_WALLET_INDEX      🔑 the address index; can be used for PEM files, keyfiles of type
                                                  mnemonic or Ledger devices (default: 0)
   --sender-username SENDER_USERNAME              🖄 the username of the sender
+  --hrp HRP                                      The hrp used to convert the address to its bech32 representation
   --nonce NONCE                                  # the nonce for the transaction. If not provided, is fetched from the
                                                  network.
   --recall-nonce                                 ⭮ whether to recall the nonce when creating the transaction (default:
@@ -1539,6 +1560,7 @@ options:
   --sender-wallet-index SENDER_WALLET_INDEX      🔑 the address index; can be used for PEM files, keyfiles of type
                                                  mnemonic or Ledger devices (default: 0)
   --sender-username SENDER_USERNAME              🖄 the username of the sender
+  --hrp HRP                                      The hrp used to convert the address to its bech32 representation
   --nonce NONCE                                  # the nonce for the transaction. If not provided, is fetched from the
                                                  network.
   --recall-nonce                                 ⭮ whether to recall the nonce when creating the transaction (default:
@@ -1595,6 +1617,7 @@ options:
   --sender-wallet-index SENDER_WALLET_INDEX      🔑 the address index; can be used for PEM files, keyfiles of type
                                                  mnemonic or Ledger devices (default: 0)
   --sender-username SENDER_USERNAME              🖄 the username of the sender
+  --hrp HRP                                      The hrp used to convert the address to its bech32 representation
   --nonce NONCE                                  # the nonce for the transaction. If not provided, is fetched from the
                                                  network.
   --recall-nonce                                 ⭮ whether to recall the nonce when creating the transaction (default:
@@ -1651,6 +1674,7 @@ options:
   --sender-wallet-index SENDER_WALLET_INDEX      🔑 the address index; can be used for PEM files, keyfiles of type
                                                  mnemonic or Ledger devices (default: 0)
   --sender-username SENDER_USERNAME              🖄 the username of the sender
+  --hrp HRP                                      The hrp used to convert the address to its bech32 representation
   --nonce NONCE                                  # the nonce for the transaction. If not provided, is fetched from the
                                                  network.
   --recall-nonce                                 ⭮ whether to recall the nonce when creating the transaction (default:
@@ -1707,6 +1731,7 @@ options:
   --sender-wallet-index SENDER_WALLET_INDEX      🔑 the address index; can be used for PEM files, keyfiles of type
                                                  mnemonic or Ledger devices (default: 0)
   --sender-username SENDER_USERNAME              🖄 the username of the sender
+  --hrp HRP                                      The hrp used to convert the address to its bech32 representation
   --nonce NONCE                                  # the nonce for the transaction. If not provided, is fetched from the
                                                  network.
   --recall-nonce                                 ⭮ whether to recall the nonce when creating the transaction (default:
@@ -1763,6 +1788,7 @@ options:
   --sender-wallet-index SENDER_WALLET_INDEX      🔑 the address index; can be used for PEM files, keyfiles of type
                                                  mnemonic or Ledger devices (default: 0)
   --sender-username SENDER_USERNAME              🖄 the username of the sender
+  --hrp HRP                                      The hrp used to convert the address to its bech32 representation
   --nonce NONCE                                  # the nonce for the transaction. If not provided, is fetched from the
                                                  network.
   --recall-nonce                                 ⭮ whether to recall the nonce when creating the transaction (default:
@@ -1817,6 +1843,7 @@ options:
   --sender-wallet-index SENDER_WALLET_INDEX      🔑 the address index; can be used for PEM files, keyfiles of type
                                                  mnemonic or Ledger devices (default: 0)
   --sender-username SENDER_USERNAME              🖄 the username of the sender
+  --hrp HRP                                      The hrp used to convert the address to its bech32 representation
   --nonce NONCE                                  # the nonce for the transaction. If not provided, is fetched from the
                                                  network.
   --recall-nonce                                 ⭮ whether to recall the nonce when creating the transaction (default:
@@ -1871,6 +1898,7 @@ options:
   --sender-wallet-index SENDER_WALLET_INDEX      🔑 the address index; can be used for PEM files, keyfiles of type
                                                  mnemonic or Ledger devices (default: 0)
   --sender-username SENDER_USERNAME              🖄 the username of the sender
+  --hrp HRP                                      The hrp used to convert the address to its bech32 representation
   --nonce NONCE                                  # the nonce for the transaction. If not provided, is fetched from the
                                                  network.
   --recall-nonce                                 ⭮ whether to recall the nonce when creating the transaction (default:
@@ -1925,6 +1953,7 @@ options:
   --sender-wallet-index SENDER_WALLET_INDEX      🔑 the address index; can be used for PEM files, keyfiles of type
                                                  mnemonic or Ledger devices (default: 0)
   --sender-username SENDER_USERNAME              🖄 the username of the sender
+  --hrp HRP                                      The hrp used to convert the address to its bech32 representation
   --nonce NONCE                                  # the nonce for the transaction. If not provided, is fetched from the
                                                  network.
   --recall-nonce                                 ⭮ whether to recall the nonce when creating the transaction (default:
@@ -1979,6 +2008,7 @@ options:
   --sender-wallet-index SENDER_WALLET_INDEX      🔑 the address index; can be used for PEM files, keyfiles of type
                                                  mnemonic or Ledger devices (default: 0)
   --sender-username SENDER_USERNAME              🖄 the username of the sender
+  --hrp HRP                                      The hrp used to convert the address to its bech32 representation
   --nonce NONCE                                  # the nonce for the transaction. If not provided, is fetched from the
                                                  network.
   --recall-nonce                                 ⭮ whether to recall the nonce when creating the transaction (default:
@@ -2033,6 +2063,7 @@ options:
   --sender-wallet-index SENDER_WALLET_INDEX      🔑 the address index; can be used for PEM files, keyfiles of type
                                                  mnemonic or Ledger devices (default: 0)
   --sender-username SENDER_USERNAME              🖄 the username of the sender
+  --hrp HRP                                      The hrp used to convert the address to its bech32 representation
   --nonce NONCE                                  # the nonce for the transaction. If not provided, is fetched from the
                                                  network.
   --recall-nonce                                 ⭮ whether to recall the nonce when creating the transaction (default:
@@ -2088,6 +2119,7 @@ options:
   --sender-wallet-index SENDER_WALLET_INDEX      🔑 the address index; can be used for PEM files, keyfiles of type
                                                  mnemonic or Ledger devices (default: 0)
   --sender-username SENDER_USERNAME              🖄 the username of the sender
+  --hrp HRP                                      The hrp used to convert the address to its bech32 representation
   --nonce NONCE                                  # the nonce for the transaction. If not provided, is fetched from the
                                                  network.
   --recall-nonce                                 ⭮ whether to recall the nonce when creating the transaction (default:
@@ -2143,6 +2175,7 @@ options:
   --sender-wallet-index SENDER_WALLET_INDEX      🔑 the address index; can be used for PEM files, keyfiles of type
                                                  mnemonic or Ledger devices (default: 0)
   --sender-username SENDER_USERNAME              🖄 the username of the sender
+  --hrp HRP                                      The hrp used to convert the address to its bech32 representation
   --nonce NONCE                                  # the nonce for the transaction. If not provided, is fetched from the
                                                  network.
   --recall-nonce                                 ⭮ whether to recall the nonce when creating the transaction (default:
@@ -2199,6 +2232,7 @@ options:
   --sender-wallet-index SENDER_WALLET_INDEX      🔑 the address index; can be used for PEM files, keyfiles of type
                                                  mnemonic or Ledger devices (default: 0)
   --sender-username SENDER_USERNAME              🖄 the username of the sender
+  --hrp HRP                                      The hrp used to convert the address to its bech32 representation
   --nonce NONCE                                  # the nonce for the transaction. If not provided, is fetched from the
                                                  network.
   --recall-nonce                                 ⭮ whether to recall the nonce when creating the transaction (default:
@@ -2255,6 +2289,7 @@ options:
   --sender-wallet-index SENDER_WALLET_INDEX      🔑 the address index; can be used for PEM files, keyfiles of type
                                                  mnemonic or Ledger devices (default: 0)
   --sender-username SENDER_USERNAME              🖄 the username of the sender
+  --hrp HRP                                      The hrp used to convert the address to its bech32 representation
   --nonce NONCE                                  # the nonce for the transaction. If not provided, is fetched from the
                                                  network.
   --recall-nonce                                 ⭮ whether to recall the nonce when creating the transaction (default:
@@ -2312,6 +2347,7 @@ options:
   --sender-wallet-index SENDER_WALLET_INDEX      🔑 the address index; can be used for PEM files, keyfiles of type
                                                  mnemonic or Ledger devices (default: 0)
   --sender-username SENDER_USERNAME              🖄 the username of the sender
+  --hrp HRP                                      The hrp used to convert the address to its bech32 representation
   --nonce NONCE                                  # the nonce for the transaction. If not provided, is fetched from the
                                                  network.
   --recall-nonce                                 ⭮ whether to recall the nonce when creating the transaction (default:
@@ -2369,6 +2405,7 @@ options:
   --sender-wallet-index SENDER_WALLET_INDEX      🔑 the address index; can be used for PEM files, keyfiles of type
                                                  mnemonic or Ledger devices (default: 0)
   --sender-username SENDER_USERNAME              🖄 the username of the sender
+  --hrp HRP                                      The hrp used to convert the address to its bech32 representation
   --nonce NONCE                                  # the nonce for the transaction. If not provided, is fetched from the
                                                  network.
   --recall-nonce                                 ⭮ whether to recall the nonce when creating the transaction (default:
@@ -2510,6 +2547,7 @@ options:
   --sender-wallet-index SENDER_WALLET_INDEX  🔑 the address index; can be used for PEM files, keyfiles of type mnemonic
                                              or Ledger devices (default: 0)
   --sender-username SENDER_USERNAME          🖄 the username of the sender
+  --hrp HRP                                  The hrp used to convert the address to its bech32 representation
 
 ```
 ### Wallet.VerifyMessage
@@ -3030,6 +3068,7 @@ options:
   --sender-wallet-index SENDER_WALLET_INDEX  🔑 the address index; can be used for PEM files, keyfiles of type mnemonic
                                              or Ledger devices (default: 0)
   --sender-username SENDER_USERNAME          🖄 the username of the sender
+  --hrp HRP                                  The hrp used to convert the address to its bech32 representation
   --chain {D,T}                              the chain identifier
   --api API                                  custom api url for the native auth client
   --wallet-url WALLET_URL                    custom wallet url to call the faucet from
