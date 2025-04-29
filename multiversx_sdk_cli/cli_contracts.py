@@ -180,6 +180,14 @@ def setup_parser(args: list[str], subparsers: Any) -> Any:
         help="in case of a multicontract, specify the contract variant you want to verify",
     )
     cli_shared.add_wallet_args(args, sub)
+    sub.add_argument(
+        "--skip-confirmation",
+        "-y",
+        dest="skip_confirmation",
+        action="store_true",
+        default=False,
+        help="can be used to skip the confirmation prompt",
+    )
     sub.set_defaults(func=verify)
 
     sub = cli_shared.add_command_subparser(
@@ -548,12 +556,13 @@ def _send_or_simulate(tx: Transaction, contract_address: Address, args: Any):
 
 
 def verify(args: Any) -> None:
-    response = input(
-        "Are you sure you want to verify the contract? This will publish the contract's source code, which will be displayed on the MultiversX Explorer (y/n): "
-    )
-    if response.lower() != "y":
-        logger.info("Contract verification cancelled.")
-        return
+    if not args.skip_confirmation:
+        response = input(
+            "Are you sure you want to verify the contract? This will publish the contract's source code, which will be displayed on the MultiversX Explorer (y/n): "
+        )
+        if response.lower() != "y":
+            logger.info("Contract verification cancelled.")
+            return
 
     contract = Address.new_from_bech32(args.contract)
     verifier_url = args.verifier_url
