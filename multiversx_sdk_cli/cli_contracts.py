@@ -1,3 +1,4 @@
+import hashlib
 import json
 import logging
 import os
@@ -569,25 +570,28 @@ def verify(args: Any) -> None:
 
 def unverify(args: Any) -> None:
     account = cli_shared.prepare_account(args)
-    contract = args.contract
-    code_hash = args.code_hash
-    verifier_url = f"{args.verifier_url}/verifier"
+    contract: str = args.contract
+    code_hash: str = args.code_hash
+    verifier_url: str = f"{args.verifier_url}/verifier"
 
     payload = {
         "contract": contract,
         "codeHash": code_hash,
     }
 
-    payload_json = json.dumps(payload, separators=(",", ":"))
-    message = Message(payload_json.encode())
-    signature = account.sign_message(message)
+    serialized_payload = json.dumps(payload, separators=(",", ":")).encode("utf-8")
+    hash = hashlib.sha256(serialized_payload).hexdigest()
+    message_to_sign = (contract + hash).encode("utf-8")
+
+    signature = account.sign_message(Message(message_to_sign))
 
     request_payload = {
         "signature": signature.hex(),
-        "payload": payload_json,
+        "payload": payload,
     }
 
-    response = requests.delete(verifier_url, json=request_payload)
+    headers = {"Content-type": "application/json"}
+    response = requests.delete(verifier_url, json=request_payload, headers=headers)
     logger.info(f"Your request to unverify contract {contract} was submitted.")
     print(response.json().get("message"))
 
