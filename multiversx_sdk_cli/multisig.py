@@ -549,6 +549,389 @@ class MultisigWrapper(BaseTransactionsController):
 
         return tx
 
+    def prepare_contract_upgrade_from_source_transaction(
+        self,
+        owner: IAccount,
+        nonce: int,
+        contract: Address,
+        contract_to_upgrade: Address,
+        contract_to_copy: Address,
+        gas_limit: int,
+        gas_price: int,
+        version: int,
+        options: int,
+        upgradeable: bool,
+        readable: bool,
+        payable: bool,
+        payable_by_sc: bool,
+        should_prepare_args: bool,
+        guardian_and_relayer_data: GuardianRelayerData,
+        native_token_amount: int = 0,
+        abi: Optional[Abi] = None,
+        arguments: Optional[list[Any]] = None,
+    ) -> Transaction:
+        args = arguments if arguments else []
+        if should_prepare_args:
+            args = self._prepare_args(args)
+
+        tx = self._factory.create_transaction_for_propose_contract_upgrade_from_source(
+            sender=owner.address,
+            contract=contract,
+            contract_to_upgrade=contract_to_upgrade,
+            contract_to_copy=contract_to_copy,
+            gas_limit=gas_limit,
+            is_upgradeable=upgradeable,
+            is_readable=readable,
+            is_payable=payable,
+            is_payable_by_sc=payable_by_sc,
+            native_token_amount=native_token_amount,
+            abi=abi,
+            arguments=args,
+        )
+        tx.nonce = nonce
+        tx.version = version
+        tx.options = options
+        tx.gas_price = gas_price
+        tx.guardian = guardian_and_relayer_data.guardian_address
+        tx.relayer = guardian_and_relayer_data.relayer_address
+
+        self.sign_transaction(
+            transaction=tx,
+            sender=owner,
+            guardian=guardian_and_relayer_data.guardian,
+            relayer=guardian_and_relayer_data.relayer,
+            guardian_service_url=guardian_and_relayer_data.guardian_service_url,
+            guardian_2fa_code=guardian_and_relayer_data.guardian_2fa_code,
+        )
+
+        return tx
+
+    def prepare_sign_action_transaction(
+        self,
+        owner: IAccount,
+        nonce: int,
+        contract: Address,
+        action_id: int,
+        gas_limit: int,
+        gas_price: int,
+        version: int,
+        options: int,
+        guardian_and_relayer_data: GuardianRelayerData,
+    ) -> Transaction:
+        tx = self._factory.create_transaction_for_sign_action(
+            sender=owner.address,
+            contract=contract,
+            action_id=action_id,
+            gas_limit=gas_limit,
+        )
+        tx.nonce = nonce
+        tx.version = version
+        tx.options = options
+        tx.gas_price = gas_price
+        tx.guardian = guardian_and_relayer_data.guardian_address
+        tx.relayer = guardian_and_relayer_data.relayer_address
+
+        self.sign_transaction(
+            transaction=tx,
+            sender=owner,
+            guardian=guardian_and_relayer_data.guardian,
+            relayer=guardian_and_relayer_data.relayer,
+            guardian_service_url=guardian_and_relayer_data.guardian_service_url,
+            guardian_2fa_code=guardian_and_relayer_data.guardian_2fa_code,
+        )
+
+        return tx
+
+    def prepare_sign_batch_transaction(
+        self,
+        owner: IAccount,
+        nonce: int,
+        contract: Address,
+        batch_id: int,
+        gas_limit: int,
+        gas_price: int,
+        version: int,
+        options: int,
+        guardian_and_relayer_data: GuardianRelayerData,
+    ) -> Transaction:
+        tx = self._factory.create_transaction_for_sign_batch(
+            sender=owner.address,
+            contract=contract,
+            batch_id=batch_id,
+            gas_limit=gas_limit,
+        )
+        tx.nonce = nonce
+        tx.version = version
+        tx.options = options
+        tx.gas_price = gas_price
+        tx.guardian = guardian_and_relayer_data.guardian_address
+        tx.relayer = guardian_and_relayer_data.relayer_address
+
+        self.sign_transaction(
+            transaction=tx,
+            sender=owner,
+            guardian=guardian_and_relayer_data.guardian,
+            relayer=guardian_and_relayer_data.relayer,
+            guardian_service_url=guardian_and_relayer_data.guardian_service_url,
+            guardian_2fa_code=guardian_and_relayer_data.guardian_2fa_code,
+        )
+
+        return tx
+
+    def prepare_sign_and_perform_transaction(
+        self,
+        owner: IAccount,
+        nonce: int,
+        contract: Address,
+        action_id: int,
+        gas_limit: int,
+        gas_price: int,
+        version: int,
+        options: int,
+        guardian_and_relayer_data: GuardianRelayerData,
+    ) -> Transaction:
+        tx = self._factory.create_transaction_for_sign_and_perform(
+            sender=owner.address,
+            contract=contract,
+            action_id=action_id,
+            gas_limit=gas_limit,
+        )
+        tx.nonce = nonce
+        tx.version = version
+        tx.options = options
+        tx.gas_price = gas_price
+        tx.guardian = guardian_and_relayer_data.guardian_address
+        tx.relayer = guardian_and_relayer_data.relayer_address
+
+        self.sign_transaction(
+            transaction=tx,
+            sender=owner,
+            guardian=guardian_and_relayer_data.guardian,
+            relayer=guardian_and_relayer_data.relayer,
+            guardian_service_url=guardian_and_relayer_data.guardian_service_url,
+            guardian_2fa_code=guardian_and_relayer_data.guardian_2fa_code,
+        )
+
+        return tx
+
+    def prepare_sign_batch_and_perform_transaction(
+        self,
+        owner: IAccount,
+        nonce: int,
+        contract: Address,
+        batch_id: int,
+        gas_limit: int,
+        gas_price: int,
+        version: int,
+        options: int,
+        guardian_and_relayer_data: GuardianRelayerData,
+    ) -> Transaction:
+        tx = self._factory.create_transaction_for_sign_batch_and_perform(
+            sender=owner.address,
+            contract=contract,
+            batch_id=batch_id,
+            gas_limit=gas_limit,
+        )
+        tx.nonce = nonce
+        tx.version = version
+        tx.options = options
+        tx.gas_price = gas_price
+        tx.guardian = guardian_and_relayer_data.guardian_address
+        tx.relayer = guardian_and_relayer_data.relayer_address
+
+        self.sign_transaction(
+            transaction=tx,
+            sender=owner,
+            guardian=guardian_and_relayer_data.guardian,
+            relayer=guardian_and_relayer_data.relayer,
+            guardian_service_url=guardian_and_relayer_data.guardian_service_url,
+            guardian_2fa_code=guardian_and_relayer_data.guardian_2fa_code,
+        )
+
+        return tx
+
+    def prepare_unsign_action_transaction(
+        self,
+        owner: IAccount,
+        nonce: int,
+        contract: Address,
+        action_id: int,
+        gas_limit: int,
+        gas_price: int,
+        version: int,
+        options: int,
+        guardian_and_relayer_data: GuardianRelayerData,
+    ) -> Transaction:
+        tx = self._factory.create_transaction_for_unsign_action(
+            sender=owner.address,
+            contract=contract,
+            action_id=action_id,
+            gas_limit=gas_limit,
+        )
+        tx.nonce = nonce
+        tx.version = version
+        tx.options = options
+        tx.gas_price = gas_price
+        tx.guardian = guardian_and_relayer_data.guardian_address
+        tx.relayer = guardian_and_relayer_data.relayer_address
+
+        self.sign_transaction(
+            transaction=tx,
+            sender=owner,
+            guardian=guardian_and_relayer_data.guardian,
+            relayer=guardian_and_relayer_data.relayer,
+            guardian_service_url=guardian_and_relayer_data.guardian_service_url,
+            guardian_2fa_code=guardian_and_relayer_data.guardian_2fa_code,
+        )
+
+        return tx
+
+    def prepare_unsign_batch_transaction(
+        self,
+        owner: IAccount,
+        nonce: int,
+        contract: Address,
+        batch_id: int,
+        gas_limit: int,
+        gas_price: int,
+        version: int,
+        options: int,
+        guardian_and_relayer_data: GuardianRelayerData,
+    ) -> Transaction:
+        tx = self._factory.create_transaction_for_unsign_batch(
+            sender=owner.address,
+            contract=contract,
+            batch_id=batch_id,
+            gas_limit=gas_limit,
+        )
+        tx.nonce = nonce
+        tx.version = version
+        tx.options = options
+        tx.gas_price = gas_price
+        tx.guardian = guardian_and_relayer_data.guardian_address
+        tx.relayer = guardian_and_relayer_data.relayer_address
+
+        self.sign_transaction(
+            transaction=tx,
+            sender=owner,
+            guardian=guardian_and_relayer_data.guardian,
+            relayer=guardian_and_relayer_data.relayer,
+            guardian_service_url=guardian_and_relayer_data.guardian_service_url,
+            guardian_2fa_code=guardian_and_relayer_data.guardian_2fa_code,
+        )
+
+        return tx
+
+    def prepare_unsign_for_outdated_board_members_transaction(
+        self,
+        owner: IAccount,
+        nonce: int,
+        contract: Address,
+        action_id: int,
+        outdated_board_members: list[int],
+        gas_limit: int,
+        gas_price: int,
+        version: int,
+        options: int,
+        guardian_and_relayer_data: GuardianRelayerData,
+    ) -> Transaction:
+        tx = self._factory.create_transaction_for_unsign_for_outdated_board_members(
+            sender=owner.address,
+            contract=contract,
+            action_id=action_id,
+            outdated_board_members=outdated_board_members,
+            gas_limit=gas_limit,
+        )
+        tx.nonce = nonce
+        tx.version = version
+        tx.options = options
+        tx.gas_price = gas_price
+        tx.guardian = guardian_and_relayer_data.guardian_address
+        tx.relayer = guardian_and_relayer_data.relayer_address
+
+        self.sign_transaction(
+            transaction=tx,
+            sender=owner,
+            guardian=guardian_and_relayer_data.guardian,
+            relayer=guardian_and_relayer_data.relayer,
+            guardian_service_url=guardian_and_relayer_data.guardian_service_url,
+            guardian_2fa_code=guardian_and_relayer_data.guardian_2fa_code,
+        )
+
+        return tx
+
+    def prepare_perform_action_transaction(
+        self,
+        owner: IAccount,
+        nonce: int,
+        contract: Address,
+        action_id: int,
+        gas_limit: int,
+        gas_price: int,
+        version: int,
+        options: int,
+        guardian_and_relayer_data: GuardianRelayerData,
+    ) -> Transaction:
+        tx = self._factory.create_transaction_for_perform_action(
+            sender=owner.address,
+            contract=contract,
+            action_id=action_id,
+            gas_limit=gas_limit,
+        )
+        tx.nonce = nonce
+        tx.version = version
+        tx.options = options
+        tx.gas_price = gas_price
+        tx.guardian = guardian_and_relayer_data.guardian_address
+        tx.relayer = guardian_and_relayer_data.relayer_address
+
+        self.sign_transaction(
+            transaction=tx,
+            sender=owner,
+            guardian=guardian_and_relayer_data.guardian,
+            relayer=guardian_and_relayer_data.relayer,
+            guardian_service_url=guardian_and_relayer_data.guardian_service_url,
+            guardian_2fa_code=guardian_and_relayer_data.guardian_2fa_code,
+        )
+
+        return tx
+
+    def prepare_perform_batch_transaction(
+        self,
+        owner: IAccount,
+        nonce: int,
+        contract: Address,
+        batch_id: int,
+        gas_limit: int,
+        gas_price: int,
+        version: int,
+        options: int,
+        guardian_and_relayer_data: GuardianRelayerData,
+    ) -> Transaction:
+        tx = self._factory.create_transaction_for_perform_batch(
+            sender=owner.address,
+            contract=contract,
+            batch_id=batch_id,
+            gas_limit=gas_limit,
+        )
+        tx.nonce = nonce
+        tx.version = version
+        tx.options = options
+        tx.gas_price = gas_price
+        tx.guardian = guardian_and_relayer_data.guardian_address
+        tx.relayer = guardian_and_relayer_data.relayer_address
+
+        self.sign_transaction(
+            transaction=tx,
+            sender=owner,
+            guardian=guardian_and_relayer_data.guardian,
+            relayer=guardian_and_relayer_data.relayer,
+            guardian_service_url=guardian_and_relayer_data.guardian_service_url,
+            guardian_2fa_code=guardian_and_relayer_data.guardian_2fa_code,
+        )
+
+        return tx
+
     def _prepare_args(self, arguments: list[str]) -> list[Any]:
         args: list[Any] = []
 

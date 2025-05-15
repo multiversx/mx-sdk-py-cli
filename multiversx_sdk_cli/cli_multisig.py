@@ -6,6 +6,9 @@ from typing import Any
 from multiversx_sdk import (
     Address,
     AddressComputer,
+    MultisigController,
+    ProxyNetworkProvider,
+    SmartContractController,
     Token,
     TokenComputer,
     TokenTransfer,
@@ -19,6 +22,7 @@ from multiversx_sdk_cli.args_validation import (
     ensure_wallet_args_are_provided,
     validate_broadcast_args,
     validate_chain_id_args,
+    validate_proxy_argument,
     validate_transaction_args,
 )
 from multiversx_sdk_cli.cli_output import CLIOutputBuilder
@@ -452,8 +456,10 @@ def setup_parser(args: list[str], subparsers: Any) -> Any:
     _add_contract_arg(sub)
     _add_abi_arg(sub)
 
-    sub.add_argument("--contract-abi", type=str, help="the ABI file of the contract to call")
+    sub.add_argument("--contract-to-copy", required=True, type=str, help="the bech32 address of the contract to copy")
+    sub.add_argument("--contract-abi", type=str, help="the ABI file of the contract to copy")
     _add_arguments_arg(sub)
+    _add_metadata_arg(sub)
     cli_shared.add_outfile_arg(sub)
     cli_shared.add_wallet_args(args, sub)
     cli_shared.add_proxy_arg(sub)
@@ -475,6 +481,561 @@ def setup_parser(args: list[str], subparsers: Any) -> Any:
     cli_shared.add_relayed_v3_wallet_args(args, sub)
 
     sub.set_defaults(func=deploy_from_source)
+
+    sub = cli_shared.add_command_subparser(
+        subparsers,
+        "multisig",
+        "upgrade-from-source",
+        f"Propose a smart contract upgrade from a previously deployed smart contract.{output_description}",
+    )
+    _add_contract_arg(sub)
+    _add_abi_arg(sub)
+
+    sub.add_argument(
+        "--contract-to-upgrade", required=True, type=str, help="the bech32 address of the contract to upgrade"
+    )
+    sub.add_argument("--contract-to-copy", required=True, type=str, help="the bech32 address of the contract to copy")
+    sub.add_argument("--contract-abi", type=str, help="the ABI file of the contract to copy")
+    _add_arguments_arg(sub)
+    _add_metadata_arg(sub)
+    cli_shared.add_outfile_arg(sub)
+    cli_shared.add_wallet_args(args, sub)
+    cli_shared.add_proxy_arg(sub)
+    cli_shared.add_tx_args(args, sub, with_receiver=False, with_data=False)
+
+    sub.add_argument(
+        "--wait-result",
+        action="store_true",
+        default=False,
+        help="signal to wait for the transaction result - only valid if --send is set",
+    )
+    sub.add_argument(
+        "--timeout",
+        default=100,
+        help="max num of seconds to wait for result" " - only valid if --wait-result is set",
+    )
+    cli_shared.add_broadcast_args(sub)
+    cli_shared.add_guardian_wallet_args(args, sub)
+    cli_shared.add_relayed_v3_wallet_args(args, sub)
+
+    sub.set_defaults(func=upgrade_from_source)
+
+    sub = cli_shared.add_command_subparser(
+        subparsers,
+        "multisig",
+        "sign-action",
+        f"Sign a proposed action.{output_description}",
+    )
+    _add_contract_arg(sub)
+    _add_abi_arg(sub)
+
+    _add_action_id_arg(sub)
+    cli_shared.add_outfile_arg(sub)
+    cli_shared.add_wallet_args(args, sub)
+    cli_shared.add_proxy_arg(sub)
+    cli_shared.add_tx_args(args, sub, with_receiver=False, with_data=False)
+
+    sub.add_argument(
+        "--wait-result",
+        action="store_true",
+        default=False,
+        help="signal to wait for the transaction result - only valid if --send is set",
+    )
+    sub.add_argument(
+        "--timeout",
+        default=100,
+        help="max num of seconds to wait for result" " - only valid if --wait-result is set",
+    )
+    cli_shared.add_broadcast_args(sub)
+    cli_shared.add_guardian_wallet_args(args, sub)
+    cli_shared.add_relayed_v3_wallet_args(args, sub)
+
+    sub.set_defaults(func=sign_action)
+
+    sub = cli_shared.add_command_subparser(
+        subparsers,
+        "multisig",
+        "sign-batch",
+        f"Sign a batch of actions.{output_description}",
+    )
+    _add_contract_arg(sub)
+    _add_abi_arg(sub)
+
+    sub.add_argument("--batch", required=True, type=int, help="the id of the batch to sign")
+    cli_shared.add_outfile_arg(sub)
+    cli_shared.add_wallet_args(args, sub)
+    cli_shared.add_proxy_arg(sub)
+    cli_shared.add_tx_args(args, sub, with_receiver=False, with_data=False)
+
+    sub.add_argument(
+        "--wait-result",
+        action="store_true",
+        default=False,
+        help="signal to wait for the transaction result - only valid if --send is set",
+    )
+    sub.add_argument(
+        "--timeout",
+        default=100,
+        help="max num of seconds to wait for result" " - only valid if --wait-result is set",
+    )
+    cli_shared.add_broadcast_args(sub)
+    cli_shared.add_guardian_wallet_args(args, sub)
+    cli_shared.add_relayed_v3_wallet_args(args, sub)
+
+    sub.set_defaults(func=sign_batch)
+
+    sub = cli_shared.add_command_subparser(
+        subparsers,
+        "multisig",
+        "sign-and-perform",
+        f"Sign a proposed action and perform it. Works only if quorum is reached.{output_description}",
+    )
+    _add_contract_arg(sub)
+    _add_abi_arg(sub)
+
+    _add_action_id_arg(sub)
+    cli_shared.add_outfile_arg(sub)
+    cli_shared.add_wallet_args(args, sub)
+    cli_shared.add_proxy_arg(sub)
+    cli_shared.add_tx_args(args, sub, with_receiver=False, with_data=False)
+
+    sub.add_argument(
+        "--wait-result",
+        action="store_true",
+        default=False,
+        help="signal to wait for the transaction result - only valid if --send is set",
+    )
+    sub.add_argument(
+        "--timeout",
+        default=100,
+        help="max num of seconds to wait for result" " - only valid if --wait-result is set",
+    )
+    cli_shared.add_broadcast_args(sub)
+    cli_shared.add_guardian_wallet_args(args, sub)
+    cli_shared.add_relayed_v3_wallet_args(args, sub)
+
+    sub.set_defaults(func=sign_and_perform)
+
+    sub = cli_shared.add_command_subparser(
+        subparsers,
+        "multisig",
+        "sign-batch-and-perform",
+        f"Sign a batch of actions and perform them. Works only if quorum is reached.{output_description}",
+    )
+    _add_contract_arg(sub)
+    _add_abi_arg(sub)
+
+    sub.add_argument("--batch", required=True, type=int, help="the id of the batch to sign")
+    cli_shared.add_outfile_arg(sub)
+    cli_shared.add_wallet_args(args, sub)
+    cli_shared.add_proxy_arg(sub)
+    cli_shared.add_tx_args(args, sub, with_receiver=False, with_data=False)
+
+    sub.add_argument(
+        "--wait-result",
+        action="store_true",
+        default=False,
+        help="signal to wait for the transaction result - only valid if --send is set",
+    )
+    sub.add_argument(
+        "--timeout",
+        default=100,
+        help="max num of seconds to wait for result" " - only valid if --wait-result is set",
+    )
+    cli_shared.add_broadcast_args(sub)
+    cli_shared.add_guardian_wallet_args(args, sub)
+    cli_shared.add_relayed_v3_wallet_args(args, sub)
+
+    sub.set_defaults(func=sign_batch_and_perform)
+
+    sub = cli_shared.add_command_subparser(
+        subparsers,
+        "multisig",
+        "unsign-action",
+        f"Unsign a proposed action.{output_description}",
+    )
+    _add_contract_arg(sub)
+    _add_abi_arg(sub)
+
+    _add_action_id_arg(sub)
+    cli_shared.add_outfile_arg(sub)
+    cli_shared.add_wallet_args(args, sub)
+    cli_shared.add_proxy_arg(sub)
+    cli_shared.add_tx_args(args, sub, with_receiver=False, with_data=False)
+
+    sub.add_argument(
+        "--wait-result",
+        action="store_true",
+        default=False,
+        help="signal to wait for the transaction result - only valid if --send is set",
+    )
+    sub.add_argument(
+        "--timeout",
+        default=100,
+        help="max num of seconds to wait for result" " - only valid if --wait-result is set",
+    )
+    cli_shared.add_broadcast_args(sub)
+    cli_shared.add_guardian_wallet_args(args, sub)
+    cli_shared.add_relayed_v3_wallet_args(args, sub)
+
+    sub.set_defaults(func=unsign_action)
+
+    sub = cli_shared.add_command_subparser(
+        subparsers,
+        "multisig",
+        "unsign-batch",
+        f"Unsign a batch of actions.{output_description}",
+    )
+    _add_contract_arg(sub)
+    _add_abi_arg(sub)
+
+    sub.add_argument("--batch", required=True, type=int, help="the id of the batch to sign")
+    cli_shared.add_outfile_arg(sub)
+    cli_shared.add_wallet_args(args, sub)
+    cli_shared.add_proxy_arg(sub)
+    cli_shared.add_tx_args(args, sub, with_receiver=False, with_data=False)
+
+    sub.add_argument(
+        "--wait-result",
+        action="store_true",
+        default=False,
+        help="signal to wait for the transaction result - only valid if --send is set",
+    )
+    sub.add_argument(
+        "--timeout",
+        default=100,
+        help="max num of seconds to wait for result" " - only valid if --wait-result is set",
+    )
+    cli_shared.add_broadcast_args(sub)
+    cli_shared.add_guardian_wallet_args(args, sub)
+    cli_shared.add_relayed_v3_wallet_args(args, sub)
+
+    sub.set_defaults(func=unsign_batch)
+
+    sub = cli_shared.add_command_subparser(
+        subparsers,
+        "multisig",
+        "unsign-for-outdated-members",
+        f"Unsign an action for outdated board members.{output_description}",
+    )
+    _add_contract_arg(sub)
+    _add_abi_arg(sub)
+
+    _add_action_id_arg(sub)
+    sub.add_argument(
+        "--outdated-members",
+        nargs="+",
+        type=int,
+        help="IDs of the outdated board members",
+    )
+    cli_shared.add_outfile_arg(sub)
+    cli_shared.add_wallet_args(args, sub)
+    cli_shared.add_proxy_arg(sub)
+    cli_shared.add_tx_args(args, sub, with_receiver=False, with_data=False)
+
+    sub.add_argument(
+        "--wait-result",
+        action="store_true",
+        default=False,
+        help="signal to wait for the transaction result - only valid if --send is set",
+    )
+    sub.add_argument(
+        "--timeout",
+        default=100,
+        help="max num of seconds to wait for result" " - only valid if --wait-result is set",
+    )
+    cli_shared.add_broadcast_args(sub)
+    cli_shared.add_guardian_wallet_args(args, sub)
+    cli_shared.add_relayed_v3_wallet_args(args, sub)
+
+    sub.set_defaults(func=unsign_for_outdated_board_members)
+
+    sub = cli_shared.add_command_subparser(
+        subparsers,
+        "multisig",
+        "perform-action",
+        f"Perform an action that has reached quorum.{output_description}",
+    )
+    _add_contract_arg(sub)
+    _add_abi_arg(sub)
+
+    _add_action_id_arg(sub)
+    cli_shared.add_outfile_arg(sub)
+    cli_shared.add_wallet_args(args, sub)
+    cli_shared.add_proxy_arg(sub)
+    cli_shared.add_tx_args(args, sub, with_receiver=False, with_data=False)
+
+    sub.add_argument(
+        "--wait-result",
+        action="store_true",
+        default=False,
+        help="signal to wait for the transaction result - only valid if --send is set",
+    )
+    sub.add_argument(
+        "--timeout",
+        default=100,
+        help="max num of seconds to wait for result" " - only valid if --wait-result is set",
+    )
+    cli_shared.add_broadcast_args(sub)
+    cli_shared.add_guardian_wallet_args(args, sub)
+    cli_shared.add_relayed_v3_wallet_args(args, sub)
+
+    sub.set_defaults(func=perform_action)
+
+    sub = cli_shared.add_command_subparser(
+        subparsers,
+        "multisig",
+        "perform-batch",
+        f"Perform a batch of actions that has reached quorum.{output_description}",
+    )
+    _add_contract_arg(sub)
+    _add_abi_arg(sub)
+
+    sub.add_argument("--batch", required=True, type=int, help="the id of the batch to sign")
+    cli_shared.add_outfile_arg(sub)
+    cli_shared.add_wallet_args(args, sub)
+    cli_shared.add_proxy_arg(sub)
+    cli_shared.add_tx_args(args, sub, with_receiver=False, with_data=False)
+
+    sub.add_argument(
+        "--wait-result",
+        action="store_true",
+        default=False,
+        help="signal to wait for the transaction result - only valid if --send is set",
+    )
+    sub.add_argument(
+        "--timeout",
+        default=100,
+        help="max num of seconds to wait for result" " - only valid if --wait-result is set",
+    )
+    cli_shared.add_broadcast_args(sub)
+    cli_shared.add_guardian_wallet_args(args, sub)
+    cli_shared.add_relayed_v3_wallet_args(args, sub)
+
+    sub.set_defaults(func=perform_batch)
+
+    sub = cli_shared.add_command_subparser(
+        subparsers,
+        "multisig",
+        "get-quorum",
+        f"Perform a smart contract query to get the quorum.{output_description}",
+    )
+    _add_contract_arg(sub)
+    _add_abi_arg(sub)
+    cli_shared.add_proxy_arg(sub)
+
+    sub.set_defaults(func=get_quorum)
+
+    sub = cli_shared.add_command_subparser(
+        subparsers,
+        "multisig",
+        "get-num-board-members",
+        f"Perform a smart contract query to get the number of board members.{output_description}",
+    )
+    _add_contract_arg(sub)
+    _add_abi_arg(sub)
+    cli_shared.add_proxy_arg(sub)
+
+    sub.set_defaults(func=get_num_board_members)
+
+    sub = cli_shared.add_command_subparser(
+        subparsers,
+        "multisig",
+        "get-num-groups",
+        f"Perform a smart contract query to get the number of groups.{output_description}",
+    )
+    _add_contract_arg(sub)
+    _add_abi_arg(sub)
+    cli_shared.add_proxy_arg(sub)
+
+    sub.set_defaults(func=get_num_groups)
+
+    sub = cli_shared.add_command_subparser(
+        subparsers,
+        "multisig",
+        "get-num-proposers",
+        f"Perform a smart contract query to get the number of proposers.{output_description}",
+    )
+    _add_contract_arg(sub)
+    _add_abi_arg(sub)
+    cli_shared.add_proxy_arg(sub)
+
+    sub.set_defaults(func=get_num_proposers)
+
+    sub = cli_shared.add_command_subparser(
+        subparsers,
+        "multisig",
+        "get-action-group",
+        f"Perform a smart contract query to get the actions in a group.{output_description}",
+    )
+    _add_contract_arg(sub)
+    _add_abi_arg(sub)
+    sub.add_argument("--group", required=True, type=int, help="the group id")
+    cli_shared.add_proxy_arg(sub)
+
+    sub.set_defaults(func=get_action_group)
+
+    sub = cli_shared.add_command_subparser(
+        subparsers,
+        "multisig",
+        "get-last-action-group-id",
+        f"Perform a smart contract query to get the id of the last action in a group.{output_description}",
+    )
+    _add_contract_arg(sub)
+    _add_abi_arg(sub)
+    cli_shared.add_proxy_arg(sub)
+
+    sub.set_defaults(func=get_last_group_action_id)
+
+    sub = cli_shared.add_command_subparser(
+        subparsers,
+        "multisig",
+        "get-action-last-index",
+        f"Perform a smart contract query to get the index of the last action.{output_description}",
+    )
+    _add_contract_arg(sub)
+    _add_abi_arg(sub)
+    cli_shared.add_proxy_arg(sub)
+
+    sub.set_defaults(func=get_action_last_index)
+
+    sub = cli_shared.add_command_subparser(
+        subparsers,
+        "multisig",
+        "is-signed-by",
+        f"Perform a smart contract query to check if an action is signed by a user.{output_description}",
+    )
+    _add_contract_arg(sub)
+    _add_abi_arg(sub)
+    _add_action_id_arg(sub)
+    sub.add_argument("--user", required=True, type=str, help="the bech32 address of the user")
+    cli_shared.add_proxy_arg(sub)
+
+    sub.set_defaults(func=is_signed_by)
+
+    sub = cli_shared.add_command_subparser(
+        subparsers,
+        "multisig",
+        "is-quorum-reached",
+        f"Perform a smart contract query to check if an action has reached quorum.{output_description}",
+    )
+    _add_contract_arg(sub)
+    _add_abi_arg(sub)
+    _add_action_id_arg(sub)
+    cli_shared.add_proxy_arg(sub)
+
+    sub.set_defaults(func=is_quorum_reached)
+
+    sub = cli_shared.add_command_subparser(
+        subparsers,
+        "multisig",
+        "get-pending-actions",
+        f"Perform a smart contract query to get the pending actions full info.{output_description}",
+    )
+    _add_contract_arg(sub)
+    _add_abi_arg(sub)
+    cli_shared.add_proxy_arg(sub)
+
+    sub.set_defaults(func=get_pending_actions_full_info)
+
+    sub = cli_shared.add_command_subparser(
+        subparsers,
+        "multisig",
+        "get-user-role",
+        f"Perform a smart contract query to get the role of a user.{output_description}",
+    )
+    _add_contract_arg(sub)
+    _add_abi_arg(sub)
+    sub.add_argument("--user", required=True, type=str, help="the bech32 address of the user")
+    cli_shared.add_proxy_arg(sub)
+
+    sub.set_defaults(func=get_user_role)
+
+    sub = cli_shared.add_command_subparser(
+        subparsers,
+        "multisig",
+        "get-board-members",
+        f"Perform a smart contract query to get all the board members.{output_description}",
+    )
+    _add_contract_arg(sub)
+    _add_abi_arg(sub)
+    cli_shared.add_proxy_arg(sub)
+
+    sub.set_defaults(func=get_all_board_members)
+
+    sub = cli_shared.add_command_subparser(
+        subparsers,
+        "multisig",
+        "get-proposers",
+        f"Perform a smart contract query to get all the proposers.{output_description}",
+    )
+    _add_contract_arg(sub)
+    _add_abi_arg(sub)
+    cli_shared.add_proxy_arg(sub)
+
+    sub.set_defaults(func=get_all_proposers)
+
+    sub = cli_shared.add_command_subparser(
+        subparsers,
+        "multisig",
+        "get-action-data",
+        f"Perform a smart contract query to get the data of an action.{output_description}",
+    )
+    _add_contract_arg(sub)
+    _add_abi_arg(sub)
+    _add_action_id_arg(sub)
+    cli_shared.add_proxy_arg(sub)
+
+    sub.set_defaults(func=get_action_data)
+
+    sub = cli_shared.add_command_subparser(
+        subparsers,
+        "multisig",
+        "get-action-signers",
+        f"Perform a smart contract query to get the signers of an action.{output_description}",
+    )
+    _add_contract_arg(sub)
+    _add_abi_arg(sub)
+    _add_action_id_arg(sub)
+    cli_shared.add_proxy_arg(sub)
+
+    sub = cli_shared.add_command_subparser(
+        subparsers,
+        "multisig",
+        "get-action-signers-count",
+        f"Perform a smart contract query to get the number of signers of an action.{output_description}",
+    )
+    _add_contract_arg(sub)
+    _add_abi_arg(sub)
+    _add_action_id_arg(sub)
+    cli_shared.add_proxy_arg(sub)
+
+    sub.set_defaults(func=get_action_signer_count)
+
+    sub = cli_shared.add_command_subparser(
+        subparsers,
+        "multisig",
+        "get-action-valid-signers-count",
+        f"Perform a smart contract query to get the number of valid signers of an action.{output_description}",
+    )
+    _add_contract_arg(sub)
+    _add_abi_arg(sub)
+    _add_action_id_arg(sub)
+    cli_shared.add_proxy_arg(sub)
+
+    sub.set_defaults(func=get_action_valid_signer_count)
+
+    sub = cli_shared.add_command_subparser(
+        subparsers,
+        "multisig",
+        "parse-propose-action",
+        f"Parses the propose action transaction to extract proposal ID.{output_description}",
+    )
+    _add_abi_arg(sub)
+    sub.add_argument("--hash", required=True, type=str, help="the transaction hash of the propose action")
+    cli_shared.add_proxy_arg(sub)
+
+    sub.set_defaults(func=parse_proposal)
 
     parser.epilog = cli_shared.build_group_epilog(subparsers)
     return subparsers
@@ -609,7 +1170,10 @@ def deposit(args: Any):
 
     contract = Address.new_from_bech32(args.contract)
     native_amount = int(args.value)
-    token_transfers = _prepare_token_transfers(args.token_transfers)
+
+    token_transfers = args.token_transfers or None
+    if token_transfers:
+        token_transfers = _prepare_token_transfers(token_transfers)
 
     tx = multisig.prepare_deposit_transaction(
         owner=sender,
@@ -973,51 +1537,660 @@ def async_call(args: Any):
 
 
 def deploy_from_source(args: Any):
-    pass
-    # validate_transaction_args(args)
-    # ensure_wallet_args_are_provided(args)
-    # validate_broadcast_args(args)
-    # validate_chain_id_args(args)
+    validate_transaction_args(args)
+    ensure_wallet_args_are_provided(args)
+    validate_broadcast_args(args)
+    validate_chain_id_args(args)
 
-    # sender = cli_shared.prepare_sender(args)
-    # guardian_and_relayer_data = cli_shared.get_guardian_and_relayer_data(
-    #     sender=sender.address.to_bech32(),
-    #     args=args,
-    # )
+    sender = cli_shared.prepare_sender(args)
+    guardian_and_relayer_data = cli_shared.get_guardian_and_relayer_data(
+        sender=sender.address.to_bech32(),
+        args=args,
+    )
 
-    # abi = Abi.load(Path(args.abi))
-    # chain_id = cli_shared.get_chain_id(args.chain, args.proxy)
-    # multisig = MultisigWrapper(TransactionsFactoryConfig(chain_id), abi)
+    abi = Abi.load(Path(args.abi))
+    chain_id = cli_shared.get_chain_id(args.chain, args.proxy)
+    multisig = MultisigWrapper(TransactionsFactoryConfig(chain_id), abi)
 
-    # contract = Address.new_from_bech32(args.contract)
+    contract = Address.new_from_bech32(args.contract)
+    contract_to_copy = Address.new_from_bech32(args.contract_to_copy)
 
-    # receiver = Address.new_from_bech32(args.receiver)
-    # opt_gas_limit = int(args.opt_gas_limit) if args.opt_gas_limit else None
-    # function = args.function if args.function else None
-    # contract_abi = Abi.load(Path(args.contract_abi)) if args.contract_abi else None
-    # arguments, should_prepare_args = _get_contract_arguments(args)
-    # token_transfers = _prepare_token_transfers(args.token_transfers)
+    contract_abi = Abi.load(Path(args.contract_abi)) if args.contract_abi else None
+    arguments, should_prepare_args = _get_contract_arguments(args)
 
-    # tx = multisig.prepare_async_call_transaction(
-    #     owner=sender,
-    #     nonce=sender.nonce,
-    #     contract=contract,
-    #     receiver=receiver,
-    #     gas_limit=int(args.gas_limit),
-    #     gas_price=int(args.gas_price),
-    #     version=int(args.version),
-    #     options=int(args.options),
-    #     should_prepare_args=should_prepare_args,
-    #     guardian_and_relayer_data=guardian_and_relayer_data,
-    #     native_token_amount=int(args.value),
-    #     token_transfers=token_transfers,
-    #     opt_gas_limit=opt_gas_limit,
-    #     function=function,
-    #     abi=contract_abi,
-    #     arguments=arguments,
-    # )
+    tx = multisig.prepare_contract_deploy_from_source_transaction(
+        owner=sender,
+        nonce=sender.nonce,
+        contract=contract,
+        contract_to_copy=contract_to_copy,
+        gas_limit=int(args.gas_limit),
+        gas_price=int(args.gas_price),
+        version=int(args.version),
+        options=int(args.options),
+        upgradeable=args.metadata_upgradeable,
+        readable=args.metadata_readable,
+        payable=args.metadata_payable,
+        payable_by_sc=args.metadata_payable_by_sc,
+        should_prepare_args=should_prepare_args,
+        guardian_and_relayer_data=guardian_and_relayer_data,
+        native_token_amount=int(args.value),
+        abi=contract_abi,
+        arguments=arguments,
+    )
 
-    # _send_or_simulate(tx, contract, args)
+    _send_or_simulate(tx, contract, args)
+
+
+def upgrade_from_source(args: Any):
+    validate_transaction_args(args)
+    ensure_wallet_args_are_provided(args)
+    validate_broadcast_args(args)
+    validate_chain_id_args(args)
+
+    sender = cli_shared.prepare_sender(args)
+    guardian_and_relayer_data = cli_shared.get_guardian_and_relayer_data(
+        sender=sender.address.to_bech32(),
+        args=args,
+    )
+
+    abi = Abi.load(Path(args.abi))
+    chain_id = cli_shared.get_chain_id(args.chain, args.proxy)
+    multisig = MultisigWrapper(TransactionsFactoryConfig(chain_id), abi)
+
+    contract = Address.new_from_bech32(args.contract)
+    contract_to_upgrade = Address.new_from_bech32(args.contract_to_upgrade)
+    contract_to_copy = Address.new_from_bech32(args.contract_to_copy)
+
+    contract_abi = Abi.load(Path(args.contract_abi)) if args.contract_abi else None
+    arguments, should_prepare_args = _get_contract_arguments(args)
+
+    tx = multisig.prepare_contract_upgrade_from_source_transaction(
+        owner=sender,
+        nonce=sender.nonce,
+        contract=contract,
+        contract_to_upgrade=contract_to_upgrade,
+        contract_to_copy=contract_to_copy,
+        gas_limit=int(args.gas_limit),
+        gas_price=int(args.gas_price),
+        version=int(args.version),
+        options=int(args.options),
+        upgradeable=args.metadata_upgradeable,
+        readable=args.metadata_readable,
+        payable=args.metadata_payable,
+        payable_by_sc=args.metadata_payable_by_sc,
+        should_prepare_args=should_prepare_args,
+        guardian_and_relayer_data=guardian_and_relayer_data,
+        native_token_amount=int(args.value),
+        abi=contract_abi,
+        arguments=arguments,
+    )
+
+    _send_or_simulate(tx, contract, args)
+
+
+def sign_action(args: Any):
+    validate_transaction_args(args)
+    ensure_wallet_args_are_provided(args)
+    validate_broadcast_args(args)
+    validate_chain_id_args(args)
+
+    sender = cli_shared.prepare_sender(args)
+    guardian_and_relayer_data = cli_shared.get_guardian_and_relayer_data(
+        sender=sender.address.to_bech32(),
+        args=args,
+    )
+
+    abi = Abi.load(Path(args.abi))
+    chain_id = cli_shared.get_chain_id(args.chain, args.proxy)
+    multisig = MultisigWrapper(TransactionsFactoryConfig(chain_id), abi)
+
+    contract = Address.new_from_bech32(args.contract)
+    action_id = int(args.action)
+
+    tx = multisig.prepare_sign_action_transaction(
+        owner=sender,
+        nonce=sender.nonce,
+        contract=contract,
+        action_id=action_id,
+        gas_limit=int(args.gas_limit),
+        gas_price=int(args.gas_price),
+        version=int(args.version),
+        options=int(args.options),
+        guardian_and_relayer_data=guardian_and_relayer_data,
+    )
+
+    _send_or_simulate(tx, contract, args)
+
+
+def sign_batch(args: Any):
+    validate_transaction_args(args)
+    ensure_wallet_args_are_provided(args)
+    validate_broadcast_args(args)
+    validate_chain_id_args(args)
+
+    sender = cli_shared.prepare_sender(args)
+    guardian_and_relayer_data = cli_shared.get_guardian_and_relayer_data(
+        sender=sender.address.to_bech32(),
+        args=args,
+    )
+
+    abi = Abi.load(Path(args.abi))
+    chain_id = cli_shared.get_chain_id(args.chain, args.proxy)
+    multisig = MultisigWrapper(TransactionsFactoryConfig(chain_id), abi)
+
+    contract = Address.new_from_bech32(args.contract)
+    batch_id = int(args.batch)
+
+    tx = multisig.prepare_sign_batch_transaction(
+        owner=sender,
+        nonce=sender.nonce,
+        contract=contract,
+        batch_id=batch_id,
+        gas_limit=int(args.gas_limit),
+        gas_price=int(args.gas_price),
+        version=int(args.version),
+        options=int(args.options),
+        guardian_and_relayer_data=guardian_and_relayer_data,
+    )
+
+    _send_or_simulate(tx, contract, args)
+
+
+def sign_and_perform(args: Any):
+    validate_transaction_args(args)
+    ensure_wallet_args_are_provided(args)
+    validate_broadcast_args(args)
+    validate_chain_id_args(args)
+
+    sender = cli_shared.prepare_sender(args)
+    guardian_and_relayer_data = cli_shared.get_guardian_and_relayer_data(
+        sender=sender.address.to_bech32(),
+        args=args,
+    )
+
+    abi = Abi.load(Path(args.abi))
+    chain_id = cli_shared.get_chain_id(args.chain, args.proxy)
+    multisig = MultisigWrapper(TransactionsFactoryConfig(chain_id), abi)
+
+    contract = Address.new_from_bech32(args.contract)
+    action_id = int(args.action)
+
+    tx = multisig.prepare_sign_and_perform_transaction(
+        owner=sender,
+        nonce=sender.nonce,
+        contract=contract,
+        action_id=action_id,
+        gas_limit=int(args.gas_limit),
+        gas_price=int(args.gas_price),
+        version=int(args.version),
+        options=int(args.options),
+        guardian_and_relayer_data=guardian_and_relayer_data,
+    )
+
+    _send_or_simulate(tx, contract, args)
+
+
+def sign_batch_and_perform(args: Any):
+    validate_transaction_args(args)
+    ensure_wallet_args_are_provided(args)
+    validate_broadcast_args(args)
+    validate_chain_id_args(args)
+
+    sender = cli_shared.prepare_sender(args)
+    guardian_and_relayer_data = cli_shared.get_guardian_and_relayer_data(
+        sender=sender.address.to_bech32(),
+        args=args,
+    )
+
+    abi = Abi.load(Path(args.abi))
+    chain_id = cli_shared.get_chain_id(args.chain, args.proxy)
+    multisig = MultisigWrapper(TransactionsFactoryConfig(chain_id), abi)
+
+    contract = Address.new_from_bech32(args.contract)
+    batch_id = int(args.batch)
+
+    tx = multisig.prepare_sign_batch_and_perform_transaction(
+        owner=sender,
+        nonce=sender.nonce,
+        contract=contract,
+        batch_id=batch_id,
+        gas_limit=int(args.gas_limit),
+        gas_price=int(args.gas_price),
+        version=int(args.version),
+        options=int(args.options),
+        guardian_and_relayer_data=guardian_and_relayer_data,
+    )
+
+    _send_or_simulate(tx, contract, args)
+
+
+def unsign_action(args: Any):
+    validate_transaction_args(args)
+    ensure_wallet_args_are_provided(args)
+    validate_broadcast_args(args)
+    validate_chain_id_args(args)
+
+    sender = cli_shared.prepare_sender(args)
+    guardian_and_relayer_data = cli_shared.get_guardian_and_relayer_data(
+        sender=sender.address.to_bech32(),
+        args=args,
+    )
+
+    abi = Abi.load(Path(args.abi))
+    chain_id = cli_shared.get_chain_id(args.chain, args.proxy)
+    multisig = MultisigWrapper(TransactionsFactoryConfig(chain_id), abi)
+
+    contract = Address.new_from_bech32(args.contract)
+    action_id = int(args.action)
+
+    tx = multisig.prepare_unsign_action_transaction(
+        owner=sender,
+        nonce=sender.nonce,
+        contract=contract,
+        action_id=action_id,
+        gas_limit=int(args.gas_limit),
+        gas_price=int(args.gas_price),
+        version=int(args.version),
+        options=int(args.options),
+        guardian_and_relayer_data=guardian_and_relayer_data,
+    )
+
+    _send_or_simulate(tx, contract, args)
+
+
+def unsign_batch(args: Any):
+    validate_transaction_args(args)
+    ensure_wallet_args_are_provided(args)
+    validate_broadcast_args(args)
+    validate_chain_id_args(args)
+
+    sender = cli_shared.prepare_sender(args)
+    guardian_and_relayer_data = cli_shared.get_guardian_and_relayer_data(
+        sender=sender.address.to_bech32(),
+        args=args,
+    )
+
+    abi = Abi.load(Path(args.abi))
+    chain_id = cli_shared.get_chain_id(args.chain, args.proxy)
+    multisig = MultisigWrapper(TransactionsFactoryConfig(chain_id), abi)
+
+    contract = Address.new_from_bech32(args.contract)
+    batch_id = int(args.batch)
+
+    tx = multisig.prepare_unsign_batch_transaction(
+        owner=sender,
+        nonce=sender.nonce,
+        contract=contract,
+        batch_id=batch_id,
+        gas_limit=int(args.gas_limit),
+        gas_price=int(args.gas_price),
+        version=int(args.version),
+        options=int(args.options),
+        guardian_and_relayer_data=guardian_and_relayer_data,
+    )
+
+    _send_or_simulate(tx, contract, args)
+
+
+def unsign_for_outdated_board_members(args: Any):
+    validate_transaction_args(args)
+    ensure_wallet_args_are_provided(args)
+    validate_broadcast_args(args)
+    validate_chain_id_args(args)
+
+    sender = cli_shared.prepare_sender(args)
+    guardian_and_relayer_data = cli_shared.get_guardian_and_relayer_data(
+        sender=sender.address.to_bech32(),
+        args=args,
+    )
+
+    abi = Abi.load(Path(args.abi))
+    chain_id = cli_shared.get_chain_id(args.chain, args.proxy)
+    multisig = MultisigWrapper(TransactionsFactoryConfig(chain_id), abi)
+
+    contract = Address.new_from_bech32(args.contract)
+    action_id = int(args.action)
+
+    tx = multisig.prepare_unsign_for_outdated_board_members_transaction(
+        owner=sender,
+        nonce=sender.nonce,
+        contract=contract,
+        action_id=action_id,
+        outdated_board_members=args.outdated_members,
+        gas_limit=int(args.gas_limit),
+        gas_price=int(args.gas_price),
+        version=int(args.version),
+        options=int(args.options),
+        guardian_and_relayer_data=guardian_and_relayer_data,
+    )
+
+    _send_or_simulate(tx, contract, args)
+
+
+def perform_action(args: Any):
+    validate_transaction_args(args)
+    ensure_wallet_args_are_provided(args)
+    validate_broadcast_args(args)
+    validate_chain_id_args(args)
+
+    sender = cli_shared.prepare_sender(args)
+    guardian_and_relayer_data = cli_shared.get_guardian_and_relayer_data(
+        sender=sender.address.to_bech32(),
+        args=args,
+    )
+
+    abi = Abi.load(Path(args.abi))
+    chain_id = cli_shared.get_chain_id(args.chain, args.proxy)
+    multisig = MultisigWrapper(TransactionsFactoryConfig(chain_id), abi)
+
+    contract = Address.new_from_bech32(args.contract)
+    action_id = int(args.action)
+
+    tx = multisig.prepare_perform_action_transaction(
+        owner=sender,
+        nonce=sender.nonce,
+        contract=contract,
+        action_id=action_id,
+        gas_limit=int(args.gas_limit),
+        gas_price=int(args.gas_price),
+        version=int(args.version),
+        options=int(args.options),
+        guardian_and_relayer_data=guardian_and_relayer_data,
+    )
+
+    _send_or_simulate(tx, contract, args)
+
+
+def perform_batch(args: Any):
+    validate_transaction_args(args)
+    ensure_wallet_args_are_provided(args)
+    validate_broadcast_args(args)
+    validate_chain_id_args(args)
+
+    sender = cli_shared.prepare_sender(args)
+    guardian_and_relayer_data = cli_shared.get_guardian_and_relayer_data(
+        sender=sender.address.to_bech32(),
+        args=args,
+    )
+
+    abi = Abi.load(Path(args.abi))
+    chain_id = cli_shared.get_chain_id(args.chain, args.proxy)
+    multisig = MultisigWrapper(TransactionsFactoryConfig(chain_id), abi)
+
+    contract = Address.new_from_bech32(args.contract)
+    batch_id = int(args.batch)
+
+    tx = multisig.prepare_perform_batch_transaction(
+        owner=sender,
+        nonce=sender.nonce,
+        contract=contract,
+        batch_id=batch_id,
+        gas_limit=int(args.gas_limit),
+        gas_price=int(args.gas_price),
+        version=int(args.version),
+        options=int(args.options),
+        guardian_and_relayer_data=guardian_and_relayer_data,
+    )
+
+    _send_or_simulate(tx, contract, args)
+
+
+def get_quorum(args: Any):
+    validate_proxy_argument(args)
+
+    abi = Abi.load(Path(args.abi))
+    proxy = ProxyNetworkProvider(args.proxy)
+    chain_id = proxy.get_network_config().chain_id
+    multisig = MultisigController(chain_id, proxy, abi)
+
+    quorum = multisig.get_quorum(Address.new_from_bech32(args.contract))
+    print(f"Quorum: {quorum}")
+
+
+def get_num_board_members(args: Any):
+    validate_proxy_argument(args)
+
+    abi = Abi.load(Path(args.abi))
+    proxy = ProxyNetworkProvider(args.proxy)
+    chain_id = proxy.get_network_config().chain_id
+    multisig = MultisigController(chain_id, proxy, abi)
+
+    num_board_members = multisig.get_num_board_members(Address.new_from_bech32(args.contract))
+    print(f"Number of board members: {num_board_members}")
+
+
+def get_num_groups(args: Any):
+    validate_proxy_argument(args)
+
+    abi = Abi.load(Path(args.abi))
+    proxy = ProxyNetworkProvider(args.proxy)
+    chain_id = proxy.get_network_config().chain_id
+    multisig = MultisigController(chain_id, proxy, abi)
+
+    num_groups = multisig.get_num_groups(Address.new_from_bech32(args.contract))
+    print(f"Number of groups: {num_groups}")
+
+
+def get_num_proposers(args: Any):
+    validate_proxy_argument(args)
+
+    abi = Abi.load(Path(args.abi))
+    proxy = ProxyNetworkProvider(args.proxy)
+    chain_id = proxy.get_network_config().chain_id
+    multisig = MultisigController(chain_id, proxy, abi)
+
+    num_proposers = multisig.get_num_proposers(Address.new_from_bech32(args.contract))
+    print(f"Number of proposers: {num_proposers}")
+
+
+def get_action_group(args: Any):
+    validate_proxy_argument(args)
+
+    abi = Abi.load(Path(args.abi))
+    proxy = ProxyNetworkProvider(args.proxy)
+    chain_id = proxy.get_network_config().chain_id
+    multisig = MultisigController(chain_id, proxy, abi)
+
+    actions = multisig.get_action_group(Address.new_from_bech32(args.contract), args.group)
+    print(f"Actions: [{actions}]")
+
+
+def get_last_group_action_id(args: Any):
+    validate_proxy_argument(args)
+
+    abi = Abi.load(Path(args.abi))
+    proxy = ProxyNetworkProvider(args.proxy)
+    chain_id = proxy.get_network_config().chain_id
+    multisig = MultisigController(chain_id, proxy, abi)
+
+    id = multisig.get_last_group_action_id(Address.new_from_bech32(args.contract))
+    print(f"Last group action id: {id}")
+
+
+def get_action_last_index(args: Any):
+    validate_proxy_argument(args)
+
+    abi = Abi.load(Path(args.abi))
+    proxy = ProxyNetworkProvider(args.proxy)
+    chain_id = proxy.get_network_config().chain_id
+    multisig = MultisigController(chain_id, proxy, abi)
+
+    id = multisig.get_action_last_index(Address.new_from_bech32(args.contract))
+    print(f"Action last index: {id}")
+
+
+def is_signed_by(args: Any):
+    validate_proxy_argument(args)
+
+    abi = Abi.load(Path(args.abi))
+    proxy = ProxyNetworkProvider(args.proxy)
+    chain_id = proxy.get_network_config().chain_id
+    multisig = MultisigController(chain_id, proxy, abi)
+
+    contract = Address.new_from_bech32(args.contract)
+    action_id = int(args.action)
+    user = Address.new_from_bech32(args.user)
+
+    is_signed = multisig.is_signed_by(contract, user, action_id)
+    print(f"Action {action_id} is signed by {user.to_bech32()}: {is_signed}")
+
+
+def is_quorum_reached(args: Any):
+    validate_proxy_argument(args)
+
+    abi = Abi.load(Path(args.abi))
+    proxy = ProxyNetworkProvider(args.proxy)
+    chain_id = proxy.get_network_config().chain_id
+    multisig = MultisigController(chain_id, proxy, abi)
+
+    contract = Address.new_from_bech32(args.contract)
+    action_id = int(args.action)
+
+    is_quorum_reached = multisig.is_quorum_reached(contract, action_id)
+    print(f"Quorum reached for action {action_id}: {is_quorum_reached}")
+
+
+def get_pending_actions_full_info(args: Any):
+    validate_proxy_argument(args)
+
+    abi = Abi.load(Path(args.abi))
+    proxy = ProxyNetworkProvider(args.proxy)
+    chain_id = proxy.get_network_config().chain_id
+    controller = SmartContractController(chain_id, proxy, abi)
+
+    contract = Address.new_from_bech32(args.contract)
+    [values] = controller.query(
+        contract=contract,
+        function="getPendingActionFullInfo",
+        arguments=[None],
+    )
+
+    print(values)
+
+
+def get_user_role(args: Any):
+    validate_proxy_argument(args)
+
+    abi = Abi.load(Path(args.abi))
+    proxy = ProxyNetworkProvider(args.proxy)
+    chain_id = proxy.get_network_config().chain_id
+    multisig = MultisigController(chain_id, proxy, abi)
+
+    contract = Address.new_from_bech32(args.contract)
+    user = Address.new_from_bech32(args.user)
+
+    role = multisig.get_user_role(contract, user)
+    print(f"User {user.to_bech32()} has role: {role.name}")
+
+
+def get_all_board_members(args: Any):
+    validate_proxy_argument(args)
+
+    abi = Abi.load(Path(args.abi))
+    proxy = ProxyNetworkProvider(args.proxy)
+    chain_id = proxy.get_network_config().chain_id
+    multisig = MultisigController(chain_id, proxy, abi)
+
+    contract = Address.new_from_bech32(args.contract)
+
+    board_members = multisig.get_all_board_members(contract)
+    print("Board members:")
+    for member in board_members:
+        print(f" - {member.to_bech32()}")
+
+
+def get_all_proposers(args: Any):
+    validate_proxy_argument(args)
+
+    abi = Abi.load(Path(args.abi))
+    proxy = ProxyNetworkProvider(args.proxy)
+    chain_id = proxy.get_network_config().chain_id
+    multisig = MultisigController(chain_id, proxy, abi)
+
+    contract = Address.new_from_bech32(args.contract)
+
+    proposers = multisig.get_all_proposers(contract)
+    print("Proposers:")
+    for proposer in proposers:
+        print(f" - {proposer.to_bech32()}")
+
+
+def get_action_data(args: Any):
+    validate_proxy_argument(args)
+
+    abi = Abi.load(Path(args.abi))
+    proxy = ProxyNetworkProvider(args.proxy)
+    chain_id = proxy.get_network_config().chain_id
+    controller = SmartContractController(chain_id, proxy, abi)
+
+    contract = Address.new_from_bech32(args.contract)
+    action = args.action
+
+    [value] = controller.query(
+        contract=contract,
+        function="getActionData",
+        arguments=[action],
+    )
+    print(value)
+
+
+def get_action_signers(args: Any):
+    validate_proxy_argument(args)
+
+    abi = Abi.load(Path(args.abi))
+    proxy = ProxyNetworkProvider(args.proxy)
+    chain_id = proxy.get_network_config().chain_id
+    multisig = MultisigController(chain_id, proxy, abi)
+
+    contract = Address.new_from_bech32(args.contract)
+    action = args.action
+
+    signers = multisig.get_action_signers(contract, action)
+    print(f"Signers for action {action}:")
+    for signer in signers:
+        print(f" - {signer.to_bech32()}")
+
+
+def get_action_signer_count(args: Any):
+    validate_proxy_argument(args)
+
+    abi = Abi.load(Path(args.abi))
+    proxy = ProxyNetworkProvider(args.proxy)
+    chain_id = proxy.get_network_config().chain_id
+    multisig = MultisigController(chain_id, proxy, abi)
+
+    contract = Address.new_from_bech32(args.contract)
+    action = args.action
+
+    signers = multisig.get_action_signer_count(contract, action)
+    print(f"{signers} signers for action {action}:")
+
+
+def get_action_valid_signer_count(args: Any):
+    validate_proxy_argument(args)
+
+    abi = Abi.load(Path(args.abi))
+    proxy = ProxyNetworkProvider(args.proxy)
+    chain_id = proxy.get_network_config().chain_id
+    multisig = MultisigController(chain_id, proxy, abi)
+
+    contract = Address.new_from_bech32(args.contract)
+    action = args.action
+
+    signers = multisig.get_action_valid_signer_count(contract, action)
+    print(f"{signers} valid signers for action {action}:")
+
+
+def parse_proposal(args: Any):
+    validate_proxy_argument(args)
+
+    abi = Abi.load(Path(args.abi))
+    proxy = ProxyNetworkProvider(args.proxy)
+    chain_id = proxy.get_network_config().chain_id
+    multisig = MultisigController(chain_id, proxy, abi)
+
+    id = multisig.await_completed_execute_propose_any(args.hash)
+    print(f"Proposal ID: {id}")
 
 
 def _get_contract_arguments(args: Any) -> tuple[list[Any], bool]:
