@@ -8,7 +8,6 @@ from multiversx_sdk import (
     AddressComputer,
     MultisigController,
     ProxyNetworkProvider,
-    SmartContractController,
     Token,
     TokenComputer,
     TokenTransfer,
@@ -26,6 +25,7 @@ from multiversx_sdk_cli.args_validation import (
     validate_transaction_args,
 )
 from multiversx_sdk_cli.cli_output import CLIOutputBuilder
+from multiversx_sdk_cli.config import get_config_for_network_providers
 from multiversx_sdk_cli.constants import NUMBER_OF_SHARDS
 from multiversx_sdk_cli.multisig import MultisigWrapper
 
@@ -999,6 +999,8 @@ def setup_parser(args: list[str], subparsers: Any) -> Any:
     _add_action_id_arg(sub)
     cli_shared.add_proxy_arg(sub)
 
+    sub.set_defaults(func=get_action_signers)
+
     sub = cli_shared.add_command_subparser(
         subparsers,
         "multisig",
@@ -1449,6 +1451,9 @@ def transfer_and_execute_esdt(args: Any):
     if int(args.value) != 0:
         raise Exception("Native token transfer is not allowed for this command.")
 
+    if not args.token_transfers:
+        raise Exception("Token transfers not provided.")
+
     sender = cli_shared.prepare_sender(args)
     guardian_and_relayer_data = cli_shared.get_guardian_and_relayer_data(
         sender=sender.address.to_bech32(),
@@ -1512,7 +1517,10 @@ def async_call(args: Any):
     function = args.function if args.function else None
     contract_abi = Abi.load(Path(args.contract_abi)) if args.contract_abi else None
     arguments, should_prepare_args = _get_contract_arguments(args)
-    token_transfers = _prepare_token_transfers(args.token_transfers)
+
+    token_transfers = args.token_transfers or None
+    if token_transfers:
+        token_transfers = _prepare_token_transfers(args.token_transfers)
 
     tx = multisig.prepare_async_call_transaction(
         owner=sender,
@@ -1939,7 +1947,8 @@ def get_quorum(args: Any):
     validate_proxy_argument(args)
 
     abi = Abi.load(Path(args.abi))
-    proxy = ProxyNetworkProvider(args.proxy)
+    config = get_config_for_network_providers()
+    proxy = ProxyNetworkProvider(url=args.proxy, config=config)
     chain_id = proxy.get_network_config().chain_id
     multisig = MultisigController(chain_id, proxy, abi)
 
@@ -1951,7 +1960,8 @@ def get_num_board_members(args: Any):
     validate_proxy_argument(args)
 
     abi = Abi.load(Path(args.abi))
-    proxy = ProxyNetworkProvider(args.proxy)
+    config = get_config_for_network_providers()
+    proxy = ProxyNetworkProvider(url=args.proxy, config=config)
     chain_id = proxy.get_network_config().chain_id
     multisig = MultisigController(chain_id, proxy, abi)
 
@@ -1963,7 +1973,8 @@ def get_num_groups(args: Any):
     validate_proxy_argument(args)
 
     abi = Abi.load(Path(args.abi))
-    proxy = ProxyNetworkProvider(args.proxy)
+    config = get_config_for_network_providers()
+    proxy = ProxyNetworkProvider(url=args.proxy, config=config)
     chain_id = proxy.get_network_config().chain_id
     multisig = MultisigController(chain_id, proxy, abi)
 
@@ -1975,7 +1986,8 @@ def get_num_proposers(args: Any):
     validate_proxy_argument(args)
 
     abi = Abi.load(Path(args.abi))
-    proxy = ProxyNetworkProvider(args.proxy)
+    config = get_config_for_network_providers()
+    proxy = ProxyNetworkProvider(url=args.proxy, config=config)
     chain_id = proxy.get_network_config().chain_id
     multisig = MultisigController(chain_id, proxy, abi)
 
@@ -1987,7 +1999,8 @@ def get_action_group(args: Any):
     validate_proxy_argument(args)
 
     abi = Abi.load(Path(args.abi))
-    proxy = ProxyNetworkProvider(args.proxy)
+    config = get_config_for_network_providers()
+    proxy = ProxyNetworkProvider(url=args.proxy, config=config)
     chain_id = proxy.get_network_config().chain_id
     multisig = MultisigController(chain_id, proxy, abi)
 
@@ -1999,7 +2012,8 @@ def get_last_group_action_id(args: Any):
     validate_proxy_argument(args)
 
     abi = Abi.load(Path(args.abi))
-    proxy = ProxyNetworkProvider(args.proxy)
+    config = get_config_for_network_providers()
+    proxy = ProxyNetworkProvider(url=args.proxy, config=config)
     chain_id = proxy.get_network_config().chain_id
     multisig = MultisigController(chain_id, proxy, abi)
 
@@ -2011,7 +2025,8 @@ def get_action_last_index(args: Any):
     validate_proxy_argument(args)
 
     abi = Abi.load(Path(args.abi))
-    proxy = ProxyNetworkProvider(args.proxy)
+    config = get_config_for_network_providers()
+    proxy = ProxyNetworkProvider(url=args.proxy, config=config)
     chain_id = proxy.get_network_config().chain_id
     multisig = MultisigController(chain_id, proxy, abi)
 
@@ -2023,7 +2038,8 @@ def is_signed_by(args: Any):
     validate_proxy_argument(args)
 
     abi = Abi.load(Path(args.abi))
-    proxy = ProxyNetworkProvider(args.proxy)
+    config = get_config_for_network_providers()
+    proxy = ProxyNetworkProvider(url=args.proxy, config=config)
     chain_id = proxy.get_network_config().chain_id
     multisig = MultisigController(chain_id, proxy, abi)
 
@@ -2039,7 +2055,8 @@ def is_quorum_reached(args: Any):
     validate_proxy_argument(args)
 
     abi = Abi.load(Path(args.abi))
-    proxy = ProxyNetworkProvider(args.proxy)
+    config = get_config_for_network_providers()
+    proxy = ProxyNetworkProvider(url=args.proxy, config=config)
     chain_id = proxy.get_network_config().chain_id
     multisig = MultisigController(chain_id, proxy, abi)
 
@@ -2051,19 +2068,17 @@ def is_quorum_reached(args: Any):
 
 
 def get_pending_actions_full_info(args: Any):
+    # TODO: needs fix
     validate_proxy_argument(args)
 
     abi = Abi.load(Path(args.abi))
-    proxy = ProxyNetworkProvider(args.proxy)
+    config = get_config_for_network_providers()
+    proxy = ProxyNetworkProvider(url=args.proxy, config=config)
     chain_id = proxy.get_network_config().chain_id
-    controller = SmartContractController(chain_id, proxy, abi)
-
     contract = Address.new_from_bech32(args.contract)
-    [values] = controller.query(
-        contract=contract,
-        function="getPendingActionFullInfo",
-        arguments=[None],
-    )
+
+    controller = MultisigController(chain_id, proxy, abi)
+    values = controller.get_pending_actions_full_info(contract)
 
     print(values)
 
@@ -2072,7 +2087,8 @@ def get_user_role(args: Any):
     validate_proxy_argument(args)
 
     abi = Abi.load(Path(args.abi))
-    proxy = ProxyNetworkProvider(args.proxy)
+    config = get_config_for_network_providers()
+    proxy = ProxyNetworkProvider(url=args.proxy, config=config)
     chain_id = proxy.get_network_config().chain_id
     multisig = MultisigController(chain_id, proxy, abi)
 
@@ -2087,50 +2103,56 @@ def get_all_board_members(args: Any):
     validate_proxy_argument(args)
 
     abi = Abi.load(Path(args.abi))
-    proxy = ProxyNetworkProvider(args.proxy)
+    config = get_config_for_network_providers()
+    proxy = ProxyNetworkProvider(url=args.proxy, config=config)
     chain_id = proxy.get_network_config().chain_id
     multisig = MultisigController(chain_id, proxy, abi)
 
     contract = Address.new_from_bech32(args.contract)
 
     board_members = multisig.get_all_board_members(contract)
-    print("Board members:")
-    for member in board_members:
-        print(f" - {member.to_bech32()}")
+    if not board_members:
+        print(None)
+    else:
+        print("Board members:")
+        for member in board_members:
+            print(f" - {member.to_bech32()}")
 
 
 def get_all_proposers(args: Any):
     validate_proxy_argument(args)
 
     abi = Abi.load(Path(args.abi))
-    proxy = ProxyNetworkProvider(args.proxy)
+    config = get_config_for_network_providers()
+    proxy = ProxyNetworkProvider(url=args.proxy, config=config)
     chain_id = proxy.get_network_config().chain_id
     multisig = MultisigController(chain_id, proxy, abi)
 
     contract = Address.new_from_bech32(args.contract)
 
     proposers = multisig.get_all_proposers(contract)
-    print("Proposers:")
-    for proposer in proposers:
-        print(f" - {proposer.to_bech32()}")
+    if not proposers:
+        print(None)
+    else:
+        print("Proposers:")
+        for proposer in proposers:
+            print(f" - {proposer.to_bech32()}")
 
 
 def get_action_data(args: Any):
+    # TODO: needs fix
     validate_proxy_argument(args)
 
     abi = Abi.load(Path(args.abi))
-    proxy = ProxyNetworkProvider(args.proxy)
+    config = get_config_for_network_providers()
+    proxy = ProxyNetworkProvider(url=args.proxy, config=config)
     chain_id = proxy.get_network_config().chain_id
-    controller = SmartContractController(chain_id, proxy, abi)
+    controller = MultisigController(chain_id, proxy, abi)
 
     contract = Address.new_from_bech32(args.contract)
     action = args.action
 
-    [value] = controller.query(
-        contract=contract,
-        function="getActionData",
-        arguments=[action],
-    )
+    value = controller.get_action_data(contract=contract, action_id=action)
     print(value)
 
 
@@ -2138,7 +2160,8 @@ def get_action_signers(args: Any):
     validate_proxy_argument(args)
 
     abi = Abi.load(Path(args.abi))
-    proxy = ProxyNetworkProvider(args.proxy)
+    config = get_config_for_network_providers()
+    proxy = ProxyNetworkProvider(url=args.proxy, config=config)
     chain_id = proxy.get_network_config().chain_id
     multisig = MultisigController(chain_id, proxy, abi)
 
@@ -2155,7 +2178,8 @@ def get_action_signer_count(args: Any):
     validate_proxy_argument(args)
 
     abi = Abi.load(Path(args.abi))
-    proxy = ProxyNetworkProvider(args.proxy)
+    config = get_config_for_network_providers()
+    proxy = ProxyNetworkProvider(url=args.proxy, config=config)
     chain_id = proxy.get_network_config().chain_id
     multisig = MultisigController(chain_id, proxy, abi)
 
@@ -2170,7 +2194,8 @@ def get_action_valid_signer_count(args: Any):
     validate_proxy_argument(args)
 
     abi = Abi.load(Path(args.abi))
-    proxy = ProxyNetworkProvider(args.proxy)
+    config = get_config_for_network_providers()
+    proxy = ProxyNetworkProvider(url=args.proxy, config=config)
     chain_id = proxy.get_network_config().chain_id
     multisig = MultisigController(chain_id, proxy, abi)
 
@@ -2185,7 +2210,8 @@ def parse_proposal(args: Any):
     validate_proxy_argument(args)
 
     abi = Abi.load(Path(args.abi))
-    proxy = ProxyNetworkProvider(args.proxy)
+    config = get_config_for_network_providers()
+    proxy = ProxyNetworkProvider(url=args.proxy, config=config)
     chain_id = proxy.get_network_config().chain_id
     multisig = MultisigController(chain_id, proxy, abi)
 

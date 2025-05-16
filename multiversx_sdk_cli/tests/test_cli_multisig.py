@@ -12,6 +12,7 @@ multisig_abi = testdata / "multisig.abi.json"
 contract_address = "erd1qqqqqqqqqqqqqpgqe832k3l6d02ww7l9cvqum25539nmmdxa9ncsdutjuf"
 contract_address_hex = "00000000000000000500c9e2ab47fa6bd4e77be5c301cdaa948967bdb4dd2cf1"
 bob = "erd1spyavw0956vq68xj8y4tenjpq2wd5a9p2c6j8gsz7ztyrnpxrruqzu66jx"
+adder_abi = testdata / "adder.abi.json"
 
 
 def test_deploy_multisig(capsys: Any):
@@ -295,6 +296,655 @@ def test_remove_user(capsys: Any):
     data = tx["data"]
     data = base64.b64decode(data).decode()
     assert data == "proposeRemoveUser@8049d639e5a6980d1cd2392abcce41029cda74a1563523a202f09641cc2618f8"
+
+
+def test_change_quorum(capsys: Any):
+    return_code = main(
+        [
+            "multisig",
+            "change-quorum",
+            "--contract",
+            str(contract_address),
+            "--abi",
+            str(multisig_abi),
+            "--quorum",
+            "10",
+            "--pem",
+            str(user),
+            "--nonce",
+            "0",
+            "--gas-limit",
+            "60000000",
+            "--chain",
+            "D",
+        ]
+    )
+    assert not return_code
+    tx = get_transaction(capsys)
+
+    assert tx["sender"] == user_address
+    assert tx["receiver"] == contract_address
+    assert tx["value"] == "0"
+    assert tx["gasLimit"] == 60_000_000
+    assert tx["chainID"] == "D"
+    data = tx["data"]
+    data = base64.b64decode(data).decode()
+    assert data == "proposeChangeQuorum@0a"
+
+
+def test_transfer_and_execute_with_abi(capsys: Any):
+    return_code = main(
+        [
+            "multisig",
+            "transfer-and-execute",
+            "--contract",
+            str(contract_address),
+            "--abi",
+            str(multisig_abi),
+            "--opt-gas-limit",
+            "1000000",
+            "--contract-abi",
+            str(adder_abi),
+            "--function",
+            "add",
+            "--arguments",
+            "7",
+            "--receiver",
+            "erd1qqqqqqqqqqqqqpgq0rffvv4vk9vesqplv9ws55fxzdfaspqa8cfszy2hms",
+            "--value",
+            "1000000000000000000",
+            "--pem",
+            str(user),
+            "--nonce",
+            "0",
+            "--gas-limit",
+            "60000000",
+            "--chain",
+            "D",
+        ]
+    )
+    assert not return_code
+    tx = get_transaction(capsys)
+
+    assert tx["sender"] == user_address
+    assert tx["receiver"] == contract_address
+    assert tx["value"] == "0"
+    assert tx["gasLimit"] == 60_000_000
+    assert tx["chainID"] == "D"
+    data = tx["data"]
+    data = base64.b64decode(data).decode()
+    assert (
+        data
+        == "proposeTransferExecute@0000000000000000050078d29632acb15998003f615d0a51261353d8041d3e13@0de0b6b3a7640000@0100000000000f4240@616464@07"
+    )
+
+
+def test_transfer_and_execute_without_abi(capsys: Any):
+    return_code = main(
+        [
+            "multisig",
+            "transfer-and-execute",
+            "--contract",
+            str(contract_address),
+            "--abi",
+            str(multisig_abi),
+            "--opt-gas-limit",
+            "1000000",
+            "--function",
+            "add",
+            "--arguments",
+            "0x07",
+            "--receiver",
+            "erd1qqqqqqqqqqqqqpgq0rffvv4vk9vesqplv9ws55fxzdfaspqa8cfszy2hms",
+            "--value",
+            "1000000000000000000",
+            "--pem",
+            str(user),
+            "--nonce",
+            "0",
+            "--gas-limit",
+            "60000000",
+            "--chain",
+            "D",
+        ]
+    )
+    assert not return_code
+    tx = get_transaction(capsys)
+
+    assert tx["sender"] == user_address
+    assert tx["receiver"] == contract_address
+    assert tx["value"] == "0"
+    assert tx["gasLimit"] == 60_000_000
+    assert tx["chainID"] == "D"
+    data = tx["data"]
+    data = base64.b64decode(data).decode()
+    assert (
+        data
+        == "proposeTransferExecute@0000000000000000050078d29632acb15998003f615d0a51261353d8041d3e13@0de0b6b3a7640000@0100000000000f4240@616464@07"
+    )
+
+
+def test_transfer_and_execute_without_execute(capsys: Any):
+    return_code = main(
+        [
+            "multisig",
+            "transfer-and-execute",
+            "--contract",
+            str(contract_address),
+            "--abi",
+            str(multisig_abi),
+            "--receiver",
+            "erd1qqqqqqqqqqqqqpgq0rffvv4vk9vesqplv9ws55fxzdfaspqa8cfszy2hms",
+            "--value",
+            "1000000000000000000",
+            "--pem",
+            str(user),
+            "--nonce",
+            "0",
+            "--gas-limit",
+            "60000000",
+            "--chain",
+            "D",
+        ]
+    )
+    assert not return_code
+    tx = get_transaction(capsys)
+
+    assert tx["sender"] == user_address
+    assert tx["receiver"] == contract_address
+    assert tx["value"] == "0"
+    assert tx["gasLimit"] == 60_000_000
+    assert tx["chainID"] == "D"
+    data = tx["data"]
+    data = base64.b64decode(data).decode()
+    assert (
+        data
+        == "proposeTransferExecute@0000000000000000050078d29632acb15998003f615d0a51261353d8041d3e13@0de0b6b3a7640000@"
+    )
+
+
+def test_transfer_and_execute_esdt(capsys: Any):
+    return_code = main(
+        [
+            "multisig",
+            "transfer-and-execute-esdt",
+            "--contract",
+            str(contract_address),
+            "--abi",
+            str(multisig_abi),
+            "--token-transfers",
+            "ALICE-5627f1",
+            "10",
+            "--opt-gas-limit",
+            "5000000",
+            "--function",
+            "distribute",
+            "--receiver",
+            "erd1qqqqqqqqqqqqqpgqfxlljcaalgl2qfcnxcsftheju0ts36kvl3ts3qkewe",
+            "--pem",
+            str(user),
+            "--nonce",
+            "0",
+            "--gas-limit",
+            "60000000",
+            "--chain",
+            "D",
+        ]
+    )
+    assert not return_code
+    tx = get_transaction(capsys)
+
+    assert tx["sender"] == user_address
+    assert tx["receiver"] == contract_address
+    assert tx["value"] == "0"
+    assert tx["gasLimit"] == 60_000_000
+    assert tx["chainID"] == "D"
+    data = tx["data"]
+    data = base64.b64decode(data).decode()
+    assert (
+        data
+        == "proposeTransferExecuteEsdt@0000000000000000050049bff963bdfa3ea02713362095df32e3d708eaccfc57@0000000c414c4943452d3536323766310000000000000000000000010a@0100000000004c4b40@3634363937333734373236393632373537343635"
+    )
+
+
+def test_async_call(capsys: Any):
+    return_code = main(
+        [
+            "multisig",
+            "async-call",
+            "--contract",
+            str(contract_address),
+            "--abi",
+            str(multisig_abi),
+            "--opt-gas-limit",
+            "5000000",
+            "--contract-abi",
+            str(adder_abi),
+            "--function",
+            "add",
+            "--arguments",
+            "7",
+            "--receiver",
+            "erd1qqqqqqqqqqqqqpgqdvmhpxxmwv2vfz3sfpggzfyl5qznuz5x05vq5y37ql",
+            "--pem",
+            str(user),
+            "--nonce",
+            "0",
+            "--gas-limit",
+            "60000000",
+            "--chain",
+            "D",
+        ]
+    )
+    assert not return_code
+    tx = get_transaction(capsys)
+
+    assert tx["sender"] == user_address
+    assert tx["receiver"] == contract_address
+    assert tx["value"] == "0"
+    assert tx["gasLimit"] == 60_000_000
+    assert tx["chainID"] == "D"
+    data = tx["data"]
+    data = base64.b64decode(data).decode()
+    assert (
+        data
+        == "proposeAsyncCall@000000000000000005006b377098db7314c48a30485081249fa0053e0a867d18@@0100000000004c4b40@616464@07"
+    )
+
+
+def test_sc_deploy_from_source(capsys: Any):
+    return_code = main(
+        [
+            "multisig",
+            "deploy-from-source",
+            "--contract",
+            str(contract_address),
+            "--abi",
+            str(multisig_abi),
+            "--contract-to-copy",
+            "erd1qqqqqqqqqqqqqpgqsuxsgykwm6r3s5apct2g5a2rcpe7kw0ed8ssf6h9f6",
+            "--contract-abi",
+            str(adder_abi),
+            "--arguments",
+            "0",
+            "--pem",
+            str(user),
+            "--nonce",
+            "0",
+            "--gas-limit",
+            "60000000",
+            "--chain",
+            "D",
+            "--value",
+            "50000000000000000",
+        ]
+    )
+    assert not return_code
+    tx = get_transaction(capsys)
+
+    assert tx["sender"] == user_address
+    assert tx["receiver"] == contract_address
+    assert tx["value"] == "0"
+    assert tx["gasLimit"] == 60_000_000
+    assert tx["chainID"] == "D"
+    data = tx["data"]
+    data = base64.b64decode(data).decode()
+    assert (
+        data
+        == "proposeSCDeployFromSource@b1a2bc2ec50000@00000000000000000500870d0412cede871853a1c2d48a7543c073eb39f969e1@0500@"
+    )
+
+
+def test_sc_upgrade_from_source(capsys: Any):
+    return_code = main(
+        [
+            "multisig",
+            "upgrade-from-source",
+            "--contract",
+            str(contract_address),
+            "--abi",
+            str(multisig_abi),
+            "--contract-to-upgrade",
+            "erd1qqqqqqqqqqqqqpgqsuxsgykwm6r3s5apct2g5a2rcpe7kw0ed8ssf6h9f6",
+            "--contract-to-copy",
+            "erd1qqqqqqqqqqqqqpgqsuxsgykwm6r3s5apct2g5a2rcpe7kw0ed8ssf6h9f6",
+            "--arguments",
+            "0x00",
+            "--pem",
+            str(user),
+            "--nonce",
+            "0",
+            "--gas-limit",
+            "60000000",
+            "--chain",
+            "D",
+            "--value",
+            "50000000000000000",
+        ]
+    )
+    assert not return_code
+    tx = get_transaction(capsys)
+
+    assert tx["sender"] == user_address
+    assert tx["receiver"] == contract_address
+    assert tx["value"] == "0"
+    assert tx["gasLimit"] == 60_000_000
+    assert tx["chainID"] == "D"
+    data = tx["data"]
+    data = base64.b64decode(data).decode()
+    assert (
+        data
+        == "proposeSCUpgradeFromSource@00000000000000000500870d0412cede871853a1c2d48a7543c073eb39f969e1@b1a2bc2ec50000@00000000000000000500870d0412cede871853a1c2d48a7543c073eb39f969e1@0500@00"
+    )
+
+
+def test_sign_action(capsys: Any):
+    return_code = main(
+        [
+            "multisig",
+            "sign-action",
+            "--contract",
+            str(contract_address),
+            "--abi",
+            str(multisig_abi),
+            "--action",
+            "7",
+            "--pem",
+            str(user),
+            "--nonce",
+            "0",
+            "--gas-limit",
+            "1000000",
+            "--chain",
+            "D",
+        ]
+    )
+    assert not return_code
+    tx = get_transaction(capsys)
+
+    assert tx["sender"] == user_address
+    assert tx["receiver"] == contract_address
+    assert tx["value"] == "0"
+    assert tx["gasLimit"] == 1_000_000
+    assert tx["chainID"] == "D"
+    data = tx["data"]
+    data = base64.b64decode(data).decode()
+    assert data == "sign@07"
+
+
+def test_sign_batch(capsys: Any):
+    return_code = main(
+        [
+            "multisig",
+            "sign-batch",
+            "--contract",
+            str(contract_address),
+            "--abi",
+            str(multisig_abi),
+            "--batch",
+            "7",
+            "--pem",
+            str(user),
+            "--nonce",
+            "0",
+            "--gas-limit",
+            "1000000",
+            "--chain",
+            "D",
+        ]
+    )
+    assert not return_code
+    tx = get_transaction(capsys)
+
+    assert tx["sender"] == user_address
+    assert tx["receiver"] == contract_address
+    assert tx["value"] == "0"
+    assert tx["gasLimit"] == 1_000_000
+    assert tx["chainID"] == "D"
+    data = tx["data"]
+    data = base64.b64decode(data).decode()
+    assert data == "signBatch@07"
+
+
+def test_sign_and_perform(capsys: Any):
+    return_code = main(
+        [
+            "multisig",
+            "sign-and-perform",
+            "--contract",
+            str(contract_address),
+            "--abi",
+            str(multisig_abi),
+            "--action",
+            "7",
+            "--pem",
+            str(user),
+            "--nonce",
+            "0",
+            "--gas-limit",
+            "1000000",
+            "--chain",
+            "D",
+        ]
+    )
+    assert not return_code
+    tx = get_transaction(capsys)
+
+    assert tx["sender"] == user_address
+    assert tx["receiver"] == contract_address
+    assert tx["value"] == "0"
+    assert tx["gasLimit"] == 1_000_000
+    assert tx["chainID"] == "D"
+    data = tx["data"]
+    data = base64.b64decode(data).decode()
+    assert data == "signAndPerform@07"
+
+
+def test_sign_batch_and_perform(capsys: Any):
+    return_code = main(
+        [
+            "multisig",
+            "sign-batch-and-perform",
+            "--contract",
+            str(contract_address),
+            "--abi",
+            str(multisig_abi),
+            "--batch",
+            "7",
+            "--pem",
+            str(user),
+            "--nonce",
+            "0",
+            "--gas-limit",
+            "1000000",
+            "--chain",
+            "D",
+        ]
+    )
+    assert not return_code
+    tx = get_transaction(capsys)
+
+    assert tx["sender"] == user_address
+    assert tx["receiver"] == contract_address
+    assert tx["value"] == "0"
+    assert tx["gasLimit"] == 1_000_000
+    assert tx["chainID"] == "D"
+    data = tx["data"]
+    data = base64.b64decode(data).decode()
+    assert data == "signBatchAndPerform@07"
+
+
+def test_unsign_action(capsys: Any):
+    return_code = main(
+        [
+            "multisig",
+            "unsign-action",
+            "--contract",
+            str(contract_address),
+            "--abi",
+            str(multisig_abi),
+            "--action",
+            "7",
+            "--pem",
+            str(user),
+            "--nonce",
+            "0",
+            "--gas-limit",
+            "1000000",
+            "--chain",
+            "D",
+        ]
+    )
+    assert not return_code
+    tx = get_transaction(capsys)
+
+    assert tx["sender"] == user_address
+    assert tx["receiver"] == contract_address
+    assert tx["value"] == "0"
+    assert tx["gasLimit"] == 1_000_000
+    assert tx["chainID"] == "D"
+    data = tx["data"]
+    data = base64.b64decode(data).decode()
+    assert data == "unsign@07"
+
+
+def test_unsign_batch(capsys: Any):
+    return_code = main(
+        [
+            "multisig",
+            "unsign-batch",
+            "--contract",
+            str(contract_address),
+            "--abi",
+            str(multisig_abi),
+            "--batch",
+            "7",
+            "--pem",
+            str(user),
+            "--nonce",
+            "0",
+            "--gas-limit",
+            "1000000",
+            "--chain",
+            "D",
+        ]
+    )
+    assert not return_code
+    tx = get_transaction(capsys)
+
+    assert tx["sender"] == user_address
+    assert tx["receiver"] == contract_address
+    assert tx["value"] == "0"
+    assert tx["gasLimit"] == 1_000_000
+    assert tx["chainID"] == "D"
+    data = tx["data"]
+    data = base64.b64decode(data).decode()
+    assert data == "unsignBatch@07"
+
+
+def test_unsign_for_outdated_board_members(capsys: Any):
+    return_code = main(
+        [
+            "multisig",
+            "unsign-for-outdated-members",
+            "--contract",
+            str(contract_address),
+            "--abi",
+            str(multisig_abi),
+            "--action",
+            "7",
+            "--outdated-members",
+            "1",
+            "2",
+            "--pem",
+            str(user),
+            "--nonce",
+            "0",
+            "--gas-limit",
+            "1000000",
+            "--chain",
+            "D",
+        ]
+    )
+    assert not return_code
+    tx = get_transaction(capsys)
+
+    assert tx["sender"] == user_address
+    assert tx["receiver"] == contract_address
+    assert tx["value"] == "0"
+    assert tx["gasLimit"] == 1_000_000
+    assert tx["chainID"] == "D"
+    data = tx["data"]
+    data = base64.b64decode(data).decode()
+    assert data == "unsignForOutdatedBoardMembers@07@01@02"
+
+
+def test_perform_action(capsys: Any):
+    return_code = main(
+        [
+            "multisig",
+            "perform-action",
+            "--contract",
+            str(contract_address),
+            "--abi",
+            str(multisig_abi),
+            "--action",
+            "7",
+            "--pem",
+            str(user),
+            "--nonce",
+            "0",
+            "--gas-limit",
+            "1000000",
+            "--chain",
+            "D",
+        ]
+    )
+    assert not return_code
+    tx = get_transaction(capsys)
+
+    assert tx["sender"] == user_address
+    assert tx["receiver"] == contract_address
+    assert tx["value"] == "0"
+    assert tx["gasLimit"] == 1_000_000
+    assert tx["chainID"] == "D"
+    data = tx["data"]
+    data = base64.b64decode(data).decode()
+    assert data == "performAction@07"
+
+
+def test_perform_batch(capsys: Any):
+    return_code = main(
+        [
+            "multisig",
+            "perform-batch",
+            "--contract",
+            str(contract_address),
+            "--abi",
+            str(multisig_abi),
+            "--batch",
+            "7",
+            "--pem",
+            str(user),
+            "--nonce",
+            "0",
+            "--gas-limit",
+            "1000000",
+            "--chain",
+            "D",
+        ]
+    )
+    assert not return_code
+    tx = get_transaction(capsys)
+
+    assert tx["sender"] == user_address
+    assert tx["receiver"] == contract_address
+    assert tx["value"] == "0"
+    assert tx["gasLimit"] == 1_000_000
+    assert tx["chainID"] == "D"
+    data = tx["data"]
+    data = base64.b64decode(data).decode()
+    assert data == "performBatch@07"
 
 
 def _read_stdout(capsys: Any) -> str:
