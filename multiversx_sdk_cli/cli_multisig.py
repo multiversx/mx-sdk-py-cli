@@ -4,10 +4,24 @@ from pathlib import Path
 from typing import Any
 
 from multiversx_sdk import (
+    Action,
+    ActionFullInfo,
+    AddBoardMember,
+    AddProposer,
     Address,
     AddressComputer,
+    CallActionData,
+    ChangeQuorum,
+    EsdtTokenPayment,
+    EsdtTransferExecuteData,
     MultisigController,
     ProxyNetworkProvider,
+    RemoveUser,
+    SCDeployFromSource,
+    SCUpgradeFromSource,
+    SendAsyncCall,
+    SendTransferExecuteEgld,
+    SendTransferExecuteEsdt,
     Token,
     TokenComputer,
     TokenTransfer,
@@ -2068,7 +2082,6 @@ def is_quorum_reached(args: Any):
 
 
 def get_pending_actions_full_info(args: Any):
-    # TODO: needs fix
     validate_proxy_argument(args)
 
     abi = Abi.load(Path(args.abi))
@@ -2078,9 +2091,10 @@ def get_pending_actions_full_info(args: Any):
     contract = Address.new_from_bech32(args.contract)
 
     controller = MultisigController(chain_id, proxy, abi)
-    values = controller.get_pending_actions_full_info(contract)
+    actions = controller.get_pending_actions_full_info(contract)
 
-    print(values)
+    output = [_convert_action_full_info_to_dict(action) for action in actions]
+    utils.dump_out_json(output)
 
 
 def get_user_role(args: Any):
@@ -2140,7 +2154,6 @@ def get_all_proposers(args: Any):
 
 
 def get_action_data(args: Any):
-    # TODO: needs fix
     validate_proxy_argument(args)
 
     abi = Abi.load(Path(args.abi))
@@ -2152,8 +2165,8 @@ def get_action_data(args: Any):
     contract = Address.new_from_bech32(args.contract)
     action = args.action
 
-    value = controller.get_action_data(contract=contract, action_id=action)
-    print(value)
+    action_data = controller.get_action_data(contract=contract, action_id=action)
+    utils.dump_out_json(_convert_action_to_dict(action_data))
 
 
 def get_action_signers(args: Any):
@@ -2254,3 +2267,145 @@ def _send_or_simulate(tx: Transaction, contract_address: Address, args: Any):
     output_builder = cli_shared.send_or_simulate(tx, args, dump_output=False)
     output_builder.set_contract_address(contract_address)
     utils.dump_out_json(output_builder.build(), outfile=args.outfile)
+
+
+def _convert_action_to_dict(action: Action) -> dict[str, Any]:
+    if isinstance(action, AddBoardMember):
+        return _convert_add_board_member_to_dict(action)
+    elif isinstance(action, AddProposer):
+        return _convert_add_proposer_to_dict(action)
+    elif isinstance(action, RemoveUser):
+        return _convert_remove_user_to_dict(action)
+    elif isinstance(action, ChangeQuorum):
+        return _convert_change_quorum_to_dict(action)
+    elif isinstance(action, SendTransferExecuteEgld):
+        return _convert_send_transfer_execute_egld_to_dict(action)
+    elif isinstance(action, SendTransferExecuteEsdt):
+        return _convert_send_transfer_execute_esdt_to_dict(action)
+    elif isinstance(action, SendAsyncCall):
+        return _convert_send_async_call_to_dict(action)
+    elif isinstance(action, SCDeployFromSource):
+        return _convert_sc_deploy_from_source_to_dict(action)
+    elif isinstance(action, SCUpgradeFromSource):
+        return _convert_sc_upgrade_from_source_to_dict(action)
+    else:
+        raise Exception(f"Unknown action type: {type(action)}")
+
+
+def _convert_add_board_member_to_dict(action: AddBoardMember) -> dict[str, Any]:
+    return {
+        "type": "AddBoardMember",
+        "discriminant": action.discriminant,
+        "address": action.address.to_bech32(),
+    }
+
+
+def _convert_add_proposer_to_dict(action: AddProposer) -> dict[str, Any]:
+    return {
+        "type": "AddProposer",
+        "discriminant": action.discriminant,
+        "address": action.address.to_bech32(),
+    }
+
+
+def _convert_remove_user_to_dict(action: RemoveUser) -> dict[str, Any]:
+    return {
+        "type": "RemoveUser",
+        "discriminant": action.discriminant,
+        "address": action.address.to_bech32(),
+    }
+
+
+def _convert_change_quorum_to_dict(action: ChangeQuorum) -> dict[str, Any]:
+    return {
+        "type": "ChangeQuorum",
+        "discriminant": action.discriminant,
+        "quorum": action.quorum,
+    }
+
+
+def _convert_send_transfer_execute_egld_to_dict(action: SendTransferExecuteEgld) -> dict[str, Any]:
+    return {
+        "type": "SendTransferExecuteEgld",
+        "discriminant": action.discriminant,
+        "callActionData": _convert_call_action_data_to_dict(action.data),
+    }
+
+
+def _convert_call_action_data_to_dict(call_action_data: CallActionData) -> dict[str, Any]:
+    return {
+        "to": call_action_data.to.to_bech32(),
+        "egldAmount": call_action_data.egld_amount,
+        "optGasLimit": call_action_data.opt_gas_limit,
+        "endpointName": call_action_data.endpoint_name,
+        "arguments": [arg.hex() for arg in call_action_data.arguments],
+    }
+
+
+def _convert_send_transfer_execute_esdt_to_dict(action: SendTransferExecuteEsdt) -> dict[str, Any]:
+    return {
+        "type": "SendTransferExecuteEsdt",
+        "discriminant": action.discriminant,
+        "esdtTransferExecuteData": _convert_esdt_transfer_execute_data_to_dict(action.data),
+    }
+
+
+def _convert_esdt_transfer_execute_data_to_dict(call_action_data: EsdtTransferExecuteData) -> dict[str, Any]:
+    return {
+        "to": call_action_data.to.to_bech32(),
+        "tokens": _convert_tokens_to_dict(call_action_data.tokens),
+        "optGasLimit": call_action_data.opt_gas_limit,
+        "endpointName": call_action_data.endpoint_name,
+        "arguments": [arg.hex() for arg in call_action_data.arguments],
+    }
+
+
+def _convert_tokens_to_dict(tokens: list[EsdtTokenPayment]) -> list[dict[str, Any]]:
+    return [
+        {
+            "tokenIdentifier": token.fields[0].get_payload(),
+            "tokenNonce": token.fields[1].get_payload(),
+            "amount": token.fields[2].get_payload(),
+        }
+        for token in tokens
+    ]
+
+
+def _convert_send_async_call_to_dict(action: SendAsyncCall) -> dict[str, Any]:
+    return {
+        "type": "SendAsyncCall",
+        "discriminant": action.discriminant,
+        "callActionData": _convert_call_action_data_to_dict(action.data),
+    }
+
+
+def _convert_sc_deploy_from_source_to_dict(action: SCDeployFromSource) -> dict[str, Any]:
+    return {
+        "type": "SCDeployFromSource",
+        "discriminant": action.discriminant,
+        "amount": action.amount,
+        "source": action.source.to_bech32(),
+        "codeMetadata": action.code_metadata.hex(),
+        "arguments": [arg.hex() for arg in action.arguments],
+    }
+
+
+def _convert_sc_upgrade_from_source_to_dict(action: SCUpgradeFromSource) -> dict[str, Any]:
+    return {
+        "type": "SCDeployFromSource",
+        "discriminant": action.discriminant,
+        "scAddress": action.sc_address.to_bech32(),
+        "amount": action.amount,
+        "source": action.source.to_bech32(),
+        "codeMetadata": action.code_metadata.hex(),
+        "arguments": [arg.hex() for arg in action.arguments],
+    }
+
+
+def _convert_action_full_info_to_dict(action: ActionFullInfo) -> dict[str, Any]:
+    return {
+        "actionId": action.action_id,
+        "groupId": action.group_id,
+        "actionData": _convert_action_to_dict(action.action_data),
+        "signers": [signer.to_bech32() for signer in action.signers],
+    }
