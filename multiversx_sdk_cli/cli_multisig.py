@@ -22,9 +22,6 @@ from multiversx_sdk import (
     SendAsyncCall,
     SendTransferExecuteEgld,
     SendTransferExecuteEsdt,
-    Token,
-    TokenComputer,
-    TokenTransfer,
     Transaction,
     TransactionsFactoryConfig,
 )
@@ -1189,7 +1186,7 @@ def deposit(args: Any):
 
     token_transfers = args.token_transfers or None
     if token_transfers:
-        token_transfers = _prepare_token_transfers(token_transfers)
+        token_transfers = cli_shared.prepare_token_transfers(token_transfers)
 
     tx = multisig.prepare_deposit_transaction(
         owner=sender,
@@ -1444,7 +1441,7 @@ def transfer_and_execute(args: Any):
         gas_price=int(args.gas_price),
         version=int(args.version),
         options=int(args.options),
-        should_prepare_args=should_prepare_args,
+        should_prepare_args_for_factory=should_prepare_args,
         guardian_and_relayer_data=guardian_and_relayer_data,
         opt_gas_limit=opt_gas_limit,
         function=function,
@@ -1485,7 +1482,7 @@ def transfer_and_execute_esdt(args: Any):
     function = args.function if args.function else None
     contract_abi = Abi.load(Path(args.contract_abi)) if args.contract_abi else None
     arguments, should_prepare_args = _get_contract_arguments(args)
-    token_transfers = _prepare_token_transfers(args.token_transfers)
+    token_transfers = cli_shared.prepare_token_transfers(args.token_transfers)
 
     tx = multisig.prepare_transfer_execute_esdt_transaction(
         owner=sender,
@@ -1496,7 +1493,7 @@ def transfer_and_execute_esdt(args: Any):
         gas_price=int(args.gas_price),
         version=int(args.version),
         options=int(args.options),
-        should_prepare_args=should_prepare_args,
+        should_prepare_args_for_factory=should_prepare_args,
         guardian_and_relayer_data=guardian_and_relayer_data,
         token_transfers=token_transfers,
         opt_gas_limit=opt_gas_limit,
@@ -1534,7 +1531,7 @@ def async_call(args: Any):
 
     token_transfers = args.token_transfers or None
     if token_transfers:
-        token_transfers = _prepare_token_transfers(args.token_transfers)
+        token_transfers = cli_shared.prepare_token_transfers(args.token_transfers)
 
     tx = multisig.prepare_async_call_transaction(
         owner=sender,
@@ -1545,7 +1542,7 @@ def async_call(args: Any):
         gas_price=int(args.gas_price),
         version=int(args.version),
         options=int(args.options),
-        should_prepare_args=should_prepare_args,
+        should_prepare_args_for_factory=should_prepare_args,
         guardian_and_relayer_data=guardian_and_relayer_data,
         native_token_amount=int(args.value),
         token_transfers=token_transfers,
@@ -1593,7 +1590,7 @@ def deploy_from_source(args: Any):
         readable=args.metadata_readable,
         payable=args.metadata_payable,
         payable_by_sc=args.metadata_payable_by_sc,
-        should_prepare_args=should_prepare_args,
+        should_prepare_args_for_factory=should_prepare_args,
         guardian_and_relayer_data=guardian_and_relayer_data,
         native_token_amount=int(args.value),
         abi=contract_abi,
@@ -1640,7 +1637,7 @@ def upgrade_from_source(args: Any):
         readable=args.metadata_readable,
         payable=args.metadata_payable,
         payable_by_sc=args.metadata_payable_by_sc,
-        should_prepare_args=should_prepare_args,
+        should_prepare_args_for_factory=should_prepare_args,
         guardian_and_relayer_data=guardian_and_relayer_data,
         native_token_amount=int(args.value),
         abi=contract_abi,
@@ -2245,22 +2242,6 @@ def _get_contract_arguments(args: Any) -> tuple[list[Any], bool]:
         return json_args, False
     else:
         return args.arguments, True
-
-
-def _prepare_token_transfers(transfers: list[str]) -> list[TokenTransfer]:
-    token_computer = TokenComputer()
-    token_transfers: list[TokenTransfer] = []
-
-    for i in range(0, len(transfers) - 1, 2):
-        identifier = transfers[i]
-        amount = int(transfers[i + 1])
-        nonce = token_computer.extract_nonce_from_extended_identifier(identifier)
-
-        token = Token(identifier, nonce)
-        transfer = TokenTransfer(token, amount)
-        token_transfers.append(transfer)
-
-    return token_transfers
 
 
 def _send_or_simulate(tx: Transaction, contract_address: Address, args: Any):

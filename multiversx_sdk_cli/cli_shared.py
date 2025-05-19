@@ -11,6 +11,9 @@ from multiversx_sdk import (
     ApiNetworkProvider,
     LedgerAccount,
     ProxyNetworkProvider,
+    Token,
+    TokenComputer,
+    TokenTransfer,
     Transaction,
 )
 
@@ -617,3 +620,20 @@ def prepare_guardian_relayer_data(args: Any) -> GuardianRelayerData:
         relayer=relayer,
         relayer_address=relayer_address,
     )
+
+
+def prepare_token_transfers(transfers: list[str]) -> list[TokenTransfer]:
+    """Converts a list of token transfers as received from the CLI to a list of TokenTransfer objects."""
+    token_computer = TokenComputer()
+    token_transfers: list[TokenTransfer] = []
+
+    for i in range(0, len(transfers) - 1, 2):
+        identifier = transfers[i]
+        amount = int(transfers[i + 1])
+        nonce = token_computer.extract_nonce_from_extended_identifier(identifier)
+
+        token = Token(identifier, nonce)
+        transfer = TokenTransfer(token, amount)
+        token_transfers.append(transfer)
+
+    return token_transfers

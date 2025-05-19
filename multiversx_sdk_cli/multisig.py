@@ -9,26 +9,9 @@ from multiversx_sdk import (
     Transaction,
     TransactionsFactoryConfig,
 )
-from multiversx_sdk.abi import (
-    Abi,
-    AddressValue,
-    BigUIntValue,
-    BoolValue,
-    BytesValue,
-    StringValue,
-)
+from multiversx_sdk.abi import Abi
 
 from multiversx_sdk_cli.base_transactions_controller import BaseTransactionsController
-from multiversx_sdk_cli.config import get_address_hrp
-from multiversx_sdk_cli.contracts import (
-    ADDRESS_PREFIX,
-    FALSE_STR_LOWER,
-    HEX_PREFIX,
-    MAINCHAIN_ADDRESS_HRP,
-    STR_PREFIX,
-    TRUE_STR_LOWER,
-)
-from multiversx_sdk_cli.errors import BadUserInput
 from multiversx_sdk_cli.guardian_relayer_data import GuardianRelayerData
 from multiversx_sdk_cli.interfaces import IAccount
 
@@ -350,7 +333,7 @@ class MultisigWrapper(BaseTransactionsController):
         gas_price: int,
         version: int,
         options: int,
-        should_prepare_args: bool,
+        should_prepare_args_for_factory: bool,
         guardian_and_relayer_data: GuardianRelayerData,
         opt_gas_limit: Optional[int] = None,
         abi: Optional[Abi] = None,
@@ -358,8 +341,8 @@ class MultisigWrapper(BaseTransactionsController):
         arguments: Optional[list[Any]] = None,
     ) -> Transaction:
         args = arguments if arguments else []
-        if should_prepare_args:
-            args = self._prepare_args(args)
+        if should_prepare_args_for_factory:
+            args = self._prepare_args_for_factory(args)
 
         tx = self._factory.create_transaction_for_propose_transfer_execute(
             sender=owner.address,
@@ -400,7 +383,7 @@ class MultisigWrapper(BaseTransactionsController):
         gas_price: int,
         version: int,
         options: int,
-        should_prepare_args: bool,
+        should_prepare_args_for_factory: bool,
         guardian_and_relayer_data: GuardianRelayerData,
         token_transfers: list[TokenTransfer],
         opt_gas_limit: Optional[int] = None,
@@ -409,8 +392,8 @@ class MultisigWrapper(BaseTransactionsController):
         arguments: Optional[list[Any]] = None,
     ) -> Transaction:
         args = arguments if arguments else []
-        if should_prepare_args:
-            args = self._prepare_args(args)
+        if should_prepare_args_for_factory:
+            args = self._prepare_args_for_factory(args)
 
         tx = self._factory.create_transaction_for_propose_transfer_esdt_execute(
             sender=owner.address,
@@ -451,7 +434,7 @@ class MultisigWrapper(BaseTransactionsController):
         gas_price: int,
         version: int,
         options: int,
-        should_prepare_args: bool,
+        should_prepare_args_for_factory: bool,
         guardian_and_relayer_data: GuardianRelayerData,
         native_token_amount: int = 0,
         token_transfers: Optional[list[TokenTransfer]] = None,
@@ -461,8 +444,8 @@ class MultisigWrapper(BaseTransactionsController):
         arguments: Optional[list[Any]] = None,
     ) -> Transaction:
         args = arguments if arguments else []
-        if should_prepare_args:
-            args = self._prepare_args(args)
+        if should_prepare_args_for_factory:
+            args = self._prepare_args_for_factory(args)
 
         tx = self._factory.create_transaction_for_propose_async_call(
             sender=owner.address,
@@ -508,15 +491,15 @@ class MultisigWrapper(BaseTransactionsController):
         readable: bool,
         payable: bool,
         payable_by_sc: bool,
-        should_prepare_args: bool,
+        should_prepare_args_for_factory: bool,
         guardian_and_relayer_data: GuardianRelayerData,
         native_token_amount: int = 0,
         abi: Optional[Abi] = None,
         arguments: Optional[list[Any]] = None,
     ) -> Transaction:
         args = arguments if arguments else []
-        if should_prepare_args:
-            args = self._prepare_args(args)
+        if should_prepare_args_for_factory:
+            args = self._prepare_args_for_factory(args)
 
         tx = self._factory.create_transaction_for_propose_contract_deploy_from_source(
             sender=owner.address,
@@ -564,15 +547,15 @@ class MultisigWrapper(BaseTransactionsController):
         readable: bool,
         payable: bool,
         payable_by_sc: bool,
-        should_prepare_args: bool,
+        should_prepare_args_for_factory: bool,
         guardian_and_relayer_data: GuardianRelayerData,
         native_token_amount: int = 0,
         abi: Optional[Abi] = None,
         arguments: Optional[list[Any]] = None,
     ) -> Transaction:
         args = arguments if arguments else []
-        if should_prepare_args:
-            args = self._prepare_args(args)
+        if should_prepare_args_for_factory:
+            args = self._prepare_args_for_factory(args)
 
         tx = self._factory.create_transaction_for_propose_contract_upgrade_from_source(
             sender=owner.address,
@@ -931,45 +914,3 @@ class MultisigWrapper(BaseTransactionsController):
         )
 
         return tx
-
-    def _prepare_args(self, arguments: list[str]) -> list[Any]:
-        args: list[Any] = []
-
-        for arg in arguments:
-            if arg.startswith(HEX_PREFIX):
-                args.append(BytesValue(self._hex_to_bytes(arg)))
-            elif arg.isnumeric():
-                args.append(BigUIntValue(int(arg)))
-            elif arg.startswith(ADDRESS_PREFIX):
-                args.append(AddressValue.new_from_address(Address.new_from_bech32(arg[len(ADDRESS_PREFIX) :])))
-            elif arg.startswith(MAINCHAIN_ADDRESS_HRP):
-                # this flow will be removed in the future
-                logger.warning(
-                    "Address argument has no prefix. This flow will be removed in the future. Please provide each address using the `addr:` prefix. (e.g. --arguments addr:erd1...)"
-                )
-                args.append(AddressValue.new_from_address(Address.new_from_bech32(arg)))
-            elif arg.startswith(get_address_hrp()):
-                args.append(AddressValue.new_from_address(Address.new_from_bech32(arg)))
-            elif arg.lower() == FALSE_STR_LOWER:
-                args.append(BoolValue(False))
-            elif arg.lower() == TRUE_STR_LOWER:
-                args.append(BoolValue(True))
-            elif arg.startswith(STR_PREFIX):
-                args.append(StringValue(arg[len(STR_PREFIX) :]))
-            else:
-                raise BadUserInput(
-                    f"Unknown argument type for argument: `{arg}`. Use `mxpy contract <sub-command> --help` to check all supported arguments"
-                )
-
-        return args
-
-    def _hex_to_bytes(self, arg: str):
-        argument = arg[len(HEX_PREFIX) :]
-        argument = argument.upper()
-        argument = self.ensure_even_length(argument)
-        return bytes.fromhex(argument)
-
-    def ensure_even_length(self, string: str) -> str:
-        if len(string) % 2 == 1:
-            return "0" + string
-        return string
