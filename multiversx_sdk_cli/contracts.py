@@ -53,6 +53,7 @@ class SmartContract(BaseTransactionsController):
         payable: bool,
         payable_by_sc: bool,
         gas_limit: int,
+        gas_price: int,
         value: int,
         nonce: int,
         version: int,
@@ -77,6 +78,7 @@ class SmartContract(BaseTransactionsController):
         tx.nonce = nonce
         tx.version = version
         tx.options = options
+        tx.gas_price = gas_price
         tx.guardian = guardian_and_relayer_data.guardian_address
         tx.relayer = guardian_and_relayer_data.relayer_address
 
@@ -99,6 +101,7 @@ class SmartContract(BaseTransactionsController):
         arguments: Union[list[Any], None],
         should_prepare_args: bool,
         gas_limit: int,
+        gas_price: int,
         value: int,
         token_transfers: Union[list[TokenTransfer], None],
         nonce: int,
@@ -122,6 +125,7 @@ class SmartContract(BaseTransactionsController):
         tx.nonce = nonce
         tx.version = version
         tx.options = options
+        tx.gas_price = gas_price
         tx.guardian = guardian_and_relayer_data.guardian_address
         tx.relayer = guardian_and_relayer_data.relayer_address
 
@@ -148,6 +152,7 @@ class SmartContract(BaseTransactionsController):
         payable: bool,
         payable_by_sc: bool,
         gas_limit: int,
+        gas_price: int,
         value: int,
         nonce: int,
         version: int,
@@ -173,6 +178,7 @@ class SmartContract(BaseTransactionsController):
         tx.nonce = nonce
         tx.version = version
         tx.options = options
+        tx.gas_price = gas_price
         tx.guardian = guardian_and_relayer_data.guardian_address
         tx.relayer = guardian_and_relayer_data.relayer_address
 
