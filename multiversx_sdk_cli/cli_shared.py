@@ -282,6 +282,20 @@ def add_token_transfers_args(sub: Any):
     )
 
 
+def add_wait_result_and_timeout_args(sub: Any):
+    sub.add_argument(
+        "--wait-result",
+        action="store_true",
+        default=False,
+        help="signal to wait for the transaction result - only valid if --send is set",
+    )
+    sub.add_argument(
+        "--timeout",
+        default=100,
+        help="max num of seconds to wait for result" " - only valid if --wait-result is set",
+    )
+
+
 def parse_omit_fields_arg(args: Any) -> list[str]:
     literal = args.omit_fields
     parsed = ast.literal_eval(literal)

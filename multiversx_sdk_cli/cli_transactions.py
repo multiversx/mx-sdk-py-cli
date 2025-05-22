@@ -44,17 +44,7 @@ def setup_parser(args: list[str], subparsers: Any) -> Any:
     cli_shared.add_guardian_wallet_args(args, sub)
     cli_shared.add_relayed_v3_wallet_args(args, sub)
 
-    sub.add_argument(
-        "--wait-result",
-        action="store_true",
-        default=False,
-        help="signal to wait for the transaction result - only valid if --send is set",
-    )
-    sub.add_argument(
-        "--timeout",
-        default=100,
-        help="max num of seconds to wait for result" " - only valid if --wait-result is set",
-    )
+    cli_shared.add_wait_result_and_timeout_args(sub)
     sub.set_defaults(func=create_transaction)
 
     sub = cli_shared.add_command_subparser(
