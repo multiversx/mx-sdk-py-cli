@@ -413,6 +413,10 @@ def call(args: Any):
     arguments, should_prepare_args = _get_contract_arguments(args)
     contract_address = Address.new_from_bech32(args.contract)
 
+    token_transfers = None
+    if args.token_transfers:
+        token_transfers = cli_shared.prepare_token_transfers(args.token_transfers)
+
     tx = contract.prepare_execute_transaction(
         caller=sender,
         contract=contract_address,
@@ -422,7 +426,7 @@ def call(args: Any):
         gas_limit=int(args.gas_limit),
         gas_price=int(args.gas_price),
         value=int(args.value),
-        transfers=args.token_transfers,
+        token_transfers=token_transfers,
         nonce=sender.nonce,
         version=int(args.version),
         options=int(args.options),
