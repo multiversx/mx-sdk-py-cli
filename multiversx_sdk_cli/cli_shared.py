@@ -128,7 +128,7 @@ def add_tx_args(
     )
     sub.add_argument("--gas-limit", required=False, type=int, help="⛽ the gas limit")
 
-    sub.add_argument("--value", default="0", type=int, help="the value to transfer (default: %(default)s)")
+    sub.add_argument("--value", default=0, type=int, help="the value to transfer (default: %(default)s)")
 
     if with_data:
         sub.add_argument(
