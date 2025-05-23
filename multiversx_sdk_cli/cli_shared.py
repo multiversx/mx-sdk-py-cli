@@ -128,7 +128,7 @@ def add_tx_args(
     )
     sub.add_argument("--gas-limit", required=False, type=int, help="⛽ the gas limit")
 
-    sub.add_argument("--value", default="0", type=int, help="the value to transfer (default: %(default)s)")
+    sub.add_argument("--value", default=0, type=int, help="the value to transfer (default: %(default)s)")
 
     if with_data:
         sub.add_argument(
@@ -279,6 +279,20 @@ def add_token_transfers_args(sub: Any):
         nargs="+",
         help="token transfers for transfer & execute, as [token, amount] "
         "E.g. --token-transfers NFT-123456-0a 1 ESDT-987654 100000000",
+    )
+
+
+def add_wait_result_and_timeout_args(sub: Any):
+    sub.add_argument(
+        "--wait-result",
+        action="store_true",
+        default=False,
+        help="signal to wait for the transaction result - only valid if --send is set",
+    )
+    sub.add_argument(
+        "--timeout",
+        default=100,
+        help="max num of seconds to wait for result" " - only valid if --wait-result is set",
     )
 
 
