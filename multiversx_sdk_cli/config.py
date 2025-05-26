@@ -11,23 +11,6 @@ LOCAL_CONFIG_PATH = Path("mxpy.json").resolve()
 GLOBAL_CONFIG_PATH = SDK_PATH / "mxpy.json"
 
 
-class MetaChainSystemSCsCost:
-    STAKE = 5000000
-    UNSTAKE = 5000000
-    UNBOND = 5000000
-    CLAIM = 5000000
-    GET = 5000000
-    CHANGE_REWARD_ADDRESS = 5000000
-    CHANGE_VALIDATOR_KEYS = 5000000
-    UNJAIL = 5000000
-    DELEGATION_MANAGER_OPS = 50000000
-    DELEGATION_OPS = 1000000
-    UNSTAKE_TOKENS = 5000000
-    UNBOND_TOKENS = 5000000
-    CLEAN_REGISTERED_DATA = 5000000
-    RESTAKE_UNSTAKED_NODES = 5000000
-
-
 def get_dependency_resolution(key: str) -> str:
     try:
         return get_value(f"dependencies.{key}.resolution")
@@ -145,26 +128,39 @@ def _guard_valid_config_deletion(name: str):
 
 def get_defaults() -> dict[str, Any]:
     return {
-        "dependencies.vmtools.tag": "v1.5.24",
-        "dependencies.vmtools.urlTemplate.linux": "https://github.com/multiversx/mx-chain-vm-go/archive/{TAG}.tar.gz",
-        "dependencies.vmtools.urlTemplate.osx": "https://github.com/multiversx/mx-chain-vm-go/archive/{TAG}.tar.gz",
-        "dependencies.vmtools.urlTemplate.windows": "https://github.com/multiversx/mx-chain-vm-go/archive/{TAG}.tar.gz",
-        "dependencies.rust.tag": "stable",
         "dependencies.golang.resolution": "SDK",
         "dependencies.golang.tag": "go1.20.7",
         "dependencies.golang.urlTemplate.linux": "https://golang.org/dl/{TAG}.linux-amd64.tar.gz",
         "dependencies.golang.urlTemplate.osx": "https://golang.org/dl/{TAG}.darwin-amd64.tar.gz",
         "dependencies.golang.urlTemplate.windows": "https://golang.org/dl/{TAG}.windows-amd64.zip",
-        "dependencies.twiggy.tag": "",
-        "dependencies.sc-meta.tag": "",
         "dependencies.testwallets.tag": "v1.0.0",
         "dependencies.testwallets.urlTemplate.linux": "https://github.com/multiversx/mx-sdk-testwallets/archive/{TAG}.tar.gz",
         "dependencies.testwallets.urlTemplate.osx": "https://github.com/multiversx/mx-sdk-testwallets/archive/{TAG}.tar.gz",
         "dependencies.testwallets.urlTemplate.windows": "https://github.com/multiversx/mx-sdk-testwallets/archive/{TAG}.tar.gz",
-        "dependencies.wasm-opt.tag": "0.112.0",
         "github_api_token": "",
         "default_address_hrp": "erd",
+        "proxy_url": "",
+        "explorer_url": "",
+        "ask_confirmation": "true",
     }
+
+
+def get_proxy_url() -> str:
+    return get_value("proxy_url")
+
+
+def get_explorer_url() -> str:
+    return get_value("explorer_url")
+
+
+def get_confirmation_setting() -> bool:
+    confirmation_value = get_value("ask_confirmation")
+    if confirmation_value.lower() in ["true", "yes", "1"]:
+        return True
+    elif confirmation_value.lower() in ["false", "no", "0"]:
+        return False
+    else:
+        raise errors.InvalidConfirmationSettingError(confirmation_value)
 
 
 def get_deprecated_entries_in_config_file():
@@ -190,53 +186,6 @@ def read_file() -> dict[str, Any]:
 def write_file(data: dict[str, Any]):
     config_path = resolve_config_path()
     utils.write_json_file(str(config_path), data)
-
-
-def add_config_args(argv: list[str]) -> list[str]:
-    try:
-        command, subcommand, *_ = argv
-    except ValueError:
-        return argv
-
-    config = read_file()
-
-    try:
-        config_args = config[command][subcommand]
-    except KeyError:
-        return argv
-
-    final_args = determine_final_args(argv, config_args)
-    print(f"Found extra arguments in mxpy.json. Final arguments: {final_args}")
-    return final_args
-
-
-def determine_final_args(argv: list[str], config_args: dict[str, Any]) -> list[str]:
-    extra_args: list[str] = []
-    for key, value in config_args.items():
-        key_arg = f"--{key}"
-        # arguments from the command line override the config
-        if key_arg in argv:
-            continue
-        if any(arg.startswith(f"{key_arg}=") for arg in argv):
-            continue
-        extra_args.append(key_arg)
-        if value is True:
-            continue
-        if isinstance(value, list):
-            for item in value:  # type: ignore
-                extra_args.append(str(item))  # type: ignore
-        else:
-            extra_args.append(str(value))
-
-    # the verbose flag is an exception since it has to go before the command and subcommand
-    # eg. mxpy --verbose contract deploy
-    verbose_flag = "--verbose"
-    pre_args = []
-    if verbose_flag in extra_args:
-        extra_args.remove(verbose_flag)
-        pre_args = [verbose_flag]
-
-    return pre_args + argv + extra_args
 
 
 def get_dependency_directory(key: str, tag: str) -> Path:

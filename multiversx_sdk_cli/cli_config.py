@@ -10,10 +10,10 @@ logger = logging.getLogger("cli.config")
 
 
 def setup_parser(subparsers: Any) -> Any:
-    parser = cli_shared.add_group_subparser(subparsers, "config", "Configure multiversx-sdk (default values etc.)")
+    parser = cli_shared.add_group_subparser(subparsers, "config", "Configure MultiversX CLI (default values etc.)")
     subparsers = parser.add_subparsers()
 
-    sub = cli_shared.add_command_subparser(subparsers, "config", "dump", "Dumps configuration.")
+    sub = cli_shared.add_command_subparser(subparsers, "config", "dump", "Dumps the active configuration.")
     sub.add_argument(
         "--defaults",
         required=False,
@@ -22,20 +22,28 @@ def setup_parser(subparsers: Any) -> Any:
     )
     sub.set_defaults(func=dump)
 
-    sub = cli_shared.add_command_subparser(subparsers, "config", "get", "Gets a configuration value.")
+    sub = cli_shared.add_command_subparser(
+        subparsers, "config", "get", "Gets a configuration value from the active configuration."
+    )
     _add_name_arg(sub)
     sub.set_defaults(func=get_value)
 
-    sub = cli_shared.add_command_subparser(subparsers, "config", "set", "Sets a configuration value.")
+    sub = cli_shared.add_command_subparser(
+        subparsers, "config", "set", "Sets a configuration value for the active configuration."
+    )
     _add_name_arg(sub)
     sub.add_argument("value", help="the new value")
     sub.set_defaults(func=set_value)
 
-    sub = cli_shared.add_command_subparser(subparsers, "config", "delete", "Deletes a configuration value.")
+    sub = cli_shared.add_command_subparser(
+        subparsers, "config", "delete", "Deletes a configuration value from the active configuration."
+    )
     _add_name_arg(sub)
     sub.set_defaults(func=delete_value)
 
-    sub = cli_shared.add_command_subparser(subparsers, "config", "new", "Creates a new configuration.")
+    sub = cli_shared.add_command_subparser(
+        subparsers, "config", "new", "Creates a new configuration and sets it as the active configuration."
+    )
     _add_name_arg(sub)
     sub.add_argument(
         "--template",
@@ -44,7 +52,7 @@ def setup_parser(subparsers: Any) -> Any:
     )
     sub.set_defaults(func=new_config)
 
-    sub = cli_shared.add_command_subparser(subparsers, "config", "switch", "Switch to a different config")
+    sub = cli_shared.add_command_subparser(subparsers, "config", "switch", "Switch to a different config.")
     _add_name_arg(sub)
     sub.set_defaults(func=switch_config)
 

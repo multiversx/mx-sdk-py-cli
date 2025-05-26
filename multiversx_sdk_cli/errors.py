@@ -149,3 +149,10 @@ class IncorrectWalletError(KnownError):
 class InvalidArgumentsError(KnownError):
     def __init__(self, message: str):
         super().__init__(message)
+
+
+class InvalidConfirmationSettingError(KnownError):
+    def __init__(self, value: str):
+        super().__init__(
+            f"Invalid confirmation setting: {value}. Valid values are: ['true', 'false', 'yes', 'no', '1', '0']."
+        )

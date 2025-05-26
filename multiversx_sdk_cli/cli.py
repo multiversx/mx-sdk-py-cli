@@ -43,10 +43,9 @@ def main(cli_args: list[str] = sys.argv[1:]):
 
 def _do_main(cli_args: list[str]):
     utils.ensure_folder(config.SDK_PATH)
-    argv_with_config_args = config.add_config_args(cli_args)
-    parser = setup_parser(argv_with_config_args)
+    parser = setup_parser(cli_args)
     argcomplete.autocomplete(parser)
-    args = parser.parse_args(argv_with_config_args)
+    args = parser.parse_args(cli_args)
 
     if args.verbose:
         logging.basicConfig(
