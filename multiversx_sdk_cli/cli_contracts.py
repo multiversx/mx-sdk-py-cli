@@ -420,7 +420,7 @@ def deploy(args: Any):
     contract_address = address_computer.compute_contract_address(deployer=sender.address, deployment_nonce=tx.nonce)
 
     logger.info("Contract address: %s", contract_address.to_bech32())
-    utils.log_explorer_contract_address(args.chain, contract_address.to_bech32())
+    utils.log_explorer_contract_address(args.chain, contract_address.to_bech32(), cli_config.explorer_url)
 
     _send_or_simulate(tx, contract_address, args)
 

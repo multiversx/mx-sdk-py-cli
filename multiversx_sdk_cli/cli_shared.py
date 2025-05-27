@@ -591,6 +591,7 @@ def send_or_simulate(tx: Transaction, args: Any, dump_output: bool = True) -> CL
             log_explorer_transaction(
                 chain=output_transaction["emittedTransaction"]["chainID"],
                 transaction_hash=output_transaction["emittedTransactionHash"],
+                explorer_url=cli_config.explorer_url,
             )
 
     return output_builder
