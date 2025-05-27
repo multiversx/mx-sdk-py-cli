@@ -1,5 +1,6 @@
 import os
 from dataclasses import dataclass
+from functools import cache
 from pathlib import Path
 from typing import Any
 
@@ -32,6 +33,7 @@ def get_dependency_url(key: str, tag: str, platform: str) -> str:
     return url_template.replace("{TAG}", tag)
 
 
+@cache
 def get_value(name: str) -> str:
     _guard_valid_name(name)
     data = get_active()
@@ -41,6 +43,7 @@ def get_value(name: str) -> str:
     return value
 
 
+@cache
 def get_address_hrp() -> str:
     return get_value("default_address_hrp")
 
@@ -146,14 +149,17 @@ def get_defaults() -> dict[str, Any]:
     }
 
 
+@cache
 def get_proxy_url() -> str:
     return get_value("proxy_url")
 
 
+@cache
 def get_explorer_url() -> str:
     return get_value("explorer_url")
 
 
+@cache
 def get_confirmation_setting() -> bool:
     confirmation_value = get_value("ask_confirmation")
     if confirmation_value.lower() in ["true", "yes", "1"]:
@@ -176,6 +182,7 @@ def resolve_config_path() -> Path:
     return GLOBAL_CONFIG_PATH
 
 
+@cache
 def read_file() -> dict[str, Any]:
     config_path = resolve_config_path()
     if config_path.exists():
@@ -210,6 +217,7 @@ class MxpyConfig:
     ask_confirmation: bool
 
     @classmethod
+    @cache
     def from_active_config(cls) -> "MxpyConfig":
         return cls(
             address_hrp=get_address_hrp(),

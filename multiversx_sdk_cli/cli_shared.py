@@ -4,6 +4,7 @@ import base64
 import logging
 import sys
 from argparse import FileType
+from functools import cache
 from pathlib import Path
 from typing import Any, Text, Union, cast
 
@@ -507,6 +508,7 @@ def get_current_nonce_for_address(address: Address, proxy_url: Union[str, None])
     return proxy.get_account(address).nonce
 
 
+@cache
 def get_chain_id(chain_id: str, proxy_url: str) -> str:
     if chain_id and proxy_url:
         fetched_chain_id = _fetch_chain_id(proxy_url)
@@ -523,6 +525,7 @@ def get_chain_id(chain_id: str, proxy_url: str) -> str:
     return _fetch_chain_id(proxy_url)
 
 
+@cache
 def _fetch_chain_id(proxy_url: str) -> str:
     network_provider_config = config.get_config_for_network_providers()
     proxy = ProxyNetworkProvider(url=proxy_url, config=network_provider_config)
