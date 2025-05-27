@@ -1,4 +1,5 @@
 import os
+from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
@@ -141,7 +142,7 @@ def get_defaults() -> dict[str, Any]:
         "default_address_hrp": "erd",
         "proxy_url": "",
         "explorer_url": "",
-        "ask_confirmation": "true",
+        "ask_confirmation": "false",
     }
 
 
@@ -199,3 +200,20 @@ def get_dependency_parent_directory(key: str) -> Path:
 
 def get_config_for_network_providers() -> NetworkProviderConfig:
     return NetworkProviderConfig(client_name="mxpy")
+
+
+@dataclass
+class MxpyConfig:
+    address_hrp: str
+    proxy_url: str
+    explorer_url: str
+    ask_confirmation: bool
+
+    @classmethod
+    def from_active_config(cls) -> "MxpyConfig":
+        return cls(
+            address_hrp=get_address_hrp(),
+            proxy_url=get_proxy_url(),
+            explorer_url=get_explorer_url(),
+            ask_confirmation=get_confirmation_setting(),
+        )

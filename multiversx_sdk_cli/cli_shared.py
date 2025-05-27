@@ -1,5 +1,7 @@
 import argparse
 import ast
+import base64
+import logging
 import sys
 from argparse import FileType
 from pathlib import Path
@@ -36,7 +38,10 @@ from multiversx_sdk_cli.interfaces import IAccount
 from multiversx_sdk_cli.simulation import Simulator
 from multiversx_sdk_cli.transactions import send_and_wait_for_result
 from multiversx_sdk_cli.utils import log_explorer_transaction
-from multiversx_sdk_cli.ux import show_warning
+from multiversx_sdk_cli.ux import confirm_continuation, show_warning
+
+logger = logging.getLogger("cli_shared")
+
 
 trusted_cosigner_service_url_by_chain_id = {
     "1": "https://tools.multiversx.com/guardian",
@@ -557,11 +562,17 @@ def send_or_simulate(tx: Transaction, args: Any, dump_output: bool = True) -> CL
     output_builder.set_emitted_transaction(tx)
     outfile = args.outfile if hasattr(args, "outfile") else None
 
+    cli_config = config.MxpyConfig.from_active_config()
+    hash = ""
     try:
         if send_wait_result:
+            _confirm_continuation_if_required(cli_config, tx)
+
             transaction_on_network = send_and_wait_for_result(tx, proxy, args.timeout)
             output_builder.set_awaited_transaction(transaction_on_network)
         elif send_only:
+            _confirm_continuation_if_required(cli_config, tx)
+
             hash = proxy.send_transaction(tx)
             output_builder.set_emitted_transaction_hash(hash.hex())
         elif simulate:
@@ -573,13 +584,25 @@ def send_or_simulate(tx: Transaction, args: Any, dump_output: bool = True) -> CL
         if dump_output:
             utils.dump_out_json(output_transaction, outfile=outfile)
 
-        if send_only:
+        if send_only and hash:
             log_explorer_transaction(
                 chain=output_transaction["emittedTransaction"]["chainID"],
                 transaction_hash=output_transaction["emittedTransactionHash"],
             )
 
     return output_builder
+
+
+def _confirm_continuation_if_required(config: config.MxpyConfig, tx: Transaction) -> None:
+    if config.ask_confirmation:
+        transaction = tx.to_dictionary()
+
+        # decode the data field from base64 if it exists
+        data = base64.b64decode(transaction.get("data", "")).decode()
+        transaction["data"] = data if data else ""
+
+        utils.dump_out_json(transaction)
+        confirm_continuation("You are about to send the above transaction. Do you want to continue?")
 
 
 def prepare_sender(args: Any):
@@ -617,3 +640,11 @@ def prepare_guardian_relayer_data(args: Any) -> GuardianRelayerData:
         relayer=relayer,
         relayer_address=relayer_address,
     )
+
+
+def set_proxy_from_config_if_not_provided(args: Any, config: config.MxpyConfig) -> None:
+    """This function modifies the `args` object by setting the proxy from the config if not already set."""
+    if not args.proxy:
+        if config.proxy_url:
+            logger.info(f"Using proxy URL from config: {config.proxy_url}")
+            args.proxy = config.proxy_url

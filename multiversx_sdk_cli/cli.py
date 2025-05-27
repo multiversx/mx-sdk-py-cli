@@ -45,6 +45,8 @@ def _do_main(cli_args: list[str]):
     utils.ensure_folder(config.SDK_PATH)
     parser = setup_parser(cli_args)
     argcomplete.autocomplete(parser)
+
+    _handle_verbose_argument(cli_args)
     args = parser.parse_args(cli_args)
 
     if args.verbose:
@@ -144,6 +146,13 @@ def verify_deprecated_entries_in_config_file():
         message += f"-> {entry} \n"
 
     ux.show_warning(message.rstrip("\n"))
+
+
+def _handle_verbose_argument(args: list[str]):
+    verbose_arg = "--verbose"
+    if verbose_arg in args:
+        args.remove(verbose_arg)
+        args.insert(0, verbose_arg)
 
 
 if __name__ == "__main__":

@@ -23,7 +23,7 @@ from multiversx_sdk_cli.args_validation import (
 )
 from multiversx_sdk_cli.base_transactions_controller import BaseTransactionsController
 from multiversx_sdk_cli.cli_output import CLIOutputBuilder
-from multiversx_sdk_cli.config import get_config_for_network_providers
+from multiversx_sdk_cli.config import MxpyConfig, get_config_for_network_providers
 from multiversx_sdk_cli.errors import BadUsage, IncorrectWalletError, NoWalletProvided
 from multiversx_sdk_cli.transactions import (
     TransactionsController,
@@ -114,6 +114,9 @@ def _add_common_arguments(args: list[str], sub: Any):
 
 
 def create_transaction(args: Any):
+    cli_config = MxpyConfig.from_active_config()
+    cli_shared.set_proxy_from_config_if_not_provided(args, cli_config)
+
     validate_nonce_args(args)
     validate_receiver_args(args)
     ensure_wallet_args_are_provided(args)
@@ -172,6 +175,9 @@ def prepare_token_transfers(transfers: list[Any]) -> list[TokenTransfer]:
 
 
 def send_transaction(args: Any):
+    cli_config = MxpyConfig.from_active_config()
+    cli_shared.set_proxy_from_config_if_not_provided(args, cli_config)
+
     validate_proxy_argument(args)
 
     tx = load_transaction_from_file(args.infile)
@@ -181,6 +187,8 @@ def send_transaction(args: Any):
     proxy = ProxyNetworkProvider(url=args.proxy, config=config)
 
     try:
+        cli_shared._confirm_continuation_if_required(cli_config, tx)
+
         tx_hash = proxy.send_transaction(tx)
         output.set_emitted_transaction_hash(tx_hash.hex())
     finally:
@@ -189,6 +197,9 @@ def send_transaction(args: Any):
 
 
 def sign_transaction(args: Any):
+    cli_config = MxpyConfig.from_active_config()
+    cli_shared.set_proxy_from_config_if_not_provided(args, cli_config)
+
     validate_broadcast_args(args)
 
     tx = load_transaction_from_file(args.infile)
@@ -228,6 +239,9 @@ def sign_transaction(args: Any):
 
 
 def relay_transaction(args: Any):
+    cli_config = MxpyConfig.from_active_config()
+    cli_shared.set_proxy_from_config_if_not_provided(args, cli_config)
+
     ensure_relayer_wallet_args_are_provided(args)
     validate_broadcast_args(args)
 

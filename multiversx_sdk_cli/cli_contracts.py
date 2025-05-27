@@ -25,7 +25,7 @@ from multiversx_sdk_cli.args_validation import (
     validate_transaction_args,
 )
 from multiversx_sdk_cli.cli_output import CLIOutputBuilder
-from multiversx_sdk_cli.config import get_config_for_network_providers
+from multiversx_sdk_cli.config import MxpyConfig, get_config_for_network_providers
 from multiversx_sdk_cli.constants import NUMBER_OF_SHARDS
 from multiversx_sdk_cli.contract_verification import trigger_contract_verification
 from multiversx_sdk_cli.contracts import SmartContract
@@ -369,12 +369,15 @@ def build(args: Any):
 
 The primary tool for building smart contracts is `sc-meta`.
 To install `sc-meta` check out the documentation: https://docs.multiversx.com/sdk-and-tools/troubleshooting/rust-setup.
-After installing, use the `sc-meta all build` command. To lear more about `sc-meta`, check out this page: https://docs.multiversx.com/developers/meta/sc-meta-cli/#calling-build."""
+After installing, use the `sc-meta all build` command. To learn more about `sc-meta`, check out this page: https://docs.multiversx.com/developers/meta/sc-meta-cli/#calling-build."""
     show_warning(message)
 
 
 def deploy(args: Any):
     logger.debug("deploy")
+
+    cli_config = MxpyConfig.from_active_config()
+    cli_shared.set_proxy_from_config_if_not_provided(args, cli_config)
 
     validate_transaction_args(args)
     ensure_wallet_args_are_provided(args)
@@ -425,6 +428,9 @@ def deploy(args: Any):
 def call(args: Any):
     logger.debug("call")
 
+    cli_config = MxpyConfig.from_active_config()
+    cli_shared.set_proxy_from_config_if_not_provided(args, cli_config)
+
     validate_transaction_args(args)
     ensure_wallet_args_are_provided(args)
     validate_broadcast_args(args)
@@ -466,6 +472,9 @@ def call(args: Any):
 
 def upgrade(args: Any):
     logger.debug("upgrade")
+
+    cli_config = MxpyConfig.from_active_config()
+    cli_shared.set_proxy_from_config_if_not_provided(args, cli_config)
 
     validate_transaction_args(args)
     ensure_wallet_args_are_provided(args)
@@ -511,6 +520,9 @@ def upgrade(args: Any):
 
 def query(args: Any):
     logger.debug("query")
+
+    cli_config = MxpyConfig.from_active_config()
+    cli_shared.set_proxy_from_config_if_not_provided(args, cli_config)
 
     validate_proxy_argument(args)
 
