@@ -558,7 +558,7 @@ def send_or_simulate(tx: Transaction, args: Any, dump_output: bool = True) -> CL
     outfile = args.outfile if hasattr(args, "outfile") else None
 
     cli_config = config.MxpyConfig.from_active_config()
-    hash = ""
+    hash = b""
     try:
         if send_wait_result:
             _confirm_continuation_if_required(cli_config, tx)
