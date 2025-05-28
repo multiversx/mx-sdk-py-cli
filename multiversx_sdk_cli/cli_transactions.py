@@ -138,7 +138,7 @@ def create_transaction(args: Any):
     transfers = getattr(args, "token_transfers", None)
     transfers = prepare_token_transfers(transfers) if transfers else None
 
-    chain_id = cli_shared.get_chain_id(args.chain, args.proxy)
+    chain_id = cli_shared.get_chain_id(args.proxy, args.chain)
     tx_controller = TransactionsController(chain_id)
 
     tx = tx_controller.create_transaction(

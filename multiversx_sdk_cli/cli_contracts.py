@@ -390,7 +390,7 @@ def deploy(args: Any):
         args=args,
     )
 
-    chain_id = cli_shared.get_chain_id(args.chain, args.proxy)
+    chain_id = cli_shared.get_chain_id(args.proxy, args.chain)
     config = TransactionsFactoryConfig(chain_id)
 
     abi = Abi.load(Path(args.abi)) if args.abi else None
@@ -442,7 +442,7 @@ def call(args: Any):
         args=args,
     )
 
-    chain_id = cli_shared.get_chain_id(args.chain, args.proxy)
+    chain_id = cli_shared.get_chain_id(args.proxy, args.chain)
     config = TransactionsFactoryConfig(chain_id)
 
     abi = Abi.load(Path(args.abi)) if args.abi else None
@@ -487,7 +487,7 @@ def upgrade(args: Any):
         args=args,
     )
 
-    chain_id = cli_shared.get_chain_id(args.chain, args.proxy)
+    chain_id = cli_shared.get_chain_id(args.proxy, args.chain)
     config = TransactionsFactoryConfig(chain_id)
 
     abi = Abi.load(Path(args.abi)) if args.abi else None

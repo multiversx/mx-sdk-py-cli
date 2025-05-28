@@ -6,7 +6,7 @@ import sys
 from argparse import FileType
 from functools import cache
 from pathlib import Path
-from typing import Any, Text, Union, cast
+from typing import Any, Optional, Text, Union, cast
 
 from multiversx_sdk import (
     Account,
@@ -39,7 +39,7 @@ from multiversx_sdk_cli.interfaces import IAccount
 from multiversx_sdk_cli.simulation import Simulator
 from multiversx_sdk_cli.transactions import send_and_wait_for_result
 from multiversx_sdk_cli.utils import log_explorer_transaction
-from multiversx_sdk_cli.ux import confirm_continuation, show_warning
+from multiversx_sdk_cli.ux import confirm_continuation
 
 logger = logging.getLogger("cli_shared")
 
@@ -509,16 +509,8 @@ def get_current_nonce_for_address(address: Address, proxy_url: Union[str, None])
 
 
 @cache
-def get_chain_id(chain_id: str, proxy_url: str) -> str:
-    if chain_id and proxy_url:
-        fetched_chain_id = _fetch_chain_id(proxy_url)
-
-        if chain_id != fetched_chain_id:
-            show_warning(
-                f"The chain ID you have provided does not match the chain ID you got from the proxy. Will use the proxy's value: '{fetched_chain_id}'"
-            )
-        return fetched_chain_id
-
+def get_chain_id(proxy_url: str, chain_id: Optional[str] = None) -> str:
+    """We know and have already validated that if chainID is not provided, proxy is provided."""
     if chain_id:
         return chain_id
 
@@ -647,8 +639,11 @@ def prepare_guardian_relayer_data(args: Any) -> GuardianRelayerData:
 
 
 def set_proxy_from_config_if_not_provided(args: Any, config: config.MxpyConfig) -> None:
-    """This function modifies the `args` object by setting the proxy from the config if not already set."""
+    """This function modifies the `args` object by setting the proxy from the config if not already set. If proxy is not needed (chainID and nonce are provided), the proxy will not be set."""
     if not args.proxy:
+        if hasattr(args, "chain") and args.chain and hasattr(args, "nonce") and args.nonce:
+            return
+
         if config.proxy_url:
             logger.info(f"Using proxy URL from config: {config.proxy_url}")
             args.proxy = config.proxy_url

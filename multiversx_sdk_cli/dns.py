@@ -77,7 +77,7 @@ def register(args: Any):
     receiver = dns_address_for_name(args.name)
     data = dns_register_data(args.name)
 
-    chain_id = cli_shared.get_chain_id(args.chain, args.proxy)
+    chain_id = cli_shared.get_chain_id(args.proxy, args.chain)
     controller = TransactionsController(chain_id)
 
     tx = controller.create_transaction(

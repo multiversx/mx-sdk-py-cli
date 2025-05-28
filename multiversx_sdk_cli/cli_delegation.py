@@ -395,7 +395,7 @@ def validate_arguments(args: Any):
 
 
 def _get_delegation_controller(args: Any):
-    chain_id = cli_shared.get_chain_id(args.chain, args.proxy)
+    chain_id = cli_shared.get_chain_id(args.proxy, args.chain)
     config = TransactionsFactoryConfig(chain_id)
     delegation = DelegationOperations(config)
     return delegation
