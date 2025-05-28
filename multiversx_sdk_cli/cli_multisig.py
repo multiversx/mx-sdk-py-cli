@@ -76,7 +76,7 @@ def setup_parser(args: list[str], subparsers: Any) -> Any:
         type=str,
         help="the bech32 addresses of the board members",
     )
-    _add_metadata_arg(sub)
+    cli_shared.add_metadata_arg(sub)
     cli_shared.add_outfile_arg(sub)
     cli_shared.add_wallet_args(args, sub)
     cli_shared.add_proxy_arg(sub)
@@ -91,7 +91,7 @@ def setup_parser(args: list[str], subparsers: Any) -> Any:
     sub.add_argument(
         "--timeout",
         default=100,
-        help="max num of seconds to wait for result" " - only valid if --wait-result is set",
+        help="max num of seconds to wait for result - only valid if --wait-result is set",
     )
     cli_shared.add_broadcast_args(sub)
     cli_shared.add_guardian_wallet_args(args, sub)
@@ -122,7 +122,7 @@ def setup_parser(args: list[str], subparsers: Any) -> Any:
     sub.add_argument(
         "--timeout",
         default=100,
-        help="max num of seconds to wait for result" " - only valid if --wait-result is set",
+        help="max num of seconds to wait for result - only valid if --wait-result is set",
     )
     cli_shared.add_broadcast_args(sub)
     cli_shared.add_guardian_wallet_args(args, sub)
@@ -153,7 +153,7 @@ def setup_parser(args: list[str], subparsers: Any) -> Any:
     sub.add_argument(
         "--timeout",
         default=100,
-        help="max num of seconds to wait for result" " - only valid if --wait-result is set",
+        help="max num of seconds to wait for result - only valid if --wait-result is set",
     )
     cli_shared.add_broadcast_args(sub)
     cli_shared.add_guardian_wallet_args(args, sub)
@@ -190,7 +190,7 @@ def setup_parser(args: list[str], subparsers: Any) -> Any:
     sub.add_argument(
         "--timeout",
         default=100,
-        help="max num of seconds to wait for result" " - only valid if --wait-result is set",
+        help="max num of seconds to wait for result - only valid if --wait-result is set",
     )
     cli_shared.add_broadcast_args(sub)
     cli_shared.add_guardian_wallet_args(args, sub)
@@ -226,7 +226,7 @@ def setup_parser(args: list[str], subparsers: Any) -> Any:
     sub.add_argument(
         "--timeout",
         default=100,
-        help="max num of seconds to wait for result" " - only valid if --wait-result is set",
+        help="max num of seconds to wait for result - only valid if --wait-result is set",
     )
     cli_shared.add_broadcast_args(sub)
     cli_shared.add_guardian_wallet_args(args, sub)
@@ -262,7 +262,7 @@ def setup_parser(args: list[str], subparsers: Any) -> Any:
     sub.add_argument(
         "--timeout",
         default=100,
-        help="max num of seconds to wait for result" " - only valid if --wait-result is set",
+        help="max num of seconds to wait for result - only valid if --wait-result is set",
     )
     cli_shared.add_broadcast_args(sub)
     cli_shared.add_guardian_wallet_args(args, sub)
@@ -298,7 +298,7 @@ def setup_parser(args: list[str], subparsers: Any) -> Any:
     sub.add_argument(
         "--timeout",
         default=100,
-        help="max num of seconds to wait for result" " - only valid if --wait-result is set",
+        help="max num of seconds to wait for result - only valid if --wait-result is set",
     )
     cli_shared.add_broadcast_args(sub)
     cli_shared.add_guardian_wallet_args(args, sub)
@@ -334,7 +334,7 @@ def setup_parser(args: list[str], subparsers: Any) -> Any:
     sub.add_argument(
         "--timeout",
         default=100,
-        help="max num of seconds to wait for result" " - only valid if --wait-result is set",
+        help="max num of seconds to wait for result - only valid if --wait-result is set",
     )
     cli_shared.add_broadcast_args(sub)
     cli_shared.add_guardian_wallet_args(args, sub)
@@ -372,7 +372,7 @@ def setup_parser(args: list[str], subparsers: Any) -> Any:
     sub.add_argument(
         "--timeout",
         default=100,
-        help="max num of seconds to wait for result" " - only valid if --wait-result is set",
+        help="max num of seconds to wait for result - only valid if --wait-result is set",
     )
     cli_shared.add_broadcast_args(sub)
     cli_shared.add_guardian_wallet_args(args, sub)
@@ -411,7 +411,7 @@ def setup_parser(args: list[str], subparsers: Any) -> Any:
     sub.add_argument(
         "--timeout",
         default=100,
-        help="max num of seconds to wait for result" " - only valid if --wait-result is set",
+        help="max num of seconds to wait for result - only valid if --wait-result is set",
     )
     cli_shared.add_broadcast_args(sub)
     cli_shared.add_guardian_wallet_args(args, sub)
@@ -450,7 +450,7 @@ def setup_parser(args: list[str], subparsers: Any) -> Any:
     sub.add_argument(
         "--timeout",
         default=100,
-        help="max num of seconds to wait for result" " - only valid if --wait-result is set",
+        help="max num of seconds to wait for result - only valid if --wait-result is set",
     )
     cli_shared.add_broadcast_args(sub)
     cli_shared.add_guardian_wallet_args(args, sub)
@@ -470,7 +470,7 @@ def setup_parser(args: list[str], subparsers: Any) -> Any:
     sub.add_argument("--contract-to-copy", required=True, type=str, help="the bech32 address of the contract to copy")
     sub.add_argument("--contract-abi", type=str, help="the ABI file of the contract to copy")
     _add_arguments_arg(sub)
-    _add_metadata_arg(sub)
+    cli_shared.add_metadata_arg(sub)
     cli_shared.add_outfile_arg(sub)
     cli_shared.add_wallet_args(args, sub)
     cli_shared.add_proxy_arg(sub)
@@ -485,7 +485,7 @@ def setup_parser(args: list[str], subparsers: Any) -> Any:
     sub.add_argument(
         "--timeout",
         default=100,
-        help="max num of seconds to wait for result" " - only valid if --wait-result is set",
+        help="max num of seconds to wait for result - only valid if --wait-result is set",
     )
     cli_shared.add_broadcast_args(sub)
     cli_shared.add_guardian_wallet_args(args, sub)
@@ -508,7 +508,7 @@ def setup_parser(args: list[str], subparsers: Any) -> Any:
     sub.add_argument("--contract-to-copy", required=True, type=str, help="the bech32 address of the contract to copy")
     sub.add_argument("--contract-abi", type=str, help="the ABI file of the contract to copy")
     _add_arguments_arg(sub)
-    _add_metadata_arg(sub)
+    cli_shared.add_metadata_arg(sub)
     cli_shared.add_outfile_arg(sub)
     cli_shared.add_wallet_args(args, sub)
     cli_shared.add_proxy_arg(sub)
@@ -523,7 +523,7 @@ def setup_parser(args: list[str], subparsers: Any) -> Any:
     sub.add_argument(
         "--timeout",
         default=100,
-        help="max num of seconds to wait for result" " - only valid if --wait-result is set",
+        help="max num of seconds to wait for result - only valid if --wait-result is set",
     )
     cli_shared.add_broadcast_args(sub)
     cli_shared.add_guardian_wallet_args(args, sub)
@@ -555,7 +555,7 @@ def setup_parser(args: list[str], subparsers: Any) -> Any:
     sub.add_argument(
         "--timeout",
         default=100,
-        help="max num of seconds to wait for result" " - only valid if --wait-result is set",
+        help="max num of seconds to wait for result - only valid if --wait-result is set",
     )
     cli_shared.add_broadcast_args(sub)
     cli_shared.add_guardian_wallet_args(args, sub)
@@ -587,7 +587,7 @@ def setup_parser(args: list[str], subparsers: Any) -> Any:
     sub.add_argument(
         "--timeout",
         default=100,
-        help="max num of seconds to wait for result" " - only valid if --wait-result is set",
+        help="max num of seconds to wait for result - only valid if --wait-result is set",
     )
     cli_shared.add_broadcast_args(sub)
     cli_shared.add_guardian_wallet_args(args, sub)
@@ -619,7 +619,7 @@ def setup_parser(args: list[str], subparsers: Any) -> Any:
     sub.add_argument(
         "--timeout",
         default=100,
-        help="max num of seconds to wait for result" " - only valid if --wait-result is set",
+        help="max num of seconds to wait for result - only valid if --wait-result is set",
     )
     cli_shared.add_broadcast_args(sub)
     cli_shared.add_guardian_wallet_args(args, sub)
@@ -651,7 +651,7 @@ def setup_parser(args: list[str], subparsers: Any) -> Any:
     sub.add_argument(
         "--timeout",
         default=100,
-        help="max num of seconds to wait for result" " - only valid if --wait-result is set",
+        help="max num of seconds to wait for result - only valid if --wait-result is set",
     )
     cli_shared.add_broadcast_args(sub)
     cli_shared.add_guardian_wallet_args(args, sub)
@@ -683,7 +683,7 @@ def setup_parser(args: list[str], subparsers: Any) -> Any:
     sub.add_argument(
         "--timeout",
         default=100,
-        help="max num of seconds to wait for result" " - only valid if --wait-result is set",
+        help="max num of seconds to wait for result - only valid if --wait-result is set",
     )
     cli_shared.add_broadcast_args(sub)
     cli_shared.add_guardian_wallet_args(args, sub)
@@ -715,7 +715,7 @@ def setup_parser(args: list[str], subparsers: Any) -> Any:
     sub.add_argument(
         "--timeout",
         default=100,
-        help="max num of seconds to wait for result" " - only valid if --wait-result is set",
+        help="max num of seconds to wait for result - only valid if --wait-result is set",
     )
     cli_shared.add_broadcast_args(sub)
     cli_shared.add_guardian_wallet_args(args, sub)
@@ -753,7 +753,7 @@ def setup_parser(args: list[str], subparsers: Any) -> Any:
     sub.add_argument(
         "--timeout",
         default=100,
-        help="max num of seconds to wait for result" " - only valid if --wait-result is set",
+        help="max num of seconds to wait for result - only valid if --wait-result is set",
     )
     cli_shared.add_broadcast_args(sub)
     cli_shared.add_guardian_wallet_args(args, sub)
@@ -785,7 +785,7 @@ def setup_parser(args: list[str], subparsers: Any) -> Any:
     sub.add_argument(
         "--timeout",
         default=100,
-        help="max num of seconds to wait for result" " - only valid if --wait-result is set",
+        help="max num of seconds to wait for result - only valid if --wait-result is set",
     )
     cli_shared.add_broadcast_args(sub)
     cli_shared.add_guardian_wallet_args(args, sub)
@@ -817,7 +817,7 @@ def setup_parser(args: list[str], subparsers: Any) -> Any:
     sub.add_argument(
         "--timeout",
         default=100,
-        help="max num of seconds to wait for result" " - only valid if --wait-result is set",
+        help="max num of seconds to wait for result - only valid if --wait-result is set",
     )
     cli_shared.add_broadcast_args(sub)
     cli_shared.add_guardian_wallet_args(args, sub)
@@ -1073,34 +1073,6 @@ def _add_abi_arg(sub: Any):
 
 def _add_action_id_arg(sub: Any):
     sub.add_argument("--action", required=True, type=int, help="the id of the action")
-
-
-def _add_metadata_arg(sub: Any):
-    sub.add_argument(
-        "--metadata-not-upgradeable",
-        dest="metadata_upgradeable",
-        action="store_false",
-        help="‼ mark the contract as NOT upgradeable (default: upgradeable)",
-    )
-    sub.add_argument(
-        "--metadata-not-readable",
-        dest="metadata_readable",
-        action="store_false",
-        help="‼ mark the contract as NOT readable (default: readable)",
-    )
-    sub.add_argument(
-        "--metadata-payable",
-        dest="metadata_payable",
-        action="store_true",
-        help="‼ mark the contract as payable (default: not payable)",
-    )
-    sub.add_argument(
-        "--metadata-payable-by-sc",
-        dest="metadata_payable_by_sc",
-        action="store_true",
-        help="‼ mark the contract as payable by SC (default: not payable by SC)",
-    )
-    sub.set_defaults(metadata_upgradeable=True, metadata_payable=False)
 
 
 def _add_arguments_arg(sub: Any):
