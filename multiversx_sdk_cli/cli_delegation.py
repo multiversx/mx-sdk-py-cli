@@ -19,8 +19,9 @@ from multiversx_sdk_cli.args_validation import (
     validate_proxy_argument,
     validate_receiver_args,
 )
-from multiversx_sdk_cli.config import MxpyConfig, get_config_for_network_providers
+from multiversx_sdk_cli.config import get_config_for_network_providers
 from multiversx_sdk_cli.delegation import DelegationOperations
+from multiversx_sdk_cli.env import MxpyEnv
 
 
 def setup_parser(args: list[str], subparsers: Any) -> Any:
@@ -402,7 +403,7 @@ def _get_delegation_controller(args: Any):
 
 
 def do_create_delegation_contract(args: Any):
-    cli_config = MxpyConfig.from_active_config()
+    cli_config = MxpyEnv.from_active_env()
     cli_shared.set_proxy_from_config_if_not_provided(args, cli_config)
 
     validate_arguments(args)
@@ -433,7 +434,7 @@ def do_create_delegation_contract(args: Any):
 
 
 def get_contract_address_by_deploy_tx_hash(args: Any):
-    cli_config = MxpyConfig.from_active_config()
+    cli_config = MxpyEnv.from_active_env()
     cli_shared.set_proxy_from_config_if_not_provided(args, cli_config)
 
     validate_proxy_argument(args)
@@ -453,7 +454,7 @@ def get_contract_address_by_deploy_tx_hash(args: Any):
 
 
 def add_new_nodes(args: Any):
-    cli_config = MxpyConfig.from_active_config()
+    cli_config = MxpyEnv.from_active_env()
     cli_shared.set_proxy_from_config_if_not_provided(args, cli_config)
 
     validate_arguments(args)
@@ -504,7 +505,7 @@ def _get_public_keys_and_signed_messages(args: Any) -> tuple[list[ValidatorPubli
 
 
 def remove_nodes(args: Any):
-    cli_config = MxpyConfig.from_active_config()
+    cli_config = MxpyEnv.from_active_env()
     cli_shared.set_proxy_from_config_if_not_provided(args, cli_config)
 
     validate_arguments(args)
@@ -556,7 +557,7 @@ def _parse_public_bls_keys(public_bls_keys: str) -> list[ValidatorPublicKey]:
 
 
 def stake_nodes(args: Any):
-    cli_config = MxpyConfig.from_active_config()
+    cli_config = MxpyEnv.from_active_env()
     cli_shared.set_proxy_from_config_if_not_provided(args, cli_config)
 
     _check_if_either_bls_keys_or_validators_file_are_provided(args)
@@ -597,7 +598,7 @@ def _check_if_either_bls_keys_or_validators_file_are_provided(args: Any):
 
 
 def unbond_nodes(args: Any):
-    cli_config = MxpyConfig.from_active_config()
+    cli_config = MxpyEnv.from_active_env()
     cli_shared.set_proxy_from_config_if_not_provided(args, cli_config)
 
     _check_if_either_bls_keys_or_validators_file_are_provided(args)
@@ -630,7 +631,7 @@ def unbond_nodes(args: Any):
 
 
 def unstake_nodes(args: Any):
-    cli_config = MxpyConfig.from_active_config()
+    cli_config = MxpyEnv.from_active_env()
     cli_shared.set_proxy_from_config_if_not_provided(args, cli_config)
 
     _check_if_either_bls_keys_or_validators_file_are_provided(args)
@@ -663,7 +664,7 @@ def unstake_nodes(args: Any):
 
 
 def unjail_nodes(args: Any):
-    cli_config = MxpyConfig.from_active_config()
+    cli_config = MxpyEnv.from_active_env()
     cli_shared.set_proxy_from_config_if_not_provided(args, cli_config)
 
     _check_if_either_bls_keys_or_validators_file_are_provided(args)
@@ -696,7 +697,7 @@ def unjail_nodes(args: Any):
 
 
 def delegate(args: Any):
-    cli_config = MxpyConfig.from_active_config()
+    cli_config = MxpyEnv.from_active_env()
     cli_shared.set_proxy_from_config_if_not_provided(args, cli_config)
 
     validate_arguments(args)
@@ -727,7 +728,7 @@ def delegate(args: Any):
 
 
 def claim_rewards(args: Any):
-    cli_config = MxpyConfig.from_active_config()
+    cli_config = MxpyEnv.from_active_env()
     cli_shared.set_proxy_from_config_if_not_provided(args, cli_config)
 
     validate_arguments(args)
@@ -756,7 +757,7 @@ def claim_rewards(args: Any):
 
 
 def redelegate_rewards(args: Any):
-    cli_config = MxpyConfig.from_active_config()
+    cli_config = MxpyEnv.from_active_env()
     cli_shared.set_proxy_from_config_if_not_provided(args, cli_config)
 
     validate_arguments(args)
@@ -785,7 +786,7 @@ def redelegate_rewards(args: Any):
 
 
 def undelegate(args: Any):
-    cli_config = MxpyConfig.from_active_config()
+    cli_config = MxpyEnv.from_active_env()
     cli_shared.set_proxy_from_config_if_not_provided(args, cli_config)
 
     validate_arguments(args)
@@ -816,7 +817,7 @@ def undelegate(args: Any):
 
 
 def withdraw(args: Any):
-    cli_config = MxpyConfig.from_active_config()
+    cli_config = MxpyEnv.from_active_env()
     cli_shared.set_proxy_from_config_if_not_provided(args, cli_config)
 
     validate_arguments(args)
@@ -846,7 +847,7 @@ def withdraw(args: Any):
 
 
 def change_service_fee(args: Any):
-    cli_config = MxpyConfig.from_active_config()
+    cli_config = MxpyEnv.from_active_env()
     cli_shared.set_proxy_from_config_if_not_provided(args, cli_config)
 
     validate_arguments(args)
@@ -877,7 +878,7 @@ def change_service_fee(args: Any):
 
 
 def modify_delegation_cap(args: Any):
-    cli_config = MxpyConfig.from_active_config()
+    cli_config = MxpyEnv.from_active_env()
     cli_shared.set_proxy_from_config_if_not_provided(args, cli_config)
 
     validate_arguments(args)
@@ -908,7 +909,7 @@ def modify_delegation_cap(args: Any):
 
 
 def automatic_activation(args: Any):
-    cli_config = MxpyConfig.from_active_config()
+    cli_config = MxpyEnv.from_active_env()
     cli_shared.set_proxy_from_config_if_not_provided(args, cli_config)
 
     validate_arguments(args)
@@ -940,7 +941,7 @@ def automatic_activation(args: Any):
 
 
 def redelegate_cap(args: Any):
-    cli_config = MxpyConfig.from_active_config()
+    cli_config = MxpyEnv.from_active_env()
     cli_shared.set_proxy_from_config_if_not_provided(args, cli_config)
 
     validate_arguments(args)
@@ -972,7 +973,7 @@ def redelegate_cap(args: Any):
 
 
 def set_metadata(args: Any):
-    cli_config = MxpyConfig.from_active_config()
+    cli_config = MxpyEnv.from_active_env()
     cli_shared.set_proxy_from_config_if_not_provided(args, cli_config)
 
     validate_arguments(args)
@@ -1005,7 +1006,7 @@ def set_metadata(args: Any):
 
 
 def make_new_contract_from_validator_data(args: Any):
-    cli_config = MxpyConfig.from_active_config()
+    cli_config = MxpyEnv.from_active_env()
     cli_shared.set_proxy_from_config_if_not_provided(args, cli_config)
 
     validate_arguments(args)

@@ -130,6 +130,16 @@ generate() {
 
     group "Faucet" "faucet"
     command "Faucet.Request" "faucet request"
+
+    group "Environment" "env"
+    command "Environment.New" "env new"
+    command "Environment.Set" "env set"
+    command "Environment.Get" "env get"
+    command "Environment.Dump" "env dump"
+    command "Environment.Switch" "env switch"
+    command "Environment.List" "env list"
+    command "Environment.Remove" "env remove"
+    command "Environment.Reset" "env reset"
 }
 
 generate

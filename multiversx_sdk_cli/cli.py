@@ -15,6 +15,7 @@ import multiversx_sdk_cli.cli_data
 import multiversx_sdk_cli.cli_delegation
 import multiversx_sdk_cli.cli_deps
 import multiversx_sdk_cli.cli_dns
+import multiversx_sdk_cli.cli_env
 import multiversx_sdk_cli.cli_faucet
 import multiversx_sdk_cli.cli_ledger
 import multiversx_sdk_cli.cli_localnet
@@ -24,6 +25,7 @@ import multiversx_sdk_cli.cli_validators
 import multiversx_sdk_cli.cli_wallet
 import multiversx_sdk_cli.version
 from multiversx_sdk_cli import config, errors, utils, ux
+from multiversx_sdk_cli.env import get_address_hrp
 
 logger = logging.getLogger("cli")
 
@@ -64,7 +66,7 @@ def _do_main(cli_args: list[str]):
         )
 
     verify_deprecated_entries_in_config_file()
-    default_hrp = config.get_address_hrp()
+    default_hrp = get_address_hrp()
     LibraryConfig.default_address_hrp = default_hrp
 
     if hasattr(args, "recall_nonce") and args.recall_nonce:
@@ -123,6 +125,7 @@ See:
     commands.append(multiversx_sdk_cli.cli_delegation.setup_parser(args, subparsers))
     commands.append(multiversx_sdk_cli.cli_dns.setup_parser(args, subparsers))
     commands.append(multiversx_sdk_cli.cli_faucet.setup_parser(args, subparsers))
+    commands.append(multiversx_sdk_cli.cli_env.setup_parser(subparsers))
 
     parser.epilog = """
 ----------------------

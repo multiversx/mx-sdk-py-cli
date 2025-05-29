@@ -23,7 +23,8 @@ from multiversx_sdk_cli.args_validation import (
 )
 from multiversx_sdk_cli.base_transactions_controller import BaseTransactionsController
 from multiversx_sdk_cli.cli_output import CLIOutputBuilder
-from multiversx_sdk_cli.config import MxpyConfig, get_config_for_network_providers
+from multiversx_sdk_cli.config import get_config_for_network_providers
+from multiversx_sdk_cli.env import MxpyEnv
 from multiversx_sdk_cli.errors import BadUsage, IncorrectWalletError, NoWalletProvided
 from multiversx_sdk_cli.transactions import (
     TransactionsController,
@@ -114,7 +115,7 @@ def _add_common_arguments(args: list[str], sub: Any):
 
 
 def create_transaction(args: Any):
-    cli_config = MxpyConfig.from_active_config()
+    cli_config = MxpyEnv.from_active_env()
     cli_shared.set_proxy_from_config_if_not_provided(args, cli_config)
 
     validate_nonce_args(args)
@@ -175,7 +176,7 @@ def prepare_token_transfers(transfers: list[Any]) -> list[TokenTransfer]:
 
 
 def send_transaction(args: Any):
-    cli_config = MxpyConfig.from_active_config()
+    cli_config = MxpyEnv.from_active_env()
     cli_shared.set_proxy_from_config_if_not_provided(args, cli_config)
 
     validate_proxy_argument(args)
@@ -197,7 +198,7 @@ def send_transaction(args: Any):
 
 
 def sign_transaction(args: Any):
-    cli_config = MxpyConfig.from_active_config()
+    cli_config = MxpyEnv.from_active_env()
     cli_shared.set_proxy_from_config_if_not_provided(args, cli_config)
 
     validate_broadcast_args(args)
@@ -239,7 +240,7 @@ def sign_transaction(args: Any):
 
 
 def relay_transaction(args: Any):
-    cli_config = MxpyConfig.from_active_config()
+    cli_config = MxpyEnv.from_active_env()
     cli_shared.set_proxy_from_config_if_not_provided(args, cli_config)
 
     ensure_relayer_wallet_args_are_provided(args)

@@ -25,11 +25,12 @@ from multiversx_sdk_cli.args_validation import (
     validate_transaction_args,
 )
 from multiversx_sdk_cli.cli_output import CLIOutputBuilder
-from multiversx_sdk_cli.config import MxpyConfig, get_config_for_network_providers
+from multiversx_sdk_cli.config import get_config_for_network_providers
 from multiversx_sdk_cli.constants import NUMBER_OF_SHARDS
 from multiversx_sdk_cli.contract_verification import trigger_contract_verification
 from multiversx_sdk_cli.contracts import SmartContract
 from multiversx_sdk_cli.docker import is_docker_installed, run_docker
+from multiversx_sdk_cli.env import MxpyEnv
 from multiversx_sdk_cli.errors import DockerMissingError
 from multiversx_sdk_cli.ux import show_warning
 
@@ -376,7 +377,7 @@ After installing, use the `sc-meta all build` command. To learn more about `sc-m
 def deploy(args: Any):
     logger.debug("deploy")
 
-    cli_config = MxpyConfig.from_active_config()
+    cli_config = MxpyEnv.from_active_env()
     cli_shared.set_proxy_from_config_if_not_provided(args, cli_config)
 
     validate_transaction_args(args)
@@ -428,7 +429,7 @@ def deploy(args: Any):
 def call(args: Any):
     logger.debug("call")
 
-    cli_config = MxpyConfig.from_active_config()
+    cli_config = MxpyEnv.from_active_env()
     cli_shared.set_proxy_from_config_if_not_provided(args, cli_config)
 
     validate_transaction_args(args)
@@ -473,7 +474,7 @@ def call(args: Any):
 def upgrade(args: Any):
     logger.debug("upgrade")
 
-    cli_config = MxpyConfig.from_active_config()
+    cli_config = MxpyEnv.from_active_env()
     cli_shared.set_proxy_from_config_if_not_provided(args, cli_config)
 
     validate_transaction_args(args)
@@ -521,7 +522,7 @@ def upgrade(args: Any):
 def query(args: Any):
     logger.debug("query")
 
-    cli_config = MxpyConfig.from_active_config()
+    cli_config = MxpyEnv.from_active_env()
     cli_shared.set_proxy_from_config_if_not_provided(args, cli_config)
 
     validate_proxy_argument(args)

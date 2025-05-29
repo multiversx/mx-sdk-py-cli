@@ -156,3 +156,23 @@ class InvalidConfirmationSettingError(KnownError):
         super().__init__(
             f"Invalid confirmation setting: {value}. Valid values are: ['true', 'false', 'yes', 'no', '1', '0']."
         )
+
+
+class InvalidEnvironmentValue(KnownError):
+    def __init__(self, message: str):
+        super().__init__(message)
+
+
+class EnvironmentProtectedError(KnownError):
+    def __init__(self, name: str):
+        super().__init__(f"This environment name is protected: {name}.")
+
+
+class UnknownEnvironmentError(KnownError):
+    def __init__(self, name: str):
+        super().__init__(f"Environment entry is not known: {name}.")
+
+
+class EnvironmentAlreadyExistsError(KnownError):
+    def __init__(self, name: str):
+        super().__init__(f"Environment entry already exists: {name}.")

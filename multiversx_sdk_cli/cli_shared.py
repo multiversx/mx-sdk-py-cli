@@ -29,6 +29,7 @@ from multiversx_sdk_cli.constants import (
     DEFAULT_TX_VERSION,
     TCS_SERVICE_ID,
 )
+from multiversx_sdk_cli.env import MxpyEnv, get_address_hrp
 from multiversx_sdk_cli.errors import (
     ArgumentsNotProvidedError,
     BadUsage,
@@ -328,7 +329,7 @@ def _get_address_hrp(args: Any) -> str:
     if hrp:
         return hrp
 
-    return config.get_address_hrp()
+    return get_address_hrp()
 
 
 def _get_hrp_from_proxy(args: Any) -> str:
@@ -557,7 +558,7 @@ def send_or_simulate(tx: Transaction, args: Any, dump_output: bool = True) -> CL
     output_builder.set_emitted_transaction(tx)
     outfile = args.outfile if hasattr(args, "outfile") else None
 
-    cli_config = config.MxpyConfig.from_active_config()
+    cli_config = MxpyEnv.from_active_env()
     hash = b""
     try:
         if send_wait_result:
@@ -589,8 +590,8 @@ def send_or_simulate(tx: Transaction, args: Any, dump_output: bool = True) -> CL
     return output_builder
 
 
-def _confirm_continuation_if_required(config: config.MxpyConfig, tx: Transaction) -> None:
-    if config.ask_confirmation:
+def _confirm_continuation_if_required(env: MxpyEnv, tx: Transaction) -> None:
+    if env.ask_confirmation:
         transaction = tx.to_dictionary()
 
         # decode the data field from base64 if it exists
@@ -638,12 +639,12 @@ def prepare_guardian_relayer_data(args: Any) -> GuardianRelayerData:
     )
 
 
-def set_proxy_from_config_if_not_provided(args: Any, config: config.MxpyConfig) -> None:
+def set_proxy_from_config_if_not_provided(args: Any, env: MxpyEnv) -> None:
     """This function modifies the `args` object by setting the proxy from the config if not already set. If proxy is not needed (chainID and nonce are provided), the proxy will not be set."""
     if not args.proxy:
         if hasattr(args, "chain") and args.chain and hasattr(args, "nonce") and args.nonce:
             return
 
-        if config.proxy_url:
-            logger.info(f"Using proxy URL from config: {config.proxy_url}")
-            args.proxy = config.proxy_url
+        if env.proxy_url:
+            logger.info(f"Using proxy URL from config: {env.proxy_url}")
+            args.proxy = env.proxy_url

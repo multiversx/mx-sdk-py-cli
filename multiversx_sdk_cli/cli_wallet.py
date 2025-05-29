@@ -9,8 +9,8 @@ from multiversx_sdk import Address, Mnemonic, UserPEM, UserSecretKey, UserWallet
 from multiversx_sdk.core.address import get_shard_of_pubkey
 
 from multiversx_sdk_cli import cli_shared, utils
-from multiversx_sdk_cli.config import get_address_hrp
 from multiversx_sdk_cli.constants import NUMBER_OF_SHARDS
+from multiversx_sdk_cli.env import get_address_hrp
 from multiversx_sdk_cli.errors import (
     BadUsage,
     BadUserInput,

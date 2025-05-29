@@ -8,7 +8,7 @@ from multiversx_sdk import (
 from multiversx_sdk.abi import BigUIntValue, Serializer
 
 from multiversx_sdk_cli.base_transactions_controller import BaseTransactionsController
-from multiversx_sdk_cli.config import get_address_hrp
+from multiversx_sdk_cli.env import get_address_hrp
 from multiversx_sdk_cli.errors import BadUsage
 from multiversx_sdk_cli.guardian_relayer_data import GuardianRelayerData
 from multiversx_sdk_cli.interfaces import IAccount

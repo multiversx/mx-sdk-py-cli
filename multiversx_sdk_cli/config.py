@@ -1,5 +1,4 @@
 import os
-from dataclasses import dataclass
 from functools import cache
 from pathlib import Path
 from typing import Any
@@ -41,11 +40,6 @@ def get_value(name: str) -> str:
     value = data.get(name, default_value)
     assert isinstance(value, str)
     return value
-
-
-@cache
-def get_address_hrp() -> str:
-    return get_value("default_address_hrp")
 
 
 def set_value(name: str, value: Any):
@@ -142,32 +136,7 @@ def get_defaults() -> dict[str, Any]:
         "dependencies.testwallets.urlTemplate.osx": "https://github.com/multiversx/mx-sdk-testwallets/archive/{TAG}.tar.gz",
         "dependencies.testwallets.urlTemplate.windows": "https://github.com/multiversx/mx-sdk-testwallets/archive/{TAG}.tar.gz",
         "github_api_token": "",
-        "default_address_hrp": "erd",
-        "proxy_url": "",
-        "explorer_url": "",
-        "ask_confirmation": "false",
     }
-
-
-@cache
-def get_proxy_url() -> str:
-    return get_value("proxy_url")
-
-
-@cache
-def get_explorer_url() -> str:
-    return get_value("explorer_url")
-
-
-@cache
-def get_confirmation_setting() -> bool:
-    confirmation_value = get_value("ask_confirmation")
-    if confirmation_value.lower() in ["true", "yes", "1"]:
-        return True
-    elif confirmation_value.lower() in ["false", "no", "0"]:
-        return False
-    else:
-        raise errors.InvalidConfirmationSettingError(confirmation_value)
 
 
 def get_deprecated_entries_in_config_file():
@@ -207,21 +176,3 @@ def get_dependency_parent_directory(key: str) -> Path:
 
 def get_config_for_network_providers() -> NetworkProviderConfig:
     return NetworkProviderConfig(client_name="mxpy")
-
-
-@dataclass
-class MxpyConfig:
-    address_hrp: str
-    proxy_url: str
-    explorer_url: str
-    ask_confirmation: bool
-
-    @classmethod
-    @cache
-    def from_active_config(cls) -> "MxpyConfig":
-        return cls(
-            address_hrp=get_address_hrp(),
-            proxy_url=get_proxy_url(),
-            explorer_url=get_explorer_url(),
-            ask_confirmation=get_confirmation_setting(),
-        )
