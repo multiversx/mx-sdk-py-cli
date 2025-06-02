@@ -3175,7 +3175,6 @@ Output example:
 options:
   -h, --help                                      show this help message and exit
   --bytecode BYTECODE                             the file containing the WASM bytecode
-  --abi ABI                                       the ABI file of the Multisig Smart Contract
   --quorum QUORUM                                 the number of signatures required to approve a proposal
   --board-members BOARD_MEMBERS [BOARD_MEMBERS ...]
                                                   the bech32 addresses of the board members
@@ -3183,6 +3182,7 @@ options:
   --metadata-not-readable                         ‼ mark the contract as NOT readable (default: readable)
   --metadata-payable                              ‼ mark the contract as payable (default: not payable)
   --metadata-payable-by-sc                        ‼ mark the contract as payable by SC (default: not payable by SC)
+  --abi ABI                                       the ABI file of the Multisig Smart Contract
   --outfile OUTFILE                               where to save the output (default: stdout)
   --pem PEM                                       🔑 the PEM file, if keyfile not provided
   --keyfile KEYFILE                               🔑 a JSON keyfile, if PEM not provided
@@ -3206,10 +3206,6 @@ options:
   --options OPTIONS                               the transaction options (default: 0)
   --relayer RELAYER                               the bech32 address of the relayer
   --guardian GUARDIAN                             the bech32 address of the guardian
-  --wait-result                                   signal to wait for the transaction result - only valid if --send is
-                                                  set
-  --timeout TIMEOUT                               max num of seconds to wait for result - only valid if --wait-result is
-                                                  set
   --send                                          ✓ whether to broadcast the transaction (default: False)
   --simulate                                      whether to simulate the transaction (default: False)
   --guardian-service-url GUARDIAN_SERVICE_URL     the url of the guardian service
@@ -3228,6 +3224,10 @@ options:
   --relayer-ledger                                🔐 bool flag for signing transaction using ledger
   --relayer-wallet-index RELAYER_WALLET_INDEX     🔑 the address index; can be used for PEM files, keyfiles of type
                                                   mnemonic or Ledger devices (default: 0)
+  --wait-result                                   signal to wait for the transaction result - only valid if --send is
+                                                  set
+  --timeout TIMEOUT                               max num of seconds to wait for result - only valid if --wait-result is
+                                                  set
 
 ```
 ### Multisig.Deposit
@@ -3269,6 +3269,9 @@ Output example:
 
 options:
   -h, --help                                      show this help message and exit
+  --token-transfers TOKEN_TRANSFERS [TOKEN_TRANSFERS ...]
+                                                  token transfers for transfer & execute, as [token, amount] E.g.
+                                                  --token-transfers NFT-123456-0a 1 ESDT-987654 100000000
   --contract CONTRACT                             🖄 the bech32 address of the Multisig Smart Contract
   --abi ABI                                       the ABI file of the Multisig Smart Contract
   --outfile OUTFILE                               where to save the output (default: stdout)
@@ -3294,13 +3297,6 @@ options:
   --options OPTIONS                               the transaction options (default: 0)
   --relayer RELAYER                               the bech32 address of the relayer
   --guardian GUARDIAN                             the bech32 address of the guardian
-  --token-transfers TOKEN_TRANSFERS [TOKEN_TRANSFERS ...]
-                                                  token transfers for transfer & execute, as [token, amount] E.g.
-                                                  --token-transfers NFT-123456-0a 1 ESDT-987654 100000000
-  --wait-result                                   signal to wait for the transaction result - only valid if --send is
-                                                  set
-  --timeout TIMEOUT                               max num of seconds to wait for result - only valid if --wait-result is
-                                                  set
   --send                                          ✓ whether to broadcast the transaction (default: False)
   --simulate                                      whether to simulate the transaction (default: False)
   --guardian-service-url GUARDIAN_SERVICE_URL     the url of the guardian service
@@ -3319,6 +3315,10 @@ options:
   --relayer-ledger                                🔐 bool flag for signing transaction using ledger
   --relayer-wallet-index RELAYER_WALLET_INDEX     🔑 the address index; can be used for PEM files, keyfiles of type
                                                   mnemonic or Ledger devices (default: 0)
+  --wait-result                                   signal to wait for the transaction result - only valid if --send is
+                                                  set
+  --timeout TIMEOUT                               max num of seconds to wait for result - only valid if --wait-result is
+                                                  set
 
 ```
 ### Multisig.DiscardAction
@@ -3360,9 +3360,9 @@ Output example:
 
 options:
   -h, --help                                     show this help message and exit
+  --action ACTION                                the id of the action
   --contract CONTRACT                            🖄 the bech32 address of the Multisig Smart Contract
   --abi ABI                                      the ABI file of the Multisig Smart Contract
-  --action ACTION                                the id of the action
   --outfile OUTFILE                              where to save the output (default: stdout)
   --pem PEM                                      🔑 the PEM file, if keyfile not provided
   --keyfile KEYFILE                              🔑 a JSON keyfile, if PEM not provided
@@ -3386,9 +3386,6 @@ options:
   --options OPTIONS                              the transaction options (default: 0)
   --relayer RELAYER                              the bech32 address of the relayer
   --guardian GUARDIAN                            the bech32 address of the guardian
-  --wait-result                                  signal to wait for the transaction result - only valid if --send is set
-  --timeout TIMEOUT                              max num of seconds to wait for result - only valid if --wait-result is
-                                                 set
   --send                                         ✓ whether to broadcast the transaction (default: False)
   --simulate                                     whether to simulate the transaction (default: False)
   --guardian-service-url GUARDIAN_SERVICE_URL    the url of the guardian service
@@ -3407,6 +3404,9 @@ options:
   --relayer-ledger                               🔐 bool flag for signing transaction using ledger
   --relayer-wallet-index RELAYER_WALLET_INDEX    🔑 the address index; can be used for PEM files, keyfiles of type
                                                  mnemonic or Ledger devices (default: 0)
+  --wait-result                                  signal to wait for the transaction result - only valid if --send is set
+  --timeout TIMEOUT                              max num of seconds to wait for result - only valid if --wait-result is
+                                                 set
 
 ```
 ### Multisig.DiscardBatch
@@ -3448,9 +3448,9 @@ Output example:
 
 options:
   -h, --help                                     show this help message and exit
+  --action-ids ACTION_IDS [ACTION_IDS ...]       the IDs of the actions to discard
   --contract CONTRACT                            🖄 the bech32 address of the Multisig Smart Contract
   --abi ABI                                      the ABI file of the Multisig Smart Contract
-  --action-ids ACTION_IDS [ACTION_IDS ...]       the IDs of the actions to discard
   --outfile OUTFILE                              where to save the output (default: stdout)
   --pem PEM                                      🔑 the PEM file, if keyfile not provided
   --keyfile KEYFILE                              🔑 a JSON keyfile, if PEM not provided
@@ -3474,9 +3474,6 @@ options:
   --options OPTIONS                              the transaction options (default: 0)
   --relayer RELAYER                              the bech32 address of the relayer
   --guardian GUARDIAN                            the bech32 address of the guardian
-  --wait-result                                  signal to wait for the transaction result - only valid if --send is set
-  --timeout TIMEOUT                              max num of seconds to wait for result - only valid if --wait-result is
-                                                 set
   --send                                         ✓ whether to broadcast the transaction (default: False)
   --simulate                                     whether to simulate the transaction (default: False)
   --guardian-service-url GUARDIAN_SERVICE_URL    the url of the guardian service
@@ -3495,6 +3492,9 @@ options:
   --relayer-ledger                               🔐 bool flag for signing transaction using ledger
   --relayer-wallet-index RELAYER_WALLET_INDEX    🔑 the address index; can be used for PEM files, keyfiles of type
                                                  mnemonic or Ledger devices (default: 0)
+  --wait-result                                  signal to wait for the transaction result - only valid if --send is set
+  --timeout TIMEOUT                              max num of seconds to wait for result - only valid if --wait-result is
+                                                 set
 
 ```
 ### Multisig.AddBoardMember
@@ -3536,9 +3536,9 @@ Output example:
 
 options:
   -h, --help                                     show this help message and exit
+  --board-member BOARD_MEMBER                    the bech32 address of the proposed board member
   --contract CONTRACT                            🖄 the bech32 address of the Multisig Smart Contract
   --abi ABI                                      the ABI file of the Multisig Smart Contract
-  --board-member BOARD_MEMBER                    the bech32 address of the proposed board member
   --outfile OUTFILE                              where to save the output (default: stdout)
   --pem PEM                                      🔑 the PEM file, if keyfile not provided
   --keyfile KEYFILE                              🔑 a JSON keyfile, if PEM not provided
@@ -3562,9 +3562,6 @@ options:
   --options OPTIONS                              the transaction options (default: 0)
   --relayer RELAYER                              the bech32 address of the relayer
   --guardian GUARDIAN                            the bech32 address of the guardian
-  --wait-result                                  signal to wait for the transaction result - only valid if --send is set
-  --timeout TIMEOUT                              max num of seconds to wait for result - only valid if --wait-result is
-                                                 set
   --send                                         ✓ whether to broadcast the transaction (default: False)
   --simulate                                     whether to simulate the transaction (default: False)
   --guardian-service-url GUARDIAN_SERVICE_URL    the url of the guardian service
@@ -3583,6 +3580,9 @@ options:
   --relayer-ledger                               🔐 bool flag for signing transaction using ledger
   --relayer-wallet-index RELAYER_WALLET_INDEX    🔑 the address index; can be used for PEM files, keyfiles of type
                                                  mnemonic or Ledger devices (default: 0)
+  --wait-result                                  signal to wait for the transaction result - only valid if --send is set
+  --timeout TIMEOUT                              max num of seconds to wait for result - only valid if --wait-result is
+                                                 set
 
 ```
 ### Multisig.AddProposer
@@ -3624,9 +3624,9 @@ Output example:
 
 options:
   -h, --help                                     show this help message and exit
+  --proposer PROPOSER                            the bech32 address of the proposed proposer
   --contract CONTRACT                            🖄 the bech32 address of the Multisig Smart Contract
   --abi ABI                                      the ABI file of the Multisig Smart Contract
-  --proposer PROPOSER                            the bech32 address of the proposed proposer
   --outfile OUTFILE                              where to save the output (default: stdout)
   --pem PEM                                      🔑 the PEM file, if keyfile not provided
   --keyfile KEYFILE                              🔑 a JSON keyfile, if PEM not provided
@@ -3650,9 +3650,6 @@ options:
   --options OPTIONS                              the transaction options (default: 0)
   --relayer RELAYER                              the bech32 address of the relayer
   --guardian GUARDIAN                            the bech32 address of the guardian
-  --wait-result                                  signal to wait for the transaction result - only valid if --send is set
-  --timeout TIMEOUT                              max num of seconds to wait for result - only valid if --wait-result is
-                                                 set
   --send                                         ✓ whether to broadcast the transaction (default: False)
   --simulate                                     whether to simulate the transaction (default: False)
   --guardian-service-url GUARDIAN_SERVICE_URL    the url of the guardian service
@@ -3671,6 +3668,9 @@ options:
   --relayer-ledger                               🔐 bool flag for signing transaction using ledger
   --relayer-wallet-index RELAYER_WALLET_INDEX    🔑 the address index; can be used for PEM files, keyfiles of type
                                                  mnemonic or Ledger devices (default: 0)
+  --wait-result                                  signal to wait for the transaction result - only valid if --send is set
+  --timeout TIMEOUT                              max num of seconds to wait for result - only valid if --wait-result is
+                                                 set
 
 ```
 ### Multisig.RemoveUser
@@ -3712,9 +3712,9 @@ Output example:
 
 options:
   -h, --help                                     show this help message and exit
+  --user USER                                    the bech32 address of the proposed user to be removed
   --contract CONTRACT                            🖄 the bech32 address of the Multisig Smart Contract
   --abi ABI                                      the ABI file of the Multisig Smart Contract
-  --user USER                                    the bech32 address of the proposed user to be removed
   --outfile OUTFILE                              where to save the output (default: stdout)
   --pem PEM                                      🔑 the PEM file, if keyfile not provided
   --keyfile KEYFILE                              🔑 a JSON keyfile, if PEM not provided
@@ -3738,9 +3738,6 @@ options:
   --options OPTIONS                              the transaction options (default: 0)
   --relayer RELAYER                              the bech32 address of the relayer
   --guardian GUARDIAN                            the bech32 address of the guardian
-  --wait-result                                  signal to wait for the transaction result - only valid if --send is set
-  --timeout TIMEOUT                              max num of seconds to wait for result - only valid if --wait-result is
-                                                 set
   --send                                         ✓ whether to broadcast the transaction (default: False)
   --simulate                                     whether to simulate the transaction (default: False)
   --guardian-service-url GUARDIAN_SERVICE_URL    the url of the guardian service
@@ -3759,6 +3756,9 @@ options:
   --relayer-ledger                               🔐 bool flag for signing transaction using ledger
   --relayer-wallet-index RELAYER_WALLET_INDEX    🔑 the address index; can be used for PEM files, keyfiles of type
                                                  mnemonic or Ledger devices (default: 0)
+  --wait-result                                  signal to wait for the transaction result - only valid if --send is set
+  --timeout TIMEOUT                              max num of seconds to wait for result - only valid if --wait-result is
+                                                 set
 
 ```
 ### Multisig.ChangeQuorum
@@ -3800,10 +3800,10 @@ Output example:
 
 options:
   -h, --help                                     show this help message and exit
-  --contract CONTRACT                            🖄 the bech32 address of the Multisig Smart Contract
-  --abi ABI                                      the ABI file of the Multisig Smart Contract
   --quorum QUORUM                                the size of the new quorum (number of signatures required to approve a
                                                  proposal)
+  --contract CONTRACT                            🖄 the bech32 address of the Multisig Smart Contract
+  --abi ABI                                      the ABI file of the Multisig Smart Contract
   --outfile OUTFILE                              where to save the output (default: stdout)
   --pem PEM                                      🔑 the PEM file, if keyfile not provided
   --keyfile KEYFILE                              🔑 a JSON keyfile, if PEM not provided
@@ -3827,9 +3827,6 @@ options:
   --options OPTIONS                              the transaction options (default: 0)
   --relayer RELAYER                              the bech32 address of the relayer
   --guardian GUARDIAN                            the bech32 address of the guardian
-  --wait-result                                  signal to wait for the transaction result - only valid if --send is set
-  --timeout TIMEOUT                              max num of seconds to wait for result - only valid if --wait-result is
-                                                 set
   --send                                         ✓ whether to broadcast the transaction (default: False)
   --simulate                                     whether to simulate the transaction (default: False)
   --guardian-service-url GUARDIAN_SERVICE_URL    the url of the guardian service
@@ -3848,6 +3845,9 @@ options:
   --relayer-ledger                               🔐 bool flag for signing transaction using ledger
   --relayer-wallet-index RELAYER_WALLET_INDEX    🔑 the address index; can be used for PEM files, keyfiles of type
                                                  mnemonic or Ledger devices (default: 0)
+  --wait-result                                  signal to wait for the transaction result - only valid if --send is set
+  --timeout TIMEOUT                              max num of seconds to wait for result - only valid if --wait-result is
+                                                 set
 
 ```
 ### Multisig.TransferAndExecute
@@ -3889,8 +3889,6 @@ Output example:
 
 options:
   -h, --help                                     show this help message and exit
-  --contract CONTRACT                            🖄 the bech32 address of the Multisig Smart Contract
-  --abi ABI                                      the ABI file of the Multisig Smart Contract
   --opt-gas-limit OPT_GAS_LIMIT                  the size of the new quorum (number of signatures required to approve a
                                                  proposal)
   --contract-abi CONTRACT_ABI                    the ABI file of the contract to call
@@ -3900,6 +3898,8 @@ options:
                                                  0xabba str:TOK-a1c2ef true addr:erd1[..]
   --arguments-file ARGUMENTS_FILE                a json file containing the arguments. ONLY if abi file is provided.
                                                  E.g. [{ 'to': 'erd1...', 'amount': 10000000000 }]
+  --contract CONTRACT                            🖄 the bech32 address of the Multisig Smart Contract
+  --abi ABI                                      the ABI file of the Multisig Smart Contract
   --outfile OUTFILE                              where to save the output (default: stdout)
   --pem PEM                                      🔑 the PEM file, if keyfile not provided
   --keyfile KEYFILE                              🔑 a JSON keyfile, if PEM not provided
@@ -3925,9 +3925,6 @@ options:
   --options OPTIONS                              the transaction options (default: 0)
   --relayer RELAYER                              the bech32 address of the relayer
   --guardian GUARDIAN                            the bech32 address of the guardian
-  --wait-result                                  signal to wait for the transaction result - only valid if --send is set
-  --timeout TIMEOUT                              max num of seconds to wait for result - only valid if --wait-result is
-                                                 set
   --send                                         ✓ whether to broadcast the transaction (default: False)
   --simulate                                     whether to simulate the transaction (default: False)
   --guardian-service-url GUARDIAN_SERVICE_URL    the url of the guardian service
@@ -3946,6 +3943,9 @@ options:
   --relayer-ledger                               🔐 bool flag for signing transaction using ledger
   --relayer-wallet-index RELAYER_WALLET_INDEX    🔑 the address index; can be used for PEM files, keyfiles of type
                                                  mnemonic or Ledger devices (default: 0)
+  --wait-result                                  signal to wait for the transaction result - only valid if --send is set
+  --timeout TIMEOUT                              max num of seconds to wait for result - only valid if --wait-result is
+                                                 set
 
 ```
 ### Multisig.TransferAndExecuteEsdt
@@ -3987,8 +3987,6 @@ Output example:
 
 options:
   -h, --help                                      show this help message and exit
-  --contract CONTRACT                             🖄 the bech32 address of the Multisig Smart Contract
-  --abi ABI                                       the ABI file of the Multisig Smart Contract
   --token-transfers TOKEN_TRANSFERS [TOKEN_TRANSFERS ...]
                                                   token transfers for transfer & execute, as [token, amount] E.g.
                                                   --token-transfers NFT-123456-0a 1 ESDT-987654 100000000
@@ -4001,6 +3999,8 @@ options:
                                                   0xabba str:TOK-a1c2ef true addr:erd1[..]
   --arguments-file ARGUMENTS_FILE                 a json file containing the arguments. ONLY if abi file is provided.
                                                   E.g. [{ 'to': 'erd1...', 'amount': 10000000000 }]
+  --contract CONTRACT                             🖄 the bech32 address of the Multisig Smart Contract
+  --abi ABI                                       the ABI file of the Multisig Smart Contract
   --outfile OUTFILE                               where to save the output (default: stdout)
   --pem PEM                                       🔑 the PEM file, if keyfile not provided
   --keyfile KEYFILE                               🔑 a JSON keyfile, if PEM not provided
@@ -4026,10 +4026,6 @@ options:
   --options OPTIONS                               the transaction options (default: 0)
   --relayer RELAYER                               the bech32 address of the relayer
   --guardian GUARDIAN                             the bech32 address of the guardian
-  --wait-result                                   signal to wait for the transaction result - only valid if --send is
-                                                  set
-  --timeout TIMEOUT                               max num of seconds to wait for result - only valid if --wait-result is
-                                                  set
   --send                                          ✓ whether to broadcast the transaction (default: False)
   --simulate                                      whether to simulate the transaction (default: False)
   --guardian-service-url GUARDIAN_SERVICE_URL     the url of the guardian service
@@ -4048,6 +4044,10 @@ options:
   --relayer-ledger                                🔐 bool flag for signing transaction using ledger
   --relayer-wallet-index RELAYER_WALLET_INDEX     🔑 the address index; can be used for PEM files, keyfiles of type
                                                   mnemonic or Ledger devices (default: 0)
+  --wait-result                                   signal to wait for the transaction result - only valid if --send is
+                                                  set
+  --timeout TIMEOUT                               max num of seconds to wait for result - only valid if --wait-result is
+                                                  set
 
 ```
 ### Multisig.AsyncCall
@@ -4089,8 +4089,6 @@ Output example:
 
 options:
   -h, --help                                      show this help message and exit
-  --contract CONTRACT                             🖄 the bech32 address of the Multisig Smart Contract
-  --abi ABI                                       the ABI file of the Multisig Smart Contract
   --token-transfers TOKEN_TRANSFERS [TOKEN_TRANSFERS ...]
                                                   token transfers for transfer & execute, as [token, amount] E.g.
                                                   --token-transfers NFT-123456-0a 1 ESDT-987654 100000000
@@ -4103,6 +4101,8 @@ options:
                                                   0xabba str:TOK-a1c2ef true addr:erd1[..]
   --arguments-file ARGUMENTS_FILE                 a json file containing the arguments. ONLY if abi file is provided.
                                                   E.g. [{ 'to': 'erd1...', 'amount': 10000000000 }]
+  --contract CONTRACT                             🖄 the bech32 address of the Multisig Smart Contract
+  --abi ABI                                       the ABI file of the Multisig Smart Contract
   --outfile OUTFILE                               where to save the output (default: stdout)
   --pem PEM                                       🔑 the PEM file, if keyfile not provided
   --keyfile KEYFILE                               🔑 a JSON keyfile, if PEM not provided
@@ -4128,10 +4128,6 @@ options:
   --options OPTIONS                               the transaction options (default: 0)
   --relayer RELAYER                               the bech32 address of the relayer
   --guardian GUARDIAN                             the bech32 address of the guardian
-  --wait-result                                   signal to wait for the transaction result - only valid if --send is
-                                                  set
-  --timeout TIMEOUT                               max num of seconds to wait for result - only valid if --wait-result is
-                                                  set
   --send                                          ✓ whether to broadcast the transaction (default: False)
   --simulate                                      whether to simulate the transaction (default: False)
   --guardian-service-url GUARDIAN_SERVICE_URL     the url of the guardian service
@@ -4150,6 +4146,10 @@ options:
   --relayer-ledger                                🔐 bool flag for signing transaction using ledger
   --relayer-wallet-index RELAYER_WALLET_INDEX     🔑 the address index; can be used for PEM files, keyfiles of type
                                                   mnemonic or Ledger devices (default: 0)
+  --wait-result                                   signal to wait for the transaction result - only valid if --send is
+                                                  set
+  --timeout TIMEOUT                               max num of seconds to wait for result - only valid if --wait-result is
+                                                  set
 
 ```
 ### Multisig.DeployFromSource
@@ -4191,19 +4191,19 @@ Output example:
 
 options:
   -h, --help                                     show this help message and exit
-  --contract CONTRACT                            🖄 the bech32 address of the Multisig Smart Contract
-  --abi ABI                                      the ABI file of the Multisig Smart Contract
   --contract-to-copy CONTRACT_TO_COPY            the bech32 address of the contract to copy
   --contract-abi CONTRACT_ABI                    the ABI file of the contract to copy
+  --metadata-not-upgradeable                     ‼ mark the contract as NOT upgradeable (default: upgradeable)
+  --metadata-not-readable                        ‼ mark the contract as NOT readable (default: readable)
+  --metadata-payable                             ‼ mark the contract as payable (default: not payable)
+  --metadata-payable-by-sc                       ‼ mark the contract as payable by SC (default: not payable by SC)
   --arguments ARGUMENTS [ARGUMENTS ...]          arguments for the contract transaction, as [number, bech32-address,
                                                  ascii string, boolean] or hex-encoded. E.g. --arguments 42 0x64 1000
                                                  0xabba str:TOK-a1c2ef true addr:erd1[..]
   --arguments-file ARGUMENTS_FILE                a json file containing the arguments. ONLY if abi file is provided.
                                                  E.g. [{ 'to': 'erd1...', 'amount': 10000000000 }]
-  --metadata-not-upgradeable                     ‼ mark the contract as NOT upgradeable (default: upgradeable)
-  --metadata-not-readable                        ‼ mark the contract as NOT readable (default: readable)
-  --metadata-payable                             ‼ mark the contract as payable (default: not payable)
-  --metadata-payable-by-sc                       ‼ mark the contract as payable by SC (default: not payable by SC)
+  --contract CONTRACT                            🖄 the bech32 address of the Multisig Smart Contract
+  --abi ABI                                      the ABI file of the Multisig Smart Contract
   --outfile OUTFILE                              where to save the output (default: stdout)
   --pem PEM                                      🔑 the PEM file, if keyfile not provided
   --keyfile KEYFILE                              🔑 a JSON keyfile, if PEM not provided
@@ -4227,9 +4227,6 @@ options:
   --options OPTIONS                              the transaction options (default: 0)
   --relayer RELAYER                              the bech32 address of the relayer
   --guardian GUARDIAN                            the bech32 address of the guardian
-  --wait-result                                  signal to wait for the transaction result - only valid if --send is set
-  --timeout TIMEOUT                              max num of seconds to wait for result - only valid if --wait-result is
-                                                 set
   --send                                         ✓ whether to broadcast the transaction (default: False)
   --simulate                                     whether to simulate the transaction (default: False)
   --guardian-service-url GUARDIAN_SERVICE_URL    the url of the guardian service
@@ -4248,6 +4245,9 @@ options:
   --relayer-ledger                               🔐 bool flag for signing transaction using ledger
   --relayer-wallet-index RELAYER_WALLET_INDEX    🔑 the address index; can be used for PEM files, keyfiles of type
                                                  mnemonic or Ledger devices (default: 0)
+  --wait-result                                  signal to wait for the transaction result - only valid if --send is set
+  --timeout TIMEOUT                              max num of seconds to wait for result - only valid if --wait-result is
+                                                 set
 
 ```
 ### Multisig.UpgradeFromSource
@@ -4289,20 +4289,20 @@ Output example:
 
 options:
   -h, --help                                     show this help message and exit
-  --contract CONTRACT                            🖄 the bech32 address of the Multisig Smart Contract
-  --abi ABI                                      the ABI file of the Multisig Smart Contract
   --contract-to-upgrade CONTRACT_TO_UPGRADE      the bech32 address of the contract to upgrade
   --contract-to-copy CONTRACT_TO_COPY            the bech32 address of the contract to copy
   --contract-abi CONTRACT_ABI                    the ABI file of the contract to copy
+  --metadata-not-upgradeable                     ‼ mark the contract as NOT upgradeable (default: upgradeable)
+  --metadata-not-readable                        ‼ mark the contract as NOT readable (default: readable)
+  --metadata-payable                             ‼ mark the contract as payable (default: not payable)
+  --metadata-payable-by-sc                       ‼ mark the contract as payable by SC (default: not payable by SC)
   --arguments ARGUMENTS [ARGUMENTS ...]          arguments for the contract transaction, as [number, bech32-address,
                                                  ascii string, boolean] or hex-encoded. E.g. --arguments 42 0x64 1000
                                                  0xabba str:TOK-a1c2ef true addr:erd1[..]
   --arguments-file ARGUMENTS_FILE                a json file containing the arguments. ONLY if abi file is provided.
                                                  E.g. [{ 'to': 'erd1...', 'amount': 10000000000 }]
-  --metadata-not-upgradeable                     ‼ mark the contract as NOT upgradeable (default: upgradeable)
-  --metadata-not-readable                        ‼ mark the contract as NOT readable (default: readable)
-  --metadata-payable                             ‼ mark the contract as payable (default: not payable)
-  --metadata-payable-by-sc                       ‼ mark the contract as payable by SC (default: not payable by SC)
+  --contract CONTRACT                            🖄 the bech32 address of the Multisig Smart Contract
+  --abi ABI                                      the ABI file of the Multisig Smart Contract
   --outfile OUTFILE                              where to save the output (default: stdout)
   --pem PEM                                      🔑 the PEM file, if keyfile not provided
   --keyfile KEYFILE                              🔑 a JSON keyfile, if PEM not provided
@@ -4326,9 +4326,6 @@ options:
   --options OPTIONS                              the transaction options (default: 0)
   --relayer RELAYER                              the bech32 address of the relayer
   --guardian GUARDIAN                            the bech32 address of the guardian
-  --wait-result                                  signal to wait for the transaction result - only valid if --send is set
-  --timeout TIMEOUT                              max num of seconds to wait for result - only valid if --wait-result is
-                                                 set
   --send                                         ✓ whether to broadcast the transaction (default: False)
   --simulate                                     whether to simulate the transaction (default: False)
   --guardian-service-url GUARDIAN_SERVICE_URL    the url of the guardian service
@@ -4347,6 +4344,9 @@ options:
   --relayer-ledger                               🔐 bool flag for signing transaction using ledger
   --relayer-wallet-index RELAYER_WALLET_INDEX    🔑 the address index; can be used for PEM files, keyfiles of type
                                                  mnemonic or Ledger devices (default: 0)
+  --wait-result                                  signal to wait for the transaction result - only valid if --send is set
+  --timeout TIMEOUT                              max num of seconds to wait for result - only valid if --wait-result is
+                                                 set
 
 ```
 ### Multisig.SignAction
@@ -4388,9 +4388,9 @@ Output example:
 
 options:
   -h, --help                                     show this help message and exit
+  --action ACTION                                the id of the action
   --contract CONTRACT                            🖄 the bech32 address of the Multisig Smart Contract
   --abi ABI                                      the ABI file of the Multisig Smart Contract
-  --action ACTION                                the id of the action
   --outfile OUTFILE                              where to save the output (default: stdout)
   --pem PEM                                      🔑 the PEM file, if keyfile not provided
   --keyfile KEYFILE                              🔑 a JSON keyfile, if PEM not provided
@@ -4414,9 +4414,6 @@ options:
   --options OPTIONS                              the transaction options (default: 0)
   --relayer RELAYER                              the bech32 address of the relayer
   --guardian GUARDIAN                            the bech32 address of the guardian
-  --wait-result                                  signal to wait for the transaction result - only valid if --send is set
-  --timeout TIMEOUT                              max num of seconds to wait for result - only valid if --wait-result is
-                                                 set
   --send                                         ✓ whether to broadcast the transaction (default: False)
   --simulate                                     whether to simulate the transaction (default: False)
   --guardian-service-url GUARDIAN_SERVICE_URL    the url of the guardian service
@@ -4435,6 +4432,9 @@ options:
   --relayer-ledger                               🔐 bool flag for signing transaction using ledger
   --relayer-wallet-index RELAYER_WALLET_INDEX    🔑 the address index; can be used for PEM files, keyfiles of type
                                                  mnemonic or Ledger devices (default: 0)
+  --wait-result                                  signal to wait for the transaction result - only valid if --send is set
+  --timeout TIMEOUT                              max num of seconds to wait for result - only valid if --wait-result is
+                                                 set
 
 ```
 ### Multisig.SignBatch
@@ -4476,9 +4476,9 @@ Output example:
 
 options:
   -h, --help                                     show this help message and exit
+  --batch BATCH                                  the id of the batch to sign
   --contract CONTRACT                            🖄 the bech32 address of the Multisig Smart Contract
   --abi ABI                                      the ABI file of the Multisig Smart Contract
-  --batch BATCH                                  the id of the batch to sign
   --outfile OUTFILE                              where to save the output (default: stdout)
   --pem PEM                                      🔑 the PEM file, if keyfile not provided
   --keyfile KEYFILE                              🔑 a JSON keyfile, if PEM not provided
@@ -4502,9 +4502,6 @@ options:
   --options OPTIONS                              the transaction options (default: 0)
   --relayer RELAYER                              the bech32 address of the relayer
   --guardian GUARDIAN                            the bech32 address of the guardian
-  --wait-result                                  signal to wait for the transaction result - only valid if --send is set
-  --timeout TIMEOUT                              max num of seconds to wait for result - only valid if --wait-result is
-                                                 set
   --send                                         ✓ whether to broadcast the transaction (default: False)
   --simulate                                     whether to simulate the transaction (default: False)
   --guardian-service-url GUARDIAN_SERVICE_URL    the url of the guardian service
@@ -4523,6 +4520,9 @@ options:
   --relayer-ledger                               🔐 bool flag for signing transaction using ledger
   --relayer-wallet-index RELAYER_WALLET_INDEX    🔑 the address index; can be used for PEM files, keyfiles of type
                                                  mnemonic or Ledger devices (default: 0)
+  --wait-result                                  signal to wait for the transaction result - only valid if --send is set
+  --timeout TIMEOUT                              max num of seconds to wait for result - only valid if --wait-result is
+                                                 set
 
 ```
 ### Multisig.SignAndPerform
@@ -4564,9 +4564,9 @@ Output example:
 
 options:
   -h, --help                                     show this help message and exit
+  --action ACTION                                the id of the action
   --contract CONTRACT                            🖄 the bech32 address of the Multisig Smart Contract
   --abi ABI                                      the ABI file of the Multisig Smart Contract
-  --action ACTION                                the id of the action
   --outfile OUTFILE                              where to save the output (default: stdout)
   --pem PEM                                      🔑 the PEM file, if keyfile not provided
   --keyfile KEYFILE                              🔑 a JSON keyfile, if PEM not provided
@@ -4590,9 +4590,6 @@ options:
   --options OPTIONS                              the transaction options (default: 0)
   --relayer RELAYER                              the bech32 address of the relayer
   --guardian GUARDIAN                            the bech32 address of the guardian
-  --wait-result                                  signal to wait for the transaction result - only valid if --send is set
-  --timeout TIMEOUT                              max num of seconds to wait for result - only valid if --wait-result is
-                                                 set
   --send                                         ✓ whether to broadcast the transaction (default: False)
   --simulate                                     whether to simulate the transaction (default: False)
   --guardian-service-url GUARDIAN_SERVICE_URL    the url of the guardian service
@@ -4611,6 +4608,9 @@ options:
   --relayer-ledger                               🔐 bool flag for signing transaction using ledger
   --relayer-wallet-index RELAYER_WALLET_INDEX    🔑 the address index; can be used for PEM files, keyfiles of type
                                                  mnemonic or Ledger devices (default: 0)
+  --wait-result                                  signal to wait for the transaction result - only valid if --send is set
+  --timeout TIMEOUT                              max num of seconds to wait for result - only valid if --wait-result is
+                                                 set
 
 ```
 ### Multisig.SignBatchAndPerform
@@ -4652,9 +4652,9 @@ Output example:
 
 options:
   -h, --help                                     show this help message and exit
+  --batch BATCH                                  the id of the batch to sign
   --contract CONTRACT                            🖄 the bech32 address of the Multisig Smart Contract
   --abi ABI                                      the ABI file of the Multisig Smart Contract
-  --batch BATCH                                  the id of the batch to sign
   --outfile OUTFILE                              where to save the output (default: stdout)
   --pem PEM                                      🔑 the PEM file, if keyfile not provided
   --keyfile KEYFILE                              🔑 a JSON keyfile, if PEM not provided
@@ -4678,9 +4678,6 @@ options:
   --options OPTIONS                              the transaction options (default: 0)
   --relayer RELAYER                              the bech32 address of the relayer
   --guardian GUARDIAN                            the bech32 address of the guardian
-  --wait-result                                  signal to wait for the transaction result - only valid if --send is set
-  --timeout TIMEOUT                              max num of seconds to wait for result - only valid if --wait-result is
-                                                 set
   --send                                         ✓ whether to broadcast the transaction (default: False)
   --simulate                                     whether to simulate the transaction (default: False)
   --guardian-service-url GUARDIAN_SERVICE_URL    the url of the guardian service
@@ -4699,6 +4696,9 @@ options:
   --relayer-ledger                               🔐 bool flag for signing transaction using ledger
   --relayer-wallet-index RELAYER_WALLET_INDEX    🔑 the address index; can be used for PEM files, keyfiles of type
                                                  mnemonic or Ledger devices (default: 0)
+  --wait-result                                  signal to wait for the transaction result - only valid if --send is set
+  --timeout TIMEOUT                              max num of seconds to wait for result - only valid if --wait-result is
+                                                 set
 
 ```
 ### Multisig.UnsignAction
@@ -4740,9 +4740,9 @@ Output example:
 
 options:
   -h, --help                                     show this help message and exit
+  --action ACTION                                the id of the action
   --contract CONTRACT                            🖄 the bech32 address of the Multisig Smart Contract
   --abi ABI                                      the ABI file of the Multisig Smart Contract
-  --action ACTION                                the id of the action
   --outfile OUTFILE                              where to save the output (default: stdout)
   --pem PEM                                      🔑 the PEM file, if keyfile not provided
   --keyfile KEYFILE                              🔑 a JSON keyfile, if PEM not provided
@@ -4766,9 +4766,6 @@ options:
   --options OPTIONS                              the transaction options (default: 0)
   --relayer RELAYER                              the bech32 address of the relayer
   --guardian GUARDIAN                            the bech32 address of the guardian
-  --wait-result                                  signal to wait for the transaction result - only valid if --send is set
-  --timeout TIMEOUT                              max num of seconds to wait for result - only valid if --wait-result is
-                                                 set
   --send                                         ✓ whether to broadcast the transaction (default: False)
   --simulate                                     whether to simulate the transaction (default: False)
   --guardian-service-url GUARDIAN_SERVICE_URL    the url of the guardian service
@@ -4787,6 +4784,9 @@ options:
   --relayer-ledger                               🔐 bool flag for signing transaction using ledger
   --relayer-wallet-index RELAYER_WALLET_INDEX    🔑 the address index; can be used for PEM files, keyfiles of type
                                                  mnemonic or Ledger devices (default: 0)
+  --wait-result                                  signal to wait for the transaction result - only valid if --send is set
+  --timeout TIMEOUT                              max num of seconds to wait for result - only valid if --wait-result is
+                                                 set
 
 ```
 ### Multisig.UnsignBatch
@@ -4828,9 +4828,9 @@ Output example:
 
 options:
   -h, --help                                     show this help message and exit
+  --batch BATCH                                  the id of the batch to unsign
   --contract CONTRACT                            🖄 the bech32 address of the Multisig Smart Contract
   --abi ABI                                      the ABI file of the Multisig Smart Contract
-  --batch BATCH                                  the id of the batch to sign
   --outfile OUTFILE                              where to save the output (default: stdout)
   --pem PEM                                      🔑 the PEM file, if keyfile not provided
   --keyfile KEYFILE                              🔑 a JSON keyfile, if PEM not provided
@@ -4854,9 +4854,6 @@ options:
   --options OPTIONS                              the transaction options (default: 0)
   --relayer RELAYER                              the bech32 address of the relayer
   --guardian GUARDIAN                            the bech32 address of the guardian
-  --wait-result                                  signal to wait for the transaction result - only valid if --send is set
-  --timeout TIMEOUT                              max num of seconds to wait for result - only valid if --wait-result is
-                                                 set
   --send                                         ✓ whether to broadcast the transaction (default: False)
   --simulate                                     whether to simulate the transaction (default: False)
   --guardian-service-url GUARDIAN_SERVICE_URL    the url of the guardian service
@@ -4875,6 +4872,9 @@ options:
   --relayer-ledger                               🔐 bool flag for signing transaction using ledger
   --relayer-wallet-index RELAYER_WALLET_INDEX    🔑 the address index; can be used for PEM files, keyfiles of type
                                                  mnemonic or Ledger devices (default: 0)
+  --wait-result                                  signal to wait for the transaction result - only valid if --send is set
+  --timeout TIMEOUT                              max num of seconds to wait for result - only valid if --wait-result is
+                                                 set
 
 ```
 ### Multisig.UnsignForOutdatedMembers
@@ -4916,11 +4916,11 @@ Output example:
 
 options:
   -h, --help                                      show this help message and exit
-  --contract CONTRACT                             🖄 the bech32 address of the Multisig Smart Contract
-  --abi ABI                                       the ABI file of the Multisig Smart Contract
   --action ACTION                                 the id of the action
   --outdated-members OUTDATED_MEMBERS [OUTDATED_MEMBERS ...]
                                                   IDs of the outdated board members
+  --contract CONTRACT                             🖄 the bech32 address of the Multisig Smart Contract
+  --abi ABI                                       the ABI file of the Multisig Smart Contract
   --outfile OUTFILE                               where to save the output (default: stdout)
   --pem PEM                                       🔑 the PEM file, if keyfile not provided
   --keyfile KEYFILE                               🔑 a JSON keyfile, if PEM not provided
@@ -4944,10 +4944,6 @@ options:
   --options OPTIONS                               the transaction options (default: 0)
   --relayer RELAYER                               the bech32 address of the relayer
   --guardian GUARDIAN                             the bech32 address of the guardian
-  --wait-result                                   signal to wait for the transaction result - only valid if --send is
-                                                  set
-  --timeout TIMEOUT                               max num of seconds to wait for result - only valid if --wait-result is
-                                                  set
   --send                                          ✓ whether to broadcast the transaction (default: False)
   --simulate                                      whether to simulate the transaction (default: False)
   --guardian-service-url GUARDIAN_SERVICE_URL     the url of the guardian service
@@ -4966,6 +4962,10 @@ options:
   --relayer-ledger                                🔐 bool flag for signing transaction using ledger
   --relayer-wallet-index RELAYER_WALLET_INDEX     🔑 the address index; can be used for PEM files, keyfiles of type
                                                   mnemonic or Ledger devices (default: 0)
+  --wait-result                                   signal to wait for the transaction result - only valid if --send is
+                                                  set
+  --timeout TIMEOUT                               max num of seconds to wait for result - only valid if --wait-result is
+                                                  set
 
 ```
 ### Multisig.PerformAction
@@ -5007,9 +5007,9 @@ Output example:
 
 options:
   -h, --help                                     show this help message and exit
+  --action ACTION                                the id of the action
   --contract CONTRACT                            🖄 the bech32 address of the Multisig Smart Contract
   --abi ABI                                      the ABI file of the Multisig Smart Contract
-  --action ACTION                                the id of the action
   --outfile OUTFILE                              where to save the output (default: stdout)
   --pem PEM                                      🔑 the PEM file, if keyfile not provided
   --keyfile KEYFILE                              🔑 a JSON keyfile, if PEM not provided
@@ -5033,9 +5033,6 @@ options:
   --options OPTIONS                              the transaction options (default: 0)
   --relayer RELAYER                              the bech32 address of the relayer
   --guardian GUARDIAN                            the bech32 address of the guardian
-  --wait-result                                  signal to wait for the transaction result - only valid if --send is set
-  --timeout TIMEOUT                              max num of seconds to wait for result - only valid if --wait-result is
-                                                 set
   --send                                         ✓ whether to broadcast the transaction (default: False)
   --simulate                                     whether to simulate the transaction (default: False)
   --guardian-service-url GUARDIAN_SERVICE_URL    the url of the guardian service
@@ -5054,6 +5051,9 @@ options:
   --relayer-ledger                               🔐 bool flag for signing transaction using ledger
   --relayer-wallet-index RELAYER_WALLET_INDEX    🔑 the address index; can be used for PEM files, keyfiles of type
                                                  mnemonic or Ledger devices (default: 0)
+  --wait-result                                  signal to wait for the transaction result - only valid if --send is set
+  --timeout TIMEOUT                              max num of seconds to wait for result - only valid if --wait-result is
+                                                 set
 
 ```
 ### Multisig.PerformBatch
@@ -5095,9 +5095,9 @@ Output example:
 
 options:
   -h, --help                                     show this help message and exit
+  --batch BATCH                                  the id of the batch to perform
   --contract CONTRACT                            🖄 the bech32 address of the Multisig Smart Contract
   --abi ABI                                      the ABI file of the Multisig Smart Contract
-  --batch BATCH                                  the id of the batch to sign
   --outfile OUTFILE                              where to save the output (default: stdout)
   --pem PEM                                      🔑 the PEM file, if keyfile not provided
   --keyfile KEYFILE                              🔑 a JSON keyfile, if PEM not provided
@@ -5121,9 +5121,6 @@ options:
   --options OPTIONS                              the transaction options (default: 0)
   --relayer RELAYER                              the bech32 address of the relayer
   --guardian GUARDIAN                            the bech32 address of the guardian
-  --wait-result                                  signal to wait for the transaction result - only valid if --send is set
-  --timeout TIMEOUT                              max num of seconds to wait for result - only valid if --wait-result is
-                                                 set
   --send                                         ✓ whether to broadcast the transaction (default: False)
   --simulate                                     whether to simulate the transaction (default: False)
   --guardian-service-url GUARDIAN_SERVICE_URL    the url of the guardian service
@@ -5142,6 +5139,9 @@ options:
   --relayer-ledger                               🔐 bool flag for signing transaction using ledger
   --relayer-wallet-index RELAYER_WALLET_INDEX    🔑 the address index; can be used for PEM files, keyfiles of type
                                                  mnemonic or Ledger devices (default: 0)
+  --wait-result                                  signal to wait for the transaction result - only valid if --send is set
+  --timeout TIMEOUT                              max num of seconds to wait for result - only valid if --wait-result is
+                                                 set
 
 ```
 ### Multisig.GetQuorum

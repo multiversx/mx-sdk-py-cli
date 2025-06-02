@@ -38,15 +38,7 @@ def setup_parser(args: list[str], subparsers: Any) -> Any:
     _add_commit_hash_arg(sub)
     sub.add_argument("--start-vote-epoch", required=True, type=int, help="the epoch in which the voting will start")
     sub.add_argument("--end-vote-epoch", required=True, type=int, help="the epoch in which the voting will stop")
-
-    cli_shared.add_wallet_args(args, sub)
-    cli_shared.add_proxy_arg(sub)
-    cli_shared.add_tx_args(args, sub, with_receiver=False, with_data=False)
-    cli_shared.add_guardian_wallet_args(args, sub)
-    cli_shared.add_relayed_v3_wallet_args(args, sub)
-    cli_shared.add_outfile_arg(sub)
-    cli_shared.add_broadcast_args(sub)
-    cli_shared.add_wait_result_and_timeout_args(sub)
+    _add_common_args(args, sub)
 
     sub.set_defaults(func=create_proposal)
 
@@ -65,15 +57,7 @@ def setup_parser(args: list[str], subparsers: Any) -> Any:
         choices=["yes", "no", "veto", "abstain"],
         help="the type of vote",
     )
-
-    cli_shared.add_wallet_args(args, sub)
-    cli_shared.add_proxy_arg(sub)
-    cli_shared.add_tx_args(args, sub, with_receiver=False, with_data=False)
-    cli_shared.add_guardian_wallet_args(args, sub)
-    cli_shared.add_relayed_v3_wallet_args(args, sub)
-    cli_shared.add_outfile_arg(sub)
-    cli_shared.add_broadcast_args(sub)
-    cli_shared.add_wait_result_and_timeout_args(sub)
+    _add_common_args(args, sub)
 
     sub.set_defaults(func=vote)
 
@@ -85,14 +69,7 @@ def setup_parser(args: list[str], subparsers: Any) -> Any:
     )
 
     _add_proposal_nonce_arg(sub)
-    cli_shared.add_wallet_args(args, sub)
-    cli_shared.add_proxy_arg(sub)
-    cli_shared.add_tx_args(args, sub, with_receiver=False, with_data=False)
-    cli_shared.add_guardian_wallet_args(args, sub)
-    cli_shared.add_relayed_v3_wallet_args(args, sub)
-    cli_shared.add_outfile_arg(sub)
-    cli_shared.add_broadcast_args(sub)
-    cli_shared.add_wait_result_and_timeout_args(sub)
+    _add_common_args(args, sub)
 
     sub.set_defaults(func=close_proposal)
 
@@ -110,14 +87,7 @@ def setup_parser(args: list[str], subparsers: Any) -> Any:
         type=str,
         help="a list of users who initiated the proposals (e.g. --proposers erd1..., erd1...)",
     )
-    cli_shared.add_wallet_args(args, sub)
-    cli_shared.add_proxy_arg(sub)
-    cli_shared.add_tx_args(args, sub, with_receiver=False, with_data=False)
-    cli_shared.add_guardian_wallet_args(args, sub)
-    cli_shared.add_relayed_v3_wallet_args(args, sub)
-    cli_shared.add_outfile_arg(sub)
-    cli_shared.add_broadcast_args(sub)
-    cli_shared.add_wait_result_and_timeout_args(sub)
+    _add_common_args(args, sub)
 
     sub.set_defaults(func=clear_ended_proposals)
 
@@ -127,15 +97,7 @@ def setup_parser(args: list[str], subparsers: Any) -> Any:
         "claim-accumulated-fees",
         f"Claim the accumulated fees.{CLIOutputBuilder.describe()}",
     )
-
-    cli_shared.add_wallet_args(args, sub)
-    cli_shared.add_proxy_arg(sub)
-    cli_shared.add_tx_args(args, sub, with_receiver=False, with_data=False)
-    cli_shared.add_guardian_wallet_args(args, sub)
-    cli_shared.add_relayed_v3_wallet_args(args, sub)
-    cli_shared.add_outfile_arg(sub)
-    cli_shared.add_broadcast_args(sub)
-    cli_shared.add_wait_result_and_timeout_args(sub)
+    _add_common_args(args, sub)
 
     sub.set_defaults(func=claim_accumulated_fees)
 
@@ -158,15 +120,7 @@ def setup_parser(args: list[str], subparsers: Any) -> Any:
     )
     sub.add_argument("--min-veto-threshold", required=True, type=int, help="the min veto threshold")
     sub.add_argument("--min-pass-threshold", required=True, type=int, help="the min pass threshold")
-
-    cli_shared.add_wallet_args(args, sub)
-    cli_shared.add_proxy_arg(sub)
-    cli_shared.add_tx_args(args, sub, with_receiver=False, with_data=False)
-    cli_shared.add_guardian_wallet_args(args, sub)
-    cli_shared.add_relayed_v3_wallet_args(args, sub)
-    cli_shared.add_outfile_arg(sub)
-    cli_shared.add_broadcast_args(sub)
-    cli_shared.add_wait_result_and_timeout_args(sub)
+    _add_common_args(args, sub)
 
     sub.set_defaults(func=change_config)
 
@@ -225,6 +179,17 @@ def _add_commit_hash_arg(sub: Any):
 
 def _add_proposal_nonce_arg(sub: Any):
     sub.add_argument("--proposal-nonce", required=True, type=int, help="the nonce of the proposal")
+
+
+def _add_common_args(args: Any, sub: Any):
+    cli_shared.add_wallet_args(args, sub)
+    cli_shared.add_proxy_arg(sub)
+    cli_shared.add_tx_args(args, sub, with_receiver=False, with_data=False)
+    cli_shared.add_guardian_wallet_args(args, sub)
+    cli_shared.add_relayed_v3_wallet_args(args, sub)
+    cli_shared.add_outfile_arg(sub)
+    cli_shared.add_broadcast_args(sub)
+    cli_shared.add_wait_result_and_timeout_args(sub)
 
 
 def create_proposal(args: Any):
