@@ -9,36 +9,19 @@ from multiversx_sdk import (
     SmartContractQuery,
     SmartContractQueryResponse,
     SmartContractTransactionsFactory,
-    Token,
-    TokenComputer,
     TokenTransfer,
     Transaction,
     TransactionOnNetwork,
     TransactionsFactoryConfig,
 )
-from multiversx_sdk.abi import (
-    Abi,
-    AddressValue,
-    BigUIntValue,
-    BoolValue,
-    BytesValue,
-    StringValue,
-)
+from multiversx_sdk.abi import Abi
 
 from multiversx_sdk_cli import errors
 from multiversx_sdk_cli.base_transactions_controller import BaseTransactionsController
-from multiversx_sdk_cli.config import get_address_hrp
 from multiversx_sdk_cli.guardian_relayer_data import GuardianRelayerData
 from multiversx_sdk_cli.interfaces import IAccount
 
 logger = logging.getLogger("contracts")
-
-HEX_PREFIX = "0x"
-FALSE_STR_LOWER = "false"
-TRUE_STR_LOWER = "true"
-STR_PREFIX = "str:"
-ADDRESS_PREFIX = "addr:"
-MAINCHAIN_ADDRESS_HRP = "erd"
 
 
 # fmt: off
@@ -79,7 +62,7 @@ class SmartContract(BaseTransactionsController):
     ) -> Transaction:
         args = arguments if arguments else []
         if should_prepare_args:
-            args = self._prepare_args_for_factory(args)
+            args = self._convert_args_to_typed_values(args)
 
         tx = self._factory.create_transaction_for_deploy(
             sender=owner.address,
@@ -120,17 +103,15 @@ class SmartContract(BaseTransactionsController):
         gas_limit: int,
         gas_price: int,
         value: int,
-        transfers: Union[list[str], None],
+        token_transfers: Union[list[TokenTransfer], None],
         nonce: int,
         version: int,
         options: int,
         guardian_and_relayer_data: GuardianRelayerData,
     ) -> Transaction:
-        token_transfers = self._prepare_token_transfers(transfers) if transfers else []
-
         args = arguments if arguments else []
         if should_prepare_args:
-            args = self._prepare_args_for_factory(args)
+            args = self._convert_args_to_typed_values(args)
 
         tx = self._factory.create_transaction_for_execute(
             sender=caller.address,
@@ -139,7 +120,7 @@ class SmartContract(BaseTransactionsController):
             gas_limit=gas_limit,
             arguments=args,
             native_transfer_amount=value,
-            token_transfers=token_transfers,
+            token_transfers=token_transfers or [],
         )
         tx.nonce = nonce
         tx.version = version
@@ -180,7 +161,7 @@ class SmartContract(BaseTransactionsController):
     ) -> Transaction:
         args = arguments if arguments else []
         if should_prepare_args:
-            args = self._prepare_args_for_factory(args)
+            args = self._convert_args_to_typed_values(args)
 
         tx = self._factory.create_transaction_for_upgrade(
             sender=owner.address,
@@ -222,7 +203,7 @@ class SmartContract(BaseTransactionsController):
     ) -> list[Any]:
         args = arguments if arguments else []
         if should_prepare_args:
-            args = self._prepare_args_for_factory(args)
+            args = self._convert_args_to_typed_values(args)
 
         sc_query_controller = SmartContractController(self._config.chain_id, proxy, self._abi)
 
@@ -232,60 +213,3 @@ class SmartContract(BaseTransactionsController):
             raise errors.QueryContractError("Couldn't query contract: ", e)
 
         return response
-
-    def _prepare_token_transfers(self, transfers: list[str]) -> list[TokenTransfer]:
-        token_computer = TokenComputer()
-        token_transfers: list[TokenTransfer] = []
-
-        for i in range(0, len(transfers) - 1, 2):
-            identifier = transfers[i]
-            amount = int(transfers[i + 1])
-            nonce = token_computer.extract_nonce_from_extended_identifier(identifier)
-
-            token = Token(identifier, nonce)
-            transfer = TokenTransfer(token, amount)
-            token_transfers.append(transfer)
-
-        return token_transfers
-
-    def _prepare_args_for_factory(self, arguments: list[str]) -> list[Any]:
-        args: list[Any] = []
-
-        for arg in arguments:
-            if arg.startswith(HEX_PREFIX):
-                args.append(BytesValue(self._hex_to_bytes(arg)))
-            elif arg.isnumeric():
-                args.append(BigUIntValue(int(arg)))
-            elif arg.startswith(ADDRESS_PREFIX):
-                args.append(AddressValue.new_from_address(Address.new_from_bech32(arg[len(ADDRESS_PREFIX) :])))
-            elif arg.startswith(MAINCHAIN_ADDRESS_HRP):
-                # this flow will be removed in the future
-                logger.warning(
-                    "Address argument has no prefix. This flow will be removed in the future. Please provide each address using the `addr:` prefix. (e.g. --arguments addr:erd1...)"
-                )
-                args.append(AddressValue.new_from_address(Address.new_from_bech32(arg)))
-            elif arg.startswith(get_address_hrp()):
-                args.append(AddressValue.new_from_address(Address.new_from_bech32(arg)))
-            elif arg.lower() == FALSE_STR_LOWER:
-                args.append(BoolValue(False))
-            elif arg.lower() == TRUE_STR_LOWER:
-                args.append(BoolValue(True))
-            elif arg.startswith(STR_PREFIX):
-                args.append(StringValue(arg[len(STR_PREFIX) :]))
-            else:
-                raise errors.BadUserInput(
-                    f"Unknown argument type for argument: `{arg}`. Use `mxpy contract <sub-command> --help` to check all supported arguments"
-                )
-
-        return args
-
-    def _hex_to_bytes(self, arg: str):
-        argument = arg[len(HEX_PREFIX) :]
-        argument = argument.upper()
-        argument = self.ensure_even_length(argument)
-        return bytes.fromhex(argument)
-
-    def ensure_even_length(self, string: str) -> str:
-        if len(string) % 2 == 1:
-            return "0" + string
-        return string

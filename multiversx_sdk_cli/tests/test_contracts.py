@@ -40,7 +40,7 @@ def test_prepare_args_for_factories():
         "erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th",
     ]
 
-    arguments = sc._prepare_args_for_factory(args)
+    arguments = sc._convert_args_to_typed_values(args)
     assert arguments[0].get_payload() == b"\x05"
     assert arguments[1].get_payload() == 123
     assert arguments[2].get_payload() is False
