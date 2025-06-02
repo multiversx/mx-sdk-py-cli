@@ -62,7 +62,6 @@ def setup_parser(args: list[str], subparsers: Any) -> Any:
         f"Deploy a Multisig Smart Contract.{output_description}",
     )
     _add_bytecode_arg(sub)
-    _add_abi_arg(sub)
     sub.add_argument(
         "--quorum",
         type=int,
@@ -77,25 +76,7 @@ def setup_parser(args: list[str], subparsers: Any) -> Any:
         help="the bech32 addresses of the board members",
     )
     cli_shared.add_metadata_arg(sub)
-    cli_shared.add_outfile_arg(sub)
-    cli_shared.add_wallet_args(args, sub)
-    cli_shared.add_proxy_arg(sub)
-    cli_shared.add_tx_args(args, sub, with_receiver=False, with_data=False)
-
-    sub.add_argument(
-        "--wait-result",
-        action="store_true",
-        default=False,
-        help="signal to wait for the transaction result - only valid if --send is set",
-    )
-    sub.add_argument(
-        "--timeout",
-        default=100,
-        help="max num of seconds to wait for result - only valid if --wait-result is set",
-    )
-    cli_shared.add_broadcast_args(sub)
-    cli_shared.add_guardian_wallet_args(args, sub)
-    cli_shared.add_relayed_v3_wallet_args(args, sub)
+    _add_common_args(args=args, sub=sub, with_contract_arg=False, with_receiver_arg=False)
 
     sub.set_defaults(func=deploy)
 
@@ -105,28 +86,8 @@ def setup_parser(args: list[str], subparsers: Any) -> Any:
         "deposit",
         f"Deposit native tokens (EGLD) or ESDT tokens into a Multisig Smart Contract.{output_description}",
     )
-    _add_contract_arg(sub)
-    _add_abi_arg(sub)
-    cli_shared.add_outfile_arg(sub)
-    cli_shared.add_wallet_args(args, sub)
-    cli_shared.add_proxy_arg(sub)
-    cli_shared.add_tx_args(args, sub, with_receiver=False, with_data=False)
     cli_shared.add_token_transfers_args(sub)
-
-    sub.add_argument(
-        "--wait-result",
-        action="store_true",
-        default=False,
-        help="signal to wait for the transaction result - only valid if --send is set",
-    )
-    sub.add_argument(
-        "--timeout",
-        default=100,
-        help="max num of seconds to wait for result - only valid if --wait-result is set",
-    )
-    cli_shared.add_broadcast_args(sub)
-    cli_shared.add_guardian_wallet_args(args, sub)
-    cli_shared.add_relayed_v3_wallet_args(args, sub)
+    _add_common_args(args=args, sub=sub, with_contract_arg=True, with_receiver_arg=False)
 
     sub.set_defaults(func=deposit)
 
@@ -136,28 +97,8 @@ def setup_parser(args: list[str], subparsers: Any) -> Any:
         "discard-action",
         f"Discard a proposed action. Signatures must be removed first via `unsign`.{output_description}",
     )
-    _add_contract_arg(sub)
-    _add_abi_arg(sub)
     _add_action_id_arg(sub)
-    cli_shared.add_outfile_arg(sub)
-    cli_shared.add_wallet_args(args, sub)
-    cli_shared.add_proxy_arg(sub)
-    cli_shared.add_tx_args(args, sub, with_receiver=False, with_data=False)
-
-    sub.add_argument(
-        "--wait-result",
-        action="store_true",
-        default=False,
-        help="signal to wait for the transaction result - only valid if --send is set",
-    )
-    sub.add_argument(
-        "--timeout",
-        default=100,
-        help="max num of seconds to wait for result - only valid if --wait-result is set",
-    )
-    cli_shared.add_broadcast_args(sub)
-    cli_shared.add_guardian_wallet_args(args, sub)
-    cli_shared.add_relayed_v3_wallet_args(args, sub)
+    _add_common_args(args=args, sub=sub, with_contract_arg=True, with_receiver_arg=False)
 
     sub.set_defaults(func=discard_action)
 
@@ -167,8 +108,6 @@ def setup_parser(args: list[str], subparsers: Any) -> Any:
         "discard-batch",
         f"Discard all the actions for the specified IDs.{output_description}",
     )
-    _add_contract_arg(sub)
-    _add_abi_arg(sub)
     sub.add_argument(
         "--action-ids",
         required=True,
@@ -176,25 +115,7 @@ def setup_parser(args: list[str], subparsers: Any) -> Any:
         type=int,
         help="the IDs of the actions to discard",
     )
-    cli_shared.add_outfile_arg(sub)
-    cli_shared.add_wallet_args(args, sub)
-    cli_shared.add_proxy_arg(sub)
-    cli_shared.add_tx_args(args, sub, with_receiver=False, with_data=False)
-
-    sub.add_argument(
-        "--wait-result",
-        action="store_true",
-        default=False,
-        help="signal to wait for the transaction result - only valid if --send is set",
-    )
-    sub.add_argument(
-        "--timeout",
-        default=100,
-        help="max num of seconds to wait for result - only valid if --wait-result is set",
-    )
-    cli_shared.add_broadcast_args(sub)
-    cli_shared.add_guardian_wallet_args(args, sub)
-    cli_shared.add_relayed_v3_wallet_args(args, sub)
+    _add_common_args(args=args, sub=sub, with_contract_arg=True, with_receiver_arg=False)
 
     sub.set_defaults(func=discard_batch)
 
@@ -204,33 +125,13 @@ def setup_parser(args: list[str], subparsers: Any) -> Any:
         "add-board-member",
         f"Propose adding a new board member.{output_description}",
     )
-    _add_contract_arg(sub)
-    _add_abi_arg(sub)
     sub.add_argument(
         "--board-member",
         required=True,
         type=str,
         help="the bech32 address of the proposed board member",
     )
-    cli_shared.add_outfile_arg(sub)
-    cli_shared.add_wallet_args(args, sub)
-    cli_shared.add_proxy_arg(sub)
-    cli_shared.add_tx_args(args, sub, with_receiver=False, with_data=False)
-
-    sub.add_argument(
-        "--wait-result",
-        action="store_true",
-        default=False,
-        help="signal to wait for the transaction result - only valid if --send is set",
-    )
-    sub.add_argument(
-        "--timeout",
-        default=100,
-        help="max num of seconds to wait for result - only valid if --wait-result is set",
-    )
-    cli_shared.add_broadcast_args(sub)
-    cli_shared.add_guardian_wallet_args(args, sub)
-    cli_shared.add_relayed_v3_wallet_args(args, sub)
+    _add_common_args(args=args, sub=sub, with_contract_arg=True, with_receiver_arg=False)
 
     sub.set_defaults(func=add_board_member)
 
@@ -240,33 +141,13 @@ def setup_parser(args: list[str], subparsers: Any) -> Any:
         "add-proposer",
         f"Propose adding a new proposer.{output_description}",
     )
-    _add_contract_arg(sub)
-    _add_abi_arg(sub)
     sub.add_argument(
         "--proposer",
         required=True,
         type=str,
         help="the bech32 address of the proposed proposer",
     )
-    cli_shared.add_outfile_arg(sub)
-    cli_shared.add_wallet_args(args, sub)
-    cli_shared.add_proxy_arg(sub)
-    cli_shared.add_tx_args(args, sub, with_receiver=False, with_data=False)
-
-    sub.add_argument(
-        "--wait-result",
-        action="store_true",
-        default=False,
-        help="signal to wait for the transaction result - only valid if --send is set",
-    )
-    sub.add_argument(
-        "--timeout",
-        default=100,
-        help="max num of seconds to wait for result - only valid if --wait-result is set",
-    )
-    cli_shared.add_broadcast_args(sub)
-    cli_shared.add_guardian_wallet_args(args, sub)
-    cli_shared.add_relayed_v3_wallet_args(args, sub)
+    _add_common_args(args=args, sub=sub, with_contract_arg=True, with_receiver_arg=False)
 
     sub.set_defaults(func=add_proposer)
 
@@ -276,33 +157,13 @@ def setup_parser(args: list[str], subparsers: Any) -> Any:
         "remove-user",
         f"Propose removing a user from the Multisig Smart Contract.{output_description}",
     )
-    _add_contract_arg(sub)
-    _add_abi_arg(sub)
     sub.add_argument(
         "--user",
         required=True,
         type=str,
         help="the bech32 address of the proposed user to be removed",
     )
-    cli_shared.add_outfile_arg(sub)
-    cli_shared.add_wallet_args(args, sub)
-    cli_shared.add_proxy_arg(sub)
-    cli_shared.add_tx_args(args, sub, with_receiver=False, with_data=False)
-
-    sub.add_argument(
-        "--wait-result",
-        action="store_true",
-        default=False,
-        help="signal to wait for the transaction result - only valid if --send is set",
-    )
-    sub.add_argument(
-        "--timeout",
-        default=100,
-        help="max num of seconds to wait for result - only valid if --wait-result is set",
-    )
-    cli_shared.add_broadcast_args(sub)
-    cli_shared.add_guardian_wallet_args(args, sub)
-    cli_shared.add_relayed_v3_wallet_args(args, sub)
+    _add_common_args(args=args, sub=sub, with_contract_arg=True, with_receiver_arg=False)
 
     sub.set_defaults(func=remove_user)
 
@@ -312,33 +173,13 @@ def setup_parser(args: list[str], subparsers: Any) -> Any:
         "change-quorum",
         f"Propose changing the quorum of the Multisig Smart Contract.{output_description}",
     )
-    _add_contract_arg(sub)
-    _add_abi_arg(sub)
     sub.add_argument(
         "--quorum",
         required=True,
         type=int,
         help="the size of the new quorum (number of signatures required to approve a proposal)",
     )
-    cli_shared.add_outfile_arg(sub)
-    cli_shared.add_wallet_args(args, sub)
-    cli_shared.add_proxy_arg(sub)
-    cli_shared.add_tx_args(args, sub, with_receiver=False, with_data=False)
-
-    sub.add_argument(
-        "--wait-result",
-        action="store_true",
-        default=False,
-        help="signal to wait for the transaction result - only valid if --send is set",
-    )
-    sub.add_argument(
-        "--timeout",
-        default=100,
-        help="max num of seconds to wait for result - only valid if --wait-result is set",
-    )
-    cli_shared.add_broadcast_args(sub)
-    cli_shared.add_guardian_wallet_args(args, sub)
-    cli_shared.add_relayed_v3_wallet_args(args, sub)
+    _add_common_args(args=args, sub=sub, with_contract_arg=True, with_receiver_arg=False)
 
     sub.set_defaults(func=change_quorum)
 
@@ -348,8 +189,6 @@ def setup_parser(args: list[str], subparsers: Any) -> Any:
         "transfer-and-execute",
         f"Propose transferring EGLD and optionally calling a smart contract.{output_description}",
     )
-    _add_contract_arg(sub)
-    _add_abi_arg(sub)
     sub.add_argument(
         "--opt-gas-limit",
         type=int,
@@ -358,25 +197,7 @@ def setup_parser(args: list[str], subparsers: Any) -> Any:
     sub.add_argument("--contract-abi", type=str, help="the ABI file of the contract to call")
     sub.add_argument("--function", type=str, help="the function to call")
     _add_arguments_arg(sub)
-    cli_shared.add_outfile_arg(sub)
-    cli_shared.add_wallet_args(args, sub)
-    cli_shared.add_proxy_arg(sub)
-    cli_shared.add_tx_args(args, sub, with_receiver=True, with_data=False)
-
-    sub.add_argument(
-        "--wait-result",
-        action="store_true",
-        default=False,
-        help="signal to wait for the transaction result - only valid if --send is set",
-    )
-    sub.add_argument(
-        "--timeout",
-        default=100,
-        help="max num of seconds to wait for result - only valid if --wait-result is set",
-    )
-    cli_shared.add_broadcast_args(sub)
-    cli_shared.add_guardian_wallet_args(args, sub)
-    cli_shared.add_relayed_v3_wallet_args(args, sub)
+    _add_common_args(args=args, sub=sub, with_contract_arg=True, with_receiver_arg=True)
 
     sub.set_defaults(func=transfer_and_execute)
 
@@ -386,8 +207,6 @@ def setup_parser(args: list[str], subparsers: Any) -> Any:
         "transfer-and-execute-esdt",
         f"Propose transferring ESDTs and optionally calling a smart contract.{output_description}",
     )
-    _add_contract_arg(sub)
-    _add_abi_arg(sub)
     cli_shared.add_token_transfers_args(sub)
     sub.add_argument(
         "--opt-gas-limit",
@@ -397,25 +216,7 @@ def setup_parser(args: list[str], subparsers: Any) -> Any:
     sub.add_argument("--contract-abi", type=str, help="the ABI file of the contract to call")
     sub.add_argument("--function", type=str, help="the function to call")
     _add_arguments_arg(sub)
-    cli_shared.add_outfile_arg(sub)
-    cli_shared.add_wallet_args(args, sub)
-    cli_shared.add_proxy_arg(sub)
-    cli_shared.add_tx_args(args, sub, with_receiver=True, with_data=False)
-
-    sub.add_argument(
-        "--wait-result",
-        action="store_true",
-        default=False,
-        help="signal to wait for the transaction result - only valid if --send is set",
-    )
-    sub.add_argument(
-        "--timeout",
-        default=100,
-        help="max num of seconds to wait for result - only valid if --wait-result is set",
-    )
-    cli_shared.add_broadcast_args(sub)
-    cli_shared.add_guardian_wallet_args(args, sub)
-    cli_shared.add_relayed_v3_wallet_args(args, sub)
+    _add_common_args(args=args, sub=sub, with_contract_arg=True, with_receiver_arg=True)
 
     sub.set_defaults(func=transfer_and_execute_esdt)
 
@@ -425,8 +226,6 @@ def setup_parser(args: list[str], subparsers: Any) -> Any:
         "async-call",
         f"Propose a transaction in which the contract will perform an async call.{output_description}",
     )
-    _add_contract_arg(sub)
-    _add_abi_arg(sub)
     cli_shared.add_token_transfers_args(sub)
     sub.add_argument(
         "--opt-gas-limit",
@@ -436,25 +235,7 @@ def setup_parser(args: list[str], subparsers: Any) -> Any:
     sub.add_argument("--contract-abi", type=str, help="the ABI file of the contract to call")
     sub.add_argument("--function", type=str, help="the function to call")
     _add_arguments_arg(sub)
-    cli_shared.add_outfile_arg(sub)
-    cli_shared.add_wallet_args(args, sub)
-    cli_shared.add_proxy_arg(sub)
-    cli_shared.add_tx_args(args, sub, with_receiver=True, with_data=False)
-
-    sub.add_argument(
-        "--wait-result",
-        action="store_true",
-        default=False,
-        help="signal to wait for the transaction result - only valid if --send is set",
-    )
-    sub.add_argument(
-        "--timeout",
-        default=100,
-        help="max num of seconds to wait for result - only valid if --wait-result is set",
-    )
-    cli_shared.add_broadcast_args(sub)
-    cli_shared.add_guardian_wallet_args(args, sub)
-    cli_shared.add_relayed_v3_wallet_args(args, sub)
+    _add_common_args(args=args, sub=sub, with_contract_arg=True, with_receiver_arg=True)
 
     sub.set_defaults(func=async_call)
 
@@ -464,32 +245,12 @@ def setup_parser(args: list[str], subparsers: Any) -> Any:
         "deploy-from-source",
         f"Propose a smart contract deploy from a previously deployed smart contract.{output_description}",
     )
-    _add_contract_arg(sub)
-    _add_abi_arg(sub)
 
     sub.add_argument("--contract-to-copy", required=True, type=str, help="the bech32 address of the contract to copy")
     sub.add_argument("--contract-abi", type=str, help="the ABI file of the contract to copy")
-    _add_arguments_arg(sub)
     cli_shared.add_metadata_arg(sub)
-    cli_shared.add_outfile_arg(sub)
-    cli_shared.add_wallet_args(args, sub)
-    cli_shared.add_proxy_arg(sub)
-    cli_shared.add_tx_args(args, sub, with_receiver=False, with_data=False)
-
-    sub.add_argument(
-        "--wait-result",
-        action="store_true",
-        default=False,
-        help="signal to wait for the transaction result - only valid if --send is set",
-    )
-    sub.add_argument(
-        "--timeout",
-        default=100,
-        help="max num of seconds to wait for result - only valid if --wait-result is set",
-    )
-    cli_shared.add_broadcast_args(sub)
-    cli_shared.add_guardian_wallet_args(args, sub)
-    cli_shared.add_relayed_v3_wallet_args(args, sub)
+    _add_arguments_arg(sub)
+    _add_common_args(args=args, sub=sub, with_contract_arg=True, with_receiver_arg=False)
 
     sub.set_defaults(func=deploy_from_source)
 
@@ -499,35 +260,14 @@ def setup_parser(args: list[str], subparsers: Any) -> Any:
         "upgrade-from-source",
         f"Propose a smart contract upgrade from a previously deployed smart contract.{output_description}",
     )
-    _add_contract_arg(sub)
-    _add_abi_arg(sub)
-
     sub.add_argument(
         "--contract-to-upgrade", required=True, type=str, help="the bech32 address of the contract to upgrade"
     )
     sub.add_argument("--contract-to-copy", required=True, type=str, help="the bech32 address of the contract to copy")
     sub.add_argument("--contract-abi", type=str, help="the ABI file of the contract to copy")
-    _add_arguments_arg(sub)
     cli_shared.add_metadata_arg(sub)
-    cli_shared.add_outfile_arg(sub)
-    cli_shared.add_wallet_args(args, sub)
-    cli_shared.add_proxy_arg(sub)
-    cli_shared.add_tx_args(args, sub, with_receiver=False, with_data=False)
-
-    sub.add_argument(
-        "--wait-result",
-        action="store_true",
-        default=False,
-        help="signal to wait for the transaction result - only valid if --send is set",
-    )
-    sub.add_argument(
-        "--timeout",
-        default=100,
-        help="max num of seconds to wait for result - only valid if --wait-result is set",
-    )
-    cli_shared.add_broadcast_args(sub)
-    cli_shared.add_guardian_wallet_args(args, sub)
-    cli_shared.add_relayed_v3_wallet_args(args, sub)
+    _add_arguments_arg(sub)
+    _add_common_args(args=args, sub=sub, with_contract_arg=True, with_receiver_arg=False)
 
     sub.set_defaults(func=upgrade_from_source)
 
@@ -537,29 +277,8 @@ def setup_parser(args: list[str], subparsers: Any) -> Any:
         "sign-action",
         f"Sign a proposed action.{output_description}",
     )
-    _add_contract_arg(sub)
-    _add_abi_arg(sub)
-
     _add_action_id_arg(sub)
-    cli_shared.add_outfile_arg(sub)
-    cli_shared.add_wallet_args(args, sub)
-    cli_shared.add_proxy_arg(sub)
-    cli_shared.add_tx_args(args, sub, with_receiver=False, with_data=False)
-
-    sub.add_argument(
-        "--wait-result",
-        action="store_true",
-        default=False,
-        help="signal to wait for the transaction result - only valid if --send is set",
-    )
-    sub.add_argument(
-        "--timeout",
-        default=100,
-        help="max num of seconds to wait for result - only valid if --wait-result is set",
-    )
-    cli_shared.add_broadcast_args(sub)
-    cli_shared.add_guardian_wallet_args(args, sub)
-    cli_shared.add_relayed_v3_wallet_args(args, sub)
+    _add_common_args(args=args, sub=sub, with_contract_arg=True, with_receiver_arg=False)
 
     sub.set_defaults(func=sign_action)
 
@@ -569,29 +288,8 @@ def setup_parser(args: list[str], subparsers: Any) -> Any:
         "sign-batch",
         f"Sign a batch of actions.{output_description}",
     )
-    _add_contract_arg(sub)
-    _add_abi_arg(sub)
-
     sub.add_argument("--batch", required=True, type=int, help="the id of the batch to sign")
-    cli_shared.add_outfile_arg(sub)
-    cli_shared.add_wallet_args(args, sub)
-    cli_shared.add_proxy_arg(sub)
-    cli_shared.add_tx_args(args, sub, with_receiver=False, with_data=False)
-
-    sub.add_argument(
-        "--wait-result",
-        action="store_true",
-        default=False,
-        help="signal to wait for the transaction result - only valid if --send is set",
-    )
-    sub.add_argument(
-        "--timeout",
-        default=100,
-        help="max num of seconds to wait for result - only valid if --wait-result is set",
-    )
-    cli_shared.add_broadcast_args(sub)
-    cli_shared.add_guardian_wallet_args(args, sub)
-    cli_shared.add_relayed_v3_wallet_args(args, sub)
+    _add_common_args(args=args, sub=sub, with_contract_arg=True, with_receiver_arg=False)
 
     sub.set_defaults(func=sign_batch)
 
@@ -601,29 +299,8 @@ def setup_parser(args: list[str], subparsers: Any) -> Any:
         "sign-and-perform",
         f"Sign a proposed action and perform it. Works only if quorum is reached.{output_description}",
     )
-    _add_contract_arg(sub)
-    _add_abi_arg(sub)
-
     _add_action_id_arg(sub)
-    cli_shared.add_outfile_arg(sub)
-    cli_shared.add_wallet_args(args, sub)
-    cli_shared.add_proxy_arg(sub)
-    cli_shared.add_tx_args(args, sub, with_receiver=False, with_data=False)
-
-    sub.add_argument(
-        "--wait-result",
-        action="store_true",
-        default=False,
-        help="signal to wait for the transaction result - only valid if --send is set",
-    )
-    sub.add_argument(
-        "--timeout",
-        default=100,
-        help="max num of seconds to wait for result - only valid if --wait-result is set",
-    )
-    cli_shared.add_broadcast_args(sub)
-    cli_shared.add_guardian_wallet_args(args, sub)
-    cli_shared.add_relayed_v3_wallet_args(args, sub)
+    _add_common_args(args=args, sub=sub, with_contract_arg=True, with_receiver_arg=False)
 
     sub.set_defaults(func=sign_and_perform)
 
@@ -633,29 +310,8 @@ def setup_parser(args: list[str], subparsers: Any) -> Any:
         "sign-batch-and-perform",
         f"Sign a batch of actions and perform them. Works only if quorum is reached.{output_description}",
     )
-    _add_contract_arg(sub)
-    _add_abi_arg(sub)
-
     sub.add_argument("--batch", required=True, type=int, help="the id of the batch to sign")
-    cli_shared.add_outfile_arg(sub)
-    cli_shared.add_wallet_args(args, sub)
-    cli_shared.add_proxy_arg(sub)
-    cli_shared.add_tx_args(args, sub, with_receiver=False, with_data=False)
-
-    sub.add_argument(
-        "--wait-result",
-        action="store_true",
-        default=False,
-        help="signal to wait for the transaction result - only valid if --send is set",
-    )
-    sub.add_argument(
-        "--timeout",
-        default=100,
-        help="max num of seconds to wait for result - only valid if --wait-result is set",
-    )
-    cli_shared.add_broadcast_args(sub)
-    cli_shared.add_guardian_wallet_args(args, sub)
-    cli_shared.add_relayed_v3_wallet_args(args, sub)
+    _add_common_args(args=args, sub=sub, with_contract_arg=True, with_receiver_arg=False)
 
     sub.set_defaults(func=sign_batch_and_perform)
 
@@ -665,29 +321,8 @@ def setup_parser(args: list[str], subparsers: Any) -> Any:
         "unsign-action",
         f"Unsign a proposed action.{output_description}",
     )
-    _add_contract_arg(sub)
-    _add_abi_arg(sub)
-
     _add_action_id_arg(sub)
-    cli_shared.add_outfile_arg(sub)
-    cli_shared.add_wallet_args(args, sub)
-    cli_shared.add_proxy_arg(sub)
-    cli_shared.add_tx_args(args, sub, with_receiver=False, with_data=False)
-
-    sub.add_argument(
-        "--wait-result",
-        action="store_true",
-        default=False,
-        help="signal to wait for the transaction result - only valid if --send is set",
-    )
-    sub.add_argument(
-        "--timeout",
-        default=100,
-        help="max num of seconds to wait for result - only valid if --wait-result is set",
-    )
-    cli_shared.add_broadcast_args(sub)
-    cli_shared.add_guardian_wallet_args(args, sub)
-    cli_shared.add_relayed_v3_wallet_args(args, sub)
+    _add_common_args(args=args, sub=sub, with_contract_arg=True, with_receiver_arg=False)
 
     sub.set_defaults(func=unsign_action)
 
@@ -697,29 +332,8 @@ def setup_parser(args: list[str], subparsers: Any) -> Any:
         "unsign-batch",
         f"Unsign a batch of actions.{output_description}",
     )
-    _add_contract_arg(sub)
-    _add_abi_arg(sub)
-
-    sub.add_argument("--batch", required=True, type=int, help="the id of the batch to sign")
-    cli_shared.add_outfile_arg(sub)
-    cli_shared.add_wallet_args(args, sub)
-    cli_shared.add_proxy_arg(sub)
-    cli_shared.add_tx_args(args, sub, with_receiver=False, with_data=False)
-
-    sub.add_argument(
-        "--wait-result",
-        action="store_true",
-        default=False,
-        help="signal to wait for the transaction result - only valid if --send is set",
-    )
-    sub.add_argument(
-        "--timeout",
-        default=100,
-        help="max num of seconds to wait for result - only valid if --wait-result is set",
-    )
-    cli_shared.add_broadcast_args(sub)
-    cli_shared.add_guardian_wallet_args(args, sub)
-    cli_shared.add_relayed_v3_wallet_args(args, sub)
+    sub.add_argument("--batch", required=True, type=int, help="the id of the batch to unsign")
+    _add_common_args(args=args, sub=sub, with_contract_arg=True, with_receiver_arg=False)
 
     sub.set_defaults(func=unsign_batch)
 
@@ -729,9 +343,6 @@ def setup_parser(args: list[str], subparsers: Any) -> Any:
         "unsign-for-outdated-members",
         f"Unsign an action for outdated board members.{output_description}",
     )
-    _add_contract_arg(sub)
-    _add_abi_arg(sub)
-
     _add_action_id_arg(sub)
     sub.add_argument(
         "--outdated-members",
@@ -739,25 +350,7 @@ def setup_parser(args: list[str], subparsers: Any) -> Any:
         type=int,
         help="IDs of the outdated board members",
     )
-    cli_shared.add_outfile_arg(sub)
-    cli_shared.add_wallet_args(args, sub)
-    cli_shared.add_proxy_arg(sub)
-    cli_shared.add_tx_args(args, sub, with_receiver=False, with_data=False)
-
-    sub.add_argument(
-        "--wait-result",
-        action="store_true",
-        default=False,
-        help="signal to wait for the transaction result - only valid if --send is set",
-    )
-    sub.add_argument(
-        "--timeout",
-        default=100,
-        help="max num of seconds to wait for result - only valid if --wait-result is set",
-    )
-    cli_shared.add_broadcast_args(sub)
-    cli_shared.add_guardian_wallet_args(args, sub)
-    cli_shared.add_relayed_v3_wallet_args(args, sub)
+    _add_common_args(args=args, sub=sub, with_contract_arg=True, with_receiver_arg=False)
 
     sub.set_defaults(func=unsign_for_outdated_board_members)
 
@@ -767,29 +360,8 @@ def setup_parser(args: list[str], subparsers: Any) -> Any:
         "perform-action",
         f"Perform an action that has reached quorum.{output_description}",
     )
-    _add_contract_arg(sub)
-    _add_abi_arg(sub)
-
     _add_action_id_arg(sub)
-    cli_shared.add_outfile_arg(sub)
-    cli_shared.add_wallet_args(args, sub)
-    cli_shared.add_proxy_arg(sub)
-    cli_shared.add_tx_args(args, sub, with_receiver=False, with_data=False)
-
-    sub.add_argument(
-        "--wait-result",
-        action="store_true",
-        default=False,
-        help="signal to wait for the transaction result - only valid if --send is set",
-    )
-    sub.add_argument(
-        "--timeout",
-        default=100,
-        help="max num of seconds to wait for result - only valid if --wait-result is set",
-    )
-    cli_shared.add_broadcast_args(sub)
-    cli_shared.add_guardian_wallet_args(args, sub)
-    cli_shared.add_relayed_v3_wallet_args(args, sub)
+    _add_common_args(args=args, sub=sub, with_contract_arg=True, with_receiver_arg=False)
 
     sub.set_defaults(func=perform_action)
 
@@ -799,29 +371,8 @@ def setup_parser(args: list[str], subparsers: Any) -> Any:
         "perform-batch",
         f"Perform a batch of actions that has reached quorum.{output_description}",
     )
-    _add_contract_arg(sub)
-    _add_abi_arg(sub)
-
-    sub.add_argument("--batch", required=True, type=int, help="the id of the batch to sign")
-    cli_shared.add_outfile_arg(sub)
-    cli_shared.add_wallet_args(args, sub)
-    cli_shared.add_proxy_arg(sub)
-    cli_shared.add_tx_args(args, sub, with_receiver=False, with_data=False)
-
-    sub.add_argument(
-        "--wait-result",
-        action="store_true",
-        default=False,
-        help="signal to wait for the transaction result - only valid if --send is set",
-    )
-    sub.add_argument(
-        "--timeout",
-        default=100,
-        help="max num of seconds to wait for result - only valid if --wait-result is set",
-    )
-    cli_shared.add_broadcast_args(sub)
-    cli_shared.add_guardian_wallet_args(args, sub)
-    cli_shared.add_relayed_v3_wallet_args(args, sub)
+    sub.add_argument("--batch", required=True, type=int, help="the id of the batch to perform")
+    _add_common_args(args=args, sub=sub, with_contract_arg=True, with_receiver_arg=False)
 
     sub.set_defaults(func=perform_batch)
 
@@ -1087,6 +638,31 @@ def _add_arguments_arg(sub: Any):
         type=str,
         help="a json file containing the arguments. ONLY if abi file is provided. "
         "E.g. [{ 'to': 'erd1...', 'amount': 10000000000 }]",
+    )
+
+
+def _add_common_args(args: Any, sub: Any, with_contract_arg: bool = True, with_receiver_arg: bool = False):
+    if with_contract_arg:
+        _add_contract_arg(sub)
+
+    _add_abi_arg(sub)
+    cli_shared.add_outfile_arg(sub)
+    cli_shared.add_wallet_args(args, sub)
+    cli_shared.add_proxy_arg(sub)
+    cli_shared.add_tx_args(args, sub, with_receiver=with_receiver_arg, with_data=False)
+    cli_shared.add_broadcast_args(sub)
+    cli_shared.add_guardian_wallet_args(args, sub)
+    cli_shared.add_relayed_v3_wallet_args(args, sub)
+    sub.add_argument(
+        "--wait-result",
+        action="store_true",
+        default=False,
+        help="signal to wait for the transaction result - only valid if --send is set",
+    )
+    sub.add_argument(
+        "--timeout",
+        default=100,
+        help="max num of seconds to wait for result - only valid if --wait-result is set",
     )
 
 
