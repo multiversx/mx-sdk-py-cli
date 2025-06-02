@@ -103,7 +103,7 @@ class BaseTransactionsController:
         if relayer and transaction.relayer:
             transaction.relayer_signature = relayer.sign_transaction(transaction)
 
-    def _prepare_args_for_factory(self, arguments: list[str]) -> list[Any]:
+    def _convert_args_to_typed_values(self, arguments: list[str]) -> list[Any]:
         args: list[Any] = []
 
         for arg in arguments:

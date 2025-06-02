@@ -342,7 +342,7 @@ class MultisigWrapper(BaseTransactionsController):
     ) -> Transaction:
         args = arguments if arguments else []
         if should_prepare_args_for_factory:
-            args = self._prepare_args_for_factory(args)
+            args = self._convert_args_to_typed_values(args)
 
         tx = self._factory.create_transaction_for_propose_transfer_execute(
             sender=owner.address,
@@ -393,7 +393,7 @@ class MultisigWrapper(BaseTransactionsController):
     ) -> Transaction:
         args = arguments if arguments else []
         if should_prepare_args_for_factory:
-            args = self._prepare_args_for_factory(args)
+            args = self._convert_args_to_typed_values(args)
 
         tx = self._factory.create_transaction_for_propose_transfer_esdt_execute(
             sender=owner.address,
@@ -445,7 +445,7 @@ class MultisigWrapper(BaseTransactionsController):
     ) -> Transaction:
         args = arguments if arguments else []
         if should_prepare_args_for_factory:
-            args = self._prepare_args_for_factory(args)
+            args = self._convert_args_to_typed_values(args)
 
         tx = self._factory.create_transaction_for_propose_async_call(
             sender=owner.address,
@@ -499,7 +499,7 @@ class MultisigWrapper(BaseTransactionsController):
     ) -> Transaction:
         args = arguments if arguments else []
         if should_prepare_args_for_factory:
-            args = self._prepare_args_for_factory(args)
+            args = self._convert_args_to_typed_values(args)
 
         tx = self._factory.create_transaction_for_propose_contract_deploy_from_source(
             sender=owner.address,
@@ -555,7 +555,7 @@ class MultisigWrapper(BaseTransactionsController):
     ) -> Transaction:
         args = arguments if arguments else []
         if should_prepare_args_for_factory:
-            args = self._prepare_args_for_factory(args)
+            args = self._convert_args_to_typed_values(args)
 
         tx = self._factory.create_transaction_for_propose_contract_upgrade_from_source(
             sender=owner.address,

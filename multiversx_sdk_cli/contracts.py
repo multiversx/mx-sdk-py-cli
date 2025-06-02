@@ -62,7 +62,7 @@ class SmartContract(BaseTransactionsController):
     ) -> Transaction:
         args = arguments if arguments else []
         if should_prepare_args:
-            args = self._prepare_args_for_factory(args)
+            args = self._convert_args_to_typed_values(args)
 
         tx = self._factory.create_transaction_for_deploy(
             sender=owner.address,
@@ -111,7 +111,7 @@ class SmartContract(BaseTransactionsController):
     ) -> Transaction:
         args = arguments if arguments else []
         if should_prepare_args:
-            args = self._prepare_args_for_factory(args)
+            args = self._convert_args_to_typed_values(args)
 
         tx = self._factory.create_transaction_for_execute(
             sender=caller.address,
@@ -161,7 +161,7 @@ class SmartContract(BaseTransactionsController):
     ) -> Transaction:
         args = arguments if arguments else []
         if should_prepare_args:
-            args = self._prepare_args_for_factory(args)
+            args = self._convert_args_to_typed_values(args)
 
         tx = self._factory.create_transaction_for_upgrade(
             sender=owner.address,
@@ -203,7 +203,7 @@ class SmartContract(BaseTransactionsController):
     ) -> list[Any]:
         args = arguments if arguments else []
         if should_prepare_args:
-            args = self._prepare_args_for_factory(args)
+            args = self._convert_args_to_typed_values(args)
 
         sc_query_controller = SmartContractController(self._config.chain_id, proxy, self._abi)
 

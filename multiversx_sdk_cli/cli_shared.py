@@ -282,6 +282,34 @@ def add_token_transfers_args(sub: Any):
     )
 
 
+def add_metadata_arg(sub: Any):
+    sub.add_argument(
+        "--metadata-not-upgradeable",
+        dest="metadata_upgradeable",
+        action="store_false",
+        help="‼ mark the contract as NOT upgradeable (default: upgradeable)",
+    )
+    sub.add_argument(
+        "--metadata-not-readable",
+        dest="metadata_readable",
+        action="store_false",
+        help="‼ mark the contract as NOT readable (default: readable)",
+    )
+    sub.add_argument(
+        "--metadata-payable",
+        dest="metadata_payable",
+        action="store_true",
+        help="‼ mark the contract as payable (default: not payable)",
+    )
+    sub.add_argument(
+        "--metadata-payable-by-sc",
+        dest="metadata_payable_by_sc",
+        action="store_true",
+        help="‼ mark the contract as payable by SC (default: not payable by SC)",
+    )
+    sub.set_defaults(metadata_upgradeable=True, metadata_payable=False)
+
+
 def add_wait_result_and_timeout_args(sub: Any):
     sub.add_argument(
         "--wait-result",
@@ -642,9 +670,10 @@ def prepare_token_transfers(transfers: list[str]) -> list[TokenTransfer]:
     token_transfers: list[TokenTransfer] = []
 
     for i in range(0, len(transfers) - 1, 2):
-        identifier = transfers[i]
+        extended_identifier = transfers[i]
         amount = int(transfers[i + 1])
-        nonce = token_computer.extract_nonce_from_extended_identifier(identifier)
+        nonce = token_computer.extract_nonce_from_extended_identifier(extended_identifier)
+        identifier = token_computer.extract_identifier_from_extended_identifier(extended_identifier)
 
         token = Token(identifier, nonce)
         transfer = TokenTransfer(token, amount)
