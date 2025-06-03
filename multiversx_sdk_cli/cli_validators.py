@@ -5,7 +5,6 @@ from multiversx_sdk import Address, ValidatorPublicKey, ValidatorsSigners
 
 from multiversx_sdk_cli import cli_shared, utils
 from multiversx_sdk_cli.args_validation import (
-    ensure_wallet_args_are_provided,
     validate_broadcast_args,
     validate_chain_id_args,
     validate_nonce_args,
@@ -149,7 +148,6 @@ def _add_nodes_arg(sub: Any):
 def validate_args(args: Any) -> None:
     validate_nonce_args(args)
     validate_receiver_args(args)
-    ensure_wallet_args_are_provided(args)
     validate_broadcast_args(args)
     validate_chain_id_args(args)
 

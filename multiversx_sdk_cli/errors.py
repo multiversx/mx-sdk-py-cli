@@ -196,3 +196,8 @@ class AliasProtectedError(KnownError):
 class InvalidAddressConfigValue(KnownError):
     def __init__(self, message: str):
         super().__init__(message)
+
+
+class AddressConfigFileError(KnownError):
+    def __init__(self, message: str):
+        super().__init__(message)

@@ -14,7 +14,6 @@ from multiversx_sdk import (
 from multiversx_sdk_cli import cli_shared, utils
 from multiversx_sdk_cli.args_validation import (
     ensure_relayer_wallet_args_are_provided,
-    ensure_wallet_args_are_provided,
     validate_broadcast_args,
     validate_chain_id_args,
     validate_nonce_args,
@@ -120,7 +119,6 @@ def create_transaction(args: Any):
 
     validate_nonce_args(args)
     validate_receiver_args(args)
-    ensure_wallet_args_are_provided(args)
     validate_broadcast_args(args)
     validate_chain_id_args(args)
 

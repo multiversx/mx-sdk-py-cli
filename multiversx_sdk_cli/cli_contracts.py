@@ -18,7 +18,6 @@ from multiversx_sdk.abi import Abi
 
 from multiversx_sdk_cli import cli_shared, utils
 from multiversx_sdk_cli.args_validation import (
-    ensure_wallet_args_are_provided,
     validate_broadcast_args,
     validate_chain_id_args,
     validate_proxy_argument,
@@ -381,7 +380,6 @@ def deploy(args: Any):
     cli_shared.set_proxy_from_config_if_not_provided(args, cli_config)
 
     validate_transaction_args(args)
-    ensure_wallet_args_are_provided(args)
     validate_broadcast_args(args)
     validate_chain_id_args(args)
 
@@ -433,7 +431,6 @@ def call(args: Any):
     cli_shared.set_proxy_from_config_if_not_provided(args, cli_config)
 
     validate_transaction_args(args)
-    ensure_wallet_args_are_provided(args)
     validate_broadcast_args(args)
     validate_chain_id_args(args)
 
@@ -478,7 +475,6 @@ def upgrade(args: Any):
     cli_shared.set_proxy_from_config_if_not_provided(args, cli_config)
 
     validate_transaction_args(args)
-    ensure_wallet_args_are_provided(args)
     validate_broadcast_args(args)
     validate_chain_id_args(args)
 

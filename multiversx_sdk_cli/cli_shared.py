@@ -17,7 +17,12 @@ from multiversx_sdk import (
     Transaction,
 )
 
-from multiversx_sdk_cli import config, errors, utils
+from multiversx_sdk_cli import config, utils
+from multiversx_sdk_cli.address import (
+    get_active_address,
+    read_address_config_file,
+    resolve_address_config_path,
+)
 from multiversx_sdk_cli.cli_output import CLIOutputBuilder
 from multiversx_sdk_cli.cli_password import (
     load_guardian_password,
@@ -31,9 +36,13 @@ from multiversx_sdk_cli.constants import (
 )
 from multiversx_sdk_cli.env import MxpyEnv, get_address_hrp
 from multiversx_sdk_cli.errors import (
+    AddressConfigFileError,
     ArgumentsNotProvidedError,
     BadUsage,
     IncorrectWalletError,
+    InvalidAddressConfigValue,
+    NoWalletProvided,
+    UnknownAddressAliasError,
 )
 from multiversx_sdk_cli.guardian_relayer_data import GuardianRelayerData
 from multiversx_sdk_cli.interfaces import IAccount
@@ -155,6 +164,7 @@ def add_tx_args(
 
 
 def add_wallet_args(args: list[str], sub: Any):
+    sub.add_argument("--sender", type=str, help="the alias of the wallet set in the address config")
     sub.add_argument(
         "--pem",
         required=False,
@@ -309,8 +319,64 @@ def prepare_account(args: Any):
         )
     elif args.ledger:
         return LedgerAccount(address_index=args.sender_wallet_index)
+    elif args.sender:
+        file_path = resolve_address_config_path()
+        if not file_path.is_file():
+            raise AddressConfigFileError("The address config file was not found")
+
+        file = read_address_config_file()
+        if file == dict():
+            raise AddressConfigFileError("Address config file is empty")
+
+        addresses: dict[str, Any] = file["addresses"]
+        wallet = addresses.get(args.sender, None)
+        if not wallet:
+            raise UnknownAddressAliasError(args.sender)
+
+        logger.info(f"Using sender [{args.sender}] from address config.")
+        return _load_wallet_from_address_config(wallet=wallet, hrp=hrp)
     else:
-        raise errors.NoWalletProvided()
+        active_address = get_active_address()
+        if active_address == dict():
+            logger.info("No default wallet found in address config.")
+            raise NoWalletProvided()
+
+        alias_of_default_wallet = read_address_config_file().get("active", "")
+        logger.info(f"Using sender [{alias_of_default_wallet}] from address config.")
+
+        return _load_wallet_from_address_config(wallet=active_address, hrp=hrp)
+
+
+def _load_wallet_from_address_config(wallet: dict[str, str], hrp: str) -> Account:
+    kind = wallet.get("kind", None)
+    if not kind:
+        raise AddressConfigFileError("'kind' field must be set in the address config")
+
+    if kind not in ["pem", "keystore"]:
+        raise InvalidAddressConfigValue("'kind' must be 'pem' or 'keystore'")
+
+    path = wallet.get("path", None)
+    if not path:
+        raise AddressConfigFileError("'path' field must be set in the address config")
+    path = Path(path)
+
+    index = int(wallet.get("index", 0))
+
+    if kind == "pem":
+        return Account.new_from_pem(file_path=path, index=index, hrp=hrp)
+    else:
+        password = wallet.get("password", "")
+        password_path = wallet.get("passwordPath", None)
+
+        if not password and not password_path:
+            raise AddressConfigFileError(
+                "'password' or 'passwordPath' must be set in the address config for keystore wallets"
+            )
+
+        if password_path:
+            password = Path(password_path).read_text().splitlines()[0].strip()
+
+        return Account.new_from_keystore(file_path=path, password=password, address_index=index, hrp=hrp)
 
 
 def _get_address_hrp(args: Any) -> str:
