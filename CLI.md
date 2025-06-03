@@ -3154,22 +3154,7 @@ Output example:
         "...": "..."
     },
     "emittedTransactionData": "the transaction data, not encoded",
-    "emittedTransactionHash": "the transaction hash",
-    "contractAddress": "the address of the contract",
-    "transactionOnNetwork": {
-        "nonce": 42,
-        "sender": "alice",
-        "receiver": "bob",
-        "...": "..."
-    },
-    "simulation": {
-        "execution": {
-            "...": "..."
-        },
-        "cost": {
-            "...": "..."
-        }
-    }
+    "emittedTransactionHash": "the transaction hash"
 }
 
 options:
@@ -3249,22 +3234,7 @@ Output example:
         "...": "..."
     },
     "emittedTransactionData": "the transaction data, not encoded",
-    "emittedTransactionHash": "the transaction hash",
-    "contractAddress": "the address of the contract",
-    "transactionOnNetwork": {
-        "nonce": 42,
-        "sender": "alice",
-        "receiver": "bob",
-        "...": "..."
-    },
-    "simulation": {
-        "execution": {
-            "...": "..."
-        },
-        "cost": {
-            "...": "..."
-        }
-    }
+    "emittedTransactionHash": "the transaction hash"
 }
 
 options:
@@ -3340,22 +3310,7 @@ Output example:
         "...": "..."
     },
     "emittedTransactionData": "the transaction data, not encoded",
-    "emittedTransactionHash": "the transaction hash",
-    "contractAddress": "the address of the contract",
-    "transactionOnNetwork": {
-        "nonce": 42,
-        "sender": "alice",
-        "receiver": "bob",
-        "...": "..."
-    },
-    "simulation": {
-        "execution": {
-            "...": "..."
-        },
-        "cost": {
-            "...": "..."
-        }
-    }
+    "emittedTransactionHash": "the transaction hash"
 }
 
 options:
@@ -3428,22 +3383,7 @@ Output example:
         "...": "..."
     },
     "emittedTransactionData": "the transaction data, not encoded",
-    "emittedTransactionHash": "the transaction hash",
-    "contractAddress": "the address of the contract",
-    "transactionOnNetwork": {
-        "nonce": 42,
-        "sender": "alice",
-        "receiver": "bob",
-        "...": "..."
-    },
-    "simulation": {
-        "execution": {
-            "...": "..."
-        },
-        "cost": {
-            "...": "..."
-        }
-    }
+    "emittedTransactionHash": "the transaction hash"
 }
 
 options:
@@ -3516,22 +3456,7 @@ Output example:
         "...": "..."
     },
     "emittedTransactionData": "the transaction data, not encoded",
-    "emittedTransactionHash": "the transaction hash",
-    "contractAddress": "the address of the contract",
-    "transactionOnNetwork": {
-        "nonce": 42,
-        "sender": "alice",
-        "receiver": "bob",
-        "...": "..."
-    },
-    "simulation": {
-        "execution": {
-            "...": "..."
-        },
-        "cost": {
-            "...": "..."
-        }
-    }
+    "emittedTransactionHash": "the transaction hash"
 }
 
 options:
@@ -3604,22 +3529,7 @@ Output example:
         "...": "..."
     },
     "emittedTransactionData": "the transaction data, not encoded",
-    "emittedTransactionHash": "the transaction hash",
-    "contractAddress": "the address of the contract",
-    "transactionOnNetwork": {
-        "nonce": 42,
-        "sender": "alice",
-        "receiver": "bob",
-        "...": "..."
-    },
-    "simulation": {
-        "execution": {
-            "...": "..."
-        },
-        "cost": {
-            "...": "..."
-        }
-    }
+    "emittedTransactionHash": "the transaction hash"
 }
 
 options:
@@ -3692,22 +3602,7 @@ Output example:
         "...": "..."
     },
     "emittedTransactionData": "the transaction data, not encoded",
-    "emittedTransactionHash": "the transaction hash",
-    "contractAddress": "the address of the contract",
-    "transactionOnNetwork": {
-        "nonce": 42,
-        "sender": "alice",
-        "receiver": "bob",
-        "...": "..."
-    },
-    "simulation": {
-        "execution": {
-            "...": "..."
-        },
-        "cost": {
-            "...": "..."
-        }
-    }
+    "emittedTransactionHash": "the transaction hash"
 }
 
 options:
@@ -3780,22 +3675,7 @@ Output example:
         "...": "..."
     },
     "emittedTransactionData": "the transaction data, not encoded",
-    "emittedTransactionHash": "the transaction hash",
-    "contractAddress": "the address of the contract",
-    "transactionOnNetwork": {
-        "nonce": 42,
-        "sender": "alice",
-        "receiver": "bob",
-        "...": "..."
-    },
-    "simulation": {
-        "execution": {
-            "...": "..."
-        },
-        "cost": {
-            "...": "..."
-        }
-    }
+    "emittedTransactionHash": "the transaction hash"
 }
 
 options:
@@ -3869,22 +3749,7 @@ Output example:
         "...": "..."
     },
     "emittedTransactionData": "the transaction data, not encoded",
-    "emittedTransactionHash": "the transaction hash",
-    "contractAddress": "the address of the contract",
-    "transactionOnNetwork": {
-        "nonce": 42,
-        "sender": "alice",
-        "receiver": "bob",
-        "...": "..."
-    },
-    "simulation": {
-        "execution": {
-            "...": "..."
-        },
-        "cost": {
-            "...": "..."
-        }
-    }
+    "emittedTransactionHash": "the transaction hash"
 }
 
 options:
@@ -3967,22 +3832,7 @@ Output example:
         "...": "..."
     },
     "emittedTransactionData": "the transaction data, not encoded",
-    "emittedTransactionHash": "the transaction hash",
-    "contractAddress": "the address of the contract",
-    "transactionOnNetwork": {
-        "nonce": 42,
-        "sender": "alice",
-        "receiver": "bob",
-        "...": "..."
-    },
-    "simulation": {
-        "execution": {
-            "...": "..."
-        },
-        "cost": {
-            "...": "..."
-        }
-    }
+    "emittedTransactionHash": "the transaction hash"
 }
 
 options:
@@ -4069,22 +3919,7 @@ Output example:
         "...": "..."
     },
     "emittedTransactionData": "the transaction data, not encoded",
-    "emittedTransactionHash": "the transaction hash",
-    "contractAddress": "the address of the contract",
-    "transactionOnNetwork": {
-        "nonce": 42,
-        "sender": "alice",
-        "receiver": "bob",
-        "...": "..."
-    },
-    "simulation": {
-        "execution": {
-            "...": "..."
-        },
-        "cost": {
-            "...": "..."
-        }
-    }
+    "emittedTransactionHash": "the transaction hash"
 }
 
 options:
@@ -4171,22 +4006,7 @@ Output example:
         "...": "..."
     },
     "emittedTransactionData": "the transaction data, not encoded",
-    "emittedTransactionHash": "the transaction hash",
-    "contractAddress": "the address of the contract",
-    "transactionOnNetwork": {
-        "nonce": 42,
-        "sender": "alice",
-        "receiver": "bob",
-        "...": "..."
-    },
-    "simulation": {
-        "execution": {
-            "...": "..."
-        },
-        "cost": {
-            "...": "..."
-        }
-    }
+    "emittedTransactionHash": "the transaction hash"
 }
 
 options:
@@ -4269,22 +4089,7 @@ Output example:
         "...": "..."
     },
     "emittedTransactionData": "the transaction data, not encoded",
-    "emittedTransactionHash": "the transaction hash",
-    "contractAddress": "the address of the contract",
-    "transactionOnNetwork": {
-        "nonce": 42,
-        "sender": "alice",
-        "receiver": "bob",
-        "...": "..."
-    },
-    "simulation": {
-        "execution": {
-            "...": "..."
-        },
-        "cost": {
-            "...": "..."
-        }
-    }
+    "emittedTransactionHash": "the transaction hash"
 }
 
 options:
@@ -4368,22 +4173,7 @@ Output example:
         "...": "..."
     },
     "emittedTransactionData": "the transaction data, not encoded",
-    "emittedTransactionHash": "the transaction hash",
-    "contractAddress": "the address of the contract",
-    "transactionOnNetwork": {
-        "nonce": 42,
-        "sender": "alice",
-        "receiver": "bob",
-        "...": "..."
-    },
-    "simulation": {
-        "execution": {
-            "...": "..."
-        },
-        "cost": {
-            "...": "..."
-        }
-    }
+    "emittedTransactionHash": "the transaction hash"
 }
 
 options:
@@ -4456,22 +4246,7 @@ Output example:
         "...": "..."
     },
     "emittedTransactionData": "the transaction data, not encoded",
-    "emittedTransactionHash": "the transaction hash",
-    "contractAddress": "the address of the contract",
-    "transactionOnNetwork": {
-        "nonce": 42,
-        "sender": "alice",
-        "receiver": "bob",
-        "...": "..."
-    },
-    "simulation": {
-        "execution": {
-            "...": "..."
-        },
-        "cost": {
-            "...": "..."
-        }
-    }
+    "emittedTransactionHash": "the transaction hash"
 }
 
 options:
@@ -4544,22 +4319,7 @@ Output example:
         "...": "..."
     },
     "emittedTransactionData": "the transaction data, not encoded",
-    "emittedTransactionHash": "the transaction hash",
-    "contractAddress": "the address of the contract",
-    "transactionOnNetwork": {
-        "nonce": 42,
-        "sender": "alice",
-        "receiver": "bob",
-        "...": "..."
-    },
-    "simulation": {
-        "execution": {
-            "...": "..."
-        },
-        "cost": {
-            "...": "..."
-        }
-    }
+    "emittedTransactionHash": "the transaction hash"
 }
 
 options:
@@ -4632,22 +4392,7 @@ Output example:
         "...": "..."
     },
     "emittedTransactionData": "the transaction data, not encoded",
-    "emittedTransactionHash": "the transaction hash",
-    "contractAddress": "the address of the contract",
-    "transactionOnNetwork": {
-        "nonce": 42,
-        "sender": "alice",
-        "receiver": "bob",
-        "...": "..."
-    },
-    "simulation": {
-        "execution": {
-            "...": "..."
-        },
-        "cost": {
-            "...": "..."
-        }
-    }
+    "emittedTransactionHash": "the transaction hash"
 }
 
 options:
@@ -4720,22 +4465,7 @@ Output example:
         "...": "..."
     },
     "emittedTransactionData": "the transaction data, not encoded",
-    "emittedTransactionHash": "the transaction hash",
-    "contractAddress": "the address of the contract",
-    "transactionOnNetwork": {
-        "nonce": 42,
-        "sender": "alice",
-        "receiver": "bob",
-        "...": "..."
-    },
-    "simulation": {
-        "execution": {
-            "...": "..."
-        },
-        "cost": {
-            "...": "..."
-        }
-    }
+    "emittedTransactionHash": "the transaction hash"
 }
 
 options:
@@ -4808,22 +4538,7 @@ Output example:
         "...": "..."
     },
     "emittedTransactionData": "the transaction data, not encoded",
-    "emittedTransactionHash": "the transaction hash",
-    "contractAddress": "the address of the contract",
-    "transactionOnNetwork": {
-        "nonce": 42,
-        "sender": "alice",
-        "receiver": "bob",
-        "...": "..."
-    },
-    "simulation": {
-        "execution": {
-            "...": "..."
-        },
-        "cost": {
-            "...": "..."
-        }
-    }
+    "emittedTransactionHash": "the transaction hash"
 }
 
 options:
@@ -4896,22 +4611,7 @@ Output example:
         "...": "..."
     },
     "emittedTransactionData": "the transaction data, not encoded",
-    "emittedTransactionHash": "the transaction hash",
-    "contractAddress": "the address of the contract",
-    "transactionOnNetwork": {
-        "nonce": 42,
-        "sender": "alice",
-        "receiver": "bob",
-        "...": "..."
-    },
-    "simulation": {
-        "execution": {
-            "...": "..."
-        },
-        "cost": {
-            "...": "..."
-        }
-    }
+    "emittedTransactionHash": "the transaction hash"
 }
 
 options:
@@ -4987,22 +4687,7 @@ Output example:
         "...": "..."
     },
     "emittedTransactionData": "the transaction data, not encoded",
-    "emittedTransactionHash": "the transaction hash",
-    "contractAddress": "the address of the contract",
-    "transactionOnNetwork": {
-        "nonce": 42,
-        "sender": "alice",
-        "receiver": "bob",
-        "...": "..."
-    },
-    "simulation": {
-        "execution": {
-            "...": "..."
-        },
-        "cost": {
-            "...": "..."
-        }
-    }
+    "emittedTransactionHash": "the transaction hash"
 }
 
 options:
@@ -5075,22 +4760,7 @@ Output example:
         "...": "..."
     },
     "emittedTransactionData": "the transaction data, not encoded",
-    "emittedTransactionHash": "the transaction hash",
-    "contractAddress": "the address of the contract",
-    "transactionOnNetwork": {
-        "nonce": 42,
-        "sender": "alice",
-        "receiver": "bob",
-        "...": "..."
-    },
-    "simulation": {
-        "execution": {
-            "...": "..."
-        },
-        "cost": {
-            "...": "..."
-        }
-    }
+    "emittedTransactionHash": "the transaction hash"
 }
 
 options:
@@ -5163,22 +4833,7 @@ Output example:
         "...": "..."
     },
     "emittedTransactionData": "the transaction data, not encoded",
-    "emittedTransactionHash": "the transaction hash",
-    "contractAddress": "the address of the contract",
-    "transactionOnNetwork": {
-        "nonce": 42,
-        "sender": "alice",
-        "receiver": "bob",
-        "...": "..."
-    },
-    "simulation": {
-        "execution": {
-            "...": "..."
-        },
-        "cost": {
-            "...": "..."
-        }
-    }
+    "emittedTransactionHash": "the transaction hash"
 }
 
 options:
@@ -5207,22 +4862,7 @@ Output example:
         "...": "..."
     },
     "emittedTransactionData": "the transaction data, not encoded",
-    "emittedTransactionHash": "the transaction hash",
-    "contractAddress": "the address of the contract",
-    "transactionOnNetwork": {
-        "nonce": 42,
-        "sender": "alice",
-        "receiver": "bob",
-        "...": "..."
-    },
-    "simulation": {
-        "execution": {
-            "...": "..."
-        },
-        "cost": {
-            "...": "..."
-        }
-    }
+    "emittedTransactionHash": "the transaction hash"
 }
 
 options:
@@ -5251,22 +4891,7 @@ Output example:
         "...": "..."
     },
     "emittedTransactionData": "the transaction data, not encoded",
-    "emittedTransactionHash": "the transaction hash",
-    "contractAddress": "the address of the contract",
-    "transactionOnNetwork": {
-        "nonce": 42,
-        "sender": "alice",
-        "receiver": "bob",
-        "...": "..."
-    },
-    "simulation": {
-        "execution": {
-            "...": "..."
-        },
-        "cost": {
-            "...": "..."
-        }
-    }
+    "emittedTransactionHash": "the transaction hash"
 }
 
 options:
@@ -5295,22 +4920,7 @@ Output example:
         "...": "..."
     },
     "emittedTransactionData": "the transaction data, not encoded",
-    "emittedTransactionHash": "the transaction hash",
-    "contractAddress": "the address of the contract",
-    "transactionOnNetwork": {
-        "nonce": 42,
-        "sender": "alice",
-        "receiver": "bob",
-        "...": "..."
-    },
-    "simulation": {
-        "execution": {
-            "...": "..."
-        },
-        "cost": {
-            "...": "..."
-        }
-    }
+    "emittedTransactionHash": "the transaction hash"
 }
 
 options:
@@ -5339,22 +4949,7 @@ Output example:
         "...": "..."
     },
     "emittedTransactionData": "the transaction data, not encoded",
-    "emittedTransactionHash": "the transaction hash",
-    "contractAddress": "the address of the contract",
-    "transactionOnNetwork": {
-        "nonce": 42,
-        "sender": "alice",
-        "receiver": "bob",
-        "...": "..."
-    },
-    "simulation": {
-        "execution": {
-            "...": "..."
-        },
-        "cost": {
-            "...": "..."
-        }
-    }
+    "emittedTransactionHash": "the transaction hash"
 }
 
 options:
@@ -5384,22 +4979,7 @@ Output example:
         "...": "..."
     },
     "emittedTransactionData": "the transaction data, not encoded",
-    "emittedTransactionHash": "the transaction hash",
-    "contractAddress": "the address of the contract",
-    "transactionOnNetwork": {
-        "nonce": 42,
-        "sender": "alice",
-        "receiver": "bob",
-        "...": "..."
-    },
-    "simulation": {
-        "execution": {
-            "...": "..."
-        },
-        "cost": {
-            "...": "..."
-        }
-    }
+    "emittedTransactionHash": "the transaction hash"
 }
 
 options:
@@ -5428,22 +5008,7 @@ Output example:
         "...": "..."
     },
     "emittedTransactionData": "the transaction data, not encoded",
-    "emittedTransactionHash": "the transaction hash",
-    "contractAddress": "the address of the contract",
-    "transactionOnNetwork": {
-        "nonce": 42,
-        "sender": "alice",
-        "receiver": "bob",
-        "...": "..."
-    },
-    "simulation": {
-        "execution": {
-            "...": "..."
-        },
-        "cost": {
-            "...": "..."
-        }
-    }
+    "emittedTransactionHash": "the transaction hash"
 }
 
 options:
@@ -5472,22 +5037,7 @@ Output example:
         "...": "..."
     },
     "emittedTransactionData": "the transaction data, not encoded",
-    "emittedTransactionHash": "the transaction hash",
-    "contractAddress": "the address of the contract",
-    "transactionOnNetwork": {
-        "nonce": 42,
-        "sender": "alice",
-        "receiver": "bob",
-        "...": "..."
-    },
-    "simulation": {
-        "execution": {
-            "...": "..."
-        },
-        "cost": {
-            "...": "..."
-        }
-    }
+    "emittedTransactionHash": "the transaction hash"
 }
 
 options:
@@ -5518,22 +5068,7 @@ Output example:
         "...": "..."
     },
     "emittedTransactionData": "the transaction data, not encoded",
-    "emittedTransactionHash": "the transaction hash",
-    "contractAddress": "the address of the contract",
-    "transactionOnNetwork": {
-        "nonce": 42,
-        "sender": "alice",
-        "receiver": "bob",
-        "...": "..."
-    },
-    "simulation": {
-        "execution": {
-            "...": "..."
-        },
-        "cost": {
-            "...": "..."
-        }
-    }
+    "emittedTransactionHash": "the transaction hash"
 }
 
 options:
@@ -5563,22 +5098,7 @@ Output example:
         "...": "..."
     },
     "emittedTransactionData": "the transaction data, not encoded",
-    "emittedTransactionHash": "the transaction hash",
-    "contractAddress": "the address of the contract",
-    "transactionOnNetwork": {
-        "nonce": 42,
-        "sender": "alice",
-        "receiver": "bob",
-        "...": "..."
-    },
-    "simulation": {
-        "execution": {
-            "...": "..."
-        },
-        "cost": {
-            "...": "..."
-        }
-    }
+    "emittedTransactionHash": "the transaction hash"
 }
 
 options:
@@ -5607,22 +5127,7 @@ Output example:
         "...": "..."
     },
     "emittedTransactionData": "the transaction data, not encoded",
-    "emittedTransactionHash": "the transaction hash",
-    "contractAddress": "the address of the contract",
-    "transactionOnNetwork": {
-        "nonce": 42,
-        "sender": "alice",
-        "receiver": "bob",
-        "...": "..."
-    },
-    "simulation": {
-        "execution": {
-            "...": "..."
-        },
-        "cost": {
-            "...": "..."
-        }
-    }
+    "emittedTransactionHash": "the transaction hash"
 }
 
 options:
@@ -5652,22 +5157,7 @@ Output example:
         "...": "..."
     },
     "emittedTransactionData": "the transaction data, not encoded",
-    "emittedTransactionHash": "the transaction hash",
-    "contractAddress": "the address of the contract",
-    "transactionOnNetwork": {
-        "nonce": 42,
-        "sender": "alice",
-        "receiver": "bob",
-        "...": "..."
-    },
-    "simulation": {
-        "execution": {
-            "...": "..."
-        },
-        "cost": {
-            "...": "..."
-        }
-    }
+    "emittedTransactionHash": "the transaction hash"
 }
 
 options:
@@ -5696,22 +5186,7 @@ Output example:
         "...": "..."
     },
     "emittedTransactionData": "the transaction data, not encoded",
-    "emittedTransactionHash": "the transaction hash",
-    "contractAddress": "the address of the contract",
-    "transactionOnNetwork": {
-        "nonce": 42,
-        "sender": "alice",
-        "receiver": "bob",
-        "...": "..."
-    },
-    "simulation": {
-        "execution": {
-            "...": "..."
-        },
-        "cost": {
-            "...": "..."
-        }
-    }
+    "emittedTransactionHash": "the transaction hash"
 }
 
 options:
@@ -5740,22 +5215,7 @@ Output example:
         "...": "..."
     },
     "emittedTransactionData": "the transaction data, not encoded",
-    "emittedTransactionHash": "the transaction hash",
-    "contractAddress": "the address of the contract",
-    "transactionOnNetwork": {
-        "nonce": 42,
-        "sender": "alice",
-        "receiver": "bob",
-        "...": "..."
-    },
-    "simulation": {
-        "execution": {
-            "...": "..."
-        },
-        "cost": {
-            "...": "..."
-        }
-    }
+    "emittedTransactionHash": "the transaction hash"
 }
 
 options:
@@ -5785,22 +5245,7 @@ Output example:
         "...": "..."
     },
     "emittedTransactionData": "the transaction data, not encoded",
-    "emittedTransactionHash": "the transaction hash",
-    "contractAddress": "the address of the contract",
-    "transactionOnNetwork": {
-        "nonce": 42,
-        "sender": "alice",
-        "receiver": "bob",
-        "...": "..."
-    },
-    "simulation": {
-        "execution": {
-            "...": "..."
-        },
-        "cost": {
-            "...": "..."
-        }
-    }
+    "emittedTransactionHash": "the transaction hash"
 }
 
 options:
@@ -5830,22 +5275,7 @@ Output example:
         "...": "..."
     },
     "emittedTransactionData": "the transaction data, not encoded",
-    "emittedTransactionHash": "the transaction hash",
-    "contractAddress": "the address of the contract",
-    "transactionOnNetwork": {
-        "nonce": 42,
-        "sender": "alice",
-        "receiver": "bob",
-        "...": "..."
-    },
-    "simulation": {
-        "execution": {
-            "...": "..."
-        },
-        "cost": {
-            "...": "..."
-        }
-    }
+    "emittedTransactionHash": "the transaction hash"
 }
 
 options:
@@ -5875,22 +5305,7 @@ Output example:
         "...": "..."
     },
     "emittedTransactionData": "the transaction data, not encoded",
-    "emittedTransactionHash": "the transaction hash",
-    "contractAddress": "the address of the contract",
-    "transactionOnNetwork": {
-        "nonce": 42,
-        "sender": "alice",
-        "receiver": "bob",
-        "...": "..."
-    },
-    "simulation": {
-        "execution": {
-            "...": "..."
-        },
-        "cost": {
-            "...": "..."
-        }
-    }
+    "emittedTransactionHash": "the transaction hash"
 }
 
 options:
@@ -5920,22 +5335,7 @@ Output example:
         "...": "..."
     },
     "emittedTransactionData": "the transaction data, not encoded",
-    "emittedTransactionHash": "the transaction hash",
-    "contractAddress": "the address of the contract",
-    "transactionOnNetwork": {
-        "nonce": 42,
-        "sender": "alice",
-        "receiver": "bob",
-        "...": "..."
-    },
-    "simulation": {
-        "execution": {
-            "...": "..."
-        },
-        "cost": {
-            "...": "..."
-        }
-    }
+    "emittedTransactionHash": "the transaction hash"
 }
 
 options:

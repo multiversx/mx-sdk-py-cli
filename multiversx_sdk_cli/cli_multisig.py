@@ -51,9 +51,7 @@ def setup_parser(args: list[str], subparsers: Any) -> Any:
     )
     subparsers = parser.add_subparsers()
 
-    output_description = CLIOutputBuilder.describe(
-        with_contract=True, with_transaction_on_network=True, with_simulation=True
-    )
+    output_description = CLIOutputBuilder.describe()
 
     sub = cli_shared.add_command_subparser(
         subparsers,
