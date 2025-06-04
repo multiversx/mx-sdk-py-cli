@@ -18,6 +18,7 @@ import multiversx_sdk_cli.cli_deps
 import multiversx_sdk_cli.cli_dns
 import multiversx_sdk_cli.cli_env
 import multiversx_sdk_cli.cli_faucet
+import multiversx_sdk_cli.cli_get
 import multiversx_sdk_cli.cli_ledger
 import multiversx_sdk_cli.cli_localnet
 import multiversx_sdk_cli.cli_transactions
@@ -128,6 +129,7 @@ See:
     commands.append(multiversx_sdk_cli.cli_dns.setup_parser(args, subparsers))
     commands.append(multiversx_sdk_cli.cli_faucet.setup_parser(args, subparsers))
     commands.append(multiversx_sdk_cli.cli_env.setup_parser(subparsers))
+    commands.append(multiversx_sdk_cli.cli_get.setup_parser(subparsers))
 
     parser.epilog = """
 ----------------------

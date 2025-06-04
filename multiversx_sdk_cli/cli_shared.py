@@ -334,7 +334,7 @@ def prepare_account(args: Any):
             raise UnknownAddressAliasError(args.sender)
 
         logger.info(f"Using sender [{args.sender}] from address config.")
-        return _load_wallet_from_address_config(wallet=wallet, hrp=hrp)
+        return load_wallet_from_address_config(wallet=wallet, hrp=hrp)
     else:
         active_address = get_active_address()
         if active_address == dict():
@@ -344,10 +344,10 @@ def prepare_account(args: Any):
         alias_of_default_wallet = read_address_config_file().get("active", "")
         logger.info(f"Using sender [{alias_of_default_wallet}] from address config.")
 
-        return _load_wallet_from_address_config(wallet=active_address, hrp=hrp)
+        return load_wallet_from_address_config(wallet=active_address, hrp=hrp)
 
 
-def _load_wallet_from_address_config(wallet: dict[str, str], hrp: str) -> Account:
+def load_wallet_from_address_config(wallet: dict[str, str], hrp: str) -> Account:
     kind = wallet.get("kind", None)
     if not kind:
         raise AddressConfigFileError("'kind' field must be set in the address config")
