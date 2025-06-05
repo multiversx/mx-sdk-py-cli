@@ -1,12 +1,15 @@
+import hashlib
 import json
 import logging
 import os
 from pathlib import Path
 from typing import Any
 
+import requests
 from multiversx_sdk import (
     Address,
     AddressComputer,
+    Message,
     ProxyNetworkProvider,
     Transaction,
     TransactionsFactoryConfig,
@@ -147,7 +150,36 @@ def setup_parser(args: list[str], subparsers: Any) -> Any:
         help="in case of a multicontract, specify the contract variant you want to verify",
     )
     cli_shared.add_wallet_args(args, sub)
+    sub.add_argument(
+        "--skip-confirmation",
+        "-y",
+        dest="skip_confirmation",
+        action="store_true",
+        default=False,
+        help="can be used to skip the confirmation prompt",
+    )
     sub.set_defaults(func=verify)
+
+    sub = cli_shared.add_command_subparser(
+        subparsers,
+        "contract",
+        "unverify",
+        "Unverify a previously verified Smart Contract",
+    )
+
+    _add_contract_arg(sub)
+    sub.add_argument(
+        "--code-hash",
+        required=True,
+        help="the code hash of the contract",
+    )
+    sub.add_argument(
+        "--verifier-url",
+        required=True,
+        help="the url of the service that validates the contract",
+    )
+    cli_shared.add_wallet_args(args, sub)
+    sub.set_defaults(func=unverify)
 
     sub = cli_shared.add_command_subparser(
         subparsers,
@@ -473,6 +505,14 @@ def _send_or_simulate(tx: Transaction, contract_address: Address, args: Any):
 
 
 def verify(args: Any) -> None:
+    if not args.skip_confirmation:
+        response = input(
+            "Are you sure you want to verify the contract? This will publish the contract's source code, which will be displayed on the MultiversX Explorer (y/n): "
+        )
+        if response.lower() != "y":
+            logger.info("Contract verification cancelled.")
+            return
+
     contract = Address.new_from_bech32(args.contract)
     verifier_url = args.verifier_url
 
@@ -484,6 +524,34 @@ def verify(args: Any) -> None:
 
     trigger_contract_verification(packaged_src, owner, contract, verifier_url, docker_image, contract_variant)
     logger.info("Contract verification request completed!")
+
+
+def unverify(args: Any) -> None:
+    account = cli_shared.prepare_account(args)
+    contract: str = args.contract
+    code_hash: str = args.code_hash
+    verifier_url: str = f"{args.verifier_url}/verifier"
+
+    payload = {
+        "contract": contract,
+        "codeHash": code_hash,
+    }
+
+    serialized_payload = json.dumps(payload, separators=(",", ":")).encode("utf-8")
+    hash = hashlib.sha256(serialized_payload).hexdigest()
+    message_to_sign = (contract + hash).encode("utf-8")
+
+    signature = account.sign_message(Message(message_to_sign))
+
+    request_payload = {
+        "signature": signature.hex(),
+        "payload": payload,
+    }
+
+    headers = {"Content-type": "application/json"}
+    response = requests.delete(verifier_url, json=request_payload, headers=headers)
+    logger.info(f"Your request to unverify contract {contract} was submitted.")
+    print(response.json().get("message"))
 
 
 def do_reproducible_build(args: Any):
