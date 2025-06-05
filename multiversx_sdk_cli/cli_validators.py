@@ -10,7 +10,6 @@ from multiversx_sdk_cli.args_validation import (
     validate_nonce_args,
     validate_receiver_args,
 )
-from multiversx_sdk_cli.env import MxpyEnv
 from multiversx_sdk_cli.validators import ValidatorsController
 
 
@@ -217,8 +216,7 @@ def _parse_public_bls_keys(public_bls_keys: str) -> list[ValidatorPublicKey]:
 
 
 def do_unstake(args: Any):
-    cli_config = MxpyEnv.from_active_env()
-    cli_shared.set_proxy_from_config_if_not_provided(args, cli_config)
+    cli_shared.set_proxy_from_config_if_not_provided(args)
 
     validate_args(args)
     sender = cli_shared.prepare_sender(args)
@@ -248,8 +246,7 @@ def do_unstake(args: Any):
 
 
 def do_unjail(args: Any):
-    cli_config = MxpyEnv.from_active_env()
-    cli_shared.set_proxy_from_config_if_not_provided(args, cli_config)
+    cli_shared.set_proxy_from_config_if_not_provided(args)
 
     validate_args(args)
     sender = cli_shared.prepare_sender(args)
@@ -279,8 +276,7 @@ def do_unjail(args: Any):
 
 
 def do_unbond(args: Any):
-    cli_config = MxpyEnv.from_active_env()
-    cli_shared.set_proxy_from_config_if_not_provided(args, cli_config)
+    cli_shared.set_proxy_from_config_if_not_provided(args)
 
     validate_args(args)
     sender = cli_shared.prepare_sender(args)
@@ -310,8 +306,7 @@ def do_unbond(args: Any):
 
 
 def change_reward_address(args: Any):
-    cli_config = MxpyEnv.from_active_env()
-    cli_shared.set_proxy_from_config_if_not_provided(args, cli_config)
+    cli_shared.set_proxy_from_config_if_not_provided(args)
 
     validate_args(args)
     sender = cli_shared.prepare_sender(args)
@@ -341,8 +336,7 @@ def change_reward_address(args: Any):
 
 
 def do_claim(args: Any):
-    cli_config = MxpyEnv.from_active_env()
-    cli_shared.set_proxy_from_config_if_not_provided(args, cli_config)
+    cli_shared.set_proxy_from_config_if_not_provided(args)
 
     validate_args(args)
     sender = cli_shared.prepare_sender(args)
@@ -370,8 +364,7 @@ def do_claim(args: Any):
 
 
 def do_unstake_nodes(args: Any):
-    cli_config = MxpyEnv.from_active_env()
-    cli_shared.set_proxy_from_config_if_not_provided(args, cli_config)
+    cli_shared.set_proxy_from_config_if_not_provided(args)
 
     validate_args(args)
     sender = cli_shared.prepare_sender(args)
@@ -402,8 +395,7 @@ def do_unstake_nodes(args: Any):
 
 
 def do_unstake_tokens(args: Any):
-    cli_config = MxpyEnv.from_active_env()
-    cli_shared.set_proxy_from_config_if_not_provided(args, cli_config)
+    cli_shared.set_proxy_from_config_if_not_provided(args)
 
     validate_args(args)
     sender = cli_shared.prepare_sender(args)
@@ -433,8 +425,7 @@ def do_unstake_tokens(args: Any):
 
 
 def do_unbond_nodes(args: Any):
-    cli_config = MxpyEnv.from_active_env()
-    cli_shared.set_proxy_from_config_if_not_provided(args, cli_config)
+    cli_shared.set_proxy_from_config_if_not_provided(args)
 
     validate_args(args)
     sender = cli_shared.prepare_sender(args)
@@ -465,8 +456,7 @@ def do_unbond_nodes(args: Any):
 
 
 def do_unbond_tokens(args: Any):
-    cli_config = MxpyEnv.from_active_env()
-    cli_shared.set_proxy_from_config_if_not_provided(args, cli_config)
+    cli_shared.set_proxy_from_config_if_not_provided(args)
 
     validate_args(args)
     sender = cli_shared.prepare_sender(args)
@@ -496,8 +486,7 @@ def do_unbond_tokens(args: Any):
 
 
 def do_clean_registered_data(args: Any):
-    cli_config = MxpyEnv.from_active_env()
-    cli_shared.set_proxy_from_config_if_not_provided(args, cli_config)
+    cli_shared.set_proxy_from_config_if_not_provided(args)
 
     validate_args(args)
     sender = cli_shared.prepare_sender(args)
@@ -525,8 +514,7 @@ def do_clean_registered_data(args: Any):
 
 
 def do_restake_unstaked_nodes(args: Any):
-    cli_config = MxpyEnv.from_active_env()
-    cli_shared.set_proxy_from_config_if_not_provided(args, cli_config)
+    cli_shared.set_proxy_from_config_if_not_provided(args)
 
     validate_args(args)
     sender = cli_shared.prepare_sender(args)

@@ -23,7 +23,7 @@ See:
 
 
 COMMAND GROUPS:
-  {contract,tx,validator,ledger,wallet,validator-wallet,deps,config,localnet,data,staking-provider,dns,faucet,env}
+  {contract,tx,validator,ledger,wallet,validator-wallet,deps,config,localnet,data,staking-provider,dns,faucet,multisig,governance,env}
 
 TOP-LEVEL OPTIONS:
   -h, --help            show this help message and exit
@@ -46,6 +46,8 @@ data                           Data manipulation omnitool
 staking-provider               Staking provider omnitool
 dns                            Operations related to the Domain Name Service
 faucet                         Get xEGLD on Devnet or Testnet
+multisig                       Deploy and interact with the Multisig Smart Contract
+governance                     Propose, vote and interact with the governance contract.
 env                            Configure MultiversX CLI to use specific environment values.
 
 ```
@@ -3074,6 +3076,2823 @@ options:
   --chain {D,T}                              the chain identifier
   --api API                                  custom api url for the native auth client
   --wallet-url WALLET_URL                    custom wallet url to call the faucet from
+
+```
+## Group **Multisig**
+
+
+```
+$ mxpy multisig --help
+usage: mxpy multisig COMMAND [-h] ...
+
+Deploy and interact with the Multisig Smart Contract
+
+COMMANDS:
+  {deploy,deposit,discard-action,discard-batch,add-board-member,add-proposer,remove-user,change-quorum,transfer-and-execute,transfer-and-execute-esdt,async-call,deploy-from-source,upgrade-from-source,sign-action,sign-batch,sign-and-perform,sign-batch-and-perform,unsign-action,unsign-batch,unsign-for-outdated-members,perform-action,perform-batch,get-quorum,get-num-board-members,get-num-groups,get-num-proposers,get-action-group,get-last-action-group-id,get-action-last-index,is-signed-by,is-quorum-reached,get-pending-actions,get-user-role,get-board-members,get-proposers,get-action-data,get-action-signers,get-action-signers-count,get-action-valid-signers-count,parse-propose-action}
+
+OPTIONS:
+  -h, --help            show this help message and exit
+
+----------------
+COMMANDS summary
+----------------
+deploy                         Deploy a Multisig Smart Contract.
+deposit                        Deposit native tokens (EGLD) or ESDT tokens into a Multisig Smart Contract.
+discard-action                 Discard a proposed action. Signatures must be removed first via `unsign`.
+discard-batch                  Discard all the actions for the specified IDs.
+add-board-member               Propose adding a new board member.
+add-proposer                   Propose adding a new proposer.
+remove-user                    Propose removing a user from the Multisig Smart Contract.
+change-quorum                  Propose changing the quorum of the Multisig Smart Contract.
+transfer-and-execute           Propose transferring EGLD and optionally calling a smart contract.
+transfer-and-execute-esdt      Propose transferring ESDTs and optionally calling a smart contract.
+async-call                     Propose a transaction in which the contract will perform an async call.
+deploy-from-source             Propose a smart contract deploy from a previously deployed smart contract.
+upgrade-from-source            Propose a smart contract upgrade from a previously deployed smart contract.
+sign-action                    Sign a proposed action.
+sign-batch                     Sign a batch of actions.
+sign-and-perform               Sign a proposed action and perform it. Works only if quorum is reached.
+sign-batch-and-perform         Sign a batch of actions and perform them. Works only if quorum is reached.
+unsign-action                  Unsign a proposed action.
+unsign-batch                   Unsign a batch of actions.
+unsign-for-outdated-members    Unsign an action for outdated board members.
+perform-action                 Perform an action that has reached quorum.
+perform-batch                  Perform a batch of actions that has reached quorum.
+get-quorum                     Perform a smart contract query to get the quorum.
+get-num-board-members          Perform a smart contract query to get the number of board members.
+get-num-groups                 Perform a smart contract query to get the number of groups.
+get-num-proposers              Perform a smart contract query to get the number of proposers.
+get-action-group               Perform a smart contract query to get the actions in a group.
+get-last-action-group-id       Perform a smart contract query to get the id of the last action in a group.
+get-action-last-index          Perform a smart contract query to get the index of the last action.
+is-signed-by                   Perform a smart contract query to check if an action is signed by a user.
+is-quorum-reached              Perform a smart contract query to check if an action has reached quorum.
+get-pending-actions            Perform a smart contract query to get the pending actions full info.
+get-user-role                  Perform a smart contract query to get the role of a user.
+get-board-members              Perform a smart contract query to get all the board members.
+get-proposers                  Perform a smart contract query to get all the proposers.
+get-action-data                Perform a smart contract query to get the data of an action.
+get-action-signers             Perform a smart contract query to get the signers of an action.
+get-action-signers-count       Perform a smart contract query to get the number of signers of an action.
+get-action-valid-signers-count Perform a smart contract query to get the number of valid signers of an action.
+parse-propose-action           Parses the propose action transaction to extract proposal ID.
+
+```
+### Multisig.Deploy
+
+
+```
+$ mxpy multisig deploy --help
+usage: mxpy multisig deploy [-h] ...
+
+Deploy a Multisig Smart Contract.
+
+Output example:
+===============
+{
+    "emittedTransaction": {
+        "nonce": 42,
+        "sender": "alice",
+        "receiver": "bob",
+        "...": "..."
+    },
+    "emittedTransactionData": "the transaction data, not encoded",
+    "emittedTransactionHash": "the transaction hash"
+}
+
+options:
+  -h, --help                                      show this help message and exit
+  --bytecode BYTECODE                             the file containing the WASM bytecode
+  --quorum QUORUM                                 the number of signatures required to approve a proposal
+  --board-members BOARD_MEMBERS [BOARD_MEMBERS ...]
+                                                  the bech32 addresses of the board members
+  --metadata-not-upgradeable                      ‼ mark the contract as NOT upgradeable (default: upgradeable)
+  --metadata-not-readable                         ‼ mark the contract as NOT readable (default: readable)
+  --metadata-payable                              ‼ mark the contract as payable (default: not payable)
+  --metadata-payable-by-sc                        ‼ mark the contract as payable by SC (default: not payable by SC)
+  --abi ABI                                       the ABI file of the Multisig Smart Contract
+  --outfile OUTFILE                               where to save the output (default: stdout)
+  --pem PEM                                       🔑 the PEM file, if keyfile not provided
+  --keyfile KEYFILE                               🔑 a JSON keyfile, if PEM not provided
+  --passfile PASSFILE                             🔑 a file containing keyfile's password, if keyfile provided. If not
+                                                  provided, you'll be prompted to enter the password.
+  --ledger                                        🔐 bool flag for signing transaction using ledger
+  --sender-wallet-index SENDER_WALLET_INDEX       🔑 the address index; can be used for PEM files, keyfiles of type
+                                                  mnemonic or Ledger devices (default: 0)
+  --sender-username SENDER_USERNAME               🖄 the username of the sender
+  --hrp HRP                                       The hrp used to convert the address to its bech32 representation
+  --proxy PROXY                                   🔗 the URL of the proxy
+  --nonce NONCE                                   # the nonce for the transaction. If not provided, is fetched from the
+                                                  network.
+  --recall-nonce                                  ⭮ whether to recall the nonce when creating the transaction (default:
+                                                  False). This argument is OBSOLETE.
+  --gas-price GAS_PRICE                           ⛽ the gas price (default: 1000000000)
+  --gas-limit GAS_LIMIT                           ⛽ the gas limit
+  --value VALUE                                   the value to transfer (default: 0)
+  --chain CHAIN                                   the chain identifier
+  --version VERSION                               the transaction version (default: 2)
+  --options OPTIONS                               the transaction options (default: 0)
+  --relayer RELAYER                               the bech32 address of the relayer
+  --guardian GUARDIAN                             the bech32 address of the guardian
+  --send                                          ✓ whether to broadcast the transaction (default: False)
+  --simulate                                      whether to simulate the transaction (default: False)
+  --guardian-service-url GUARDIAN_SERVICE_URL     the url of the guardian service
+  --guardian-2fa-code GUARDIAN_2FA_CODE           the 2fa code for the guardian
+  --guardian-pem GUARDIAN_PEM                     🔑 the PEM file, if keyfile not provided
+  --guardian-keyfile GUARDIAN_KEYFILE             🔑 a JSON keyfile, if PEM not provided
+  --guardian-passfile GUARDIAN_PASSFILE           🔑 a file containing keyfile's password, if keyfile provided. If not
+                                                  provided, you'll be prompted to enter the password.
+  --guardian-ledger                               🔐 bool flag for signing transaction using ledger
+  --guardian-wallet-index GUARDIAN_WALLET_INDEX   🔑 the address index; can be used for PEM files, keyfiles of type
+                                                  mnemonic or Ledger devices (default: 0)
+  --relayer-pem RELAYER_PEM                       🔑 the PEM file, if keyfile not provided
+  --relayer-keyfile RELAYER_KEYFILE               🔑 a JSON keyfile, if PEM not provided
+  --relayer-passfile RELAYER_PASSFILE             🔑 a file containing keyfile's password, if keyfile provided. If not
+                                                  provided, you'll be prompted to enter the password.
+  --relayer-ledger                                🔐 bool flag for signing transaction using ledger
+  --relayer-wallet-index RELAYER_WALLET_INDEX     🔑 the address index; can be used for PEM files, keyfiles of type
+                                                  mnemonic or Ledger devices (default: 0)
+  --wait-result                                   signal to wait for the transaction result - only valid if --send is
+                                                  set
+  --timeout TIMEOUT                               max num of seconds to wait for result - only valid if --wait-result is
+                                                  set
+
+```
+### Multisig.Deposit
+
+
+```
+$ mxpy multisig deposit --help
+usage: mxpy multisig deposit [-h] ...
+
+Deposit native tokens (EGLD) or ESDT tokens into a Multisig Smart Contract.
+
+Output example:
+===============
+{
+    "emittedTransaction": {
+        "nonce": 42,
+        "sender": "alice",
+        "receiver": "bob",
+        "...": "..."
+    },
+    "emittedTransactionData": "the transaction data, not encoded",
+    "emittedTransactionHash": "the transaction hash"
+}
+
+options:
+  -h, --help                                      show this help message and exit
+  --token-transfers TOKEN_TRANSFERS [TOKEN_TRANSFERS ...]
+                                                  token transfers for transfer & execute, as [token, amount] E.g.
+                                                  --token-transfers NFT-123456-0a 1 ESDT-987654 100000000
+  --contract CONTRACT                             🖄 the bech32 address of the Multisig Smart Contract
+  --abi ABI                                       the ABI file of the Multisig Smart Contract
+  --outfile OUTFILE                               where to save the output (default: stdout)
+  --pem PEM                                       🔑 the PEM file, if keyfile not provided
+  --keyfile KEYFILE                               🔑 a JSON keyfile, if PEM not provided
+  --passfile PASSFILE                             🔑 a file containing keyfile's password, if keyfile provided. If not
+                                                  provided, you'll be prompted to enter the password.
+  --ledger                                        🔐 bool flag for signing transaction using ledger
+  --sender-wallet-index SENDER_WALLET_INDEX       🔑 the address index; can be used for PEM files, keyfiles of type
+                                                  mnemonic or Ledger devices (default: 0)
+  --sender-username SENDER_USERNAME               🖄 the username of the sender
+  --hrp HRP                                       The hrp used to convert the address to its bech32 representation
+  --proxy PROXY                                   🔗 the URL of the proxy
+  --nonce NONCE                                   # the nonce for the transaction. If not provided, is fetched from the
+                                                  network.
+  --recall-nonce                                  ⭮ whether to recall the nonce when creating the transaction (default:
+                                                  False). This argument is OBSOLETE.
+  --gas-price GAS_PRICE                           ⛽ the gas price (default: 1000000000)
+  --gas-limit GAS_LIMIT                           ⛽ the gas limit
+  --value VALUE                                   the value to transfer (default: 0)
+  --chain CHAIN                                   the chain identifier
+  --version VERSION                               the transaction version (default: 2)
+  --options OPTIONS                               the transaction options (default: 0)
+  --relayer RELAYER                               the bech32 address of the relayer
+  --guardian GUARDIAN                             the bech32 address of the guardian
+  --send                                          ✓ whether to broadcast the transaction (default: False)
+  --simulate                                      whether to simulate the transaction (default: False)
+  --guardian-service-url GUARDIAN_SERVICE_URL     the url of the guardian service
+  --guardian-2fa-code GUARDIAN_2FA_CODE           the 2fa code for the guardian
+  --guardian-pem GUARDIAN_PEM                     🔑 the PEM file, if keyfile not provided
+  --guardian-keyfile GUARDIAN_KEYFILE             🔑 a JSON keyfile, if PEM not provided
+  --guardian-passfile GUARDIAN_PASSFILE           🔑 a file containing keyfile's password, if keyfile provided. If not
+                                                  provided, you'll be prompted to enter the password.
+  --guardian-ledger                               🔐 bool flag for signing transaction using ledger
+  --guardian-wallet-index GUARDIAN_WALLET_INDEX   🔑 the address index; can be used for PEM files, keyfiles of type
+                                                  mnemonic or Ledger devices (default: 0)
+  --relayer-pem RELAYER_PEM                       🔑 the PEM file, if keyfile not provided
+  --relayer-keyfile RELAYER_KEYFILE               🔑 a JSON keyfile, if PEM not provided
+  --relayer-passfile RELAYER_PASSFILE             🔑 a file containing keyfile's password, if keyfile provided. If not
+                                                  provided, you'll be prompted to enter the password.
+  --relayer-ledger                                🔐 bool flag for signing transaction using ledger
+  --relayer-wallet-index RELAYER_WALLET_INDEX     🔑 the address index; can be used for PEM files, keyfiles of type
+                                                  mnemonic or Ledger devices (default: 0)
+  --wait-result                                   signal to wait for the transaction result - only valid if --send is
+                                                  set
+  --timeout TIMEOUT                               max num of seconds to wait for result - only valid if --wait-result is
+                                                  set
+
+```
+### Multisig.DiscardAction
+
+
+```
+$ mxpy multisig discard-action --help
+usage: mxpy multisig discard-action [-h] ...
+
+Discard a proposed action. Signatures must be removed first via `unsign`.
+
+Output example:
+===============
+{
+    "emittedTransaction": {
+        "nonce": 42,
+        "sender": "alice",
+        "receiver": "bob",
+        "...": "..."
+    },
+    "emittedTransactionData": "the transaction data, not encoded",
+    "emittedTransactionHash": "the transaction hash"
+}
+
+options:
+  -h, --help                                     show this help message and exit
+  --action ACTION                                the id of the action
+  --contract CONTRACT                            🖄 the bech32 address of the Multisig Smart Contract
+  --abi ABI                                      the ABI file of the Multisig Smart Contract
+  --outfile OUTFILE                              where to save the output (default: stdout)
+  --pem PEM                                      🔑 the PEM file, if keyfile not provided
+  --keyfile KEYFILE                              🔑 a JSON keyfile, if PEM not provided
+  --passfile PASSFILE                            🔑 a file containing keyfile's password, if keyfile provided. If not
+                                                 provided, you'll be prompted to enter the password.
+  --ledger                                       🔐 bool flag for signing transaction using ledger
+  --sender-wallet-index SENDER_WALLET_INDEX      🔑 the address index; can be used for PEM files, keyfiles of type
+                                                 mnemonic or Ledger devices (default: 0)
+  --sender-username SENDER_USERNAME              🖄 the username of the sender
+  --hrp HRP                                      The hrp used to convert the address to its bech32 representation
+  --proxy PROXY                                  🔗 the URL of the proxy
+  --nonce NONCE                                  # the nonce for the transaction. If not provided, is fetched from the
+                                                 network.
+  --recall-nonce                                 ⭮ whether to recall the nonce when creating the transaction (default:
+                                                 False). This argument is OBSOLETE.
+  --gas-price GAS_PRICE                          ⛽ the gas price (default: 1000000000)
+  --gas-limit GAS_LIMIT                          ⛽ the gas limit
+  --value VALUE                                  the value to transfer (default: 0)
+  --chain CHAIN                                  the chain identifier
+  --version VERSION                              the transaction version (default: 2)
+  --options OPTIONS                              the transaction options (default: 0)
+  --relayer RELAYER                              the bech32 address of the relayer
+  --guardian GUARDIAN                            the bech32 address of the guardian
+  --send                                         ✓ whether to broadcast the transaction (default: False)
+  --simulate                                     whether to simulate the transaction (default: False)
+  --guardian-service-url GUARDIAN_SERVICE_URL    the url of the guardian service
+  --guardian-2fa-code GUARDIAN_2FA_CODE          the 2fa code for the guardian
+  --guardian-pem GUARDIAN_PEM                    🔑 the PEM file, if keyfile not provided
+  --guardian-keyfile GUARDIAN_KEYFILE            🔑 a JSON keyfile, if PEM not provided
+  --guardian-passfile GUARDIAN_PASSFILE          🔑 a file containing keyfile's password, if keyfile provided. If not
+                                                 provided, you'll be prompted to enter the password.
+  --guardian-ledger                              🔐 bool flag for signing transaction using ledger
+  --guardian-wallet-index GUARDIAN_WALLET_INDEX  🔑 the address index; can be used for PEM files, keyfiles of type
+                                                 mnemonic or Ledger devices (default: 0)
+  --relayer-pem RELAYER_PEM                      🔑 the PEM file, if keyfile not provided
+  --relayer-keyfile RELAYER_KEYFILE              🔑 a JSON keyfile, if PEM not provided
+  --relayer-passfile RELAYER_PASSFILE            🔑 a file containing keyfile's password, if keyfile provided. If not
+                                                 provided, you'll be prompted to enter the password.
+  --relayer-ledger                               🔐 bool flag for signing transaction using ledger
+  --relayer-wallet-index RELAYER_WALLET_INDEX    🔑 the address index; can be used for PEM files, keyfiles of type
+                                                 mnemonic or Ledger devices (default: 0)
+  --wait-result                                  signal to wait for the transaction result - only valid if --send is set
+  --timeout TIMEOUT                              max num of seconds to wait for result - only valid if --wait-result is
+                                                 set
+
+```
+### Multisig.DiscardBatch
+
+
+```
+$ mxpy multisig discard-batch --help
+usage: mxpy multisig discard-batch [-h] ...
+
+Discard all the actions for the specified IDs.
+
+Output example:
+===============
+{
+    "emittedTransaction": {
+        "nonce": 42,
+        "sender": "alice",
+        "receiver": "bob",
+        "...": "..."
+    },
+    "emittedTransactionData": "the transaction data, not encoded",
+    "emittedTransactionHash": "the transaction hash"
+}
+
+options:
+  -h, --help                                     show this help message and exit
+  --action-ids ACTION_IDS [ACTION_IDS ...]       the IDs of the actions to discard
+  --contract CONTRACT                            🖄 the bech32 address of the Multisig Smart Contract
+  --abi ABI                                      the ABI file of the Multisig Smart Contract
+  --outfile OUTFILE                              where to save the output (default: stdout)
+  --pem PEM                                      🔑 the PEM file, if keyfile not provided
+  --keyfile KEYFILE                              🔑 a JSON keyfile, if PEM not provided
+  --passfile PASSFILE                            🔑 a file containing keyfile's password, if keyfile provided. If not
+                                                 provided, you'll be prompted to enter the password.
+  --ledger                                       🔐 bool flag for signing transaction using ledger
+  --sender-wallet-index SENDER_WALLET_INDEX      🔑 the address index; can be used for PEM files, keyfiles of type
+                                                 mnemonic or Ledger devices (default: 0)
+  --sender-username SENDER_USERNAME              🖄 the username of the sender
+  --hrp HRP                                      The hrp used to convert the address to its bech32 representation
+  --proxy PROXY                                  🔗 the URL of the proxy
+  --nonce NONCE                                  # the nonce for the transaction. If not provided, is fetched from the
+                                                 network.
+  --recall-nonce                                 ⭮ whether to recall the nonce when creating the transaction (default:
+                                                 False). This argument is OBSOLETE.
+  --gas-price GAS_PRICE                          ⛽ the gas price (default: 1000000000)
+  --gas-limit GAS_LIMIT                          ⛽ the gas limit
+  --value VALUE                                  the value to transfer (default: 0)
+  --chain CHAIN                                  the chain identifier
+  --version VERSION                              the transaction version (default: 2)
+  --options OPTIONS                              the transaction options (default: 0)
+  --relayer RELAYER                              the bech32 address of the relayer
+  --guardian GUARDIAN                            the bech32 address of the guardian
+  --send                                         ✓ whether to broadcast the transaction (default: False)
+  --simulate                                     whether to simulate the transaction (default: False)
+  --guardian-service-url GUARDIAN_SERVICE_URL    the url of the guardian service
+  --guardian-2fa-code GUARDIAN_2FA_CODE          the 2fa code for the guardian
+  --guardian-pem GUARDIAN_PEM                    🔑 the PEM file, if keyfile not provided
+  --guardian-keyfile GUARDIAN_KEYFILE            🔑 a JSON keyfile, if PEM not provided
+  --guardian-passfile GUARDIAN_PASSFILE          🔑 a file containing keyfile's password, if keyfile provided. If not
+                                                 provided, you'll be prompted to enter the password.
+  --guardian-ledger                              🔐 bool flag for signing transaction using ledger
+  --guardian-wallet-index GUARDIAN_WALLET_INDEX  🔑 the address index; can be used for PEM files, keyfiles of type
+                                                 mnemonic or Ledger devices (default: 0)
+  --relayer-pem RELAYER_PEM                      🔑 the PEM file, if keyfile not provided
+  --relayer-keyfile RELAYER_KEYFILE              🔑 a JSON keyfile, if PEM not provided
+  --relayer-passfile RELAYER_PASSFILE            🔑 a file containing keyfile's password, if keyfile provided. If not
+                                                 provided, you'll be prompted to enter the password.
+  --relayer-ledger                               🔐 bool flag for signing transaction using ledger
+  --relayer-wallet-index RELAYER_WALLET_INDEX    🔑 the address index; can be used for PEM files, keyfiles of type
+                                                 mnemonic or Ledger devices (default: 0)
+  --wait-result                                  signal to wait for the transaction result - only valid if --send is set
+  --timeout TIMEOUT                              max num of seconds to wait for result - only valid if --wait-result is
+                                                 set
+
+```
+### Multisig.AddBoardMember
+
+
+```
+$ mxpy multisig add-board-member --help
+usage: mxpy multisig add-board-member [-h] ...
+
+Propose adding a new board member.
+
+Output example:
+===============
+{
+    "emittedTransaction": {
+        "nonce": 42,
+        "sender": "alice",
+        "receiver": "bob",
+        "...": "..."
+    },
+    "emittedTransactionData": "the transaction data, not encoded",
+    "emittedTransactionHash": "the transaction hash"
+}
+
+options:
+  -h, --help                                     show this help message and exit
+  --board-member BOARD_MEMBER                    the bech32 address of the proposed board member
+  --contract CONTRACT                            🖄 the bech32 address of the Multisig Smart Contract
+  --abi ABI                                      the ABI file of the Multisig Smart Contract
+  --outfile OUTFILE                              where to save the output (default: stdout)
+  --pem PEM                                      🔑 the PEM file, if keyfile not provided
+  --keyfile KEYFILE                              🔑 a JSON keyfile, if PEM not provided
+  --passfile PASSFILE                            🔑 a file containing keyfile's password, if keyfile provided. If not
+                                                 provided, you'll be prompted to enter the password.
+  --ledger                                       🔐 bool flag for signing transaction using ledger
+  --sender-wallet-index SENDER_WALLET_INDEX      🔑 the address index; can be used for PEM files, keyfiles of type
+                                                 mnemonic or Ledger devices (default: 0)
+  --sender-username SENDER_USERNAME              🖄 the username of the sender
+  --hrp HRP                                      The hrp used to convert the address to its bech32 representation
+  --proxy PROXY                                  🔗 the URL of the proxy
+  --nonce NONCE                                  # the nonce for the transaction. If not provided, is fetched from the
+                                                 network.
+  --recall-nonce                                 ⭮ whether to recall the nonce when creating the transaction (default:
+                                                 False). This argument is OBSOLETE.
+  --gas-price GAS_PRICE                          ⛽ the gas price (default: 1000000000)
+  --gas-limit GAS_LIMIT                          ⛽ the gas limit
+  --value VALUE                                  the value to transfer (default: 0)
+  --chain CHAIN                                  the chain identifier
+  --version VERSION                              the transaction version (default: 2)
+  --options OPTIONS                              the transaction options (default: 0)
+  --relayer RELAYER                              the bech32 address of the relayer
+  --guardian GUARDIAN                            the bech32 address of the guardian
+  --send                                         ✓ whether to broadcast the transaction (default: False)
+  --simulate                                     whether to simulate the transaction (default: False)
+  --guardian-service-url GUARDIAN_SERVICE_URL    the url of the guardian service
+  --guardian-2fa-code GUARDIAN_2FA_CODE          the 2fa code for the guardian
+  --guardian-pem GUARDIAN_PEM                    🔑 the PEM file, if keyfile not provided
+  --guardian-keyfile GUARDIAN_KEYFILE            🔑 a JSON keyfile, if PEM not provided
+  --guardian-passfile GUARDIAN_PASSFILE          🔑 a file containing keyfile's password, if keyfile provided. If not
+                                                 provided, you'll be prompted to enter the password.
+  --guardian-ledger                              🔐 bool flag for signing transaction using ledger
+  --guardian-wallet-index GUARDIAN_WALLET_INDEX  🔑 the address index; can be used for PEM files, keyfiles of type
+                                                 mnemonic or Ledger devices (default: 0)
+  --relayer-pem RELAYER_PEM                      🔑 the PEM file, if keyfile not provided
+  --relayer-keyfile RELAYER_KEYFILE              🔑 a JSON keyfile, if PEM not provided
+  --relayer-passfile RELAYER_PASSFILE            🔑 a file containing keyfile's password, if keyfile provided. If not
+                                                 provided, you'll be prompted to enter the password.
+  --relayer-ledger                               🔐 bool flag for signing transaction using ledger
+  --relayer-wallet-index RELAYER_WALLET_INDEX    🔑 the address index; can be used for PEM files, keyfiles of type
+                                                 mnemonic or Ledger devices (default: 0)
+  --wait-result                                  signal to wait for the transaction result - only valid if --send is set
+  --timeout TIMEOUT                              max num of seconds to wait for result - only valid if --wait-result is
+                                                 set
+
+```
+### Multisig.AddProposer
+
+
+```
+$ mxpy multisig add-proposer --help
+usage: mxpy multisig add-proposer [-h] ...
+
+Propose adding a new proposer.
+
+Output example:
+===============
+{
+    "emittedTransaction": {
+        "nonce": 42,
+        "sender": "alice",
+        "receiver": "bob",
+        "...": "..."
+    },
+    "emittedTransactionData": "the transaction data, not encoded",
+    "emittedTransactionHash": "the transaction hash"
+}
+
+options:
+  -h, --help                                     show this help message and exit
+  --proposer PROPOSER                            the bech32 address of the proposed proposer
+  --contract CONTRACT                            🖄 the bech32 address of the Multisig Smart Contract
+  --abi ABI                                      the ABI file of the Multisig Smart Contract
+  --outfile OUTFILE                              where to save the output (default: stdout)
+  --pem PEM                                      🔑 the PEM file, if keyfile not provided
+  --keyfile KEYFILE                              🔑 a JSON keyfile, if PEM not provided
+  --passfile PASSFILE                            🔑 a file containing keyfile's password, if keyfile provided. If not
+                                                 provided, you'll be prompted to enter the password.
+  --ledger                                       🔐 bool flag for signing transaction using ledger
+  --sender-wallet-index SENDER_WALLET_INDEX      🔑 the address index; can be used for PEM files, keyfiles of type
+                                                 mnemonic or Ledger devices (default: 0)
+  --sender-username SENDER_USERNAME              🖄 the username of the sender
+  --hrp HRP                                      The hrp used to convert the address to its bech32 representation
+  --proxy PROXY                                  🔗 the URL of the proxy
+  --nonce NONCE                                  # the nonce for the transaction. If not provided, is fetched from the
+                                                 network.
+  --recall-nonce                                 ⭮ whether to recall the nonce when creating the transaction (default:
+                                                 False). This argument is OBSOLETE.
+  --gas-price GAS_PRICE                          ⛽ the gas price (default: 1000000000)
+  --gas-limit GAS_LIMIT                          ⛽ the gas limit
+  --value VALUE                                  the value to transfer (default: 0)
+  --chain CHAIN                                  the chain identifier
+  --version VERSION                              the transaction version (default: 2)
+  --options OPTIONS                              the transaction options (default: 0)
+  --relayer RELAYER                              the bech32 address of the relayer
+  --guardian GUARDIAN                            the bech32 address of the guardian
+  --send                                         ✓ whether to broadcast the transaction (default: False)
+  --simulate                                     whether to simulate the transaction (default: False)
+  --guardian-service-url GUARDIAN_SERVICE_URL    the url of the guardian service
+  --guardian-2fa-code GUARDIAN_2FA_CODE          the 2fa code for the guardian
+  --guardian-pem GUARDIAN_PEM                    🔑 the PEM file, if keyfile not provided
+  --guardian-keyfile GUARDIAN_KEYFILE            🔑 a JSON keyfile, if PEM not provided
+  --guardian-passfile GUARDIAN_PASSFILE          🔑 a file containing keyfile's password, if keyfile provided. If not
+                                                 provided, you'll be prompted to enter the password.
+  --guardian-ledger                              🔐 bool flag for signing transaction using ledger
+  --guardian-wallet-index GUARDIAN_WALLET_INDEX  🔑 the address index; can be used for PEM files, keyfiles of type
+                                                 mnemonic or Ledger devices (default: 0)
+  --relayer-pem RELAYER_PEM                      🔑 the PEM file, if keyfile not provided
+  --relayer-keyfile RELAYER_KEYFILE              🔑 a JSON keyfile, if PEM not provided
+  --relayer-passfile RELAYER_PASSFILE            🔑 a file containing keyfile's password, if keyfile provided. If not
+                                                 provided, you'll be prompted to enter the password.
+  --relayer-ledger                               🔐 bool flag for signing transaction using ledger
+  --relayer-wallet-index RELAYER_WALLET_INDEX    🔑 the address index; can be used for PEM files, keyfiles of type
+                                                 mnemonic or Ledger devices (default: 0)
+  --wait-result                                  signal to wait for the transaction result - only valid if --send is set
+  --timeout TIMEOUT                              max num of seconds to wait for result - only valid if --wait-result is
+                                                 set
+
+```
+### Multisig.RemoveUser
+
+
+```
+$ mxpy multisig remove-user --help
+usage: mxpy multisig remove-user [-h] ...
+
+Propose removing a user from the Multisig Smart Contract.
+
+Output example:
+===============
+{
+    "emittedTransaction": {
+        "nonce": 42,
+        "sender": "alice",
+        "receiver": "bob",
+        "...": "..."
+    },
+    "emittedTransactionData": "the transaction data, not encoded",
+    "emittedTransactionHash": "the transaction hash"
+}
+
+options:
+  -h, --help                                     show this help message and exit
+  --user USER                                    the bech32 address of the proposed user to be removed
+  --contract CONTRACT                            🖄 the bech32 address of the Multisig Smart Contract
+  --abi ABI                                      the ABI file of the Multisig Smart Contract
+  --outfile OUTFILE                              where to save the output (default: stdout)
+  --pem PEM                                      🔑 the PEM file, if keyfile not provided
+  --keyfile KEYFILE                              🔑 a JSON keyfile, if PEM not provided
+  --passfile PASSFILE                            🔑 a file containing keyfile's password, if keyfile provided. If not
+                                                 provided, you'll be prompted to enter the password.
+  --ledger                                       🔐 bool flag for signing transaction using ledger
+  --sender-wallet-index SENDER_WALLET_INDEX      🔑 the address index; can be used for PEM files, keyfiles of type
+                                                 mnemonic or Ledger devices (default: 0)
+  --sender-username SENDER_USERNAME              🖄 the username of the sender
+  --hrp HRP                                      The hrp used to convert the address to its bech32 representation
+  --proxy PROXY                                  🔗 the URL of the proxy
+  --nonce NONCE                                  # the nonce for the transaction. If not provided, is fetched from the
+                                                 network.
+  --recall-nonce                                 ⭮ whether to recall the nonce when creating the transaction (default:
+                                                 False). This argument is OBSOLETE.
+  --gas-price GAS_PRICE                          ⛽ the gas price (default: 1000000000)
+  --gas-limit GAS_LIMIT                          ⛽ the gas limit
+  --value VALUE                                  the value to transfer (default: 0)
+  --chain CHAIN                                  the chain identifier
+  --version VERSION                              the transaction version (default: 2)
+  --options OPTIONS                              the transaction options (default: 0)
+  --relayer RELAYER                              the bech32 address of the relayer
+  --guardian GUARDIAN                            the bech32 address of the guardian
+  --send                                         ✓ whether to broadcast the transaction (default: False)
+  --simulate                                     whether to simulate the transaction (default: False)
+  --guardian-service-url GUARDIAN_SERVICE_URL    the url of the guardian service
+  --guardian-2fa-code GUARDIAN_2FA_CODE          the 2fa code for the guardian
+  --guardian-pem GUARDIAN_PEM                    🔑 the PEM file, if keyfile not provided
+  --guardian-keyfile GUARDIAN_KEYFILE            🔑 a JSON keyfile, if PEM not provided
+  --guardian-passfile GUARDIAN_PASSFILE          🔑 a file containing keyfile's password, if keyfile provided. If not
+                                                 provided, you'll be prompted to enter the password.
+  --guardian-ledger                              🔐 bool flag for signing transaction using ledger
+  --guardian-wallet-index GUARDIAN_WALLET_INDEX  🔑 the address index; can be used for PEM files, keyfiles of type
+                                                 mnemonic or Ledger devices (default: 0)
+  --relayer-pem RELAYER_PEM                      🔑 the PEM file, if keyfile not provided
+  --relayer-keyfile RELAYER_KEYFILE              🔑 a JSON keyfile, if PEM not provided
+  --relayer-passfile RELAYER_PASSFILE            🔑 a file containing keyfile's password, if keyfile provided. If not
+                                                 provided, you'll be prompted to enter the password.
+  --relayer-ledger                               🔐 bool flag for signing transaction using ledger
+  --relayer-wallet-index RELAYER_WALLET_INDEX    🔑 the address index; can be used for PEM files, keyfiles of type
+                                                 mnemonic or Ledger devices (default: 0)
+  --wait-result                                  signal to wait for the transaction result - only valid if --send is set
+  --timeout TIMEOUT                              max num of seconds to wait for result - only valid if --wait-result is
+                                                 set
+
+```
+### Multisig.ChangeQuorum
+
+
+```
+$ mxpy multisig change-quorum --help
+usage: mxpy multisig change-quorum [-h] ...
+
+Propose changing the quorum of the Multisig Smart Contract.
+
+Output example:
+===============
+{
+    "emittedTransaction": {
+        "nonce": 42,
+        "sender": "alice",
+        "receiver": "bob",
+        "...": "..."
+    },
+    "emittedTransactionData": "the transaction data, not encoded",
+    "emittedTransactionHash": "the transaction hash"
+}
+
+options:
+  -h, --help                                     show this help message and exit
+  --quorum QUORUM                                the size of the new quorum (number of signatures required to approve a
+                                                 proposal)
+  --contract CONTRACT                            🖄 the bech32 address of the Multisig Smart Contract
+  --abi ABI                                      the ABI file of the Multisig Smart Contract
+  --outfile OUTFILE                              where to save the output (default: stdout)
+  --pem PEM                                      🔑 the PEM file, if keyfile not provided
+  --keyfile KEYFILE                              🔑 a JSON keyfile, if PEM not provided
+  --passfile PASSFILE                            🔑 a file containing keyfile's password, if keyfile provided. If not
+                                                 provided, you'll be prompted to enter the password.
+  --ledger                                       🔐 bool flag for signing transaction using ledger
+  --sender-wallet-index SENDER_WALLET_INDEX      🔑 the address index; can be used for PEM files, keyfiles of type
+                                                 mnemonic or Ledger devices (default: 0)
+  --sender-username SENDER_USERNAME              🖄 the username of the sender
+  --hrp HRP                                      The hrp used to convert the address to its bech32 representation
+  --proxy PROXY                                  🔗 the URL of the proxy
+  --nonce NONCE                                  # the nonce for the transaction. If not provided, is fetched from the
+                                                 network.
+  --recall-nonce                                 ⭮ whether to recall the nonce when creating the transaction (default:
+                                                 False). This argument is OBSOLETE.
+  --gas-price GAS_PRICE                          ⛽ the gas price (default: 1000000000)
+  --gas-limit GAS_LIMIT                          ⛽ the gas limit
+  --value VALUE                                  the value to transfer (default: 0)
+  --chain CHAIN                                  the chain identifier
+  --version VERSION                              the transaction version (default: 2)
+  --options OPTIONS                              the transaction options (default: 0)
+  --relayer RELAYER                              the bech32 address of the relayer
+  --guardian GUARDIAN                            the bech32 address of the guardian
+  --send                                         ✓ whether to broadcast the transaction (default: False)
+  --simulate                                     whether to simulate the transaction (default: False)
+  --guardian-service-url GUARDIAN_SERVICE_URL    the url of the guardian service
+  --guardian-2fa-code GUARDIAN_2FA_CODE          the 2fa code for the guardian
+  --guardian-pem GUARDIAN_PEM                    🔑 the PEM file, if keyfile not provided
+  --guardian-keyfile GUARDIAN_KEYFILE            🔑 a JSON keyfile, if PEM not provided
+  --guardian-passfile GUARDIAN_PASSFILE          🔑 a file containing keyfile's password, if keyfile provided. If not
+                                                 provided, you'll be prompted to enter the password.
+  --guardian-ledger                              🔐 bool flag for signing transaction using ledger
+  --guardian-wallet-index GUARDIAN_WALLET_INDEX  🔑 the address index; can be used for PEM files, keyfiles of type
+                                                 mnemonic or Ledger devices (default: 0)
+  --relayer-pem RELAYER_PEM                      🔑 the PEM file, if keyfile not provided
+  --relayer-keyfile RELAYER_KEYFILE              🔑 a JSON keyfile, if PEM not provided
+  --relayer-passfile RELAYER_PASSFILE            🔑 a file containing keyfile's password, if keyfile provided. If not
+                                                 provided, you'll be prompted to enter the password.
+  --relayer-ledger                               🔐 bool flag for signing transaction using ledger
+  --relayer-wallet-index RELAYER_WALLET_INDEX    🔑 the address index; can be used for PEM files, keyfiles of type
+                                                 mnemonic or Ledger devices (default: 0)
+  --wait-result                                  signal to wait for the transaction result - only valid if --send is set
+  --timeout TIMEOUT                              max num of seconds to wait for result - only valid if --wait-result is
+                                                 set
+
+```
+### Multisig.TransferAndExecute
+
+
+```
+$ mxpy multisig transfer-and-execute --help
+usage: mxpy multisig transfer-and-execute [-h] ...
+
+Propose transferring EGLD and optionally calling a smart contract.
+
+Output example:
+===============
+{
+    "emittedTransaction": {
+        "nonce": 42,
+        "sender": "alice",
+        "receiver": "bob",
+        "...": "..."
+    },
+    "emittedTransactionData": "the transaction data, not encoded",
+    "emittedTransactionHash": "the transaction hash"
+}
+
+options:
+  -h, --help                                     show this help message and exit
+  --opt-gas-limit OPT_GAS_LIMIT                  the size of the new quorum (number of signatures required to approve a
+                                                 proposal)
+  --contract-abi CONTRACT_ABI                    the ABI file of the contract to call
+  --function FUNCTION                            the function to call
+  --arguments ARGUMENTS [ARGUMENTS ...]          arguments for the contract transaction, as [number, bech32-address,
+                                                 ascii string, boolean] or hex-encoded. E.g. --arguments 42 0x64 1000
+                                                 0xabba str:TOK-a1c2ef true addr:erd1[..]
+  --arguments-file ARGUMENTS_FILE                a json file containing the arguments. ONLY if abi file is provided.
+                                                 E.g. [{ 'to': 'erd1...', 'amount': 10000000000 }]
+  --contract CONTRACT                            🖄 the bech32 address of the Multisig Smart Contract
+  --abi ABI                                      the ABI file of the Multisig Smart Contract
+  --outfile OUTFILE                              where to save the output (default: stdout)
+  --pem PEM                                      🔑 the PEM file, if keyfile not provided
+  --keyfile KEYFILE                              🔑 a JSON keyfile, if PEM not provided
+  --passfile PASSFILE                            🔑 a file containing keyfile's password, if keyfile provided. If not
+                                                 provided, you'll be prompted to enter the password.
+  --ledger                                       🔐 bool flag for signing transaction using ledger
+  --sender-wallet-index SENDER_WALLET_INDEX      🔑 the address index; can be used for PEM files, keyfiles of type
+                                                 mnemonic or Ledger devices (default: 0)
+  --sender-username SENDER_USERNAME              🖄 the username of the sender
+  --hrp HRP                                      The hrp used to convert the address to its bech32 representation
+  --proxy PROXY                                  🔗 the URL of the proxy
+  --nonce NONCE                                  # the nonce for the transaction. If not provided, is fetched from the
+                                                 network.
+  --recall-nonce                                 ⭮ whether to recall the nonce when creating the transaction (default:
+                                                 False). This argument is OBSOLETE.
+  --receiver RECEIVER                            🖄 the address of the receiver
+  --receiver-username RECEIVER_USERNAME          🖄 the username of the receiver
+  --gas-price GAS_PRICE                          ⛽ the gas price (default: 1000000000)
+  --gas-limit GAS_LIMIT                          ⛽ the gas limit
+  --value VALUE                                  the value to transfer (default: 0)
+  --chain CHAIN                                  the chain identifier
+  --version VERSION                              the transaction version (default: 2)
+  --options OPTIONS                              the transaction options (default: 0)
+  --relayer RELAYER                              the bech32 address of the relayer
+  --guardian GUARDIAN                            the bech32 address of the guardian
+  --send                                         ✓ whether to broadcast the transaction (default: False)
+  --simulate                                     whether to simulate the transaction (default: False)
+  --guardian-service-url GUARDIAN_SERVICE_URL    the url of the guardian service
+  --guardian-2fa-code GUARDIAN_2FA_CODE          the 2fa code for the guardian
+  --guardian-pem GUARDIAN_PEM                    🔑 the PEM file, if keyfile not provided
+  --guardian-keyfile GUARDIAN_KEYFILE            🔑 a JSON keyfile, if PEM not provided
+  --guardian-passfile GUARDIAN_PASSFILE          🔑 a file containing keyfile's password, if keyfile provided. If not
+                                                 provided, you'll be prompted to enter the password.
+  --guardian-ledger                              🔐 bool flag for signing transaction using ledger
+  --guardian-wallet-index GUARDIAN_WALLET_INDEX  🔑 the address index; can be used for PEM files, keyfiles of type
+                                                 mnemonic or Ledger devices (default: 0)
+  --relayer-pem RELAYER_PEM                      🔑 the PEM file, if keyfile not provided
+  --relayer-keyfile RELAYER_KEYFILE              🔑 a JSON keyfile, if PEM not provided
+  --relayer-passfile RELAYER_PASSFILE            🔑 a file containing keyfile's password, if keyfile provided. If not
+                                                 provided, you'll be prompted to enter the password.
+  --relayer-ledger                               🔐 bool flag for signing transaction using ledger
+  --relayer-wallet-index RELAYER_WALLET_INDEX    🔑 the address index; can be used for PEM files, keyfiles of type
+                                                 mnemonic or Ledger devices (default: 0)
+  --wait-result                                  signal to wait for the transaction result - only valid if --send is set
+  --timeout TIMEOUT                              max num of seconds to wait for result - only valid if --wait-result is
+                                                 set
+
+```
+### Multisig.TransferAndExecuteEsdt
+
+
+```
+$ mxpy multisig transfer-and-execute-esdt --help
+usage: mxpy multisig transfer-and-execute-esdt [-h] ...
+
+Propose transferring ESDTs and optionally calling a smart contract.
+
+Output example:
+===============
+{
+    "emittedTransaction": {
+        "nonce": 42,
+        "sender": "alice",
+        "receiver": "bob",
+        "...": "..."
+    },
+    "emittedTransactionData": "the transaction data, not encoded",
+    "emittedTransactionHash": "the transaction hash"
+}
+
+options:
+  -h, --help                                      show this help message and exit
+  --token-transfers TOKEN_TRANSFERS [TOKEN_TRANSFERS ...]
+                                                  token transfers for transfer & execute, as [token, amount] E.g.
+                                                  --token-transfers NFT-123456-0a 1 ESDT-987654 100000000
+  --opt-gas-limit OPT_GAS_LIMIT                   the size of the new quorum (number of signatures required to approve a
+                                                  proposal)
+  --contract-abi CONTRACT_ABI                     the ABI file of the contract to call
+  --function FUNCTION                             the function to call
+  --arguments ARGUMENTS [ARGUMENTS ...]           arguments for the contract transaction, as [number, bech32-address,
+                                                  ascii string, boolean] or hex-encoded. E.g. --arguments 42 0x64 1000
+                                                  0xabba str:TOK-a1c2ef true addr:erd1[..]
+  --arguments-file ARGUMENTS_FILE                 a json file containing the arguments. ONLY if abi file is provided.
+                                                  E.g. [{ 'to': 'erd1...', 'amount': 10000000000 }]
+  --contract CONTRACT                             🖄 the bech32 address of the Multisig Smart Contract
+  --abi ABI                                       the ABI file of the Multisig Smart Contract
+  --outfile OUTFILE                               where to save the output (default: stdout)
+  --pem PEM                                       🔑 the PEM file, if keyfile not provided
+  --keyfile KEYFILE                               🔑 a JSON keyfile, if PEM not provided
+  --passfile PASSFILE                             🔑 a file containing keyfile's password, if keyfile provided. If not
+                                                  provided, you'll be prompted to enter the password.
+  --ledger                                        🔐 bool flag for signing transaction using ledger
+  --sender-wallet-index SENDER_WALLET_INDEX       🔑 the address index; can be used for PEM files, keyfiles of type
+                                                  mnemonic or Ledger devices (default: 0)
+  --sender-username SENDER_USERNAME               🖄 the username of the sender
+  --hrp HRP                                       The hrp used to convert the address to its bech32 representation
+  --proxy PROXY                                   🔗 the URL of the proxy
+  --nonce NONCE                                   # the nonce for the transaction. If not provided, is fetched from the
+                                                  network.
+  --recall-nonce                                  ⭮ whether to recall the nonce when creating the transaction (default:
+                                                  False). This argument is OBSOLETE.
+  --receiver RECEIVER                             🖄 the address of the receiver
+  --receiver-username RECEIVER_USERNAME           🖄 the username of the receiver
+  --gas-price GAS_PRICE                           ⛽ the gas price (default: 1000000000)
+  --gas-limit GAS_LIMIT                           ⛽ the gas limit
+  --value VALUE                                   the value to transfer (default: 0)
+  --chain CHAIN                                   the chain identifier
+  --version VERSION                               the transaction version (default: 2)
+  --options OPTIONS                               the transaction options (default: 0)
+  --relayer RELAYER                               the bech32 address of the relayer
+  --guardian GUARDIAN                             the bech32 address of the guardian
+  --send                                          ✓ whether to broadcast the transaction (default: False)
+  --simulate                                      whether to simulate the transaction (default: False)
+  --guardian-service-url GUARDIAN_SERVICE_URL     the url of the guardian service
+  --guardian-2fa-code GUARDIAN_2FA_CODE           the 2fa code for the guardian
+  --guardian-pem GUARDIAN_PEM                     🔑 the PEM file, if keyfile not provided
+  --guardian-keyfile GUARDIAN_KEYFILE             🔑 a JSON keyfile, if PEM not provided
+  --guardian-passfile GUARDIAN_PASSFILE           🔑 a file containing keyfile's password, if keyfile provided. If not
+                                                  provided, you'll be prompted to enter the password.
+  --guardian-ledger                               🔐 bool flag for signing transaction using ledger
+  --guardian-wallet-index GUARDIAN_WALLET_INDEX   🔑 the address index; can be used for PEM files, keyfiles of type
+                                                  mnemonic or Ledger devices (default: 0)
+  --relayer-pem RELAYER_PEM                       🔑 the PEM file, if keyfile not provided
+  --relayer-keyfile RELAYER_KEYFILE               🔑 a JSON keyfile, if PEM not provided
+  --relayer-passfile RELAYER_PASSFILE             🔑 a file containing keyfile's password, if keyfile provided. If not
+                                                  provided, you'll be prompted to enter the password.
+  --relayer-ledger                                🔐 bool flag for signing transaction using ledger
+  --relayer-wallet-index RELAYER_WALLET_INDEX     🔑 the address index; can be used for PEM files, keyfiles of type
+                                                  mnemonic or Ledger devices (default: 0)
+  --wait-result                                   signal to wait for the transaction result - only valid if --send is
+                                                  set
+  --timeout TIMEOUT                               max num of seconds to wait for result - only valid if --wait-result is
+                                                  set
+
+```
+### Multisig.AsyncCall
+
+
+```
+$ mxpy multisig async-call --help
+usage: mxpy multisig async-call [-h] ...
+
+Propose a transaction in which the contract will perform an async call.
+
+Output example:
+===============
+{
+    "emittedTransaction": {
+        "nonce": 42,
+        "sender": "alice",
+        "receiver": "bob",
+        "...": "..."
+    },
+    "emittedTransactionData": "the transaction data, not encoded",
+    "emittedTransactionHash": "the transaction hash"
+}
+
+options:
+  -h, --help                                      show this help message and exit
+  --token-transfers TOKEN_TRANSFERS [TOKEN_TRANSFERS ...]
+                                                  token transfers for transfer & execute, as [token, amount] E.g.
+                                                  --token-transfers NFT-123456-0a 1 ESDT-987654 100000000
+  --opt-gas-limit OPT_GAS_LIMIT                   the size of the new quorum (number of signatures required to approve a
+                                                  proposal)
+  --contract-abi CONTRACT_ABI                     the ABI file of the contract to call
+  --function FUNCTION                             the function to call
+  --arguments ARGUMENTS [ARGUMENTS ...]           arguments for the contract transaction, as [number, bech32-address,
+                                                  ascii string, boolean] or hex-encoded. E.g. --arguments 42 0x64 1000
+                                                  0xabba str:TOK-a1c2ef true addr:erd1[..]
+  --arguments-file ARGUMENTS_FILE                 a json file containing the arguments. ONLY if abi file is provided.
+                                                  E.g. [{ 'to': 'erd1...', 'amount': 10000000000 }]
+  --contract CONTRACT                             🖄 the bech32 address of the Multisig Smart Contract
+  --abi ABI                                       the ABI file of the Multisig Smart Contract
+  --outfile OUTFILE                               where to save the output (default: stdout)
+  --pem PEM                                       🔑 the PEM file, if keyfile not provided
+  --keyfile KEYFILE                               🔑 a JSON keyfile, if PEM not provided
+  --passfile PASSFILE                             🔑 a file containing keyfile's password, if keyfile provided. If not
+                                                  provided, you'll be prompted to enter the password.
+  --ledger                                        🔐 bool flag for signing transaction using ledger
+  --sender-wallet-index SENDER_WALLET_INDEX       🔑 the address index; can be used for PEM files, keyfiles of type
+                                                  mnemonic or Ledger devices (default: 0)
+  --sender-username SENDER_USERNAME               🖄 the username of the sender
+  --hrp HRP                                       The hrp used to convert the address to its bech32 representation
+  --proxy PROXY                                   🔗 the URL of the proxy
+  --nonce NONCE                                   # the nonce for the transaction. If not provided, is fetched from the
+                                                  network.
+  --recall-nonce                                  ⭮ whether to recall the nonce when creating the transaction (default:
+                                                  False). This argument is OBSOLETE.
+  --receiver RECEIVER                             🖄 the address of the receiver
+  --receiver-username RECEIVER_USERNAME           🖄 the username of the receiver
+  --gas-price GAS_PRICE                           ⛽ the gas price (default: 1000000000)
+  --gas-limit GAS_LIMIT                           ⛽ the gas limit
+  --value VALUE                                   the value to transfer (default: 0)
+  --chain CHAIN                                   the chain identifier
+  --version VERSION                               the transaction version (default: 2)
+  --options OPTIONS                               the transaction options (default: 0)
+  --relayer RELAYER                               the bech32 address of the relayer
+  --guardian GUARDIAN                             the bech32 address of the guardian
+  --send                                          ✓ whether to broadcast the transaction (default: False)
+  --simulate                                      whether to simulate the transaction (default: False)
+  --guardian-service-url GUARDIAN_SERVICE_URL     the url of the guardian service
+  --guardian-2fa-code GUARDIAN_2FA_CODE           the 2fa code for the guardian
+  --guardian-pem GUARDIAN_PEM                     🔑 the PEM file, if keyfile not provided
+  --guardian-keyfile GUARDIAN_KEYFILE             🔑 a JSON keyfile, if PEM not provided
+  --guardian-passfile GUARDIAN_PASSFILE           🔑 a file containing keyfile's password, if keyfile provided. If not
+                                                  provided, you'll be prompted to enter the password.
+  --guardian-ledger                               🔐 bool flag for signing transaction using ledger
+  --guardian-wallet-index GUARDIAN_WALLET_INDEX   🔑 the address index; can be used for PEM files, keyfiles of type
+                                                  mnemonic or Ledger devices (default: 0)
+  --relayer-pem RELAYER_PEM                       🔑 the PEM file, if keyfile not provided
+  --relayer-keyfile RELAYER_KEYFILE               🔑 a JSON keyfile, if PEM not provided
+  --relayer-passfile RELAYER_PASSFILE             🔑 a file containing keyfile's password, if keyfile provided. If not
+                                                  provided, you'll be prompted to enter the password.
+  --relayer-ledger                                🔐 bool flag for signing transaction using ledger
+  --relayer-wallet-index RELAYER_WALLET_INDEX     🔑 the address index; can be used for PEM files, keyfiles of type
+                                                  mnemonic or Ledger devices (default: 0)
+  --wait-result                                   signal to wait for the transaction result - only valid if --send is
+                                                  set
+  --timeout TIMEOUT                               max num of seconds to wait for result - only valid if --wait-result is
+                                                  set
+
+```
+### Multisig.DeployFromSource
+
+
+```
+$ mxpy multisig deploy-from-source --help
+usage: mxpy multisig deploy-from-source [-h] ...
+
+Propose a smart contract deploy from a previously deployed smart contract.
+
+Output example:
+===============
+{
+    "emittedTransaction": {
+        "nonce": 42,
+        "sender": "alice",
+        "receiver": "bob",
+        "...": "..."
+    },
+    "emittedTransactionData": "the transaction data, not encoded",
+    "emittedTransactionHash": "the transaction hash"
+}
+
+options:
+  -h, --help                                     show this help message and exit
+  --contract-to-copy CONTRACT_TO_COPY            the bech32 address of the contract to copy
+  --contract-abi CONTRACT_ABI                    the ABI file of the contract to copy
+  --metadata-not-upgradeable                     ‼ mark the contract as NOT upgradeable (default: upgradeable)
+  --metadata-not-readable                        ‼ mark the contract as NOT readable (default: readable)
+  --metadata-payable                             ‼ mark the contract as payable (default: not payable)
+  --metadata-payable-by-sc                       ‼ mark the contract as payable by SC (default: not payable by SC)
+  --arguments ARGUMENTS [ARGUMENTS ...]          arguments for the contract transaction, as [number, bech32-address,
+                                                 ascii string, boolean] or hex-encoded. E.g. --arguments 42 0x64 1000
+                                                 0xabba str:TOK-a1c2ef true addr:erd1[..]
+  --arguments-file ARGUMENTS_FILE                a json file containing the arguments. ONLY if abi file is provided.
+                                                 E.g. [{ 'to': 'erd1...', 'amount': 10000000000 }]
+  --contract CONTRACT                            🖄 the bech32 address of the Multisig Smart Contract
+  --abi ABI                                      the ABI file of the Multisig Smart Contract
+  --outfile OUTFILE                              where to save the output (default: stdout)
+  --pem PEM                                      🔑 the PEM file, if keyfile not provided
+  --keyfile KEYFILE                              🔑 a JSON keyfile, if PEM not provided
+  --passfile PASSFILE                            🔑 a file containing keyfile's password, if keyfile provided. If not
+                                                 provided, you'll be prompted to enter the password.
+  --ledger                                       🔐 bool flag for signing transaction using ledger
+  --sender-wallet-index SENDER_WALLET_INDEX      🔑 the address index; can be used for PEM files, keyfiles of type
+                                                 mnemonic or Ledger devices (default: 0)
+  --sender-username SENDER_USERNAME              🖄 the username of the sender
+  --hrp HRP                                      The hrp used to convert the address to its bech32 representation
+  --proxy PROXY                                  🔗 the URL of the proxy
+  --nonce NONCE                                  # the nonce for the transaction. If not provided, is fetched from the
+                                                 network.
+  --recall-nonce                                 ⭮ whether to recall the nonce when creating the transaction (default:
+                                                 False). This argument is OBSOLETE.
+  --gas-price GAS_PRICE                          ⛽ the gas price (default: 1000000000)
+  --gas-limit GAS_LIMIT                          ⛽ the gas limit
+  --value VALUE                                  the value to transfer (default: 0)
+  --chain CHAIN                                  the chain identifier
+  --version VERSION                              the transaction version (default: 2)
+  --options OPTIONS                              the transaction options (default: 0)
+  --relayer RELAYER                              the bech32 address of the relayer
+  --guardian GUARDIAN                            the bech32 address of the guardian
+  --send                                         ✓ whether to broadcast the transaction (default: False)
+  --simulate                                     whether to simulate the transaction (default: False)
+  --guardian-service-url GUARDIAN_SERVICE_URL    the url of the guardian service
+  --guardian-2fa-code GUARDIAN_2FA_CODE          the 2fa code for the guardian
+  --guardian-pem GUARDIAN_PEM                    🔑 the PEM file, if keyfile not provided
+  --guardian-keyfile GUARDIAN_KEYFILE            🔑 a JSON keyfile, if PEM not provided
+  --guardian-passfile GUARDIAN_PASSFILE          🔑 a file containing keyfile's password, if keyfile provided. If not
+                                                 provided, you'll be prompted to enter the password.
+  --guardian-ledger                              🔐 bool flag for signing transaction using ledger
+  --guardian-wallet-index GUARDIAN_WALLET_INDEX  🔑 the address index; can be used for PEM files, keyfiles of type
+                                                 mnemonic or Ledger devices (default: 0)
+  --relayer-pem RELAYER_PEM                      🔑 the PEM file, if keyfile not provided
+  --relayer-keyfile RELAYER_KEYFILE              🔑 a JSON keyfile, if PEM not provided
+  --relayer-passfile RELAYER_PASSFILE            🔑 a file containing keyfile's password, if keyfile provided. If not
+                                                 provided, you'll be prompted to enter the password.
+  --relayer-ledger                               🔐 bool flag for signing transaction using ledger
+  --relayer-wallet-index RELAYER_WALLET_INDEX    🔑 the address index; can be used for PEM files, keyfiles of type
+                                                 mnemonic or Ledger devices (default: 0)
+  --wait-result                                  signal to wait for the transaction result - only valid if --send is set
+  --timeout TIMEOUT                              max num of seconds to wait for result - only valid if --wait-result is
+                                                 set
+
+```
+### Multisig.UpgradeFromSource
+
+
+```
+$ mxpy multisig upgrade-from-source --help
+usage: mxpy multisig upgrade-from-source [-h] ...
+
+Propose a smart contract upgrade from a previously deployed smart contract.
+
+Output example:
+===============
+{
+    "emittedTransaction": {
+        "nonce": 42,
+        "sender": "alice",
+        "receiver": "bob",
+        "...": "..."
+    },
+    "emittedTransactionData": "the transaction data, not encoded",
+    "emittedTransactionHash": "the transaction hash"
+}
+
+options:
+  -h, --help                                     show this help message and exit
+  --contract-to-upgrade CONTRACT_TO_UPGRADE      the bech32 address of the contract to upgrade
+  --contract-to-copy CONTRACT_TO_COPY            the bech32 address of the contract to copy
+  --contract-abi CONTRACT_ABI                    the ABI file of the contract to copy
+  --metadata-not-upgradeable                     ‼ mark the contract as NOT upgradeable (default: upgradeable)
+  --metadata-not-readable                        ‼ mark the contract as NOT readable (default: readable)
+  --metadata-payable                             ‼ mark the contract as payable (default: not payable)
+  --metadata-payable-by-sc                       ‼ mark the contract as payable by SC (default: not payable by SC)
+  --arguments ARGUMENTS [ARGUMENTS ...]          arguments for the contract transaction, as [number, bech32-address,
+                                                 ascii string, boolean] or hex-encoded. E.g. --arguments 42 0x64 1000
+                                                 0xabba str:TOK-a1c2ef true addr:erd1[..]
+  --arguments-file ARGUMENTS_FILE                a json file containing the arguments. ONLY if abi file is provided.
+                                                 E.g. [{ 'to': 'erd1...', 'amount': 10000000000 }]
+  --contract CONTRACT                            🖄 the bech32 address of the Multisig Smart Contract
+  --abi ABI                                      the ABI file of the Multisig Smart Contract
+  --outfile OUTFILE                              where to save the output (default: stdout)
+  --pem PEM                                      🔑 the PEM file, if keyfile not provided
+  --keyfile KEYFILE                              🔑 a JSON keyfile, if PEM not provided
+  --passfile PASSFILE                            🔑 a file containing keyfile's password, if keyfile provided. If not
+                                                 provided, you'll be prompted to enter the password.
+  --ledger                                       🔐 bool flag for signing transaction using ledger
+  --sender-wallet-index SENDER_WALLET_INDEX      🔑 the address index; can be used for PEM files, keyfiles of type
+                                                 mnemonic or Ledger devices (default: 0)
+  --sender-username SENDER_USERNAME              🖄 the username of the sender
+  --hrp HRP                                      The hrp used to convert the address to its bech32 representation
+  --proxy PROXY                                  🔗 the URL of the proxy
+  --nonce NONCE                                  # the nonce for the transaction. If not provided, is fetched from the
+                                                 network.
+  --recall-nonce                                 ⭮ whether to recall the nonce when creating the transaction (default:
+                                                 False). This argument is OBSOLETE.
+  --gas-price GAS_PRICE                          ⛽ the gas price (default: 1000000000)
+  --gas-limit GAS_LIMIT                          ⛽ the gas limit
+  --value VALUE                                  the value to transfer (default: 0)
+  --chain CHAIN                                  the chain identifier
+  --version VERSION                              the transaction version (default: 2)
+  --options OPTIONS                              the transaction options (default: 0)
+  --relayer RELAYER                              the bech32 address of the relayer
+  --guardian GUARDIAN                            the bech32 address of the guardian
+  --send                                         ✓ whether to broadcast the transaction (default: False)
+  --simulate                                     whether to simulate the transaction (default: False)
+  --guardian-service-url GUARDIAN_SERVICE_URL    the url of the guardian service
+  --guardian-2fa-code GUARDIAN_2FA_CODE          the 2fa code for the guardian
+  --guardian-pem GUARDIAN_PEM                    🔑 the PEM file, if keyfile not provided
+  --guardian-keyfile GUARDIAN_KEYFILE            🔑 a JSON keyfile, if PEM not provided
+  --guardian-passfile GUARDIAN_PASSFILE          🔑 a file containing keyfile's password, if keyfile provided. If not
+                                                 provided, you'll be prompted to enter the password.
+  --guardian-ledger                              🔐 bool flag for signing transaction using ledger
+  --guardian-wallet-index GUARDIAN_WALLET_INDEX  🔑 the address index; can be used for PEM files, keyfiles of type
+                                                 mnemonic or Ledger devices (default: 0)
+  --relayer-pem RELAYER_PEM                      🔑 the PEM file, if keyfile not provided
+  --relayer-keyfile RELAYER_KEYFILE              🔑 a JSON keyfile, if PEM not provided
+  --relayer-passfile RELAYER_PASSFILE            🔑 a file containing keyfile's password, if keyfile provided. If not
+                                                 provided, you'll be prompted to enter the password.
+  --relayer-ledger                               🔐 bool flag for signing transaction using ledger
+  --relayer-wallet-index RELAYER_WALLET_INDEX    🔑 the address index; can be used for PEM files, keyfiles of type
+                                                 mnemonic or Ledger devices (default: 0)
+  --wait-result                                  signal to wait for the transaction result - only valid if --send is set
+  --timeout TIMEOUT                              max num of seconds to wait for result - only valid if --wait-result is
+                                                 set
+
+```
+### Multisig.SignAction
+
+
+```
+$ mxpy multisig sign-action --help
+usage: mxpy multisig sign-action [-h] ...
+
+Sign a proposed action.
+
+Output example:
+===============
+{
+    "emittedTransaction": {
+        "nonce": 42,
+        "sender": "alice",
+        "receiver": "bob",
+        "...": "..."
+    },
+    "emittedTransactionData": "the transaction data, not encoded",
+    "emittedTransactionHash": "the transaction hash"
+}
+
+options:
+  -h, --help                                     show this help message and exit
+  --action ACTION                                the id of the action
+  --contract CONTRACT                            🖄 the bech32 address of the Multisig Smart Contract
+  --abi ABI                                      the ABI file of the Multisig Smart Contract
+  --outfile OUTFILE                              where to save the output (default: stdout)
+  --pem PEM                                      🔑 the PEM file, if keyfile not provided
+  --keyfile KEYFILE                              🔑 a JSON keyfile, if PEM not provided
+  --passfile PASSFILE                            🔑 a file containing keyfile's password, if keyfile provided. If not
+                                                 provided, you'll be prompted to enter the password.
+  --ledger                                       🔐 bool flag for signing transaction using ledger
+  --sender-wallet-index SENDER_WALLET_INDEX      🔑 the address index; can be used for PEM files, keyfiles of type
+                                                 mnemonic or Ledger devices (default: 0)
+  --sender-username SENDER_USERNAME              🖄 the username of the sender
+  --hrp HRP                                      The hrp used to convert the address to its bech32 representation
+  --proxy PROXY                                  🔗 the URL of the proxy
+  --nonce NONCE                                  # the nonce for the transaction. If not provided, is fetched from the
+                                                 network.
+  --recall-nonce                                 ⭮ whether to recall the nonce when creating the transaction (default:
+                                                 False). This argument is OBSOLETE.
+  --gas-price GAS_PRICE                          ⛽ the gas price (default: 1000000000)
+  --gas-limit GAS_LIMIT                          ⛽ the gas limit
+  --value VALUE                                  the value to transfer (default: 0)
+  --chain CHAIN                                  the chain identifier
+  --version VERSION                              the transaction version (default: 2)
+  --options OPTIONS                              the transaction options (default: 0)
+  --relayer RELAYER                              the bech32 address of the relayer
+  --guardian GUARDIAN                            the bech32 address of the guardian
+  --send                                         ✓ whether to broadcast the transaction (default: False)
+  --simulate                                     whether to simulate the transaction (default: False)
+  --guardian-service-url GUARDIAN_SERVICE_URL    the url of the guardian service
+  --guardian-2fa-code GUARDIAN_2FA_CODE          the 2fa code for the guardian
+  --guardian-pem GUARDIAN_PEM                    🔑 the PEM file, if keyfile not provided
+  --guardian-keyfile GUARDIAN_KEYFILE            🔑 a JSON keyfile, if PEM not provided
+  --guardian-passfile GUARDIAN_PASSFILE          🔑 a file containing keyfile's password, if keyfile provided. If not
+                                                 provided, you'll be prompted to enter the password.
+  --guardian-ledger                              🔐 bool flag for signing transaction using ledger
+  --guardian-wallet-index GUARDIAN_WALLET_INDEX  🔑 the address index; can be used for PEM files, keyfiles of type
+                                                 mnemonic or Ledger devices (default: 0)
+  --relayer-pem RELAYER_PEM                      🔑 the PEM file, if keyfile not provided
+  --relayer-keyfile RELAYER_KEYFILE              🔑 a JSON keyfile, if PEM not provided
+  --relayer-passfile RELAYER_PASSFILE            🔑 a file containing keyfile's password, if keyfile provided. If not
+                                                 provided, you'll be prompted to enter the password.
+  --relayer-ledger                               🔐 bool flag for signing transaction using ledger
+  --relayer-wallet-index RELAYER_WALLET_INDEX    🔑 the address index; can be used for PEM files, keyfiles of type
+                                                 mnemonic or Ledger devices (default: 0)
+  --wait-result                                  signal to wait for the transaction result - only valid if --send is set
+  --timeout TIMEOUT                              max num of seconds to wait for result - only valid if --wait-result is
+                                                 set
+
+```
+### Multisig.SignBatch
+
+
+```
+$ mxpy multisig sign-batch --help
+usage: mxpy multisig sign-batch [-h] ...
+
+Sign a batch of actions.
+
+Output example:
+===============
+{
+    "emittedTransaction": {
+        "nonce": 42,
+        "sender": "alice",
+        "receiver": "bob",
+        "...": "..."
+    },
+    "emittedTransactionData": "the transaction data, not encoded",
+    "emittedTransactionHash": "the transaction hash"
+}
+
+options:
+  -h, --help                                     show this help message and exit
+  --batch BATCH                                  the id of the batch to sign
+  --contract CONTRACT                            🖄 the bech32 address of the Multisig Smart Contract
+  --abi ABI                                      the ABI file of the Multisig Smart Contract
+  --outfile OUTFILE                              where to save the output (default: stdout)
+  --pem PEM                                      🔑 the PEM file, if keyfile not provided
+  --keyfile KEYFILE                              🔑 a JSON keyfile, if PEM not provided
+  --passfile PASSFILE                            🔑 a file containing keyfile's password, if keyfile provided. If not
+                                                 provided, you'll be prompted to enter the password.
+  --ledger                                       🔐 bool flag for signing transaction using ledger
+  --sender-wallet-index SENDER_WALLET_INDEX      🔑 the address index; can be used for PEM files, keyfiles of type
+                                                 mnemonic or Ledger devices (default: 0)
+  --sender-username SENDER_USERNAME              🖄 the username of the sender
+  --hrp HRP                                      The hrp used to convert the address to its bech32 representation
+  --proxy PROXY                                  🔗 the URL of the proxy
+  --nonce NONCE                                  # the nonce for the transaction. If not provided, is fetched from the
+                                                 network.
+  --recall-nonce                                 ⭮ whether to recall the nonce when creating the transaction (default:
+                                                 False). This argument is OBSOLETE.
+  --gas-price GAS_PRICE                          ⛽ the gas price (default: 1000000000)
+  --gas-limit GAS_LIMIT                          ⛽ the gas limit
+  --value VALUE                                  the value to transfer (default: 0)
+  --chain CHAIN                                  the chain identifier
+  --version VERSION                              the transaction version (default: 2)
+  --options OPTIONS                              the transaction options (default: 0)
+  --relayer RELAYER                              the bech32 address of the relayer
+  --guardian GUARDIAN                            the bech32 address of the guardian
+  --send                                         ✓ whether to broadcast the transaction (default: False)
+  --simulate                                     whether to simulate the transaction (default: False)
+  --guardian-service-url GUARDIAN_SERVICE_URL    the url of the guardian service
+  --guardian-2fa-code GUARDIAN_2FA_CODE          the 2fa code for the guardian
+  --guardian-pem GUARDIAN_PEM                    🔑 the PEM file, if keyfile not provided
+  --guardian-keyfile GUARDIAN_KEYFILE            🔑 a JSON keyfile, if PEM not provided
+  --guardian-passfile GUARDIAN_PASSFILE          🔑 a file containing keyfile's password, if keyfile provided. If not
+                                                 provided, you'll be prompted to enter the password.
+  --guardian-ledger                              🔐 bool flag for signing transaction using ledger
+  --guardian-wallet-index GUARDIAN_WALLET_INDEX  🔑 the address index; can be used for PEM files, keyfiles of type
+                                                 mnemonic or Ledger devices (default: 0)
+  --relayer-pem RELAYER_PEM                      🔑 the PEM file, if keyfile not provided
+  --relayer-keyfile RELAYER_KEYFILE              🔑 a JSON keyfile, if PEM not provided
+  --relayer-passfile RELAYER_PASSFILE            🔑 a file containing keyfile's password, if keyfile provided. If not
+                                                 provided, you'll be prompted to enter the password.
+  --relayer-ledger                               🔐 bool flag for signing transaction using ledger
+  --relayer-wallet-index RELAYER_WALLET_INDEX    🔑 the address index; can be used for PEM files, keyfiles of type
+                                                 mnemonic or Ledger devices (default: 0)
+  --wait-result                                  signal to wait for the transaction result - only valid if --send is set
+  --timeout TIMEOUT                              max num of seconds to wait for result - only valid if --wait-result is
+                                                 set
+
+```
+### Multisig.SignAndPerform
+
+
+```
+$ mxpy multisig sign-and-perform --help
+usage: mxpy multisig sign-and-perform [-h] ...
+
+Sign a proposed action and perform it. Works only if quorum is reached.
+
+Output example:
+===============
+{
+    "emittedTransaction": {
+        "nonce": 42,
+        "sender": "alice",
+        "receiver": "bob",
+        "...": "..."
+    },
+    "emittedTransactionData": "the transaction data, not encoded",
+    "emittedTransactionHash": "the transaction hash"
+}
+
+options:
+  -h, --help                                     show this help message and exit
+  --action ACTION                                the id of the action
+  --contract CONTRACT                            🖄 the bech32 address of the Multisig Smart Contract
+  --abi ABI                                      the ABI file of the Multisig Smart Contract
+  --outfile OUTFILE                              where to save the output (default: stdout)
+  --pem PEM                                      🔑 the PEM file, if keyfile not provided
+  --keyfile KEYFILE                              🔑 a JSON keyfile, if PEM not provided
+  --passfile PASSFILE                            🔑 a file containing keyfile's password, if keyfile provided. If not
+                                                 provided, you'll be prompted to enter the password.
+  --ledger                                       🔐 bool flag for signing transaction using ledger
+  --sender-wallet-index SENDER_WALLET_INDEX      🔑 the address index; can be used for PEM files, keyfiles of type
+                                                 mnemonic or Ledger devices (default: 0)
+  --sender-username SENDER_USERNAME              🖄 the username of the sender
+  --hrp HRP                                      The hrp used to convert the address to its bech32 representation
+  --proxy PROXY                                  🔗 the URL of the proxy
+  --nonce NONCE                                  # the nonce for the transaction. If not provided, is fetched from the
+                                                 network.
+  --recall-nonce                                 ⭮ whether to recall the nonce when creating the transaction (default:
+                                                 False). This argument is OBSOLETE.
+  --gas-price GAS_PRICE                          ⛽ the gas price (default: 1000000000)
+  --gas-limit GAS_LIMIT                          ⛽ the gas limit
+  --value VALUE                                  the value to transfer (default: 0)
+  --chain CHAIN                                  the chain identifier
+  --version VERSION                              the transaction version (default: 2)
+  --options OPTIONS                              the transaction options (default: 0)
+  --relayer RELAYER                              the bech32 address of the relayer
+  --guardian GUARDIAN                            the bech32 address of the guardian
+  --send                                         ✓ whether to broadcast the transaction (default: False)
+  --simulate                                     whether to simulate the transaction (default: False)
+  --guardian-service-url GUARDIAN_SERVICE_URL    the url of the guardian service
+  --guardian-2fa-code GUARDIAN_2FA_CODE          the 2fa code for the guardian
+  --guardian-pem GUARDIAN_PEM                    🔑 the PEM file, if keyfile not provided
+  --guardian-keyfile GUARDIAN_KEYFILE            🔑 a JSON keyfile, if PEM not provided
+  --guardian-passfile GUARDIAN_PASSFILE          🔑 a file containing keyfile's password, if keyfile provided. If not
+                                                 provided, you'll be prompted to enter the password.
+  --guardian-ledger                              🔐 bool flag for signing transaction using ledger
+  --guardian-wallet-index GUARDIAN_WALLET_INDEX  🔑 the address index; can be used for PEM files, keyfiles of type
+                                                 mnemonic or Ledger devices (default: 0)
+  --relayer-pem RELAYER_PEM                      🔑 the PEM file, if keyfile not provided
+  --relayer-keyfile RELAYER_KEYFILE              🔑 a JSON keyfile, if PEM not provided
+  --relayer-passfile RELAYER_PASSFILE            🔑 a file containing keyfile's password, if keyfile provided. If not
+                                                 provided, you'll be prompted to enter the password.
+  --relayer-ledger                               🔐 bool flag for signing transaction using ledger
+  --relayer-wallet-index RELAYER_WALLET_INDEX    🔑 the address index; can be used for PEM files, keyfiles of type
+                                                 mnemonic or Ledger devices (default: 0)
+  --wait-result                                  signal to wait for the transaction result - only valid if --send is set
+  --timeout TIMEOUT                              max num of seconds to wait for result - only valid if --wait-result is
+                                                 set
+
+```
+### Multisig.SignBatchAndPerform
+
+
+```
+$ mxpy multisig sign-batch-and-perform --help
+usage: mxpy multisig sign-batch-and-perform [-h] ...
+
+Sign a batch of actions and perform them. Works only if quorum is reached.
+
+Output example:
+===============
+{
+    "emittedTransaction": {
+        "nonce": 42,
+        "sender": "alice",
+        "receiver": "bob",
+        "...": "..."
+    },
+    "emittedTransactionData": "the transaction data, not encoded",
+    "emittedTransactionHash": "the transaction hash"
+}
+
+options:
+  -h, --help                                     show this help message and exit
+  --batch BATCH                                  the id of the batch to sign
+  --contract CONTRACT                            🖄 the bech32 address of the Multisig Smart Contract
+  --abi ABI                                      the ABI file of the Multisig Smart Contract
+  --outfile OUTFILE                              where to save the output (default: stdout)
+  --pem PEM                                      🔑 the PEM file, if keyfile not provided
+  --keyfile KEYFILE                              🔑 a JSON keyfile, if PEM not provided
+  --passfile PASSFILE                            🔑 a file containing keyfile's password, if keyfile provided. If not
+                                                 provided, you'll be prompted to enter the password.
+  --ledger                                       🔐 bool flag for signing transaction using ledger
+  --sender-wallet-index SENDER_WALLET_INDEX      🔑 the address index; can be used for PEM files, keyfiles of type
+                                                 mnemonic or Ledger devices (default: 0)
+  --sender-username SENDER_USERNAME              🖄 the username of the sender
+  --hrp HRP                                      The hrp used to convert the address to its bech32 representation
+  --proxy PROXY                                  🔗 the URL of the proxy
+  --nonce NONCE                                  # the nonce for the transaction. If not provided, is fetched from the
+                                                 network.
+  --recall-nonce                                 ⭮ whether to recall the nonce when creating the transaction (default:
+                                                 False). This argument is OBSOLETE.
+  --gas-price GAS_PRICE                          ⛽ the gas price (default: 1000000000)
+  --gas-limit GAS_LIMIT                          ⛽ the gas limit
+  --value VALUE                                  the value to transfer (default: 0)
+  --chain CHAIN                                  the chain identifier
+  --version VERSION                              the transaction version (default: 2)
+  --options OPTIONS                              the transaction options (default: 0)
+  --relayer RELAYER                              the bech32 address of the relayer
+  --guardian GUARDIAN                            the bech32 address of the guardian
+  --send                                         ✓ whether to broadcast the transaction (default: False)
+  --simulate                                     whether to simulate the transaction (default: False)
+  --guardian-service-url GUARDIAN_SERVICE_URL    the url of the guardian service
+  --guardian-2fa-code GUARDIAN_2FA_CODE          the 2fa code for the guardian
+  --guardian-pem GUARDIAN_PEM                    🔑 the PEM file, if keyfile not provided
+  --guardian-keyfile GUARDIAN_KEYFILE            🔑 a JSON keyfile, if PEM not provided
+  --guardian-passfile GUARDIAN_PASSFILE          🔑 a file containing keyfile's password, if keyfile provided. If not
+                                                 provided, you'll be prompted to enter the password.
+  --guardian-ledger                              🔐 bool flag for signing transaction using ledger
+  --guardian-wallet-index GUARDIAN_WALLET_INDEX  🔑 the address index; can be used for PEM files, keyfiles of type
+                                                 mnemonic or Ledger devices (default: 0)
+  --relayer-pem RELAYER_PEM                      🔑 the PEM file, if keyfile not provided
+  --relayer-keyfile RELAYER_KEYFILE              🔑 a JSON keyfile, if PEM not provided
+  --relayer-passfile RELAYER_PASSFILE            🔑 a file containing keyfile's password, if keyfile provided. If not
+                                                 provided, you'll be prompted to enter the password.
+  --relayer-ledger                               🔐 bool flag for signing transaction using ledger
+  --relayer-wallet-index RELAYER_WALLET_INDEX    🔑 the address index; can be used for PEM files, keyfiles of type
+                                                 mnemonic or Ledger devices (default: 0)
+  --wait-result                                  signal to wait for the transaction result - only valid if --send is set
+  --timeout TIMEOUT                              max num of seconds to wait for result - only valid if --wait-result is
+                                                 set
+
+```
+### Multisig.UnsignAction
+
+
+```
+$ mxpy multisig unsign-action --help
+usage: mxpy multisig unsign-action [-h] ...
+
+Unsign a proposed action.
+
+Output example:
+===============
+{
+    "emittedTransaction": {
+        "nonce": 42,
+        "sender": "alice",
+        "receiver": "bob",
+        "...": "..."
+    },
+    "emittedTransactionData": "the transaction data, not encoded",
+    "emittedTransactionHash": "the transaction hash"
+}
+
+options:
+  -h, --help                                     show this help message and exit
+  --action ACTION                                the id of the action
+  --contract CONTRACT                            🖄 the bech32 address of the Multisig Smart Contract
+  --abi ABI                                      the ABI file of the Multisig Smart Contract
+  --outfile OUTFILE                              where to save the output (default: stdout)
+  --pem PEM                                      🔑 the PEM file, if keyfile not provided
+  --keyfile KEYFILE                              🔑 a JSON keyfile, if PEM not provided
+  --passfile PASSFILE                            🔑 a file containing keyfile's password, if keyfile provided. If not
+                                                 provided, you'll be prompted to enter the password.
+  --ledger                                       🔐 bool flag for signing transaction using ledger
+  --sender-wallet-index SENDER_WALLET_INDEX      🔑 the address index; can be used for PEM files, keyfiles of type
+                                                 mnemonic or Ledger devices (default: 0)
+  --sender-username SENDER_USERNAME              🖄 the username of the sender
+  --hrp HRP                                      The hrp used to convert the address to its bech32 representation
+  --proxy PROXY                                  🔗 the URL of the proxy
+  --nonce NONCE                                  # the nonce for the transaction. If not provided, is fetched from the
+                                                 network.
+  --recall-nonce                                 ⭮ whether to recall the nonce when creating the transaction (default:
+                                                 False). This argument is OBSOLETE.
+  --gas-price GAS_PRICE                          ⛽ the gas price (default: 1000000000)
+  --gas-limit GAS_LIMIT                          ⛽ the gas limit
+  --value VALUE                                  the value to transfer (default: 0)
+  --chain CHAIN                                  the chain identifier
+  --version VERSION                              the transaction version (default: 2)
+  --options OPTIONS                              the transaction options (default: 0)
+  --relayer RELAYER                              the bech32 address of the relayer
+  --guardian GUARDIAN                            the bech32 address of the guardian
+  --send                                         ✓ whether to broadcast the transaction (default: False)
+  --simulate                                     whether to simulate the transaction (default: False)
+  --guardian-service-url GUARDIAN_SERVICE_URL    the url of the guardian service
+  --guardian-2fa-code GUARDIAN_2FA_CODE          the 2fa code for the guardian
+  --guardian-pem GUARDIAN_PEM                    🔑 the PEM file, if keyfile not provided
+  --guardian-keyfile GUARDIAN_KEYFILE            🔑 a JSON keyfile, if PEM not provided
+  --guardian-passfile GUARDIAN_PASSFILE          🔑 a file containing keyfile's password, if keyfile provided. If not
+                                                 provided, you'll be prompted to enter the password.
+  --guardian-ledger                              🔐 bool flag for signing transaction using ledger
+  --guardian-wallet-index GUARDIAN_WALLET_INDEX  🔑 the address index; can be used for PEM files, keyfiles of type
+                                                 mnemonic or Ledger devices (default: 0)
+  --relayer-pem RELAYER_PEM                      🔑 the PEM file, if keyfile not provided
+  --relayer-keyfile RELAYER_KEYFILE              🔑 a JSON keyfile, if PEM not provided
+  --relayer-passfile RELAYER_PASSFILE            🔑 a file containing keyfile's password, if keyfile provided. If not
+                                                 provided, you'll be prompted to enter the password.
+  --relayer-ledger                               🔐 bool flag for signing transaction using ledger
+  --relayer-wallet-index RELAYER_WALLET_INDEX    🔑 the address index; can be used for PEM files, keyfiles of type
+                                                 mnemonic or Ledger devices (default: 0)
+  --wait-result                                  signal to wait for the transaction result - only valid if --send is set
+  --timeout TIMEOUT                              max num of seconds to wait for result - only valid if --wait-result is
+                                                 set
+
+```
+### Multisig.UnsignBatch
+
+
+```
+$ mxpy multisig unsign-batch --help
+usage: mxpy multisig unsign-batch [-h] ...
+
+Unsign a batch of actions.
+
+Output example:
+===============
+{
+    "emittedTransaction": {
+        "nonce": 42,
+        "sender": "alice",
+        "receiver": "bob",
+        "...": "..."
+    },
+    "emittedTransactionData": "the transaction data, not encoded",
+    "emittedTransactionHash": "the transaction hash"
+}
+
+options:
+  -h, --help                                     show this help message and exit
+  --batch BATCH                                  the id of the batch to unsign
+  --contract CONTRACT                            🖄 the bech32 address of the Multisig Smart Contract
+  --abi ABI                                      the ABI file of the Multisig Smart Contract
+  --outfile OUTFILE                              where to save the output (default: stdout)
+  --pem PEM                                      🔑 the PEM file, if keyfile not provided
+  --keyfile KEYFILE                              🔑 a JSON keyfile, if PEM not provided
+  --passfile PASSFILE                            🔑 a file containing keyfile's password, if keyfile provided. If not
+                                                 provided, you'll be prompted to enter the password.
+  --ledger                                       🔐 bool flag for signing transaction using ledger
+  --sender-wallet-index SENDER_WALLET_INDEX      🔑 the address index; can be used for PEM files, keyfiles of type
+                                                 mnemonic or Ledger devices (default: 0)
+  --sender-username SENDER_USERNAME              🖄 the username of the sender
+  --hrp HRP                                      The hrp used to convert the address to its bech32 representation
+  --proxy PROXY                                  🔗 the URL of the proxy
+  --nonce NONCE                                  # the nonce for the transaction. If not provided, is fetched from the
+                                                 network.
+  --recall-nonce                                 ⭮ whether to recall the nonce when creating the transaction (default:
+                                                 False). This argument is OBSOLETE.
+  --gas-price GAS_PRICE                          ⛽ the gas price (default: 1000000000)
+  --gas-limit GAS_LIMIT                          ⛽ the gas limit
+  --value VALUE                                  the value to transfer (default: 0)
+  --chain CHAIN                                  the chain identifier
+  --version VERSION                              the transaction version (default: 2)
+  --options OPTIONS                              the transaction options (default: 0)
+  --relayer RELAYER                              the bech32 address of the relayer
+  --guardian GUARDIAN                            the bech32 address of the guardian
+  --send                                         ✓ whether to broadcast the transaction (default: False)
+  --simulate                                     whether to simulate the transaction (default: False)
+  --guardian-service-url GUARDIAN_SERVICE_URL    the url of the guardian service
+  --guardian-2fa-code GUARDIAN_2FA_CODE          the 2fa code for the guardian
+  --guardian-pem GUARDIAN_PEM                    🔑 the PEM file, if keyfile not provided
+  --guardian-keyfile GUARDIAN_KEYFILE            🔑 a JSON keyfile, if PEM not provided
+  --guardian-passfile GUARDIAN_PASSFILE          🔑 a file containing keyfile's password, if keyfile provided. If not
+                                                 provided, you'll be prompted to enter the password.
+  --guardian-ledger                              🔐 bool flag for signing transaction using ledger
+  --guardian-wallet-index GUARDIAN_WALLET_INDEX  🔑 the address index; can be used for PEM files, keyfiles of type
+                                                 mnemonic or Ledger devices (default: 0)
+  --relayer-pem RELAYER_PEM                      🔑 the PEM file, if keyfile not provided
+  --relayer-keyfile RELAYER_KEYFILE              🔑 a JSON keyfile, if PEM not provided
+  --relayer-passfile RELAYER_PASSFILE            🔑 a file containing keyfile's password, if keyfile provided. If not
+                                                 provided, you'll be prompted to enter the password.
+  --relayer-ledger                               🔐 bool flag for signing transaction using ledger
+  --relayer-wallet-index RELAYER_WALLET_INDEX    🔑 the address index; can be used for PEM files, keyfiles of type
+                                                 mnemonic or Ledger devices (default: 0)
+  --wait-result                                  signal to wait for the transaction result - only valid if --send is set
+  --timeout TIMEOUT                              max num of seconds to wait for result - only valid if --wait-result is
+                                                 set
+
+```
+### Multisig.UnsignForOutdatedMembers
+
+
+```
+$ mxpy multisig unsign-for-outdated-members --help
+usage: mxpy multisig unsign-for-outdated-members [-h] ...
+
+Unsign an action for outdated board members.
+
+Output example:
+===============
+{
+    "emittedTransaction": {
+        "nonce": 42,
+        "sender": "alice",
+        "receiver": "bob",
+        "...": "..."
+    },
+    "emittedTransactionData": "the transaction data, not encoded",
+    "emittedTransactionHash": "the transaction hash"
+}
+
+options:
+  -h, --help                                      show this help message and exit
+  --action ACTION                                 the id of the action
+  --outdated-members OUTDATED_MEMBERS [OUTDATED_MEMBERS ...]
+                                                  IDs of the outdated board members
+  --contract CONTRACT                             🖄 the bech32 address of the Multisig Smart Contract
+  --abi ABI                                       the ABI file of the Multisig Smart Contract
+  --outfile OUTFILE                               where to save the output (default: stdout)
+  --pem PEM                                       🔑 the PEM file, if keyfile not provided
+  --keyfile KEYFILE                               🔑 a JSON keyfile, if PEM not provided
+  --passfile PASSFILE                             🔑 a file containing keyfile's password, if keyfile provided. If not
+                                                  provided, you'll be prompted to enter the password.
+  --ledger                                        🔐 bool flag for signing transaction using ledger
+  --sender-wallet-index SENDER_WALLET_INDEX       🔑 the address index; can be used for PEM files, keyfiles of type
+                                                  mnemonic or Ledger devices (default: 0)
+  --sender-username SENDER_USERNAME               🖄 the username of the sender
+  --hrp HRP                                       The hrp used to convert the address to its bech32 representation
+  --proxy PROXY                                   🔗 the URL of the proxy
+  --nonce NONCE                                   # the nonce for the transaction. If not provided, is fetched from the
+                                                  network.
+  --recall-nonce                                  ⭮ whether to recall the nonce when creating the transaction (default:
+                                                  False). This argument is OBSOLETE.
+  --gas-price GAS_PRICE                           ⛽ the gas price (default: 1000000000)
+  --gas-limit GAS_LIMIT                           ⛽ the gas limit
+  --value VALUE                                   the value to transfer (default: 0)
+  --chain CHAIN                                   the chain identifier
+  --version VERSION                               the transaction version (default: 2)
+  --options OPTIONS                               the transaction options (default: 0)
+  --relayer RELAYER                               the bech32 address of the relayer
+  --guardian GUARDIAN                             the bech32 address of the guardian
+  --send                                          ✓ whether to broadcast the transaction (default: False)
+  --simulate                                      whether to simulate the transaction (default: False)
+  --guardian-service-url GUARDIAN_SERVICE_URL     the url of the guardian service
+  --guardian-2fa-code GUARDIAN_2FA_CODE           the 2fa code for the guardian
+  --guardian-pem GUARDIAN_PEM                     🔑 the PEM file, if keyfile not provided
+  --guardian-keyfile GUARDIAN_KEYFILE             🔑 a JSON keyfile, if PEM not provided
+  --guardian-passfile GUARDIAN_PASSFILE           🔑 a file containing keyfile's password, if keyfile provided. If not
+                                                  provided, you'll be prompted to enter the password.
+  --guardian-ledger                               🔐 bool flag for signing transaction using ledger
+  --guardian-wallet-index GUARDIAN_WALLET_INDEX   🔑 the address index; can be used for PEM files, keyfiles of type
+                                                  mnemonic or Ledger devices (default: 0)
+  --relayer-pem RELAYER_PEM                       🔑 the PEM file, if keyfile not provided
+  --relayer-keyfile RELAYER_KEYFILE               🔑 a JSON keyfile, if PEM not provided
+  --relayer-passfile RELAYER_PASSFILE             🔑 a file containing keyfile's password, if keyfile provided. If not
+                                                  provided, you'll be prompted to enter the password.
+  --relayer-ledger                                🔐 bool flag for signing transaction using ledger
+  --relayer-wallet-index RELAYER_WALLET_INDEX     🔑 the address index; can be used for PEM files, keyfiles of type
+                                                  mnemonic or Ledger devices (default: 0)
+  --wait-result                                   signal to wait for the transaction result - only valid if --send is
+                                                  set
+  --timeout TIMEOUT                               max num of seconds to wait for result - only valid if --wait-result is
+                                                  set
+
+```
+### Multisig.PerformAction
+
+
+```
+$ mxpy multisig perform-action --help
+usage: mxpy multisig perform-action [-h] ...
+
+Perform an action that has reached quorum.
+
+Output example:
+===============
+{
+    "emittedTransaction": {
+        "nonce": 42,
+        "sender": "alice",
+        "receiver": "bob",
+        "...": "..."
+    },
+    "emittedTransactionData": "the transaction data, not encoded",
+    "emittedTransactionHash": "the transaction hash"
+}
+
+options:
+  -h, --help                                     show this help message and exit
+  --action ACTION                                the id of the action
+  --contract CONTRACT                            🖄 the bech32 address of the Multisig Smart Contract
+  --abi ABI                                      the ABI file of the Multisig Smart Contract
+  --outfile OUTFILE                              where to save the output (default: stdout)
+  --pem PEM                                      🔑 the PEM file, if keyfile not provided
+  --keyfile KEYFILE                              🔑 a JSON keyfile, if PEM not provided
+  --passfile PASSFILE                            🔑 a file containing keyfile's password, if keyfile provided. If not
+                                                 provided, you'll be prompted to enter the password.
+  --ledger                                       🔐 bool flag for signing transaction using ledger
+  --sender-wallet-index SENDER_WALLET_INDEX      🔑 the address index; can be used for PEM files, keyfiles of type
+                                                 mnemonic or Ledger devices (default: 0)
+  --sender-username SENDER_USERNAME              🖄 the username of the sender
+  --hrp HRP                                      The hrp used to convert the address to its bech32 representation
+  --proxy PROXY                                  🔗 the URL of the proxy
+  --nonce NONCE                                  # the nonce for the transaction. If not provided, is fetched from the
+                                                 network.
+  --recall-nonce                                 ⭮ whether to recall the nonce when creating the transaction (default:
+                                                 False). This argument is OBSOLETE.
+  --gas-price GAS_PRICE                          ⛽ the gas price (default: 1000000000)
+  --gas-limit GAS_LIMIT                          ⛽ the gas limit
+  --value VALUE                                  the value to transfer (default: 0)
+  --chain CHAIN                                  the chain identifier
+  --version VERSION                              the transaction version (default: 2)
+  --options OPTIONS                              the transaction options (default: 0)
+  --relayer RELAYER                              the bech32 address of the relayer
+  --guardian GUARDIAN                            the bech32 address of the guardian
+  --send                                         ✓ whether to broadcast the transaction (default: False)
+  --simulate                                     whether to simulate the transaction (default: False)
+  --guardian-service-url GUARDIAN_SERVICE_URL    the url of the guardian service
+  --guardian-2fa-code GUARDIAN_2FA_CODE          the 2fa code for the guardian
+  --guardian-pem GUARDIAN_PEM                    🔑 the PEM file, if keyfile not provided
+  --guardian-keyfile GUARDIAN_KEYFILE            🔑 a JSON keyfile, if PEM not provided
+  --guardian-passfile GUARDIAN_PASSFILE          🔑 a file containing keyfile's password, if keyfile provided. If not
+                                                 provided, you'll be prompted to enter the password.
+  --guardian-ledger                              🔐 bool flag for signing transaction using ledger
+  --guardian-wallet-index GUARDIAN_WALLET_INDEX  🔑 the address index; can be used for PEM files, keyfiles of type
+                                                 mnemonic or Ledger devices (default: 0)
+  --relayer-pem RELAYER_PEM                      🔑 the PEM file, if keyfile not provided
+  --relayer-keyfile RELAYER_KEYFILE              🔑 a JSON keyfile, if PEM not provided
+  --relayer-passfile RELAYER_PASSFILE            🔑 a file containing keyfile's password, if keyfile provided. If not
+                                                 provided, you'll be prompted to enter the password.
+  --relayer-ledger                               🔐 bool flag for signing transaction using ledger
+  --relayer-wallet-index RELAYER_WALLET_INDEX    🔑 the address index; can be used for PEM files, keyfiles of type
+                                                 mnemonic or Ledger devices (default: 0)
+  --wait-result                                  signal to wait for the transaction result - only valid if --send is set
+  --timeout TIMEOUT                              max num of seconds to wait for result - only valid if --wait-result is
+                                                 set
+
+```
+### Multisig.PerformBatch
+
+
+```
+$ mxpy multisig perform-batch --help
+usage: mxpy multisig perform-batch [-h] ...
+
+Perform a batch of actions that has reached quorum.
+
+Output example:
+===============
+{
+    "emittedTransaction": {
+        "nonce": 42,
+        "sender": "alice",
+        "receiver": "bob",
+        "...": "..."
+    },
+    "emittedTransactionData": "the transaction data, not encoded",
+    "emittedTransactionHash": "the transaction hash"
+}
+
+options:
+  -h, --help                                     show this help message and exit
+  --batch BATCH                                  the id of the batch to perform
+  --contract CONTRACT                            🖄 the bech32 address of the Multisig Smart Contract
+  --abi ABI                                      the ABI file of the Multisig Smart Contract
+  --outfile OUTFILE                              where to save the output (default: stdout)
+  --pem PEM                                      🔑 the PEM file, if keyfile not provided
+  --keyfile KEYFILE                              🔑 a JSON keyfile, if PEM not provided
+  --passfile PASSFILE                            🔑 a file containing keyfile's password, if keyfile provided. If not
+                                                 provided, you'll be prompted to enter the password.
+  --ledger                                       🔐 bool flag for signing transaction using ledger
+  --sender-wallet-index SENDER_WALLET_INDEX      🔑 the address index; can be used for PEM files, keyfiles of type
+                                                 mnemonic or Ledger devices (default: 0)
+  --sender-username SENDER_USERNAME              🖄 the username of the sender
+  --hrp HRP                                      The hrp used to convert the address to its bech32 representation
+  --proxy PROXY                                  🔗 the URL of the proxy
+  --nonce NONCE                                  # the nonce for the transaction. If not provided, is fetched from the
+                                                 network.
+  --recall-nonce                                 ⭮ whether to recall the nonce when creating the transaction (default:
+                                                 False). This argument is OBSOLETE.
+  --gas-price GAS_PRICE                          ⛽ the gas price (default: 1000000000)
+  --gas-limit GAS_LIMIT                          ⛽ the gas limit
+  --value VALUE                                  the value to transfer (default: 0)
+  --chain CHAIN                                  the chain identifier
+  --version VERSION                              the transaction version (default: 2)
+  --options OPTIONS                              the transaction options (default: 0)
+  --relayer RELAYER                              the bech32 address of the relayer
+  --guardian GUARDIAN                            the bech32 address of the guardian
+  --send                                         ✓ whether to broadcast the transaction (default: False)
+  --simulate                                     whether to simulate the transaction (default: False)
+  --guardian-service-url GUARDIAN_SERVICE_URL    the url of the guardian service
+  --guardian-2fa-code GUARDIAN_2FA_CODE          the 2fa code for the guardian
+  --guardian-pem GUARDIAN_PEM                    🔑 the PEM file, if keyfile not provided
+  --guardian-keyfile GUARDIAN_KEYFILE            🔑 a JSON keyfile, if PEM not provided
+  --guardian-passfile GUARDIAN_PASSFILE          🔑 a file containing keyfile's password, if keyfile provided. If not
+                                                 provided, you'll be prompted to enter the password.
+  --guardian-ledger                              🔐 bool flag for signing transaction using ledger
+  --guardian-wallet-index GUARDIAN_WALLET_INDEX  🔑 the address index; can be used for PEM files, keyfiles of type
+                                                 mnemonic or Ledger devices (default: 0)
+  --relayer-pem RELAYER_PEM                      🔑 the PEM file, if keyfile not provided
+  --relayer-keyfile RELAYER_KEYFILE              🔑 a JSON keyfile, if PEM not provided
+  --relayer-passfile RELAYER_PASSFILE            🔑 a file containing keyfile's password, if keyfile provided. If not
+                                                 provided, you'll be prompted to enter the password.
+  --relayer-ledger                               🔐 bool flag for signing transaction using ledger
+  --relayer-wallet-index RELAYER_WALLET_INDEX    🔑 the address index; can be used for PEM files, keyfiles of type
+                                                 mnemonic or Ledger devices (default: 0)
+  --wait-result                                  signal to wait for the transaction result - only valid if --send is set
+  --timeout TIMEOUT                              max num of seconds to wait for result - only valid if --wait-result is
+                                                 set
+
+```
+### Multisig.GetQuorum
+
+
+```
+$ mxpy multisig get-quorum --help
+usage: mxpy multisig get-quorum [-h] ...
+
+Perform a smart contract query to get the quorum.
+
+Output example:
+===============
+{
+    "emittedTransaction": {
+        "nonce": 42,
+        "sender": "alice",
+        "receiver": "bob",
+        "...": "..."
+    },
+    "emittedTransactionData": "the transaction data, not encoded",
+    "emittedTransactionHash": "the transaction hash"
+}
+
+options:
+  -h, --help           show this help message and exit
+  --contract CONTRACT  🖄 the bech32 address of the Multisig Smart Contract
+  --abi ABI            the ABI file of the Multisig Smart Contract
+  --proxy PROXY        🔗 the URL of the proxy
+
+```
+### Multisig.GetNumBoardMembers
+
+
+```
+$ mxpy multisig get-num-board-members --help
+usage: mxpy multisig get-num-board-members [-h] ...
+
+Perform a smart contract query to get the number of board members.
+
+Output example:
+===============
+{
+    "emittedTransaction": {
+        "nonce": 42,
+        "sender": "alice",
+        "receiver": "bob",
+        "...": "..."
+    },
+    "emittedTransactionData": "the transaction data, not encoded",
+    "emittedTransactionHash": "the transaction hash"
+}
+
+options:
+  -h, --help           show this help message and exit
+  --contract CONTRACT  🖄 the bech32 address of the Multisig Smart Contract
+  --abi ABI            the ABI file of the Multisig Smart Contract
+  --proxy PROXY        🔗 the URL of the proxy
+
+```
+### Multisig.GetNumGroups
+
+
+```
+$ mxpy multisig get-num-groups --help
+usage: mxpy multisig get-num-groups [-h] ...
+
+Perform a smart contract query to get the number of groups.
+
+Output example:
+===============
+{
+    "emittedTransaction": {
+        "nonce": 42,
+        "sender": "alice",
+        "receiver": "bob",
+        "...": "..."
+    },
+    "emittedTransactionData": "the transaction data, not encoded",
+    "emittedTransactionHash": "the transaction hash"
+}
+
+options:
+  -h, --help           show this help message and exit
+  --contract CONTRACT  🖄 the bech32 address of the Multisig Smart Contract
+  --abi ABI            the ABI file of the Multisig Smart Contract
+  --proxy PROXY        🔗 the URL of the proxy
+
+```
+### Multisig.GetNumProposers
+
+
+```
+$ mxpy multisig get-num-proposers --help
+usage: mxpy multisig get-num-proposers [-h] ...
+
+Perform a smart contract query to get the number of proposers.
+
+Output example:
+===============
+{
+    "emittedTransaction": {
+        "nonce": 42,
+        "sender": "alice",
+        "receiver": "bob",
+        "...": "..."
+    },
+    "emittedTransactionData": "the transaction data, not encoded",
+    "emittedTransactionHash": "the transaction hash"
+}
+
+options:
+  -h, --help           show this help message and exit
+  --contract CONTRACT  🖄 the bech32 address of the Multisig Smart Contract
+  --abi ABI            the ABI file of the Multisig Smart Contract
+  --proxy PROXY        🔗 the URL of the proxy
+
+```
+### Multisig.GetActionGroup
+
+
+```
+$ mxpy multisig get-action-group --help
+usage: mxpy multisig get-action-group [-h] ...
+
+Perform a smart contract query to get the actions in a group.
+
+Output example:
+===============
+{
+    "emittedTransaction": {
+        "nonce": 42,
+        "sender": "alice",
+        "receiver": "bob",
+        "...": "..."
+    },
+    "emittedTransactionData": "the transaction data, not encoded",
+    "emittedTransactionHash": "the transaction hash"
+}
+
+options:
+  -h, --help           show this help message and exit
+  --contract CONTRACT  🖄 the bech32 address of the Multisig Smart Contract
+  --abi ABI            the ABI file of the Multisig Smart Contract
+  --group GROUP        the group id
+  --proxy PROXY        🔗 the URL of the proxy
+
+```
+### Multisig.GetLastActionGroupId
+
+
+```
+$ mxpy multisig get-last-action-group-id --help
+usage: mxpy multisig get-last-action-group-id [-h] ...
+
+Perform a smart contract query to get the id of the last action in a group.
+
+Output example:
+===============
+{
+    "emittedTransaction": {
+        "nonce": 42,
+        "sender": "alice",
+        "receiver": "bob",
+        "...": "..."
+    },
+    "emittedTransactionData": "the transaction data, not encoded",
+    "emittedTransactionHash": "the transaction hash"
+}
+
+options:
+  -h, --help           show this help message and exit
+  --contract CONTRACT  🖄 the bech32 address of the Multisig Smart Contract
+  --abi ABI            the ABI file of the Multisig Smart Contract
+  --proxy PROXY        🔗 the URL of the proxy
+
+```
+### Multisig.GetLastActionLastIndex
+
+
+```
+$ mxpy multisig get-action-last-index --help
+usage: mxpy multisig get-action-last-index [-h] ...
+
+Perform a smart contract query to get the index of the last action.
+
+Output example:
+===============
+{
+    "emittedTransaction": {
+        "nonce": 42,
+        "sender": "alice",
+        "receiver": "bob",
+        "...": "..."
+    },
+    "emittedTransactionData": "the transaction data, not encoded",
+    "emittedTransactionHash": "the transaction hash"
+}
+
+options:
+  -h, --help           show this help message and exit
+  --contract CONTRACT  🖄 the bech32 address of the Multisig Smart Contract
+  --abi ABI            the ABI file of the Multisig Smart Contract
+  --proxy PROXY        🔗 the URL of the proxy
+
+```
+### Multisig.IsSignedBy
+
+
+```
+$ mxpy multisig is-signed-by --help
+usage: mxpy multisig is-signed-by [-h] ...
+
+Perform a smart contract query to check if an action is signed by a user.
+
+Output example:
+===============
+{
+    "emittedTransaction": {
+        "nonce": 42,
+        "sender": "alice",
+        "receiver": "bob",
+        "...": "..."
+    },
+    "emittedTransactionData": "the transaction data, not encoded",
+    "emittedTransactionHash": "the transaction hash"
+}
+
+options:
+  -h, --help           show this help message and exit
+  --contract CONTRACT  🖄 the bech32 address of the Multisig Smart Contract
+  --abi ABI            the ABI file of the Multisig Smart Contract
+  --action ACTION      the id of the action
+  --user USER          the bech32 address of the user
+  --proxy PROXY        🔗 the URL of the proxy
+
+```
+### Multisig.IsQuorumReached
+
+
+```
+$ mxpy multisig is-quorum-reached --help
+usage: mxpy multisig is-quorum-reached [-h] ...
+
+Perform a smart contract query to check if an action has reached quorum.
+
+Output example:
+===============
+{
+    "emittedTransaction": {
+        "nonce": 42,
+        "sender": "alice",
+        "receiver": "bob",
+        "...": "..."
+    },
+    "emittedTransactionData": "the transaction data, not encoded",
+    "emittedTransactionHash": "the transaction hash"
+}
+
+options:
+  -h, --help           show this help message and exit
+  --contract CONTRACT  🖄 the bech32 address of the Multisig Smart Contract
+  --abi ABI            the ABI file of the Multisig Smart Contract
+  --action ACTION      the id of the action
+  --proxy PROXY        🔗 the URL of the proxy
+
+```
+### Multisig.GetPendingActions
+
+
+```
+$ mxpy multisig get-pending-actions --help
+usage: mxpy multisig get-pending-actions [-h] ...
+
+Perform a smart contract query to get the pending actions full info.
+
+Output example:
+===============
+{
+    "emittedTransaction": {
+        "nonce": 42,
+        "sender": "alice",
+        "receiver": "bob",
+        "...": "..."
+    },
+    "emittedTransactionData": "the transaction data, not encoded",
+    "emittedTransactionHash": "the transaction hash"
+}
+
+options:
+  -h, --help           show this help message and exit
+  --contract CONTRACT  🖄 the bech32 address of the Multisig Smart Contract
+  --abi ABI            the ABI file of the Multisig Smart Contract
+  --proxy PROXY        🔗 the URL of the proxy
+
+```
+### Multisig.GetUserRole
+
+
+```
+$ mxpy multisig get-user-role --help
+usage: mxpy multisig get-user-role [-h] ...
+
+Perform a smart contract query to get the role of a user.
+
+Output example:
+===============
+{
+    "emittedTransaction": {
+        "nonce": 42,
+        "sender": "alice",
+        "receiver": "bob",
+        "...": "..."
+    },
+    "emittedTransactionData": "the transaction data, not encoded",
+    "emittedTransactionHash": "the transaction hash"
+}
+
+options:
+  -h, --help           show this help message and exit
+  --contract CONTRACT  🖄 the bech32 address of the Multisig Smart Contract
+  --abi ABI            the ABI file of the Multisig Smart Contract
+  --user USER          the bech32 address of the user
+  --proxy PROXY        🔗 the URL of the proxy
+
+```
+### Multisig.GetBoardMemebers
+
+
+```
+$ mxpy multisig get-board-members --help
+usage: mxpy multisig get-board-members [-h] ...
+
+Perform a smart contract query to get all the board members.
+
+Output example:
+===============
+{
+    "emittedTransaction": {
+        "nonce": 42,
+        "sender": "alice",
+        "receiver": "bob",
+        "...": "..."
+    },
+    "emittedTransactionData": "the transaction data, not encoded",
+    "emittedTransactionHash": "the transaction hash"
+}
+
+options:
+  -h, --help           show this help message and exit
+  --contract CONTRACT  🖄 the bech32 address of the Multisig Smart Contract
+  --abi ABI            the ABI file of the Multisig Smart Contract
+  --proxy PROXY        🔗 the URL of the proxy
+
+```
+### Multisig.GetProposers
+
+
+```
+$ mxpy multisig get-proposers --help
+usage: mxpy multisig get-proposers [-h] ...
+
+Perform a smart contract query to get all the proposers.
+
+Output example:
+===============
+{
+    "emittedTransaction": {
+        "nonce": 42,
+        "sender": "alice",
+        "receiver": "bob",
+        "...": "..."
+    },
+    "emittedTransactionData": "the transaction data, not encoded",
+    "emittedTransactionHash": "the transaction hash"
+}
+
+options:
+  -h, --help           show this help message and exit
+  --contract CONTRACT  🖄 the bech32 address of the Multisig Smart Contract
+  --abi ABI            the ABI file of the Multisig Smart Contract
+  --proxy PROXY        🔗 the URL of the proxy
+
+```
+### Multisig.GetActionData
+
+
+```
+$ mxpy multisig get-action-data --help
+usage: mxpy multisig get-action-data [-h] ...
+
+Perform a smart contract query to get the data of an action.
+
+Output example:
+===============
+{
+    "emittedTransaction": {
+        "nonce": 42,
+        "sender": "alice",
+        "receiver": "bob",
+        "...": "..."
+    },
+    "emittedTransactionData": "the transaction data, not encoded",
+    "emittedTransactionHash": "the transaction hash"
+}
+
+options:
+  -h, --help           show this help message and exit
+  --contract CONTRACT  🖄 the bech32 address of the Multisig Smart Contract
+  --abi ABI            the ABI file of the Multisig Smart Contract
+  --action ACTION      the id of the action
+  --proxy PROXY        🔗 the URL of the proxy
+
+```
+### Multisig.GetActionSigners
+
+
+```
+$ mxpy multisig get-action-signers --help
+usage: mxpy multisig get-action-signers [-h] ...
+
+Perform a smart contract query to get the signers of an action.
+
+Output example:
+===============
+{
+    "emittedTransaction": {
+        "nonce": 42,
+        "sender": "alice",
+        "receiver": "bob",
+        "...": "..."
+    },
+    "emittedTransactionData": "the transaction data, not encoded",
+    "emittedTransactionHash": "the transaction hash"
+}
+
+options:
+  -h, --help           show this help message and exit
+  --contract CONTRACT  🖄 the bech32 address of the Multisig Smart Contract
+  --abi ABI            the ABI file of the Multisig Smart Contract
+  --action ACTION      the id of the action
+  --proxy PROXY        🔗 the URL of the proxy
+
+```
+### Multisig.GetActionSignersCount
+
+
+```
+$ mxpy multisig get-action-signers-count --help
+usage: mxpy multisig get-action-signers-count [-h] ...
+
+Perform a smart contract query to get the number of signers of an action.
+
+Output example:
+===============
+{
+    "emittedTransaction": {
+        "nonce": 42,
+        "sender": "alice",
+        "receiver": "bob",
+        "...": "..."
+    },
+    "emittedTransactionData": "the transaction data, not encoded",
+    "emittedTransactionHash": "the transaction hash"
+}
+
+options:
+  -h, --help           show this help message and exit
+  --contract CONTRACT  🖄 the bech32 address of the Multisig Smart Contract
+  --abi ABI            the ABI file of the Multisig Smart Contract
+  --action ACTION      the id of the action
+  --proxy PROXY        🔗 the URL of the proxy
+
+```
+### Multisig.GetActionValidSignersCount
+
+
+```
+$ mxpy multisig get-action-valid-signers-count --help
+usage: mxpy multisig get-action-valid-signers-count [-h] ...
+
+Perform a smart contract query to get the number of valid signers of an action.
+
+Output example:
+===============
+{
+    "emittedTransaction": {
+        "nonce": 42,
+        "sender": "alice",
+        "receiver": "bob",
+        "...": "..."
+    },
+    "emittedTransactionData": "the transaction data, not encoded",
+    "emittedTransactionHash": "the transaction hash"
+}
+
+options:
+  -h, --help           show this help message and exit
+  --contract CONTRACT  🖄 the bech32 address of the Multisig Smart Contract
+  --abi ABI            the ABI file of the Multisig Smart Contract
+  --action ACTION      the id of the action
+  --proxy PROXY        🔗 the URL of the proxy
+
+```
+### Multisig.ParseProposeAction
+
+
+```
+$ mxpy multisig parse-propose-action --help
+usage: mxpy multisig parse-propose-action [-h] ...
+
+Parses the propose action transaction to extract proposal ID.
+
+Output example:
+===============
+{
+    "emittedTransaction": {
+        "nonce": 42,
+        "sender": "alice",
+        "receiver": "bob",
+        "...": "..."
+    },
+    "emittedTransactionData": "the transaction data, not encoded",
+    "emittedTransactionHash": "the transaction hash"
+}
+
+options:
+  -h, --help     show this help message and exit
+  --abi ABI      the ABI file of the Multisig Smart Contract
+  --hash HASH    the transaction hash of the propose action
+  --proxy PROXY  🔗 the URL of the proxy
+
+```
+## Group **Governance**
+
+
+```
+$ mxpy governance --help
+usage: mxpy governance COMMAND [-h] ...
+
+Propose, vote and interact with the governance contract.
+
+COMMANDS:
+  {propose,vote,close-proposal,clear-ended-proposals,claim-accumulated-fees,change-config,get-voting-power,get-config,get-proposal,get-delegated-vote-info}
+
+OPTIONS:
+  -h, --help            show this help message and exit
+
+----------------
+COMMANDS summary
+----------------
+propose                        Create a new governance proposal.
+vote                           Vote for a governance proposal.
+close-proposal                 Close a governance proposal.
+clear-ended-proposals          Clear ended proposals.
+claim-accumulated-fees         Claim the accumulated fees.
+change-config                  Change the config of the contract.
+get-voting-power               Get the voting power of an user.
+get-config                     Get the config of the governance contract.
+get-proposal                   Get info about a proposal.
+get-delegated-vote-info        Get info about a delegated vote.
+
+```
+### Governance.Propose
+
+
+```
+$ mxpy governance propose --help
+usage: mxpy governance propose [-h] ...
+
+Create a new governance proposal.
+
+Output example:
+===============
+{
+    "emittedTransaction": {
+        "nonce": 42,
+        "sender": "alice",
+        "receiver": "bob",
+        "...": "..."
+    },
+    "emittedTransactionData": "the transaction data, not encoded",
+    "emittedTransactionHash": "the transaction hash"
+}
+
+options:
+  -h, --help                                     show this help message and exit
+  --commit-hash COMMIT_HASH                      the commit hash of the proposal
+  --start-vote-epoch START_VOTE_EPOCH            the epoch in which the voting will start
+  --end-vote-epoch END_VOTE_EPOCH                the epoch in which the voting will stop
+  --pem PEM                                      🔑 the PEM file, if keyfile not provided
+  --keyfile KEYFILE                              🔑 a JSON keyfile, if PEM not provided
+  --passfile PASSFILE                            🔑 a file containing keyfile's password, if keyfile provided. If not
+                                                 provided, you'll be prompted to enter the password.
+  --ledger                                       🔐 bool flag for signing transaction using ledger
+  --sender-wallet-index SENDER_WALLET_INDEX      🔑 the address index; can be used for PEM files, keyfiles of type
+                                                 mnemonic or Ledger devices (default: 0)
+  --sender-username SENDER_USERNAME              🖄 the username of the sender
+  --hrp HRP                                      The hrp used to convert the address to its bech32 representation
+  --proxy PROXY                                  🔗 the URL of the proxy
+  --nonce NONCE                                  # the nonce for the transaction. If not provided, is fetched from the
+                                                 network.
+  --recall-nonce                                 ⭮ whether to recall the nonce when creating the transaction (default:
+                                                 False). This argument is OBSOLETE.
+  --gas-price GAS_PRICE                          ⛽ the gas price (default: 1000000000)
+  --gas-limit GAS_LIMIT                          ⛽ the gas limit
+  --value VALUE                                  the value to transfer (default: 0)
+  --chain CHAIN                                  the chain identifier
+  --version VERSION                              the transaction version (default: 2)
+  --options OPTIONS                              the transaction options (default: 0)
+  --relayer RELAYER                              the bech32 address of the relayer
+  --guardian GUARDIAN                            the bech32 address of the guardian
+  --guardian-service-url GUARDIAN_SERVICE_URL    the url of the guardian service
+  --guardian-2fa-code GUARDIAN_2FA_CODE          the 2fa code for the guardian
+  --guardian-pem GUARDIAN_PEM                    🔑 the PEM file, if keyfile not provided
+  --guardian-keyfile GUARDIAN_KEYFILE            🔑 a JSON keyfile, if PEM not provided
+  --guardian-passfile GUARDIAN_PASSFILE          🔑 a file containing keyfile's password, if keyfile provided. If not
+                                                 provided, you'll be prompted to enter the password.
+  --guardian-ledger                              🔐 bool flag for signing transaction using ledger
+  --guardian-wallet-index GUARDIAN_WALLET_INDEX  🔑 the address index; can be used for PEM files, keyfiles of type
+                                                 mnemonic or Ledger devices (default: 0)
+  --relayer-pem RELAYER_PEM                      🔑 the PEM file, if keyfile not provided
+  --relayer-keyfile RELAYER_KEYFILE              🔑 a JSON keyfile, if PEM not provided
+  --relayer-passfile RELAYER_PASSFILE            🔑 a file containing keyfile's password, if keyfile provided. If not
+                                                 provided, you'll be prompted to enter the password.
+  --relayer-ledger                               🔐 bool flag for signing transaction using ledger
+  --relayer-wallet-index RELAYER_WALLET_INDEX    🔑 the address index; can be used for PEM files, keyfiles of type
+                                                 mnemonic or Ledger devices (default: 0)
+  --outfile OUTFILE                              where to save the output (default: stdout)
+  --send                                         ✓ whether to broadcast the transaction (default: False)
+  --simulate                                     whether to simulate the transaction (default: False)
+  --wait-result                                  signal to wait for the transaction result - only valid if --send is set
+  --timeout TIMEOUT                              max num of seconds to wait for result - only valid if --wait-result is
+                                                 set
+
+```
+### Governance.Vote
+
+
+```
+$ mxpy governance vote --help
+usage: mxpy governance vote [-h] ...
+
+Vote for a governance proposal.
+
+Output example:
+===============
+{
+    "emittedTransaction": {
+        "nonce": 42,
+        "sender": "alice",
+        "receiver": "bob",
+        "...": "..."
+    },
+    "emittedTransactionData": "the transaction data, not encoded",
+    "emittedTransactionHash": "the transaction hash"
+}
+
+options:
+  -h, --help                                     show this help message and exit
+  --proposal-nonce PROPOSAL_NONCE                the nonce of the proposal
+  --vote {yes,no,veto,abstain}                   the type of vote
+  --pem PEM                                      🔑 the PEM file, if keyfile not provided
+  --keyfile KEYFILE                              🔑 a JSON keyfile, if PEM not provided
+  --passfile PASSFILE                            🔑 a file containing keyfile's password, if keyfile provided. If not
+                                                 provided, you'll be prompted to enter the password.
+  --ledger                                       🔐 bool flag for signing transaction using ledger
+  --sender-wallet-index SENDER_WALLET_INDEX      🔑 the address index; can be used for PEM files, keyfiles of type
+                                                 mnemonic or Ledger devices (default: 0)
+  --sender-username SENDER_USERNAME              🖄 the username of the sender
+  --hrp HRP                                      The hrp used to convert the address to its bech32 representation
+  --proxy PROXY                                  🔗 the URL of the proxy
+  --nonce NONCE                                  # the nonce for the transaction. If not provided, is fetched from the
+                                                 network.
+  --recall-nonce                                 ⭮ whether to recall the nonce when creating the transaction (default:
+                                                 False). This argument is OBSOLETE.
+  --gas-price GAS_PRICE                          ⛽ the gas price (default: 1000000000)
+  --gas-limit GAS_LIMIT                          ⛽ the gas limit
+  --value VALUE                                  the value to transfer (default: 0)
+  --chain CHAIN                                  the chain identifier
+  --version VERSION                              the transaction version (default: 2)
+  --options OPTIONS                              the transaction options (default: 0)
+  --relayer RELAYER                              the bech32 address of the relayer
+  --guardian GUARDIAN                            the bech32 address of the guardian
+  --guardian-service-url GUARDIAN_SERVICE_URL    the url of the guardian service
+  --guardian-2fa-code GUARDIAN_2FA_CODE          the 2fa code for the guardian
+  --guardian-pem GUARDIAN_PEM                    🔑 the PEM file, if keyfile not provided
+  --guardian-keyfile GUARDIAN_KEYFILE            🔑 a JSON keyfile, if PEM not provided
+  --guardian-passfile GUARDIAN_PASSFILE          🔑 a file containing keyfile's password, if keyfile provided. If not
+                                                 provided, you'll be prompted to enter the password.
+  --guardian-ledger                              🔐 bool flag for signing transaction using ledger
+  --guardian-wallet-index GUARDIAN_WALLET_INDEX  🔑 the address index; can be used for PEM files, keyfiles of type
+                                                 mnemonic or Ledger devices (default: 0)
+  --relayer-pem RELAYER_PEM                      🔑 the PEM file, if keyfile not provided
+  --relayer-keyfile RELAYER_KEYFILE              🔑 a JSON keyfile, if PEM not provided
+  --relayer-passfile RELAYER_PASSFILE            🔑 a file containing keyfile's password, if keyfile provided. If not
+                                                 provided, you'll be prompted to enter the password.
+  --relayer-ledger                               🔐 bool flag for signing transaction using ledger
+  --relayer-wallet-index RELAYER_WALLET_INDEX    🔑 the address index; can be used for PEM files, keyfiles of type
+                                                 mnemonic or Ledger devices (default: 0)
+  --outfile OUTFILE                              where to save the output (default: stdout)
+  --send                                         ✓ whether to broadcast the transaction (default: False)
+  --simulate                                     whether to simulate the transaction (default: False)
+  --wait-result                                  signal to wait for the transaction result - only valid if --send is set
+  --timeout TIMEOUT                              max num of seconds to wait for result - only valid if --wait-result is
+                                                 set
+
+```
+### Governance.CloseProposal
+
+
+```
+$ mxpy governance close-proposal --help
+usage: mxpy governance close-proposal [-h] ...
+
+Close a governance proposal.
+
+Output example:
+===============
+{
+    "emittedTransaction": {
+        "nonce": 42,
+        "sender": "alice",
+        "receiver": "bob",
+        "...": "..."
+    },
+    "emittedTransactionData": "the transaction data, not encoded",
+    "emittedTransactionHash": "the transaction hash"
+}
+
+options:
+  -h, --help                                     show this help message and exit
+  --proposal-nonce PROPOSAL_NONCE                the nonce of the proposal
+  --pem PEM                                      🔑 the PEM file, if keyfile not provided
+  --keyfile KEYFILE                              🔑 a JSON keyfile, if PEM not provided
+  --passfile PASSFILE                            🔑 a file containing keyfile's password, if keyfile provided. If not
+                                                 provided, you'll be prompted to enter the password.
+  --ledger                                       🔐 bool flag for signing transaction using ledger
+  --sender-wallet-index SENDER_WALLET_INDEX      🔑 the address index; can be used for PEM files, keyfiles of type
+                                                 mnemonic or Ledger devices (default: 0)
+  --sender-username SENDER_USERNAME              🖄 the username of the sender
+  --hrp HRP                                      The hrp used to convert the address to its bech32 representation
+  --proxy PROXY                                  🔗 the URL of the proxy
+  --nonce NONCE                                  # the nonce for the transaction. If not provided, is fetched from the
+                                                 network.
+  --recall-nonce                                 ⭮ whether to recall the nonce when creating the transaction (default:
+                                                 False). This argument is OBSOLETE.
+  --gas-price GAS_PRICE                          ⛽ the gas price (default: 1000000000)
+  --gas-limit GAS_LIMIT                          ⛽ the gas limit
+  --value VALUE                                  the value to transfer (default: 0)
+  --chain CHAIN                                  the chain identifier
+  --version VERSION                              the transaction version (default: 2)
+  --options OPTIONS                              the transaction options (default: 0)
+  --relayer RELAYER                              the bech32 address of the relayer
+  --guardian GUARDIAN                            the bech32 address of the guardian
+  --guardian-service-url GUARDIAN_SERVICE_URL    the url of the guardian service
+  --guardian-2fa-code GUARDIAN_2FA_CODE          the 2fa code for the guardian
+  --guardian-pem GUARDIAN_PEM                    🔑 the PEM file, if keyfile not provided
+  --guardian-keyfile GUARDIAN_KEYFILE            🔑 a JSON keyfile, if PEM not provided
+  --guardian-passfile GUARDIAN_PASSFILE          🔑 a file containing keyfile's password, if keyfile provided. If not
+                                                 provided, you'll be prompted to enter the password.
+  --guardian-ledger                              🔐 bool flag for signing transaction using ledger
+  --guardian-wallet-index GUARDIAN_WALLET_INDEX  🔑 the address index; can be used for PEM files, keyfiles of type
+                                                 mnemonic or Ledger devices (default: 0)
+  --relayer-pem RELAYER_PEM                      🔑 the PEM file, if keyfile not provided
+  --relayer-keyfile RELAYER_KEYFILE              🔑 a JSON keyfile, if PEM not provided
+  --relayer-passfile RELAYER_PASSFILE            🔑 a file containing keyfile's password, if keyfile provided. If not
+                                                 provided, you'll be prompted to enter the password.
+  --relayer-ledger                               🔐 bool flag for signing transaction using ledger
+  --relayer-wallet-index RELAYER_WALLET_INDEX    🔑 the address index; can be used for PEM files, keyfiles of type
+                                                 mnemonic or Ledger devices (default: 0)
+  --outfile OUTFILE                              where to save the output (default: stdout)
+  --send                                         ✓ whether to broadcast the transaction (default: False)
+  --simulate                                     whether to simulate the transaction (default: False)
+  --wait-result                                  signal to wait for the transaction result - only valid if --send is set
+  --timeout TIMEOUT                              max num of seconds to wait for result - only valid if --wait-result is
+                                                 set
+
+```
+### Governance.ClearEndedProposals
+
+
+```
+$ mxpy governance clear-ended-proposals --help
+usage: mxpy governance clear-ended-proposals [-h] ...
+
+Clear ended proposals.
+
+Output example:
+===============
+{
+    "emittedTransaction": {
+        "nonce": 42,
+        "sender": "alice",
+        "receiver": "bob",
+        "...": "..."
+    },
+    "emittedTransactionData": "the transaction data, not encoded",
+    "emittedTransactionHash": "the transaction hash"
+}
+
+options:
+  -h, --help                                     show this help message and exit
+  --proposers PROPOSERS [PROPOSERS ...]          a list of users who initiated the proposals (e.g. --proposers erd1...,
+                                                 erd1...)
+  --pem PEM                                      🔑 the PEM file, if keyfile not provided
+  --keyfile KEYFILE                              🔑 a JSON keyfile, if PEM not provided
+  --passfile PASSFILE                            🔑 a file containing keyfile's password, if keyfile provided. If not
+                                                 provided, you'll be prompted to enter the password.
+  --ledger                                       🔐 bool flag for signing transaction using ledger
+  --sender-wallet-index SENDER_WALLET_INDEX      🔑 the address index; can be used for PEM files, keyfiles of type
+                                                 mnemonic or Ledger devices (default: 0)
+  --sender-username SENDER_USERNAME              🖄 the username of the sender
+  --hrp HRP                                      The hrp used to convert the address to its bech32 representation
+  --proxy PROXY                                  🔗 the URL of the proxy
+  --nonce NONCE                                  # the nonce for the transaction. If not provided, is fetched from the
+                                                 network.
+  --recall-nonce                                 ⭮ whether to recall the nonce when creating the transaction (default:
+                                                 False). This argument is OBSOLETE.
+  --gas-price GAS_PRICE                          ⛽ the gas price (default: 1000000000)
+  --gas-limit GAS_LIMIT                          ⛽ the gas limit
+  --value VALUE                                  the value to transfer (default: 0)
+  --chain CHAIN                                  the chain identifier
+  --version VERSION                              the transaction version (default: 2)
+  --options OPTIONS                              the transaction options (default: 0)
+  --relayer RELAYER                              the bech32 address of the relayer
+  --guardian GUARDIAN                            the bech32 address of the guardian
+  --guardian-service-url GUARDIAN_SERVICE_URL    the url of the guardian service
+  --guardian-2fa-code GUARDIAN_2FA_CODE          the 2fa code for the guardian
+  --guardian-pem GUARDIAN_PEM                    🔑 the PEM file, if keyfile not provided
+  --guardian-keyfile GUARDIAN_KEYFILE            🔑 a JSON keyfile, if PEM not provided
+  --guardian-passfile GUARDIAN_PASSFILE          🔑 a file containing keyfile's password, if keyfile provided. If not
+                                                 provided, you'll be prompted to enter the password.
+  --guardian-ledger                              🔐 bool flag for signing transaction using ledger
+  --guardian-wallet-index GUARDIAN_WALLET_INDEX  🔑 the address index; can be used for PEM files, keyfiles of type
+                                                 mnemonic or Ledger devices (default: 0)
+  --relayer-pem RELAYER_PEM                      🔑 the PEM file, if keyfile not provided
+  --relayer-keyfile RELAYER_KEYFILE              🔑 a JSON keyfile, if PEM not provided
+  --relayer-passfile RELAYER_PASSFILE            🔑 a file containing keyfile's password, if keyfile provided. If not
+                                                 provided, you'll be prompted to enter the password.
+  --relayer-ledger                               🔐 bool flag for signing transaction using ledger
+  --relayer-wallet-index RELAYER_WALLET_INDEX    🔑 the address index; can be used for PEM files, keyfiles of type
+                                                 mnemonic or Ledger devices (default: 0)
+  --outfile OUTFILE                              where to save the output (default: stdout)
+  --send                                         ✓ whether to broadcast the transaction (default: False)
+  --simulate                                     whether to simulate the transaction (default: False)
+  --wait-result                                  signal to wait for the transaction result - only valid if --send is set
+  --timeout TIMEOUT                              max num of seconds to wait for result - only valid if --wait-result is
+                                                 set
+
+```
+### Governance.ClaimAccumulatedFees
+
+
+```
+$ mxpy governance claim-accumulated-fees --help
+usage: mxpy governance claim-accumulated-fees [-h] ...
+
+Claim the accumulated fees.
+
+Output example:
+===============
+{
+    "emittedTransaction": {
+        "nonce": 42,
+        "sender": "alice",
+        "receiver": "bob",
+        "...": "..."
+    },
+    "emittedTransactionData": "the transaction data, not encoded",
+    "emittedTransactionHash": "the transaction hash"
+}
+
+options:
+  -h, --help                                     show this help message and exit
+  --pem PEM                                      🔑 the PEM file, if keyfile not provided
+  --keyfile KEYFILE                              🔑 a JSON keyfile, if PEM not provided
+  --passfile PASSFILE                            🔑 a file containing keyfile's password, if keyfile provided. If not
+                                                 provided, you'll be prompted to enter the password.
+  --ledger                                       🔐 bool flag for signing transaction using ledger
+  --sender-wallet-index SENDER_WALLET_INDEX      🔑 the address index; can be used for PEM files, keyfiles of type
+                                                 mnemonic or Ledger devices (default: 0)
+  --sender-username SENDER_USERNAME              🖄 the username of the sender
+  --hrp HRP                                      The hrp used to convert the address to its bech32 representation
+  --proxy PROXY                                  🔗 the URL of the proxy
+  --nonce NONCE                                  # the nonce for the transaction. If not provided, is fetched from the
+                                                 network.
+  --recall-nonce                                 ⭮ whether to recall the nonce when creating the transaction (default:
+                                                 False). This argument is OBSOLETE.
+  --gas-price GAS_PRICE                          ⛽ the gas price (default: 1000000000)
+  --gas-limit GAS_LIMIT                          ⛽ the gas limit
+  --value VALUE                                  the value to transfer (default: 0)
+  --chain CHAIN                                  the chain identifier
+  --version VERSION                              the transaction version (default: 2)
+  --options OPTIONS                              the transaction options (default: 0)
+  --relayer RELAYER                              the bech32 address of the relayer
+  --guardian GUARDIAN                            the bech32 address of the guardian
+  --guardian-service-url GUARDIAN_SERVICE_URL    the url of the guardian service
+  --guardian-2fa-code GUARDIAN_2FA_CODE          the 2fa code for the guardian
+  --guardian-pem GUARDIAN_PEM                    🔑 the PEM file, if keyfile not provided
+  --guardian-keyfile GUARDIAN_KEYFILE            🔑 a JSON keyfile, if PEM not provided
+  --guardian-passfile GUARDIAN_PASSFILE          🔑 a file containing keyfile's password, if keyfile provided. If not
+                                                 provided, you'll be prompted to enter the password.
+  --guardian-ledger                              🔐 bool flag for signing transaction using ledger
+  --guardian-wallet-index GUARDIAN_WALLET_INDEX  🔑 the address index; can be used for PEM files, keyfiles of type
+                                                 mnemonic or Ledger devices (default: 0)
+  --relayer-pem RELAYER_PEM                      🔑 the PEM file, if keyfile not provided
+  --relayer-keyfile RELAYER_KEYFILE              🔑 a JSON keyfile, if PEM not provided
+  --relayer-passfile RELAYER_PASSFILE            🔑 a file containing keyfile's password, if keyfile provided. If not
+                                                 provided, you'll be prompted to enter the password.
+  --relayer-ledger                               🔐 bool flag for signing transaction using ledger
+  --relayer-wallet-index RELAYER_WALLET_INDEX    🔑 the address index; can be used for PEM files, keyfiles of type
+                                                 mnemonic or Ledger devices (default: 0)
+  --outfile OUTFILE                              where to save the output (default: stdout)
+  --send                                         ✓ whether to broadcast the transaction (default: False)
+  --simulate                                     whether to simulate the transaction (default: False)
+  --wait-result                                  signal to wait for the transaction result - only valid if --send is set
+  --timeout TIMEOUT                              max num of seconds to wait for result - only valid if --wait-result is
+                                                 set
+
+```
+### Governance.ChangeConfig
+
+
+```
+$ mxpy governance change-config --help
+usage: mxpy governance change-config [-h] ...
+
+Change the config of the contract.
+
+Output example:
+===============
+{
+    "emittedTransaction": {
+        "nonce": 42,
+        "sender": "alice",
+        "receiver": "bob",
+        "...": "..."
+    },
+    "emittedTransactionData": "the transaction data, not encoded",
+    "emittedTransactionHash": "the transaction hash"
+}
+
+options:
+  -h, --help                                     show this help message and exit
+  --proposal-fee PROPOSAL_FEE                    the cost to create a new proposal
+  --lost-proposal-fee LOST_PROPOSAL_FEE          the amount of native tokens the proposer loses if the proposal fails
+  --min-quorum MIN_QUORUM                        the min quorum to be reached for the proposal to pass
+  --min-veto-threshold MIN_VETO_THRESHOLD        the min veto threshold
+  --min-pass-threshold MIN_PASS_THRESHOLD        the min pass threshold
+  --pem PEM                                      🔑 the PEM file, if keyfile not provided
+  --keyfile KEYFILE                              🔑 a JSON keyfile, if PEM not provided
+  --passfile PASSFILE                            🔑 a file containing keyfile's password, if keyfile provided. If not
+                                                 provided, you'll be prompted to enter the password.
+  --ledger                                       🔐 bool flag for signing transaction using ledger
+  --sender-wallet-index SENDER_WALLET_INDEX      🔑 the address index; can be used for PEM files, keyfiles of type
+                                                 mnemonic or Ledger devices (default: 0)
+  --sender-username SENDER_USERNAME              🖄 the username of the sender
+  --hrp HRP                                      The hrp used to convert the address to its bech32 representation
+  --proxy PROXY                                  🔗 the URL of the proxy
+  --nonce NONCE                                  # the nonce for the transaction. If not provided, is fetched from the
+                                                 network.
+  --recall-nonce                                 ⭮ whether to recall the nonce when creating the transaction (default:
+                                                 False). This argument is OBSOLETE.
+  --gas-price GAS_PRICE                          ⛽ the gas price (default: 1000000000)
+  --gas-limit GAS_LIMIT                          ⛽ the gas limit
+  --value VALUE                                  the value to transfer (default: 0)
+  --chain CHAIN                                  the chain identifier
+  --version VERSION                              the transaction version (default: 2)
+  --options OPTIONS                              the transaction options (default: 0)
+  --relayer RELAYER                              the bech32 address of the relayer
+  --guardian GUARDIAN                            the bech32 address of the guardian
+  --guardian-service-url GUARDIAN_SERVICE_URL    the url of the guardian service
+  --guardian-2fa-code GUARDIAN_2FA_CODE          the 2fa code for the guardian
+  --guardian-pem GUARDIAN_PEM                    🔑 the PEM file, if keyfile not provided
+  --guardian-keyfile GUARDIAN_KEYFILE            🔑 a JSON keyfile, if PEM not provided
+  --guardian-passfile GUARDIAN_PASSFILE          🔑 a file containing keyfile's password, if keyfile provided. If not
+                                                 provided, you'll be prompted to enter the password.
+  --guardian-ledger                              🔐 bool flag for signing transaction using ledger
+  --guardian-wallet-index GUARDIAN_WALLET_INDEX  🔑 the address index; can be used for PEM files, keyfiles of type
+                                                 mnemonic or Ledger devices (default: 0)
+  --relayer-pem RELAYER_PEM                      🔑 the PEM file, if keyfile not provided
+  --relayer-keyfile RELAYER_KEYFILE              🔑 a JSON keyfile, if PEM not provided
+  --relayer-passfile RELAYER_PASSFILE            🔑 a file containing keyfile's password, if keyfile provided. If not
+                                                 provided, you'll be prompted to enter the password.
+  --relayer-ledger                               🔐 bool flag for signing transaction using ledger
+  --relayer-wallet-index RELAYER_WALLET_INDEX    🔑 the address index; can be used for PEM files, keyfiles of type
+                                                 mnemonic or Ledger devices (default: 0)
+  --outfile OUTFILE                              where to save the output (default: stdout)
+  --send                                         ✓ whether to broadcast the transaction (default: False)
+  --simulate                                     whether to simulate the transaction (default: False)
+  --wait-result                                  signal to wait for the transaction result - only valid if --send is set
+  --timeout TIMEOUT                              max num of seconds to wait for result - only valid if --wait-result is
+                                                 set
+
+```
+### Governance.GetVotingPower
+
+
+```
+$ mxpy governance get-voting-power --help
+usage: mxpy governance get-voting-power [-h] ...
+
+Get the voting power of an user.
+
+Output example:
+===============
+{
+    "emittedTransaction": {
+        "nonce": 42,
+        "sender": "alice",
+        "receiver": "bob",
+        "...": "..."
+    },
+    "emittedTransactionData": "the transaction data, not encoded",
+    "emittedTransactionHash": "the transaction hash"
+}
+
+options:
+  -h, --help     show this help message and exit
+  --user USER    the bech32 address of the user
+  --proxy PROXY  🔗 the URL of the proxy
+
+```
+### Governance.GetConfig
+
+
+```
+$ mxpy governance get-config --help
+usage: mxpy governance get-config [-h] ...
+
+Get the config of the governance contract.
+
+Output example:
+===============
+{
+    "emittedTransaction": {
+        "nonce": 42,
+        "sender": "alice",
+        "receiver": "bob",
+        "...": "..."
+    },
+    "emittedTransactionData": "the transaction data, not encoded",
+    "emittedTransactionHash": "the transaction hash"
+}
+
+options:
+  -h, --help     show this help message and exit
+  --proxy PROXY  🔗 the URL of the proxy
+
+```
+### Governance.GetDelegatedVoteInfo
+
+
+```
+$ mxpy governance get-delegated-vote-info --help
+usage: mxpy governance get-delegated-vote-info [-h] ...
+
+Get info about a delegated vote.
+
+Output example:
+===============
+{
+    "emittedTransaction": {
+        "nonce": 42,
+        "sender": "alice",
+        "receiver": "bob",
+        "...": "..."
+    },
+    "emittedTransactionData": "the transaction data, not encoded",
+    "emittedTransactionHash": "the transaction hash"
+}
+
+options:
+  -h, --help           show this help message and exit
+  --contract CONTRACT  the bech32 address of the contract
+  --user USER          the bech32 address of the user
+  --proxy PROXY        🔗 the URL of the proxy
 
 ```
 ## Group **Environment**
