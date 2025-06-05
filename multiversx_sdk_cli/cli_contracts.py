@@ -319,8 +319,7 @@ After installing, use the `sc-meta all build` command. To learn more about `sc-m
 def deploy(args: Any):
     logger.debug("deploy")
 
-    cli_config = MxpyEnv.from_active_env()
-    cli_shared.set_proxy_from_config_if_not_provided(args, cli_config)
+    cli_shared.set_proxy_from_config_if_not_provided(args)
 
     validate_transaction_args(args)
     ensure_wallet_args_are_provided(args)
@@ -363,6 +362,8 @@ def deploy(args: Any):
     contract_address = address_computer.compute_contract_address(deployer=sender.address, deployment_nonce=tx.nonce)
 
     logger.info("Contract address: %s", contract_address.to_bech32())
+
+    cli_config = MxpyEnv.from_active_env()
     utils.log_explorer_contract_address(args.chain, contract_address.to_bech32(), cli_config.explorer_url)
 
     _send_or_simulate(tx, contract_address, args)
@@ -371,8 +372,7 @@ def deploy(args: Any):
 def call(args: Any):
     logger.debug("call")
 
-    cli_config = MxpyEnv.from_active_env()
-    cli_shared.set_proxy_from_config_if_not_provided(args, cli_config)
+    cli_shared.set_proxy_from_config_if_not_provided(args)
 
     validate_transaction_args(args)
     ensure_wallet_args_are_provided(args)
@@ -420,8 +420,7 @@ def call(args: Any):
 def upgrade(args: Any):
     logger.debug("upgrade")
 
-    cli_config = MxpyEnv.from_active_env()
-    cli_shared.set_proxy_from_config_if_not_provided(args, cli_config)
+    cli_shared.set_proxy_from_config_if_not_provided(args)
 
     validate_transaction_args(args)
     ensure_wallet_args_are_provided(args)
@@ -468,8 +467,7 @@ def upgrade(args: Any):
 def query(args: Any):
     logger.debug("query")
 
-    cli_config = MxpyEnv.from_active_env()
-    cli_shared.set_proxy_from_config_if_not_provided(args, cli_config)
+    cli_shared.set_proxy_from_config_if_not_provided(args)
 
     validate_proxy_argument(args)
 

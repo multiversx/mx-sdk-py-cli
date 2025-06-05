@@ -603,16 +603,15 @@ def send_or_simulate(tx: Transaction, args: Any, dump_output: bool = True) -> CL
     output_builder.set_emitted_transaction(tx)
     outfile = args.outfile if hasattr(args, "outfile") else None
 
-    cli_config = MxpyEnv.from_active_env()
     hash = b""
     try:
         if send_wait_result:
-            _confirm_continuation_if_required(cli_config, tx)
+            _confirm_continuation_if_required(tx)
 
             transaction_on_network = send_and_wait_for_result(tx, proxy, args.timeout)
             output_builder.set_awaited_transaction(transaction_on_network)
         elif send_only:
-            _confirm_continuation_if_required(cli_config, tx)
+            _confirm_continuation_if_required(tx)
 
             hash = proxy.send_transaction(tx)
             output_builder.set_emitted_transaction_hash(hash.hex())
@@ -626,6 +625,7 @@ def send_or_simulate(tx: Transaction, args: Any, dump_output: bool = True) -> CL
             utils.dump_out_json(output_transaction, outfile=outfile)
 
         if send_only and hash:
+            cli_config = MxpyEnv.from_active_env()
             log_explorer_transaction(
                 chain=output_transaction["emittedTransaction"]["chainID"],
                 transaction_hash=output_transaction["emittedTransactionHash"],
@@ -635,7 +635,9 @@ def send_or_simulate(tx: Transaction, args: Any, dump_output: bool = True) -> CL
     return output_builder
 
 
-def _confirm_continuation_if_required(env: MxpyEnv, tx: Transaction) -> None:
+def _confirm_continuation_if_required(tx: Transaction) -> None:
+    env = MxpyEnv.from_active_env()
+
     if env.ask_confirmation:
         transaction = tx.to_dictionary()
 
@@ -702,12 +704,13 @@ def prepare_token_transfers(transfers: list[str]) -> list[TokenTransfer]:
     return token_transfers
 
 
-def set_proxy_from_config_if_not_provided(args: Any, env: MxpyEnv) -> None:
+def set_proxy_from_config_if_not_provided(args: Any) -> None:
     """This function modifies the `args` object by setting the proxy from the config if not already set. If proxy is not needed (chainID and nonce are provided), the proxy will not be set."""
     if not args.proxy:
         if hasattr(args, "chain") and args.chain and hasattr(args, "nonce") and args.nonce is not None:
             return
 
+        env = MxpyEnv.from_active_env()
         if env.proxy_url:
             logger.info(f"Using proxy URL from config: {env.proxy_url}")
             args.proxy = env.proxy_url

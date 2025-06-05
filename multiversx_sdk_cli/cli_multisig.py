@@ -38,7 +38,6 @@ from multiversx_sdk_cli.args_validation import (
 from multiversx_sdk_cli.cli_output import CLIOutputBuilder
 from multiversx_sdk_cli.config import get_config_for_network_providers
 from multiversx_sdk_cli.constants import NUMBER_OF_SHARDS
-from multiversx_sdk_cli.env import MxpyEnv
 from multiversx_sdk_cli.multisig import MultisigWrapper
 
 logger = logging.getLogger("cli.multisig")
@@ -656,8 +655,7 @@ def _add_common_args(args: Any, sub: Any, with_contract_arg: bool = True, with_r
 
 
 def _ensure_args(args: Any):
-    cli_config = MxpyEnv.from_active_env()
-    cli_shared.set_proxy_from_config_if_not_provided(args, cli_config)
+    cli_shared.set_proxy_from_config_if_not_provided(args)
 
     validate_transaction_args(args)
     ensure_wallet_args_are_provided(args)
@@ -666,8 +664,7 @@ def _ensure_args(args: Any):
 
 
 def _ensure_proxy_arg(args: Any):
-    cli_config = MxpyEnv.from_active_env()
-    cli_shared.set_proxy_from_config_if_not_provided(args, cli_config)
+    cli_shared.set_proxy_from_config_if_not_provided(args)
     validate_proxy_argument(args)
 
 
