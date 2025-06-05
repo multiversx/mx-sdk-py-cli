@@ -36,15 +36,16 @@ class GovernanceWrapper(BaseTransactionsController):
             end_vote_epoch=end_vote_epoch,
             native_token_amount=native_token_amount,
         )
-        tx.nonce = nonce
-        tx.version = version
-        tx.options = options
-        tx.gas_price = gas_price
-        tx.guardian = guardian_and_relayer_data.guardian_address
-        tx.relayer = guardian_and_relayer_data.relayer_address
+        self._set_transaction_fields(
+            transaction=tx,
+            nonce=nonce,
+            version=version,
+            options=options,
+            gas_price=gas_price,
+            guardian_and_relayer_data=guardian_and_relayer_data,
+        )
 
         self.add_extra_gas_limit_if_required(tx)
-
         if gas_limit:
             tx.gas_limit = gas_limit
 
@@ -76,15 +77,16 @@ class GovernanceWrapper(BaseTransactionsController):
         tx = self.factory.create_transaction_for_voting(
             sender=sender.address, proposal_nonce=proposal_nonce, vote=vote_value
         )
-        tx.nonce = nonce
-        tx.version = version
-        tx.options = options
-        tx.gas_price = gas_price
-        tx.guardian = guardian_and_relayer_data.guardian_address
-        tx.relayer = guardian_and_relayer_data.relayer_address
+        self._set_transaction_fields(
+            transaction=tx,
+            nonce=nonce,
+            version=version,
+            options=options,
+            gas_price=gas_price,
+            guardian_and_relayer_data=guardian_and_relayer_data,
+        )
 
         self.add_extra_gas_limit_if_required(tx)
-
         if gas_limit:
             tx.gas_limit = gas_limit
 
@@ -111,15 +113,16 @@ class GovernanceWrapper(BaseTransactionsController):
         guardian_and_relayer_data: GuardianRelayerData,
     ) -> Transaction:
         tx = self.factory.create_transaction_for_closing_proposal(sender=sender.address, proposal_nonce=proposal_nonce)
-        tx.nonce = nonce
-        tx.version = version
-        tx.options = options
-        tx.gas_price = gas_price
-        tx.guardian = guardian_and_relayer_data.guardian_address
-        tx.relayer = guardian_and_relayer_data.relayer_address
+        self._set_transaction_fields(
+            transaction=tx,
+            nonce=nonce,
+            version=version,
+            options=options,
+            gas_price=gas_price,
+            guardian_and_relayer_data=guardian_and_relayer_data,
+        )
 
         self.add_extra_gas_limit_if_required(tx)
-
         if gas_limit:
             tx.gas_limit = gas_limit
 
@@ -146,15 +149,16 @@ class GovernanceWrapper(BaseTransactionsController):
         guardian_and_relayer_data: GuardianRelayerData,
     ) -> Transaction:
         tx = self.factory.create_transaction_for_clearing_ended_proposals(sender=sender.address, proposers=proposers)
-        tx.nonce = nonce
-        tx.version = version
-        tx.options = options
-        tx.gas_price = gas_price
-        tx.guardian = guardian_and_relayer_data.guardian_address
-        tx.relayer = guardian_and_relayer_data.relayer_address
+        self._set_transaction_fields(
+            transaction=tx,
+            nonce=nonce,
+            version=version,
+            options=options,
+            gas_price=gas_price,
+            guardian_and_relayer_data=guardian_and_relayer_data,
+        )
 
         self.add_extra_gas_limit_if_required(tx)
-
         if gas_limit:
             tx.gas_limit = gas_limit
 
@@ -180,15 +184,16 @@ class GovernanceWrapper(BaseTransactionsController):
         guardian_and_relayer_data: GuardianRelayerData,
     ) -> Transaction:
         tx = self.factory.create_transaction_for_claiming_accumulated_fees(sender=sender.address)
-        tx.nonce = nonce
-        tx.version = version
-        tx.options = options
-        tx.gas_price = gas_price
-        tx.guardian = guardian_and_relayer_data.guardian_address
-        tx.relayer = guardian_and_relayer_data.relayer_address
+        self._set_transaction_fields(
+            transaction=tx,
+            nonce=nonce,
+            version=version,
+            options=options,
+            gas_price=gas_price,
+            guardian_and_relayer_data=guardian_and_relayer_data,
+        )
 
         self.add_extra_gas_limit_if_required(tx)
-
         if gas_limit:
             tx.gas_limit = gas_limit
 
@@ -226,15 +231,16 @@ class GovernanceWrapper(BaseTransactionsController):
             min_veto_threshold=min_veto_threshold,
             min_pass_threshold=min_pass_threshold,
         )
-        tx.nonce = nonce
-        tx.version = version
-        tx.options = options
-        tx.gas_price = gas_price
-        tx.guardian = guardian_and_relayer_data.guardian_address
-        tx.relayer = guardian_and_relayer_data.relayer_address
+        self._set_transaction_fields(
+            transaction=tx,
+            nonce=nonce,
+            version=version,
+            options=options,
+            gas_price=gas_price,
+            guardian_and_relayer_data=guardian_and_relayer_data,
+        )
 
         self.add_extra_gas_limit_if_required(tx)
-
         if gas_limit:
             tx.gas_limit = gas_limit
 

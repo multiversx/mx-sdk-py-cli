@@ -23,6 +23,7 @@ from multiversx_sdk_cli.constants import (
 )
 from multiversx_sdk_cli.cosign_transaction import cosign_transaction
 from multiversx_sdk_cli.errors import BadUserInput
+from multiversx_sdk_cli.guardian_relayer_data import GuardianRelayerData
 from multiversx_sdk_cli.interfaces import IAccount
 
 logger = logging.getLogger("base_controller")
@@ -144,3 +145,19 @@ class BaseTransactionsController:
         if len(string) % 2 == 1:
             return "0" + string
         return string
+
+    def _set_transaction_fields(
+        self,
+        transaction: Transaction,
+        nonce: int,
+        version: int,
+        options: int,
+        gas_price: int,
+        guardian_and_relayer_data: GuardianRelayerData,
+    ):
+        transaction.nonce = nonce
+        transaction.version = version
+        transaction.options = options
+        transaction.gas_price = gas_price
+        transaction.guardian = guardian_and_relayer_data.guardian_address
+        transaction.relayer = guardian_and_relayer_data.relayer_address
