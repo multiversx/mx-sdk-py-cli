@@ -128,7 +128,7 @@ def add_tx_args(
     )
     sub.add_argument("--gas-limit", required=False, type=int, help="⛽ the gas limit")
 
-    sub.add_argument("--value", default="0", type=int, help="the value to transfer (default: %(default)s)")
+    sub.add_argument("--value", default=0, type=int, help="the value to transfer (default: %(default)s)")
 
     if with_data:
         sub.add_argument(
@@ -308,6 +308,20 @@ def add_metadata_arg(sub: Any):
         help="‼ mark the contract as payable by SC (default: not payable by SC)",
     )
     sub.set_defaults(metadata_upgradeable=True, metadata_payable=False)
+
+
+def add_wait_result_and_timeout_args(sub: Any):
+    sub.add_argument(
+        "--wait-result",
+        action="store_true",
+        default=False,
+        help="signal to wait for the transaction result - only valid if --send is set",
+    )
+    sub.add_argument(
+        "--timeout",
+        default=100,
+        help="max num of seconds to wait for result" " - only valid if --wait-result is set",
+    )
 
 
 def parse_omit_fields_arg(args: Any) -> list[str]:
