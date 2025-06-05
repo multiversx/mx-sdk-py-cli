@@ -57,23 +57,13 @@ def setup_parser(args: list[str], subparsers: Any) -> Any:
     )
     _add_bytecode_arg(sub)
     _add_contract_abi_arg(sub)
-    _add_metadata_arg(sub)
+    cli_shared.add_metadata_arg(sub)
     cli_shared.add_outfile_arg(sub)
     cli_shared.add_wallet_args(args, sub)
     cli_shared.add_proxy_arg(sub)
     cli_shared.add_tx_args(args, sub, with_receiver=False, with_data=False)
     _add_arguments_arg(sub)
-    sub.add_argument(
-        "--wait-result",
-        action="store_true",
-        default=False,
-        help="signal to wait for the transaction result - only valid if --send is set",
-    )
-    sub.add_argument(
-        "--timeout",
-        default=100,
-        help="max num of seconds to wait for result" " - only valid if --wait-result is set",
-    )
+    cli_shared.add_wait_result_and_timeout_args(sub)
     cli_shared.add_broadcast_args(sub)
     cli_shared.add_guardian_wallet_args(args, sub)
     cli_shared.add_relayed_v3_wallet_args(args, sub)
@@ -95,17 +85,7 @@ def setup_parser(args: list[str], subparsers: Any) -> Any:
     _add_function_arg(sub)
     _add_arguments_arg(sub)
     cli_shared.add_token_transfers_args(sub)
-    sub.add_argument(
-        "--wait-result",
-        action="store_true",
-        default=False,
-        help="signal to wait for the transaction result - only valid if --send is set",
-    )
-    sub.add_argument(
-        "--timeout",
-        default=100,
-        help="max num of seconds to wait for result" " - only valid if --wait-result is set",
-    )
+    cli_shared.add_wait_result_and_timeout_args(sub)
     cli_shared.add_broadcast_args(sub)
     cli_shared.add_guardian_wallet_args(args, sub)
     cli_shared.add_relayed_v3_wallet_args(args, sub)
@@ -122,22 +102,12 @@ def setup_parser(args: list[str], subparsers: Any) -> Any:
     _add_contract_abi_arg(sub)
     cli_shared.add_outfile_arg(sub)
     _add_bytecode_arg(sub)
-    _add_metadata_arg(sub)
+    cli_shared.add_metadata_arg(sub)
     cli_shared.add_wallet_args(args, sub)
     cli_shared.add_proxy_arg(sub)
     cli_shared.add_tx_args(args, sub, with_receiver=False, with_data=False)
     _add_arguments_arg(sub)
-    sub.add_argument(
-        "--wait-result",
-        action="store_true",
-        default=False,
-        help="signal to wait for the transaction result - only valid if --send is set",
-    )
-    sub.add_argument(
-        "--timeout",
-        default=100,
-        help="max num of seconds to wait for result" " - only valid if --wait-result is set",
-    )
+    cli_shared.add_wait_result_and_timeout_args(sub)
     cli_shared.add_broadcast_args(sub)
     cli_shared.add_guardian_wallet_args(args, sub)
     cli_shared.add_relayed_v3_wallet_args(args, sub)
@@ -337,34 +307,6 @@ def _add_arguments_arg(sub: Any):
     )
 
 
-def _add_metadata_arg(sub: Any):
-    sub.add_argument(
-        "--metadata-not-upgradeable",
-        dest="metadata_upgradeable",
-        action="store_false",
-        help="‼ mark the contract as NOT upgradeable (default: upgradeable)",
-    )
-    sub.add_argument(
-        "--metadata-not-readable",
-        dest="metadata_readable",
-        action="store_false",
-        help="‼ mark the contract as NOT readable (default: readable)",
-    )
-    sub.add_argument(
-        "--metadata-payable",
-        dest="metadata_payable",
-        action="store_true",
-        help="‼ mark the contract as payable (default: not payable)",
-    )
-    sub.add_argument(
-        "--metadata-payable-by-sc",
-        dest="metadata_payable_by_sc",
-        action="store_true",
-        help="‼ mark the contract as payable by SC (default: not payable by SC)",
-    )
-    sub.set_defaults(metadata_upgradeable=True, metadata_payable=False)
-
-
 def build(args: Any):
     message = """This command cannot build smart contracts anymore.
 
@@ -452,6 +394,10 @@ def call(args: Any):
     arguments, should_prepare_args = _get_contract_arguments(args)
     contract_address = Address.new_from_bech32(args.contract)
 
+    token_transfers = None
+    if args.token_transfers:
+        token_transfers = cli_shared.prepare_token_transfers(args.token_transfers)
+
     tx = contract.prepare_execute_transaction(
         caller=sender,
         contract=contract_address,
@@ -461,7 +407,7 @@ def call(args: Any):
         gas_limit=int(args.gas_limit),
         gas_price=int(args.gas_price),
         value=int(args.value),
-        transfers=args.token_transfers,
+        token_transfers=token_transfers,
         nonce=sender.nonce,
         version=int(args.version),
         options=int(args.options),

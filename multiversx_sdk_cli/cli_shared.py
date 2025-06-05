@@ -14,6 +14,9 @@ from multiversx_sdk import (
     ApiNetworkProvider,
     LedgerAccount,
     ProxyNetworkProvider,
+    Token,
+    TokenComputer,
+    TokenTransfer,
     Transaction,
 )
 
@@ -132,7 +135,7 @@ def add_tx_args(
     )
     sub.add_argument("--gas-limit", required=False, type=int, help="⛽ the gas limit")
 
-    sub.add_argument("--value", default="0", type=int, help="the value to transfer (default: %(default)s)")
+    sub.add_argument("--value", default=0, type=int, help="the value to transfer (default: %(default)s)")
 
     if with_data:
         sub.add_argument(
@@ -283,6 +286,48 @@ def add_token_transfers_args(sub: Any):
         nargs="+",
         help="token transfers for transfer & execute, as [token, amount] "
         "E.g. --token-transfers NFT-123456-0a 1 ESDT-987654 100000000",
+    )
+
+
+def add_metadata_arg(sub: Any):
+    sub.add_argument(
+        "--metadata-not-upgradeable",
+        dest="metadata_upgradeable",
+        action="store_false",
+        help="‼ mark the contract as NOT upgradeable (default: upgradeable)",
+    )
+    sub.add_argument(
+        "--metadata-not-readable",
+        dest="metadata_readable",
+        action="store_false",
+        help="‼ mark the contract as NOT readable (default: readable)",
+    )
+    sub.add_argument(
+        "--metadata-payable",
+        dest="metadata_payable",
+        action="store_true",
+        help="‼ mark the contract as payable (default: not payable)",
+    )
+    sub.add_argument(
+        "--metadata-payable-by-sc",
+        dest="metadata_payable_by_sc",
+        action="store_true",
+        help="‼ mark the contract as payable by SC (default: not payable by SC)",
+    )
+    sub.set_defaults(metadata_upgradeable=True, metadata_payable=False)
+
+
+def add_wait_result_and_timeout_args(sub: Any):
+    sub.add_argument(
+        "--wait-result",
+        action="store_true",
+        default=False,
+        help="signal to wait for the transaction result - only valid if --send is set",
+    )
+    sub.add_argument(
+        "--timeout",
+        default=100,
+        help="max num of seconds to wait for result" " - only valid if --wait-result is set",
     )
 
 
@@ -639,10 +684,28 @@ def prepare_guardian_relayer_data(args: Any) -> GuardianRelayerData:
     )
 
 
+def prepare_token_transfers(transfers: list[str]) -> list[TokenTransfer]:
+    """Converts a list of token transfers as received from the CLI to a list of TokenTransfer objects."""
+    token_computer = TokenComputer()
+    token_transfers: list[TokenTransfer] = []
+
+    for i in range(0, len(transfers) - 1, 2):
+        extended_identifier = transfers[i]
+        amount = int(transfers[i + 1])
+        nonce = token_computer.extract_nonce_from_extended_identifier(extended_identifier)
+        identifier = token_computer.extract_identifier_from_extended_identifier(extended_identifier)
+
+        token = Token(identifier, nonce)
+        transfer = TokenTransfer(token, amount)
+        token_transfers.append(transfer)
+
+    return token_transfers
+
+
 def set_proxy_from_config_if_not_provided(args: Any, env: MxpyEnv) -> None:
     """This function modifies the `args` object by setting the proxy from the config if not already set. If proxy is not needed (chainID and nonce are provided), the proxy will not be set."""
     if not args.proxy:
-        if hasattr(args, "chain") and args.chain and hasattr(args, "nonce") and args.nonce:
+        if hasattr(args, "chain") and args.chain and hasattr(args, "nonce") and args.nonce is not None:
             return
 
         if env.proxy_url:
