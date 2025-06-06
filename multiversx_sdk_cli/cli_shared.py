@@ -33,6 +33,7 @@ from multiversx_sdk_cli.errors import (
     ArgumentsNotProvidedError,
     BadUsage,
     IncorrectWalletError,
+    LedgerError,
 )
 from multiversx_sdk_cli.guardian_relayer_data import GuardianRelayerData
 from multiversx_sdk_cli.interfaces import IAccount
@@ -346,7 +347,10 @@ def prepare_account(args: Any):
             hrp=hrp,
         )
     elif args.ledger:
-        return LedgerAccount(address_index=args.sender_wallet_index)
+        try:
+            return LedgerAccount(address_index=args.sender_wallet_index)
+        except Exception as e:
+            raise LedgerError(str(e))
     else:
         raise errors.NoWalletProvided()
 
@@ -402,7 +406,10 @@ def load_guardian_account(args: Any) -> Union[IAccount, None]:
             hrp=hrp,
         )
     elif args.guardian_ledger:
-        return LedgerAccount(address_index=args.guardian_wallet_index)
+        try:
+            return LedgerAccount(address_index=args.guardian_wallet_index)
+        except Exception as e:
+            raise LedgerError(str(e))
 
     return None
 
@@ -533,7 +540,10 @@ def load_relayer_account(args: Any) -> Union[IAccount, None]:
             hrp=hrp,
         )
     elif args.relayer_ledger:
-        return LedgerAccount(address_index=args.relayer_wallet_index)
+        try:
+            return LedgerAccount(address_index=args.relayer_wallet_index)
+        except Exception as e:
+            raise LedgerError(str(e))
 
     return None
 
