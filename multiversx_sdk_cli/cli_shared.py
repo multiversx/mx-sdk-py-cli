@@ -716,6 +716,9 @@ def prepare_token_transfers(transfers: list[str]) -> list[TokenTransfer]:
 
 def set_proxy_from_config_if_not_provided(args: Any) -> None:
     """This function modifies the `args` object by setting the proxy from the config if not already set. If proxy is not needed (chainID and nonce are provided), the proxy will not be set."""
+    if not hasattr(args, "proxy"):
+        return
+
     if not args.proxy:
         if hasattr(args, "chain") and args.chain and hasattr(args, "nonce") and args.nonce is not None:
             return

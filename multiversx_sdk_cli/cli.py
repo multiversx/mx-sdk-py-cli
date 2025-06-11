@@ -27,6 +27,7 @@ import multiversx_sdk_cli.cli_validators
 import multiversx_sdk_cli.cli_wallet
 import multiversx_sdk_cli.version
 from multiversx_sdk_cli import config, errors, utils, ux
+from multiversx_sdk_cli.cli_shared import set_proxy_from_config_if_not_provided
 from multiversx_sdk_cli.env import get_address_hrp
 
 logger = logging.getLogger("cli")
@@ -77,6 +78,7 @@ def _do_main(cli_args: list[str]):
     if not hasattr(args, "func"):
         parser.print_help()
     else:
+        set_proxy_from_config_if_not_provided(args)
         args.func(args)
 
 

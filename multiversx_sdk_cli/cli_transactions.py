@@ -97,8 +97,6 @@ def _add_common_arguments(args: list[str], sub: Any):
 
 
 def create_transaction(args: Any):
-    cli_shared.set_proxy_from_config_if_not_provided(args)
-
     validate_nonce_args(args)
     validate_receiver_args(args)
     ensure_wallet_args_are_provided(args)
@@ -141,8 +139,6 @@ def create_transaction(args: Any):
 
 
 def send_transaction(args: Any):
-    cli_shared.set_proxy_from_config_if_not_provided(args)
-
     validate_proxy_argument(args)
 
     tx = load_transaction_from_file(args.infile)
@@ -162,8 +158,6 @@ def send_transaction(args: Any):
 
 
 def sign_transaction(args: Any):
-    cli_shared.set_proxy_from_config_if_not_provided(args)
-
     validate_broadcast_args(args)
 
     tx = load_transaction_from_file(args.infile)
@@ -203,8 +197,6 @@ def sign_transaction(args: Any):
 
 
 def relay_transaction(args: Any):
-    cli_shared.set_proxy_from_config_if_not_provided(args)
-
     ensure_relayer_wallet_args_are_provided(args)
     validate_broadcast_args(args)
 

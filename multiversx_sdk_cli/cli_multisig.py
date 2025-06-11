@@ -655,17 +655,10 @@ def _add_common_args(args: Any, sub: Any, with_contract_arg: bool = True, with_r
 
 
 def _ensure_args(args: Any):
-    cli_shared.set_proxy_from_config_if_not_provided(args)
-
     validate_transaction_args(args)
     ensure_wallet_args_are_provided(args)
     validate_broadcast_args(args)
     validate_chain_id_args(args)
-
-
-def _ensure_proxy_arg(args: Any):
-    cli_shared.set_proxy_from_config_if_not_provided(args)
-    validate_proxy_argument(args)
 
 
 def deploy(args: Any):
@@ -1438,7 +1431,7 @@ def perform_batch(args: Any):
 
 
 def get_quorum(args: Any):
-    _ensure_proxy_arg(args)
+    validate_proxy_argument(args)
 
     abi = Abi.load(Path(args.abi))
     config = get_config_for_network_providers()
@@ -1451,7 +1444,7 @@ def get_quorum(args: Any):
 
 
 def get_num_board_members(args: Any):
-    _ensure_proxy_arg(args)
+    validate_proxy_argument(args)
 
     abi = Abi.load(Path(args.abi))
     config = get_config_for_network_providers()
@@ -1464,7 +1457,7 @@ def get_num_board_members(args: Any):
 
 
 def get_num_groups(args: Any):
-    _ensure_proxy_arg(args)
+    validate_proxy_argument(args)
 
     abi = Abi.load(Path(args.abi))
     config = get_config_for_network_providers()
@@ -1477,7 +1470,7 @@ def get_num_groups(args: Any):
 
 
 def get_num_proposers(args: Any):
-    _ensure_proxy_arg(args)
+    validate_proxy_argument(args)
 
     abi = Abi.load(Path(args.abi))
     config = get_config_for_network_providers()
@@ -1490,7 +1483,7 @@ def get_num_proposers(args: Any):
 
 
 def get_action_group(args: Any):
-    _ensure_proxy_arg(args)
+    validate_proxy_argument(args)
 
     abi = Abi.load(Path(args.abi))
     config = get_config_for_network_providers()
@@ -1503,7 +1496,7 @@ def get_action_group(args: Any):
 
 
 def get_last_group_action_id(args: Any):
-    _ensure_proxy_arg(args)
+    validate_proxy_argument(args)
 
     abi = Abi.load(Path(args.abi))
     config = get_config_for_network_providers()
@@ -1516,7 +1509,7 @@ def get_last_group_action_id(args: Any):
 
 
 def get_action_last_index(args: Any):
-    _ensure_proxy_arg(args)
+    validate_proxy_argument(args)
 
     abi = Abi.load(Path(args.abi))
     config = get_config_for_network_providers()
@@ -1529,7 +1522,7 @@ def get_action_last_index(args: Any):
 
 
 def is_signed_by(args: Any):
-    _ensure_proxy_arg(args)
+    validate_proxy_argument(args)
 
     abi = Abi.load(Path(args.abi))
     config = get_config_for_network_providers()
@@ -1546,7 +1539,7 @@ def is_signed_by(args: Any):
 
 
 def is_quorum_reached(args: Any):
-    _ensure_proxy_arg(args)
+    validate_proxy_argument(args)
 
     abi = Abi.load(Path(args.abi))
     config = get_config_for_network_providers()
@@ -1562,7 +1555,7 @@ def is_quorum_reached(args: Any):
 
 
 def get_pending_actions_full_info(args: Any):
-    _ensure_proxy_arg(args)
+    validate_proxy_argument(args)
 
     abi = Abi.load(Path(args.abi))
     config = get_config_for_network_providers()
@@ -1578,7 +1571,7 @@ def get_pending_actions_full_info(args: Any):
 
 
 def get_user_role(args: Any):
-    _ensure_proxy_arg(args)
+    validate_proxy_argument(args)
 
     abi = Abi.load(Path(args.abi))
     config = get_config_for_network_providers()
@@ -1594,7 +1587,7 @@ def get_user_role(args: Any):
 
 
 def get_all_board_members(args: Any):
-    _ensure_proxy_arg(args)
+    validate_proxy_argument(args)
 
     abi = Abi.load(Path(args.abi))
     config = get_config_for_network_providers()
@@ -1614,7 +1607,7 @@ def get_all_board_members(args: Any):
 
 
 def get_all_proposers(args: Any):
-    _ensure_proxy_arg(args)
+    validate_proxy_argument(args)
 
     abi = Abi.load(Path(args.abi))
     config = get_config_for_network_providers()
@@ -1634,7 +1627,7 @@ def get_all_proposers(args: Any):
 
 
 def get_action_data(args: Any):
-    _ensure_proxy_arg(args)
+    validate_proxy_argument(args)
 
     abi = Abi.load(Path(args.abi))
     config = get_config_for_network_providers()
@@ -1650,7 +1643,7 @@ def get_action_data(args: Any):
 
 
 def get_action_signers(args: Any):
-    _ensure_proxy_arg(args)
+    validate_proxy_argument(args)
 
     abi = Abi.load(Path(args.abi))
     config = get_config_for_network_providers()
@@ -1668,7 +1661,7 @@ def get_action_signers(args: Any):
 
 
 def get_action_signer_count(args: Any):
-    _ensure_proxy_arg(args)
+    validate_proxy_argument(args)
 
     abi = Abi.load(Path(args.abi))
     config = get_config_for_network_providers()
@@ -1684,7 +1677,7 @@ def get_action_signer_count(args: Any):
 
 
 def get_action_valid_signer_count(args: Any):
-    _ensure_proxy_arg(args)
+    validate_proxy_argument(args)
 
     abi = Abi.load(Path(args.abi))
     config = get_config_for_network_providers()
@@ -1700,7 +1693,7 @@ def get_action_valid_signer_count(args: Any):
 
 
 def parse_proposal(args: Any):
-    _ensure_proxy_arg(args)
+    validate_proxy_argument(args)
 
     abi = Abi.load(Path(args.abi))
     config = get_config_for_network_providers()

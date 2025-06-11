@@ -319,8 +319,6 @@ After installing, use the `sc-meta all build` command. To learn more about `sc-m
 def deploy(args: Any):
     logger.debug("deploy")
 
-    cli_shared.set_proxy_from_config_if_not_provided(args)
-
     validate_transaction_args(args)
     ensure_wallet_args_are_provided(args)
     validate_broadcast_args(args)
@@ -372,8 +370,6 @@ def deploy(args: Any):
 def call(args: Any):
     logger.debug("call")
 
-    cli_shared.set_proxy_from_config_if_not_provided(args)
-
     validate_transaction_args(args)
     ensure_wallet_args_are_provided(args)
     validate_broadcast_args(args)
@@ -420,8 +416,6 @@ def call(args: Any):
 def upgrade(args: Any):
     logger.debug("upgrade")
 
-    cli_shared.set_proxy_from_config_if_not_provided(args)
-
     validate_transaction_args(args)
     ensure_wallet_args_are_provided(args)
     validate_broadcast_args(args)
@@ -466,8 +460,6 @@ def upgrade(args: Any):
 
 def query(args: Any):
     logger.debug("query")
-
-    cli_shared.set_proxy_from_config_if_not_provided(args)
 
     validate_proxy_argument(args)
 
