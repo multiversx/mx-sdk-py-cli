@@ -22,7 +22,7 @@ from multiversx_sdk_cli.constants import (
 )
 from multiversx_sdk_cli.cosign_transaction import cosign_transaction
 from multiversx_sdk_cli.env import get_address_hrp
-from multiversx_sdk_cli.errors import BadUserInput
+from multiversx_sdk_cli.errors import BadUserInput, TransactionSigningError
 from multiversx_sdk_cli.guardian_relayer_data import GuardianRelayerData
 from multiversx_sdk_cli.interfaces import IAccount
 
@@ -47,7 +47,10 @@ class BaseTransactionsController:
         self._set_options_for_hash_signing_if_needed(transaction, sender, guardian, relayer)
 
         if sender:
-            transaction.signature = sender.sign_transaction(transaction)
+            try:
+                transaction.signature = sender.sign_transaction(transaction)
+            except Exception as e:
+                raise TransactionSigningError(f"Could not sign transaction: {str(e)}")
 
         self._sign_guarded_transaction_if_guardian(
             transaction,
@@ -94,7 +97,10 @@ class BaseTransactionsController:
     ) -> Transaction:
         #  If the guardian account is provided, we sign locally. Otherwise, we reach for the trusted cosign service.
         if guardian:
-            transaction.guardian_signature = guardian.sign_transaction(transaction)
+            try:
+                transaction.guardian_signature = guardian.sign_transaction(transaction)
+            except Exception as e:
+                raise TransactionSigningError(f"Could not sign transaction: {str(e)}")
         elif transaction.guardian and guardian_service_url and guardian_2fa_code:
             cosign_transaction(transaction, guardian_service_url, guardian_2fa_code)
 
@@ -102,7 +108,10 @@ class BaseTransactionsController:
 
     def _sign_relayed_transaction_if_relayer(self, transaction: Transaction, relayer: Union[IAccount, None]):
         if relayer and transaction.relayer:
-            transaction.relayer_signature = relayer.sign_transaction(transaction)
+            try:
+                transaction.relayer_signature = relayer.sign_transaction(transaction)
+            except Exception as e:
+                raise TransactionSigningError(f"Could not sign transaction: {str(e)}")
 
     def _convert_args_to_typed_values(self, arguments: list[str]) -> list[Any]:
         args: list[Any] = []
