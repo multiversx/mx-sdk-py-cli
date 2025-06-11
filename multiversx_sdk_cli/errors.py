@@ -149,3 +149,13 @@ class IncorrectWalletError(KnownError):
 class InvalidArgumentsError(KnownError):
     def __init__(self, message: str):
         super().__init__(message)
+
+
+class LedgerError(KnownError):
+    def __init__(self, message: str):
+        super().__init__(message)
+
+
+class TransactionSigningError(KnownError):
+    def __init__(self, message: str):
+        super().__init__(message)
