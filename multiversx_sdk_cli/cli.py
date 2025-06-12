@@ -19,14 +19,17 @@ import multiversx_sdk_cli.cli_dns
 import multiversx_sdk_cli.cli_env
 import multiversx_sdk_cli.cli_faucet
 import multiversx_sdk_cli.cli_get
+import multiversx_sdk_cli.cli_governance
 import multiversx_sdk_cli.cli_ledger
 import multiversx_sdk_cli.cli_localnet
+import multiversx_sdk_cli.cli_multisig
 import multiversx_sdk_cli.cli_transactions
 import multiversx_sdk_cli.cli_validator_wallet
 import multiversx_sdk_cli.cli_validators
 import multiversx_sdk_cli.cli_wallet
 import multiversx_sdk_cli.version
 from multiversx_sdk_cli import config, errors, utils, ux
+from multiversx_sdk_cli.cli_shared import set_proxy_from_config_if_not_provided
 from multiversx_sdk_cli.env import get_address_hrp
 
 logger = logging.getLogger("cli")
@@ -77,6 +80,7 @@ def _do_main(cli_args: list[str]):
     if not hasattr(args, "func"):
         parser.print_help()
     else:
+        set_proxy_from_config_if_not_provided(args)
         args.func(args)
 
 
@@ -128,6 +132,8 @@ See:
     commands.append(multiversx_sdk_cli.cli_delegation.setup_parser(args, subparsers))
     commands.append(multiversx_sdk_cli.cli_dns.setup_parser(args, subparsers))
     commands.append(multiversx_sdk_cli.cli_faucet.setup_parser(args, subparsers))
+    commands.append(multiversx_sdk_cli.cli_multisig.setup_parser(args, subparsers))
+    commands.append(multiversx_sdk_cli.cli_governance.setup_parser(args, subparsers))
     commands.append(multiversx_sdk_cli.cli_env.setup_parser(subparsers))
     commands.append(multiversx_sdk_cli.cli_get.setup_parser(subparsers))
 

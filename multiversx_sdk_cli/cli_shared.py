@@ -14,6 +14,9 @@ from multiversx_sdk import (
     ApiNetworkProvider,
     LedgerAccount,
     ProxyNetworkProvider,
+    Token,
+    TokenComputer,
+    TokenTransfer,
     Transaction,
 )
 
@@ -41,6 +44,7 @@ from multiversx_sdk_cli.errors import (
     BadUsage,
     IncorrectWalletError,
     InvalidAddressConfigValue,
+    LedgerError,
     NoWalletProvided,
     UnknownAddressAliasError,
 )
@@ -141,7 +145,7 @@ def add_tx_args(
     )
     sub.add_argument("--gas-limit", required=False, type=int, help="⛽ the gas limit")
 
-    sub.add_argument("--value", default="0", type=int, help="the value to transfer (default: %(default)s)")
+    sub.add_argument("--value", default=0, type=int, help="the value to transfer (default: %(default)s)")
 
     if with_data:
         sub.add_argument(
@@ -296,6 +300,48 @@ def add_token_transfers_args(sub: Any):
     )
 
 
+def add_metadata_arg(sub: Any):
+    sub.add_argument(
+        "--metadata-not-upgradeable",
+        dest="metadata_upgradeable",
+        action="store_false",
+        help="‼ mark the contract as NOT upgradeable (default: upgradeable)",
+    )
+    sub.add_argument(
+        "--metadata-not-readable",
+        dest="metadata_readable",
+        action="store_false",
+        help="‼ mark the contract as NOT readable (default: readable)",
+    )
+    sub.add_argument(
+        "--metadata-payable",
+        dest="metadata_payable",
+        action="store_true",
+        help="‼ mark the contract as payable (default: not payable)",
+    )
+    sub.add_argument(
+        "--metadata-payable-by-sc",
+        dest="metadata_payable_by_sc",
+        action="store_true",
+        help="‼ mark the contract as payable by SC (default: not payable by SC)",
+    )
+    sub.set_defaults(metadata_upgradeable=True, metadata_payable=False)
+
+
+def add_wait_result_and_timeout_args(sub: Any):
+    sub.add_argument(
+        "--wait-result",
+        action="store_true",
+        default=False,
+        help="signal to wait for the transaction result - only valid if --send is set",
+    )
+    sub.add_argument(
+        "--timeout",
+        default=100,
+        help="max num of seconds to wait for result" " - only valid if --wait-result is set",
+    )
+
+
 def parse_omit_fields_arg(args: Any) -> list[str]:
     literal = args.omit_fields
     parsed = ast.literal_eval(literal)
@@ -318,7 +364,10 @@ def prepare_account(args: Any):
             hrp=hrp,
         )
     elif args.ledger:
-        return LedgerAccount(address_index=args.sender_wallet_index)
+        try:
+            return LedgerAccount(address_index=args.sender_wallet_index)
+        except Exception as e:
+            raise LedgerError(str(e))
     elif args.sender:
         file_path = resolve_address_config_path()
         if not file_path.is_file():
@@ -430,7 +479,10 @@ def load_guardian_account(args: Any) -> Union[IAccount, None]:
             hrp=hrp,
         )
     elif args.guardian_ledger:
-        return LedgerAccount(address_index=args.guardian_wallet_index)
+        try:
+            return LedgerAccount(address_index=args.guardian_wallet_index)
+        except Exception as e:
+            raise LedgerError(str(e))
 
     return None
 
@@ -561,7 +613,10 @@ def load_relayer_account(args: Any) -> Union[IAccount, None]:
             hrp=hrp,
         )
     elif args.relayer_ledger:
-        return LedgerAccount(address_index=args.relayer_wallet_index)
+        try:
+            return LedgerAccount(address_index=args.relayer_wallet_index)
+        except Exception as e:
+            raise LedgerError(str(e))
 
     return None
 
@@ -624,16 +679,15 @@ def send_or_simulate(tx: Transaction, args: Any, dump_output: bool = True) -> CL
     output_builder.set_emitted_transaction(tx)
     outfile = args.outfile if hasattr(args, "outfile") else None
 
-    cli_config = MxpyEnv.from_active_env()
     hash = b""
     try:
         if send_wait_result:
-            _confirm_continuation_if_required(cli_config, tx)
+            _confirm_continuation_if_required(tx)
 
             transaction_on_network = send_and_wait_for_result(tx, proxy, args.timeout)
             output_builder.set_awaited_transaction(transaction_on_network)
         elif send_only:
-            _confirm_continuation_if_required(cli_config, tx)
+            _confirm_continuation_if_required(tx)
 
             hash = proxy.send_transaction(tx)
             output_builder.set_emitted_transaction_hash(hash.hex())
@@ -647,6 +701,7 @@ def send_or_simulate(tx: Transaction, args: Any, dump_output: bool = True) -> CL
             utils.dump_out_json(output_transaction, outfile=outfile)
 
         if send_only and hash:
+            cli_config = MxpyEnv.from_active_env()
             log_explorer_transaction(
                 chain=output_transaction["emittedTransaction"]["chainID"],
                 transaction_hash=output_transaction["emittedTransactionHash"],
@@ -656,7 +711,9 @@ def send_or_simulate(tx: Transaction, args: Any, dump_output: bool = True) -> CL
     return output_builder
 
 
-def _confirm_continuation_if_required(env: MxpyEnv, tx: Transaction) -> None:
+def _confirm_continuation_if_required(tx: Transaction) -> None:
+    env = MxpyEnv.from_active_env()
+
     if env.ask_confirmation:
         transaction = tx.to_dictionary()
 
@@ -705,12 +762,34 @@ def prepare_guardian_relayer_data(args: Any) -> GuardianRelayerData:
     )
 
 
-def set_proxy_from_config_if_not_provided(args: Any, env: MxpyEnv) -> None:
+def prepare_token_transfers(transfers: list[str]) -> list[TokenTransfer]:
+    """Converts a list of token transfers as received from the CLI to a list of TokenTransfer objects."""
+    token_computer = TokenComputer()
+    token_transfers: list[TokenTransfer] = []
+
+    for i in range(0, len(transfers) - 1, 2):
+        extended_identifier = transfers[i]
+        amount = int(transfers[i + 1])
+        nonce = token_computer.extract_nonce_from_extended_identifier(extended_identifier)
+        identifier = token_computer.extract_identifier_from_extended_identifier(extended_identifier)
+
+        token = Token(identifier, nonce)
+        transfer = TokenTransfer(token, amount)
+        token_transfers.append(transfer)
+
+    return token_transfers
+
+
+def set_proxy_from_config_if_not_provided(args: Any) -> None:
     """This function modifies the `args` object by setting the proxy from the config if not already set. If proxy is not needed (chainID and nonce are provided), the proxy will not be set."""
+    if not hasattr(args, "proxy"):
+        return
+
     if not args.proxy:
-        if hasattr(args, "chain") and args.chain and hasattr(args, "nonce") and args.nonce:
+        if hasattr(args, "chain") and args.chain and hasattr(args, "nonce") and args.nonce is not None:
             return
 
+        env = MxpyEnv.from_active_env()
         if env.proxy_url:
             logger.info(f"Using proxy URL from config: {env.proxy_url}")
             args.proxy = env.proxy_url

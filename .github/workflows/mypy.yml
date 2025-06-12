@@ -1,5 +1,9 @@
 name: mypy reviewdog check
 on: [pull_request]
+
+permissions:
+  contents: read
+
 jobs:
   mypy:
     name: runner / mypy

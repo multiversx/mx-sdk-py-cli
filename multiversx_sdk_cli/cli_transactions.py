@@ -2,14 +2,7 @@ import logging
 from pathlib import Path
 from typing import Any
 
-from multiversx_sdk import (
-    Address,
-    ProxyNetworkProvider,
-    Token,
-    TokenComputer,
-    TokenTransfer,
-    TransactionComputer,
-)
+from multiversx_sdk import Address, ProxyNetworkProvider, TransactionComputer
 
 from multiversx_sdk_cli import cli_shared, utils
 from multiversx_sdk_cli.args_validation import (
@@ -23,7 +16,6 @@ from multiversx_sdk_cli.args_validation import (
 from multiversx_sdk_cli.base_transactions_controller import BaseTransactionsController
 from multiversx_sdk_cli.cli_output import CLIOutputBuilder
 from multiversx_sdk_cli.config import get_config_for_network_providers
-from multiversx_sdk_cli.env import MxpyEnv
 from multiversx_sdk_cli.errors import BadUsage, IncorrectWalletError, NoWalletProvided
 from multiversx_sdk_cli.transactions import (
     TransactionsController,
@@ -51,17 +43,7 @@ def setup_parser(args: list[str], subparsers: Any) -> Any:
     cli_shared.add_guardian_wallet_args(args, sub)
     cli_shared.add_relayed_v3_wallet_args(args, sub)
 
-    sub.add_argument(
-        "--wait-result",
-        action="store_true",
-        default=False,
-        help="signal to wait for the transaction result - only valid if --send is set",
-    )
-    sub.add_argument(
-        "--timeout",
-        default=100,
-        help="max num of seconds to wait for result" " - only valid if --wait-result is set",
-    )
+    cli_shared.add_wait_result_and_timeout_args(sub)
     sub.set_defaults(func=create_transaction)
 
     sub = cli_shared.add_command_subparser(
@@ -114,9 +96,6 @@ def _add_common_arguments(args: list[str], sub: Any):
 
 
 def create_transaction(args: Any):
-    cli_config = MxpyEnv.from_active_env()
-    cli_shared.set_proxy_from_config_if_not_provided(args, cli_config)
-
     validate_nonce_args(args)
     validate_receiver_args(args)
     validate_broadcast_args(args)
@@ -135,7 +114,7 @@ def create_transaction(args: Any):
     gas_limit = int(args.gas_limit) if args.gas_limit else 0
 
     transfers = getattr(args, "token_transfers", None)
-    transfers = prepare_token_transfers(transfers) if transfers else None
+    transfers = cli_shared.prepare_token_transfers(transfers) if transfers else None
 
     chain_id = cli_shared.get_chain_id(args.proxy, args.chain)
     tx_controller = TransactionsController(chain_id)
@@ -157,26 +136,7 @@ def create_transaction(args: Any):
     cli_shared.send_or_simulate(tx, args)
 
 
-def prepare_token_transfers(transfers: list[Any]) -> list[TokenTransfer]:
-    token_computer = TokenComputer()
-    token_transfers: list[TokenTransfer] = []
-
-    for i in range(0, len(transfers) - 1, 2):
-        identifier = transfers[i]
-        amount = int(transfers[i + 1])
-        nonce = token_computer.extract_nonce_from_extended_identifier(identifier)
-
-        token = Token(identifier, nonce)
-        transfer = TokenTransfer(token, amount)
-        token_transfers.append(transfer)
-
-    return token_transfers
-
-
 def send_transaction(args: Any):
-    cli_config = MxpyEnv.from_active_env()
-    cli_shared.set_proxy_from_config_if_not_provided(args, cli_config)
-
     validate_proxy_argument(args)
 
     tx = load_transaction_from_file(args.infile)
@@ -186,7 +146,7 @@ def send_transaction(args: Any):
     proxy = ProxyNetworkProvider(url=args.proxy, config=config)
 
     try:
-        cli_shared._confirm_continuation_if_required(cli_config, tx)
+        cli_shared._confirm_continuation_if_required(tx)
 
         tx_hash = proxy.send_transaction(tx)
         output.set_emitted_transaction_hash(tx_hash.hex())
@@ -196,9 +156,6 @@ def send_transaction(args: Any):
 
 
 def sign_transaction(args: Any):
-    cli_config = MxpyEnv.from_active_env()
-    cli_shared.set_proxy_from_config_if_not_provided(args, cli_config)
-
     validate_broadcast_args(args)
 
     tx = load_transaction_from_file(args.infile)
@@ -238,9 +195,6 @@ def sign_transaction(args: Any):
 
 
 def relay_transaction(args: Any):
-    cli_config = MxpyEnv.from_active_env()
-    cli_shared.set_proxy_from_config_if_not_provided(args, cli_config)
-
     ensure_relayer_wallet_args_are_provided(args)
     validate_broadcast_args(args)
 

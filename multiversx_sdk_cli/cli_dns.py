@@ -17,7 +17,6 @@ from multiversx_sdk_cli.dns import (
     validate_name,
     version,
 )
-from multiversx_sdk_cli.env import MxpyEnv
 from multiversx_sdk_cli.errors import ArgumentsNotProvidedError
 
 
@@ -137,9 +136,6 @@ def _ensure_proxy_is_provided(args: Any):
 
 
 def dns_resolve(args: Any):
-    cli_config = MxpyEnv.from_active_env()
-    cli_shared.set_proxy_from_config_if_not_provided(args, cli_config)
-
     _ensure_proxy_is_provided(args)
 
     config = get_config_for_network_providers()
@@ -149,9 +145,6 @@ def dns_resolve(args: Any):
 
 
 def dns_validate_name(args: Any):
-    cli_config = MxpyEnv.from_active_env()
-    cli_shared.set_proxy_from_config_if_not_provided(args, cli_config)
-
     _ensure_proxy_is_provided(args)
 
     config = get_config_for_network_providers()
@@ -175,9 +168,6 @@ def get_dns_address_for_name_hex(args: Any):
 
 
 def get_registration_cost(args: Any):
-    cli_config = MxpyEnv.from_active_env()
-    cli_shared.set_proxy_from_config_if_not_provided(args, cli_config)
-
     _ensure_proxy_is_provided(args)
 
     config = get_config_for_network_providers()
@@ -185,9 +175,6 @@ def get_registration_cost(args: Any):
 
 
 def get_version(args: Any):
-    cli_config = MxpyEnv.from_active_env()
-    cli_shared.set_proxy_from_config_if_not_provided(args, cli_config)
-
     _ensure_proxy_is_provided(args)
 
     config = get_config_for_network_providers()
