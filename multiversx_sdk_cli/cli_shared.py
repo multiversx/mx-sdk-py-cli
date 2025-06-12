@@ -126,12 +126,6 @@ def add_tx_args(
             default=None,
             help="# the nonce for the transaction. If not provided, is fetched from the network.",
         )
-        sub.add_argument(
-            "--recall-nonce",
-            action="store_true",
-            default=False,
-            help="⭮ whether to recall the nonce when creating the transaction (default: %(default)s). This argument is OBSOLETE.",
-        )
 
     if with_receiver:
         sub.add_argument("--receiver", required=False, help="🖄 the address of the receiver")
