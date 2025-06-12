@@ -404,10 +404,10 @@ def _load_wallet_from_address_config(wallet: dict[str, str], hrp: str) -> Accoun
     if kind not in ["pem", "keystore"]:
         raise InvalidAddressConfigValue("'kind' must be 'pem' or 'keystore'")
 
-    path = wallet.get("path", None)
-    if not path:
+    wallet_path = wallet.get("path", None)
+    if not wallet_path:
         raise AddressConfigFileError("'path' field must be set in the address config")
-    path = Path(path)
+    path = Path(wallet_path)
 
     index = int(wallet.get("index", 0))
 
