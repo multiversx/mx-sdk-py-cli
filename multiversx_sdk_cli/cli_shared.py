@@ -1,9 +1,12 @@
 import argparse
 import ast
+import base64
+import logging
 import sys
 from argparse import FileType
+from functools import cache
 from pathlib import Path
-from typing import Any, Text, Union, cast
+from typing import Any, Optional, Text, Union, cast
 
 from multiversx_sdk import (
     Account,
@@ -29,6 +32,7 @@ from multiversx_sdk_cli.constants import (
     DEFAULT_TX_VERSION,
     TCS_SERVICE_ID,
 )
+from multiversx_sdk_cli.env import MxpyEnv, get_address_hrp
 from multiversx_sdk_cli.errors import (
     ArgumentsNotProvidedError,
     BadUsage,
@@ -40,7 +44,10 @@ from multiversx_sdk_cli.interfaces import IAccount
 from multiversx_sdk_cli.simulation import Simulator
 from multiversx_sdk_cli.transactions import send_and_wait_for_result
 from multiversx_sdk_cli.utils import log_explorer_transaction
-from multiversx_sdk_cli.ux import show_warning
+from multiversx_sdk_cli.ux import confirm_continuation
+
+logger = logging.getLogger("cli_shared")
+
 
 trusted_cosigner_service_url_by_chain_id = {
     "1": "https://tools.multiversx.com/guardian",
@@ -371,7 +378,7 @@ def _get_address_hrp(args: Any) -> str:
     if hrp:
         return hrp
 
-    return config.get_address_hrp()
+    return get_address_hrp()
 
 
 def _get_hrp_from_proxy(args: Any) -> str:
@@ -557,22 +564,16 @@ def get_current_nonce_for_address(address: Address, proxy_url: Union[str, None])
     return proxy.get_account(address).nonce
 
 
-def get_chain_id(chain_id: str, proxy_url: str) -> str:
-    if chain_id and proxy_url:
-        fetched_chain_id = _fetch_chain_id(proxy_url)
-
-        if chain_id != fetched_chain_id:
-            show_warning(
-                f"The chain ID you have provided does not match the chain ID you got from the proxy. Will use the proxy's value: '{fetched_chain_id}'"
-            )
-        return fetched_chain_id
-
+@cache
+def get_chain_id(proxy_url: str, chain_id: Optional[str] = None) -> str:
+    """We know and have already validated that if chainID is not provided, proxy is provided."""
     if chain_id:
         return chain_id
 
     return _fetch_chain_id(proxy_url)
 
 
+@cache
 def _fetch_chain_id(proxy_url: str) -> str:
     network_provider_config = config.get_config_for_network_providers()
     proxy = ProxyNetworkProvider(url=proxy_url, config=network_provider_config)
@@ -612,11 +613,16 @@ def send_or_simulate(tx: Transaction, args: Any, dump_output: bool = True) -> CL
     output_builder.set_emitted_transaction(tx)
     outfile = args.outfile if hasattr(args, "outfile") else None
 
+    hash = b""
     try:
         if send_wait_result:
+            _confirm_continuation_if_required(tx)
+
             transaction_on_network = send_and_wait_for_result(tx, proxy, args.timeout)
             output_builder.set_awaited_transaction(transaction_on_network)
         elif send_only:
+            _confirm_continuation_if_required(tx)
+
             hash = proxy.send_transaction(tx)
             output_builder.set_emitted_transaction_hash(hash.hex())
         elif simulate:
@@ -628,13 +634,29 @@ def send_or_simulate(tx: Transaction, args: Any, dump_output: bool = True) -> CL
         if dump_output:
             utils.dump_out_json(output_transaction, outfile=outfile)
 
-        if send_only:
+        if send_only and hash:
+            cli_config = MxpyEnv.from_active_env()
             log_explorer_transaction(
                 chain=output_transaction["emittedTransaction"]["chainID"],
                 transaction_hash=output_transaction["emittedTransactionHash"],
+                explorer_url=cli_config.explorer_url,
             )
 
     return output_builder
+
+
+def _confirm_continuation_if_required(tx: Transaction) -> None:
+    env = MxpyEnv.from_active_env()
+
+    if env.ask_confirmation:
+        transaction = tx.to_dictionary()
+
+        # decode the data field from base64 if it exists
+        data = base64.b64decode(transaction.get("data", "")).decode()
+        transaction["data"] = data if data else ""
+
+        utils.dump_out_json(transaction)
+        confirm_continuation("You are about to send the above transaction. Do you want to continue?")
 
 
 def prepare_sender(args: Any):
@@ -690,3 +712,18 @@ def prepare_token_transfers(transfers: list[str]) -> list[TokenTransfer]:
         token_transfers.append(transfer)
 
     return token_transfers
+
+
+def set_proxy_from_config_if_not_provided(args: Any) -> None:
+    """This function modifies the `args` object by setting the proxy from the config if not already set. If proxy is not needed (chainID and nonce are provided), the proxy will not be set."""
+    if not hasattr(args, "proxy"):
+        return
+
+    if not args.proxy:
+        if hasattr(args, "chain") and args.chain and hasattr(args, "nonce") and args.nonce is not None:
+            return
+
+        env = MxpyEnv.from_active_env()
+        if env.proxy_url:
+            logger.info(f"Using proxy URL from config: {env.proxy_url}")
+            args.proxy = env.proxy_url

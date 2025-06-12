@@ -15,6 +15,7 @@ import multiversx_sdk_cli.cli_data
 import multiversx_sdk_cli.cli_delegation
 import multiversx_sdk_cli.cli_deps
 import multiversx_sdk_cli.cli_dns
+import multiversx_sdk_cli.cli_env
 import multiversx_sdk_cli.cli_faucet
 import multiversx_sdk_cli.cli_governance
 import multiversx_sdk_cli.cli_ledger
@@ -26,6 +27,8 @@ import multiversx_sdk_cli.cli_validators
 import multiversx_sdk_cli.cli_wallet
 import multiversx_sdk_cli.version
 from multiversx_sdk_cli import config, errors, utils, ux
+from multiversx_sdk_cli.cli_shared import set_proxy_from_config_if_not_provided
+from multiversx_sdk_cli.env import get_address_hrp
 
 logger = logging.getLogger("cli")
 
@@ -45,10 +48,11 @@ def main(cli_args: list[str] = sys.argv[1:]):
 
 def _do_main(cli_args: list[str]):
     utils.ensure_folder(config.SDK_PATH)
-    argv_with_config_args = config.add_config_args(cli_args)
-    parser = setup_parser(argv_with_config_args)
+    parser = setup_parser(cli_args)
     argcomplete.autocomplete(parser)
-    args = parser.parse_args(argv_with_config_args)
+
+    _handle_verbose_argument(cli_args)
+    args = parser.parse_args(cli_args)
 
     if args.verbose:
         logging.basicConfig(
@@ -65,7 +69,7 @@ def _do_main(cli_args: list[str]):
         )
 
     verify_deprecated_entries_in_config_file()
-    default_hrp = config.get_address_hrp()
+    default_hrp = get_address_hrp()
     LibraryConfig.default_address_hrp = default_hrp
 
     if hasattr(args, "recall_nonce") and args.recall_nonce:
@@ -74,6 +78,7 @@ def _do_main(cli_args: list[str]):
     if not hasattr(args, "func"):
         parser.print_help()
     else:
+        set_proxy_from_config_if_not_provided(args)
         args.func(args)
 
 
@@ -126,6 +131,7 @@ See:
     commands.append(multiversx_sdk_cli.cli_faucet.setup_parser(args, subparsers))
     commands.append(multiversx_sdk_cli.cli_multisig.setup_parser(args, subparsers))
     commands.append(multiversx_sdk_cli.cli_governance.setup_parser(args, subparsers))
+    commands.append(multiversx_sdk_cli.cli_env.setup_parser(subparsers))
 
     parser.epilog = """
 ----------------------
@@ -149,6 +155,13 @@ def verify_deprecated_entries_in_config_file():
         message += f"-> {entry} \n"
 
     ux.show_warning(message.rstrip("\n"))
+
+
+def _handle_verbose_argument(args: list[str]):
+    verbose_arg = "--verbose"
+    if verbose_arg in args:
+        args.remove(verbose_arg)
+        args.insert(0, verbose_arg)
 
 
 if __name__ == "__main__":

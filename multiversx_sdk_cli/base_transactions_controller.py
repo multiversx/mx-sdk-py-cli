@@ -10,7 +10,6 @@ from multiversx_sdk.abi import (
     StringValue,
 )
 
-from multiversx_sdk_cli.config import get_address_hrp
 from multiversx_sdk_cli.constants import (
     ADDRESS_PREFIX,
     EXTRA_GAS_LIMIT_FOR_GUARDED_TRANSACTIONS,
@@ -22,6 +21,7 @@ from multiversx_sdk_cli.constants import (
     TRUE_STR_LOWER,
 )
 from multiversx_sdk_cli.cosign_transaction import cosign_transaction
+from multiversx_sdk_cli.env import get_address_hrp
 from multiversx_sdk_cli.errors import BadUserInput, TransactionSigningError
 from multiversx_sdk_cli.guardian_relayer_data import GuardianRelayerData
 from multiversx_sdk_cli.interfaces import IAccount

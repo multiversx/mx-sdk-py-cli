@@ -30,6 +30,7 @@ from multiversx_sdk_cli.constants import NUMBER_OF_SHARDS
 from multiversx_sdk_cli.contract_verification import trigger_contract_verification
 from multiversx_sdk_cli.contracts import SmartContract
 from multiversx_sdk_cli.docker import is_docker_installed, run_docker
+from multiversx_sdk_cli.env import MxpyEnv
 from multiversx_sdk_cli.errors import DockerMissingError
 from multiversx_sdk_cli.ux import show_warning
 
@@ -311,7 +312,7 @@ def build(args: Any):
 
 The primary tool for building smart contracts is `sc-meta`.
 To install `sc-meta` check out the documentation: https://docs.multiversx.com/sdk-and-tools/troubleshooting/rust-setup.
-After installing, use the `sc-meta all build` command. To lear more about `sc-meta`, check out this page: https://docs.multiversx.com/developers/meta/sc-meta-cli/#calling-build."""
+After installing, use the `sc-meta all build` command. To learn more about `sc-meta`, check out this page: https://docs.multiversx.com/developers/meta/sc-meta-cli/#calling-build."""
     show_warning(message)
 
 
@@ -329,7 +330,7 @@ def deploy(args: Any):
         args=args,
     )
 
-    chain_id = cli_shared.get_chain_id(args.chain, args.proxy)
+    chain_id = cli_shared.get_chain_id(args.proxy, args.chain)
     config = TransactionsFactoryConfig(chain_id)
 
     abi = Abi.load(Path(args.abi)) if args.abi else None
@@ -359,7 +360,9 @@ def deploy(args: Any):
     contract_address = address_computer.compute_contract_address(deployer=sender.address, deployment_nonce=tx.nonce)
 
     logger.info("Contract address: %s", contract_address.to_bech32())
-    utils.log_explorer_contract_address(args.chain, contract_address.to_bech32())
+
+    cli_config = MxpyEnv.from_active_env()
+    utils.log_explorer_contract_address(args.chain, contract_address.to_bech32(), cli_config.explorer_url)
 
     _send_or_simulate(tx, contract_address, args)
 
@@ -378,7 +381,7 @@ def call(args: Any):
         args=args,
     )
 
-    chain_id = cli_shared.get_chain_id(args.chain, args.proxy)
+    chain_id = cli_shared.get_chain_id(args.proxy, args.chain)
     config = TransactionsFactoryConfig(chain_id)
 
     abi = Abi.load(Path(args.abi)) if args.abi else None
@@ -424,7 +427,7 @@ def upgrade(args: Any):
         args=args,
     )
 
-    chain_id = cli_shared.get_chain_id(args.chain, args.proxy)
+    chain_id = cli_shared.get_chain_id(args.proxy, args.chain)
     config = TransactionsFactoryConfig(chain_id)
 
     abi = Abi.load(Path(args.abi)) if args.abi else None

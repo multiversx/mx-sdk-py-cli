@@ -654,13 +654,16 @@ def _add_common_args(args: Any, sub: Any, with_contract_arg: bool = True, with_r
     cli_shared.add_wait_result_and_timeout_args(sub)
 
 
-def deploy(args: Any):
-    logger.debug("multisig.deploy")
-
+def _ensure_args(args: Any):
     validate_transaction_args(args)
     ensure_wallet_args_are_provided(args)
     validate_broadcast_args(args)
     validate_chain_id_args(args)
+
+
+def deploy(args: Any):
+    logger.debug("multisig.deploy")
+    _ensure_args(args)
 
     sender = cli_shared.prepare_sender(args)
     guardian_and_relayer_data = cli_shared.get_guardian_and_relayer_data(
@@ -672,7 +675,7 @@ def deploy(args: Any):
     quorum = args.quorum
     board_members = [Address.new_from_bech32(addr) for addr in args.board_members]
 
-    chain_id = cli_shared.get_chain_id(args.chain, args.proxy)
+    chain_id = cli_shared.get_chain_id(args.proxy, args.chain)
     multisig = MultisigWrapper(TransactionsFactoryConfig(chain_id), abi)
 
     tx = multisig.prepare_deploy_transaction(
@@ -702,10 +705,7 @@ def deploy(args: Any):
 
 
 def deposit(args: Any):
-    validate_transaction_args(args)
-    ensure_wallet_args_are_provided(args)
-    validate_broadcast_args(args)
-    validate_chain_id_args(args)
+    _ensure_args(args)
 
     sender = cli_shared.prepare_sender(args)
     guardian_and_relayer_data = cli_shared.get_guardian_and_relayer_data(
@@ -714,7 +714,7 @@ def deposit(args: Any):
     )
 
     abi = Abi.load(Path(args.abi))
-    chain_id = cli_shared.get_chain_id(args.chain, args.proxy)
+    chain_id = cli_shared.get_chain_id(args.proxy, args.chain)
     multisig = MultisigWrapper(TransactionsFactoryConfig(chain_id), abi)
 
     contract = Address.new_from_bech32(args.contract)
@@ -741,10 +741,7 @@ def deposit(args: Any):
 
 
 def discard_action(args: Any):
-    validate_transaction_args(args)
-    ensure_wallet_args_are_provided(args)
-    validate_broadcast_args(args)
-    validate_chain_id_args(args)
+    _ensure_args(args)
 
     sender = cli_shared.prepare_sender(args)
     guardian_and_relayer_data = cli_shared.get_guardian_and_relayer_data(
@@ -753,7 +750,7 @@ def discard_action(args: Any):
     )
 
     abi = Abi.load(Path(args.abi))
-    chain_id = cli_shared.get_chain_id(args.chain, args.proxy)
+    chain_id = cli_shared.get_chain_id(args.proxy, args.chain)
     multisig = MultisigWrapper(TransactionsFactoryConfig(chain_id), abi)
 
     contract = Address.new_from_bech32(args.contract)
@@ -775,10 +772,7 @@ def discard_action(args: Any):
 
 
 def discard_batch(args: Any):
-    validate_transaction_args(args)
-    ensure_wallet_args_are_provided(args)
-    validate_broadcast_args(args)
-    validate_chain_id_args(args)
+    _ensure_args(args)
 
     sender = cli_shared.prepare_sender(args)
     guardian_and_relayer_data = cli_shared.get_guardian_and_relayer_data(
@@ -787,7 +781,7 @@ def discard_batch(args: Any):
     )
 
     abi = Abi.load(Path(args.abi))
-    chain_id = cli_shared.get_chain_id(args.chain, args.proxy)
+    chain_id = cli_shared.get_chain_id(args.proxy, args.chain)
     multisig = MultisigWrapper(TransactionsFactoryConfig(chain_id), abi)
 
     contract = Address.new_from_bech32(args.contract)
@@ -809,10 +803,7 @@ def discard_batch(args: Any):
 
 
 def add_board_member(args: Any):
-    validate_transaction_args(args)
-    ensure_wallet_args_are_provided(args)
-    validate_broadcast_args(args)
-    validate_chain_id_args(args)
+    _ensure_args(args)
 
     sender = cli_shared.prepare_sender(args)
     guardian_and_relayer_data = cli_shared.get_guardian_and_relayer_data(
@@ -821,7 +812,7 @@ def add_board_member(args: Any):
     )
 
     abi = Abi.load(Path(args.abi))
-    chain_id = cli_shared.get_chain_id(args.chain, args.proxy)
+    chain_id = cli_shared.get_chain_id(args.proxy, args.chain)
     multisig = MultisigWrapper(TransactionsFactoryConfig(chain_id), abi)
 
     contract = Address.new_from_bech32(args.contract)
@@ -843,10 +834,7 @@ def add_board_member(args: Any):
 
 
 def add_proposer(args: Any):
-    validate_transaction_args(args)
-    ensure_wallet_args_are_provided(args)
-    validate_broadcast_args(args)
-    validate_chain_id_args(args)
+    _ensure_args(args)
 
     sender = cli_shared.prepare_sender(args)
     guardian_and_relayer_data = cli_shared.get_guardian_and_relayer_data(
@@ -855,7 +843,7 @@ def add_proposer(args: Any):
     )
 
     abi = Abi.load(Path(args.abi))
-    chain_id = cli_shared.get_chain_id(args.chain, args.proxy)
+    chain_id = cli_shared.get_chain_id(args.proxy, args.chain)
     multisig = MultisigWrapper(TransactionsFactoryConfig(chain_id), abi)
 
     contract = Address.new_from_bech32(args.contract)
@@ -877,10 +865,7 @@ def add_proposer(args: Any):
 
 
 def remove_user(args: Any):
-    validate_transaction_args(args)
-    ensure_wallet_args_are_provided(args)
-    validate_broadcast_args(args)
-    validate_chain_id_args(args)
+    _ensure_args(args)
 
     sender = cli_shared.prepare_sender(args)
     guardian_and_relayer_data = cli_shared.get_guardian_and_relayer_data(
@@ -889,7 +874,7 @@ def remove_user(args: Any):
     )
 
     abi = Abi.load(Path(args.abi))
-    chain_id = cli_shared.get_chain_id(args.chain, args.proxy)
+    chain_id = cli_shared.get_chain_id(args.proxy, args.chain)
     multisig = MultisigWrapper(TransactionsFactoryConfig(chain_id), abi)
 
     contract = Address.new_from_bech32(args.contract)
@@ -911,10 +896,7 @@ def remove_user(args: Any):
 
 
 def change_quorum(args: Any):
-    validate_transaction_args(args)
-    ensure_wallet_args_are_provided(args)
-    validate_broadcast_args(args)
-    validate_chain_id_args(args)
+    _ensure_args(args)
 
     sender = cli_shared.prepare_sender(args)
     guardian_and_relayer_data = cli_shared.get_guardian_and_relayer_data(
@@ -923,7 +905,7 @@ def change_quorum(args: Any):
     )
 
     abi = Abi.load(Path(args.abi))
-    chain_id = cli_shared.get_chain_id(args.chain, args.proxy)
+    chain_id = cli_shared.get_chain_id(args.proxy, args.chain)
     multisig = MultisigWrapper(TransactionsFactoryConfig(chain_id), abi)
 
     contract = Address.new_from_bech32(args.contract)
@@ -945,10 +927,7 @@ def change_quorum(args: Any):
 
 
 def transfer_and_execute(args: Any):
-    validate_transaction_args(args)
-    ensure_wallet_args_are_provided(args)
-    validate_broadcast_args(args)
-    validate_chain_id_args(args)
+    _ensure_args(args)
 
     sender = cli_shared.prepare_sender(args)
     guardian_and_relayer_data = cli_shared.get_guardian_and_relayer_data(
@@ -957,7 +936,7 @@ def transfer_and_execute(args: Any):
     )
 
     abi = Abi.load(Path(args.abi))
-    chain_id = cli_shared.get_chain_id(args.chain, args.proxy)
+    chain_id = cli_shared.get_chain_id(args.proxy, args.chain)
     multisig = MultisigWrapper(TransactionsFactoryConfig(chain_id), abi)
 
     contract = Address.new_from_bech32(args.contract)
@@ -990,10 +969,7 @@ def transfer_and_execute(args: Any):
 
 
 def transfer_and_execute_esdt(args: Any):
-    validate_transaction_args(args)
-    ensure_wallet_args_are_provided(args)
-    validate_broadcast_args(args)
-    validate_chain_id_args(args)
+    _ensure_args(args)
 
     if int(args.value) != 0:
         raise Exception("Native token transfer is not allowed for this command.")
@@ -1008,7 +984,7 @@ def transfer_and_execute_esdt(args: Any):
     )
 
     abi = Abi.load(Path(args.abi))
-    chain_id = cli_shared.get_chain_id(args.chain, args.proxy)
+    chain_id = cli_shared.get_chain_id(args.proxy, args.chain)
     multisig = MultisigWrapper(TransactionsFactoryConfig(chain_id), abi)
 
     contract = Address.new_from_bech32(args.contract)
@@ -1042,10 +1018,7 @@ def transfer_and_execute_esdt(args: Any):
 
 
 def async_call(args: Any):
-    validate_transaction_args(args)
-    ensure_wallet_args_are_provided(args)
-    validate_broadcast_args(args)
-    validate_chain_id_args(args)
+    _ensure_args(args)
 
     sender = cli_shared.prepare_sender(args)
     guardian_and_relayer_data = cli_shared.get_guardian_and_relayer_data(
@@ -1054,7 +1027,7 @@ def async_call(args: Any):
     )
 
     abi = Abi.load(Path(args.abi))
-    chain_id = cli_shared.get_chain_id(args.chain, args.proxy)
+    chain_id = cli_shared.get_chain_id(args.proxy, args.chain)
     multisig = MultisigWrapper(TransactionsFactoryConfig(chain_id), abi)
 
     contract = Address.new_from_bech32(args.contract)
@@ -1092,10 +1065,7 @@ def async_call(args: Any):
 
 
 def deploy_from_source(args: Any):
-    validate_transaction_args(args)
-    ensure_wallet_args_are_provided(args)
-    validate_broadcast_args(args)
-    validate_chain_id_args(args)
+    _ensure_args(args)
 
     sender = cli_shared.prepare_sender(args)
     guardian_and_relayer_data = cli_shared.get_guardian_and_relayer_data(
@@ -1104,7 +1074,7 @@ def deploy_from_source(args: Any):
     )
 
     abi = Abi.load(Path(args.abi))
-    chain_id = cli_shared.get_chain_id(args.chain, args.proxy)
+    chain_id = cli_shared.get_chain_id(args.proxy, args.chain)
     multisig = MultisigWrapper(TransactionsFactoryConfig(chain_id), abi)
 
     contract = Address.new_from_bech32(args.contract)
@@ -1137,10 +1107,7 @@ def deploy_from_source(args: Any):
 
 
 def upgrade_from_source(args: Any):
-    validate_transaction_args(args)
-    ensure_wallet_args_are_provided(args)
-    validate_broadcast_args(args)
-    validate_chain_id_args(args)
+    _ensure_args(args)
 
     sender = cli_shared.prepare_sender(args)
     guardian_and_relayer_data = cli_shared.get_guardian_and_relayer_data(
@@ -1149,7 +1116,7 @@ def upgrade_from_source(args: Any):
     )
 
     abi = Abi.load(Path(args.abi))
-    chain_id = cli_shared.get_chain_id(args.chain, args.proxy)
+    chain_id = cli_shared.get_chain_id(args.proxy, args.chain)
     multisig = MultisigWrapper(TransactionsFactoryConfig(chain_id), abi)
 
     contract = Address.new_from_bech32(args.contract)
@@ -1184,10 +1151,7 @@ def upgrade_from_source(args: Any):
 
 
 def sign_action(args: Any):
-    validate_transaction_args(args)
-    ensure_wallet_args_are_provided(args)
-    validate_broadcast_args(args)
-    validate_chain_id_args(args)
+    _ensure_args(args)
 
     sender = cli_shared.prepare_sender(args)
     guardian_and_relayer_data = cli_shared.get_guardian_and_relayer_data(
@@ -1196,7 +1160,7 @@ def sign_action(args: Any):
     )
 
     abi = Abi.load(Path(args.abi))
-    chain_id = cli_shared.get_chain_id(args.chain, args.proxy)
+    chain_id = cli_shared.get_chain_id(args.proxy, args.chain)
     multisig = MultisigWrapper(TransactionsFactoryConfig(chain_id), abi)
 
     contract = Address.new_from_bech32(args.contract)
@@ -1218,10 +1182,7 @@ def sign_action(args: Any):
 
 
 def sign_batch(args: Any):
-    validate_transaction_args(args)
-    ensure_wallet_args_are_provided(args)
-    validate_broadcast_args(args)
-    validate_chain_id_args(args)
+    _ensure_args(args)
 
     sender = cli_shared.prepare_sender(args)
     guardian_and_relayer_data = cli_shared.get_guardian_and_relayer_data(
@@ -1230,7 +1191,7 @@ def sign_batch(args: Any):
     )
 
     abi = Abi.load(Path(args.abi))
-    chain_id = cli_shared.get_chain_id(args.chain, args.proxy)
+    chain_id = cli_shared.get_chain_id(args.proxy, args.chain)
     multisig = MultisigWrapper(TransactionsFactoryConfig(chain_id), abi)
 
     contract = Address.new_from_bech32(args.contract)
@@ -1252,10 +1213,7 @@ def sign_batch(args: Any):
 
 
 def sign_and_perform(args: Any):
-    validate_transaction_args(args)
-    ensure_wallet_args_are_provided(args)
-    validate_broadcast_args(args)
-    validate_chain_id_args(args)
+    _ensure_args(args)
 
     sender = cli_shared.prepare_sender(args)
     guardian_and_relayer_data = cli_shared.get_guardian_and_relayer_data(
@@ -1264,7 +1222,7 @@ def sign_and_perform(args: Any):
     )
 
     abi = Abi.load(Path(args.abi))
-    chain_id = cli_shared.get_chain_id(args.chain, args.proxy)
+    chain_id = cli_shared.get_chain_id(args.proxy, args.chain)
     multisig = MultisigWrapper(TransactionsFactoryConfig(chain_id), abi)
 
     contract = Address.new_from_bech32(args.contract)
@@ -1286,10 +1244,7 @@ def sign_and_perform(args: Any):
 
 
 def sign_batch_and_perform(args: Any):
-    validate_transaction_args(args)
-    ensure_wallet_args_are_provided(args)
-    validate_broadcast_args(args)
-    validate_chain_id_args(args)
+    _ensure_args(args)
 
     sender = cli_shared.prepare_sender(args)
     guardian_and_relayer_data = cli_shared.get_guardian_and_relayer_data(
@@ -1298,7 +1253,7 @@ def sign_batch_and_perform(args: Any):
     )
 
     abi = Abi.load(Path(args.abi))
-    chain_id = cli_shared.get_chain_id(args.chain, args.proxy)
+    chain_id = cli_shared.get_chain_id(args.proxy, args.chain)
     multisig = MultisigWrapper(TransactionsFactoryConfig(chain_id), abi)
 
     contract = Address.new_from_bech32(args.contract)
@@ -1320,10 +1275,7 @@ def sign_batch_and_perform(args: Any):
 
 
 def unsign_action(args: Any):
-    validate_transaction_args(args)
-    ensure_wallet_args_are_provided(args)
-    validate_broadcast_args(args)
-    validate_chain_id_args(args)
+    _ensure_args(args)
 
     sender = cli_shared.prepare_sender(args)
     guardian_and_relayer_data = cli_shared.get_guardian_and_relayer_data(
@@ -1332,7 +1284,7 @@ def unsign_action(args: Any):
     )
 
     abi = Abi.load(Path(args.abi))
-    chain_id = cli_shared.get_chain_id(args.chain, args.proxy)
+    chain_id = cli_shared.get_chain_id(args.proxy, args.chain)
     multisig = MultisigWrapper(TransactionsFactoryConfig(chain_id), abi)
 
     contract = Address.new_from_bech32(args.contract)
@@ -1354,10 +1306,7 @@ def unsign_action(args: Any):
 
 
 def unsign_batch(args: Any):
-    validate_transaction_args(args)
-    ensure_wallet_args_are_provided(args)
-    validate_broadcast_args(args)
-    validate_chain_id_args(args)
+    _ensure_args(args)
 
     sender = cli_shared.prepare_sender(args)
     guardian_and_relayer_data = cli_shared.get_guardian_and_relayer_data(
@@ -1366,7 +1315,7 @@ def unsign_batch(args: Any):
     )
 
     abi = Abi.load(Path(args.abi))
-    chain_id = cli_shared.get_chain_id(args.chain, args.proxy)
+    chain_id = cli_shared.get_chain_id(args.proxy, args.chain)
     multisig = MultisigWrapper(TransactionsFactoryConfig(chain_id), abi)
 
     contract = Address.new_from_bech32(args.contract)
@@ -1388,10 +1337,7 @@ def unsign_batch(args: Any):
 
 
 def unsign_for_outdated_board_members(args: Any):
-    validate_transaction_args(args)
-    ensure_wallet_args_are_provided(args)
-    validate_broadcast_args(args)
-    validate_chain_id_args(args)
+    _ensure_args(args)
 
     sender = cli_shared.prepare_sender(args)
     guardian_and_relayer_data = cli_shared.get_guardian_and_relayer_data(
@@ -1400,7 +1346,7 @@ def unsign_for_outdated_board_members(args: Any):
     )
 
     abi = Abi.load(Path(args.abi))
-    chain_id = cli_shared.get_chain_id(args.chain, args.proxy)
+    chain_id = cli_shared.get_chain_id(args.proxy, args.chain)
     multisig = MultisigWrapper(TransactionsFactoryConfig(chain_id), abi)
 
     contract = Address.new_from_bech32(args.contract)
@@ -1423,10 +1369,7 @@ def unsign_for_outdated_board_members(args: Any):
 
 
 def perform_action(args: Any):
-    validate_transaction_args(args)
-    ensure_wallet_args_are_provided(args)
-    validate_broadcast_args(args)
-    validate_chain_id_args(args)
+    _ensure_args(args)
 
     sender = cli_shared.prepare_sender(args)
     guardian_and_relayer_data = cli_shared.get_guardian_and_relayer_data(
@@ -1435,7 +1378,7 @@ def perform_action(args: Any):
     )
 
     abi = Abi.load(Path(args.abi))
-    chain_id = cli_shared.get_chain_id(args.chain, args.proxy)
+    chain_id = cli_shared.get_chain_id(args.proxy, args.chain)
     multisig = MultisigWrapper(TransactionsFactoryConfig(chain_id), abi)
 
     contract = Address.new_from_bech32(args.contract)
@@ -1457,10 +1400,7 @@ def perform_action(args: Any):
 
 
 def perform_batch(args: Any):
-    validate_transaction_args(args)
-    ensure_wallet_args_are_provided(args)
-    validate_broadcast_args(args)
-    validate_chain_id_args(args)
+    _ensure_args(args)
 
     sender = cli_shared.prepare_sender(args)
     guardian_and_relayer_data = cli_shared.get_guardian_and_relayer_data(
@@ -1469,7 +1409,7 @@ def perform_batch(args: Any):
     )
 
     abi = Abi.load(Path(args.abi))
-    chain_id = cli_shared.get_chain_id(args.chain, args.proxy)
+    chain_id = cli_shared.get_chain_id(args.proxy, args.chain)
     multisig = MultisigWrapper(TransactionsFactoryConfig(chain_id), abi)
 
     contract = Address.new_from_bech32(args.contract)

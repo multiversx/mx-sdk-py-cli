@@ -209,4 +209,5 @@ def _read_stdout(capsys: Any) -> str:
 def get_transaction(capsys: Any) -> dict[str, Any]:
     out = _read_stdout(capsys)
     output: dict[str, Any] = json.loads(out)
-    return output["emittedTransaction"]
+    tx: dict[str, Any] = output["emittedTransaction"]
+    return tx

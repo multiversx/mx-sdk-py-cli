@@ -23,7 +23,7 @@ See:
 
 
 COMMAND GROUPS:
-  {contract,tx,validator,ledger,wallet,validator-wallet,deps,config,localnet,data,staking-provider,dns,faucet,multisig,governance}
+  {contract,tx,validator,ledger,wallet,validator-wallet,deps,config,localnet,data,staking-provider,dns,faucet,multisig,governance,env}
 
 TOP-LEVEL OPTIONS:
   -h, --help            show this help message and exit
@@ -40,7 +40,7 @@ ledger                         Get Ledger App addresses and version
 wallet                         Create wallet, derive secret key from mnemonic, bech32 address helpers etc.
 validator-wallet               Create a validator wallet, sign and verify messages and convert a validator wallet to a hex secret key.
 deps                           Manage dependencies or multiversx-sdk modules
-config                         Configure multiversx-sdk (default values etc.)
+config                         Configure MultiversX CLI (default values etc.)
 localnet                       Set up, start and control localnets
 data                           Data manipulation omnitool
 staking-provider               Staking provider omnitool
@@ -48,6 +48,7 @@ dns                            Operations related to the Domain Name Service
 faucet                         Get xEGLD on Devnet or Testnet
 multisig                       Deploy and interact with the Multisig Smart Contract
 governance                     Propose, vote and interact with the governance contract.
+env                            Configure MultiversX CLI to use specific environment values.
 
 ```
 ## Group **Contract**
@@ -423,6 +424,7 @@ options:
                                              or Ledger devices (default: 0)
   --sender-username SENDER_USERNAME          🖄 the username of the sender
   --hrp HRP                                  The hrp used to convert the address to its bech32 representation
+  --skip-confirmation, -y                    can be used to skip the confirmation prompt
 
 ```
 ### Contract.ReproducibleBuild
@@ -2832,7 +2834,7 @@ options:
 $ mxpy config --help
 usage: mxpy config COMMAND [-h] ...
 
-Configure multiversx-sdk (default values etc.)
+Configure MultiversX CLI (default values etc.)
 
 COMMANDS:
   {dump,get,set,delete,new,switch,list,reset}
@@ -2843,12 +2845,12 @@ OPTIONS:
 ----------------
 COMMANDS summary
 ----------------
-dump                           Dumps configuration.
-get                            Gets a configuration value.
-set                            Sets a configuration value.
-delete                         Deletes a configuration value.
-new                            Creates a new configuration.
-switch                         Switch to a different config
+dump                           Dumps the active configuration.
+get                            Gets a configuration value from the active configuration.
+set                            Sets a configuration value for the active configuration.
+delete                         Deletes a configuration value from the active configuration.
+new                            Creates a new configuration and sets it as the active configuration.
+switch                         Switch to a different config.
 list                           List available configs
 reset                          Deletes the config file. Default config will be used.
 
@@ -2860,7 +2862,7 @@ reset                          Deletes the config file. Default config will be u
 $ mxpy config dump --help
 usage: mxpy config dump [-h] ...
 
-Dumps configuration.
+Dumps the active configuration.
 
 options:
   -h, --help  show this help message and exit
@@ -2874,7 +2876,7 @@ options:
 $ mxpy config get --help
 usage: mxpy config get [-h] ...
 
-Gets a configuration value.
+Gets a configuration value from the active configuration.
 
 positional arguments:
   name        the name of the configuration entry
@@ -2890,7 +2892,7 @@ options:
 $ mxpy config set --help
 usage: mxpy config set [-h] ...
 
-Sets a configuration value.
+Sets a configuration value for the active configuration.
 
 positional arguments:
   name        the name of the configuration entry
@@ -2907,7 +2909,7 @@ options:
 $ mxpy config new --help
 usage: mxpy config new [-h] ...
 
-Creates a new configuration.
+Creates a new configuration and sets it as the active configuration.
 
 positional arguments:
   name                 the name of the configuration entry
@@ -2924,7 +2926,7 @@ options:
 $ mxpy config switch --help
 usage: mxpy config switch [-h] ...
 
-Switch to a different config
+Switch to a different config.
 
 positional arguments:
   name        the name of the configuration entry
@@ -5891,5 +5893,156 @@ options:
   --contract CONTRACT  the bech32 address of the contract
   --user USER          the bech32 address of the user
   --proxy PROXY        🔗 the URL of the proxy
+
+```
+## Group **Environment**
+
+
+```
+$ mxpy env --help
+usage: mxpy env COMMAND [-h] ...
+
+Configure MultiversX CLI to use specific environment values.
+
+COMMANDS:
+  {new,get,set,dump,delete,switch,list,remove,reset}
+
+OPTIONS:
+  -h, --help            show this help message and exit
+
+----------------
+COMMANDS summary
+----------------
+new                            Creates a new environment and sets it as the active environment.
+get                            Gets an env value from the active environment.
+set                            Sets an env value for the active environment.
+dump                           Dumps the active environment.
+delete                         Deletes an env value from the active environment.
+switch                         Switch to a different environment.
+list                           List available environments
+remove                         Deletes an environment from the env file. Will switch to default env.
+reset                          Deletes the environment file. Default env will be used.
+
+```
+### Environment.New
+
+
+```
+$ mxpy env new --help
+usage: mxpy env new [-h] ...
+
+Creates a new environment and sets it as the active environment.
+
+positional arguments:
+  name                 the name of the configuration entry
+
+options:
+  -h, --help           show this help message and exit
+  --template TEMPLATE  an environment from which to create the new environment
+
+```
+### Environment.Set
+
+
+```
+$ mxpy env set --help
+usage: mxpy env set [-h] ...
+
+Sets an env value for the active environment.
+
+positional arguments:
+  name        the name of the configuration entry
+  value       the new value
+
+options:
+  -h, --help  show this help message and exit
+
+```
+### Environment.Get
+
+
+```
+$ mxpy env get --help
+usage: mxpy env get [-h] ...
+
+Gets an env value from the active environment.
+
+positional arguments:
+  name        the name of the configuration entry
+
+options:
+  -h, --help  show this help message and exit
+
+```
+### Environment.Dump
+
+
+```
+$ mxpy env dump --help
+usage: mxpy env dump [-h] ...
+
+Dumps the active environment.
+
+options:
+  -h, --help  show this help message and exit
+  --default   dumps the default environment instead of the active one.
+
+```
+### Environment.Switch
+
+
+```
+$ mxpy env switch --help
+usage: mxpy env switch [-h] ...
+
+Switch to a different environment.
+
+positional arguments:
+  name        the name of the configuration entry
+
+options:
+  -h, --help  show this help message and exit
+
+```
+### Environment.List
+
+
+```
+$ mxpy env list --help
+usage: mxpy env list [-h] ...
+
+List available environments
+
+options:
+  -h, --help  show this help message and exit
+
+```
+### Environment.Remove
+
+
+```
+$ mxpy env remove --help
+usage: mxpy env remove [-h] ...
+
+Deletes an environment from the env file. Will switch to default env.
+
+positional arguments:
+  environment  The environment to remove from env file.
+
+options:
+  -h, --help   show this help message and exit
+
+```
+### Environment.Reset
+
+
+```
+$ mxpy env reset --help
+usage: mxpy env reset [-h] ...
+
+Deletes the environment file. Default env will be used.
+
+options:
+  -h, --help  show this help message and exit
 
 ```

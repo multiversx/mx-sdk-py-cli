@@ -192,17 +192,21 @@ def _add_common_args(args: Any, sub: Any):
     cli_shared.add_wait_result_and_timeout_args(sub)
 
 
-def create_proposal(args: Any):
+def _ensure_args(args: Any):
     ensure_wallet_args_are_provided(args)
     validate_broadcast_args(args)
     validate_chain_id_args(args)
+
+
+def create_proposal(args: Any):
+    _ensure_args(args)
 
     sender = cli_shared.prepare_sender(args)
     guardian_and_relayer_data = cli_shared.get_guardian_and_relayer_data(
         sender=sender.address.to_bech32(),
         args=args,
     )
-    chain_id = cli_shared.get_chain_id(args.chain, args.proxy)
+    chain_id = cli_shared.get_chain_id(args.proxy, args.chain)
     gas_limit = args.gas_limit if args.gas_limit else 0
 
     controller = GovernanceWrapper(TransactionsFactoryConfig(chain_id))
@@ -224,16 +228,14 @@ def create_proposal(args: Any):
 
 
 def vote(args: Any):
-    ensure_wallet_args_are_provided(args)
-    validate_broadcast_args(args)
-    validate_chain_id_args(args)
+    _ensure_args(args)
 
     sender = cli_shared.prepare_sender(args)
     guardian_and_relayer_data = cli_shared.get_guardian_and_relayer_data(
         sender=sender.address.to_bech32(),
         args=args,
     )
-    chain_id = cli_shared.get_chain_id(args.chain, args.proxy)
+    chain_id = cli_shared.get_chain_id(args.proxy, args.chain)
     gas_limit = args.gas_limit if args.gas_limit else 0
 
     controller = GovernanceWrapper(TransactionsFactoryConfig(chain_id))
@@ -253,16 +255,14 @@ def vote(args: Any):
 
 
 def close_proposal(args: Any):
-    ensure_wallet_args_are_provided(args)
-    validate_broadcast_args(args)
-    validate_chain_id_args(args)
+    _ensure_args(args)
 
     sender = cli_shared.prepare_sender(args)
     guardian_and_relayer_data = cli_shared.get_guardian_and_relayer_data(
         sender=sender.address.to_bech32(),
         args=args,
     )
-    chain_id = cli_shared.get_chain_id(args.chain, args.proxy)
+    chain_id = cli_shared.get_chain_id(args.proxy, args.chain)
     gas_limit = args.gas_limit if args.gas_limit else 0
 
     controller = GovernanceWrapper(TransactionsFactoryConfig(chain_id))
@@ -281,16 +281,14 @@ def close_proposal(args: Any):
 
 
 def clear_ended_proposals(args: Any):
-    ensure_wallet_args_are_provided(args)
-    validate_broadcast_args(args)
-    validate_chain_id_args(args)
+    _ensure_args(args)
 
     sender = cli_shared.prepare_sender(args)
     guardian_and_relayer_data = cli_shared.get_guardian_and_relayer_data(
         sender=sender.address.to_bech32(),
         args=args,
     )
-    chain_id = cli_shared.get_chain_id(args.chain, args.proxy)
+    chain_id = cli_shared.get_chain_id(args.proxy, args.chain)
     gas_limit = args.gas_limit if args.gas_limit else 0
     controller = GovernanceWrapper(TransactionsFactoryConfig(chain_id))
 
@@ -310,16 +308,14 @@ def clear_ended_proposals(args: Any):
 
 
 def claim_accumulated_fees(args: Any):
-    ensure_wallet_args_are_provided(args)
-    validate_broadcast_args(args)
-    validate_chain_id_args(args)
+    _ensure_args(args)
 
     sender = cli_shared.prepare_sender(args)
     guardian_and_relayer_data = cli_shared.get_guardian_and_relayer_data(
         sender=sender.address.to_bech32(),
         args=args,
     )
-    chain_id = cli_shared.get_chain_id(args.chain, args.proxy)
+    chain_id = cli_shared.get_chain_id(args.proxy, args.chain)
     gas_limit = args.gas_limit if args.gas_limit else 0
 
     controller = GovernanceWrapper(TransactionsFactoryConfig(chain_id))
@@ -337,16 +333,14 @@ def claim_accumulated_fees(args: Any):
 
 
 def change_config(args: Any):
-    ensure_wallet_args_are_provided(args)
-    validate_broadcast_args(args)
-    validate_chain_id_args(args)
+    _ensure_args(args)
 
     sender = cli_shared.prepare_sender(args)
     guardian_and_relayer_data = cli_shared.get_guardian_and_relayer_data(
         sender=sender.address.to_bech32(),
         args=args,
     )
-    chain_id = cli_shared.get_chain_id(args.chain, args.proxy)
+    chain_id = cli_shared.get_chain_id(args.proxy, args.chain)
     gas_limit = args.gas_limit if args.gas_limit else 0
 
     controller = GovernanceWrapper(TransactionsFactoryConfig(chain_id))

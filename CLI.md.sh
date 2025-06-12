@@ -183,6 +183,16 @@ generate() {
     command "Governance.GetVotingPower" "governance get-voting-power"
     command "Governance.GetConfig" "governance get-config"
     command "Governance.GetDelegatedVoteInfo" "governance get-delegated-vote-info"
+
+    group "Environment" "env"
+    command "Environment.New" "env new"
+    command "Environment.Set" "env set"
+    command "Environment.Get" "env get"
+    command "Environment.Dump" "env dump"
+    command "Environment.Switch" "env switch"
+    command "Environment.List" "env list"
+    command "Environment.Remove" "env remove"
+    command "Environment.Reset" "env reset"
 }
 
 generate

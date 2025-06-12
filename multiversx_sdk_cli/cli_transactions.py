@@ -118,7 +118,7 @@ def create_transaction(args: Any):
     transfers = getattr(args, "token_transfers", None)
     transfers = cli_shared.prepare_token_transfers(transfers) if transfers else None
 
-    chain_id = cli_shared.get_chain_id(args.chain, args.proxy)
+    chain_id = cli_shared.get_chain_id(args.proxy, args.chain)
     tx_controller = TransactionsController(chain_id)
 
     tx = tx_controller.create_transaction(
@@ -148,6 +148,8 @@ def send_transaction(args: Any):
     proxy = ProxyNetworkProvider(url=args.proxy, config=config)
 
     try:
+        cli_shared._confirm_continuation_if_required(tx)
+
         tx_hash = proxy.send_transaction(tx)
         output.set_emitted_transaction_hash(tx_hash.hex())
     finally:

@@ -15,8 +15,8 @@ from multiversx_sdk_cli.args_validation import (
     validate_chain_id_args,
     validate_transaction_args,
 )
-from multiversx_sdk_cli.config import get_address_hrp
 from multiversx_sdk_cli.constants import ADDRESS_ZERO_HEX
+from multiversx_sdk_cli.env import get_address_hrp
 from multiversx_sdk_cli.transactions import TransactionsController
 
 MaxNumShards = 256
@@ -77,7 +77,7 @@ def register(args: Any):
     receiver = dns_address_for_name(args.name)
     data = dns_register_data(args.name)
 
-    chain_id = cli_shared.get_chain_id(args.chain, args.proxy)
+    chain_id = cli_shared.get_chain_id(args.proxy, args.chain)
     controller = TransactionsController(chain_id)
 
     tx = controller.create_transaction(
