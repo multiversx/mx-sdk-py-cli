@@ -197,11 +197,6 @@ def _ensure_args(args: Any):
     validate_chain_id_args(args)
 
 
-def _ensure_proxy_arg(args: Any):
-    cli_shared.set_proxy_from_config_if_not_provided(args)
-    validate_proxy_argument(args)
-
-
 def create_proposal(args: Any):
     _ensure_args(args)
 
@@ -367,7 +362,7 @@ def change_config(args: Any):
 
 
 def get_voting_power(args: Any):
-    _ensure_proxy_arg(args)
+    validate_proxy_argument(args)
 
     config = get_config_for_network_providers()
     proxy = ProxyNetworkProvider(url=args.proxy, config=config)
@@ -381,7 +376,7 @@ def get_voting_power(args: Any):
 
 
 def get_config(args: Any):
-    _ensure_proxy_arg(args)
+    validate_proxy_argument(args)
 
     config = get_config_for_network_providers()
     proxy = ProxyNetworkProvider(url=args.proxy, config=config)
@@ -393,7 +388,7 @@ def get_config(args: Any):
 
 
 def get_proposal(args: Any):
-    _ensure_proxy_arg(args)
+    validate_proxy_argument(args)
 
     config = get_config_for_network_providers()
     proxy = ProxyNetworkProvider(url=args.proxy, config=config)
@@ -405,7 +400,7 @@ def get_proposal(args: Any):
 
 
 def get_delegated_vote_info(args: Any):
-    _ensure_proxy_arg(args)
+    validate_proxy_argument(args)
 
     config = get_config_for_network_providers()
     proxy = ProxyNetworkProvider(url=args.proxy, config=config)

@@ -5,6 +5,9 @@ on:
     branches: [main, feat/*]
   workflow_dispatch:
 
+permissions:
+  contents: read
+
 env:
  BRANCH_NAME: ${{ github.head_ref || github.ref_name }}
 
@@ -40,10 +43,10 @@ jobs:
           export PYTHONPATH=.
           python3 -m multiversx_sdk_cli.cli localnet prerequisites --configfile=./multiversx_sdk_cli/tests/testdata/localnet_with_resolution_remote.toml
           python3 -m multiversx_sdk_cli.cli localnet build --configfile=./multiversx_sdk_cli/tests/testdata/localnet_with_resolution_remote.toml
-         
+
           # "Go" and artifacts from "GOPATH/pkg/mod" are not needed anymore.
           sudo rm -rf ~/multiversx-sdk/golang
-          
+
           python3 -m multiversx_sdk_cli.cli localnet clean --configfile=./multiversx_sdk_cli/tests/testdata/localnet_with_resolution_remote.toml
           python3 -m multiversx_sdk_cli.cli localnet config --configfile=./multiversx_sdk_cli/tests/testdata/localnet_with_resolution_remote.toml
           nohup python3 -m multiversx_sdk_cli.cli localnet start --configfile=./multiversx_sdk_cli/tests/testdata/localnet_with_resolution_remote.toml > localnet.log 2>&1 & echo $! > localnet.pid

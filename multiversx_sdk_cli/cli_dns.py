@@ -136,8 +136,6 @@ def _ensure_proxy_is_provided(args: Any):
 
 
 def dns_resolve(args: Any):
-    cli_shared.set_proxy_from_config_if_not_provided(args)
-
     _ensure_proxy_is_provided(args)
 
     config = get_config_for_network_providers()
@@ -147,8 +145,6 @@ def dns_resolve(args: Any):
 
 
 def dns_validate_name(args: Any):
-    cli_shared.set_proxy_from_config_if_not_provided(args)
-
     _ensure_proxy_is_provided(args)
 
     config = get_config_for_network_providers()
@@ -172,8 +168,6 @@ def get_dns_address_for_name_hex(args: Any):
 
 
 def get_registration_cost(args: Any):
-    cli_shared.set_proxy_from_config_if_not_provided(args)
-
     _ensure_proxy_is_provided(args)
 
     config = get_config_for_network_providers()
@@ -181,8 +175,6 @@ def get_registration_cost(args: Any):
 
 
 def get_version(args: Any):
-    cli_shared.set_proxy_from_config_if_not_provided(args)
-
     _ensure_proxy_is_provided(args)
 
     config = get_config_for_network_providers()

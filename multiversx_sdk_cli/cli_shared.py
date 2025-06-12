@@ -44,6 +44,7 @@ from multiversx_sdk_cli.errors import (
     BadUsage,
     IncorrectWalletError,
     InvalidAddressConfigValue,
+    LedgerError,
     NoWalletProvided,
     UnknownAddressAliasError,
 )
@@ -363,7 +364,10 @@ def prepare_account(args: Any):
             hrp=hrp,
         )
     elif args.ledger:
-        return LedgerAccount(address_index=args.sender_wallet_index)
+        try:
+            return LedgerAccount(address_index=args.sender_wallet_index)
+        except Exception as e:
+            raise LedgerError(str(e))
     elif args.sender:
         file_path = resolve_address_config_path()
         if not file_path.is_file():
@@ -475,7 +479,10 @@ def load_guardian_account(args: Any) -> Union[IAccount, None]:
             hrp=hrp,
         )
     elif args.guardian_ledger:
-        return LedgerAccount(address_index=args.guardian_wallet_index)
+        try:
+            return LedgerAccount(address_index=args.guardian_wallet_index)
+        except Exception as e:
+            raise LedgerError(str(e))
 
     return None
 
@@ -606,7 +613,10 @@ def load_relayer_account(args: Any) -> Union[IAccount, None]:
             hrp=hrp,
         )
     elif args.relayer_ledger:
-        return LedgerAccount(address_index=args.relayer_wallet_index)
+        try:
+            return LedgerAccount(address_index=args.relayer_wallet_index)
+        except Exception as e:
+            raise LedgerError(str(e))
 
     return None
 
@@ -772,6 +782,9 @@ def prepare_token_transfers(transfers: list[str]) -> list[TokenTransfer]:
 
 def set_proxy_from_config_if_not_provided(args: Any) -> None:
     """This function modifies the `args` object by setting the proxy from the config if not already set. If proxy is not needed (chainID and nonce are provided), the proxy will not be set."""
+    if not hasattr(args, "proxy"):
+        return
+
     if not args.proxy:
         if hasattr(args, "chain") and args.chain and hasattr(args, "nonce") and args.nonce is not None:
             return

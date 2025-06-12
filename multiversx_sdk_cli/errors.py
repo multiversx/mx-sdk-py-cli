@@ -151,6 +151,16 @@ class InvalidArgumentsError(KnownError):
         super().__init__(message)
 
 
+class LedgerError(KnownError):
+    def __init__(self, message: str):
+        super().__init__(message)
+
+
+class TransactionSigningError(KnownError):
+    def __init__(self, message: str):
+        super().__init__(message)
+
+
 class InvalidConfirmationSettingError(KnownError):
     def __init__(self, value: str):
         super().__init__(
