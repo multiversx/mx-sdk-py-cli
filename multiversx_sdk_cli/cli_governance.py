@@ -192,7 +192,6 @@ def _add_common_args(args: Any, sub: Any):
 
 
 def _ensure_args(args: Any):
-    cli_shared.set_proxy_from_config_if_not_provided(args)
     validate_broadcast_args(args)
     validate_chain_id_args(args)
 
