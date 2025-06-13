@@ -136,7 +136,16 @@ def get_defaults() -> dict[str, Any]:
         "dependencies.testwallets.urlTemplate.osx": "https://github.com/multiversx/mx-sdk-testwallets/archive/{TAG}.tar.gz",
         "dependencies.testwallets.urlTemplate.windows": "https://github.com/multiversx/mx-sdk-testwallets/archive/{TAG}.tar.gz",
         "github_api_token": "",
+        "log_level": "info",
     }
+
+
+def get_log_level_from_config():
+    log_level = get_value("log_level")
+    if log_level not in ["debug", "info", "warning", "error"]:
+        raise errors.LogLevelError(log_level)
+
+    return log_level
 
 
 def get_deprecated_entries_in_config_file():

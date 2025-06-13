@@ -53,6 +53,7 @@ def _do_main(cli_args: list[str]):
     parser = setup_parser(cli_args)
     argcomplete.autocomplete(parser)
 
+    _handle_log_level_argument(cli_args)
     _handle_verbose_argument(cli_args)
     args = parser.parse_args(cli_args)
 
@@ -64,8 +65,9 @@ def _do_main(cli_args: list[str]):
             handlers=[RichHandler(show_time=False, rich_tracebacks=True)],
         )
     else:
+        level: str = args.log_level
         logging.basicConfig(
-            level="INFO",
+            level=level.upper(),
             format="%(name)s: %(message)s",
             handlers=[RichHandler(show_time=False, rich_tracebacks=True)],
         )
@@ -111,6 +113,13 @@ See:
         version=f"MultiversX Python CLI (mxpy) {version}",
     )
     parser.add_argument("--verbose", action="store_true", default=False)
+    parser.add_argument(
+        "--log-level",
+        type=str,
+        default=config.get_log_level_from_config(),
+        choices=["debug", "info", "warning", "error"],
+        help="default: %(default)s",
+    )
 
     subparsers = parser.add_subparsers()
     commands: list[Any] = []
@@ -163,6 +172,17 @@ def _handle_verbose_argument(args: list[str]):
     if verbose_arg in args:
         args.remove(verbose_arg)
         args.insert(0, verbose_arg)
+
+
+def _handle_log_level_argument(args: list[str]):
+    log_level_arg = "--log-level"
+
+    if log_level_arg in args:
+        index = args.index(log_level_arg)
+        log_arg = args.pop(index)
+        log_value = args.pop(index)
+        args.insert(0, log_value)
+        args.insert(0, log_arg)
 
 
 if __name__ == "__main__":

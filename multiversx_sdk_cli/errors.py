@@ -211,3 +211,8 @@ class InvalidAddressConfigValue(KnownError):
 class AddressConfigFileError(KnownError):
     def __init__(self, message: str):
         super().__init__(message)
+
+
+class LogLevelError(KnownError):
+    def __init__(self, log_level: str):
+        super().__init__(f"Log level not accepted: {log_level}. Choose between ['debug', 'info', 'warning', 'error'].")
