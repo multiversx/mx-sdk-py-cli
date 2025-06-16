@@ -58,7 +58,8 @@ def test_empty_address_config(capsys: Any, monkeypatch: Any, tmp_path: Path):
 
 
 def test_without_address_config(capsys: Any, monkeypatch: Any, tmp_path: Path):
-    test_file = tmp_path / "addresses.mxpy.json"
+    # Ensure the address config file does not exist; if the actual name is used, when running the tests locally, it will fail with a different error message
+    test_file = tmp_path / "test-addresses.mxpy.json"
     assert not test_file.exists()
 
     import multiversx_sdk_cli.address_config
@@ -106,7 +107,7 @@ def test_without_address_config(capsys: Any, monkeypatch: Any, tmp_path: Path):
     )
     assert return_code
     out = _read_stdout(capsys)
-    assert "Alias is not known: invalidAlias." in out
+    assert "The address config file was not found." in out
 
 
 def test_incomplete_address_config(capsys: Any, monkeypatch: Any, tmp_path: Path):
