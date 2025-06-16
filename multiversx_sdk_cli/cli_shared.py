@@ -21,7 +21,7 @@ from multiversx_sdk import (
 )
 
 from multiversx_sdk_cli import config, utils
-from multiversx_sdk_cli.address import (
+from multiversx_sdk_cli.address_config import (
     get_active_address,
     read_address_config_file,
     resolve_address_config_path,
@@ -371,11 +371,11 @@ def prepare_account(args: Any):
     elif args.sender:
         file_path = resolve_address_config_path()
         if not file_path.is_file():
-            raise AddressConfigFileError("The address config file was not found")
+            raise AddressConfigFileError("The address config file was not found.")
 
         file = read_address_config_file()
         if file == dict():
-            raise AddressConfigFileError("Address config file is empty")
+            raise AddressConfigFileError("Address config file is empty.")
 
         addresses: dict[str, Any] = file["addresses"]
         wallet = addresses.get(args.sender, None)
@@ -399,14 +399,14 @@ def prepare_account(args: Any):
 def _load_wallet_from_address_config(wallet: dict[str, str], hrp: str) -> Account:
     kind = wallet.get("kind", None)
     if not kind:
-        raise AddressConfigFileError("'kind' field must be set in the address config")
+        raise AddressConfigFileError("'kind' field must be set in the address config.")
 
     if kind not in ["pem", "keystore"]:
         raise InvalidAddressConfigValue("'kind' must be 'pem' or 'keystore'")
 
     wallet_path = wallet.get("path", None)
     if not wallet_path:
-        raise AddressConfigFileError("'path' field must be set in the address config")
+        raise AddressConfigFileError("'path' field must be set in the address config.")
     path = Path(wallet_path)
 
     index = int(wallet.get("index", 0))
@@ -419,7 +419,7 @@ def _load_wallet_from_address_config(wallet: dict[str, str], hrp: str) -> Accoun
 
         if not password and not password_path:
             raise AddressConfigFileError(
-                "'password' or 'passwordPath' must be set in the address config for keystore wallets"
+                "'password' or 'passwordPath' must be set in the address config for keystore wallets."
             )
 
         if password_path:

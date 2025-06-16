@@ -2,6 +2,7 @@ from functools import cache
 from pathlib import Path
 from typing import Any
 
+from multiversx_sdk_cli.constants import SDK_PATH
 from multiversx_sdk_cli.errors import (
     AliasAlreadyExistsError,
     AliasProtectedError,
@@ -10,12 +11,32 @@ from multiversx_sdk_cli.errors import (
 )
 from multiversx_sdk_cli.utils import read_json_file, write_json_file
 
-SDK_PATH = Path("~/multiversx-sdk").expanduser().resolve()
 LOCAL_ADDRESS_CONFIG_PATH = Path("addresses.mxpy.json").resolve()
 GLOBAL_ADDRESS_CONFIG_PATH = SDK_PATH / "addresses.mxpy.json"
 
 
 def get_defaults() -> dict[str, str]:
+    """Not all values are required for a config to be valid.
+
+        Valid config for PEM wallets:
+
+    {
+                "kind": "pem",
+                "path": "/path/to/wallet.pem",
+                "index": "0",  # optional, defaults to 0
+    }
+
+        Valid config for KEYSTORE wallets:
+
+    {
+                "kind": "keystore",
+                "path": "/path/to/wallet.json",
+                "password": "somePassword",  # if not set, passwordPath must be set
+                "passwordPath": "/path/to/password.txt",  # if not set, password must be set
+                "index": "0",  # optional, defaults to 0
+    }
+
+    """
     return {
         "kind": "",
         "path": "",
@@ -41,6 +62,7 @@ def _guard_valid_name(name: str):
 
 
 def get_active_address() -> dict[str, str]:
+    """Returns the active address configuration."""
     data = read_address_config_file()
     addresses: dict[str, Any] = data.get("addresses", {})
     active_address: str = data.get("active", "default")
@@ -65,25 +87,27 @@ def resolve_address_config_path() -> Path:
 
 
 def set_value(name: str, value: Any):
+    """Sets a key-value pair in the active address config."""
     _guard_valid_name(name)
     data = read_address_config_file()
     active_env = data.get("active", "default")
     data.setdefault("addresses", {})
     data["addresses"].setdefault(active_env, {})
     data["addresses"][active_env][name] = value
-    write_file(data)
+    _write_file(data)
 
 
-def write_file(data: dict[str, Any]):
+def _write_file(data: dict[str, Any]):
     env_path = resolve_address_config_path()
     write_json_file(str(env_path), data)
 
 
 def set_active(name: str):
+    """Switches to the address configuration with the given name."""
     data = read_address_config_file()
     _guard_valid_address_name(data, name)
     data["active"] = name
-    write_file(data)
+    _write_file(data)
 
 
 def _guard_valid_address_name(env: Any, name: str):
@@ -93,6 +117,7 @@ def _guard_valid_address_name(env: Any, name: str):
 
 
 def create_new_address_config(name: str, template: str):
+    """Creates a new address config with the given name and optional template."""
     data = read_address_config_file()
     _guard_alias_unique(data, name)
     new_address = {}
@@ -103,7 +128,7 @@ def create_new_address_config(name: str, template: str):
     data["active"] = name
     data.setdefault("addresses", {})
     data["addresses"][name] = new_address
-    write_file(data)
+    _write_file(data)
 
 
 def _guard_alias_unique(env: Any, name: str):
@@ -120,16 +145,17 @@ def delete_config_value(name: str):
     data.setdefault("addresses", {})
     data["addresses"].setdefault(active_env, {})
     del data["addresses"][active_env][name]
-    write_file(data)
+    _write_file(data)
 
 
 def delete_alias(name: str):
+    """Deletes the address configuration with the given name."""
     _guard_valid_alias_deletion(name)
     data = read_address_config_file()
     data["addresses"].pop(name, None)
     if data["active"] == name:
         data["active"] = "default"
-    write_file(data)
+    _write_file(data)
 
 
 def _guard_valid_alias_deletion(name: str):

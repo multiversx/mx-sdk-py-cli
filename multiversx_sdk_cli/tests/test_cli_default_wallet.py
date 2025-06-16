@@ -5,14 +5,14 @@ from typing import Any
 from multiversx_sdk_cli.cli import main
 
 
-def test_empty_address_config(monkeypatch: Any, tmp_path: Path):
+def test_empty_address_config(capsys: Any, monkeypatch: Any, tmp_path: Path):
     test_file = tmp_path / "addresses.mxpy.json"
     test_file.write_text("{}")
 
-    import multiversx_sdk_cli.address
+    import multiversx_sdk_cli.address_config
 
-    monkeypatch.setattr(multiversx_sdk_cli.address, "LOCAL_ADDRESS_CONFIG_PATH", test_file)
-    multiversx_sdk_cli.address.read_address_config_file.cache_clear()
+    monkeypatch.setattr(multiversx_sdk_cli.address_config, "LOCAL_ADDRESS_CONFIG_PATH", test_file)
+    multiversx_sdk_cli.address_config.read_address_config_file.cache_clear()
 
     return_code = main(
         [
@@ -24,7 +24,12 @@ def test_empty_address_config(monkeypatch: Any, tmp_path: Path):
             "50000",
         ]
     )
+    out = _read_stdout(capsys)
     assert return_code
+    assert "No wallet provided." in out
+
+    # Clear the captured content
+    capsys.readouterr()
 
     return_code = main(
         [
@@ -39,16 +44,18 @@ def test_empty_address_config(monkeypatch: Any, tmp_path: Path):
         ]
     )
     assert return_code
+    out = _read_stdout(capsys)
+    assert "Address config file is empty." in out
 
 
-def test_without_address_config(monkeypatch: Any, tmp_path: Path):
+def test_without_address_config(capsys: Any, monkeypatch: Any, tmp_path: Path):
     test_file = tmp_path / "addresses.mxpy.json"
     assert not test_file.exists()
 
-    import multiversx_sdk_cli.address
+    import multiversx_sdk_cli.address_config
 
-    monkeypatch.setattr(multiversx_sdk_cli.address, "LOCAL_ADDRESS_CONFIG_PATH", test_file)
-    multiversx_sdk_cli.address.read_address_config_file.cache_clear()
+    monkeypatch.setattr(multiversx_sdk_cli.address_config, "LOCAL_ADDRESS_CONFIG_PATH", test_file)
+    multiversx_sdk_cli.address_config.read_address_config_file.cache_clear()
 
     return_code = main(
         [
@@ -61,6 +68,11 @@ def test_without_address_config(monkeypatch: Any, tmp_path: Path):
         ]
     )
     assert return_code
+    out = _read_stdout(capsys)
+    assert "No wallet provided." in out
+
+    # Clear the captured content
+    capsys.readouterr()
 
     return_code = main(
         [
@@ -75,9 +87,11 @@ def test_without_address_config(monkeypatch: Any, tmp_path: Path):
         ]
     )
     assert return_code
+    out = _read_stdout(capsys)
+    assert "Alias is not known: invalidAlias." in out
 
 
-def test_incomplete_address_config(monkeypatch: Any, tmp_path: Path):
+def test_incomplete_address_config(capsys: Any, monkeypatch: Any, tmp_path: Path):
     test_file = tmp_path / "addresses.mxpy.json"
     json_file = {
         "active": "alice",
@@ -90,10 +104,10 @@ def test_incomplete_address_config(monkeypatch: Any, tmp_path: Path):
     }
     test_file.write_text(json.dumps(json_file))
 
-    import multiversx_sdk_cli.address
+    import multiversx_sdk_cli.address_config
 
-    monkeypatch.setattr(multiversx_sdk_cli.address, "LOCAL_ADDRESS_CONFIG_PATH", test_file)
-    multiversx_sdk_cli.address.read_address_config_file.cache_clear()
+    monkeypatch.setattr(multiversx_sdk_cli.address_config, "LOCAL_ADDRESS_CONFIG_PATH", test_file)
+    multiversx_sdk_cli.address_config.read_address_config_file.cache_clear()
 
     return_code = main(
         [
@@ -106,6 +120,11 @@ def test_incomplete_address_config(monkeypatch: Any, tmp_path: Path):
         ]
     )
     assert return_code
+    out = _read_stdout(capsys)
+    assert "'kind' field must be set in the address config." in out
+
+    # Clear the captured content
+    capsys.readouterr()
 
     return_code = main(
         [
@@ -120,6 +139,11 @@ def test_incomplete_address_config(monkeypatch: Any, tmp_path: Path):
         ]
     )
     assert return_code
+    out = _read_stdout(capsys)
+    assert "'kind' field must be set in the address config." in out
+
+    # Clear the captured content
+    capsys.readouterr()
 
     json_file = {
         "active": "alice",
@@ -132,10 +156,8 @@ def test_incomplete_address_config(monkeypatch: Any, tmp_path: Path):
     }
     test_file.write_text(json.dumps(json_file))
 
-    import multiversx_sdk_cli.address
-
-    monkeypatch.setattr(multiversx_sdk_cli.address, "LOCAL_ADDRESS_CONFIG_PATH", test_file)
-    multiversx_sdk_cli.address.read_address_config_file.cache_clear()
+    monkeypatch.setattr(multiversx_sdk_cli.address_config, "LOCAL_ADDRESS_CONFIG_PATH", test_file)
+    multiversx_sdk_cli.address_config.read_address_config_file.cache_clear()
 
     return_code = main(
         [
@@ -148,6 +170,11 @@ def test_incomplete_address_config(monkeypatch: Any, tmp_path: Path):
         ]
     )
     assert return_code
+    out = _read_stdout(capsys)
+    assert "'path' field must be set in the address config." in out
+
+    # Clear the captured content
+    capsys.readouterr()
 
     return_code = main(
         [
@@ -162,6 +189,11 @@ def test_incomplete_address_config(monkeypatch: Any, tmp_path: Path):
         ]
     )
     assert return_code
+    out = _read_stdout(capsys)
+    assert "'path' field must be set in the address config." in out
+
+    # Clear the captured content
+    capsys.readouterr()
 
     json_file = {
         "active": "alice",
@@ -175,10 +207,8 @@ def test_incomplete_address_config(monkeypatch: Any, tmp_path: Path):
     }
     test_file.write_text(json.dumps(json_file))
 
-    import multiversx_sdk_cli.address
-
-    monkeypatch.setattr(multiversx_sdk_cli.address, "LOCAL_ADDRESS_CONFIG_PATH", test_file)
-    multiversx_sdk_cli.address.read_address_config_file.cache_clear()
+    monkeypatch.setattr(multiversx_sdk_cli.address_config, "LOCAL_ADDRESS_CONFIG_PATH", test_file)
+    multiversx_sdk_cli.address_config.read_address_config_file.cache_clear()
 
     return_code = main(
         [
@@ -205,3 +235,8 @@ def test_incomplete_address_config(monkeypatch: Any, tmp_path: Path):
         ]
     )
     assert return_code
+
+
+def _read_stdout(capsys: Any) -> str:
+    stdout: str = capsys.readouterr().out.strip()
+    return stdout
