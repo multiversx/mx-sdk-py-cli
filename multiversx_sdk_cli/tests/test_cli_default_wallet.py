@@ -12,6 +12,7 @@ def test_empty_address_config(capsys: Any, monkeypatch: Any, tmp_path: Path):
     import multiversx_sdk_cli.address_config
 
     monkeypatch.setattr(multiversx_sdk_cli.address_config, "LOCAL_ADDRESS_CONFIG_PATH", test_file)
+    monkeypatch.setattr(multiversx_sdk_cli.address_config, "GLOBAL_ADDRESS_CONFIG_PATH", test_file)
     multiversx_sdk_cli.address_config.read_address_config_file.cache_clear()
 
     return_code = main(
@@ -63,6 +64,7 @@ def test_without_address_config(capsys: Any, monkeypatch: Any, tmp_path: Path):
     import multiversx_sdk_cli.address_config
 
     monkeypatch.setattr(multiversx_sdk_cli.address_config, "LOCAL_ADDRESS_CONFIG_PATH", test_file)
+    monkeypatch.setattr(multiversx_sdk_cli.address_config, "GLOBAL_ADDRESS_CONFIG_PATH", test_file)
     multiversx_sdk_cli.address_config.read_address_config_file.cache_clear()
 
     return_code = main(
@@ -123,6 +125,7 @@ def test_incomplete_address_config(capsys: Any, monkeypatch: Any, tmp_path: Path
     import multiversx_sdk_cli.address_config
 
     monkeypatch.setattr(multiversx_sdk_cli.address_config, "LOCAL_ADDRESS_CONFIG_PATH", test_file)
+    monkeypatch.setattr(multiversx_sdk_cli.address_config, "GLOBAL_ADDRESS_CONFIG_PATH", test_file)
     multiversx_sdk_cli.address_config.read_address_config_file.cache_clear()
 
     return_code = main(
@@ -181,6 +184,7 @@ def test_incomplete_address_config(capsys: Any, monkeypatch: Any, tmp_path: Path
     test_file.write_text(json.dumps(json_file))
 
     monkeypatch.setattr(multiversx_sdk_cli.address_config, "LOCAL_ADDRESS_CONFIG_PATH", test_file)
+    monkeypatch.setattr(multiversx_sdk_cli.address_config, "GLOBAL_ADDRESS_CONFIG_PATH", test_file)
     multiversx_sdk_cli.address_config.read_address_config_file.cache_clear()
 
     return_code = main(
