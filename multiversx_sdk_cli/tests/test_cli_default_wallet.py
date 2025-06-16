@@ -22,6 +22,10 @@ def test_empty_address_config(capsys: Any, monkeypatch: Any, tmp_path: Path):
             "erd1spyavw0956vq68xj8y4tenjpq2wd5a9p2c6j8gsz7ztyrnpxrruqzu66jx",
             "--gas-limit",
             "50000",
+            "--nonce",
+            "0",
+            "--chain",
+            "D",
         ]
     )
     out = _read_stdout(capsys)
@@ -41,6 +45,10 @@ def test_empty_address_config(capsys: Any, monkeypatch: Any, tmp_path: Path):
             "50000",
             "--sender",
             "invalidSender",
+            "--nonce",
+            "0",
+            "--chain",
+            "D",
         ]
     )
     assert return_code
@@ -65,6 +73,10 @@ def test_without_address_config(capsys: Any, monkeypatch: Any, tmp_path: Path):
             "erd1spyavw0956vq68xj8y4tenjpq2wd5a9p2c6j8gsz7ztyrnpxrruqzu66jx",
             "--gas-limit",
             "50000",
+            "--nonce",
+            "0",
+            "--chain",
+            "D",
         ]
     )
     assert return_code
@@ -84,6 +96,10 @@ def test_without_address_config(capsys: Any, monkeypatch: Any, tmp_path: Path):
             "50000",
             "--sender",
             "invalidAlias",
+            "--nonce",
+            "0",
+            "--chain",
+            "D",
         ]
     )
     assert return_code
@@ -117,6 +133,10 @@ def test_incomplete_address_config(capsys: Any, monkeypatch: Any, tmp_path: Path
             "erd1spyavw0956vq68xj8y4tenjpq2wd5a9p2c6j8gsz7ztyrnpxrruqzu66jx",
             "--gas-limit",
             "50000",
+            "--nonce",
+            "0",
+            "--chain",
+            "D",
         ]
     )
     assert return_code
@@ -136,6 +156,10 @@ def test_incomplete_address_config(capsys: Any, monkeypatch: Any, tmp_path: Path
             "50000",
             "--sender",
             "alice",
+            "--nonce",
+            "0",
+            "--chain",
+            "D",
         ]
     )
     assert return_code
@@ -167,6 +191,10 @@ def test_incomplete_address_config(capsys: Any, monkeypatch: Any, tmp_path: Path
             "erd1spyavw0956vq68xj8y4tenjpq2wd5a9p2c6j8gsz7ztyrnpxrruqzu66jx",
             "--gas-limit",
             "50000",
+            "--nonce",
+            "0",
+            "--chain",
+            "D",
         ]
     )
     assert return_code
@@ -186,6 +214,10 @@ def test_incomplete_address_config(capsys: Any, monkeypatch: Any, tmp_path: Path
             "50000",
             "--sender",
             "alice",
+            "--nonce",
+            "0",
+            "--chain",
+            "D",
         ]
     )
     assert return_code
@@ -232,6 +264,10 @@ def test_incomplete_address_config(capsys: Any, monkeypatch: Any, tmp_path: Path
             "50000",
             "--sender",
             "alice",
+            "--nonce",
+            "0",
+            "--chain",
+            "D",
         ]
     )
     assert return_code
