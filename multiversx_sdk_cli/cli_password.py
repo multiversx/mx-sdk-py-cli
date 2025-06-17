@@ -8,7 +8,7 @@ logger = logging.getLogger("cli.password")
 def load_password(args: Any) -> str:
     if args.passfile:
         logger.warning(
-            "Using a password file is deprecated and will be removed in a future version. You'll be prompted to enter the password when using keystore wallets."
+            "Using a password file is DEPRECATED and will be removed in a future version. Instead, you'll be prompted to enter the password when using keystore wallets."
         )
         with open(args.passfile) as pass_file:
             return pass_file.read().strip()
@@ -18,7 +18,7 @@ def load_password(args: Any) -> str:
 def load_guardian_password(args: Any) -> str:
     if args.guardian_passfile:
         logger.warning(
-            "Using a password file is deprecated and will be removed in a future version. You'll be prompted to enter the password when using keystore wallets."
+            "Using a password file is DEPRECATED and will be removed in a future version. Instead, you'll be prompted to enter the password when using keystore wallets."
         )
         with open(args.guardian_passfile) as pass_file:
             return pass_file.read().strip()
@@ -28,7 +28,7 @@ def load_guardian_password(args: Any) -> str:
 def load_relayer_password(args: Any) -> str:
     if args.relayer_passfile:
         logger.warning(
-            "Using a password file is deprecated and will be removed in a future version. You'll be prompted to enter the password when using keystore wallets."
+            "Using a password file is DEPRECATED and will be removed in a future version. Instead, you'll be prompted to enter the password when using keystore wallets."
         )
         with open(args.relayer_passfile) as pass_file:
             return pass_file.read().strip()

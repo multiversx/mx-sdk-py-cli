@@ -183,7 +183,7 @@ def add_wallet_args(args: list[str], sub: Any):
     )
     sub.add_argument(
         "--passfile",
-        help="🔑 a file containing keyfile's password, if keyfile provided. This argument is DEPRECATED, you'll be prompted to enter the password.",
+        help="DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter the password.",
     )
     sub.add_argument(
         "--ledger",
@@ -227,7 +227,7 @@ def add_guardian_wallet_args(args: list[str], sub: Any):
     )
     sub.add_argument(
         "--guardian-passfile",
-        help="🔑 a file containing keyfile's password, if keyfile provided. This argument is DEPRECATED, you'll be prompted to enter the password.",
+        help="DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter the password.",
     )
     sub.add_argument(
         "--guardian-ledger",
@@ -248,7 +248,7 @@ def add_relayed_v3_wallet_args(args: list[str], sub: Any):
     sub.add_argument("--relayer-keyfile", help="🔑 a JSON keyfile, if PEM not provided")
     sub.add_argument(
         "--relayer-passfile",
-        help="🔑 a file containing keyfile's password, if keyfile provided. This argument is DEPRECATED, you'll be prompted to enter the password.",
+        help="DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter the password.",
     )
     sub.add_argument(
         "--relayer-ledger",
