@@ -1,11 +1,12 @@
 import sys
 from pathlib import Path
 
-from multiversx_sdk_cli import config, utils
+from multiversx_sdk_cli import utils
+from multiversx_sdk_cli.constants import SDK_PATH
 
 
 def get_tools_folder() -> Path:
-    folder = config.SDK_PATH
+    folder = SDK_PATH
     utils.ensure_folder(folder)
     return folder
 
