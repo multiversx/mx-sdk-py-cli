@@ -29,16 +29,6 @@ def validate_gas_limit_args(args: Any):
         raise InvalidArgumentsError("--gas-limit must be provided")
 
 
-def ensure_wallet_args_are_provided(args: Any):
-    signing_methods = [args.pem, args.keyfile, args.ledger]
-
-    if all(signing_methods):
-        raise InvalidArgumentsError("Only one of --pem, --keyfile, or --ledger must be provided")
-
-    if not any(signing_methods):
-        raise InvalidArgumentsError("One of --pem, --keyfile, or --ledger must be provided")
-
-
 def ensure_relayer_wallet_args_are_provided(args: Any):
     signing_methods = [args.relayer_pem, args.relayer_keyfile, args.relayer_ledger]
 

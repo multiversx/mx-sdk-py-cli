@@ -186,3 +186,28 @@ class UnknownEnvironmentError(KnownError):
 class EnvironmentAlreadyExistsError(KnownError):
     def __init__(self, name: str):
         super().__init__(f"Environment entry already exists: {name}.")
+
+
+class UnknownAddressAliasError(KnownError):
+    def __init__(self, name: str):
+        super().__init__(f"Alias is not known: {name}.")
+
+
+class AliasAlreadyExistsError(KnownError):
+    def __init__(self, name: str):
+        super().__init__(f"Alias already exists: {name}.")
+
+
+class AliasProtectedError(KnownError):
+    def __init__(self, name: str):
+        super().__init__(f"This environment name is protected: {name}.")
+
+
+class InvalidAddressConfigValue(KnownError):
+    def __init__(self, message: str):
+        super().__init__(message)
+
+
+class AddressConfigFileError(KnownError):
+    def __init__(self, message: str):
+        super().__init__(message)

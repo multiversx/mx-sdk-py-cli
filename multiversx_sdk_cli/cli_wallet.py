@@ -180,11 +180,13 @@ def wallet_new(args: Any):
     if format == WALLET_FORMAT_RAW_MNEMONIC:
         outfile.write_text(mnemonic.get_text())
     elif format == WALLET_FORMAT_KEYSTORE_MNEMONIC:
-        password = getpass.getpass("Enter a new password (for keystore):")
+        password = _request_password()
+
         wallet = UserWallet.from_mnemonic(mnemonic.get_text(), password)
         wallet.save(outfile)
     elif format == WALLET_FORMAT_KEYSTORE_SECRET_KEY:
-        password = getpass.getpass("Enter a new password (for keystore):")
+        password = _request_password()
+
         secret_key = mnemonic.derive_key()
         wallet = UserWallet.from_secret_key(secret_key, password)
         wallet.save(outfile, address_hrp)
@@ -198,6 +200,15 @@ def wallet_new(args: Any):
         raise BadUsage(f"Unknown format: {format}")
 
     logger.info(f"Wallet ({format}) saved: {outfile}")
+
+
+def _request_password() -> str:
+    password = ""
+    while not len(password):
+        password = getpass.getpass("Enter a new password (for keystore):")
+        if not len(password):
+            logger.warning("No password provided")
+    return password
 
 
 def _generate_mnemonic_with_shard_constraint(shard: int) -> Mnemonic:

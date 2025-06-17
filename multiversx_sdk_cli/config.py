@@ -6,8 +6,8 @@ from typing import Any
 from multiversx_sdk import NetworkProviderConfig
 
 from multiversx_sdk_cli import errors, utils
+from multiversx_sdk_cli.constants import SDK_PATH
 
-SDK_PATH = Path("~/multiversx-sdk").expanduser().resolve()
 LOCAL_CONFIG_PATH = Path("mxpy.json").resolve()
 GLOBAL_CONFIG_PATH = SDK_PATH / "mxpy.json"
 
