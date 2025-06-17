@@ -211,3 +211,8 @@ class InvalidAddressConfigValue(KnownError):
 class AddressConfigFileError(KnownError):
     def __init__(self, message: str):
         super().__init__(message)
+
+
+class WalletError(KnownError):
+    def __init__(self, message: str):
+        super().__init__(message)

@@ -16,33 +16,33 @@ GLOBAL_ADDRESS_CONFIG_PATH = SDK_PATH / "addresses.mxpy.json"
 
 
 def get_defaults() -> dict[str, str]:
-    """Not all values are required for a config to be valid.
+    """
+    Not all values are required for a config to be valid.
 
-        Valid config for PEM wallets:
-
+    Valid config for PEM wallets:
+    ```
     {
-                "kind": "pem",
-                "path": "/path/to/wallet.pem",
-                "index": "0",  # optional, defaults to 0
+        "kind": "pem",
+        "path": "/path/to/wallet.pem",
+        "index": "0"  # optional, defaults to 0
     }
+    ```
 
-        Valid config for KEYSTORE wallets:
-
+    Valid config for KEYSTORE wallets:
+    ```
     {
-                "kind": "keystore",
-                "path": "/path/to/wallet.json",
-                "password": "somePassword",  # if not set, passwordPath must be set
-                "passwordPath": "/path/to/password.txt",  # if not set, password must be set
-                "index": "0",  # optional, defaults to 0
+        "kind": "keystore",
+        "path": "/path/to/wallet.json",
+        "index": "0"  # optional, defaults to 0
     }
+    ```
 
+    For keystore wallets, you'll be prompted to enter the password when using the wallet.
     """
     return {
         "kind": "",
         "path": "",
         "index": "",
-        "password": "",
-        "passwordPath": "",
     }
 
 
