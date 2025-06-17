@@ -2,6 +2,7 @@ import json
 from pathlib import Path
 from typing import Any
 
+from multiversx_sdk_cli import cli_shared
 from multiversx_sdk_cli.cli import main
 
 
@@ -247,6 +248,8 @@ def test_incomplete_address_config(capsys: Any, monkeypatch: Any, tmp_path: Path
     monkeypatch.setattr(multiversx_sdk_cli.address_config, "LOCAL_ADDRESS_CONFIG_PATH", test_file)
     multiversx_sdk_cli.address_config.read_address_config_file.cache_clear()
 
+    monkeypatch.setattr(cli_shared, "getpass", lambda *args, **kwargs: "")
+
     return_code = main(
         [
             "tx",
@@ -255,6 +258,10 @@ def test_incomplete_address_config(capsys: Any, monkeypatch: Any, tmp_path: Path
             "erd1spyavw0956vq68xj8y4tenjpq2wd5a9p2c6j8gsz7ztyrnpxrruqzu66jx",
             "--gas-limit",
             "50000",
+            "--nonce",
+            "0",
+            "--chain",
+            "D",
         ]
     )
     assert return_code
