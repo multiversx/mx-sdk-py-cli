@@ -3,6 +3,7 @@ from functools import cache
 from pathlib import Path
 from typing import Any
 
+from multiversx_sdk_cli.constants import SDK_PATH
 from multiversx_sdk_cli.errors import (
     EnvironmentAlreadyExistsError,
     EnvironmentProtectedError,
@@ -12,7 +13,6 @@ from multiversx_sdk_cli.errors import (
 )
 from multiversx_sdk_cli.utils import read_json_file, write_json_file
 
-SDK_PATH = Path("~/multiversx-sdk").expanduser().resolve()
 LOCAL_ENV_PATH = Path("env.mxpy.json").resolve()
 GLOBAL_ENV_PATH = SDK_PATH / "env.mxpy.json"
 

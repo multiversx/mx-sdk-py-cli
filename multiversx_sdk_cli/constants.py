@@ -1,3 +1,5 @@
+from pathlib import Path
+
 VM_TYPE_SYSTEM = "0001"
 VM_TYPE_WASM_VM = "0500"
 SC_HEX_PUBKEY_PREFIX = "0" * 16
@@ -26,3 +28,5 @@ TRUE_STR_LOWER = "true"
 STR_PREFIX = "str:"
 ADDRESS_PREFIX = "addr:"
 MAINCHAIN_ADDRESS_HRP = "erd"
+
+SDK_PATH = Path("~/multiversx-sdk").expanduser().resolve()

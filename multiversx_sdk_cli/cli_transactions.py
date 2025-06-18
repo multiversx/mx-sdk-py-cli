@@ -162,7 +162,8 @@ def sign_transaction(args: Any):
 
     try:
         sender = cli_shared.prepare_account(args)
-    except NoWalletProvided:
+    except:
+        logger.info("No sender wallet provided. Will not sign for the sender.")
         sender = None
 
     if sender and sender.address != tx.sender:

@@ -30,6 +30,7 @@ import multiversx_sdk_cli.cli_wallet
 import multiversx_sdk_cli.version
 from multiversx_sdk_cli import config, errors, utils, ux
 from multiversx_sdk_cli.cli_shared import set_proxy_from_config_if_not_provided
+from multiversx_sdk_cli.constants import SDK_PATH
 from multiversx_sdk_cli.env import get_address_hrp
 
 logger = logging.getLogger("cli")
@@ -49,7 +50,7 @@ def main(cli_args: list[str] = sys.argv[1:]):
 
 
 def _do_main(cli_args: list[str]):
-    utils.ensure_folder(config.SDK_PATH)
+    utils.ensure_folder(SDK_PATH)
     parser = setup_parser(cli_args)
     argcomplete.autocomplete(parser)
 

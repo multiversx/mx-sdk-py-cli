@@ -5,6 +5,7 @@ import logging
 import sys
 from argparse import FileType
 from functools import cache
+from getpass import getpass
 from pathlib import Path
 from typing import Any, Optional, Text, Union, cast
 
@@ -21,7 +22,7 @@ from multiversx_sdk import (
 )
 
 from multiversx_sdk_cli import config, utils
-from multiversx_sdk_cli.address import (
+from multiversx_sdk_cli.address_config import (
     get_active_address,
     read_address_config_file,
     resolve_address_config_path,
@@ -47,6 +48,7 @@ from multiversx_sdk_cli.errors import (
     LedgerError,
     NoWalletProvided,
     UnknownAddressAliasError,
+    WalletError,
 )
 from multiversx_sdk_cli.guardian_relayer_data import GuardianRelayerData
 from multiversx_sdk_cli.interfaces import IAccount
@@ -175,7 +177,7 @@ def add_wallet_args(args: list[str], sub: Any):
     )
     sub.add_argument(
         "--passfile",
-        help="🔑 a file containing keyfile's password, if keyfile provided. If not provided, you'll be prompted to enter the password.",
+        help="DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter the password.",
     )
     sub.add_argument(
         "--ledger",
@@ -219,7 +221,7 @@ def add_guardian_wallet_args(args: list[str], sub: Any):
     )
     sub.add_argument(
         "--guardian-passfile",
-        help="🔑 a file containing keyfile's password, if keyfile provided. If not provided, you'll be prompted to enter the password.",
+        help="DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter the password.",
     )
     sub.add_argument(
         "--guardian-ledger",
@@ -240,7 +242,7 @@ def add_relayed_v3_wallet_args(args: list[str], sub: Any):
     sub.add_argument("--relayer-keyfile", help="🔑 a JSON keyfile, if PEM not provided")
     sub.add_argument(
         "--relayer-passfile",
-        help="🔑 a file containing keyfile's password, if keyfile provided. If not provided, you'll be prompted to enter the password.",
+        help="DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter the password.",
     )
     sub.add_argument(
         "--relayer-ledger",
@@ -351,75 +353,76 @@ def prepare_account(args: Any):
         password = load_password(args)
         index = args.sender_wallet_index if args.sender_wallet_index != 0 else None
 
-        return Account.new_from_keystore(
-            file_path=Path(args.keyfile),
-            password=password,
-            address_index=index,
-            hrp=hrp,
-        )
+        try:
+            return Account.new_from_keystore(Path(args.keyfile), password=password, address_index=index, hrp=hrp)
+        except Exception as e:
+            raise WalletError(str(e))
     elif args.ledger:
         try:
             return LedgerAccount(address_index=args.sender_wallet_index)
         except Exception as e:
             raise LedgerError(str(e))
     elif args.sender:
-        file_path = resolve_address_config_path()
-        if not file_path.is_file():
-            raise AddressConfigFileError("The address config file was not found")
-
-        file = read_address_config_file()
-        if file == dict():
-            raise AddressConfigFileError("Address config file is empty")
-
-        addresses: dict[str, Any] = file["addresses"]
-        wallet = addresses.get(args.sender, None)
-        if not wallet:
-            raise UnknownAddressAliasError(args.sender)
-
-        logger.info(f"Using sender [{args.sender}] from address config.")
-        return load_wallet_from_address_config(wallet=wallet, hrp=hrp)
+        return load_wallet_by_alias(alias=args.sender, hrp=hrp)
     else:
-        active_address = get_active_address()
-        if active_address == dict():
-            logger.info("No default wallet found in address config.")
-            raise NoWalletProvided()
-
-        alias_of_default_wallet = read_address_config_file().get("active", "")
-        logger.info(f"Using sender [{alias_of_default_wallet}] from address config.")
-
-        return load_wallet_from_address_config(wallet=active_address, hrp=hrp)
+        return load_default_wallet(hrp=hrp)
 
 
-def load_wallet_from_address_config(wallet: dict[str, str], hrp: str) -> Account:
+def load_wallet_by_alias(alias: str, hrp: str) -> Account:
+    file_path = resolve_address_config_path()
+    if not file_path.is_file():
+        raise AddressConfigFileError("The address config file was not found.")
+
+    file = read_address_config_file()
+    if file == dict():
+        raise AddressConfigFileError("Address config file is empty.")
+
+    addresses: dict[str, Any] = file["addresses"]
+    wallet = addresses.get(alias, None)
+    if not wallet:
+        raise UnknownAddressAliasError(alias)
+
+    logger.info(f"Using sender [{alias}] from address config.")
+    return _load_wallet_from_address_config(wallet=wallet, hrp=hrp)
+
+
+def load_default_wallet(hrp: str) -> Account:
+    active_address = get_active_address()
+    if active_address == dict():
+        logger.info("No default wallet found in address config.")
+        raise NoWalletProvided()
+
+    alias_of_default_wallet = read_address_config_file().get("active", "")
+    logger.info(f"Using sender [{alias_of_default_wallet}] from address config.")
+
+    return _load_wallet_from_address_config(wallet=active_address, hrp=hrp)
+
+
+def _load_wallet_from_address_config(wallet: dict[str, str], hrp: str) -> Account:
     kind = wallet.get("kind", None)
     if not kind:
-        raise AddressConfigFileError("'kind' field must be set in the address config")
+        raise AddressConfigFileError("'kind' field must be set in the address config.")
 
     if kind not in ["pem", "keystore"]:
         raise InvalidAddressConfigValue("'kind' must be 'pem' or 'keystore'")
 
-    path = wallet.get("path", None)
-    if not path:
-        raise AddressConfigFileError("'path' field must be set in the address config")
-    path = Path(path)
+    wallet_path = wallet.get("path", None)
+    if not wallet_path:
+        raise AddressConfigFileError("'path' field must be set in the address config.")
+    path = Path(wallet_path)
 
     index = int(wallet.get("index", 0))
 
     if kind == "pem":
         return Account.new_from_pem(file_path=path, index=index, hrp=hrp)
     else:
-        password = wallet.get("password", "")
-        password_path = wallet.get("passwordPath", None)
+        logger.info(f"Using keystore wallet at: [{path}].")
+        password = getpass("Please enter the wallet password: ")
 
-        if not password and not password_path:
-            raise AddressConfigFileError(
-                "'password' or 'passwordPath' must be set in the address config for keystore wallets"
-            )
-
-        if password_path:
-            password = Path(password_path).read_text().splitlines()[0].strip()
-
-        return Account.new_from_keystore(file_path=path, password=password, address_index=index, hrp=hrp)
+        try:
+            return Account.new_from_keystore(file_path=path, password=password, address_index=index, hrp=hrp)
+        except Exception as e:
+            raise WalletError(str(e))
 
 
 def _get_address_hrp(args: Any) -> str:
@@ -466,12 +469,15 @@ def load_guardian_account(args: Any) -> Union[IAccount, None]:
         password = load_guardian_password(args)
         index = args.guardian_wallet_index if args.guardian_wallet_index != 0 else None
 
-        return Account.new_from_keystore(
-            file_path=Path(args.guardian_keyfile),
-            password=password,
-            address_index=index,
-            hrp=hrp,
-        )
+        try:
+            return Account.new_from_keystore(
+                Path(args.guardian_keyfile),
+                password=password,
+                address_index=index,
+                hrp=hrp,
+            )
+        except Exception as e:
+            raise WalletError(str(e))
     elif args.guardian_ledger:
         try:
             return LedgerAccount(address_index=args.guardian_wallet_index)
@@ -600,12 +606,15 @@ def load_relayer_account(args: Any) -> Union[IAccount, None]:
         password = load_relayer_password(args)
         index = args.relayer_wallet_index if args.relayer_wallet_index != 0 else None
 
-        return Account.new_from_keystore(
-            file_path=Path(args.relayer_keyfile),
-            password=password,
-            address_index=index,
-            hrp=hrp,
-        )
+        try:
+            return Account.new_from_keystore(
+                Path(args.relayer_keyfile),
+                password=password,
+                address_index=index,
+                hrp=hrp,
+            )
+        except Exception as e:
+            raise WalletError(str(e))
     elif args.relayer_ledger:
         try:
             return LedgerAccount(address_index=args.relayer_wallet_index)

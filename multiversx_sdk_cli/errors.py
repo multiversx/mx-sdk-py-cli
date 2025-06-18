@@ -213,6 +213,16 @@ class AddressConfigFileError(KnownError):
         super().__init__(message)
 
 
+class WalletError(KnownError):
+    def __init__(self, message: str):
+        super().__init__(message)
+
+
+class NetworkProviderError(KnownError):
+    def __init__(self, url: str, error: str):
+        super().__init__(f"Url = [{url}], error = {error}")
+
+
 class LogLevelError(KnownError):
     def __init__(self, log_level: str):
         super().__init__(f"Log level not accepted: {log_level}. Choose between ['debug', 'info', 'warning', 'error'].")
