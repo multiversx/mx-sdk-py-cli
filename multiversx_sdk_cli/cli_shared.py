@@ -128,12 +128,6 @@ def add_tx_args(
             default=None,
             help="# the nonce for the transaction. If not provided, is fetched from the network.",
         )
-        sub.add_argument(
-            "--recall-nonce",
-            action="store_true",
-            default=False,
-            help="⭮ whether to recall the nonce when creating the transaction (default: %(default)s). This argument is OBSOLETE.",
-        )
 
     if with_receiver:
         sub.add_argument("--receiver", required=False, help="🖄 the address of the receiver")
@@ -422,9 +416,9 @@ def _load_wallet_from_address_config(wallet: dict[str, str], hrp: str) -> Accoun
     if kind == "pem":
         return Account.new_from_pem(file_path=path, index=index, hrp=hrp)
     else:
-        logger.info("Using keystore wallet.")
+        logger.info(f"Using keystore wallet at: [{path}].")
         password = getpass("Please enter the wallet password: ")
-        logger.info(f"Loading keystore wallet from path: {path}")
+
         try:
             return Account.new_from_keystore(file_path=path, password=password, address_index=index, hrp=hrp)
         except Exception as e:

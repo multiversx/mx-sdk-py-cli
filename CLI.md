@@ -140,8 +140,6 @@ options:
   --proxy PROXY                                  🔗 the URL of the proxy
   --nonce NONCE                                  # the nonce for the transaction. If not provided, is fetched from the
                                                  network.
-  --recall-nonce                                 ⭮ whether to recall the nonce when creating the transaction (default:
-                                                 False). This argument is OBSOLETE.
   --gas-price GAS_PRICE                          ⛽ the gas price (default: 1000000000)
   --gas-limit GAS_LIMIT                          ⛽ the gas limit
   --value VALUE                                  the value to transfer (default: 0)
@@ -235,8 +233,6 @@ options:
   --proxy PROXY                                   🔗 the URL of the proxy
   --nonce NONCE                                   # the nonce for the transaction. If not provided, is fetched from the
                                                   network.
-  --recall-nonce                                  ⭮ whether to recall the nonce when creating the transaction (default:
-                                                  False). This argument is OBSOLETE.
   --gas-price GAS_PRICE                           ⛽ the gas price (default: 1000000000)
   --gas-limit GAS_LIMIT                           ⛽ the gas limit
   --value VALUE                                   the value to transfer (default: 0)
@@ -340,8 +336,6 @@ options:
   --proxy PROXY                                  🔗 the URL of the proxy
   --nonce NONCE                                  # the nonce for the transaction. If not provided, is fetched from the
                                                  network.
-  --recall-nonce                                 ⭮ whether to recall the nonce when creating the transaction (default:
-                                                 False). This argument is OBSOLETE.
   --gas-price GAS_PRICE                          ⛽ the gas price (default: 1000000000)
   --gas-limit GAS_LIMIT                          ⛽ the gas limit
   --value VALUE                                  the value to transfer (default: 0)
@@ -523,8 +517,6 @@ options:
   --hrp HRP                                       The hrp used to convert the address to its bech32 representation
   --nonce NONCE                                   # the nonce for the transaction. If not provided, is fetched from the
                                                   network.
-  --recall-nonce                                  ⭮ whether to recall the nonce when creating the transaction (default:
-                                                  False). This argument is OBSOLETE.
   --receiver RECEIVER                             🖄 the address of the receiver
   --receiver-username RECEIVER_USERNAME           🖄 the username of the receiver
   --gas-price GAS_PRICE                           ⛽ the gas price (default: 1000000000)
@@ -747,8 +739,6 @@ options:
   --hrp HRP                                      The hrp used to convert the address to its bech32 representation
   --nonce NONCE                                  # the nonce for the transaction. If not provided, is fetched from the
                                                  network.
-  --recall-nonce                                 ⭮ whether to recall the nonce when creating the transaction (default:
-                                                 False). This argument is OBSOLETE.
   --gas-price GAS_PRICE                          ⛽ the gas price (default: 1000000000)
   --gas-limit GAS_LIMIT                          ⛽ the gas limit
   --value VALUE                                  the value to transfer (default: 0)
@@ -805,8 +795,6 @@ options:
   --hrp HRP                                      The hrp used to convert the address to its bech32 representation
   --nonce NONCE                                  # the nonce for the transaction. If not provided, is fetched from the
                                                  network.
-  --recall-nonce                                 ⭮ whether to recall the nonce when creating the transaction (default:
-                                                 False). This argument is OBSOLETE.
   --gas-price GAS_PRICE                          ⛽ the gas price (default: 1000000000)
   --gas-limit GAS_LIMIT                          ⛽ the gas limit
   --value VALUE                                  the value to transfer (default: 0)
@@ -861,8 +849,6 @@ options:
   --hrp HRP                                      The hrp used to convert the address to its bech32 representation
   --nonce NONCE                                  # the nonce for the transaction. If not provided, is fetched from the
                                                  network.
-  --recall-nonce                                 ⭮ whether to recall the nonce when creating the transaction (default:
-                                                 False). This argument is OBSOLETE.
   --gas-price GAS_PRICE                          ⛽ the gas price (default: 1000000000)
   --gas-limit GAS_LIMIT                          ⛽ the gas limit
   --value VALUE                                  the value to transfer (default: 0)
@@ -917,8 +903,6 @@ options:
   --hrp HRP                                      The hrp used to convert the address to its bech32 representation
   --nonce NONCE                                  # the nonce for the transaction. If not provided, is fetched from the
                                                  network.
-  --recall-nonce                                 ⭮ whether to recall the nonce when creating the transaction (default:
-                                                 False). This argument is OBSOLETE.
   --gas-price GAS_PRICE                          ⛽ the gas price (default: 1000000000)
   --gas-limit GAS_LIMIT                          ⛽ the gas limit
   --value VALUE                                  the value to transfer (default: 0)
@@ -973,8 +957,6 @@ options:
   --hrp HRP                                      The hrp used to convert the address to its bech32 representation
   --nonce NONCE                                  # the nonce for the transaction. If not provided, is fetched from the
                                                  network.
-  --recall-nonce                                 ⭮ whether to recall the nonce when creating the transaction (default:
-                                                 False). This argument is OBSOLETE.
   --gas-price GAS_PRICE                          ⛽ the gas price (default: 1000000000)
   --gas-limit GAS_LIMIT                          ⛽ the gas limit
   --value VALUE                                  the value to transfer (default: 0)
@@ -1029,8 +1011,6 @@ options:
   --hrp HRP                                      The hrp used to convert the address to its bech32 representation
   --nonce NONCE                                  # the nonce for the transaction. If not provided, is fetched from the
                                                  network.
-  --recall-nonce                                 ⭮ whether to recall the nonce when creating the transaction (default:
-                                                 False). This argument is OBSOLETE.
   --gas-price GAS_PRICE                          ⛽ the gas price (default: 1000000000)
   --gas-limit GAS_LIMIT                          ⛽ the gas limit
   --value VALUE                                  the value to transfer (default: 0)
@@ -1084,8 +1064,6 @@ options:
   --hrp HRP                                      The hrp used to convert the address to its bech32 representation
   --nonce NONCE                                  # the nonce for the transaction. If not provided, is fetched from the
                                                  network.
-  --recall-nonce                                 ⭮ whether to recall the nonce when creating the transaction (default:
-                                                 False). This argument is OBSOLETE.
   --gas-price GAS_PRICE                          ⛽ the gas price (default: 1000000000)
   --gas-limit GAS_LIMIT                          ⛽ the gas limit
   --value VALUE                                  the value to transfer (default: 0)
@@ -1140,8 +1118,6 @@ options:
   --hrp HRP                                      The hrp used to convert the address to its bech32 representation
   --nonce NONCE                                  # the nonce for the transaction. If not provided, is fetched from the
                                                  network.
-  --recall-nonce                                 ⭮ whether to recall the nonce when creating the transaction (default:
-                                                 False). This argument is OBSOLETE.
   --gas-price GAS_PRICE                          ⛽ the gas price (default: 1000000000)
   --gas-limit GAS_LIMIT                          ⛽ the gas limit
   --value VALUE                                  the value to transfer (default: 0)
@@ -1196,8 +1172,6 @@ options:
   --hrp HRP                                      The hrp used to convert the address to its bech32 representation
   --nonce NONCE                                  # the nonce for the transaction. If not provided, is fetched from the
                                                  network.
-  --recall-nonce                                 ⭮ whether to recall the nonce when creating the transaction (default:
-                                                 False). This argument is OBSOLETE.
   --gas-price GAS_PRICE                          ⛽ the gas price (default: 1000000000)
   --gas-limit GAS_LIMIT                          ⛽ the gas limit
   --value VALUE                                  the value to transfer (default: 0)
@@ -1252,8 +1226,6 @@ options:
   --hrp HRP                                      The hrp used to convert the address to its bech32 representation
   --nonce NONCE                                  # the nonce for the transaction. If not provided, is fetched from the
                                                  network.
-  --recall-nonce                                 ⭮ whether to recall the nonce when creating the transaction (default:
-                                                 False). This argument is OBSOLETE.
   --gas-price GAS_PRICE                          ⛽ the gas price (default: 1000000000)
   --gas-limit GAS_LIMIT                          ⛽ the gas limit
   --value VALUE                                  the value to transfer (default: 0)
@@ -1308,8 +1280,6 @@ options:
   --hrp HRP                                      The hrp used to convert the address to its bech32 representation
   --nonce NONCE                                  # the nonce for the transaction. If not provided, is fetched from the
                                                  network.
-  --recall-nonce                                 ⭮ whether to recall the nonce when creating the transaction (default:
-                                                 False). This argument is OBSOLETE.
   --gas-price GAS_PRICE                          ⛽ the gas price (default: 1000000000)
   --gas-limit GAS_LIMIT                          ⛽ the gas limit
   --value VALUE                                  the value to transfer (default: 0)
@@ -1363,8 +1333,6 @@ options:
   --hrp HRP                                      The hrp used to convert the address to its bech32 representation
   --nonce NONCE                                  # the nonce for the transaction. If not provided, is fetched from the
                                                  network.
-  --recall-nonce                                 ⭮ whether to recall the nonce when creating the transaction (default:
-                                                 False). This argument is OBSOLETE.
   --gas-price GAS_PRICE                          ⛽ the gas price (default: 1000000000)
   --gas-limit GAS_LIMIT                          ⛽ the gas limit
   --value VALUE                                  the value to transfer (default: 0)
@@ -1458,8 +1426,6 @@ options:
   --hrp HRP                                      The hrp used to convert the address to its bech32 representation
   --nonce NONCE                                  # the nonce for the transaction. If not provided, is fetched from the
                                                  network.
-  --recall-nonce                                 ⭮ whether to recall the nonce when creating the transaction (default:
-                                                 False). This argument is OBSOLETE.
   --gas-price GAS_PRICE                          ⛽ the gas price (default: 1000000000)
   --gas-limit GAS_LIMIT                          ⛽ the gas limit
   --value VALUE                                  the value to transfer (default: 0)
@@ -1532,8 +1498,6 @@ options:
   --hrp HRP                                      The hrp used to convert the address to its bech32 representation
   --nonce NONCE                                  # the nonce for the transaction. If not provided, is fetched from the
                                                  network.
-  --recall-nonce                                 ⭮ whether to recall the nonce when creating the transaction (default:
-                                                 False). This argument is OBSOLETE.
   --gas-price GAS_PRICE                          ⛽ the gas price (default: 1000000000)
   --gas-limit GAS_LIMIT                          ⛽ the gas limit
   --value VALUE                                  the value to transfer (default: 0)
@@ -1590,8 +1554,6 @@ options:
   --hrp HRP                                      The hrp used to convert the address to its bech32 representation
   --nonce NONCE                                  # the nonce for the transaction. If not provided, is fetched from the
                                                  network.
-  --recall-nonce                                 ⭮ whether to recall the nonce when creating the transaction (default:
-                                                 False). This argument is OBSOLETE.
   --gas-price GAS_PRICE                          ⛽ the gas price (default: 1000000000)
   --gas-limit GAS_LIMIT                          ⛽ the gas limit
   --value VALUE                                  the value to transfer (default: 0)
@@ -1648,8 +1610,6 @@ options:
   --hrp HRP                                      The hrp used to convert the address to its bech32 representation
   --nonce NONCE                                  # the nonce for the transaction. If not provided, is fetched from the
                                                  network.
-  --recall-nonce                                 ⭮ whether to recall the nonce when creating the transaction (default:
-                                                 False). This argument is OBSOLETE.
   --gas-price GAS_PRICE                          ⛽ the gas price (default: 1000000000)
   --gas-limit GAS_LIMIT                          ⛽ the gas limit
   --value VALUE                                  the value to transfer (default: 0)
@@ -1706,8 +1666,6 @@ options:
   --hrp HRP                                      The hrp used to convert the address to its bech32 representation
   --nonce NONCE                                  # the nonce for the transaction. If not provided, is fetched from the
                                                  network.
-  --recall-nonce                                 ⭮ whether to recall the nonce when creating the transaction (default:
-                                                 False). This argument is OBSOLETE.
   --gas-price GAS_PRICE                          ⛽ the gas price (default: 1000000000)
   --gas-limit GAS_LIMIT                          ⛽ the gas limit
   --value VALUE                                  the value to transfer (default: 0)
@@ -1764,8 +1722,6 @@ options:
   --hrp HRP                                      The hrp used to convert the address to its bech32 representation
   --nonce NONCE                                  # the nonce for the transaction. If not provided, is fetched from the
                                                  network.
-  --recall-nonce                                 ⭮ whether to recall the nonce when creating the transaction (default:
-                                                 False). This argument is OBSOLETE.
   --gas-price GAS_PRICE                          ⛽ the gas price (default: 1000000000)
   --gas-limit GAS_LIMIT                          ⛽ the gas limit
   --value VALUE                                  the value to transfer (default: 0)
@@ -1822,8 +1778,6 @@ options:
   --hrp HRP                                      The hrp used to convert the address to its bech32 representation
   --nonce NONCE                                  # the nonce for the transaction. If not provided, is fetched from the
                                                  network.
-  --recall-nonce                                 ⭮ whether to recall the nonce when creating the transaction (default:
-                                                 False). This argument is OBSOLETE.
   --gas-price GAS_PRICE                          ⛽ the gas price (default: 1000000000)
   --gas-limit GAS_LIMIT                          ⛽ the gas limit
   --value VALUE                                  the value to transfer (default: 0)
@@ -1878,8 +1832,6 @@ options:
   --hrp HRP                                      The hrp used to convert the address to its bech32 representation
   --nonce NONCE                                  # the nonce for the transaction. If not provided, is fetched from the
                                                  network.
-  --recall-nonce                                 ⭮ whether to recall the nonce when creating the transaction (default:
-                                                 False). This argument is OBSOLETE.
   --gas-price GAS_PRICE                          ⛽ the gas price (default: 1000000000)
   --gas-limit GAS_LIMIT                          ⛽ the gas limit
   --value VALUE                                  the value to transfer (default: 0)
@@ -1934,8 +1886,6 @@ options:
   --hrp HRP                                      The hrp used to convert the address to its bech32 representation
   --nonce NONCE                                  # the nonce for the transaction. If not provided, is fetched from the
                                                  network.
-  --recall-nonce                                 ⭮ whether to recall the nonce when creating the transaction (default:
-                                                 False). This argument is OBSOLETE.
   --gas-price GAS_PRICE                          ⛽ the gas price (default: 1000000000)
   --gas-limit GAS_LIMIT                          ⛽ the gas limit
   --value VALUE                                  the value to transfer (default: 0)
@@ -1990,8 +1940,6 @@ options:
   --hrp HRP                                      The hrp used to convert the address to its bech32 representation
   --nonce NONCE                                  # the nonce for the transaction. If not provided, is fetched from the
                                                  network.
-  --recall-nonce                                 ⭮ whether to recall the nonce when creating the transaction (default:
-                                                 False). This argument is OBSOLETE.
   --gas-price GAS_PRICE                          ⛽ the gas price (default: 1000000000)
   --gas-limit GAS_LIMIT                          ⛽ the gas limit
   --value VALUE                                  the value to transfer (default: 0)
@@ -2046,8 +1994,6 @@ options:
   --hrp HRP                                      The hrp used to convert the address to its bech32 representation
   --nonce NONCE                                  # the nonce for the transaction. If not provided, is fetched from the
                                                  network.
-  --recall-nonce                                 ⭮ whether to recall the nonce when creating the transaction (default:
-                                                 False). This argument is OBSOLETE.
   --gas-price GAS_PRICE                          ⛽ the gas price (default: 1000000000)
   --gas-limit GAS_LIMIT                          ⛽ the gas limit
   --value VALUE                                  the value to transfer (default: 0)
@@ -2102,8 +2048,6 @@ options:
   --hrp HRP                                      The hrp used to convert the address to its bech32 representation
   --nonce NONCE                                  # the nonce for the transaction. If not provided, is fetched from the
                                                  network.
-  --recall-nonce                                 ⭮ whether to recall the nonce when creating the transaction (default:
-                                                 False). This argument is OBSOLETE.
   --gas-price GAS_PRICE                          ⛽ the gas price (default: 1000000000)
   --gas-limit GAS_LIMIT                          ⛽ the gas limit
   --value VALUE                                  the value to transfer (default: 0)
@@ -2159,8 +2103,6 @@ options:
   --hrp HRP                                      The hrp used to convert the address to its bech32 representation
   --nonce NONCE                                  # the nonce for the transaction. If not provided, is fetched from the
                                                  network.
-  --recall-nonce                                 ⭮ whether to recall the nonce when creating the transaction (default:
-                                                 False). This argument is OBSOLETE.
   --gas-price GAS_PRICE                          ⛽ the gas price (default: 1000000000)
   --gas-limit GAS_LIMIT                          ⛽ the gas limit
   --value VALUE                                  the value to transfer (default: 0)
@@ -2216,8 +2158,6 @@ options:
   --hrp HRP                                      The hrp used to convert the address to its bech32 representation
   --nonce NONCE                                  # the nonce for the transaction. If not provided, is fetched from the
                                                  network.
-  --recall-nonce                                 ⭮ whether to recall the nonce when creating the transaction (default:
-                                                 False). This argument is OBSOLETE.
   --gas-price GAS_PRICE                          ⛽ the gas price (default: 1000000000)
   --gas-limit GAS_LIMIT                          ⛽ the gas limit
   --value VALUE                                  the value to transfer (default: 0)
@@ -2274,8 +2214,6 @@ options:
   --hrp HRP                                      The hrp used to convert the address to its bech32 representation
   --nonce NONCE                                  # the nonce for the transaction. If not provided, is fetched from the
                                                  network.
-  --recall-nonce                                 ⭮ whether to recall the nonce when creating the transaction (default:
-                                                 False). This argument is OBSOLETE.
   --gas-price GAS_PRICE                          ⛽ the gas price (default: 1000000000)
   --gas-limit GAS_LIMIT                          ⛽ the gas limit
   --value VALUE                                  the value to transfer (default: 0)
@@ -2332,8 +2270,6 @@ options:
   --hrp HRP                                      The hrp used to convert the address to its bech32 representation
   --nonce NONCE                                  # the nonce for the transaction. If not provided, is fetched from the
                                                  network.
-  --recall-nonce                                 ⭮ whether to recall the nonce when creating the transaction (default:
-                                                 False). This argument is OBSOLETE.
   --gas-price GAS_PRICE                          ⛽ the gas price (default: 1000000000)
   --gas-limit GAS_LIMIT                          ⛽ the gas limit
   --value VALUE                                  the value to transfer (default: 0)
@@ -2391,8 +2327,6 @@ options:
   --hrp HRP                                      The hrp used to convert the address to its bech32 representation
   --nonce NONCE                                  # the nonce for the transaction. If not provided, is fetched from the
                                                  network.
-  --recall-nonce                                 ⭮ whether to recall the nonce when creating the transaction (default:
-                                                 False). This argument is OBSOLETE.
   --gas-price GAS_PRICE                          ⛽ the gas price (default: 1000000000)
   --gas-limit GAS_LIMIT                          ⛽ the gas limit
   --value VALUE                                  the value to transfer (default: 0)
@@ -2450,8 +2384,6 @@ options:
   --hrp HRP                                      The hrp used to convert the address to its bech32 representation
   --nonce NONCE                                  # the nonce for the transaction. If not provided, is fetched from the
                                                  network.
-  --recall-nonce                                 ⭮ whether to recall the nonce when creating the transaction (default:
-                                                 False). This argument is OBSOLETE.
   --gas-price GAS_PRICE                          ⛽ the gas price (default: 1000000000)
   --gas-limit GAS_LIMIT                          ⛽ the gas limit
   --value VALUE                                  the value to transfer (default: 0)
@@ -3225,8 +3157,6 @@ options:
   --proxy PROXY                                   🔗 the URL of the proxy
   --nonce NONCE                                   # the nonce for the transaction. If not provided, is fetched from the
                                                   network.
-  --recall-nonce                                  ⭮ whether to recall the nonce when creating the transaction (default:
-                                                  False). This argument is OBSOLETE.
   --gas-price GAS_PRICE                           ⛽ the gas price (default: 1000000000)
   --gas-limit GAS_LIMIT                           ⛽ the gas limit
   --value VALUE                                   the value to transfer (default: 0)
@@ -3302,8 +3232,6 @@ options:
   --proxy PROXY                                   🔗 the URL of the proxy
   --nonce NONCE                                   # the nonce for the transaction. If not provided, is fetched from the
                                                   network.
-  --recall-nonce                                  ⭮ whether to recall the nonce when creating the transaction (default:
-                                                  False). This argument is OBSOLETE.
   --gas-price GAS_PRICE                           ⛽ the gas price (default: 1000000000)
   --gas-limit GAS_LIMIT                           ⛽ the gas limit
   --value VALUE                                   the value to transfer (default: 0)
@@ -3377,8 +3305,6 @@ options:
   --proxy PROXY                                  🔗 the URL of the proxy
   --nonce NONCE                                  # the nonce for the transaction. If not provided, is fetched from the
                                                  network.
-  --recall-nonce                                 ⭮ whether to recall the nonce when creating the transaction (default:
-                                                 False). This argument is OBSOLETE.
   --gas-price GAS_PRICE                          ⛽ the gas price (default: 1000000000)
   --gas-limit GAS_LIMIT                          ⛽ the gas limit
   --value VALUE                                  the value to transfer (default: 0)
@@ -3451,8 +3377,6 @@ options:
   --proxy PROXY                                  🔗 the URL of the proxy
   --nonce NONCE                                  # the nonce for the transaction. If not provided, is fetched from the
                                                  network.
-  --recall-nonce                                 ⭮ whether to recall the nonce when creating the transaction (default:
-                                                 False). This argument is OBSOLETE.
   --gas-price GAS_PRICE                          ⛽ the gas price (default: 1000000000)
   --gas-limit GAS_LIMIT                          ⛽ the gas limit
   --value VALUE                                  the value to transfer (default: 0)
@@ -3525,8 +3449,6 @@ options:
   --proxy PROXY                                  🔗 the URL of the proxy
   --nonce NONCE                                  # the nonce for the transaction. If not provided, is fetched from the
                                                  network.
-  --recall-nonce                                 ⭮ whether to recall the nonce when creating the transaction (default:
-                                                 False). This argument is OBSOLETE.
   --gas-price GAS_PRICE                          ⛽ the gas price (default: 1000000000)
   --gas-limit GAS_LIMIT                          ⛽ the gas limit
   --value VALUE                                  the value to transfer (default: 0)
@@ -3599,8 +3521,6 @@ options:
   --proxy PROXY                                  🔗 the URL of the proxy
   --nonce NONCE                                  # the nonce for the transaction. If not provided, is fetched from the
                                                  network.
-  --recall-nonce                                 ⭮ whether to recall the nonce when creating the transaction (default:
-                                                 False). This argument is OBSOLETE.
   --gas-price GAS_PRICE                          ⛽ the gas price (default: 1000000000)
   --gas-limit GAS_LIMIT                          ⛽ the gas limit
   --value VALUE                                  the value to transfer (default: 0)
@@ -3673,8 +3593,6 @@ options:
   --proxy PROXY                                  🔗 the URL of the proxy
   --nonce NONCE                                  # the nonce for the transaction. If not provided, is fetched from the
                                                  network.
-  --recall-nonce                                 ⭮ whether to recall the nonce when creating the transaction (default:
-                                                 False). This argument is OBSOLETE.
   --gas-price GAS_PRICE                          ⛽ the gas price (default: 1000000000)
   --gas-limit GAS_LIMIT                          ⛽ the gas limit
   --value VALUE                                  the value to transfer (default: 0)
@@ -3748,8 +3666,6 @@ options:
   --proxy PROXY                                  🔗 the URL of the proxy
   --nonce NONCE                                  # the nonce for the transaction. If not provided, is fetched from the
                                                  network.
-  --recall-nonce                                 ⭮ whether to recall the nonce when creating the transaction (default:
-                                                 False). This argument is OBSOLETE.
   --gas-price GAS_PRICE                          ⛽ the gas price (default: 1000000000)
   --gas-limit GAS_LIMIT                          ⛽ the gas limit
   --value VALUE                                  the value to transfer (default: 0)
@@ -3830,8 +3746,6 @@ options:
   --proxy PROXY                                  🔗 the URL of the proxy
   --nonce NONCE                                  # the nonce for the transaction. If not provided, is fetched from the
                                                  network.
-  --recall-nonce                                 ⭮ whether to recall the nonce when creating the transaction (default:
-                                                 False). This argument is OBSOLETE.
   --receiver RECEIVER                            🖄 the address of the receiver
   --receiver-username RECEIVER_USERNAME          🖄 the username of the receiver
   --gas-price GAS_PRICE                          ⛽ the gas price (default: 1000000000)
@@ -3917,8 +3831,6 @@ options:
   --proxy PROXY                                   🔗 the URL of the proxy
   --nonce NONCE                                   # the nonce for the transaction. If not provided, is fetched from the
                                                   network.
-  --recall-nonce                                  ⭮ whether to recall the nonce when creating the transaction (default:
-                                                  False). This argument is OBSOLETE.
   --receiver RECEIVER                             🖄 the address of the receiver
   --receiver-username RECEIVER_USERNAME           🖄 the username of the receiver
   --gas-price GAS_PRICE                           ⛽ the gas price (default: 1000000000)
@@ -4005,8 +3917,6 @@ options:
   --proxy PROXY                                   🔗 the URL of the proxy
   --nonce NONCE                                   # the nonce for the transaction. If not provided, is fetched from the
                                                   network.
-  --recall-nonce                                  ⭮ whether to recall the nonce when creating the transaction (default:
-                                                  False). This argument is OBSOLETE.
   --receiver RECEIVER                             🖄 the address of the receiver
   --receiver-username RECEIVER_USERNAME           🖄 the username of the receiver
   --gas-price GAS_PRICE                           ⛽ the gas price (default: 1000000000)
@@ -4092,8 +4002,6 @@ options:
   --proxy PROXY                                  🔗 the URL of the proxy
   --nonce NONCE                                  # the nonce for the transaction. If not provided, is fetched from the
                                                  network.
-  --recall-nonce                                 ⭮ whether to recall the nonce when creating the transaction (default:
-                                                 False). This argument is OBSOLETE.
   --gas-price GAS_PRICE                          ⛽ the gas price (default: 1000000000)
   --gas-limit GAS_LIMIT                          ⛽ the gas limit
   --value VALUE                                  the value to transfer (default: 0)
@@ -4177,8 +4085,6 @@ options:
   --proxy PROXY                                  🔗 the URL of the proxy
   --nonce NONCE                                  # the nonce for the transaction. If not provided, is fetched from the
                                                  network.
-  --recall-nonce                                 ⭮ whether to recall the nonce when creating the transaction (default:
-                                                 False). This argument is OBSOLETE.
   --gas-price GAS_PRICE                          ⛽ the gas price (default: 1000000000)
   --gas-limit GAS_LIMIT                          ⛽ the gas limit
   --value VALUE                                  the value to transfer (default: 0)
@@ -4251,8 +4157,6 @@ options:
   --proxy PROXY                                  🔗 the URL of the proxy
   --nonce NONCE                                  # the nonce for the transaction. If not provided, is fetched from the
                                                  network.
-  --recall-nonce                                 ⭮ whether to recall the nonce when creating the transaction (default:
-                                                 False). This argument is OBSOLETE.
   --gas-price GAS_PRICE                          ⛽ the gas price (default: 1000000000)
   --gas-limit GAS_LIMIT                          ⛽ the gas limit
   --value VALUE                                  the value to transfer (default: 0)
@@ -4325,8 +4229,6 @@ options:
   --proxy PROXY                                  🔗 the URL of the proxy
   --nonce NONCE                                  # the nonce for the transaction. If not provided, is fetched from the
                                                  network.
-  --recall-nonce                                 ⭮ whether to recall the nonce when creating the transaction (default:
-                                                 False). This argument is OBSOLETE.
   --gas-price GAS_PRICE                          ⛽ the gas price (default: 1000000000)
   --gas-limit GAS_LIMIT                          ⛽ the gas limit
   --value VALUE                                  the value to transfer (default: 0)
@@ -4399,8 +4301,6 @@ options:
   --proxy PROXY                                  🔗 the URL of the proxy
   --nonce NONCE                                  # the nonce for the transaction. If not provided, is fetched from the
                                                  network.
-  --recall-nonce                                 ⭮ whether to recall the nonce when creating the transaction (default:
-                                                 False). This argument is OBSOLETE.
   --gas-price GAS_PRICE                          ⛽ the gas price (default: 1000000000)
   --gas-limit GAS_LIMIT                          ⛽ the gas limit
   --value VALUE                                  the value to transfer (default: 0)
@@ -4473,8 +4373,6 @@ options:
   --proxy PROXY                                  🔗 the URL of the proxy
   --nonce NONCE                                  # the nonce for the transaction. If not provided, is fetched from the
                                                  network.
-  --recall-nonce                                 ⭮ whether to recall the nonce when creating the transaction (default:
-                                                 False). This argument is OBSOLETE.
   --gas-price GAS_PRICE                          ⛽ the gas price (default: 1000000000)
   --gas-limit GAS_LIMIT                          ⛽ the gas limit
   --value VALUE                                  the value to transfer (default: 0)
@@ -4547,8 +4445,6 @@ options:
   --proxy PROXY                                  🔗 the URL of the proxy
   --nonce NONCE                                  # the nonce for the transaction. If not provided, is fetched from the
                                                  network.
-  --recall-nonce                                 ⭮ whether to recall the nonce when creating the transaction (default:
-                                                 False). This argument is OBSOLETE.
   --gas-price GAS_PRICE                          ⛽ the gas price (default: 1000000000)
   --gas-limit GAS_LIMIT                          ⛽ the gas limit
   --value VALUE                                  the value to transfer (default: 0)
@@ -4621,8 +4517,6 @@ options:
   --proxy PROXY                                  🔗 the URL of the proxy
   --nonce NONCE                                  # the nonce for the transaction. If not provided, is fetched from the
                                                  network.
-  --recall-nonce                                 ⭮ whether to recall the nonce when creating the transaction (default:
-                                                 False). This argument is OBSOLETE.
   --gas-price GAS_PRICE                          ⛽ the gas price (default: 1000000000)
   --gas-limit GAS_LIMIT                          ⛽ the gas limit
   --value VALUE                                  the value to transfer (default: 0)
@@ -4697,8 +4591,6 @@ options:
   --proxy PROXY                                   🔗 the URL of the proxy
   --nonce NONCE                                   # the nonce for the transaction. If not provided, is fetched from the
                                                   network.
-  --recall-nonce                                  ⭮ whether to recall the nonce when creating the transaction (default:
-                                                  False). This argument is OBSOLETE.
   --gas-price GAS_PRICE                           ⛽ the gas price (default: 1000000000)
   --gas-limit GAS_LIMIT                           ⛽ the gas limit
   --value VALUE                                   the value to transfer (default: 0)
@@ -4772,8 +4664,6 @@ options:
   --proxy PROXY                                  🔗 the URL of the proxy
   --nonce NONCE                                  # the nonce for the transaction. If not provided, is fetched from the
                                                  network.
-  --recall-nonce                                 ⭮ whether to recall the nonce when creating the transaction (default:
-                                                 False). This argument is OBSOLETE.
   --gas-price GAS_PRICE                          ⛽ the gas price (default: 1000000000)
   --gas-limit GAS_LIMIT                          ⛽ the gas limit
   --value VALUE                                  the value to transfer (default: 0)
@@ -4846,8 +4736,6 @@ options:
   --proxy PROXY                                  🔗 the URL of the proxy
   --nonce NONCE                                  # the nonce for the transaction. If not provided, is fetched from the
                                                  network.
-  --recall-nonce                                 ⭮ whether to recall the nonce when creating the transaction (default:
-                                                 False). This argument is OBSOLETE.
   --gas-price GAS_PRICE                          ⛽ the gas price (default: 1000000000)
   --gas-limit GAS_LIMIT                          ⛽ the gas limit
   --value VALUE                                  the value to transfer (default: 0)
@@ -5480,8 +5368,6 @@ options:
   --proxy PROXY                                  🔗 the URL of the proxy
   --nonce NONCE                                  # the nonce for the transaction. If not provided, is fetched from the
                                                  network.
-  --recall-nonce                                 ⭮ whether to recall the nonce when creating the transaction (default:
-                                                 False). This argument is OBSOLETE.
   --gas-price GAS_PRICE                          ⛽ the gas price (default: 1000000000)
   --gas-limit GAS_LIMIT                          ⛽ the gas limit
   --value VALUE                                  the value to transfer (default: 0)
@@ -5553,8 +5439,6 @@ options:
   --proxy PROXY                                  🔗 the URL of the proxy
   --nonce NONCE                                  # the nonce for the transaction. If not provided, is fetched from the
                                                  network.
-  --recall-nonce                                 ⭮ whether to recall the nonce when creating the transaction (default:
-                                                 False). This argument is OBSOLETE.
   --gas-price GAS_PRICE                          ⛽ the gas price (default: 1000000000)
   --gas-limit GAS_LIMIT                          ⛽ the gas limit
   --value VALUE                                  the value to transfer (default: 0)
@@ -5625,8 +5509,6 @@ options:
   --proxy PROXY                                  🔗 the URL of the proxy
   --nonce NONCE                                  # the nonce for the transaction. If not provided, is fetched from the
                                                  network.
-  --recall-nonce                                 ⭮ whether to recall the nonce when creating the transaction (default:
-                                                 False). This argument is OBSOLETE.
   --gas-price GAS_PRICE                          ⛽ the gas price (default: 1000000000)
   --gas-limit GAS_LIMIT                          ⛽ the gas limit
   --value VALUE                                  the value to transfer (default: 0)
@@ -5698,8 +5580,6 @@ options:
   --proxy PROXY                                  🔗 the URL of the proxy
   --nonce NONCE                                  # the nonce for the transaction. If not provided, is fetched from the
                                                  network.
-  --recall-nonce                                 ⭮ whether to recall the nonce when creating the transaction (default:
-                                                 False). This argument is OBSOLETE.
   --gas-price GAS_PRICE                          ⛽ the gas price (default: 1000000000)
   --gas-limit GAS_LIMIT                          ⛽ the gas limit
   --value VALUE                                  the value to transfer (default: 0)
@@ -5769,8 +5649,6 @@ options:
   --proxy PROXY                                  🔗 the URL of the proxy
   --nonce NONCE                                  # the nonce for the transaction. If not provided, is fetched from the
                                                  network.
-  --recall-nonce                                 ⭮ whether to recall the nonce when creating the transaction (default:
-                                                 False). This argument is OBSOLETE.
   --gas-price GAS_PRICE                          ⛽ the gas price (default: 1000000000)
   --gas-limit GAS_LIMIT                          ⛽ the gas limit
   --value VALUE                                  the value to transfer (default: 0)
@@ -5845,8 +5723,6 @@ options:
   --proxy PROXY                                  🔗 the URL of the proxy
   --nonce NONCE                                  # the nonce for the transaction. If not provided, is fetched from the
                                                  network.
-  --recall-nonce                                 ⭮ whether to recall the nonce when creating the transaction (default:
-                                                 False). This argument is OBSOLETE.
   --gas-price GAS_PRICE                          ⛽ the gas price (default: 1000000000)
   --gas-limit GAS_LIMIT                          ⛽ the gas limit
   --value VALUE                                  the value to transfer (default: 0)
