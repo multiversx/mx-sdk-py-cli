@@ -36,12 +36,12 @@ def setup_parser(subparsers: Any) -> Any:
     sub.set_defaults(func=get_account)
 
     sub = cli_shared.add_command_subparser(
-        subparsers, "get", "keys", "Get the storage (key-value pairs) of an account."
+        subparsers, "get", "storage", "Get the storage (key-value pairs) of an account."
     )
     _add_alias_arg(sub)
     _add_address_arg(sub)
     _add_proxy_arg(sub)
-    sub.set_defaults(func=get_keys)
+    sub.set_defaults(func=get_storage)
 
     sub = cli_shared.add_command_subparser(
         subparsers, "get", "storage-entry", "Get a specific storage entry (key-value pair) of an account."
@@ -121,7 +121,7 @@ def get_account(args: Any):
         dump_out_json(response.raw)
 
 
-def get_keys(args: Any):
+def get_storage(args: Any):
     if args.alias and args.address:
         raise BadUsage("Provide either '--alias' or '--address'")
 

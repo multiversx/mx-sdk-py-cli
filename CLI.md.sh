@@ -207,7 +207,7 @@ generate() {
 
     group "Get" "get"
     command "Get.Account" "get account"
-    command "Get.Keys" "get keys"
+    command "Get.Storage" "get storage"
     command "Get.StorageEntry" "get storage-entry"
     command "Get.Token" "get token"
     command "Get.Transaction" "get transaction"
