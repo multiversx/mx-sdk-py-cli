@@ -23,7 +23,7 @@ See:
 
 
 COMMAND GROUPS:
-  {contract,tx,validator,ledger,wallet,validator-wallet,deps,config,localnet,data,staking-provider,dns,faucet,multisig,governance,env}
+  {address,contract,tx,validator,ledger,wallet,validator-wallet,deps,config,localnet,data,staking-provider,dns,faucet,multisig,governance,env,get}
 
 TOP-LEVEL OPTIONS:
   -h, --help            show this help message and exit
@@ -33,6 +33,7 @@ TOP-LEVEL OPTIONS:
 ----------------------
 COMMAND GROUPS summary
 ----------------------
+address                        Configure MultiversX CLI to use a default wallet.
 contract                       Deploy, upgrade and interact with Smart Contracts
 tx                             Create and broadcast Transactions
 validator                      Stake, UnStake, UnBond, Unjail and other actions useful for Validators
@@ -49,6 +50,7 @@ faucet                         Get xEGLD on Devnet or Testnet
 multisig                       Deploy and interact with the Multisig Smart Contract
 governance                     Propose, vote and interact with the governance contract.
 env                            Configure MultiversX CLI to use specific environment values.
+get                            Get info from the network.
 
 ```
 ## Group **Contract**
@@ -125,6 +127,7 @@ options:
   --metadata-payable                             ‼ mark the contract as payable (default: not payable)
   --metadata-payable-by-sc                       ‼ mark the contract as payable by SC (default: not payable by SC)
   --outfile OUTFILE                              where to save the output (default: stdout)
+  --sender SENDER                                the alias of the wallet set in the address config
   --pem PEM                                      🔑 the PEM file, if keyfile not provided
   --keyfile KEYFILE                              🔑 a JSON keyfile, if PEM not provided
   --passfile PASSFILE                            🔑 a file containing keyfile's password, if keyfile provided. If not
@@ -219,6 +222,7 @@ options:
   -h, --help                                      show this help message and exit
   --abi ABI                                       the ABI file of the Smart Contract
   --outfile OUTFILE                               where to save the output (default: stdout)
+  --sender SENDER                                 the alias of the wallet set in the address config
   --pem PEM                                       🔑 the PEM file, if keyfile not provided
   --keyfile KEYFILE                               🔑 a JSON keyfile, if PEM not provided
   --passfile PASSFILE                             🔑 a file containing keyfile's password, if keyfile provided. If not
@@ -323,6 +327,7 @@ options:
   --metadata-not-readable                        ‼ mark the contract as NOT readable (default: readable)
   --metadata-payable                             ‼ mark the contract as payable (default: not payable)
   --metadata-payable-by-sc                       ‼ mark the contract as payable by SC (default: not payable by SC)
+  --sender SENDER                                the alias of the wallet set in the address config
   --pem PEM                                      🔑 the PEM file, if keyfile not provided
   --keyfile KEYFILE                              🔑 a JSON keyfile, if PEM not provided
   --passfile PASSFILE                            🔑 a file containing keyfile's password, if keyfile provided. If not
@@ -415,6 +420,7 @@ options:
   --verifier-url VERIFIER_URL                the url of the service that validates the contract
   --docker-image DOCKER_IMAGE                the docker image used for the build
   --contract-variant CONTRACT_VARIANT        in case of a multicontract, specify the contract variant you want to verify
+  --sender SENDER                            the alias of the wallet set in the address config
   --pem PEM                                  🔑 the PEM file, if keyfile not provided
   --keyfile KEYFILE                          🔑 a JSON keyfile, if PEM not provided
   --passfile PASSFILE                        🔑 a file containing keyfile's password, if keyfile provided. If not
@@ -505,6 +511,7 @@ Output example:
 
 options:
   -h, --help                                      show this help message and exit
+  --sender SENDER                                 the alias of the wallet set in the address config
   --pem PEM                                       🔑 the PEM file, if keyfile not provided
   --keyfile KEYFILE                               🔑 a JSON keyfile, if PEM not provided
   --passfile PASSFILE                             🔑 a file containing keyfile's password, if keyfile provided. If not
@@ -612,6 +619,7 @@ Output example:
 
 options:
   -h, --help                                     show this help message and exit
+  --sender SENDER                                the alias of the wallet set in the address config
   --pem PEM                                      🔑 the PEM file, if keyfile not provided
   --keyfile KEYFILE                              🔑 a JSON keyfile, if PEM not provided
   --passfile PASSFILE                            🔑 a file containing keyfile's password, if keyfile provided. If not
@@ -727,6 +735,7 @@ Stake value into the Network
 options:
   -h, --help                                     show this help message and exit
   --proxy PROXY                                  🔗 the URL of the proxy
+  --sender SENDER                                the alias of the wallet set in the address config
   --pem PEM                                      🔑 the PEM file, if keyfile not provided
   --keyfile KEYFILE                              🔑 a JSON keyfile, if PEM not provided
   --passfile PASSFILE                            🔑 a file containing keyfile's password, if keyfile provided. If not
@@ -784,6 +793,7 @@ Unstake value
 options:
   -h, --help                                     show this help message and exit
   --proxy PROXY                                  🔗 the URL of the proxy
+  --sender SENDER                                the alias of the wallet set in the address config
   --pem PEM                                      🔑 the PEM file, if keyfile not provided
   --keyfile KEYFILE                              🔑 a JSON keyfile, if PEM not provided
   --passfile PASSFILE                            🔑 a file containing keyfile's password, if keyfile provided. If not
@@ -839,6 +849,7 @@ Unjail a Validator Node
 options:
   -h, --help                                     show this help message and exit
   --proxy PROXY                                  🔗 the URL of the proxy
+  --sender SENDER                                the alias of the wallet set in the address config
   --pem PEM                                      🔑 the PEM file, if keyfile not provided
   --keyfile KEYFILE                              🔑 a JSON keyfile, if PEM not provided
   --passfile PASSFILE                            🔑 a file containing keyfile's password, if keyfile provided. If not
@@ -894,6 +905,7 @@ Unbond tokens for a bls key
 options:
   -h, --help                                     show this help message and exit
   --proxy PROXY                                  🔗 the URL of the proxy
+  --sender SENDER                                the alias of the wallet set in the address config
   --pem PEM                                      🔑 the PEM file, if keyfile not provided
   --keyfile KEYFILE                              🔑 a JSON keyfile, if PEM not provided
   --passfile PASSFILE                            🔑 a file containing keyfile's password, if keyfile provided. If not
@@ -949,6 +961,7 @@ Change the reward address
 options:
   -h, --help                                     show this help message and exit
   --proxy PROXY                                  🔗 the URL of the proxy
+  --sender SENDER                                the alias of the wallet set in the address config
   --pem PEM                                      🔑 the PEM file, if keyfile not provided
   --keyfile KEYFILE                              🔑 a JSON keyfile, if PEM not provided
   --passfile PASSFILE                            🔑 a file containing keyfile's password, if keyfile provided. If not
@@ -1004,6 +1017,7 @@ Claim rewards
 options:
   -h, --help                                     show this help message and exit
   --proxy PROXY                                  🔗 the URL of the proxy
+  --sender SENDER                                the alias of the wallet set in the address config
   --pem PEM                                      🔑 the PEM file, if keyfile not provided
   --keyfile KEYFILE                              🔑 a JSON keyfile, if PEM not provided
   --passfile PASSFILE                            🔑 a file containing keyfile's password, if keyfile provided. If not
@@ -1058,6 +1072,7 @@ Unstake-nodes will unstake nodes for provided bls keys
 options:
   -h, --help                                     show this help message and exit
   --proxy PROXY                                  🔗 the URL of the proxy
+  --sender SENDER                                the alias of the wallet set in the address config
   --pem PEM                                      🔑 the PEM file, if keyfile not provided
   --keyfile KEYFILE                              🔑 a JSON keyfile, if PEM not provided
   --passfile PASSFILE                            🔑 a file containing keyfile's password, if keyfile provided. If not
@@ -1113,6 +1128,7 @@ This command will un-stake the given amount (if value is greater than the existi
 options:
   -h, --help                                     show this help message and exit
   --proxy PROXY                                  🔗 the URL of the proxy
+  --sender SENDER                                the alias of the wallet set in the address config
   --pem PEM                                      🔑 the PEM file, if keyfile not provided
   --keyfile KEYFILE                              🔑 a JSON keyfile, if PEM not provided
   --passfile PASSFILE                            🔑 a file containing keyfile's password, if keyfile provided. If not
@@ -1168,6 +1184,7 @@ It will unBond nodes
 options:
   -h, --help                                     show this help message and exit
   --proxy PROXY                                  🔗 the URL of the proxy
+  --sender SENDER                                the alias of the wallet set in the address config
   --pem PEM                                      🔑 the PEM file, if keyfile not provided
   --keyfile KEYFILE                              🔑 a JSON keyfile, if PEM not provided
   --passfile PASSFILE                            🔑 a file containing keyfile's password, if keyfile provided. If not
@@ -1223,6 +1240,7 @@ It will unBond tokens, if provided value is bigger that topUp value will unBond 
 options:
   -h, --help                                     show this help message and exit
   --proxy PROXY                                  🔗 the URL of the proxy
+  --sender SENDER                                the alias of the wallet set in the address config
   --pem PEM                                      🔑 the PEM file, if keyfile not provided
   --keyfile KEYFILE                              🔑 a JSON keyfile, if PEM not provided
   --passfile PASSFILE                            🔑 a file containing keyfile's password, if keyfile provided. If not
@@ -1278,6 +1296,7 @@ Deletes duplicated keys from registered data
 options:
   -h, --help                                     show this help message and exit
   --proxy PROXY                                  🔗 the URL of the proxy
+  --sender SENDER                                the alias of the wallet set in the address config
   --pem PEM                                      🔑 the PEM file, if keyfile not provided
   --keyfile KEYFILE                              🔑 a JSON keyfile, if PEM not provided
   --passfile PASSFILE                            🔑 a file containing keyfile's password, if keyfile provided. If not
@@ -1332,6 +1351,7 @@ It will reStake UnStaked nodes
 options:
   -h, --help                                     show this help message and exit
   --proxy PROXY                                  🔗 the URL of the proxy
+  --sender SENDER                                the alias of the wallet set in the address config
   --pem PEM                                      🔑 the PEM file, if keyfile not provided
   --keyfile KEYFILE                              🔑 a JSON keyfile, if PEM not provided
   --passfile PASSFILE                            🔑 a file containing keyfile's password, if keyfile provided. If not
@@ -1426,6 +1446,7 @@ Create a new delegation system smart contract, transferred value must be greater
 options:
   -h, --help                                     show this help message and exit
   --proxy PROXY                                  🔗 the URL of the proxy
+  --sender SENDER                                the alias of the wallet set in the address config
   --pem PEM                                      🔑 the PEM file, if keyfile not provided
   --keyfile KEYFILE                              🔑 a JSON keyfile, if PEM not provided
   --passfile PASSFILE                            🔑 a file containing keyfile's password, if keyfile provided. If not
@@ -1499,6 +1520,7 @@ options:
   --validators-pem VALIDATORS_PEM                a PEM file holding the BLS keys; can contain multiple nodes
   --delegation-contract DELEGATION_CONTRACT      bech32 address of the delegation contract
   --proxy PROXY                                  🔗 the URL of the proxy
+  --sender SENDER                                the alias of the wallet set in the address config
   --pem PEM                                      🔑 the PEM file, if keyfile not provided
   --keyfile KEYFILE                              🔑 a JSON keyfile, if PEM not provided
   --passfile PASSFILE                            🔑 a file containing keyfile's password, if keyfile provided. If not
@@ -1556,6 +1578,7 @@ options:
   --validators-pem VALIDATORS_PEM                a PEM file holding the BLS keys; can contain multiple nodes
   --delegation-contract DELEGATION_CONTRACT      address of the delegation contract
   --proxy PROXY                                  🔗 the URL of the proxy
+  --sender SENDER                                the alias of the wallet set in the address config
   --pem PEM                                      🔑 the PEM file, if keyfile not provided
   --keyfile KEYFILE                              🔑 a JSON keyfile, if PEM not provided
   --passfile PASSFILE                            🔑 a file containing keyfile's password, if keyfile provided. If not
@@ -1613,6 +1636,7 @@ options:
   --validators-pem VALIDATORS_PEM                a PEM file holding the BLS keys; can contain multiple nodes
   --delegation-contract DELEGATION_CONTRACT      bech32 address of the delegation contract
   --proxy PROXY                                  🔗 the URL of the proxy
+  --sender SENDER                                the alias of the wallet set in the address config
   --pem PEM                                      🔑 the PEM file, if keyfile not provided
   --keyfile KEYFILE                              🔑 a JSON keyfile, if PEM not provided
   --passfile PASSFILE                            🔑 a file containing keyfile's password, if keyfile provided. If not
@@ -1670,6 +1694,7 @@ options:
   --validators-pem VALIDATORS_PEM                a PEM file holding the BLS keys; can contain multiple nodes
   --delegation-contract DELEGATION_CONTRACT      address of the delegation contract
   --proxy PROXY                                  🔗 the URL of the proxy
+  --sender SENDER                                the alias of the wallet set in the address config
   --pem PEM                                      🔑 the PEM file, if keyfile not provided
   --keyfile KEYFILE                              🔑 a JSON keyfile, if PEM not provided
   --passfile PASSFILE                            🔑 a file containing keyfile's password, if keyfile provided. If not
@@ -1727,6 +1752,7 @@ options:
   --validators-pem VALIDATORS_PEM                a PEM file holding the BLS keys; can contain multiple nodes
   --delegation-contract DELEGATION_CONTRACT      address of the delegation contract
   --proxy PROXY                                  🔗 the URL of the proxy
+  --sender SENDER                                the alias of the wallet set in the address config
   --pem PEM                                      🔑 the PEM file, if keyfile not provided
   --keyfile KEYFILE                              🔑 a JSON keyfile, if PEM not provided
   --passfile PASSFILE                            🔑 a file containing keyfile's password, if keyfile provided. If not
@@ -1784,6 +1810,7 @@ options:
   --validators-pem VALIDATORS_PEM                a PEM file holding the BLS keys; can contain multiple nodes
   --delegation-contract DELEGATION_CONTRACT      address of the delegation contract
   --proxy PROXY                                  🔗 the URL of the proxy
+  --sender SENDER                                the alias of the wallet set in the address config
   --pem PEM                                      🔑 the PEM file, if keyfile not provided
   --keyfile KEYFILE                              🔑 a JSON keyfile, if PEM not provided
   --passfile PASSFILE                            🔑 a file containing keyfile's password, if keyfile provided. If not
@@ -1839,6 +1866,7 @@ options:
   -h, --help                                     show this help message and exit
   --delegation-contract DELEGATION_CONTRACT      address of the delegation contract
   --proxy PROXY                                  🔗 the URL of the proxy
+  --sender SENDER                                the alias of the wallet set in the address config
   --pem PEM                                      🔑 the PEM file, if keyfile not provided
   --keyfile KEYFILE                              🔑 a JSON keyfile, if PEM not provided
   --passfile PASSFILE                            🔑 a file containing keyfile's password, if keyfile provided. If not
@@ -1894,6 +1922,7 @@ options:
   -h, --help                                     show this help message and exit
   --delegation-contract DELEGATION_CONTRACT      address of the delegation contract
   --proxy PROXY                                  🔗 the URL of the proxy
+  --sender SENDER                                the alias of the wallet set in the address config
   --pem PEM                                      🔑 the PEM file, if keyfile not provided
   --keyfile KEYFILE                              🔑 a JSON keyfile, if PEM not provided
   --passfile PASSFILE                            🔑 a file containing keyfile's password, if keyfile provided. If not
@@ -1949,6 +1978,7 @@ options:
   -h, --help                                     show this help message and exit
   --delegation-contract DELEGATION_CONTRACT      address of the delegation contract
   --proxy PROXY                                  🔗 the URL of the proxy
+  --sender SENDER                                the alias of the wallet set in the address config
   --pem PEM                                      🔑 the PEM file, if keyfile not provided
   --keyfile KEYFILE                              🔑 a JSON keyfile, if PEM not provided
   --passfile PASSFILE                            🔑 a file containing keyfile's password, if keyfile provided. If not
@@ -2004,6 +2034,7 @@ options:
   -h, --help                                     show this help message and exit
   --delegation-contract DELEGATION_CONTRACT      address of the delegation contract
   --proxy PROXY                                  🔗 the URL of the proxy
+  --sender SENDER                                the alias of the wallet set in the address config
   --pem PEM                                      🔑 the PEM file, if keyfile not provided
   --keyfile KEYFILE                              🔑 a JSON keyfile, if PEM not provided
   --passfile PASSFILE                            🔑 a file containing keyfile's password, if keyfile provided. If not
@@ -2059,6 +2090,7 @@ options:
   -h, --help                                     show this help message and exit
   --delegation-contract DELEGATION_CONTRACT      address of the delegation contract
   --proxy PROXY                                  🔗 the URL of the proxy
+  --sender SENDER                                the alias of the wallet set in the address config
   --pem PEM                                      🔑 the PEM file, if keyfile not provided
   --keyfile KEYFILE                              🔑 a JSON keyfile, if PEM not provided
   --passfile PASSFILE                            🔑 a file containing keyfile's password, if keyfile provided. If not
@@ -2115,6 +2147,7 @@ options:
   --service-fee SERVICE_FEE                      new service fee value
   --delegation-contract DELEGATION_CONTRACT      address of the delegation contract
   --proxy PROXY                                  🔗 the URL of the proxy
+  --sender SENDER                                the alias of the wallet set in the address config
   --pem PEM                                      🔑 the PEM file, if keyfile not provided
   --keyfile KEYFILE                              🔑 a JSON keyfile, if PEM not provided
   --passfile PASSFILE                            🔑 a file containing keyfile's password, if keyfile provided. If not
@@ -2171,6 +2204,7 @@ options:
   --delegation-cap DELEGATION_CAP                new delegation contract capacity
   --delegation-contract DELEGATION_CONTRACT      address of the delegation contract
   --proxy PROXY                                  🔗 the URL of the proxy
+  --sender SENDER                                the alias of the wallet set in the address config
   --pem PEM                                      🔑 the PEM file, if keyfile not provided
   --keyfile KEYFILE                              🔑 a JSON keyfile, if PEM not provided
   --passfile PASSFILE                            🔑 a file containing keyfile's password, if keyfile provided. If not
@@ -2228,6 +2262,7 @@ options:
   --unset                                        set automatic activation False
   --delegation-contract DELEGATION_CONTRACT      address of the delegation contract
   --proxy PROXY                                  🔗 the URL of the proxy
+  --sender SENDER                                the alias of the wallet set in the address config
   --pem PEM                                      🔑 the PEM file, if keyfile not provided
   --keyfile KEYFILE                              🔑 a JSON keyfile, if PEM not provided
   --passfile PASSFILE                            🔑 a file containing keyfile's password, if keyfile provided. If not
@@ -2285,6 +2320,7 @@ options:
   --unset                                        set redelegate cap False
   --delegation-contract DELEGATION_CONTRACT      address of the delegation contract
   --proxy PROXY                                  🔗 the URL of the proxy
+  --sender SENDER                                the alias of the wallet set in the address config
   --pem PEM                                      🔑 the PEM file, if keyfile not provided
   --keyfile KEYFILE                              🔑 a JSON keyfile, if PEM not provided
   --passfile PASSFILE                            🔑 a file containing keyfile's password, if keyfile provided. If not
@@ -2343,6 +2379,7 @@ options:
   --identifier IDENTIFIER                        identifier field in staking provider metadata
   --delegation-contract DELEGATION_CONTRACT      address of the delegation contract
   --proxy PROXY                                  🔗 the URL of the proxy
+  --sender SENDER                                the alias of the wallet set in the address config
   --pem PEM                                      🔑 the PEM file, if keyfile not provided
   --keyfile KEYFILE                              🔑 a JSON keyfile, if PEM not provided
   --passfile PASSFILE                            🔑 a file containing keyfile's password, if keyfile provided. If not
@@ -2401,6 +2438,7 @@ options:
   --fee FEE                                      service fee as hundredths of percents. (e.g. a service fee of 37.45
                                                  percent is expressed by the integer 3745)
   --proxy PROXY                                  🔗 the URL of the proxy
+  --sender SENDER                                the alias of the wallet set in the address config
   --pem PEM                                      🔑 the PEM file, if keyfile not provided
   --keyfile KEYFILE                              🔑 a JSON keyfile, if PEM not provided
   --passfile PASSFILE                            🔑 a file containing keyfile's password, if keyfile provided. If not
@@ -2543,6 +2581,7 @@ Sign a message
 options:
   -h, --help                                 show this help message and exit
   --message MESSAGE                          the message you want to sign
+  --sender SENDER                            the alias of the wallet set in the address config
   --pem PEM                                  🔑 the PEM file, if keyfile not provided
   --keyfile KEYFILE                          🔑 a JSON keyfile, if PEM not provided
   --passfile PASSFILE                        🔑 a file containing keyfile's password, if keyfile provided. If not
@@ -3064,6 +3103,7 @@ Request xEGLD.
 
 options:
   -h, --help                                 show this help message and exit
+  --sender SENDER                            the alias of the wallet set in the address config
   --pem PEM                                  🔑 the PEM file, if keyfile not provided
   --keyfile KEYFILE                          🔑 a JSON keyfile, if PEM not provided
   --passfile PASSFILE                        🔑 a file containing keyfile's password, if keyfile provided. If not
@@ -3172,6 +3212,7 @@ options:
   --metadata-payable-by-sc                        ‼ mark the contract as payable by SC (default: not payable by SC)
   --abi ABI                                       the ABI file of the Multisig Smart Contract
   --outfile OUTFILE                               where to save the output (default: stdout)
+  --sender SENDER                                 the alias of the wallet set in the address config
   --pem PEM                                       🔑 the PEM file, if keyfile not provided
   --keyfile KEYFILE                               🔑 a JSON keyfile, if PEM not provided
   --passfile PASSFILE                             🔑 a file containing keyfile's password, if keyfile provided. If not
@@ -3248,6 +3289,7 @@ options:
   --contract CONTRACT                             🖄 the bech32 address of the Multisig Smart Contract
   --abi ABI                                       the ABI file of the Multisig Smart Contract
   --outfile OUTFILE                               where to save the output (default: stdout)
+  --sender SENDER                                 the alias of the wallet set in the address config
   --pem PEM                                       🔑 the PEM file, if keyfile not provided
   --keyfile KEYFILE                               🔑 a JSON keyfile, if PEM not provided
   --passfile PASSFILE                             🔑 a file containing keyfile's password, if keyfile provided. If not
@@ -3322,6 +3364,7 @@ options:
   --contract CONTRACT                            🖄 the bech32 address of the Multisig Smart Contract
   --abi ABI                                      the ABI file of the Multisig Smart Contract
   --outfile OUTFILE                              where to save the output (default: stdout)
+  --sender SENDER                                the alias of the wallet set in the address config
   --pem PEM                                      🔑 the PEM file, if keyfile not provided
   --keyfile KEYFILE                              🔑 a JSON keyfile, if PEM not provided
   --passfile PASSFILE                            🔑 a file containing keyfile's password, if keyfile provided. If not
@@ -3395,6 +3438,7 @@ options:
   --contract CONTRACT                            🖄 the bech32 address of the Multisig Smart Contract
   --abi ABI                                      the ABI file of the Multisig Smart Contract
   --outfile OUTFILE                              where to save the output (default: stdout)
+  --sender SENDER                                the alias of the wallet set in the address config
   --pem PEM                                      🔑 the PEM file, if keyfile not provided
   --keyfile KEYFILE                              🔑 a JSON keyfile, if PEM not provided
   --passfile PASSFILE                            🔑 a file containing keyfile's password, if keyfile provided. If not
@@ -3468,6 +3512,7 @@ options:
   --contract CONTRACT                            🖄 the bech32 address of the Multisig Smart Contract
   --abi ABI                                      the ABI file of the Multisig Smart Contract
   --outfile OUTFILE                              where to save the output (default: stdout)
+  --sender SENDER                                the alias of the wallet set in the address config
   --pem PEM                                      🔑 the PEM file, if keyfile not provided
   --keyfile KEYFILE                              🔑 a JSON keyfile, if PEM not provided
   --passfile PASSFILE                            🔑 a file containing keyfile's password, if keyfile provided. If not
@@ -3541,6 +3586,7 @@ options:
   --contract CONTRACT                            🖄 the bech32 address of the Multisig Smart Contract
   --abi ABI                                      the ABI file of the Multisig Smart Contract
   --outfile OUTFILE                              where to save the output (default: stdout)
+  --sender SENDER                                the alias of the wallet set in the address config
   --pem PEM                                      🔑 the PEM file, if keyfile not provided
   --keyfile KEYFILE                              🔑 a JSON keyfile, if PEM not provided
   --passfile PASSFILE                            🔑 a file containing keyfile's password, if keyfile provided. If not
@@ -3614,6 +3660,7 @@ options:
   --contract CONTRACT                            🖄 the bech32 address of the Multisig Smart Contract
   --abi ABI                                      the ABI file of the Multisig Smart Contract
   --outfile OUTFILE                              where to save the output (default: stdout)
+  --sender SENDER                                the alias of the wallet set in the address config
   --pem PEM                                      🔑 the PEM file, if keyfile not provided
   --keyfile KEYFILE                              🔑 a JSON keyfile, if PEM not provided
   --passfile PASSFILE                            🔑 a file containing keyfile's password, if keyfile provided. If not
@@ -3688,6 +3735,7 @@ options:
   --contract CONTRACT                            🖄 the bech32 address of the Multisig Smart Contract
   --abi ABI                                      the ABI file of the Multisig Smart Contract
   --outfile OUTFILE                              where to save the output (default: stdout)
+  --sender SENDER                                the alias of the wallet set in the address config
   --pem PEM                                      🔑 the PEM file, if keyfile not provided
   --keyfile KEYFILE                              🔑 a JSON keyfile, if PEM not provided
   --passfile PASSFILE                            🔑 a file containing keyfile's password, if keyfile provided. If not
@@ -3769,6 +3817,7 @@ options:
   --contract CONTRACT                            🖄 the bech32 address of the Multisig Smart Contract
   --abi ABI                                      the ABI file of the Multisig Smart Contract
   --outfile OUTFILE                              where to save the output (default: stdout)
+  --sender SENDER                                the alias of the wallet set in the address config
   --pem PEM                                      🔑 the PEM file, if keyfile not provided
   --keyfile KEYFILE                              🔑 a JSON keyfile, if PEM not provided
   --passfile PASSFILE                            🔑 a file containing keyfile's password, if keyfile provided. If not
@@ -3855,6 +3904,7 @@ options:
   --contract CONTRACT                             🖄 the bech32 address of the Multisig Smart Contract
   --abi ABI                                       the ABI file of the Multisig Smart Contract
   --outfile OUTFILE                               where to save the output (default: stdout)
+  --sender SENDER                                 the alias of the wallet set in the address config
   --pem PEM                                       🔑 the PEM file, if keyfile not provided
   --keyfile KEYFILE                               🔑 a JSON keyfile, if PEM not provided
   --passfile PASSFILE                             🔑 a file containing keyfile's password, if keyfile provided. If not
@@ -3942,6 +3992,7 @@ options:
   --contract CONTRACT                             🖄 the bech32 address of the Multisig Smart Contract
   --abi ABI                                       the ABI file of the Multisig Smart Contract
   --outfile OUTFILE                               where to save the output (default: stdout)
+  --sender SENDER                                 the alias of the wallet set in the address config
   --pem PEM                                       🔑 the PEM file, if keyfile not provided
   --keyfile KEYFILE                               🔑 a JSON keyfile, if PEM not provided
   --passfile PASSFILE                             🔑 a file containing keyfile's password, if keyfile provided. If not
@@ -4028,6 +4079,7 @@ options:
   --contract CONTRACT                            🖄 the bech32 address of the Multisig Smart Contract
   --abi ABI                                      the ABI file of the Multisig Smart Contract
   --outfile OUTFILE                              where to save the output (default: stdout)
+  --sender SENDER                                the alias of the wallet set in the address config
   --pem PEM                                      🔑 the PEM file, if keyfile not provided
   --keyfile KEYFILE                              🔑 a JSON keyfile, if PEM not provided
   --passfile PASSFILE                            🔑 a file containing keyfile's password, if keyfile provided. If not
@@ -4112,6 +4164,7 @@ options:
   --contract CONTRACT                            🖄 the bech32 address of the Multisig Smart Contract
   --abi ABI                                      the ABI file of the Multisig Smart Contract
   --outfile OUTFILE                              where to save the output (default: stdout)
+  --sender SENDER                                the alias of the wallet set in the address config
   --pem PEM                                      🔑 the PEM file, if keyfile not provided
   --keyfile KEYFILE                              🔑 a JSON keyfile, if PEM not provided
   --passfile PASSFILE                            🔑 a file containing keyfile's password, if keyfile provided. If not
@@ -4185,6 +4238,7 @@ options:
   --contract CONTRACT                            🖄 the bech32 address of the Multisig Smart Contract
   --abi ABI                                      the ABI file of the Multisig Smart Contract
   --outfile OUTFILE                              where to save the output (default: stdout)
+  --sender SENDER                                the alias of the wallet set in the address config
   --pem PEM                                      🔑 the PEM file, if keyfile not provided
   --keyfile KEYFILE                              🔑 a JSON keyfile, if PEM not provided
   --passfile PASSFILE                            🔑 a file containing keyfile's password, if keyfile provided. If not
@@ -4258,6 +4312,7 @@ options:
   --contract CONTRACT                            🖄 the bech32 address of the Multisig Smart Contract
   --abi ABI                                      the ABI file of the Multisig Smart Contract
   --outfile OUTFILE                              where to save the output (default: stdout)
+  --sender SENDER                                the alias of the wallet set in the address config
   --pem PEM                                      🔑 the PEM file, if keyfile not provided
   --keyfile KEYFILE                              🔑 a JSON keyfile, if PEM not provided
   --passfile PASSFILE                            🔑 a file containing keyfile's password, if keyfile provided. If not
@@ -4331,6 +4386,7 @@ options:
   --contract CONTRACT                            🖄 the bech32 address of the Multisig Smart Contract
   --abi ABI                                      the ABI file of the Multisig Smart Contract
   --outfile OUTFILE                              where to save the output (default: stdout)
+  --sender SENDER                                the alias of the wallet set in the address config
   --pem PEM                                      🔑 the PEM file, if keyfile not provided
   --keyfile KEYFILE                              🔑 a JSON keyfile, if PEM not provided
   --passfile PASSFILE                            🔑 a file containing keyfile's password, if keyfile provided. If not
@@ -4404,6 +4460,7 @@ options:
   --contract CONTRACT                            🖄 the bech32 address of the Multisig Smart Contract
   --abi ABI                                      the ABI file of the Multisig Smart Contract
   --outfile OUTFILE                              where to save the output (default: stdout)
+  --sender SENDER                                the alias of the wallet set in the address config
   --pem PEM                                      🔑 the PEM file, if keyfile not provided
   --keyfile KEYFILE                              🔑 a JSON keyfile, if PEM not provided
   --passfile PASSFILE                            🔑 a file containing keyfile's password, if keyfile provided. If not
@@ -4477,6 +4534,7 @@ options:
   --contract CONTRACT                            🖄 the bech32 address of the Multisig Smart Contract
   --abi ABI                                      the ABI file of the Multisig Smart Contract
   --outfile OUTFILE                              where to save the output (default: stdout)
+  --sender SENDER                                the alias of the wallet set in the address config
   --pem PEM                                      🔑 the PEM file, if keyfile not provided
   --keyfile KEYFILE                              🔑 a JSON keyfile, if PEM not provided
   --passfile PASSFILE                            🔑 a file containing keyfile's password, if keyfile provided. If not
@@ -4550,6 +4608,7 @@ options:
   --contract CONTRACT                            🖄 the bech32 address of the Multisig Smart Contract
   --abi ABI                                      the ABI file of the Multisig Smart Contract
   --outfile OUTFILE                              where to save the output (default: stdout)
+  --sender SENDER                                the alias of the wallet set in the address config
   --pem PEM                                      🔑 the PEM file, if keyfile not provided
   --keyfile KEYFILE                              🔑 a JSON keyfile, if PEM not provided
   --passfile PASSFILE                            🔑 a file containing keyfile's password, if keyfile provided. If not
@@ -4625,6 +4684,7 @@ options:
   --contract CONTRACT                             🖄 the bech32 address of the Multisig Smart Contract
   --abi ABI                                       the ABI file of the Multisig Smart Contract
   --outfile OUTFILE                               where to save the output (default: stdout)
+  --sender SENDER                                 the alias of the wallet set in the address config
   --pem PEM                                       🔑 the PEM file, if keyfile not provided
   --keyfile KEYFILE                               🔑 a JSON keyfile, if PEM not provided
   --passfile PASSFILE                             🔑 a file containing keyfile's password, if keyfile provided. If not
@@ -4699,6 +4759,7 @@ options:
   --contract CONTRACT                            🖄 the bech32 address of the Multisig Smart Contract
   --abi ABI                                      the ABI file of the Multisig Smart Contract
   --outfile OUTFILE                              where to save the output (default: stdout)
+  --sender SENDER                                the alias of the wallet set in the address config
   --pem PEM                                      🔑 the PEM file, if keyfile not provided
   --keyfile KEYFILE                              🔑 a JSON keyfile, if PEM not provided
   --passfile PASSFILE                            🔑 a file containing keyfile's password, if keyfile provided. If not
@@ -4772,6 +4833,7 @@ options:
   --contract CONTRACT                            🖄 the bech32 address of the Multisig Smart Contract
   --abi ABI                                      the ABI file of the Multisig Smart Contract
   --outfile OUTFILE                              where to save the output (default: stdout)
+  --sender SENDER                                the alias of the wallet set in the address config
   --pem PEM                                      🔑 the PEM file, if keyfile not provided
   --keyfile KEYFILE                              🔑 a JSON keyfile, if PEM not provided
   --passfile PASSFILE                            🔑 a file containing keyfile's password, if keyfile provided. If not
@@ -5405,6 +5467,7 @@ options:
   --commit-hash COMMIT_HASH                      the commit hash of the proposal
   --start-vote-epoch START_VOTE_EPOCH            the epoch in which the voting will start
   --end-vote-epoch END_VOTE_EPOCH                the epoch in which the voting will stop
+  --sender SENDER                                the alias of the wallet set in the address config
   --pem PEM                                      🔑 the PEM file, if keyfile not provided
   --keyfile KEYFILE                              🔑 a JSON keyfile, if PEM not provided
   --passfile PASSFILE                            🔑 a file containing keyfile's password, if keyfile provided. If not
@@ -5477,6 +5540,7 @@ options:
   -h, --help                                     show this help message and exit
   --proposal-nonce PROPOSAL_NONCE                the nonce of the proposal
   --vote {yes,no,veto,abstain}                   the type of vote
+  --sender SENDER                                the alias of the wallet set in the address config
   --pem PEM                                      🔑 the PEM file, if keyfile not provided
   --keyfile KEYFILE                              🔑 a JSON keyfile, if PEM not provided
   --passfile PASSFILE                            🔑 a file containing keyfile's password, if keyfile provided. If not
@@ -5548,6 +5612,7 @@ Output example:
 options:
   -h, --help                                     show this help message and exit
   --proposal-nonce PROPOSAL_NONCE                the nonce of the proposal
+  --sender SENDER                                the alias of the wallet set in the address config
   --pem PEM                                      🔑 the PEM file, if keyfile not provided
   --keyfile KEYFILE                              🔑 a JSON keyfile, if PEM not provided
   --passfile PASSFILE                            🔑 a file containing keyfile's password, if keyfile provided. If not
@@ -5620,6 +5685,7 @@ options:
   -h, --help                                     show this help message and exit
   --proposers PROPOSERS [PROPOSERS ...]          a list of users who initiated the proposals (e.g. --proposers erd1...,
                                                  erd1...)
+  --sender SENDER                                the alias of the wallet set in the address config
   --pem PEM                                      🔑 the PEM file, if keyfile not provided
   --keyfile KEYFILE                              🔑 a JSON keyfile, if PEM not provided
   --passfile PASSFILE                            🔑 a file containing keyfile's password, if keyfile provided. If not
@@ -5690,6 +5756,7 @@ Output example:
 
 options:
   -h, --help                                     show this help message and exit
+  --sender SENDER                                the alias of the wallet set in the address config
   --pem PEM                                      🔑 the PEM file, if keyfile not provided
   --keyfile KEYFILE                              🔑 a JSON keyfile, if PEM not provided
   --passfile PASSFILE                            🔑 a file containing keyfile's password, if keyfile provided. If not
@@ -5765,6 +5832,7 @@ options:
   --min-quorum MIN_QUORUM                        the min quorum to be reached for the proposal to pass
   --min-veto-threshold MIN_VETO_THRESHOLD        the min veto threshold
   --min-pass-threshold MIN_PASS_THRESHOLD        the min pass threshold
+  --sender SENDER                                the alias of the wallet set in the address config
   --pem PEM                                      🔑 the PEM file, if keyfile not provided
   --keyfile KEYFILE                              🔑 a JSON keyfile, if PEM not provided
   --passfile PASSFILE                            🔑 a file containing keyfile's password, if keyfile provided. If not
@@ -6044,5 +6112,278 @@ Deletes the environment file. Default env will be used.
 
 options:
   -h, --help  show this help message and exit
+
+```
+## Group **Address**
+
+
+```
+$ mxpy address --help
+usage: mxpy address COMMAND [-h] ...
+
+Configure MultiversX CLI to use a default wallet.
+
+COMMANDS:
+  {new,list,dump,get,set,delete,switch,remove,reset}
+
+OPTIONS:
+  -h, --help            show this help message and exit
+
+----------------
+COMMANDS summary
+----------------
+new                            Creates a new address config and sets it as the active address.
+list                           List available addresses
+dump                           Dumps the active address.
+get                            Gets a config value from the active address.
+set                            Sets a config value for the active address.
+delete                         Deletes a config value from the active address.
+switch                         Switch to a different address.
+remove                         Deletes an address using the alias. No default address will be set. Use `address switch` to set a new address.
+reset                          Deletes the config file. No default address will be set.
+
+```
+### Address.New
+
+
+```
+$ mxpy address new --help
+usage: mxpy address new [-h] ...
+
+Creates a new address config and sets it as the active address.
+
+positional arguments:
+  alias                the alias of the wallet
+
+options:
+  -h, --help           show this help message and exit
+  --template TEMPLATE  an address config from which to create the new address
+
+```
+### Address.List
+
+
+```
+$ mxpy address list --help
+usage: mxpy address list [-h] ...
+
+List available addresses
+
+options:
+  -h, --help  show this help message and exit
+
+```
+### Address.Dump
+
+
+```
+$ mxpy address dump --help
+usage: mxpy address dump [-h] ...
+
+Dumps the active address.
+
+options:
+  -h, --help  show this help message and exit
+
+```
+### Address.Get
+
+
+```
+$ mxpy address get --help
+usage: mxpy address get [-h] ...
+
+Gets a config value from the active address.
+
+positional arguments:
+  value       the value to get from the active address (e.g. path)
+
+options:
+  -h, --help  show this help message and exit
+
+```
+### Address.Set
+
+
+```
+$ mxpy address set --help
+usage: mxpy address set [-h] ...
+
+Sets a config value for the active address.
+
+positional arguments:
+  key         the key to set for the active address (e.g. index)
+  value       the value to set for the specified key
+
+options:
+  -h, --help  show this help message and exit
+
+```
+### Address.Set
+
+
+```
+$ mxpy address delete --help
+usage: mxpy address delete [-h] ...
+
+Deletes a config value from the active address.
+
+positional arguments:
+  value       the value to delete for the active address
+
+options:
+  -h, --help  show this help message and exit
+
+```
+### Address.Switch
+
+
+```
+$ mxpy address switch --help
+usage: mxpy address switch [-h] ...
+
+Switch to a different address.
+
+positional arguments:
+  alias       the alias of the wallet
+
+options:
+  -h, --help  show this help message and exit
+
+```
+### Address.Remove
+
+
+```
+$ mxpy address remove --help
+usage: mxpy address remove [-h] ...
+
+Deletes an address using the alias. No default address will be set. Use `address switch` to set a new address.
+
+positional arguments:
+  alias       the alias of the wallet
+
+options:
+  -h, --help  show this help message and exit
+
+```
+### Address.Reset
+
+
+```
+$ mxpy address reset --help
+usage: mxpy address reset [-h] ...
+
+Deletes the config file. No default address will be set.
+
+options:
+  -h, --help  show this help message and exit
+
+```
+## Group **Get**
+
+
+```
+$ mxpy get --help
+usage: mxpy get COMMAND [-h] ...
+
+Get info from the network.
+
+COMMANDS:
+  {account,keys,storage-entry,token,transaction}
+
+OPTIONS:
+  -h, --help            show this help message and exit
+
+----------------
+COMMANDS summary
+----------------
+account                        Get info about an account.
+keys                           Get the storage (key-value pairs) of an account.
+storage-entry                  Get a specific storage entry (key-value pair) of an account.
+token                          Get a token of an account.
+transaction                    Get a transaction from the network.
+
+```
+### Get.Account
+
+
+```
+$ mxpy get account --help
+usage: mxpy get account [-h] ...
+
+Get info about an account.
+
+options:
+  -h, --help         show this help message and exit
+  --alias ALIAS      the alias of the wallet if configured in address config
+  --address ADDRESS  the bech32 address
+  --proxy PROXY      the proxy url
+  --balance          whether to only fetch the balance of the address
+
+```
+### Get.Keys
+
+
+```
+$ mxpy get keys --help
+usage: mxpy get keys [-h] ...
+
+Get the storage (key-value pairs) of an account.
+
+options:
+  -h, --help         show this help message and exit
+  --alias ALIAS      the alias of the wallet if configured in address config
+  --address ADDRESS  the bech32 address
+  --proxy PROXY      the proxy url
+
+```
+### Get.StorageEntry
+
+
+```
+$ mxpy get storage-entry --help
+usage: mxpy get storage-entry [-h] ...
+
+Get a specific storage entry (key-value pair) of an account.
+
+options:
+  -h, --help         show this help message and exit
+  --alias ALIAS      the alias of the wallet if configured in address config
+  --address ADDRESS  the bech32 address
+  --proxy PROXY      the proxy url
+  --key KEY          the storage key to read from
+
+```
+### Get.Token
+
+
+```
+$ mxpy get token --help
+usage: mxpy get token [-h] ...
+
+Get a token of an account.
+
+options:
+  -h, --help               show this help message and exit
+  --alias ALIAS            the alias of the wallet if configured in address config
+  --address ADDRESS        the bech32 address
+  --proxy PROXY            the proxy url
+  --identifier IDENTIFIER  the token identifier. Works for ESDT and NFT. (e.g. FNG-123456, NFT-987654-0a)
+
+```
+### Get.Transaction
+
+
+```
+$ mxpy get transaction --help
+usage: mxpy get transaction [-h] ...
+
+Get a transaction from the network.
+
+options:
+  -h, --help     show this help message and exit
+  --proxy PROXY  the proxy url
+  --hash HASH    the transaction hash
 
 ```

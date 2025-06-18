@@ -369,31 +369,39 @@ def prepare_account(args: Any):
         except Exception as e:
             raise LedgerError(str(e))
     elif args.sender:
-        file_path = resolve_address_config_path()
-        if not file_path.is_file():
-            raise AddressConfigFileError("The address config file was not found.")
-
-        file = read_address_config_file()
-        if file == dict():
-            raise AddressConfigFileError("Address config file is empty.")
-
-        addresses: dict[str, Any] = file["addresses"]
-        wallet = addresses.get(args.sender, None)
-        if not wallet:
-            raise UnknownAddressAliasError(args.sender)
-
-        logger.info(f"Using sender [{args.sender}] from address config.")
-        return _load_wallet_from_address_config(wallet=wallet, hrp=hrp)
+        return load_wallet_by_alias(alias=args.sender, hrp=hrp)
     else:
-        active_address = get_active_address()
-        if active_address == dict():
-            logger.info("No default wallet found in address config.")
-            raise NoWalletProvided()
+        return load_default_wallet(hrp=hrp)
 
-        alias_of_default_wallet = read_address_config_file().get("active", "")
-        logger.info(f"Using sender [{alias_of_default_wallet}] from address config.")
 
-        return _load_wallet_from_address_config(wallet=active_address, hrp=hrp)
+def load_wallet_by_alias(alias: str, hrp: str) -> Account:
+    file_path = resolve_address_config_path()
+    if not file_path.is_file():
+        raise AddressConfigFileError("The address config file was not found.")
+
+    file = read_address_config_file()
+    if file == dict():
+        raise AddressConfigFileError("Address config file is empty.")
+
+    addresses: dict[str, Any] = file["addresses"]
+    wallet = addresses.get(alias, None)
+    if not wallet:
+        raise UnknownAddressAliasError(alias)
+
+    logger.info(f"Using sender [{alias}] from address config.")
+    return _load_wallet_from_address_config(wallet=wallet, hrp=hrp)
+
+
+def load_default_wallet(hrp: str) -> Account:
+    active_address = get_active_address()
+    if active_address == dict():
+        logger.info("No default wallet found in address config.")
+        raise NoWalletProvided()
+
+    alias_of_default_wallet = read_address_config_file().get("active", "")
+    logger.info(f"Using sender [{alias_of_default_wallet}] from address config.")
+
+    return _load_wallet_from_address_config(wallet=active_address, hrp=hrp)
 
 
 def _load_wallet_from_address_config(wallet: dict[str, str], hrp: str) -> Account:

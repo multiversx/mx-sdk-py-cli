@@ -193,6 +193,24 @@ generate() {
     command "Environment.List" "env list"
     command "Environment.Remove" "env remove"
     command "Environment.Reset" "env reset"
+
+    group "Address" "address"
+    command "Address.New" "address new"
+    command "Address.List" "address list"
+    command "Address.Dump" "address dump"
+    command "Address.Get" "address get"
+    command "Address.Set" "address set"
+    command "Address.Set" "address delete"
+    command "Address.Switch" "address switch"
+    command "Address.Remove" "address remove"
+    command "Address.Reset" "address reset"
+
+    group "Get" "get"
+    command "Get.Account" "get account"
+    command "Get.Storage" "get storage"
+    command "Get.StorageEntry" "get storage-entry"
+    command "Get.Token" "get token"
+    command "Get.Transaction" "get transaction"
 }
 
 generate
