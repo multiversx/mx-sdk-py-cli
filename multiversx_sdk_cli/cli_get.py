@@ -1,22 +1,17 @@
 import logging
 from typing import Any, Optional
 
-from multiversx_sdk import Address, ProxyNetworkProvider, Token, TokenComputer
+from multiversx_sdk import Address
+from multiversx_sdk import NetworkProviderError as SDKNetworkProviderError
+from multiversx_sdk import ProxyNetworkProvider, Token, TokenComputer
 
 from multiversx_sdk_cli import cli_shared
-from multiversx_sdk_cli.address import (
-    get_active_address,
-    read_address_config_file,
-    resolve_address_config_path,
-)
 from multiversx_sdk_cli.config import get_config_for_network_providers
 from multiversx_sdk_cli.env import MxpyEnv
 from multiversx_sdk_cli.errors import (
-    AddressConfigFileError,
     ArgumentsNotProvidedError,
     BadUsage,
-    NoWalletProvided,
-    UnknownAddressAliasError,
+    NetworkProviderError,
 )
 from multiversx_sdk_cli.utils import dump_out_json
 
@@ -41,12 +36,12 @@ def setup_parser(subparsers: Any) -> Any:
     sub.set_defaults(func=get_account)
 
     sub = cli_shared.add_command_subparser(
-        subparsers, "get", "keys", "Get the storage (key-value pairs) of an account."
+        subparsers, "get", "storage", "Get the storage (key-value pairs) of an account."
     )
     _add_alias_arg(sub)
     _add_address_arg(sub)
     _add_proxy_arg(sub)
-    sub.set_defaults(func=get_keys)
+    sub.set_defaults(func=get_storage)
 
     sub = cli_shared.add_command_subparser(
         subparsers, "get", "storage-entry", "Get a specific storage entry (key-value pair) of an account."
@@ -73,6 +68,21 @@ def setup_parser(subparsers: Any) -> Any:
     _add_proxy_arg(sub)
     sub.add_argument("--hash", type=str, required=True, help="the transaction hash")
     sub.set_defaults(func=get_transaction)
+
+    sub = cli_shared.add_command_subparser(subparsers, "get", "network-config", "Get the network configuration.")
+    _add_proxy_arg(sub)
+    sub.set_defaults(func=get_network_config)
+
+    sub = cli_shared.add_command_subparser(subparsers, "get", "network-status", "Get the network status.")
+    _add_proxy_arg(sub)
+    sub.add_argument(
+        "--shard",
+        type=int,
+        choices=[0, 1, 2, 4294967295],
+        default=4294967295,
+        help="the shard to get the status for (default: %(default)s, which is methachain)",
+    )
+    sub.set_defaults(func=get_network_status)
 
     parser.epilog = cli_shared.build_group_epilog(subparsers)
     return subparsers
@@ -111,7 +121,7 @@ def get_account(args: Any):
         dump_out_json(response.raw)
 
 
-def get_keys(args: Any):
+def get_storage(args: Any):
     if args.alias and args.address:
         raise BadUsage("Provide either '--alias' or '--address'")
 
@@ -142,7 +152,10 @@ def get_key(args: Any):
     proxy = _get_proxy(args)
 
     logger.info(f"Fetching details about {address.to_bech32()}")
-    response = proxy.get_account_storage_entry(address, args.key)
+    try:
+        response = proxy.get_account_storage_entry(address, args.key)
+    except SDKNetworkProviderError as e:
+        raise NetworkProviderError(e.url, e.data)
 
     dump_out_json(response.raw)
 
@@ -173,39 +186,36 @@ def get_token(args: Any):
 
 def get_transaction(args: Any):
     proxy = _get_proxy(args)
-    response = proxy.get_transaction(args.hash)
+    try:
+        response = proxy.get_transaction(args.hash)
+    except SDKNetworkProviderError as e:
+        raise NetworkProviderError(e.url, e.data)
+    except Exception as e:
+        raise NetworkProviderError("", str(e))
 
     dump_out_json(response.raw)
 
 
+def get_network_config(args: Any):
+    proxy = _get_proxy(args)
+    config = proxy.get_network_config()
+
+    dump_out_json(config.raw)
+
+
+def get_network_status(args: Any):
+    proxy = _get_proxy(args)
+    status = proxy.get_network_status()
+
+    dump_out_json(status.raw)
+
+
 def _get_address_from_alias_or_config(alias: Optional[str], hrp: str) -> Address:
     if alias:
-        file_path = resolve_address_config_path()
-        if not file_path.is_file():
-            raise AddressConfigFileError("The address config file was not found")
-
-        file = read_address_config_file()
-        if file == dict():
-            raise AddressConfigFileError("Address config file is empty")
-
-        addresses: dict[str, Any] = file["addresses"]
-        wallet = addresses.get(alias, None)
-        if not wallet:
-            raise UnknownAddressAliasError(alias)
-
-        logger.info(f"Using address of [{alias}] from address config.")
-        account = cli_shared.load_wallet_from_address_config(wallet=wallet, hrp=hrp)
+        account = cli_shared.load_wallet_by_alias(alias=alias, hrp=hrp)
         return account.address
     else:
-        active_address = get_active_address()
-        if active_address == dict():
-            logger.info("No default wallet found in address config.")
-            raise NoWalletProvided()
-
-        alias_of_default_wallet = read_address_config_file().get("active", "")
-        logger.info(f"Using address of [{alias_of_default_wallet}] from address config.")
-
-        account = cli_shared.load_wallet_from_address_config(wallet=active_address, hrp=hrp)
+        account = cli_shared.load_default_wallet(hrp=hrp)
         return account.address
 
 

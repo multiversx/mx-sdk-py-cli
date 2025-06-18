@@ -189,7 +189,7 @@ def setup_parser(args: list[str], subparsers: Any) -> Any:
     sub.add_argument(
         "--opt-gas-limit",
         type=int,
-        help="the size of the new quorum (number of signatures required to approve a proposal)",
+        help="optional gas limit for the async call",
     )
     sub.add_argument("--contract-abi", type=str, help="the ABI file of the contract to call")
     sub.add_argument("--function", type=str, help="the function to call")
@@ -208,7 +208,7 @@ def setup_parser(args: list[str], subparsers: Any) -> Any:
     sub.add_argument(
         "--opt-gas-limit",
         type=int,
-        help="the size of the new quorum (number of signatures required to approve a proposal)",
+        help="optional gas limit for the async call",
     )
     sub.add_argument("--contract-abi", type=str, help="the ABI file of the contract to call")
     sub.add_argument("--function", type=str, help="the function to call")
@@ -227,7 +227,7 @@ def setup_parser(args: list[str], subparsers: Any) -> Any:
     sub.add_argument(
         "--opt-gas-limit",
         type=int,
-        help="the size of the new quorum (number of signatures required to approve a proposal)",
+        help="optional gas limit for the async call",
     )
     sub.add_argument("--contract-abi", type=str, help="the ABI file of the contract to call")
     sub.add_argument("--function", type=str, help="the function to call")

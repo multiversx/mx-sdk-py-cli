@@ -3,7 +3,7 @@ import os
 from typing import Any
 
 from multiversx_sdk_cli import cli_shared
-from multiversx_sdk_cli.address import (
+from multiversx_sdk_cli.address_config import (
     create_new_address_config,
     delete_alias,
     delete_config_value,
