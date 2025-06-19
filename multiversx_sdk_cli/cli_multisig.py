@@ -377,7 +377,7 @@ def setup_parser(args: list[str], subparsers: Any) -> Any:
         subparsers,
         "multisig",
         "get-quorum",
-        f"Perform a smart contract query to get the quorum.{output_description}",
+        "Perform a smart contract query to get the quorum.",
     )
     _add_contract_arg(sub)
     _add_abi_arg(sub)
@@ -389,7 +389,7 @@ def setup_parser(args: list[str], subparsers: Any) -> Any:
         subparsers,
         "multisig",
         "get-num-board-members",
-        f"Perform a smart contract query to get the number of board members.{output_description}",
+        "Perform a smart contract query to get the number of board members.",
     )
     _add_contract_arg(sub)
     _add_abi_arg(sub)
@@ -401,7 +401,7 @@ def setup_parser(args: list[str], subparsers: Any) -> Any:
         subparsers,
         "multisig",
         "get-num-groups",
-        f"Perform a smart contract query to get the number of groups.{output_description}",
+        "Perform a smart contract query to get the number of groups.",
     )
     _add_contract_arg(sub)
     _add_abi_arg(sub)
@@ -413,7 +413,7 @@ def setup_parser(args: list[str], subparsers: Any) -> Any:
         subparsers,
         "multisig",
         "get-num-proposers",
-        f"Perform a smart contract query to get the number of proposers.{output_description}",
+        "Perform a smart contract query to get the number of proposers.",
     )
     _add_contract_arg(sub)
     _add_abi_arg(sub)
@@ -425,7 +425,7 @@ def setup_parser(args: list[str], subparsers: Any) -> Any:
         subparsers,
         "multisig",
         "get-action-group",
-        f"Perform a smart contract query to get the actions in a group.{output_description}",
+        "Perform a smart contract query to get the actions in a group.",
     )
     _add_contract_arg(sub)
     _add_abi_arg(sub)
@@ -438,7 +438,7 @@ def setup_parser(args: list[str], subparsers: Any) -> Any:
         subparsers,
         "multisig",
         "get-last-action-group-id",
-        f"Perform a smart contract query to get the id of the last action in a group.{output_description}",
+        "Perform a smart contract query to get the id of the last action in a group.",
     )
     _add_contract_arg(sub)
     _add_abi_arg(sub)
@@ -450,7 +450,7 @@ def setup_parser(args: list[str], subparsers: Any) -> Any:
         subparsers,
         "multisig",
         "get-action-last-index",
-        f"Perform a smart contract query to get the index of the last action.{output_description}",
+        "Perform a smart contract query to get the index of the last action.",
     )
     _add_contract_arg(sub)
     _add_abi_arg(sub)
@@ -462,7 +462,7 @@ def setup_parser(args: list[str], subparsers: Any) -> Any:
         subparsers,
         "multisig",
         "is-signed-by",
-        f"Perform a smart contract query to check if an action is signed by a user.{output_description}",
+        "Perform a smart contract query to check if an action is signed by a user.",
     )
     _add_contract_arg(sub)
     _add_abi_arg(sub)
@@ -476,7 +476,7 @@ def setup_parser(args: list[str], subparsers: Any) -> Any:
         subparsers,
         "multisig",
         "is-quorum-reached",
-        f"Perform a smart contract query to check if an action has reached quorum.{output_description}",
+        "Perform a smart contract query to check if an action has reached quorum.",
     )
     _add_contract_arg(sub)
     _add_abi_arg(sub)
@@ -489,7 +489,7 @@ def setup_parser(args: list[str], subparsers: Any) -> Any:
         subparsers,
         "multisig",
         "get-pending-actions",
-        f"Perform a smart contract query to get the pending actions full info.{output_description}",
+        "Perform a smart contract query to get the pending actions full info.",
     )
     _add_contract_arg(sub)
     _add_abi_arg(sub)
@@ -501,7 +501,7 @@ def setup_parser(args: list[str], subparsers: Any) -> Any:
         subparsers,
         "multisig",
         "get-user-role",
-        f"Perform a smart contract query to get the role of a user.{output_description}",
+        "Perform a smart contract query to get the role of a user.",
     )
     _add_contract_arg(sub)
     _add_abi_arg(sub)
@@ -514,7 +514,7 @@ def setup_parser(args: list[str], subparsers: Any) -> Any:
         subparsers,
         "multisig",
         "get-board-members",
-        f"Perform a smart contract query to get all the board members.{output_description}",
+        "Perform a smart contract query to get all the board members.",
     )
     _add_contract_arg(sub)
     _add_abi_arg(sub)
@@ -526,7 +526,7 @@ def setup_parser(args: list[str], subparsers: Any) -> Any:
         subparsers,
         "multisig",
         "get-proposers",
-        f"Perform a smart contract query to get all the proposers.{output_description}",
+        "Perform a smart contract query to get all the proposers.",
     )
     _add_contract_arg(sub)
     _add_abi_arg(sub)
@@ -538,7 +538,7 @@ def setup_parser(args: list[str], subparsers: Any) -> Any:
         subparsers,
         "multisig",
         "get-action-data",
-        f"Perform a smart contract query to get the data of an action.{output_description}",
+        "Perform a smart contract query to get the data of an action.",
     )
     _add_contract_arg(sub)
     _add_abi_arg(sub)
@@ -551,7 +551,7 @@ def setup_parser(args: list[str], subparsers: Any) -> Any:
         subparsers,
         "multisig",
         "get-action-signers",
-        f"Perform a smart contract query to get the signers of an action.{output_description}",
+        "Perform a smart contract query to get the signers of an action.",
     )
     _add_contract_arg(sub)
     _add_abi_arg(sub)
@@ -564,7 +564,7 @@ def setup_parser(args: list[str], subparsers: Any) -> Any:
         subparsers,
         "multisig",
         "get-action-signers-count",
-        f"Perform a smart contract query to get the number of signers of an action.{output_description}",
+        "Perform a smart contract query to get the number of signers of an action.",
     )
     _add_contract_arg(sub)
     _add_abi_arg(sub)
@@ -577,7 +577,7 @@ def setup_parser(args: list[str], subparsers: Any) -> Any:
         subparsers,
         "multisig",
         "get-action-valid-signers-count",
-        f"Perform a smart contract query to get the number of valid signers of an action.{output_description}",
+        "Perform a smart contract query to get the number of valid signers of an action.",
     )
     _add_contract_arg(sub)
     _add_abi_arg(sub)
@@ -590,7 +590,7 @@ def setup_parser(args: list[str], subparsers: Any) -> Any:
         subparsers,
         "multisig",
         "parse-propose-action",
-        f"Parses the propose action transaction to extract proposal ID.{output_description}",
+        "Parses the propose action transaction to extract proposal ID.",
     )
     _add_abi_arg(sub)
     sub.add_argument("--hash", required=True, type=str, help="the transaction hash of the propose action")
