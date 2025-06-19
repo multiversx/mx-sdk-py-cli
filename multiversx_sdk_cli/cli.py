@@ -30,7 +30,7 @@ import multiversx_sdk_cli.cli_wallet
 import multiversx_sdk_cli.version
 from multiversx_sdk_cli import config, errors, utils, ux
 from multiversx_sdk_cli.cli_shared import set_proxy_from_config_if_not_provided
-from multiversx_sdk_cli.constants import SDK_PATH
+from multiversx_sdk_cli.constants import LOG_LEVELS, SDK_PATH
 from multiversx_sdk_cli.env import get_address_hrp
 
 logger = logging.getLogger("cli")
@@ -54,8 +54,7 @@ def _do_main(cli_args: list[str]):
     parser = setup_parser(cli_args)
     argcomplete.autocomplete(parser)
 
-    _handle_log_level_argument(cli_args)
-    _handle_verbose_argument(cli_args)
+    _handle_global_arguments(cli_args)
     args = parser.parse_args(cli_args)
 
     if args.verbose:
@@ -118,7 +117,7 @@ See:
         "--log-level",
         type=str,
         default=config.get_log_level_from_config(),
-        choices=["debug", "info", "warning", "error"],
+        choices=LOG_LEVELS,
         help="default: %(default)s",
     )
 
@@ -168,22 +167,24 @@ def verify_deprecated_entries_in_config_file():
     ux.show_warning(message.rstrip("\n"))
 
 
-def _handle_verbose_argument(args: list[str]):
-    verbose_arg = "--verbose"
-    if verbose_arg in args:
-        args.remove(verbose_arg)
-        args.insert(0, verbose_arg)
-
-
-def _handle_log_level_argument(args: list[str]):
+def _handle_global_arguments(args: list[str]):
+    """
+    Handle global arguments like --verbose and --log-level.
+    """
     log_level_arg = "--log-level"
-
     if log_level_arg in args:
         index = args.index(log_level_arg)
+        if index + 1 >= len(args):
+            raise ValueError(f"Argument {log_level_arg} must be followed by a log level value.")
+
         log_arg = args.pop(index)
         log_value = args.pop(index)
         args.insert(0, log_value)
         args.insert(0, log_arg)
+
+    if "--verbose" in args:
+        args.remove("--verbose")
+        args.insert(0, "--verbose")
 
 
 if __name__ == "__main__":
