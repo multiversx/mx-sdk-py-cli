@@ -29,6 +29,8 @@ TOP-LEVEL OPTIONS:
   -h, --help            show this help message and exit
   -v, --version         show program's version number and exit
   --verbose
+  --log-level {debug,info,warning,error}
+                        default: debug
 
 ----------------------
 COMMAND GROUPS summary
@@ -130,8 +132,8 @@ options:
   --sender SENDER                                the alias of the wallet set in the address config
   --pem PEM                                      🔑 the PEM file, if keyfile not provided
   --keyfile KEYFILE                              🔑 a JSON keyfile, if PEM not provided
-  --passfile PASSFILE                            🔑 a file containing keyfile's password, if keyfile provided. If not
-                                                 provided, you'll be prompted to enter the password.
+  --passfile PASSFILE                            DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
   --ledger                                       🔐 bool flag for signing transaction using ledger
   --sender-wallet-index SENDER_WALLET_INDEX      🔑 the address index; can be used for PEM files, keyfiles of type
                                                  mnemonic or Ledger devices (default: 0)
@@ -162,15 +164,15 @@ options:
   --guardian-2fa-code GUARDIAN_2FA_CODE          the 2fa code for the guardian
   --guardian-pem GUARDIAN_PEM                    🔑 the PEM file, if keyfile not provided
   --guardian-keyfile GUARDIAN_KEYFILE            🔑 a JSON keyfile, if PEM not provided
-  --guardian-passfile GUARDIAN_PASSFILE          🔑 a file containing keyfile's password, if keyfile provided. If not
-                                                 provided, you'll be prompted to enter the password.
+  --guardian-passfile GUARDIAN_PASSFILE          DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
   --guardian-ledger                              🔐 bool flag for signing transaction using ledger
   --guardian-wallet-index GUARDIAN_WALLET_INDEX  🔑 the address index; can be used for PEM files, keyfiles of type
                                                  mnemonic or Ledger devices (default: 0)
   --relayer-pem RELAYER_PEM                      🔑 the PEM file, if keyfile not provided
   --relayer-keyfile RELAYER_KEYFILE              🔑 a JSON keyfile, if PEM not provided
-  --relayer-passfile RELAYER_PASSFILE            🔑 a file containing keyfile's password, if keyfile provided. If not
-                                                 provided, you'll be prompted to enter the password.
+  --relayer-passfile RELAYER_PASSFILE            DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
   --relayer-ledger                               🔐 bool flag for signing transaction using ledger
   --relayer-wallet-index RELAYER_WALLET_INDEX    🔑 the address index; can be used for PEM files, keyfiles of type
                                                  mnemonic or Ledger devices (default: 0)
@@ -223,8 +225,8 @@ options:
   --sender SENDER                                 the alias of the wallet set in the address config
   --pem PEM                                       🔑 the PEM file, if keyfile not provided
   --keyfile KEYFILE                               🔑 a JSON keyfile, if PEM not provided
-  --passfile PASSFILE                             🔑 a file containing keyfile's password, if keyfile provided. If not
-                                                  provided, you'll be prompted to enter the password.
+  --passfile PASSFILE                             DEPRECATED, do not use it anymore. Instead, you'll be prompted to
+                                                  enter the password.
   --ledger                                        🔐 bool flag for signing transaction using ledger
   --sender-wallet-index SENDER_WALLET_INDEX       🔑 the address index; can be used for PEM files, keyfiles of type
                                                   mnemonic or Ledger devices (default: 0)
@@ -260,15 +262,15 @@ options:
   --guardian-2fa-code GUARDIAN_2FA_CODE           the 2fa code for the guardian
   --guardian-pem GUARDIAN_PEM                     🔑 the PEM file, if keyfile not provided
   --guardian-keyfile GUARDIAN_KEYFILE             🔑 a JSON keyfile, if PEM not provided
-  --guardian-passfile GUARDIAN_PASSFILE           🔑 a file containing keyfile's password, if keyfile provided. If not
-                                                  provided, you'll be prompted to enter the password.
+  --guardian-passfile GUARDIAN_PASSFILE           DEPRECATED, do not use it anymore. Instead, you'll be prompted to
+                                                  enter the password.
   --guardian-ledger                               🔐 bool flag for signing transaction using ledger
   --guardian-wallet-index GUARDIAN_WALLET_INDEX   🔑 the address index; can be used for PEM files, keyfiles of type
                                                   mnemonic or Ledger devices (default: 0)
   --relayer-pem RELAYER_PEM                       🔑 the PEM file, if keyfile not provided
   --relayer-keyfile RELAYER_KEYFILE               🔑 a JSON keyfile, if PEM not provided
-  --relayer-passfile RELAYER_PASSFILE             🔑 a file containing keyfile's password, if keyfile provided. If not
-                                                  provided, you'll be prompted to enter the password.
+  --relayer-passfile RELAYER_PASSFILE             DEPRECATED, do not use it anymore. Instead, you'll be prompted to
+                                                  enter the password.
   --relayer-ledger                                🔐 bool flag for signing transaction using ledger
   --relayer-wallet-index RELAYER_WALLET_INDEX     🔑 the address index; can be used for PEM files, keyfiles of type
                                                   mnemonic or Ledger devices (default: 0)
@@ -326,8 +328,8 @@ options:
   --sender SENDER                                the alias of the wallet set in the address config
   --pem PEM                                      🔑 the PEM file, if keyfile not provided
   --keyfile KEYFILE                              🔑 a JSON keyfile, if PEM not provided
-  --passfile PASSFILE                            🔑 a file containing keyfile's password, if keyfile provided. If not
-                                                 provided, you'll be prompted to enter the password.
+  --passfile PASSFILE                            DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
   --ledger                                       🔐 bool flag for signing transaction using ledger
   --sender-wallet-index SENDER_WALLET_INDEX      🔑 the address index; can be used for PEM files, keyfiles of type
                                                  mnemonic or Ledger devices (default: 0)
@@ -358,15 +360,15 @@ options:
   --guardian-2fa-code GUARDIAN_2FA_CODE          the 2fa code for the guardian
   --guardian-pem GUARDIAN_PEM                    🔑 the PEM file, if keyfile not provided
   --guardian-keyfile GUARDIAN_KEYFILE            🔑 a JSON keyfile, if PEM not provided
-  --guardian-passfile GUARDIAN_PASSFILE          🔑 a file containing keyfile's password, if keyfile provided. If not
-                                                 provided, you'll be prompted to enter the password.
+  --guardian-passfile GUARDIAN_PASSFILE          DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
   --guardian-ledger                              🔐 bool flag for signing transaction using ledger
   --guardian-wallet-index GUARDIAN_WALLET_INDEX  🔑 the address index; can be used for PEM files, keyfiles of type
                                                  mnemonic or Ledger devices (default: 0)
   --relayer-pem RELAYER_PEM                      🔑 the PEM file, if keyfile not provided
   --relayer-keyfile RELAYER_KEYFILE              🔑 a JSON keyfile, if PEM not provided
-  --relayer-passfile RELAYER_PASSFILE            🔑 a file containing keyfile's password, if keyfile provided. If not
-                                                 provided, you'll be prompted to enter the password.
+  --relayer-passfile RELAYER_PASSFILE            DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
   --relayer-ledger                               🔐 bool flag for signing transaction using ledger
   --relayer-wallet-index RELAYER_WALLET_INDEX    🔑 the address index; can be used for PEM files, keyfiles of type
                                                  mnemonic or Ledger devices (default: 0)
@@ -417,14 +419,42 @@ options:
   --sender SENDER                            the alias of the wallet set in the address config
   --pem PEM                                  🔑 the PEM file, if keyfile not provided
   --keyfile KEYFILE                          🔑 a JSON keyfile, if PEM not provided
-  --passfile PASSFILE                        🔑 a file containing keyfile's password, if keyfile provided. If not
-                                             provided, you'll be prompted to enter the password.
+  --passfile PASSFILE                        DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter the
+                                             password.
   --ledger                                   🔐 bool flag for signing transaction using ledger
   --sender-wallet-index SENDER_WALLET_INDEX  🔑 the address index; can be used for PEM files, keyfiles of type mnemonic
                                              or Ledger devices (default: 0)
   --sender-username SENDER_USERNAME          🖄 the username of the sender
   --hrp HRP                                  The hrp used to convert the address to its bech32 representation
   --skip-confirmation, -y                    can be used to skip the confirmation prompt
+
+```
+### Contract.Unverify
+
+
+```
+$ mxpy contract unverify --help
+usage: mxpy contract unverify [-h] ...
+
+Unverify a previously verified Smart Contract
+
+positional arguments:
+  contract                                   🖄 the bech32 address of the Smart Contract
+
+options:
+  -h, --help                                 show this help message and exit
+  --code-hash CODE_HASH                      the code hash of the contract
+  --verifier-url VERIFIER_URL                the url of the service that validates the contract
+  --sender SENDER                            the alias of the wallet set in the address config
+  --pem PEM                                  🔑 the PEM file, if keyfile not provided
+  --keyfile KEYFILE                          🔑 a JSON keyfile, if PEM not provided
+  --passfile PASSFILE                        DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter the
+                                             password.
+  --ledger                                   🔐 bool flag for signing transaction using ledger
+  --sender-wallet-index SENDER_WALLET_INDEX  🔑 the address index; can be used for PEM files, keyfiles of type mnemonic
+                                             or Ledger devices (default: 0)
+  --sender-username SENDER_USERNAME          🖄 the username of the sender
+  --hrp HRP                                  The hrp used to convert the address to its bech32 representation
 
 ```
 ### Contract.ReproducibleBuild
@@ -508,8 +538,8 @@ options:
   --sender SENDER                                 the alias of the wallet set in the address config
   --pem PEM                                       🔑 the PEM file, if keyfile not provided
   --keyfile KEYFILE                               🔑 a JSON keyfile, if PEM not provided
-  --passfile PASSFILE                             🔑 a file containing keyfile's password, if keyfile provided. If not
-                                                  provided, you'll be prompted to enter the password.
+  --passfile PASSFILE                             DEPRECATED, do not use it anymore. Instead, you'll be prompted to
+                                                  enter the password.
   --ledger                                        🔐 bool flag for signing transaction using ledger
   --sender-wallet-index SENDER_WALLET_INDEX       🔑 the address index; can be used for PEM files, keyfiles of type
                                                   mnemonic or Ledger devices (default: 0)
@@ -540,15 +570,15 @@ options:
   --guardian-2fa-code GUARDIAN_2FA_CODE           the 2fa code for the guardian
   --guardian-pem GUARDIAN_PEM                     🔑 the PEM file, if keyfile not provided
   --guardian-keyfile GUARDIAN_KEYFILE             🔑 a JSON keyfile, if PEM not provided
-  --guardian-passfile GUARDIAN_PASSFILE           🔑 a file containing keyfile's password, if keyfile provided. If not
-                                                  provided, you'll be prompted to enter the password.
+  --guardian-passfile GUARDIAN_PASSFILE           DEPRECATED, do not use it anymore. Instead, you'll be prompted to
+                                                  enter the password.
   --guardian-ledger                               🔐 bool flag for signing transaction using ledger
   --guardian-wallet-index GUARDIAN_WALLET_INDEX   🔑 the address index; can be used for PEM files, keyfiles of type
                                                   mnemonic or Ledger devices (default: 0)
   --relayer-pem RELAYER_PEM                       🔑 the PEM file, if keyfile not provided
   --relayer-keyfile RELAYER_KEYFILE               🔑 a JSON keyfile, if PEM not provided
-  --relayer-passfile RELAYER_PASSFILE             🔑 a file containing keyfile's password, if keyfile provided. If not
-                                                  provided, you'll be prompted to enter the password.
+  --relayer-passfile RELAYER_PASSFILE             DEPRECATED, do not use it anymore. Instead, you'll be prompted to
+                                                  enter the password.
   --relayer-ledger                                🔐 bool flag for signing transaction using ledger
   --relayer-wallet-index RELAYER_WALLET_INDEX     🔑 the address index; can be used for PEM files, keyfiles of type
                                                   mnemonic or Ledger devices (default: 0)
@@ -614,8 +644,8 @@ options:
   --sender SENDER                                the alias of the wallet set in the address config
   --pem PEM                                      🔑 the PEM file, if keyfile not provided
   --keyfile KEYFILE                              🔑 a JSON keyfile, if PEM not provided
-  --passfile PASSFILE                            🔑 a file containing keyfile's password, if keyfile provided. If not
-                                                 provided, you'll be prompted to enter the password.
+  --passfile PASSFILE                            DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
   --ledger                                       🔐 bool flag for signing transaction using ledger
   --sender-wallet-index SENDER_WALLET_INDEX      🔑 the address index; can be used for PEM files, keyfiles of type
                                                  mnemonic or Ledger devices (default: 0)
@@ -630,15 +660,15 @@ options:
   --guardian-2fa-code GUARDIAN_2FA_CODE          the 2fa code for the guardian
   --guardian-pem GUARDIAN_PEM                    🔑 the PEM file, if keyfile not provided
   --guardian-keyfile GUARDIAN_KEYFILE            🔑 a JSON keyfile, if PEM not provided
-  --guardian-passfile GUARDIAN_PASSFILE          🔑 a file containing keyfile's password, if keyfile provided. If not
-                                                 provided, you'll be prompted to enter the password.
+  --guardian-passfile GUARDIAN_PASSFILE          DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
   --guardian-ledger                              🔐 bool flag for signing transaction using ledger
   --guardian-wallet-index GUARDIAN_WALLET_INDEX  🔑 the address index; can be used for PEM files, keyfiles of type
                                                  mnemonic or Ledger devices (default: 0)
   --relayer-pem RELAYER_PEM                      🔑 the PEM file, if keyfile not provided
   --relayer-keyfile RELAYER_KEYFILE              🔑 a JSON keyfile, if PEM not provided
-  --relayer-passfile RELAYER_PASSFILE            🔑 a file containing keyfile's password, if keyfile provided. If not
-                                                 provided, you'll be prompted to enter the password.
+  --relayer-passfile RELAYER_PASSFILE            DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
   --relayer-ledger                               🔐 bool flag for signing transaction using ledger
   --relayer-wallet-index RELAYER_WALLET_INDEX    🔑 the address index; can be used for PEM files, keyfiles of type
                                                  mnemonic or Ledger devices (default: 0)
@@ -670,8 +700,8 @@ options:
   -h, --help                                   show this help message and exit
   --relayer-pem RELAYER_PEM                    🔑 the PEM file, if keyfile not provided
   --relayer-keyfile RELAYER_KEYFILE            🔑 a JSON keyfile, if PEM not provided
-  --relayer-passfile RELAYER_PASSFILE          🔑 a file containing keyfile's password, if keyfile provided. If not
-                                               provided, you'll be prompted to enter the password.
+  --relayer-passfile RELAYER_PASSFILE          DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                               the password.
   --relayer-ledger                             🔐 bool flag for signing transaction using ledger
   --relayer-wallet-index RELAYER_WALLET_INDEX  🔑 the address index; can be used for PEM files, keyfiles of type mnemonic
                                                or Ledger devices (default: 0)
@@ -730,8 +760,8 @@ options:
   --sender SENDER                                the alias of the wallet set in the address config
   --pem PEM                                      🔑 the PEM file, if keyfile not provided
   --keyfile KEYFILE                              🔑 a JSON keyfile, if PEM not provided
-  --passfile PASSFILE                            🔑 a file containing keyfile's password, if keyfile provided. If not
-                                                 provided, you'll be prompted to enter the password.
+  --passfile PASSFILE                            DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
   --ledger                                       🔐 bool flag for signing transaction using ledger
   --sender-wallet-index SENDER_WALLET_INDEX      🔑 the address index; can be used for PEM files, keyfiles of type
                                                  mnemonic or Ledger devices (default: 0)
@@ -754,15 +784,15 @@ options:
   --guardian-2fa-code GUARDIAN_2FA_CODE          the 2fa code for the guardian
   --guardian-pem GUARDIAN_PEM                    🔑 the PEM file, if keyfile not provided
   --guardian-keyfile GUARDIAN_KEYFILE            🔑 a JSON keyfile, if PEM not provided
-  --guardian-passfile GUARDIAN_PASSFILE          🔑 a file containing keyfile's password, if keyfile provided. If not
-                                                 provided, you'll be prompted to enter the password.
+  --guardian-passfile GUARDIAN_PASSFILE          DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
   --guardian-ledger                              🔐 bool flag for signing transaction using ledger
   --guardian-wallet-index GUARDIAN_WALLET_INDEX  🔑 the address index; can be used for PEM files, keyfiles of type
                                                  mnemonic or Ledger devices (default: 0)
   --relayer-pem RELAYER_PEM                      🔑 the PEM file, if keyfile not provided
   --relayer-keyfile RELAYER_KEYFILE              🔑 a JSON keyfile, if PEM not provided
-  --relayer-passfile RELAYER_PASSFILE            🔑 a file containing keyfile's password, if keyfile provided. If not
-                                                 provided, you'll be prompted to enter the password.
+  --relayer-passfile RELAYER_PASSFILE            DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
   --relayer-ledger                               🔐 bool flag for signing transaction using ledger
   --relayer-wallet-index RELAYER_WALLET_INDEX    🔑 the address index; can be used for PEM files, keyfiles of type
                                                  mnemonic or Ledger devices (default: 0)
@@ -786,8 +816,8 @@ options:
   --sender SENDER                                the alias of the wallet set in the address config
   --pem PEM                                      🔑 the PEM file, if keyfile not provided
   --keyfile KEYFILE                              🔑 a JSON keyfile, if PEM not provided
-  --passfile PASSFILE                            🔑 a file containing keyfile's password, if keyfile provided. If not
-                                                 provided, you'll be prompted to enter the password.
+  --passfile PASSFILE                            DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
   --ledger                                       🔐 bool flag for signing transaction using ledger
   --sender-wallet-index SENDER_WALLET_INDEX      🔑 the address index; can be used for PEM files, keyfiles of type
                                                  mnemonic or Ledger devices (default: 0)
@@ -810,15 +840,15 @@ options:
   --guardian-2fa-code GUARDIAN_2FA_CODE          the 2fa code for the guardian
   --guardian-pem GUARDIAN_PEM                    🔑 the PEM file, if keyfile not provided
   --guardian-keyfile GUARDIAN_KEYFILE            🔑 a JSON keyfile, if PEM not provided
-  --guardian-passfile GUARDIAN_PASSFILE          🔑 a file containing keyfile's password, if keyfile provided. If not
-                                                 provided, you'll be prompted to enter the password.
+  --guardian-passfile GUARDIAN_PASSFILE          DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
   --guardian-ledger                              🔐 bool flag for signing transaction using ledger
   --guardian-wallet-index GUARDIAN_WALLET_INDEX  🔑 the address index; can be used for PEM files, keyfiles of type
                                                  mnemonic or Ledger devices (default: 0)
   --relayer-pem RELAYER_PEM                      🔑 the PEM file, if keyfile not provided
   --relayer-keyfile RELAYER_KEYFILE              🔑 a JSON keyfile, if PEM not provided
-  --relayer-passfile RELAYER_PASSFILE            🔑 a file containing keyfile's password, if keyfile provided. If not
-                                                 provided, you'll be prompted to enter the password.
+  --relayer-passfile RELAYER_PASSFILE            DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
   --relayer-ledger                               🔐 bool flag for signing transaction using ledger
   --relayer-wallet-index RELAYER_WALLET_INDEX    🔑 the address index; can be used for PEM files, keyfiles of type
                                                  mnemonic or Ledger devices (default: 0)
@@ -840,8 +870,8 @@ options:
   --sender SENDER                                the alias of the wallet set in the address config
   --pem PEM                                      🔑 the PEM file, if keyfile not provided
   --keyfile KEYFILE                              🔑 a JSON keyfile, if PEM not provided
-  --passfile PASSFILE                            🔑 a file containing keyfile's password, if keyfile provided. If not
-                                                 provided, you'll be prompted to enter the password.
+  --passfile PASSFILE                            DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
   --ledger                                       🔐 bool flag for signing transaction using ledger
   --sender-wallet-index SENDER_WALLET_INDEX      🔑 the address index; can be used for PEM files, keyfiles of type
                                                  mnemonic or Ledger devices (default: 0)
@@ -864,15 +894,15 @@ options:
   --guardian-2fa-code GUARDIAN_2FA_CODE          the 2fa code for the guardian
   --guardian-pem GUARDIAN_PEM                    🔑 the PEM file, if keyfile not provided
   --guardian-keyfile GUARDIAN_KEYFILE            🔑 a JSON keyfile, if PEM not provided
-  --guardian-passfile GUARDIAN_PASSFILE          🔑 a file containing keyfile's password, if keyfile provided. If not
-                                                 provided, you'll be prompted to enter the password.
+  --guardian-passfile GUARDIAN_PASSFILE          DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
   --guardian-ledger                              🔐 bool flag for signing transaction using ledger
   --guardian-wallet-index GUARDIAN_WALLET_INDEX  🔑 the address index; can be used for PEM files, keyfiles of type
                                                  mnemonic or Ledger devices (default: 0)
   --relayer-pem RELAYER_PEM                      🔑 the PEM file, if keyfile not provided
   --relayer-keyfile RELAYER_KEYFILE              🔑 a JSON keyfile, if PEM not provided
-  --relayer-passfile RELAYER_PASSFILE            🔑 a file containing keyfile's password, if keyfile provided. If not
-                                                 provided, you'll be prompted to enter the password.
+  --relayer-passfile RELAYER_PASSFILE            DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
   --relayer-ledger                               🔐 bool flag for signing transaction using ledger
   --relayer-wallet-index RELAYER_WALLET_INDEX    🔑 the address index; can be used for PEM files, keyfiles of type
                                                  mnemonic or Ledger devices (default: 0)
@@ -894,8 +924,8 @@ options:
   --sender SENDER                                the alias of the wallet set in the address config
   --pem PEM                                      🔑 the PEM file, if keyfile not provided
   --keyfile KEYFILE                              🔑 a JSON keyfile, if PEM not provided
-  --passfile PASSFILE                            🔑 a file containing keyfile's password, if keyfile provided. If not
-                                                 provided, you'll be prompted to enter the password.
+  --passfile PASSFILE                            DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
   --ledger                                       🔐 bool flag for signing transaction using ledger
   --sender-wallet-index SENDER_WALLET_INDEX      🔑 the address index; can be used for PEM files, keyfiles of type
                                                  mnemonic or Ledger devices (default: 0)
@@ -918,15 +948,15 @@ options:
   --guardian-2fa-code GUARDIAN_2FA_CODE          the 2fa code for the guardian
   --guardian-pem GUARDIAN_PEM                    🔑 the PEM file, if keyfile not provided
   --guardian-keyfile GUARDIAN_KEYFILE            🔑 a JSON keyfile, if PEM not provided
-  --guardian-passfile GUARDIAN_PASSFILE          🔑 a file containing keyfile's password, if keyfile provided. If not
-                                                 provided, you'll be prompted to enter the password.
+  --guardian-passfile GUARDIAN_PASSFILE          DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
   --guardian-ledger                              🔐 bool flag for signing transaction using ledger
   --guardian-wallet-index GUARDIAN_WALLET_INDEX  🔑 the address index; can be used for PEM files, keyfiles of type
                                                  mnemonic or Ledger devices (default: 0)
   --relayer-pem RELAYER_PEM                      🔑 the PEM file, if keyfile not provided
   --relayer-keyfile RELAYER_KEYFILE              🔑 a JSON keyfile, if PEM not provided
-  --relayer-passfile RELAYER_PASSFILE            🔑 a file containing keyfile's password, if keyfile provided. If not
-                                                 provided, you'll be prompted to enter the password.
+  --relayer-passfile RELAYER_PASSFILE            DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
   --relayer-ledger                               🔐 bool flag for signing transaction using ledger
   --relayer-wallet-index RELAYER_WALLET_INDEX    🔑 the address index; can be used for PEM files, keyfiles of type
                                                  mnemonic or Ledger devices (default: 0)
@@ -948,8 +978,8 @@ options:
   --sender SENDER                                the alias of the wallet set in the address config
   --pem PEM                                      🔑 the PEM file, if keyfile not provided
   --keyfile KEYFILE                              🔑 a JSON keyfile, if PEM not provided
-  --passfile PASSFILE                            🔑 a file containing keyfile's password, if keyfile provided. If not
-                                                 provided, you'll be prompted to enter the password.
+  --passfile PASSFILE                            DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
   --ledger                                       🔐 bool flag for signing transaction using ledger
   --sender-wallet-index SENDER_WALLET_INDEX      🔑 the address index; can be used for PEM files, keyfiles of type
                                                  mnemonic or Ledger devices (default: 0)
@@ -972,15 +1002,15 @@ options:
   --guardian-2fa-code GUARDIAN_2FA_CODE          the 2fa code for the guardian
   --guardian-pem GUARDIAN_PEM                    🔑 the PEM file, if keyfile not provided
   --guardian-keyfile GUARDIAN_KEYFILE            🔑 a JSON keyfile, if PEM not provided
-  --guardian-passfile GUARDIAN_PASSFILE          🔑 a file containing keyfile's password, if keyfile provided. If not
-                                                 provided, you'll be prompted to enter the password.
+  --guardian-passfile GUARDIAN_PASSFILE          DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
   --guardian-ledger                              🔐 bool flag for signing transaction using ledger
   --guardian-wallet-index GUARDIAN_WALLET_INDEX  🔑 the address index; can be used for PEM files, keyfiles of type
                                                  mnemonic or Ledger devices (default: 0)
   --relayer-pem RELAYER_PEM                      🔑 the PEM file, if keyfile not provided
   --relayer-keyfile RELAYER_KEYFILE              🔑 a JSON keyfile, if PEM not provided
-  --relayer-passfile RELAYER_PASSFILE            🔑 a file containing keyfile's password, if keyfile provided. If not
-                                                 provided, you'll be prompted to enter the password.
+  --relayer-passfile RELAYER_PASSFILE            DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
   --relayer-ledger                               🔐 bool flag for signing transaction using ledger
   --relayer-wallet-index RELAYER_WALLET_INDEX    🔑 the address index; can be used for PEM files, keyfiles of type
                                                  mnemonic or Ledger devices (default: 0)
@@ -1002,8 +1032,8 @@ options:
   --sender SENDER                                the alias of the wallet set in the address config
   --pem PEM                                      🔑 the PEM file, if keyfile not provided
   --keyfile KEYFILE                              🔑 a JSON keyfile, if PEM not provided
-  --passfile PASSFILE                            🔑 a file containing keyfile's password, if keyfile provided. If not
-                                                 provided, you'll be prompted to enter the password.
+  --passfile PASSFILE                            DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
   --ledger                                       🔐 bool flag for signing transaction using ledger
   --sender-wallet-index SENDER_WALLET_INDEX      🔑 the address index; can be used for PEM files, keyfiles of type
                                                  mnemonic or Ledger devices (default: 0)
@@ -1026,15 +1056,15 @@ options:
   --guardian-2fa-code GUARDIAN_2FA_CODE          the 2fa code for the guardian
   --guardian-pem GUARDIAN_PEM                    🔑 the PEM file, if keyfile not provided
   --guardian-keyfile GUARDIAN_KEYFILE            🔑 a JSON keyfile, if PEM not provided
-  --guardian-passfile GUARDIAN_PASSFILE          🔑 a file containing keyfile's password, if keyfile provided. If not
-                                                 provided, you'll be prompted to enter the password.
+  --guardian-passfile GUARDIAN_PASSFILE          DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
   --guardian-ledger                              🔐 bool flag for signing transaction using ledger
   --guardian-wallet-index GUARDIAN_WALLET_INDEX  🔑 the address index; can be used for PEM files, keyfiles of type
                                                  mnemonic or Ledger devices (default: 0)
   --relayer-pem RELAYER_PEM                      🔑 the PEM file, if keyfile not provided
   --relayer-keyfile RELAYER_KEYFILE              🔑 a JSON keyfile, if PEM not provided
-  --relayer-passfile RELAYER_PASSFILE            🔑 a file containing keyfile's password, if keyfile provided. If not
-                                                 provided, you'll be prompted to enter the password.
+  --relayer-passfile RELAYER_PASSFILE            DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
   --relayer-ledger                               🔐 bool flag for signing transaction using ledger
   --relayer-wallet-index RELAYER_WALLET_INDEX    🔑 the address index; can be used for PEM files, keyfiles of type
                                                  mnemonic or Ledger devices (default: 0)
@@ -1055,8 +1085,8 @@ options:
   --sender SENDER                                the alias of the wallet set in the address config
   --pem PEM                                      🔑 the PEM file, if keyfile not provided
   --keyfile KEYFILE                              🔑 a JSON keyfile, if PEM not provided
-  --passfile PASSFILE                            🔑 a file containing keyfile's password, if keyfile provided. If not
-                                                 provided, you'll be prompted to enter the password.
+  --passfile PASSFILE                            DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
   --ledger                                       🔐 bool flag for signing transaction using ledger
   --sender-wallet-index SENDER_WALLET_INDEX      🔑 the address index; can be used for PEM files, keyfiles of type
                                                  mnemonic or Ledger devices (default: 0)
@@ -1079,15 +1109,15 @@ options:
   --guardian-2fa-code GUARDIAN_2FA_CODE          the 2fa code for the guardian
   --guardian-pem GUARDIAN_PEM                    🔑 the PEM file, if keyfile not provided
   --guardian-keyfile GUARDIAN_KEYFILE            🔑 a JSON keyfile, if PEM not provided
-  --guardian-passfile GUARDIAN_PASSFILE          🔑 a file containing keyfile's password, if keyfile provided. If not
-                                                 provided, you'll be prompted to enter the password.
+  --guardian-passfile GUARDIAN_PASSFILE          DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
   --guardian-ledger                              🔐 bool flag for signing transaction using ledger
   --guardian-wallet-index GUARDIAN_WALLET_INDEX  🔑 the address index; can be used for PEM files, keyfiles of type
                                                  mnemonic or Ledger devices (default: 0)
   --relayer-pem RELAYER_PEM                      🔑 the PEM file, if keyfile not provided
   --relayer-keyfile RELAYER_KEYFILE              🔑 a JSON keyfile, if PEM not provided
-  --relayer-passfile RELAYER_PASSFILE            🔑 a file containing keyfile's password, if keyfile provided. If not
-                                                 provided, you'll be prompted to enter the password.
+  --relayer-passfile RELAYER_PASSFILE            DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
   --relayer-ledger                               🔐 bool flag for signing transaction using ledger
   --relayer-wallet-index RELAYER_WALLET_INDEX    🔑 the address index; can be used for PEM files, keyfiles of type
                                                  mnemonic or Ledger devices (default: 0)
@@ -1109,8 +1139,8 @@ options:
   --sender SENDER                                the alias of the wallet set in the address config
   --pem PEM                                      🔑 the PEM file, if keyfile not provided
   --keyfile KEYFILE                              🔑 a JSON keyfile, if PEM not provided
-  --passfile PASSFILE                            🔑 a file containing keyfile's password, if keyfile provided. If not
-                                                 provided, you'll be prompted to enter the password.
+  --passfile PASSFILE                            DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
   --ledger                                       🔐 bool flag for signing transaction using ledger
   --sender-wallet-index SENDER_WALLET_INDEX      🔑 the address index; can be used for PEM files, keyfiles of type
                                                  mnemonic or Ledger devices (default: 0)
@@ -1133,15 +1163,15 @@ options:
   --guardian-2fa-code GUARDIAN_2FA_CODE          the 2fa code for the guardian
   --guardian-pem GUARDIAN_PEM                    🔑 the PEM file, if keyfile not provided
   --guardian-keyfile GUARDIAN_KEYFILE            🔑 a JSON keyfile, if PEM not provided
-  --guardian-passfile GUARDIAN_PASSFILE          🔑 a file containing keyfile's password, if keyfile provided. If not
-                                                 provided, you'll be prompted to enter the password.
+  --guardian-passfile GUARDIAN_PASSFILE          DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
   --guardian-ledger                              🔐 bool flag for signing transaction using ledger
   --guardian-wallet-index GUARDIAN_WALLET_INDEX  🔑 the address index; can be used for PEM files, keyfiles of type
                                                  mnemonic or Ledger devices (default: 0)
   --relayer-pem RELAYER_PEM                      🔑 the PEM file, if keyfile not provided
   --relayer-keyfile RELAYER_KEYFILE              🔑 a JSON keyfile, if PEM not provided
-  --relayer-passfile RELAYER_PASSFILE            🔑 a file containing keyfile's password, if keyfile provided. If not
-                                                 provided, you'll be prompted to enter the password.
+  --relayer-passfile RELAYER_PASSFILE            DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
   --relayer-ledger                               🔐 bool flag for signing transaction using ledger
   --relayer-wallet-index RELAYER_WALLET_INDEX    🔑 the address index; can be used for PEM files, keyfiles of type
                                                  mnemonic or Ledger devices (default: 0)
@@ -1163,8 +1193,8 @@ options:
   --sender SENDER                                the alias of the wallet set in the address config
   --pem PEM                                      🔑 the PEM file, if keyfile not provided
   --keyfile KEYFILE                              🔑 a JSON keyfile, if PEM not provided
-  --passfile PASSFILE                            🔑 a file containing keyfile's password, if keyfile provided. If not
-                                                 provided, you'll be prompted to enter the password.
+  --passfile PASSFILE                            DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
   --ledger                                       🔐 bool flag for signing transaction using ledger
   --sender-wallet-index SENDER_WALLET_INDEX      🔑 the address index; can be used for PEM files, keyfiles of type
                                                  mnemonic or Ledger devices (default: 0)
@@ -1187,15 +1217,15 @@ options:
   --guardian-2fa-code GUARDIAN_2FA_CODE          the 2fa code for the guardian
   --guardian-pem GUARDIAN_PEM                    🔑 the PEM file, if keyfile not provided
   --guardian-keyfile GUARDIAN_KEYFILE            🔑 a JSON keyfile, if PEM not provided
-  --guardian-passfile GUARDIAN_PASSFILE          🔑 a file containing keyfile's password, if keyfile provided. If not
-                                                 provided, you'll be prompted to enter the password.
+  --guardian-passfile GUARDIAN_PASSFILE          DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
   --guardian-ledger                              🔐 bool flag for signing transaction using ledger
   --guardian-wallet-index GUARDIAN_WALLET_INDEX  🔑 the address index; can be used for PEM files, keyfiles of type
                                                  mnemonic or Ledger devices (default: 0)
   --relayer-pem RELAYER_PEM                      🔑 the PEM file, if keyfile not provided
   --relayer-keyfile RELAYER_KEYFILE              🔑 a JSON keyfile, if PEM not provided
-  --relayer-passfile RELAYER_PASSFILE            🔑 a file containing keyfile's password, if keyfile provided. If not
-                                                 provided, you'll be prompted to enter the password.
+  --relayer-passfile RELAYER_PASSFILE            DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
   --relayer-ledger                               🔐 bool flag for signing transaction using ledger
   --relayer-wallet-index RELAYER_WALLET_INDEX    🔑 the address index; can be used for PEM files, keyfiles of type
                                                  mnemonic or Ledger devices (default: 0)
@@ -1217,8 +1247,8 @@ options:
   --sender SENDER                                the alias of the wallet set in the address config
   --pem PEM                                      🔑 the PEM file, if keyfile not provided
   --keyfile KEYFILE                              🔑 a JSON keyfile, if PEM not provided
-  --passfile PASSFILE                            🔑 a file containing keyfile's password, if keyfile provided. If not
-                                                 provided, you'll be prompted to enter the password.
+  --passfile PASSFILE                            DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
   --ledger                                       🔐 bool flag for signing transaction using ledger
   --sender-wallet-index SENDER_WALLET_INDEX      🔑 the address index; can be used for PEM files, keyfiles of type
                                                  mnemonic or Ledger devices (default: 0)
@@ -1241,15 +1271,15 @@ options:
   --guardian-2fa-code GUARDIAN_2FA_CODE          the 2fa code for the guardian
   --guardian-pem GUARDIAN_PEM                    🔑 the PEM file, if keyfile not provided
   --guardian-keyfile GUARDIAN_KEYFILE            🔑 a JSON keyfile, if PEM not provided
-  --guardian-passfile GUARDIAN_PASSFILE          🔑 a file containing keyfile's password, if keyfile provided. If not
-                                                 provided, you'll be prompted to enter the password.
+  --guardian-passfile GUARDIAN_PASSFILE          DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
   --guardian-ledger                              🔐 bool flag for signing transaction using ledger
   --guardian-wallet-index GUARDIAN_WALLET_INDEX  🔑 the address index; can be used for PEM files, keyfiles of type
                                                  mnemonic or Ledger devices (default: 0)
   --relayer-pem RELAYER_PEM                      🔑 the PEM file, if keyfile not provided
   --relayer-keyfile RELAYER_KEYFILE              🔑 a JSON keyfile, if PEM not provided
-  --relayer-passfile RELAYER_PASSFILE            🔑 a file containing keyfile's password, if keyfile provided. If not
-                                                 provided, you'll be prompted to enter the password.
+  --relayer-passfile RELAYER_PASSFILE            DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
   --relayer-ledger                               🔐 bool flag for signing transaction using ledger
   --relayer-wallet-index RELAYER_WALLET_INDEX    🔑 the address index; can be used for PEM files, keyfiles of type
                                                  mnemonic or Ledger devices (default: 0)
@@ -1271,8 +1301,8 @@ options:
   --sender SENDER                                the alias of the wallet set in the address config
   --pem PEM                                      🔑 the PEM file, if keyfile not provided
   --keyfile KEYFILE                              🔑 a JSON keyfile, if PEM not provided
-  --passfile PASSFILE                            🔑 a file containing keyfile's password, if keyfile provided. If not
-                                                 provided, you'll be prompted to enter the password.
+  --passfile PASSFILE                            DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
   --ledger                                       🔐 bool flag for signing transaction using ledger
   --sender-wallet-index SENDER_WALLET_INDEX      🔑 the address index; can be used for PEM files, keyfiles of type
                                                  mnemonic or Ledger devices (default: 0)
@@ -1295,15 +1325,15 @@ options:
   --guardian-2fa-code GUARDIAN_2FA_CODE          the 2fa code for the guardian
   --guardian-pem GUARDIAN_PEM                    🔑 the PEM file, if keyfile not provided
   --guardian-keyfile GUARDIAN_KEYFILE            🔑 a JSON keyfile, if PEM not provided
-  --guardian-passfile GUARDIAN_PASSFILE          🔑 a file containing keyfile's password, if keyfile provided. If not
-                                                 provided, you'll be prompted to enter the password.
+  --guardian-passfile GUARDIAN_PASSFILE          DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
   --guardian-ledger                              🔐 bool flag for signing transaction using ledger
   --guardian-wallet-index GUARDIAN_WALLET_INDEX  🔑 the address index; can be used for PEM files, keyfiles of type
                                                  mnemonic or Ledger devices (default: 0)
   --relayer-pem RELAYER_PEM                      🔑 the PEM file, if keyfile not provided
   --relayer-keyfile RELAYER_KEYFILE              🔑 a JSON keyfile, if PEM not provided
-  --relayer-passfile RELAYER_PASSFILE            🔑 a file containing keyfile's password, if keyfile provided. If not
-                                                 provided, you'll be prompted to enter the password.
+  --relayer-passfile RELAYER_PASSFILE            DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
   --relayer-ledger                               🔐 bool flag for signing transaction using ledger
   --relayer-wallet-index RELAYER_WALLET_INDEX    🔑 the address index; can be used for PEM files, keyfiles of type
                                                  mnemonic or Ledger devices (default: 0)
@@ -1324,8 +1354,8 @@ options:
   --sender SENDER                                the alias of the wallet set in the address config
   --pem PEM                                      🔑 the PEM file, if keyfile not provided
   --keyfile KEYFILE                              🔑 a JSON keyfile, if PEM not provided
-  --passfile PASSFILE                            🔑 a file containing keyfile's password, if keyfile provided. If not
-                                                 provided, you'll be prompted to enter the password.
+  --passfile PASSFILE                            DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
   --ledger                                       🔐 bool flag for signing transaction using ledger
   --sender-wallet-index SENDER_WALLET_INDEX      🔑 the address index; can be used for PEM files, keyfiles of type
                                                  mnemonic or Ledger devices (default: 0)
@@ -1348,15 +1378,15 @@ options:
   --guardian-2fa-code GUARDIAN_2FA_CODE          the 2fa code for the guardian
   --guardian-pem GUARDIAN_PEM                    🔑 the PEM file, if keyfile not provided
   --guardian-keyfile GUARDIAN_KEYFILE            🔑 a JSON keyfile, if PEM not provided
-  --guardian-passfile GUARDIAN_PASSFILE          🔑 a file containing keyfile's password, if keyfile provided. If not
-                                                 provided, you'll be prompted to enter the password.
+  --guardian-passfile GUARDIAN_PASSFILE          DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
   --guardian-ledger                              🔐 bool flag for signing transaction using ledger
   --guardian-wallet-index GUARDIAN_WALLET_INDEX  🔑 the address index; can be used for PEM files, keyfiles of type
                                                  mnemonic or Ledger devices (default: 0)
   --relayer-pem RELAYER_PEM                      🔑 the PEM file, if keyfile not provided
   --relayer-keyfile RELAYER_KEYFILE              🔑 a JSON keyfile, if PEM not provided
-  --relayer-passfile RELAYER_PASSFILE            🔑 a file containing keyfile's password, if keyfile provided. If not
-                                                 provided, you'll be prompted to enter the password.
+  --relayer-passfile RELAYER_PASSFILE            DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
   --relayer-ledger                               🔐 bool flag for signing transaction using ledger
   --relayer-wallet-index RELAYER_WALLET_INDEX    🔑 the address index; can be used for PEM files, keyfiles of type
                                                  mnemonic or Ledger devices (default: 0)
@@ -1417,8 +1447,8 @@ options:
   --sender SENDER                                the alias of the wallet set in the address config
   --pem PEM                                      🔑 the PEM file, if keyfile not provided
   --keyfile KEYFILE                              🔑 a JSON keyfile, if PEM not provided
-  --passfile PASSFILE                            🔑 a file containing keyfile's password, if keyfile provided. If not
-                                                 provided, you'll be prompted to enter the password.
+  --passfile PASSFILE                            DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
   --ledger                                       🔐 bool flag for signing transaction using ledger
   --sender-wallet-index SENDER_WALLET_INDEX      🔑 the address index; can be used for PEM files, keyfiles of type
                                                  mnemonic or Ledger devices (default: 0)
@@ -1441,15 +1471,15 @@ options:
   --guardian-2fa-code GUARDIAN_2FA_CODE          the 2fa code for the guardian
   --guardian-pem GUARDIAN_PEM                    🔑 the PEM file, if keyfile not provided
   --guardian-keyfile GUARDIAN_KEYFILE            🔑 a JSON keyfile, if PEM not provided
-  --guardian-passfile GUARDIAN_PASSFILE          🔑 a file containing keyfile's password, if keyfile provided. If not
-                                                 provided, you'll be prompted to enter the password.
+  --guardian-passfile GUARDIAN_PASSFILE          DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
   --guardian-ledger                              🔐 bool flag for signing transaction using ledger
   --guardian-wallet-index GUARDIAN_WALLET_INDEX  🔑 the address index; can be used for PEM files, keyfiles of type
                                                  mnemonic or Ledger devices (default: 0)
   --relayer-pem RELAYER_PEM                      🔑 the PEM file, if keyfile not provided
   --relayer-keyfile RELAYER_KEYFILE              🔑 a JSON keyfile, if PEM not provided
-  --relayer-passfile RELAYER_PASSFILE            🔑 a file containing keyfile's password, if keyfile provided. If not
-                                                 provided, you'll be prompted to enter the password.
+  --relayer-passfile RELAYER_PASSFILE            DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
   --relayer-ledger                               🔐 bool flag for signing transaction using ledger
   --relayer-wallet-index RELAYER_WALLET_INDEX    🔑 the address index; can be used for PEM files, keyfiles of type
                                                  mnemonic or Ledger devices (default: 0)
@@ -1489,8 +1519,8 @@ options:
   --sender SENDER                                the alias of the wallet set in the address config
   --pem PEM                                      🔑 the PEM file, if keyfile not provided
   --keyfile KEYFILE                              🔑 a JSON keyfile, if PEM not provided
-  --passfile PASSFILE                            🔑 a file containing keyfile's password, if keyfile provided. If not
-                                                 provided, you'll be prompted to enter the password.
+  --passfile PASSFILE                            DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
   --ledger                                       🔐 bool flag for signing transaction using ledger
   --sender-wallet-index SENDER_WALLET_INDEX      🔑 the address index; can be used for PEM files, keyfiles of type
                                                  mnemonic or Ledger devices (default: 0)
@@ -1513,15 +1543,15 @@ options:
   --guardian-2fa-code GUARDIAN_2FA_CODE          the 2fa code for the guardian
   --guardian-pem GUARDIAN_PEM                    🔑 the PEM file, if keyfile not provided
   --guardian-keyfile GUARDIAN_KEYFILE            🔑 a JSON keyfile, if PEM not provided
-  --guardian-passfile GUARDIAN_PASSFILE          🔑 a file containing keyfile's password, if keyfile provided. If not
-                                                 provided, you'll be prompted to enter the password.
+  --guardian-passfile GUARDIAN_PASSFILE          DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
   --guardian-ledger                              🔐 bool flag for signing transaction using ledger
   --guardian-wallet-index GUARDIAN_WALLET_INDEX  🔑 the address index; can be used for PEM files, keyfiles of type
                                                  mnemonic or Ledger devices (default: 0)
   --relayer-pem RELAYER_PEM                      🔑 the PEM file, if keyfile not provided
   --relayer-keyfile RELAYER_KEYFILE              🔑 a JSON keyfile, if PEM not provided
-  --relayer-passfile RELAYER_PASSFILE            🔑 a file containing keyfile's password, if keyfile provided. If not
-                                                 provided, you'll be prompted to enter the password.
+  --relayer-passfile RELAYER_PASSFILE            DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
   --relayer-ledger                               🔐 bool flag for signing transaction using ledger
   --relayer-wallet-index RELAYER_WALLET_INDEX    🔑 the address index; can be used for PEM files, keyfiles of type
                                                  mnemonic or Ledger devices (default: 0)
@@ -1545,8 +1575,8 @@ options:
   --sender SENDER                                the alias of the wallet set in the address config
   --pem PEM                                      🔑 the PEM file, if keyfile not provided
   --keyfile KEYFILE                              🔑 a JSON keyfile, if PEM not provided
-  --passfile PASSFILE                            🔑 a file containing keyfile's password, if keyfile provided. If not
-                                                 provided, you'll be prompted to enter the password.
+  --passfile PASSFILE                            DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
   --ledger                                       🔐 bool flag for signing transaction using ledger
   --sender-wallet-index SENDER_WALLET_INDEX      🔑 the address index; can be used for PEM files, keyfiles of type
                                                  mnemonic or Ledger devices (default: 0)
@@ -1569,15 +1599,15 @@ options:
   --guardian-2fa-code GUARDIAN_2FA_CODE          the 2fa code for the guardian
   --guardian-pem GUARDIAN_PEM                    🔑 the PEM file, if keyfile not provided
   --guardian-keyfile GUARDIAN_KEYFILE            🔑 a JSON keyfile, if PEM not provided
-  --guardian-passfile GUARDIAN_PASSFILE          🔑 a file containing keyfile's password, if keyfile provided. If not
-                                                 provided, you'll be prompted to enter the password.
+  --guardian-passfile GUARDIAN_PASSFILE          DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
   --guardian-ledger                              🔐 bool flag for signing transaction using ledger
   --guardian-wallet-index GUARDIAN_WALLET_INDEX  🔑 the address index; can be used for PEM files, keyfiles of type
                                                  mnemonic or Ledger devices (default: 0)
   --relayer-pem RELAYER_PEM                      🔑 the PEM file, if keyfile not provided
   --relayer-keyfile RELAYER_KEYFILE              🔑 a JSON keyfile, if PEM not provided
-  --relayer-passfile RELAYER_PASSFILE            🔑 a file containing keyfile's password, if keyfile provided. If not
-                                                 provided, you'll be prompted to enter the password.
+  --relayer-passfile RELAYER_PASSFILE            DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
   --relayer-ledger                               🔐 bool flag for signing transaction using ledger
   --relayer-wallet-index RELAYER_WALLET_INDEX    🔑 the address index; can be used for PEM files, keyfiles of type
                                                  mnemonic or Ledger devices (default: 0)
@@ -1601,8 +1631,8 @@ options:
   --sender SENDER                                the alias of the wallet set in the address config
   --pem PEM                                      🔑 the PEM file, if keyfile not provided
   --keyfile KEYFILE                              🔑 a JSON keyfile, if PEM not provided
-  --passfile PASSFILE                            🔑 a file containing keyfile's password, if keyfile provided. If not
-                                                 provided, you'll be prompted to enter the password.
+  --passfile PASSFILE                            DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
   --ledger                                       🔐 bool flag for signing transaction using ledger
   --sender-wallet-index SENDER_WALLET_INDEX      🔑 the address index; can be used for PEM files, keyfiles of type
                                                  mnemonic or Ledger devices (default: 0)
@@ -1625,15 +1655,15 @@ options:
   --guardian-2fa-code GUARDIAN_2FA_CODE          the 2fa code for the guardian
   --guardian-pem GUARDIAN_PEM                    🔑 the PEM file, if keyfile not provided
   --guardian-keyfile GUARDIAN_KEYFILE            🔑 a JSON keyfile, if PEM not provided
-  --guardian-passfile GUARDIAN_PASSFILE          🔑 a file containing keyfile's password, if keyfile provided. If not
-                                                 provided, you'll be prompted to enter the password.
+  --guardian-passfile GUARDIAN_PASSFILE          DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
   --guardian-ledger                              🔐 bool flag for signing transaction using ledger
   --guardian-wallet-index GUARDIAN_WALLET_INDEX  🔑 the address index; can be used for PEM files, keyfiles of type
                                                  mnemonic or Ledger devices (default: 0)
   --relayer-pem RELAYER_PEM                      🔑 the PEM file, if keyfile not provided
   --relayer-keyfile RELAYER_KEYFILE              🔑 a JSON keyfile, if PEM not provided
-  --relayer-passfile RELAYER_PASSFILE            🔑 a file containing keyfile's password, if keyfile provided. If not
-                                                 provided, you'll be prompted to enter the password.
+  --relayer-passfile RELAYER_PASSFILE            DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
   --relayer-ledger                               🔐 bool flag for signing transaction using ledger
   --relayer-wallet-index RELAYER_WALLET_INDEX    🔑 the address index; can be used for PEM files, keyfiles of type
                                                  mnemonic or Ledger devices (default: 0)
@@ -1657,8 +1687,8 @@ options:
   --sender SENDER                                the alias of the wallet set in the address config
   --pem PEM                                      🔑 the PEM file, if keyfile not provided
   --keyfile KEYFILE                              🔑 a JSON keyfile, if PEM not provided
-  --passfile PASSFILE                            🔑 a file containing keyfile's password, if keyfile provided. If not
-                                                 provided, you'll be prompted to enter the password.
+  --passfile PASSFILE                            DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
   --ledger                                       🔐 bool flag for signing transaction using ledger
   --sender-wallet-index SENDER_WALLET_INDEX      🔑 the address index; can be used for PEM files, keyfiles of type
                                                  mnemonic or Ledger devices (default: 0)
@@ -1681,15 +1711,15 @@ options:
   --guardian-2fa-code GUARDIAN_2FA_CODE          the 2fa code for the guardian
   --guardian-pem GUARDIAN_PEM                    🔑 the PEM file, if keyfile not provided
   --guardian-keyfile GUARDIAN_KEYFILE            🔑 a JSON keyfile, if PEM not provided
-  --guardian-passfile GUARDIAN_PASSFILE          🔑 a file containing keyfile's password, if keyfile provided. If not
-                                                 provided, you'll be prompted to enter the password.
+  --guardian-passfile GUARDIAN_PASSFILE          DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
   --guardian-ledger                              🔐 bool flag for signing transaction using ledger
   --guardian-wallet-index GUARDIAN_WALLET_INDEX  🔑 the address index; can be used for PEM files, keyfiles of type
                                                  mnemonic or Ledger devices (default: 0)
   --relayer-pem RELAYER_PEM                      🔑 the PEM file, if keyfile not provided
   --relayer-keyfile RELAYER_KEYFILE              🔑 a JSON keyfile, if PEM not provided
-  --relayer-passfile RELAYER_PASSFILE            🔑 a file containing keyfile's password, if keyfile provided. If not
-                                                 provided, you'll be prompted to enter the password.
+  --relayer-passfile RELAYER_PASSFILE            DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
   --relayer-ledger                               🔐 bool flag for signing transaction using ledger
   --relayer-wallet-index RELAYER_WALLET_INDEX    🔑 the address index; can be used for PEM files, keyfiles of type
                                                  mnemonic or Ledger devices (default: 0)
@@ -1713,8 +1743,8 @@ options:
   --sender SENDER                                the alias of the wallet set in the address config
   --pem PEM                                      🔑 the PEM file, if keyfile not provided
   --keyfile KEYFILE                              🔑 a JSON keyfile, if PEM not provided
-  --passfile PASSFILE                            🔑 a file containing keyfile's password, if keyfile provided. If not
-                                                 provided, you'll be prompted to enter the password.
+  --passfile PASSFILE                            DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
   --ledger                                       🔐 bool flag for signing transaction using ledger
   --sender-wallet-index SENDER_WALLET_INDEX      🔑 the address index; can be used for PEM files, keyfiles of type
                                                  mnemonic or Ledger devices (default: 0)
@@ -1737,15 +1767,15 @@ options:
   --guardian-2fa-code GUARDIAN_2FA_CODE          the 2fa code for the guardian
   --guardian-pem GUARDIAN_PEM                    🔑 the PEM file, if keyfile not provided
   --guardian-keyfile GUARDIAN_KEYFILE            🔑 a JSON keyfile, if PEM not provided
-  --guardian-passfile GUARDIAN_PASSFILE          🔑 a file containing keyfile's password, if keyfile provided. If not
-                                                 provided, you'll be prompted to enter the password.
+  --guardian-passfile GUARDIAN_PASSFILE          DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
   --guardian-ledger                              🔐 bool flag for signing transaction using ledger
   --guardian-wallet-index GUARDIAN_WALLET_INDEX  🔑 the address index; can be used for PEM files, keyfiles of type
                                                  mnemonic or Ledger devices (default: 0)
   --relayer-pem RELAYER_PEM                      🔑 the PEM file, if keyfile not provided
   --relayer-keyfile RELAYER_KEYFILE              🔑 a JSON keyfile, if PEM not provided
-  --relayer-passfile RELAYER_PASSFILE            🔑 a file containing keyfile's password, if keyfile provided. If not
-                                                 provided, you'll be prompted to enter the password.
+  --relayer-passfile RELAYER_PASSFILE            DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
   --relayer-ledger                               🔐 bool flag for signing transaction using ledger
   --relayer-wallet-index RELAYER_WALLET_INDEX    🔑 the address index; can be used for PEM files, keyfiles of type
                                                  mnemonic or Ledger devices (default: 0)
@@ -1769,8 +1799,8 @@ options:
   --sender SENDER                                the alias of the wallet set in the address config
   --pem PEM                                      🔑 the PEM file, if keyfile not provided
   --keyfile KEYFILE                              🔑 a JSON keyfile, if PEM not provided
-  --passfile PASSFILE                            🔑 a file containing keyfile's password, if keyfile provided. If not
-                                                 provided, you'll be prompted to enter the password.
+  --passfile PASSFILE                            DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
   --ledger                                       🔐 bool flag for signing transaction using ledger
   --sender-wallet-index SENDER_WALLET_INDEX      🔑 the address index; can be used for PEM files, keyfiles of type
                                                  mnemonic or Ledger devices (default: 0)
@@ -1793,15 +1823,15 @@ options:
   --guardian-2fa-code GUARDIAN_2FA_CODE          the 2fa code for the guardian
   --guardian-pem GUARDIAN_PEM                    🔑 the PEM file, if keyfile not provided
   --guardian-keyfile GUARDIAN_KEYFILE            🔑 a JSON keyfile, if PEM not provided
-  --guardian-passfile GUARDIAN_PASSFILE          🔑 a file containing keyfile's password, if keyfile provided. If not
-                                                 provided, you'll be prompted to enter the password.
+  --guardian-passfile GUARDIAN_PASSFILE          DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
   --guardian-ledger                              🔐 bool flag for signing transaction using ledger
   --guardian-wallet-index GUARDIAN_WALLET_INDEX  🔑 the address index; can be used for PEM files, keyfiles of type
                                                  mnemonic or Ledger devices (default: 0)
   --relayer-pem RELAYER_PEM                      🔑 the PEM file, if keyfile not provided
   --relayer-keyfile RELAYER_KEYFILE              🔑 a JSON keyfile, if PEM not provided
-  --relayer-passfile RELAYER_PASSFILE            🔑 a file containing keyfile's password, if keyfile provided. If not
-                                                 provided, you'll be prompted to enter the password.
+  --relayer-passfile RELAYER_PASSFILE            DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
   --relayer-ledger                               🔐 bool flag for signing transaction using ledger
   --relayer-wallet-index RELAYER_WALLET_INDEX    🔑 the address index; can be used for PEM files, keyfiles of type
                                                  mnemonic or Ledger devices (default: 0)
@@ -1823,8 +1853,8 @@ options:
   --sender SENDER                                the alias of the wallet set in the address config
   --pem PEM                                      🔑 the PEM file, if keyfile not provided
   --keyfile KEYFILE                              🔑 a JSON keyfile, if PEM not provided
-  --passfile PASSFILE                            🔑 a file containing keyfile's password, if keyfile provided. If not
-                                                 provided, you'll be prompted to enter the password.
+  --passfile PASSFILE                            DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
   --ledger                                       🔐 bool flag for signing transaction using ledger
   --sender-wallet-index SENDER_WALLET_INDEX      🔑 the address index; can be used for PEM files, keyfiles of type
                                                  mnemonic or Ledger devices (default: 0)
@@ -1847,15 +1877,15 @@ options:
   --guardian-2fa-code GUARDIAN_2FA_CODE          the 2fa code for the guardian
   --guardian-pem GUARDIAN_PEM                    🔑 the PEM file, if keyfile not provided
   --guardian-keyfile GUARDIAN_KEYFILE            🔑 a JSON keyfile, if PEM not provided
-  --guardian-passfile GUARDIAN_PASSFILE          🔑 a file containing keyfile's password, if keyfile provided. If not
-                                                 provided, you'll be prompted to enter the password.
+  --guardian-passfile GUARDIAN_PASSFILE          DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
   --guardian-ledger                              🔐 bool flag for signing transaction using ledger
   --guardian-wallet-index GUARDIAN_WALLET_INDEX  🔑 the address index; can be used for PEM files, keyfiles of type
                                                  mnemonic or Ledger devices (default: 0)
   --relayer-pem RELAYER_PEM                      🔑 the PEM file, if keyfile not provided
   --relayer-keyfile RELAYER_KEYFILE              🔑 a JSON keyfile, if PEM not provided
-  --relayer-passfile RELAYER_PASSFILE            🔑 a file containing keyfile's password, if keyfile provided. If not
-                                                 provided, you'll be prompted to enter the password.
+  --relayer-passfile RELAYER_PASSFILE            DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
   --relayer-ledger                               🔐 bool flag for signing transaction using ledger
   --relayer-wallet-index RELAYER_WALLET_INDEX    🔑 the address index; can be used for PEM files, keyfiles of type
                                                  mnemonic or Ledger devices (default: 0)
@@ -1877,8 +1907,8 @@ options:
   --sender SENDER                                the alias of the wallet set in the address config
   --pem PEM                                      🔑 the PEM file, if keyfile not provided
   --keyfile KEYFILE                              🔑 a JSON keyfile, if PEM not provided
-  --passfile PASSFILE                            🔑 a file containing keyfile's password, if keyfile provided. If not
-                                                 provided, you'll be prompted to enter the password.
+  --passfile PASSFILE                            DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
   --ledger                                       🔐 bool flag for signing transaction using ledger
   --sender-wallet-index SENDER_WALLET_INDEX      🔑 the address index; can be used for PEM files, keyfiles of type
                                                  mnemonic or Ledger devices (default: 0)
@@ -1901,15 +1931,15 @@ options:
   --guardian-2fa-code GUARDIAN_2FA_CODE          the 2fa code for the guardian
   --guardian-pem GUARDIAN_PEM                    🔑 the PEM file, if keyfile not provided
   --guardian-keyfile GUARDIAN_KEYFILE            🔑 a JSON keyfile, if PEM not provided
-  --guardian-passfile GUARDIAN_PASSFILE          🔑 a file containing keyfile's password, if keyfile provided. If not
-                                                 provided, you'll be prompted to enter the password.
+  --guardian-passfile GUARDIAN_PASSFILE          DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
   --guardian-ledger                              🔐 bool flag for signing transaction using ledger
   --guardian-wallet-index GUARDIAN_WALLET_INDEX  🔑 the address index; can be used for PEM files, keyfiles of type
                                                  mnemonic or Ledger devices (default: 0)
   --relayer-pem RELAYER_PEM                      🔑 the PEM file, if keyfile not provided
   --relayer-keyfile RELAYER_KEYFILE              🔑 a JSON keyfile, if PEM not provided
-  --relayer-passfile RELAYER_PASSFILE            🔑 a file containing keyfile's password, if keyfile provided. If not
-                                                 provided, you'll be prompted to enter the password.
+  --relayer-passfile RELAYER_PASSFILE            DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
   --relayer-ledger                               🔐 bool flag for signing transaction using ledger
   --relayer-wallet-index RELAYER_WALLET_INDEX    🔑 the address index; can be used for PEM files, keyfiles of type
                                                  mnemonic or Ledger devices (default: 0)
@@ -1931,8 +1961,8 @@ options:
   --sender SENDER                                the alias of the wallet set in the address config
   --pem PEM                                      🔑 the PEM file, if keyfile not provided
   --keyfile KEYFILE                              🔑 a JSON keyfile, if PEM not provided
-  --passfile PASSFILE                            🔑 a file containing keyfile's password, if keyfile provided. If not
-                                                 provided, you'll be prompted to enter the password.
+  --passfile PASSFILE                            DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
   --ledger                                       🔐 bool flag for signing transaction using ledger
   --sender-wallet-index SENDER_WALLET_INDEX      🔑 the address index; can be used for PEM files, keyfiles of type
                                                  mnemonic or Ledger devices (default: 0)
@@ -1955,15 +1985,15 @@ options:
   --guardian-2fa-code GUARDIAN_2FA_CODE          the 2fa code for the guardian
   --guardian-pem GUARDIAN_PEM                    🔑 the PEM file, if keyfile not provided
   --guardian-keyfile GUARDIAN_KEYFILE            🔑 a JSON keyfile, if PEM not provided
-  --guardian-passfile GUARDIAN_PASSFILE          🔑 a file containing keyfile's password, if keyfile provided. If not
-                                                 provided, you'll be prompted to enter the password.
+  --guardian-passfile GUARDIAN_PASSFILE          DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
   --guardian-ledger                              🔐 bool flag for signing transaction using ledger
   --guardian-wallet-index GUARDIAN_WALLET_INDEX  🔑 the address index; can be used for PEM files, keyfiles of type
                                                  mnemonic or Ledger devices (default: 0)
   --relayer-pem RELAYER_PEM                      🔑 the PEM file, if keyfile not provided
   --relayer-keyfile RELAYER_KEYFILE              🔑 a JSON keyfile, if PEM not provided
-  --relayer-passfile RELAYER_PASSFILE            🔑 a file containing keyfile's password, if keyfile provided. If not
-                                                 provided, you'll be prompted to enter the password.
+  --relayer-passfile RELAYER_PASSFILE            DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
   --relayer-ledger                               🔐 bool flag for signing transaction using ledger
   --relayer-wallet-index RELAYER_WALLET_INDEX    🔑 the address index; can be used for PEM files, keyfiles of type
                                                  mnemonic or Ledger devices (default: 0)
@@ -1985,8 +2015,8 @@ options:
   --sender SENDER                                the alias of the wallet set in the address config
   --pem PEM                                      🔑 the PEM file, if keyfile not provided
   --keyfile KEYFILE                              🔑 a JSON keyfile, if PEM not provided
-  --passfile PASSFILE                            🔑 a file containing keyfile's password, if keyfile provided. If not
-                                                 provided, you'll be prompted to enter the password.
+  --passfile PASSFILE                            DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
   --ledger                                       🔐 bool flag for signing transaction using ledger
   --sender-wallet-index SENDER_WALLET_INDEX      🔑 the address index; can be used for PEM files, keyfiles of type
                                                  mnemonic or Ledger devices (default: 0)
@@ -2009,15 +2039,15 @@ options:
   --guardian-2fa-code GUARDIAN_2FA_CODE          the 2fa code for the guardian
   --guardian-pem GUARDIAN_PEM                    🔑 the PEM file, if keyfile not provided
   --guardian-keyfile GUARDIAN_KEYFILE            🔑 a JSON keyfile, if PEM not provided
-  --guardian-passfile GUARDIAN_PASSFILE          🔑 a file containing keyfile's password, if keyfile provided. If not
-                                                 provided, you'll be prompted to enter the password.
+  --guardian-passfile GUARDIAN_PASSFILE          DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
   --guardian-ledger                              🔐 bool flag for signing transaction using ledger
   --guardian-wallet-index GUARDIAN_WALLET_INDEX  🔑 the address index; can be used for PEM files, keyfiles of type
                                                  mnemonic or Ledger devices (default: 0)
   --relayer-pem RELAYER_PEM                      🔑 the PEM file, if keyfile not provided
   --relayer-keyfile RELAYER_KEYFILE              🔑 a JSON keyfile, if PEM not provided
-  --relayer-passfile RELAYER_PASSFILE            🔑 a file containing keyfile's password, if keyfile provided. If not
-                                                 provided, you'll be prompted to enter the password.
+  --relayer-passfile RELAYER_PASSFILE            DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
   --relayer-ledger                               🔐 bool flag for signing transaction using ledger
   --relayer-wallet-index RELAYER_WALLET_INDEX    🔑 the address index; can be used for PEM files, keyfiles of type
                                                  mnemonic or Ledger devices (default: 0)
@@ -2039,8 +2069,8 @@ options:
   --sender SENDER                                the alias of the wallet set in the address config
   --pem PEM                                      🔑 the PEM file, if keyfile not provided
   --keyfile KEYFILE                              🔑 a JSON keyfile, if PEM not provided
-  --passfile PASSFILE                            🔑 a file containing keyfile's password, if keyfile provided. If not
-                                                 provided, you'll be prompted to enter the password.
+  --passfile PASSFILE                            DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
   --ledger                                       🔐 bool flag for signing transaction using ledger
   --sender-wallet-index SENDER_WALLET_INDEX      🔑 the address index; can be used for PEM files, keyfiles of type
                                                  mnemonic or Ledger devices (default: 0)
@@ -2063,15 +2093,15 @@ options:
   --guardian-2fa-code GUARDIAN_2FA_CODE          the 2fa code for the guardian
   --guardian-pem GUARDIAN_PEM                    🔑 the PEM file, if keyfile not provided
   --guardian-keyfile GUARDIAN_KEYFILE            🔑 a JSON keyfile, if PEM not provided
-  --guardian-passfile GUARDIAN_PASSFILE          🔑 a file containing keyfile's password, if keyfile provided. If not
-                                                 provided, you'll be prompted to enter the password.
+  --guardian-passfile GUARDIAN_PASSFILE          DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
   --guardian-ledger                              🔐 bool flag for signing transaction using ledger
   --guardian-wallet-index GUARDIAN_WALLET_INDEX  🔑 the address index; can be used for PEM files, keyfiles of type
                                                  mnemonic or Ledger devices (default: 0)
   --relayer-pem RELAYER_PEM                      🔑 the PEM file, if keyfile not provided
   --relayer-keyfile RELAYER_KEYFILE              🔑 a JSON keyfile, if PEM not provided
-  --relayer-passfile RELAYER_PASSFILE            🔑 a file containing keyfile's password, if keyfile provided. If not
-                                                 provided, you'll be prompted to enter the password.
+  --relayer-passfile RELAYER_PASSFILE            DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
   --relayer-ledger                               🔐 bool flag for signing transaction using ledger
   --relayer-wallet-index RELAYER_WALLET_INDEX    🔑 the address index; can be used for PEM files, keyfiles of type
                                                  mnemonic or Ledger devices (default: 0)
@@ -2094,8 +2124,8 @@ options:
   --sender SENDER                                the alias of the wallet set in the address config
   --pem PEM                                      🔑 the PEM file, if keyfile not provided
   --keyfile KEYFILE                              🔑 a JSON keyfile, if PEM not provided
-  --passfile PASSFILE                            🔑 a file containing keyfile's password, if keyfile provided. If not
-                                                 provided, you'll be prompted to enter the password.
+  --passfile PASSFILE                            DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
   --ledger                                       🔐 bool flag for signing transaction using ledger
   --sender-wallet-index SENDER_WALLET_INDEX      🔑 the address index; can be used for PEM files, keyfiles of type
                                                  mnemonic or Ledger devices (default: 0)
@@ -2118,15 +2148,15 @@ options:
   --guardian-2fa-code GUARDIAN_2FA_CODE          the 2fa code for the guardian
   --guardian-pem GUARDIAN_PEM                    🔑 the PEM file, if keyfile not provided
   --guardian-keyfile GUARDIAN_KEYFILE            🔑 a JSON keyfile, if PEM not provided
-  --guardian-passfile GUARDIAN_PASSFILE          🔑 a file containing keyfile's password, if keyfile provided. If not
-                                                 provided, you'll be prompted to enter the password.
+  --guardian-passfile GUARDIAN_PASSFILE          DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
   --guardian-ledger                              🔐 bool flag for signing transaction using ledger
   --guardian-wallet-index GUARDIAN_WALLET_INDEX  🔑 the address index; can be used for PEM files, keyfiles of type
                                                  mnemonic or Ledger devices (default: 0)
   --relayer-pem RELAYER_PEM                      🔑 the PEM file, if keyfile not provided
   --relayer-keyfile RELAYER_KEYFILE              🔑 a JSON keyfile, if PEM not provided
-  --relayer-passfile RELAYER_PASSFILE            🔑 a file containing keyfile's password, if keyfile provided. If not
-                                                 provided, you'll be prompted to enter the password.
+  --relayer-passfile RELAYER_PASSFILE            DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
   --relayer-ledger                               🔐 bool flag for signing transaction using ledger
   --relayer-wallet-index RELAYER_WALLET_INDEX    🔑 the address index; can be used for PEM files, keyfiles of type
                                                  mnemonic or Ledger devices (default: 0)
@@ -2149,8 +2179,8 @@ options:
   --sender SENDER                                the alias of the wallet set in the address config
   --pem PEM                                      🔑 the PEM file, if keyfile not provided
   --keyfile KEYFILE                              🔑 a JSON keyfile, if PEM not provided
-  --passfile PASSFILE                            🔑 a file containing keyfile's password, if keyfile provided. If not
-                                                 provided, you'll be prompted to enter the password.
+  --passfile PASSFILE                            DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
   --ledger                                       🔐 bool flag for signing transaction using ledger
   --sender-wallet-index SENDER_WALLET_INDEX      🔑 the address index; can be used for PEM files, keyfiles of type
                                                  mnemonic or Ledger devices (default: 0)
@@ -2173,15 +2203,15 @@ options:
   --guardian-2fa-code GUARDIAN_2FA_CODE          the 2fa code for the guardian
   --guardian-pem GUARDIAN_PEM                    🔑 the PEM file, if keyfile not provided
   --guardian-keyfile GUARDIAN_KEYFILE            🔑 a JSON keyfile, if PEM not provided
-  --guardian-passfile GUARDIAN_PASSFILE          🔑 a file containing keyfile's password, if keyfile provided. If not
-                                                 provided, you'll be prompted to enter the password.
+  --guardian-passfile GUARDIAN_PASSFILE          DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
   --guardian-ledger                              🔐 bool flag for signing transaction using ledger
   --guardian-wallet-index GUARDIAN_WALLET_INDEX  🔑 the address index; can be used for PEM files, keyfiles of type
                                                  mnemonic or Ledger devices (default: 0)
   --relayer-pem RELAYER_PEM                      🔑 the PEM file, if keyfile not provided
   --relayer-keyfile RELAYER_KEYFILE              🔑 a JSON keyfile, if PEM not provided
-  --relayer-passfile RELAYER_PASSFILE            🔑 a file containing keyfile's password, if keyfile provided. If not
-                                                 provided, you'll be prompted to enter the password.
+  --relayer-passfile RELAYER_PASSFILE            DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
   --relayer-ledger                               🔐 bool flag for signing transaction using ledger
   --relayer-wallet-index RELAYER_WALLET_INDEX    🔑 the address index; can be used for PEM files, keyfiles of type
                                                  mnemonic or Ledger devices (default: 0)
@@ -2205,8 +2235,8 @@ options:
   --sender SENDER                                the alias of the wallet set in the address config
   --pem PEM                                      🔑 the PEM file, if keyfile not provided
   --keyfile KEYFILE                              🔑 a JSON keyfile, if PEM not provided
-  --passfile PASSFILE                            🔑 a file containing keyfile's password, if keyfile provided. If not
-                                                 provided, you'll be prompted to enter the password.
+  --passfile PASSFILE                            DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
   --ledger                                       🔐 bool flag for signing transaction using ledger
   --sender-wallet-index SENDER_WALLET_INDEX      🔑 the address index; can be used for PEM files, keyfiles of type
                                                  mnemonic or Ledger devices (default: 0)
@@ -2229,15 +2259,15 @@ options:
   --guardian-2fa-code GUARDIAN_2FA_CODE          the 2fa code for the guardian
   --guardian-pem GUARDIAN_PEM                    🔑 the PEM file, if keyfile not provided
   --guardian-keyfile GUARDIAN_KEYFILE            🔑 a JSON keyfile, if PEM not provided
-  --guardian-passfile GUARDIAN_PASSFILE          🔑 a file containing keyfile's password, if keyfile provided. If not
-                                                 provided, you'll be prompted to enter the password.
+  --guardian-passfile GUARDIAN_PASSFILE          DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
   --guardian-ledger                              🔐 bool flag for signing transaction using ledger
   --guardian-wallet-index GUARDIAN_WALLET_INDEX  🔑 the address index; can be used for PEM files, keyfiles of type
                                                  mnemonic or Ledger devices (default: 0)
   --relayer-pem RELAYER_PEM                      🔑 the PEM file, if keyfile not provided
   --relayer-keyfile RELAYER_KEYFILE              🔑 a JSON keyfile, if PEM not provided
-  --relayer-passfile RELAYER_PASSFILE            🔑 a file containing keyfile's password, if keyfile provided. If not
-                                                 provided, you'll be prompted to enter the password.
+  --relayer-passfile RELAYER_PASSFILE            DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
   --relayer-ledger                               🔐 bool flag for signing transaction using ledger
   --relayer-wallet-index RELAYER_WALLET_INDEX    🔑 the address index; can be used for PEM files, keyfiles of type
                                                  mnemonic or Ledger devices (default: 0)
@@ -2261,8 +2291,8 @@ options:
   --sender SENDER                                the alias of the wallet set in the address config
   --pem PEM                                      🔑 the PEM file, if keyfile not provided
   --keyfile KEYFILE                              🔑 a JSON keyfile, if PEM not provided
-  --passfile PASSFILE                            🔑 a file containing keyfile's password, if keyfile provided. If not
-                                                 provided, you'll be prompted to enter the password.
+  --passfile PASSFILE                            DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
   --ledger                                       🔐 bool flag for signing transaction using ledger
   --sender-wallet-index SENDER_WALLET_INDEX      🔑 the address index; can be used for PEM files, keyfiles of type
                                                  mnemonic or Ledger devices (default: 0)
@@ -2285,15 +2315,15 @@ options:
   --guardian-2fa-code GUARDIAN_2FA_CODE          the 2fa code for the guardian
   --guardian-pem GUARDIAN_PEM                    🔑 the PEM file, if keyfile not provided
   --guardian-keyfile GUARDIAN_KEYFILE            🔑 a JSON keyfile, if PEM not provided
-  --guardian-passfile GUARDIAN_PASSFILE          🔑 a file containing keyfile's password, if keyfile provided. If not
-                                                 provided, you'll be prompted to enter the password.
+  --guardian-passfile GUARDIAN_PASSFILE          DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
   --guardian-ledger                              🔐 bool flag for signing transaction using ledger
   --guardian-wallet-index GUARDIAN_WALLET_INDEX  🔑 the address index; can be used for PEM files, keyfiles of type
                                                  mnemonic or Ledger devices (default: 0)
   --relayer-pem RELAYER_PEM                      🔑 the PEM file, if keyfile not provided
   --relayer-keyfile RELAYER_KEYFILE              🔑 a JSON keyfile, if PEM not provided
-  --relayer-passfile RELAYER_PASSFILE            🔑 a file containing keyfile's password, if keyfile provided. If not
-                                                 provided, you'll be prompted to enter the password.
+  --relayer-passfile RELAYER_PASSFILE            DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
   --relayer-ledger                               🔐 bool flag for signing transaction using ledger
   --relayer-wallet-index RELAYER_WALLET_INDEX    🔑 the address index; can be used for PEM files, keyfiles of type
                                                  mnemonic or Ledger devices (default: 0)
@@ -2318,8 +2348,8 @@ options:
   --sender SENDER                                the alias of the wallet set in the address config
   --pem PEM                                      🔑 the PEM file, if keyfile not provided
   --keyfile KEYFILE                              🔑 a JSON keyfile, if PEM not provided
-  --passfile PASSFILE                            🔑 a file containing keyfile's password, if keyfile provided. If not
-                                                 provided, you'll be prompted to enter the password.
+  --passfile PASSFILE                            DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
   --ledger                                       🔐 bool flag for signing transaction using ledger
   --sender-wallet-index SENDER_WALLET_INDEX      🔑 the address index; can be used for PEM files, keyfiles of type
                                                  mnemonic or Ledger devices (default: 0)
@@ -2342,15 +2372,15 @@ options:
   --guardian-2fa-code GUARDIAN_2FA_CODE          the 2fa code for the guardian
   --guardian-pem GUARDIAN_PEM                    🔑 the PEM file, if keyfile not provided
   --guardian-keyfile GUARDIAN_KEYFILE            🔑 a JSON keyfile, if PEM not provided
-  --guardian-passfile GUARDIAN_PASSFILE          🔑 a file containing keyfile's password, if keyfile provided. If not
-                                                 provided, you'll be prompted to enter the password.
+  --guardian-passfile GUARDIAN_PASSFILE          DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
   --guardian-ledger                              🔐 bool flag for signing transaction using ledger
   --guardian-wallet-index GUARDIAN_WALLET_INDEX  🔑 the address index; can be used for PEM files, keyfiles of type
                                                  mnemonic or Ledger devices (default: 0)
   --relayer-pem RELAYER_PEM                      🔑 the PEM file, if keyfile not provided
   --relayer-keyfile RELAYER_KEYFILE              🔑 a JSON keyfile, if PEM not provided
-  --relayer-passfile RELAYER_PASSFILE            🔑 a file containing keyfile's password, if keyfile provided. If not
-                                                 provided, you'll be prompted to enter the password.
+  --relayer-passfile RELAYER_PASSFILE            DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
   --relayer-ledger                               🔐 bool flag for signing transaction using ledger
   --relayer-wallet-index RELAYER_WALLET_INDEX    🔑 the address index; can be used for PEM files, keyfiles of type
                                                  mnemonic or Ledger devices (default: 0)
@@ -2375,8 +2405,8 @@ options:
   --sender SENDER                                the alias of the wallet set in the address config
   --pem PEM                                      🔑 the PEM file, if keyfile not provided
   --keyfile KEYFILE                              🔑 a JSON keyfile, if PEM not provided
-  --passfile PASSFILE                            🔑 a file containing keyfile's password, if keyfile provided. If not
-                                                 provided, you'll be prompted to enter the password.
+  --passfile PASSFILE                            DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
   --ledger                                       🔐 bool flag for signing transaction using ledger
   --sender-wallet-index SENDER_WALLET_INDEX      🔑 the address index; can be used for PEM files, keyfiles of type
                                                  mnemonic or Ledger devices (default: 0)
@@ -2399,15 +2429,15 @@ options:
   --guardian-2fa-code GUARDIAN_2FA_CODE          the 2fa code for the guardian
   --guardian-pem GUARDIAN_PEM                    🔑 the PEM file, if keyfile not provided
   --guardian-keyfile GUARDIAN_KEYFILE            🔑 a JSON keyfile, if PEM not provided
-  --guardian-passfile GUARDIAN_PASSFILE          🔑 a file containing keyfile's password, if keyfile provided. If not
-                                                 provided, you'll be prompted to enter the password.
+  --guardian-passfile GUARDIAN_PASSFILE          DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
   --guardian-ledger                              🔐 bool flag for signing transaction using ledger
   --guardian-wallet-index GUARDIAN_WALLET_INDEX  🔑 the address index; can be used for PEM files, keyfiles of type
                                                  mnemonic or Ledger devices (default: 0)
   --relayer-pem RELAYER_PEM                      🔑 the PEM file, if keyfile not provided
   --relayer-keyfile RELAYER_KEYFILE              🔑 a JSON keyfile, if PEM not provided
-  --relayer-passfile RELAYER_PASSFILE            🔑 a file containing keyfile's password, if keyfile provided. If not
-                                                 provided, you'll be prompted to enter the password.
+  --relayer-passfile RELAYER_PASSFILE            DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
   --relayer-ledger                               🔐 bool flag for signing transaction using ledger
   --relayer-wallet-index RELAYER_WALLET_INDEX    🔑 the address index; can be used for PEM files, keyfiles of type
                                                  mnemonic or Ledger devices (default: 0)
@@ -2516,8 +2546,8 @@ options:
   --sender SENDER                            the alias of the wallet set in the address config
   --pem PEM                                  🔑 the PEM file, if keyfile not provided
   --keyfile KEYFILE                          🔑 a JSON keyfile, if PEM not provided
-  --passfile PASSFILE                        🔑 a file containing keyfile's password, if keyfile provided. If not
-                                             provided, you'll be prompted to enter the password.
+  --passfile PASSFILE                        DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter the
+                                             password.
   --ledger                                   🔐 bool flag for signing transaction using ledger
   --sender-wallet-index SENDER_WALLET_INDEX  🔑 the address index; can be used for PEM files, keyfiles of type mnemonic
                                              or Ledger devices (default: 0)
@@ -3038,8 +3068,8 @@ options:
   --sender SENDER                            the alias of the wallet set in the address config
   --pem PEM                                  🔑 the PEM file, if keyfile not provided
   --keyfile KEYFILE                          🔑 a JSON keyfile, if PEM not provided
-  --passfile PASSFILE                        🔑 a file containing keyfile's password, if keyfile provided. If not
-                                             provided, you'll be prompted to enter the password.
+  --passfile PASSFILE                        DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter the
+                                             password.
   --ledger                                   🔐 bool flag for signing transaction using ledger
   --sender-wallet-index SENDER_WALLET_INDEX  🔑 the address index; can be used for PEM files, keyfiles of type mnemonic
                                              or Ledger devices (default: 0)
@@ -3147,8 +3177,8 @@ options:
   --sender SENDER                                 the alias of the wallet set in the address config
   --pem PEM                                       🔑 the PEM file, if keyfile not provided
   --keyfile KEYFILE                               🔑 a JSON keyfile, if PEM not provided
-  --passfile PASSFILE                             🔑 a file containing keyfile's password, if keyfile provided. If not
-                                                  provided, you'll be prompted to enter the password.
+  --passfile PASSFILE                             DEPRECATED, do not use it anymore. Instead, you'll be prompted to
+                                                  enter the password.
   --ledger                                        🔐 bool flag for signing transaction using ledger
   --sender-wallet-index SENDER_WALLET_INDEX       🔑 the address index; can be used for PEM files, keyfiles of type
                                                   mnemonic or Ledger devices (default: 0)
@@ -3171,15 +3201,15 @@ options:
   --guardian-2fa-code GUARDIAN_2FA_CODE           the 2fa code for the guardian
   --guardian-pem GUARDIAN_PEM                     🔑 the PEM file, if keyfile not provided
   --guardian-keyfile GUARDIAN_KEYFILE             🔑 a JSON keyfile, if PEM not provided
-  --guardian-passfile GUARDIAN_PASSFILE           🔑 a file containing keyfile's password, if keyfile provided. If not
-                                                  provided, you'll be prompted to enter the password.
+  --guardian-passfile GUARDIAN_PASSFILE           DEPRECATED, do not use it anymore. Instead, you'll be prompted to
+                                                  enter the password.
   --guardian-ledger                               🔐 bool flag for signing transaction using ledger
   --guardian-wallet-index GUARDIAN_WALLET_INDEX   🔑 the address index; can be used for PEM files, keyfiles of type
                                                   mnemonic or Ledger devices (default: 0)
   --relayer-pem RELAYER_PEM                       🔑 the PEM file, if keyfile not provided
   --relayer-keyfile RELAYER_KEYFILE               🔑 a JSON keyfile, if PEM not provided
-  --relayer-passfile RELAYER_PASSFILE             🔑 a file containing keyfile's password, if keyfile provided. If not
-                                                  provided, you'll be prompted to enter the password.
+  --relayer-passfile RELAYER_PASSFILE             DEPRECATED, do not use it anymore. Instead, you'll be prompted to
+                                                  enter the password.
   --relayer-ledger                                🔐 bool flag for signing transaction using ledger
   --relayer-wallet-index RELAYER_WALLET_INDEX     🔑 the address index; can be used for PEM files, keyfiles of type
                                                   mnemonic or Ledger devices (default: 0)
@@ -3222,8 +3252,8 @@ options:
   --sender SENDER                                 the alias of the wallet set in the address config
   --pem PEM                                       🔑 the PEM file, if keyfile not provided
   --keyfile KEYFILE                               🔑 a JSON keyfile, if PEM not provided
-  --passfile PASSFILE                             🔑 a file containing keyfile's password, if keyfile provided. If not
-                                                  provided, you'll be prompted to enter the password.
+  --passfile PASSFILE                             DEPRECATED, do not use it anymore. Instead, you'll be prompted to
+                                                  enter the password.
   --ledger                                        🔐 bool flag for signing transaction using ledger
   --sender-wallet-index SENDER_WALLET_INDEX       🔑 the address index; can be used for PEM files, keyfiles of type
                                                   mnemonic or Ledger devices (default: 0)
@@ -3246,15 +3276,15 @@ options:
   --guardian-2fa-code GUARDIAN_2FA_CODE           the 2fa code for the guardian
   --guardian-pem GUARDIAN_PEM                     🔑 the PEM file, if keyfile not provided
   --guardian-keyfile GUARDIAN_KEYFILE             🔑 a JSON keyfile, if PEM not provided
-  --guardian-passfile GUARDIAN_PASSFILE           🔑 a file containing keyfile's password, if keyfile provided. If not
-                                                  provided, you'll be prompted to enter the password.
+  --guardian-passfile GUARDIAN_PASSFILE           DEPRECATED, do not use it anymore. Instead, you'll be prompted to
+                                                  enter the password.
   --guardian-ledger                               🔐 bool flag for signing transaction using ledger
   --guardian-wallet-index GUARDIAN_WALLET_INDEX   🔑 the address index; can be used for PEM files, keyfiles of type
                                                   mnemonic or Ledger devices (default: 0)
   --relayer-pem RELAYER_PEM                       🔑 the PEM file, if keyfile not provided
   --relayer-keyfile RELAYER_KEYFILE               🔑 a JSON keyfile, if PEM not provided
-  --relayer-passfile RELAYER_PASSFILE             🔑 a file containing keyfile's password, if keyfile provided. If not
-                                                  provided, you'll be prompted to enter the password.
+  --relayer-passfile RELAYER_PASSFILE             DEPRECATED, do not use it anymore. Instead, you'll be prompted to
+                                                  enter the password.
   --relayer-ledger                                🔐 bool flag for signing transaction using ledger
   --relayer-wallet-index RELAYER_WALLET_INDEX     🔑 the address index; can be used for PEM files, keyfiles of type
                                                   mnemonic or Ledger devices (default: 0)
@@ -3295,8 +3325,8 @@ options:
   --sender SENDER                                the alias of the wallet set in the address config
   --pem PEM                                      🔑 the PEM file, if keyfile not provided
   --keyfile KEYFILE                              🔑 a JSON keyfile, if PEM not provided
-  --passfile PASSFILE                            🔑 a file containing keyfile's password, if keyfile provided. If not
-                                                 provided, you'll be prompted to enter the password.
+  --passfile PASSFILE                            DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
   --ledger                                       🔐 bool flag for signing transaction using ledger
   --sender-wallet-index SENDER_WALLET_INDEX      🔑 the address index; can be used for PEM files, keyfiles of type
                                                  mnemonic or Ledger devices (default: 0)
@@ -3319,15 +3349,15 @@ options:
   --guardian-2fa-code GUARDIAN_2FA_CODE          the 2fa code for the guardian
   --guardian-pem GUARDIAN_PEM                    🔑 the PEM file, if keyfile not provided
   --guardian-keyfile GUARDIAN_KEYFILE            🔑 a JSON keyfile, if PEM not provided
-  --guardian-passfile GUARDIAN_PASSFILE          🔑 a file containing keyfile's password, if keyfile provided. If not
-                                                 provided, you'll be prompted to enter the password.
+  --guardian-passfile GUARDIAN_PASSFILE          DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
   --guardian-ledger                              🔐 bool flag for signing transaction using ledger
   --guardian-wallet-index GUARDIAN_WALLET_INDEX  🔑 the address index; can be used for PEM files, keyfiles of type
                                                  mnemonic or Ledger devices (default: 0)
   --relayer-pem RELAYER_PEM                      🔑 the PEM file, if keyfile not provided
   --relayer-keyfile RELAYER_KEYFILE              🔑 a JSON keyfile, if PEM not provided
-  --relayer-passfile RELAYER_PASSFILE            🔑 a file containing keyfile's password, if keyfile provided. If not
-                                                 provided, you'll be prompted to enter the password.
+  --relayer-passfile RELAYER_PASSFILE            DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
   --relayer-ledger                               🔐 bool flag for signing transaction using ledger
   --relayer-wallet-index RELAYER_WALLET_INDEX    🔑 the address index; can be used for PEM files, keyfiles of type
                                                  mnemonic or Ledger devices (default: 0)
@@ -3367,8 +3397,8 @@ options:
   --sender SENDER                                the alias of the wallet set in the address config
   --pem PEM                                      🔑 the PEM file, if keyfile not provided
   --keyfile KEYFILE                              🔑 a JSON keyfile, if PEM not provided
-  --passfile PASSFILE                            🔑 a file containing keyfile's password, if keyfile provided. If not
-                                                 provided, you'll be prompted to enter the password.
+  --passfile PASSFILE                            DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
   --ledger                                       🔐 bool flag for signing transaction using ledger
   --sender-wallet-index SENDER_WALLET_INDEX      🔑 the address index; can be used for PEM files, keyfiles of type
                                                  mnemonic or Ledger devices (default: 0)
@@ -3391,15 +3421,15 @@ options:
   --guardian-2fa-code GUARDIAN_2FA_CODE          the 2fa code for the guardian
   --guardian-pem GUARDIAN_PEM                    🔑 the PEM file, if keyfile not provided
   --guardian-keyfile GUARDIAN_KEYFILE            🔑 a JSON keyfile, if PEM not provided
-  --guardian-passfile GUARDIAN_PASSFILE          🔑 a file containing keyfile's password, if keyfile provided. If not
-                                                 provided, you'll be prompted to enter the password.
+  --guardian-passfile GUARDIAN_PASSFILE          DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
   --guardian-ledger                              🔐 bool flag for signing transaction using ledger
   --guardian-wallet-index GUARDIAN_WALLET_INDEX  🔑 the address index; can be used for PEM files, keyfiles of type
                                                  mnemonic or Ledger devices (default: 0)
   --relayer-pem RELAYER_PEM                      🔑 the PEM file, if keyfile not provided
   --relayer-keyfile RELAYER_KEYFILE              🔑 a JSON keyfile, if PEM not provided
-  --relayer-passfile RELAYER_PASSFILE            🔑 a file containing keyfile's password, if keyfile provided. If not
-                                                 provided, you'll be prompted to enter the password.
+  --relayer-passfile RELAYER_PASSFILE            DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
   --relayer-ledger                               🔐 bool flag for signing transaction using ledger
   --relayer-wallet-index RELAYER_WALLET_INDEX    🔑 the address index; can be used for PEM files, keyfiles of type
                                                  mnemonic or Ledger devices (default: 0)
@@ -3439,8 +3469,8 @@ options:
   --sender SENDER                                the alias of the wallet set in the address config
   --pem PEM                                      🔑 the PEM file, if keyfile not provided
   --keyfile KEYFILE                              🔑 a JSON keyfile, if PEM not provided
-  --passfile PASSFILE                            🔑 a file containing keyfile's password, if keyfile provided. If not
-                                                 provided, you'll be prompted to enter the password.
+  --passfile PASSFILE                            DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
   --ledger                                       🔐 bool flag for signing transaction using ledger
   --sender-wallet-index SENDER_WALLET_INDEX      🔑 the address index; can be used for PEM files, keyfiles of type
                                                  mnemonic or Ledger devices (default: 0)
@@ -3463,15 +3493,15 @@ options:
   --guardian-2fa-code GUARDIAN_2FA_CODE          the 2fa code for the guardian
   --guardian-pem GUARDIAN_PEM                    🔑 the PEM file, if keyfile not provided
   --guardian-keyfile GUARDIAN_KEYFILE            🔑 a JSON keyfile, if PEM not provided
-  --guardian-passfile GUARDIAN_PASSFILE          🔑 a file containing keyfile's password, if keyfile provided. If not
-                                                 provided, you'll be prompted to enter the password.
+  --guardian-passfile GUARDIAN_PASSFILE          DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
   --guardian-ledger                              🔐 bool flag for signing transaction using ledger
   --guardian-wallet-index GUARDIAN_WALLET_INDEX  🔑 the address index; can be used for PEM files, keyfiles of type
                                                  mnemonic or Ledger devices (default: 0)
   --relayer-pem RELAYER_PEM                      🔑 the PEM file, if keyfile not provided
   --relayer-keyfile RELAYER_KEYFILE              🔑 a JSON keyfile, if PEM not provided
-  --relayer-passfile RELAYER_PASSFILE            🔑 a file containing keyfile's password, if keyfile provided. If not
-                                                 provided, you'll be prompted to enter the password.
+  --relayer-passfile RELAYER_PASSFILE            DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
   --relayer-ledger                               🔐 bool flag for signing transaction using ledger
   --relayer-wallet-index RELAYER_WALLET_INDEX    🔑 the address index; can be used for PEM files, keyfiles of type
                                                  mnemonic or Ledger devices (default: 0)
@@ -3511,8 +3541,8 @@ options:
   --sender SENDER                                the alias of the wallet set in the address config
   --pem PEM                                      🔑 the PEM file, if keyfile not provided
   --keyfile KEYFILE                              🔑 a JSON keyfile, if PEM not provided
-  --passfile PASSFILE                            🔑 a file containing keyfile's password, if keyfile provided. If not
-                                                 provided, you'll be prompted to enter the password.
+  --passfile PASSFILE                            DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
   --ledger                                       🔐 bool flag for signing transaction using ledger
   --sender-wallet-index SENDER_WALLET_INDEX      🔑 the address index; can be used for PEM files, keyfiles of type
                                                  mnemonic or Ledger devices (default: 0)
@@ -3535,15 +3565,15 @@ options:
   --guardian-2fa-code GUARDIAN_2FA_CODE          the 2fa code for the guardian
   --guardian-pem GUARDIAN_PEM                    🔑 the PEM file, if keyfile not provided
   --guardian-keyfile GUARDIAN_KEYFILE            🔑 a JSON keyfile, if PEM not provided
-  --guardian-passfile GUARDIAN_PASSFILE          🔑 a file containing keyfile's password, if keyfile provided. If not
-                                                 provided, you'll be prompted to enter the password.
+  --guardian-passfile GUARDIAN_PASSFILE          DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
   --guardian-ledger                              🔐 bool flag for signing transaction using ledger
   --guardian-wallet-index GUARDIAN_WALLET_INDEX  🔑 the address index; can be used for PEM files, keyfiles of type
                                                  mnemonic or Ledger devices (default: 0)
   --relayer-pem RELAYER_PEM                      🔑 the PEM file, if keyfile not provided
   --relayer-keyfile RELAYER_KEYFILE              🔑 a JSON keyfile, if PEM not provided
-  --relayer-passfile RELAYER_PASSFILE            🔑 a file containing keyfile's password, if keyfile provided. If not
-                                                 provided, you'll be prompted to enter the password.
+  --relayer-passfile RELAYER_PASSFILE            DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
   --relayer-ledger                               🔐 bool flag for signing transaction using ledger
   --relayer-wallet-index RELAYER_WALLET_INDEX    🔑 the address index; can be used for PEM files, keyfiles of type
                                                  mnemonic or Ledger devices (default: 0)
@@ -3583,8 +3613,8 @@ options:
   --sender SENDER                                the alias of the wallet set in the address config
   --pem PEM                                      🔑 the PEM file, if keyfile not provided
   --keyfile KEYFILE                              🔑 a JSON keyfile, if PEM not provided
-  --passfile PASSFILE                            🔑 a file containing keyfile's password, if keyfile provided. If not
-                                                 provided, you'll be prompted to enter the password.
+  --passfile PASSFILE                            DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
   --ledger                                       🔐 bool flag for signing transaction using ledger
   --sender-wallet-index SENDER_WALLET_INDEX      🔑 the address index; can be used for PEM files, keyfiles of type
                                                  mnemonic or Ledger devices (default: 0)
@@ -3607,15 +3637,15 @@ options:
   --guardian-2fa-code GUARDIAN_2FA_CODE          the 2fa code for the guardian
   --guardian-pem GUARDIAN_PEM                    🔑 the PEM file, if keyfile not provided
   --guardian-keyfile GUARDIAN_KEYFILE            🔑 a JSON keyfile, if PEM not provided
-  --guardian-passfile GUARDIAN_PASSFILE          🔑 a file containing keyfile's password, if keyfile provided. If not
-                                                 provided, you'll be prompted to enter the password.
+  --guardian-passfile GUARDIAN_PASSFILE          DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
   --guardian-ledger                              🔐 bool flag for signing transaction using ledger
   --guardian-wallet-index GUARDIAN_WALLET_INDEX  🔑 the address index; can be used for PEM files, keyfiles of type
                                                  mnemonic or Ledger devices (default: 0)
   --relayer-pem RELAYER_PEM                      🔑 the PEM file, if keyfile not provided
   --relayer-keyfile RELAYER_KEYFILE              🔑 a JSON keyfile, if PEM not provided
-  --relayer-passfile RELAYER_PASSFILE            🔑 a file containing keyfile's password, if keyfile provided. If not
-                                                 provided, you'll be prompted to enter the password.
+  --relayer-passfile RELAYER_PASSFILE            DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
   --relayer-ledger                               🔐 bool flag for signing transaction using ledger
   --relayer-wallet-index RELAYER_WALLET_INDEX    🔑 the address index; can be used for PEM files, keyfiles of type
                                                  mnemonic or Ledger devices (default: 0)
@@ -3656,8 +3686,8 @@ options:
   --sender SENDER                                the alias of the wallet set in the address config
   --pem PEM                                      🔑 the PEM file, if keyfile not provided
   --keyfile KEYFILE                              🔑 a JSON keyfile, if PEM not provided
-  --passfile PASSFILE                            🔑 a file containing keyfile's password, if keyfile provided. If not
-                                                 provided, you'll be prompted to enter the password.
+  --passfile PASSFILE                            DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
   --ledger                                       🔐 bool flag for signing transaction using ledger
   --sender-wallet-index SENDER_WALLET_INDEX      🔑 the address index; can be used for PEM files, keyfiles of type
                                                  mnemonic or Ledger devices (default: 0)
@@ -3680,15 +3710,15 @@ options:
   --guardian-2fa-code GUARDIAN_2FA_CODE          the 2fa code for the guardian
   --guardian-pem GUARDIAN_PEM                    🔑 the PEM file, if keyfile not provided
   --guardian-keyfile GUARDIAN_KEYFILE            🔑 a JSON keyfile, if PEM not provided
-  --guardian-passfile GUARDIAN_PASSFILE          🔑 a file containing keyfile's password, if keyfile provided. If not
-                                                 provided, you'll be prompted to enter the password.
+  --guardian-passfile GUARDIAN_PASSFILE          DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
   --guardian-ledger                              🔐 bool flag for signing transaction using ledger
   --guardian-wallet-index GUARDIAN_WALLET_INDEX  🔑 the address index; can be used for PEM files, keyfiles of type
                                                  mnemonic or Ledger devices (default: 0)
   --relayer-pem RELAYER_PEM                      🔑 the PEM file, if keyfile not provided
   --relayer-keyfile RELAYER_KEYFILE              🔑 a JSON keyfile, if PEM not provided
-  --relayer-passfile RELAYER_PASSFILE            🔑 a file containing keyfile's password, if keyfile provided. If not
-                                                 provided, you'll be prompted to enter the password.
+  --relayer-passfile RELAYER_PASSFILE            DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
   --relayer-ledger                               🔐 bool flag for signing transaction using ledger
   --relayer-wallet-index RELAYER_WALLET_INDEX    🔑 the address index; can be used for PEM files, keyfiles of type
                                                  mnemonic or Ledger devices (default: 0)
@@ -3721,8 +3751,7 @@ Output example:
 
 options:
   -h, --help                                     show this help message and exit
-  --opt-gas-limit OPT_GAS_LIMIT                  the size of the new quorum (number of signatures required to approve a
-                                                 proposal)
+  --opt-gas-limit OPT_GAS_LIMIT                  optional gas limit for the async call
   --contract-abi CONTRACT_ABI                    the ABI file of the contract to call
   --function FUNCTION                            the function to call
   --arguments ARGUMENTS [ARGUMENTS ...]          arguments for the contract transaction, as [number, bech32-address,
@@ -3736,8 +3765,8 @@ options:
   --sender SENDER                                the alias of the wallet set in the address config
   --pem PEM                                      🔑 the PEM file, if keyfile not provided
   --keyfile KEYFILE                              🔑 a JSON keyfile, if PEM not provided
-  --passfile PASSFILE                            🔑 a file containing keyfile's password, if keyfile provided. If not
-                                                 provided, you'll be prompted to enter the password.
+  --passfile PASSFILE                            DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
   --ledger                                       🔐 bool flag for signing transaction using ledger
   --sender-wallet-index SENDER_WALLET_INDEX      🔑 the address index; can be used for PEM files, keyfiles of type
                                                  mnemonic or Ledger devices (default: 0)
@@ -3762,15 +3791,15 @@ options:
   --guardian-2fa-code GUARDIAN_2FA_CODE          the 2fa code for the guardian
   --guardian-pem GUARDIAN_PEM                    🔑 the PEM file, if keyfile not provided
   --guardian-keyfile GUARDIAN_KEYFILE            🔑 a JSON keyfile, if PEM not provided
-  --guardian-passfile GUARDIAN_PASSFILE          🔑 a file containing keyfile's password, if keyfile provided. If not
-                                                 provided, you'll be prompted to enter the password.
+  --guardian-passfile GUARDIAN_PASSFILE          DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
   --guardian-ledger                              🔐 bool flag for signing transaction using ledger
   --guardian-wallet-index GUARDIAN_WALLET_INDEX  🔑 the address index; can be used for PEM files, keyfiles of type
                                                  mnemonic or Ledger devices (default: 0)
   --relayer-pem RELAYER_PEM                      🔑 the PEM file, if keyfile not provided
   --relayer-keyfile RELAYER_KEYFILE              🔑 a JSON keyfile, if PEM not provided
-  --relayer-passfile RELAYER_PASSFILE            🔑 a file containing keyfile's password, if keyfile provided. If not
-                                                 provided, you'll be prompted to enter the password.
+  --relayer-passfile RELAYER_PASSFILE            DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
   --relayer-ledger                               🔐 bool flag for signing transaction using ledger
   --relayer-wallet-index RELAYER_WALLET_INDEX    🔑 the address index; can be used for PEM files, keyfiles of type
                                                  mnemonic or Ledger devices (default: 0)
@@ -3806,8 +3835,7 @@ options:
   --token-transfers TOKEN_TRANSFERS [TOKEN_TRANSFERS ...]
                                                   token transfers for transfer & execute, as [token, amount] E.g.
                                                   --token-transfers NFT-123456-0a 1 ESDT-987654 100000000
-  --opt-gas-limit OPT_GAS_LIMIT                   the size of the new quorum (number of signatures required to approve a
-                                                  proposal)
+  --opt-gas-limit OPT_GAS_LIMIT                   optional gas limit for the async call
   --contract-abi CONTRACT_ABI                     the ABI file of the contract to call
   --function FUNCTION                             the function to call
   --arguments ARGUMENTS [ARGUMENTS ...]           arguments for the contract transaction, as [number, bech32-address,
@@ -3821,8 +3849,8 @@ options:
   --sender SENDER                                 the alias of the wallet set in the address config
   --pem PEM                                       🔑 the PEM file, if keyfile not provided
   --keyfile KEYFILE                               🔑 a JSON keyfile, if PEM not provided
-  --passfile PASSFILE                             🔑 a file containing keyfile's password, if keyfile provided. If not
-                                                  provided, you'll be prompted to enter the password.
+  --passfile PASSFILE                             DEPRECATED, do not use it anymore. Instead, you'll be prompted to
+                                                  enter the password.
   --ledger                                        🔐 bool flag for signing transaction using ledger
   --sender-wallet-index SENDER_WALLET_INDEX       🔑 the address index; can be used for PEM files, keyfiles of type
                                                   mnemonic or Ledger devices (default: 0)
@@ -3847,15 +3875,15 @@ options:
   --guardian-2fa-code GUARDIAN_2FA_CODE           the 2fa code for the guardian
   --guardian-pem GUARDIAN_PEM                     🔑 the PEM file, if keyfile not provided
   --guardian-keyfile GUARDIAN_KEYFILE             🔑 a JSON keyfile, if PEM not provided
-  --guardian-passfile GUARDIAN_PASSFILE           🔑 a file containing keyfile's password, if keyfile provided. If not
-                                                  provided, you'll be prompted to enter the password.
+  --guardian-passfile GUARDIAN_PASSFILE           DEPRECATED, do not use it anymore. Instead, you'll be prompted to
+                                                  enter the password.
   --guardian-ledger                               🔐 bool flag for signing transaction using ledger
   --guardian-wallet-index GUARDIAN_WALLET_INDEX   🔑 the address index; can be used for PEM files, keyfiles of type
                                                   mnemonic or Ledger devices (default: 0)
   --relayer-pem RELAYER_PEM                       🔑 the PEM file, if keyfile not provided
   --relayer-keyfile RELAYER_KEYFILE               🔑 a JSON keyfile, if PEM not provided
-  --relayer-passfile RELAYER_PASSFILE             🔑 a file containing keyfile's password, if keyfile provided. If not
-                                                  provided, you'll be prompted to enter the password.
+  --relayer-passfile RELAYER_PASSFILE             DEPRECATED, do not use it anymore. Instead, you'll be prompted to
+                                                  enter the password.
   --relayer-ledger                                🔐 bool flag for signing transaction using ledger
   --relayer-wallet-index RELAYER_WALLET_INDEX     🔑 the address index; can be used for PEM files, keyfiles of type
                                                   mnemonic or Ledger devices (default: 0)
@@ -3892,8 +3920,7 @@ options:
   --token-transfers TOKEN_TRANSFERS [TOKEN_TRANSFERS ...]
                                                   token transfers for transfer & execute, as [token, amount] E.g.
                                                   --token-transfers NFT-123456-0a 1 ESDT-987654 100000000
-  --opt-gas-limit OPT_GAS_LIMIT                   the size of the new quorum (number of signatures required to approve a
-                                                  proposal)
+  --opt-gas-limit OPT_GAS_LIMIT                   optional gas limit for the async call
   --contract-abi CONTRACT_ABI                     the ABI file of the contract to call
   --function FUNCTION                             the function to call
   --arguments ARGUMENTS [ARGUMENTS ...]           arguments for the contract transaction, as [number, bech32-address,
@@ -3907,8 +3934,8 @@ options:
   --sender SENDER                                 the alias of the wallet set in the address config
   --pem PEM                                       🔑 the PEM file, if keyfile not provided
   --keyfile KEYFILE                               🔑 a JSON keyfile, if PEM not provided
-  --passfile PASSFILE                             🔑 a file containing keyfile's password, if keyfile provided. If not
-                                                  provided, you'll be prompted to enter the password.
+  --passfile PASSFILE                             DEPRECATED, do not use it anymore. Instead, you'll be prompted to
+                                                  enter the password.
   --ledger                                        🔐 bool flag for signing transaction using ledger
   --sender-wallet-index SENDER_WALLET_INDEX       🔑 the address index; can be used for PEM files, keyfiles of type
                                                   mnemonic or Ledger devices (default: 0)
@@ -3933,15 +3960,15 @@ options:
   --guardian-2fa-code GUARDIAN_2FA_CODE           the 2fa code for the guardian
   --guardian-pem GUARDIAN_PEM                     🔑 the PEM file, if keyfile not provided
   --guardian-keyfile GUARDIAN_KEYFILE             🔑 a JSON keyfile, if PEM not provided
-  --guardian-passfile GUARDIAN_PASSFILE           🔑 a file containing keyfile's password, if keyfile provided. If not
-                                                  provided, you'll be prompted to enter the password.
+  --guardian-passfile GUARDIAN_PASSFILE           DEPRECATED, do not use it anymore. Instead, you'll be prompted to
+                                                  enter the password.
   --guardian-ledger                               🔐 bool flag for signing transaction using ledger
   --guardian-wallet-index GUARDIAN_WALLET_INDEX   🔑 the address index; can be used for PEM files, keyfiles of type
                                                   mnemonic or Ledger devices (default: 0)
   --relayer-pem RELAYER_PEM                       🔑 the PEM file, if keyfile not provided
   --relayer-keyfile RELAYER_KEYFILE               🔑 a JSON keyfile, if PEM not provided
-  --relayer-passfile RELAYER_PASSFILE             🔑 a file containing keyfile's password, if keyfile provided. If not
-                                                  provided, you'll be prompted to enter the password.
+  --relayer-passfile RELAYER_PASSFILE             DEPRECATED, do not use it anymore. Instead, you'll be prompted to
+                                                  enter the password.
   --relayer-ledger                                🔐 bool flag for signing transaction using ledger
   --relayer-wallet-index RELAYER_WALLET_INDEX     🔑 the address index; can be used for PEM files, keyfiles of type
                                                   mnemonic or Ledger devices (default: 0)
@@ -3992,8 +4019,8 @@ options:
   --sender SENDER                                the alias of the wallet set in the address config
   --pem PEM                                      🔑 the PEM file, if keyfile not provided
   --keyfile KEYFILE                              🔑 a JSON keyfile, if PEM not provided
-  --passfile PASSFILE                            🔑 a file containing keyfile's password, if keyfile provided. If not
-                                                 provided, you'll be prompted to enter the password.
+  --passfile PASSFILE                            DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
   --ledger                                       🔐 bool flag for signing transaction using ledger
   --sender-wallet-index SENDER_WALLET_INDEX      🔑 the address index; can be used for PEM files, keyfiles of type
                                                  mnemonic or Ledger devices (default: 0)
@@ -4016,15 +4043,15 @@ options:
   --guardian-2fa-code GUARDIAN_2FA_CODE          the 2fa code for the guardian
   --guardian-pem GUARDIAN_PEM                    🔑 the PEM file, if keyfile not provided
   --guardian-keyfile GUARDIAN_KEYFILE            🔑 a JSON keyfile, if PEM not provided
-  --guardian-passfile GUARDIAN_PASSFILE          🔑 a file containing keyfile's password, if keyfile provided. If not
-                                                 provided, you'll be prompted to enter the password.
+  --guardian-passfile GUARDIAN_PASSFILE          DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
   --guardian-ledger                              🔐 bool flag for signing transaction using ledger
   --guardian-wallet-index GUARDIAN_WALLET_INDEX  🔑 the address index; can be used for PEM files, keyfiles of type
                                                  mnemonic or Ledger devices (default: 0)
   --relayer-pem RELAYER_PEM                      🔑 the PEM file, if keyfile not provided
   --relayer-keyfile RELAYER_KEYFILE              🔑 a JSON keyfile, if PEM not provided
-  --relayer-passfile RELAYER_PASSFILE            🔑 a file containing keyfile's password, if keyfile provided. If not
-                                                 provided, you'll be prompted to enter the password.
+  --relayer-passfile RELAYER_PASSFILE            DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
   --relayer-ledger                               🔐 bool flag for signing transaction using ledger
   --relayer-wallet-index RELAYER_WALLET_INDEX    🔑 the address index; can be used for PEM files, keyfiles of type
                                                  mnemonic or Ledger devices (default: 0)
@@ -4075,8 +4102,8 @@ options:
   --sender SENDER                                the alias of the wallet set in the address config
   --pem PEM                                      🔑 the PEM file, if keyfile not provided
   --keyfile KEYFILE                              🔑 a JSON keyfile, if PEM not provided
-  --passfile PASSFILE                            🔑 a file containing keyfile's password, if keyfile provided. If not
-                                                 provided, you'll be prompted to enter the password.
+  --passfile PASSFILE                            DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
   --ledger                                       🔐 bool flag for signing transaction using ledger
   --sender-wallet-index SENDER_WALLET_INDEX      🔑 the address index; can be used for PEM files, keyfiles of type
                                                  mnemonic or Ledger devices (default: 0)
@@ -4099,15 +4126,15 @@ options:
   --guardian-2fa-code GUARDIAN_2FA_CODE          the 2fa code for the guardian
   --guardian-pem GUARDIAN_PEM                    🔑 the PEM file, if keyfile not provided
   --guardian-keyfile GUARDIAN_KEYFILE            🔑 a JSON keyfile, if PEM not provided
-  --guardian-passfile GUARDIAN_PASSFILE          🔑 a file containing keyfile's password, if keyfile provided. If not
-                                                 provided, you'll be prompted to enter the password.
+  --guardian-passfile GUARDIAN_PASSFILE          DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
   --guardian-ledger                              🔐 bool flag for signing transaction using ledger
   --guardian-wallet-index GUARDIAN_WALLET_INDEX  🔑 the address index; can be used for PEM files, keyfiles of type
                                                  mnemonic or Ledger devices (default: 0)
   --relayer-pem RELAYER_PEM                      🔑 the PEM file, if keyfile not provided
   --relayer-keyfile RELAYER_KEYFILE              🔑 a JSON keyfile, if PEM not provided
-  --relayer-passfile RELAYER_PASSFILE            🔑 a file containing keyfile's password, if keyfile provided. If not
-                                                 provided, you'll be prompted to enter the password.
+  --relayer-passfile RELAYER_PASSFILE            DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
   --relayer-ledger                               🔐 bool flag for signing transaction using ledger
   --relayer-wallet-index RELAYER_WALLET_INDEX    🔑 the address index; can be used for PEM files, keyfiles of type
                                                  mnemonic or Ledger devices (default: 0)
@@ -4147,8 +4174,8 @@ options:
   --sender SENDER                                the alias of the wallet set in the address config
   --pem PEM                                      🔑 the PEM file, if keyfile not provided
   --keyfile KEYFILE                              🔑 a JSON keyfile, if PEM not provided
-  --passfile PASSFILE                            🔑 a file containing keyfile's password, if keyfile provided. If not
-                                                 provided, you'll be prompted to enter the password.
+  --passfile PASSFILE                            DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
   --ledger                                       🔐 bool flag for signing transaction using ledger
   --sender-wallet-index SENDER_WALLET_INDEX      🔑 the address index; can be used for PEM files, keyfiles of type
                                                  mnemonic or Ledger devices (default: 0)
@@ -4171,15 +4198,15 @@ options:
   --guardian-2fa-code GUARDIAN_2FA_CODE          the 2fa code for the guardian
   --guardian-pem GUARDIAN_PEM                    🔑 the PEM file, if keyfile not provided
   --guardian-keyfile GUARDIAN_KEYFILE            🔑 a JSON keyfile, if PEM not provided
-  --guardian-passfile GUARDIAN_PASSFILE          🔑 a file containing keyfile's password, if keyfile provided. If not
-                                                 provided, you'll be prompted to enter the password.
+  --guardian-passfile GUARDIAN_PASSFILE          DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
   --guardian-ledger                              🔐 bool flag for signing transaction using ledger
   --guardian-wallet-index GUARDIAN_WALLET_INDEX  🔑 the address index; can be used for PEM files, keyfiles of type
                                                  mnemonic or Ledger devices (default: 0)
   --relayer-pem RELAYER_PEM                      🔑 the PEM file, if keyfile not provided
   --relayer-keyfile RELAYER_KEYFILE              🔑 a JSON keyfile, if PEM not provided
-  --relayer-passfile RELAYER_PASSFILE            🔑 a file containing keyfile's password, if keyfile provided. If not
-                                                 provided, you'll be prompted to enter the password.
+  --relayer-passfile RELAYER_PASSFILE            DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
   --relayer-ledger                               🔐 bool flag for signing transaction using ledger
   --relayer-wallet-index RELAYER_WALLET_INDEX    🔑 the address index; can be used for PEM files, keyfiles of type
                                                  mnemonic or Ledger devices (default: 0)
@@ -4219,8 +4246,8 @@ options:
   --sender SENDER                                the alias of the wallet set in the address config
   --pem PEM                                      🔑 the PEM file, if keyfile not provided
   --keyfile KEYFILE                              🔑 a JSON keyfile, if PEM not provided
-  --passfile PASSFILE                            🔑 a file containing keyfile's password, if keyfile provided. If not
-                                                 provided, you'll be prompted to enter the password.
+  --passfile PASSFILE                            DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
   --ledger                                       🔐 bool flag for signing transaction using ledger
   --sender-wallet-index SENDER_WALLET_INDEX      🔑 the address index; can be used for PEM files, keyfiles of type
                                                  mnemonic or Ledger devices (default: 0)
@@ -4243,15 +4270,15 @@ options:
   --guardian-2fa-code GUARDIAN_2FA_CODE          the 2fa code for the guardian
   --guardian-pem GUARDIAN_PEM                    🔑 the PEM file, if keyfile not provided
   --guardian-keyfile GUARDIAN_KEYFILE            🔑 a JSON keyfile, if PEM not provided
-  --guardian-passfile GUARDIAN_PASSFILE          🔑 a file containing keyfile's password, if keyfile provided. If not
-                                                 provided, you'll be prompted to enter the password.
+  --guardian-passfile GUARDIAN_PASSFILE          DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
   --guardian-ledger                              🔐 bool flag for signing transaction using ledger
   --guardian-wallet-index GUARDIAN_WALLET_INDEX  🔑 the address index; can be used for PEM files, keyfiles of type
                                                  mnemonic or Ledger devices (default: 0)
   --relayer-pem RELAYER_PEM                      🔑 the PEM file, if keyfile not provided
   --relayer-keyfile RELAYER_KEYFILE              🔑 a JSON keyfile, if PEM not provided
-  --relayer-passfile RELAYER_PASSFILE            🔑 a file containing keyfile's password, if keyfile provided. If not
-                                                 provided, you'll be prompted to enter the password.
+  --relayer-passfile RELAYER_PASSFILE            DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
   --relayer-ledger                               🔐 bool flag for signing transaction using ledger
   --relayer-wallet-index RELAYER_WALLET_INDEX    🔑 the address index; can be used for PEM files, keyfiles of type
                                                  mnemonic or Ledger devices (default: 0)
@@ -4291,8 +4318,8 @@ options:
   --sender SENDER                                the alias of the wallet set in the address config
   --pem PEM                                      🔑 the PEM file, if keyfile not provided
   --keyfile KEYFILE                              🔑 a JSON keyfile, if PEM not provided
-  --passfile PASSFILE                            🔑 a file containing keyfile's password, if keyfile provided. If not
-                                                 provided, you'll be prompted to enter the password.
+  --passfile PASSFILE                            DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
   --ledger                                       🔐 bool flag for signing transaction using ledger
   --sender-wallet-index SENDER_WALLET_INDEX      🔑 the address index; can be used for PEM files, keyfiles of type
                                                  mnemonic or Ledger devices (default: 0)
@@ -4315,15 +4342,15 @@ options:
   --guardian-2fa-code GUARDIAN_2FA_CODE          the 2fa code for the guardian
   --guardian-pem GUARDIAN_PEM                    🔑 the PEM file, if keyfile not provided
   --guardian-keyfile GUARDIAN_KEYFILE            🔑 a JSON keyfile, if PEM not provided
-  --guardian-passfile GUARDIAN_PASSFILE          🔑 a file containing keyfile's password, if keyfile provided. If not
-                                                 provided, you'll be prompted to enter the password.
+  --guardian-passfile GUARDIAN_PASSFILE          DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
   --guardian-ledger                              🔐 bool flag for signing transaction using ledger
   --guardian-wallet-index GUARDIAN_WALLET_INDEX  🔑 the address index; can be used for PEM files, keyfiles of type
                                                  mnemonic or Ledger devices (default: 0)
   --relayer-pem RELAYER_PEM                      🔑 the PEM file, if keyfile not provided
   --relayer-keyfile RELAYER_KEYFILE              🔑 a JSON keyfile, if PEM not provided
-  --relayer-passfile RELAYER_PASSFILE            🔑 a file containing keyfile's password, if keyfile provided. If not
-                                                 provided, you'll be prompted to enter the password.
+  --relayer-passfile RELAYER_PASSFILE            DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
   --relayer-ledger                               🔐 bool flag for signing transaction using ledger
   --relayer-wallet-index RELAYER_WALLET_INDEX    🔑 the address index; can be used for PEM files, keyfiles of type
                                                  mnemonic or Ledger devices (default: 0)
@@ -4363,8 +4390,8 @@ options:
   --sender SENDER                                the alias of the wallet set in the address config
   --pem PEM                                      🔑 the PEM file, if keyfile not provided
   --keyfile KEYFILE                              🔑 a JSON keyfile, if PEM not provided
-  --passfile PASSFILE                            🔑 a file containing keyfile's password, if keyfile provided. If not
-                                                 provided, you'll be prompted to enter the password.
+  --passfile PASSFILE                            DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
   --ledger                                       🔐 bool flag for signing transaction using ledger
   --sender-wallet-index SENDER_WALLET_INDEX      🔑 the address index; can be used for PEM files, keyfiles of type
                                                  mnemonic or Ledger devices (default: 0)
@@ -4387,15 +4414,15 @@ options:
   --guardian-2fa-code GUARDIAN_2FA_CODE          the 2fa code for the guardian
   --guardian-pem GUARDIAN_PEM                    🔑 the PEM file, if keyfile not provided
   --guardian-keyfile GUARDIAN_KEYFILE            🔑 a JSON keyfile, if PEM not provided
-  --guardian-passfile GUARDIAN_PASSFILE          🔑 a file containing keyfile's password, if keyfile provided. If not
-                                                 provided, you'll be prompted to enter the password.
+  --guardian-passfile GUARDIAN_PASSFILE          DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
   --guardian-ledger                              🔐 bool flag for signing transaction using ledger
   --guardian-wallet-index GUARDIAN_WALLET_INDEX  🔑 the address index; can be used for PEM files, keyfiles of type
                                                  mnemonic or Ledger devices (default: 0)
   --relayer-pem RELAYER_PEM                      🔑 the PEM file, if keyfile not provided
   --relayer-keyfile RELAYER_KEYFILE              🔑 a JSON keyfile, if PEM not provided
-  --relayer-passfile RELAYER_PASSFILE            🔑 a file containing keyfile's password, if keyfile provided. If not
-                                                 provided, you'll be prompted to enter the password.
+  --relayer-passfile RELAYER_PASSFILE            DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
   --relayer-ledger                               🔐 bool flag for signing transaction using ledger
   --relayer-wallet-index RELAYER_WALLET_INDEX    🔑 the address index; can be used for PEM files, keyfiles of type
                                                  mnemonic or Ledger devices (default: 0)
@@ -4435,8 +4462,8 @@ options:
   --sender SENDER                                the alias of the wallet set in the address config
   --pem PEM                                      🔑 the PEM file, if keyfile not provided
   --keyfile KEYFILE                              🔑 a JSON keyfile, if PEM not provided
-  --passfile PASSFILE                            🔑 a file containing keyfile's password, if keyfile provided. If not
-                                                 provided, you'll be prompted to enter the password.
+  --passfile PASSFILE                            DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
   --ledger                                       🔐 bool flag for signing transaction using ledger
   --sender-wallet-index SENDER_WALLET_INDEX      🔑 the address index; can be used for PEM files, keyfiles of type
                                                  mnemonic or Ledger devices (default: 0)
@@ -4459,15 +4486,15 @@ options:
   --guardian-2fa-code GUARDIAN_2FA_CODE          the 2fa code for the guardian
   --guardian-pem GUARDIAN_PEM                    🔑 the PEM file, if keyfile not provided
   --guardian-keyfile GUARDIAN_KEYFILE            🔑 a JSON keyfile, if PEM not provided
-  --guardian-passfile GUARDIAN_PASSFILE          🔑 a file containing keyfile's password, if keyfile provided. If not
-                                                 provided, you'll be prompted to enter the password.
+  --guardian-passfile GUARDIAN_PASSFILE          DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
   --guardian-ledger                              🔐 bool flag for signing transaction using ledger
   --guardian-wallet-index GUARDIAN_WALLET_INDEX  🔑 the address index; can be used for PEM files, keyfiles of type
                                                  mnemonic or Ledger devices (default: 0)
   --relayer-pem RELAYER_PEM                      🔑 the PEM file, if keyfile not provided
   --relayer-keyfile RELAYER_KEYFILE              🔑 a JSON keyfile, if PEM not provided
-  --relayer-passfile RELAYER_PASSFILE            🔑 a file containing keyfile's password, if keyfile provided. If not
-                                                 provided, you'll be prompted to enter the password.
+  --relayer-passfile RELAYER_PASSFILE            DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
   --relayer-ledger                               🔐 bool flag for signing transaction using ledger
   --relayer-wallet-index RELAYER_WALLET_INDEX    🔑 the address index; can be used for PEM files, keyfiles of type
                                                  mnemonic or Ledger devices (default: 0)
@@ -4507,8 +4534,8 @@ options:
   --sender SENDER                                the alias of the wallet set in the address config
   --pem PEM                                      🔑 the PEM file, if keyfile not provided
   --keyfile KEYFILE                              🔑 a JSON keyfile, if PEM not provided
-  --passfile PASSFILE                            🔑 a file containing keyfile's password, if keyfile provided. If not
-                                                 provided, you'll be prompted to enter the password.
+  --passfile PASSFILE                            DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
   --ledger                                       🔐 bool flag for signing transaction using ledger
   --sender-wallet-index SENDER_WALLET_INDEX      🔑 the address index; can be used for PEM files, keyfiles of type
                                                  mnemonic or Ledger devices (default: 0)
@@ -4531,15 +4558,15 @@ options:
   --guardian-2fa-code GUARDIAN_2FA_CODE          the 2fa code for the guardian
   --guardian-pem GUARDIAN_PEM                    🔑 the PEM file, if keyfile not provided
   --guardian-keyfile GUARDIAN_KEYFILE            🔑 a JSON keyfile, if PEM not provided
-  --guardian-passfile GUARDIAN_PASSFILE          🔑 a file containing keyfile's password, if keyfile provided. If not
-                                                 provided, you'll be prompted to enter the password.
+  --guardian-passfile GUARDIAN_PASSFILE          DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
   --guardian-ledger                              🔐 bool flag for signing transaction using ledger
   --guardian-wallet-index GUARDIAN_WALLET_INDEX  🔑 the address index; can be used for PEM files, keyfiles of type
                                                  mnemonic or Ledger devices (default: 0)
   --relayer-pem RELAYER_PEM                      🔑 the PEM file, if keyfile not provided
   --relayer-keyfile RELAYER_KEYFILE              🔑 a JSON keyfile, if PEM not provided
-  --relayer-passfile RELAYER_PASSFILE            🔑 a file containing keyfile's password, if keyfile provided. If not
-                                                 provided, you'll be prompted to enter the password.
+  --relayer-passfile RELAYER_PASSFILE            DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
   --relayer-ledger                               🔐 bool flag for signing transaction using ledger
   --relayer-wallet-index RELAYER_WALLET_INDEX    🔑 the address index; can be used for PEM files, keyfiles of type
                                                  mnemonic or Ledger devices (default: 0)
@@ -4581,8 +4608,8 @@ options:
   --sender SENDER                                 the alias of the wallet set in the address config
   --pem PEM                                       🔑 the PEM file, if keyfile not provided
   --keyfile KEYFILE                               🔑 a JSON keyfile, if PEM not provided
-  --passfile PASSFILE                             🔑 a file containing keyfile's password, if keyfile provided. If not
-                                                  provided, you'll be prompted to enter the password.
+  --passfile PASSFILE                             DEPRECATED, do not use it anymore. Instead, you'll be prompted to
+                                                  enter the password.
   --ledger                                        🔐 bool flag for signing transaction using ledger
   --sender-wallet-index SENDER_WALLET_INDEX       🔑 the address index; can be used for PEM files, keyfiles of type
                                                   mnemonic or Ledger devices (default: 0)
@@ -4605,15 +4632,15 @@ options:
   --guardian-2fa-code GUARDIAN_2FA_CODE           the 2fa code for the guardian
   --guardian-pem GUARDIAN_PEM                     🔑 the PEM file, if keyfile not provided
   --guardian-keyfile GUARDIAN_KEYFILE             🔑 a JSON keyfile, if PEM not provided
-  --guardian-passfile GUARDIAN_PASSFILE           🔑 a file containing keyfile's password, if keyfile provided. If not
-                                                  provided, you'll be prompted to enter the password.
+  --guardian-passfile GUARDIAN_PASSFILE           DEPRECATED, do not use it anymore. Instead, you'll be prompted to
+                                                  enter the password.
   --guardian-ledger                               🔐 bool flag for signing transaction using ledger
   --guardian-wallet-index GUARDIAN_WALLET_INDEX   🔑 the address index; can be used for PEM files, keyfiles of type
                                                   mnemonic or Ledger devices (default: 0)
   --relayer-pem RELAYER_PEM                       🔑 the PEM file, if keyfile not provided
   --relayer-keyfile RELAYER_KEYFILE               🔑 a JSON keyfile, if PEM not provided
-  --relayer-passfile RELAYER_PASSFILE             🔑 a file containing keyfile's password, if keyfile provided. If not
-                                                  provided, you'll be prompted to enter the password.
+  --relayer-passfile RELAYER_PASSFILE             DEPRECATED, do not use it anymore. Instead, you'll be prompted to
+                                                  enter the password.
   --relayer-ledger                                🔐 bool flag for signing transaction using ledger
   --relayer-wallet-index RELAYER_WALLET_INDEX     🔑 the address index; can be used for PEM files, keyfiles of type
                                                   mnemonic or Ledger devices (default: 0)
@@ -4654,8 +4681,8 @@ options:
   --sender SENDER                                the alias of the wallet set in the address config
   --pem PEM                                      🔑 the PEM file, if keyfile not provided
   --keyfile KEYFILE                              🔑 a JSON keyfile, if PEM not provided
-  --passfile PASSFILE                            🔑 a file containing keyfile's password, if keyfile provided. If not
-                                                 provided, you'll be prompted to enter the password.
+  --passfile PASSFILE                            DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
   --ledger                                       🔐 bool flag for signing transaction using ledger
   --sender-wallet-index SENDER_WALLET_INDEX      🔑 the address index; can be used for PEM files, keyfiles of type
                                                  mnemonic or Ledger devices (default: 0)
@@ -4678,15 +4705,15 @@ options:
   --guardian-2fa-code GUARDIAN_2FA_CODE          the 2fa code for the guardian
   --guardian-pem GUARDIAN_PEM                    🔑 the PEM file, if keyfile not provided
   --guardian-keyfile GUARDIAN_KEYFILE            🔑 a JSON keyfile, if PEM not provided
-  --guardian-passfile GUARDIAN_PASSFILE          🔑 a file containing keyfile's password, if keyfile provided. If not
-                                                 provided, you'll be prompted to enter the password.
+  --guardian-passfile GUARDIAN_PASSFILE          DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
   --guardian-ledger                              🔐 bool flag for signing transaction using ledger
   --guardian-wallet-index GUARDIAN_WALLET_INDEX  🔑 the address index; can be used for PEM files, keyfiles of type
                                                  mnemonic or Ledger devices (default: 0)
   --relayer-pem RELAYER_PEM                      🔑 the PEM file, if keyfile not provided
   --relayer-keyfile RELAYER_KEYFILE              🔑 a JSON keyfile, if PEM not provided
-  --relayer-passfile RELAYER_PASSFILE            🔑 a file containing keyfile's password, if keyfile provided. If not
-                                                 provided, you'll be prompted to enter the password.
+  --relayer-passfile RELAYER_PASSFILE            DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
   --relayer-ledger                               🔐 bool flag for signing transaction using ledger
   --relayer-wallet-index RELAYER_WALLET_INDEX    🔑 the address index; can be used for PEM files, keyfiles of type
                                                  mnemonic or Ledger devices (default: 0)
@@ -4726,8 +4753,8 @@ options:
   --sender SENDER                                the alias of the wallet set in the address config
   --pem PEM                                      🔑 the PEM file, if keyfile not provided
   --keyfile KEYFILE                              🔑 a JSON keyfile, if PEM not provided
-  --passfile PASSFILE                            🔑 a file containing keyfile's password, if keyfile provided. If not
-                                                 provided, you'll be prompted to enter the password.
+  --passfile PASSFILE                            DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
   --ledger                                       🔐 bool flag for signing transaction using ledger
   --sender-wallet-index SENDER_WALLET_INDEX      🔑 the address index; can be used for PEM files, keyfiles of type
                                                  mnemonic or Ledger devices (default: 0)
@@ -4750,15 +4777,15 @@ options:
   --guardian-2fa-code GUARDIAN_2FA_CODE          the 2fa code for the guardian
   --guardian-pem GUARDIAN_PEM                    🔑 the PEM file, if keyfile not provided
   --guardian-keyfile GUARDIAN_KEYFILE            🔑 a JSON keyfile, if PEM not provided
-  --guardian-passfile GUARDIAN_PASSFILE          🔑 a file containing keyfile's password, if keyfile provided. If not
-                                                 provided, you'll be prompted to enter the password.
+  --guardian-passfile GUARDIAN_PASSFILE          DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
   --guardian-ledger                              🔐 bool flag for signing transaction using ledger
   --guardian-wallet-index GUARDIAN_WALLET_INDEX  🔑 the address index; can be used for PEM files, keyfiles of type
                                                  mnemonic or Ledger devices (default: 0)
   --relayer-pem RELAYER_PEM                      🔑 the PEM file, if keyfile not provided
   --relayer-keyfile RELAYER_KEYFILE              🔑 a JSON keyfile, if PEM not provided
-  --relayer-passfile RELAYER_PASSFILE            🔑 a file containing keyfile's password, if keyfile provided. If not
-                                                 provided, you'll be prompted to enter the password.
+  --relayer-passfile RELAYER_PASSFILE            DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
   --relayer-ledger                               🔐 bool flag for signing transaction using ledger
   --relayer-wallet-index RELAYER_WALLET_INDEX    🔑 the address index; can be used for PEM files, keyfiles of type
                                                  mnemonic or Ledger devices (default: 0)
@@ -4776,19 +4803,6 @@ usage: mxpy multisig get-quorum [-h] ...
 
 Perform a smart contract query to get the quorum.
 
-Output example:
-===============
-{
-    "emittedTransaction": {
-        "nonce": 42,
-        "sender": "alice",
-        "receiver": "bob",
-        "...": "..."
-    },
-    "emittedTransactionData": "the transaction data, not encoded",
-    "emittedTransactionHash": "the transaction hash"
-}
-
 options:
   -h, --help           show this help message and exit
   --contract CONTRACT  🖄 the bech32 address of the Multisig Smart Contract
@@ -4804,19 +4818,6 @@ $ mxpy multisig get-num-board-members --help
 usage: mxpy multisig get-num-board-members [-h] ...
 
 Perform a smart contract query to get the number of board members.
-
-Output example:
-===============
-{
-    "emittedTransaction": {
-        "nonce": 42,
-        "sender": "alice",
-        "receiver": "bob",
-        "...": "..."
-    },
-    "emittedTransactionData": "the transaction data, not encoded",
-    "emittedTransactionHash": "the transaction hash"
-}
 
 options:
   -h, --help           show this help message and exit
@@ -4834,19 +4835,6 @@ usage: mxpy multisig get-num-groups [-h] ...
 
 Perform a smart contract query to get the number of groups.
 
-Output example:
-===============
-{
-    "emittedTransaction": {
-        "nonce": 42,
-        "sender": "alice",
-        "receiver": "bob",
-        "...": "..."
-    },
-    "emittedTransactionData": "the transaction data, not encoded",
-    "emittedTransactionHash": "the transaction hash"
-}
-
 options:
   -h, --help           show this help message and exit
   --contract CONTRACT  🖄 the bech32 address of the Multisig Smart Contract
@@ -4863,19 +4851,6 @@ usage: mxpy multisig get-num-proposers [-h] ...
 
 Perform a smart contract query to get the number of proposers.
 
-Output example:
-===============
-{
-    "emittedTransaction": {
-        "nonce": 42,
-        "sender": "alice",
-        "receiver": "bob",
-        "...": "..."
-    },
-    "emittedTransactionData": "the transaction data, not encoded",
-    "emittedTransactionHash": "the transaction hash"
-}
-
 options:
   -h, --help           show this help message and exit
   --contract CONTRACT  🖄 the bech32 address of the Multisig Smart Contract
@@ -4891,19 +4866,6 @@ $ mxpy multisig get-action-group --help
 usage: mxpy multisig get-action-group [-h] ...
 
 Perform a smart contract query to get the actions in a group.
-
-Output example:
-===============
-{
-    "emittedTransaction": {
-        "nonce": 42,
-        "sender": "alice",
-        "receiver": "bob",
-        "...": "..."
-    },
-    "emittedTransactionData": "the transaction data, not encoded",
-    "emittedTransactionHash": "the transaction hash"
-}
 
 options:
   -h, --help           show this help message and exit
@@ -4922,19 +4884,6 @@ usage: mxpy multisig get-last-action-group-id [-h] ...
 
 Perform a smart contract query to get the id of the last action in a group.
 
-Output example:
-===============
-{
-    "emittedTransaction": {
-        "nonce": 42,
-        "sender": "alice",
-        "receiver": "bob",
-        "...": "..."
-    },
-    "emittedTransactionData": "the transaction data, not encoded",
-    "emittedTransactionHash": "the transaction hash"
-}
-
 options:
   -h, --help           show this help message and exit
   --contract CONTRACT  🖄 the bech32 address of the Multisig Smart Contract
@@ -4951,19 +4900,6 @@ usage: mxpy multisig get-action-last-index [-h] ...
 
 Perform a smart contract query to get the index of the last action.
 
-Output example:
-===============
-{
-    "emittedTransaction": {
-        "nonce": 42,
-        "sender": "alice",
-        "receiver": "bob",
-        "...": "..."
-    },
-    "emittedTransactionData": "the transaction data, not encoded",
-    "emittedTransactionHash": "the transaction hash"
-}
-
 options:
   -h, --help           show this help message and exit
   --contract CONTRACT  🖄 the bech32 address of the Multisig Smart Contract
@@ -4979,19 +4915,6 @@ $ mxpy multisig is-signed-by --help
 usage: mxpy multisig is-signed-by [-h] ...
 
 Perform a smart contract query to check if an action is signed by a user.
-
-Output example:
-===============
-{
-    "emittedTransaction": {
-        "nonce": 42,
-        "sender": "alice",
-        "receiver": "bob",
-        "...": "..."
-    },
-    "emittedTransactionData": "the transaction data, not encoded",
-    "emittedTransactionHash": "the transaction hash"
-}
 
 options:
   -h, --help           show this help message and exit
@@ -5011,19 +4934,6 @@ usage: mxpy multisig is-quorum-reached [-h] ...
 
 Perform a smart contract query to check if an action has reached quorum.
 
-Output example:
-===============
-{
-    "emittedTransaction": {
-        "nonce": 42,
-        "sender": "alice",
-        "receiver": "bob",
-        "...": "..."
-    },
-    "emittedTransactionData": "the transaction data, not encoded",
-    "emittedTransactionHash": "the transaction hash"
-}
-
 options:
   -h, --help           show this help message and exit
   --contract CONTRACT  🖄 the bech32 address of the Multisig Smart Contract
@@ -5041,19 +4951,6 @@ usage: mxpy multisig get-pending-actions [-h] ...
 
 Perform a smart contract query to get the pending actions full info.
 
-Output example:
-===============
-{
-    "emittedTransaction": {
-        "nonce": 42,
-        "sender": "alice",
-        "receiver": "bob",
-        "...": "..."
-    },
-    "emittedTransactionData": "the transaction data, not encoded",
-    "emittedTransactionHash": "the transaction hash"
-}
-
 options:
   -h, --help           show this help message and exit
   --contract CONTRACT  🖄 the bech32 address of the Multisig Smart Contract
@@ -5069,19 +4966,6 @@ $ mxpy multisig get-user-role --help
 usage: mxpy multisig get-user-role [-h] ...
 
 Perform a smart contract query to get the role of a user.
-
-Output example:
-===============
-{
-    "emittedTransaction": {
-        "nonce": 42,
-        "sender": "alice",
-        "receiver": "bob",
-        "...": "..."
-    },
-    "emittedTransactionData": "the transaction data, not encoded",
-    "emittedTransactionHash": "the transaction hash"
-}
 
 options:
   -h, --help           show this help message and exit
@@ -5100,19 +4984,6 @@ usage: mxpy multisig get-board-members [-h] ...
 
 Perform a smart contract query to get all the board members.
 
-Output example:
-===============
-{
-    "emittedTransaction": {
-        "nonce": 42,
-        "sender": "alice",
-        "receiver": "bob",
-        "...": "..."
-    },
-    "emittedTransactionData": "the transaction data, not encoded",
-    "emittedTransactionHash": "the transaction hash"
-}
-
 options:
   -h, --help           show this help message and exit
   --contract CONTRACT  🖄 the bech32 address of the Multisig Smart Contract
@@ -5129,19 +5000,6 @@ usage: mxpy multisig get-proposers [-h] ...
 
 Perform a smart contract query to get all the proposers.
 
-Output example:
-===============
-{
-    "emittedTransaction": {
-        "nonce": 42,
-        "sender": "alice",
-        "receiver": "bob",
-        "...": "..."
-    },
-    "emittedTransactionData": "the transaction data, not encoded",
-    "emittedTransactionHash": "the transaction hash"
-}
-
 options:
   -h, --help           show this help message and exit
   --contract CONTRACT  🖄 the bech32 address of the Multisig Smart Contract
@@ -5157,19 +5015,6 @@ $ mxpy multisig get-action-data --help
 usage: mxpy multisig get-action-data [-h] ...
 
 Perform a smart contract query to get the data of an action.
-
-Output example:
-===============
-{
-    "emittedTransaction": {
-        "nonce": 42,
-        "sender": "alice",
-        "receiver": "bob",
-        "...": "..."
-    },
-    "emittedTransactionData": "the transaction data, not encoded",
-    "emittedTransactionHash": "the transaction hash"
-}
 
 options:
   -h, --help           show this help message and exit
@@ -5188,19 +5033,6 @@ usage: mxpy multisig get-action-signers [-h] ...
 
 Perform a smart contract query to get the signers of an action.
 
-Output example:
-===============
-{
-    "emittedTransaction": {
-        "nonce": 42,
-        "sender": "alice",
-        "receiver": "bob",
-        "...": "..."
-    },
-    "emittedTransactionData": "the transaction data, not encoded",
-    "emittedTransactionHash": "the transaction hash"
-}
-
 options:
   -h, --help           show this help message and exit
   --contract CONTRACT  🖄 the bech32 address of the Multisig Smart Contract
@@ -5217,19 +5049,6 @@ $ mxpy multisig get-action-signers-count --help
 usage: mxpy multisig get-action-signers-count [-h] ...
 
 Perform a smart contract query to get the number of signers of an action.
-
-Output example:
-===============
-{
-    "emittedTransaction": {
-        "nonce": 42,
-        "sender": "alice",
-        "receiver": "bob",
-        "...": "..."
-    },
-    "emittedTransactionData": "the transaction data, not encoded",
-    "emittedTransactionHash": "the transaction hash"
-}
 
 options:
   -h, --help           show this help message and exit
@@ -5248,19 +5067,6 @@ usage: mxpy multisig get-action-valid-signers-count [-h] ...
 
 Perform a smart contract query to get the number of valid signers of an action.
 
-Output example:
-===============
-{
-    "emittedTransaction": {
-        "nonce": 42,
-        "sender": "alice",
-        "receiver": "bob",
-        "...": "..."
-    },
-    "emittedTransactionData": "the transaction data, not encoded",
-    "emittedTransactionHash": "the transaction hash"
-}
-
 options:
   -h, --help           show this help message and exit
   --contract CONTRACT  🖄 the bech32 address of the Multisig Smart Contract
@@ -5277,19 +5083,6 @@ $ mxpy multisig parse-propose-action --help
 usage: mxpy multisig parse-propose-action [-h] ...
 
 Parses the propose action transaction to extract proposal ID.
-
-Output example:
-===============
-{
-    "emittedTransaction": {
-        "nonce": 42,
-        "sender": "alice",
-        "receiver": "bob",
-        "...": "..."
-    },
-    "emittedTransactionData": "the transaction data, not encoded",
-    "emittedTransactionHash": "the transaction hash"
-}
 
 options:
   -h, --help     show this help message and exit
@@ -5358,8 +5151,8 @@ options:
   --sender SENDER                                the alias of the wallet set in the address config
   --pem PEM                                      🔑 the PEM file, if keyfile not provided
   --keyfile KEYFILE                              🔑 a JSON keyfile, if PEM not provided
-  --passfile PASSFILE                            🔑 a file containing keyfile's password, if keyfile provided. If not
-                                                 provided, you'll be prompted to enter the password.
+  --passfile PASSFILE                            DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
   --ledger                                       🔐 bool flag for signing transaction using ledger
   --sender-wallet-index SENDER_WALLET_INDEX      🔑 the address index; can be used for PEM files, keyfiles of type
                                                  mnemonic or Ledger devices (default: 0)
@@ -5380,15 +5173,15 @@ options:
   --guardian-2fa-code GUARDIAN_2FA_CODE          the 2fa code for the guardian
   --guardian-pem GUARDIAN_PEM                    🔑 the PEM file, if keyfile not provided
   --guardian-keyfile GUARDIAN_KEYFILE            🔑 a JSON keyfile, if PEM not provided
-  --guardian-passfile GUARDIAN_PASSFILE          🔑 a file containing keyfile's password, if keyfile provided. If not
-                                                 provided, you'll be prompted to enter the password.
+  --guardian-passfile GUARDIAN_PASSFILE          DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
   --guardian-ledger                              🔐 bool flag for signing transaction using ledger
   --guardian-wallet-index GUARDIAN_WALLET_INDEX  🔑 the address index; can be used for PEM files, keyfiles of type
                                                  mnemonic or Ledger devices (default: 0)
   --relayer-pem RELAYER_PEM                      🔑 the PEM file, if keyfile not provided
   --relayer-keyfile RELAYER_KEYFILE              🔑 a JSON keyfile, if PEM not provided
-  --relayer-passfile RELAYER_PASSFILE            🔑 a file containing keyfile's password, if keyfile provided. If not
-                                                 provided, you'll be prompted to enter the password.
+  --relayer-passfile RELAYER_PASSFILE            DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
   --relayer-ledger                               🔐 bool flag for signing transaction using ledger
   --relayer-wallet-index RELAYER_WALLET_INDEX    🔑 the address index; can be used for PEM files, keyfiles of type
                                                  mnemonic or Ledger devices (default: 0)
@@ -5429,8 +5222,8 @@ options:
   --sender SENDER                                the alias of the wallet set in the address config
   --pem PEM                                      🔑 the PEM file, if keyfile not provided
   --keyfile KEYFILE                              🔑 a JSON keyfile, if PEM not provided
-  --passfile PASSFILE                            🔑 a file containing keyfile's password, if keyfile provided. If not
-                                                 provided, you'll be prompted to enter the password.
+  --passfile PASSFILE                            DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
   --ledger                                       🔐 bool flag for signing transaction using ledger
   --sender-wallet-index SENDER_WALLET_INDEX      🔑 the address index; can be used for PEM files, keyfiles of type
                                                  mnemonic or Ledger devices (default: 0)
@@ -5451,15 +5244,15 @@ options:
   --guardian-2fa-code GUARDIAN_2FA_CODE          the 2fa code for the guardian
   --guardian-pem GUARDIAN_PEM                    🔑 the PEM file, if keyfile not provided
   --guardian-keyfile GUARDIAN_KEYFILE            🔑 a JSON keyfile, if PEM not provided
-  --guardian-passfile GUARDIAN_PASSFILE          🔑 a file containing keyfile's password, if keyfile provided. If not
-                                                 provided, you'll be prompted to enter the password.
+  --guardian-passfile GUARDIAN_PASSFILE          DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
   --guardian-ledger                              🔐 bool flag for signing transaction using ledger
   --guardian-wallet-index GUARDIAN_WALLET_INDEX  🔑 the address index; can be used for PEM files, keyfiles of type
                                                  mnemonic or Ledger devices (default: 0)
   --relayer-pem RELAYER_PEM                      🔑 the PEM file, if keyfile not provided
   --relayer-keyfile RELAYER_KEYFILE              🔑 a JSON keyfile, if PEM not provided
-  --relayer-passfile RELAYER_PASSFILE            🔑 a file containing keyfile's password, if keyfile provided. If not
-                                                 provided, you'll be prompted to enter the password.
+  --relayer-passfile RELAYER_PASSFILE            DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
   --relayer-ledger                               🔐 bool flag for signing transaction using ledger
   --relayer-wallet-index RELAYER_WALLET_INDEX    🔑 the address index; can be used for PEM files, keyfiles of type
                                                  mnemonic or Ledger devices (default: 0)
@@ -5499,8 +5292,8 @@ options:
   --sender SENDER                                the alias of the wallet set in the address config
   --pem PEM                                      🔑 the PEM file, if keyfile not provided
   --keyfile KEYFILE                              🔑 a JSON keyfile, if PEM not provided
-  --passfile PASSFILE                            🔑 a file containing keyfile's password, if keyfile provided. If not
-                                                 provided, you'll be prompted to enter the password.
+  --passfile PASSFILE                            DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
   --ledger                                       🔐 bool flag for signing transaction using ledger
   --sender-wallet-index SENDER_WALLET_INDEX      🔑 the address index; can be used for PEM files, keyfiles of type
                                                  mnemonic or Ledger devices (default: 0)
@@ -5521,15 +5314,15 @@ options:
   --guardian-2fa-code GUARDIAN_2FA_CODE          the 2fa code for the guardian
   --guardian-pem GUARDIAN_PEM                    🔑 the PEM file, if keyfile not provided
   --guardian-keyfile GUARDIAN_KEYFILE            🔑 a JSON keyfile, if PEM not provided
-  --guardian-passfile GUARDIAN_PASSFILE          🔑 a file containing keyfile's password, if keyfile provided. If not
-                                                 provided, you'll be prompted to enter the password.
+  --guardian-passfile GUARDIAN_PASSFILE          DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
   --guardian-ledger                              🔐 bool flag for signing transaction using ledger
   --guardian-wallet-index GUARDIAN_WALLET_INDEX  🔑 the address index; can be used for PEM files, keyfiles of type
                                                  mnemonic or Ledger devices (default: 0)
   --relayer-pem RELAYER_PEM                      🔑 the PEM file, if keyfile not provided
   --relayer-keyfile RELAYER_KEYFILE              🔑 a JSON keyfile, if PEM not provided
-  --relayer-passfile RELAYER_PASSFILE            🔑 a file containing keyfile's password, if keyfile provided. If not
-                                                 provided, you'll be prompted to enter the password.
+  --relayer-passfile RELAYER_PASSFILE            DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
   --relayer-ledger                               🔐 bool flag for signing transaction using ledger
   --relayer-wallet-index RELAYER_WALLET_INDEX    🔑 the address index; can be used for PEM files, keyfiles of type
                                                  mnemonic or Ledger devices (default: 0)
@@ -5570,8 +5363,8 @@ options:
   --sender SENDER                                the alias of the wallet set in the address config
   --pem PEM                                      🔑 the PEM file, if keyfile not provided
   --keyfile KEYFILE                              🔑 a JSON keyfile, if PEM not provided
-  --passfile PASSFILE                            🔑 a file containing keyfile's password, if keyfile provided. If not
-                                                 provided, you'll be prompted to enter the password.
+  --passfile PASSFILE                            DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
   --ledger                                       🔐 bool flag for signing transaction using ledger
   --sender-wallet-index SENDER_WALLET_INDEX      🔑 the address index; can be used for PEM files, keyfiles of type
                                                  mnemonic or Ledger devices (default: 0)
@@ -5592,15 +5385,15 @@ options:
   --guardian-2fa-code GUARDIAN_2FA_CODE          the 2fa code for the guardian
   --guardian-pem GUARDIAN_PEM                    🔑 the PEM file, if keyfile not provided
   --guardian-keyfile GUARDIAN_KEYFILE            🔑 a JSON keyfile, if PEM not provided
-  --guardian-passfile GUARDIAN_PASSFILE          🔑 a file containing keyfile's password, if keyfile provided. If not
-                                                 provided, you'll be prompted to enter the password.
+  --guardian-passfile GUARDIAN_PASSFILE          DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
   --guardian-ledger                              🔐 bool flag for signing transaction using ledger
   --guardian-wallet-index GUARDIAN_WALLET_INDEX  🔑 the address index; can be used for PEM files, keyfiles of type
                                                  mnemonic or Ledger devices (default: 0)
   --relayer-pem RELAYER_PEM                      🔑 the PEM file, if keyfile not provided
   --relayer-keyfile RELAYER_KEYFILE              🔑 a JSON keyfile, if PEM not provided
-  --relayer-passfile RELAYER_PASSFILE            🔑 a file containing keyfile's password, if keyfile provided. If not
-                                                 provided, you'll be prompted to enter the password.
+  --relayer-passfile RELAYER_PASSFILE            DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
   --relayer-ledger                               🔐 bool flag for signing transaction using ledger
   --relayer-wallet-index RELAYER_WALLET_INDEX    🔑 the address index; can be used for PEM files, keyfiles of type
                                                  mnemonic or Ledger devices (default: 0)
@@ -5639,8 +5432,8 @@ options:
   --sender SENDER                                the alias of the wallet set in the address config
   --pem PEM                                      🔑 the PEM file, if keyfile not provided
   --keyfile KEYFILE                              🔑 a JSON keyfile, if PEM not provided
-  --passfile PASSFILE                            🔑 a file containing keyfile's password, if keyfile provided. If not
-                                                 provided, you'll be prompted to enter the password.
+  --passfile PASSFILE                            DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
   --ledger                                       🔐 bool flag for signing transaction using ledger
   --sender-wallet-index SENDER_WALLET_INDEX      🔑 the address index; can be used for PEM files, keyfiles of type
                                                  mnemonic or Ledger devices (default: 0)
@@ -5661,15 +5454,15 @@ options:
   --guardian-2fa-code GUARDIAN_2FA_CODE          the 2fa code for the guardian
   --guardian-pem GUARDIAN_PEM                    🔑 the PEM file, if keyfile not provided
   --guardian-keyfile GUARDIAN_KEYFILE            🔑 a JSON keyfile, if PEM not provided
-  --guardian-passfile GUARDIAN_PASSFILE          🔑 a file containing keyfile's password, if keyfile provided. If not
-                                                 provided, you'll be prompted to enter the password.
+  --guardian-passfile GUARDIAN_PASSFILE          DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
   --guardian-ledger                              🔐 bool flag for signing transaction using ledger
   --guardian-wallet-index GUARDIAN_WALLET_INDEX  🔑 the address index; can be used for PEM files, keyfiles of type
                                                  mnemonic or Ledger devices (default: 0)
   --relayer-pem RELAYER_PEM                      🔑 the PEM file, if keyfile not provided
   --relayer-keyfile RELAYER_KEYFILE              🔑 a JSON keyfile, if PEM not provided
-  --relayer-passfile RELAYER_PASSFILE            🔑 a file containing keyfile's password, if keyfile provided. If not
-                                                 provided, you'll be prompted to enter the password.
+  --relayer-passfile RELAYER_PASSFILE            DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
   --relayer-ledger                               🔐 bool flag for signing transaction using ledger
   --relayer-wallet-index RELAYER_WALLET_INDEX    🔑 the address index; can be used for PEM files, keyfiles of type
                                                  mnemonic or Ledger devices (default: 0)
@@ -5713,8 +5506,8 @@ options:
   --sender SENDER                                the alias of the wallet set in the address config
   --pem PEM                                      🔑 the PEM file, if keyfile not provided
   --keyfile KEYFILE                              🔑 a JSON keyfile, if PEM not provided
-  --passfile PASSFILE                            🔑 a file containing keyfile's password, if keyfile provided. If not
-                                                 provided, you'll be prompted to enter the password.
+  --passfile PASSFILE                            DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
   --ledger                                       🔐 bool flag for signing transaction using ledger
   --sender-wallet-index SENDER_WALLET_INDEX      🔑 the address index; can be used for PEM files, keyfiles of type
                                                  mnemonic or Ledger devices (default: 0)
@@ -5735,15 +5528,15 @@ options:
   --guardian-2fa-code GUARDIAN_2FA_CODE          the 2fa code for the guardian
   --guardian-pem GUARDIAN_PEM                    🔑 the PEM file, if keyfile not provided
   --guardian-keyfile GUARDIAN_KEYFILE            🔑 a JSON keyfile, if PEM not provided
-  --guardian-passfile GUARDIAN_PASSFILE          🔑 a file containing keyfile's password, if keyfile provided. If not
-                                                 provided, you'll be prompted to enter the password.
+  --guardian-passfile GUARDIAN_PASSFILE          DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
   --guardian-ledger                              🔐 bool flag for signing transaction using ledger
   --guardian-wallet-index GUARDIAN_WALLET_INDEX  🔑 the address index; can be used for PEM files, keyfiles of type
                                                  mnemonic or Ledger devices (default: 0)
   --relayer-pem RELAYER_PEM                      🔑 the PEM file, if keyfile not provided
   --relayer-keyfile RELAYER_KEYFILE              🔑 a JSON keyfile, if PEM not provided
-  --relayer-passfile RELAYER_PASSFILE            🔑 a file containing keyfile's password, if keyfile provided. If not
-                                                 provided, you'll be prompted to enter the password.
+  --relayer-passfile RELAYER_PASSFILE            DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
   --relayer-ledger                               🔐 bool flag for signing transaction using ledger
   --relayer-wallet-index RELAYER_WALLET_INDEX    🔑 the address index; can be used for PEM files, keyfiles of type
                                                  mnemonic or Ledger devices (default: 0)
@@ -6166,7 +5959,7 @@ usage: mxpy get COMMAND [-h] ...
 Get info from the network.
 
 COMMANDS:
-  {account,keys,storage-entry,token,transaction}
+  {account,storage,storage-entry,token,transaction,network-config,network-status}
 
 OPTIONS:
   -h, --help            show this help message and exit
@@ -6175,10 +5968,12 @@ OPTIONS:
 COMMANDS summary
 ----------------
 account                        Get info about an account.
-keys                           Get the storage (key-value pairs) of an account.
+storage                        Get the storage (key-value pairs) of an account.
 storage-entry                  Get a specific storage entry (key-value pair) of an account.
 token                          Get a token of an account.
 transaction                    Get a transaction from the network.
+network-config                 Get the network configuration.
+network-status                 Get the network status.
 
 ```
 ### Get.Account
@@ -6198,12 +5993,12 @@ options:
   --balance          whether to only fetch the balance of the address
 
 ```
-### Get.Keys
+### Get.Storage
 
 
 ```
-$ mxpy get keys --help
-usage: mxpy get keys [-h] ...
+$ mxpy get storage --help
+usage: mxpy get storage [-h] ...
 
 Get the storage (key-value pairs) of an account.
 
