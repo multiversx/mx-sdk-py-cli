@@ -144,7 +144,7 @@ def get_defaults() -> dict[str, Any]:
 def get_log_level_from_config() -> str:
     log_level = get_value("log_level")
     if log_level not in LOG_LEVELS:
-        default_log_level = get_defaults()["log_level"]
+        default_log_level: str = get_defaults()["log_level"]
         show_warning(f"Invalid log level set in config: [{log_level}]. Defaulting to [{default_log_level}].")
         return default_log_level
 
