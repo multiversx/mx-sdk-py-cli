@@ -30,3 +30,5 @@ ADDRESS_PREFIX = "addr:"
 MAINCHAIN_ADDRESS_HRP = "erd"
 
 SDK_PATH = Path("~/multiversx-sdk").expanduser().resolve()
+
+LOG_LEVELS = ["debug", "info", "warning", "error"]

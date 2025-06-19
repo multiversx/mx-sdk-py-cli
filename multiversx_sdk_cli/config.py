@@ -6,7 +6,8 @@ from typing import Any
 from multiversx_sdk import NetworkProviderConfig
 
 from multiversx_sdk_cli import errors, utils
-from multiversx_sdk_cli.constants import SDK_PATH
+from multiversx_sdk_cli.constants import LOG_LEVELS, SDK_PATH
+from multiversx_sdk_cli.ux import show_warning
 
 LOCAL_CONFIG_PATH = Path("mxpy.json").resolve()
 GLOBAL_CONFIG_PATH = SDK_PATH / "mxpy.json"
@@ -136,7 +137,18 @@ def get_defaults() -> dict[str, Any]:
         "dependencies.testwallets.urlTemplate.osx": "https://github.com/multiversx/mx-sdk-testwallets/archive/{TAG}.tar.gz",
         "dependencies.testwallets.urlTemplate.windows": "https://github.com/multiversx/mx-sdk-testwallets/archive/{TAG}.tar.gz",
         "github_api_token": "",
+        "log_level": "info",
     }
+
+
+def get_log_level_from_config() -> str:
+    log_level = get_value("log_level")
+    if log_level not in LOG_LEVELS:
+        default_log_level: str = get_defaults()["log_level"]
+        show_warning(f"Invalid log level set in config: [{log_level}]. Defaulting to [{default_log_level}].")
+        return default_log_level
+
+    return log_level
 
 
 def get_deprecated_entries_in_config_file():
