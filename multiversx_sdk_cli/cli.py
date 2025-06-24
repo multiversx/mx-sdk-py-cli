@@ -10,13 +10,13 @@ from multiversx_sdk import LibraryConfig
 from rich.logging import RichHandler
 
 import multiversx_sdk_cli.cli_config
+import multiversx_sdk_cli.cli_config_env
 import multiversx_sdk_cli.cli_config_wallet
 import multiversx_sdk_cli.cli_contracts
 import multiversx_sdk_cli.cli_data
 import multiversx_sdk_cli.cli_delegation
 import multiversx_sdk_cli.cli_deps
 import multiversx_sdk_cli.cli_dns
-import multiversx_sdk_cli.cli_env
 import multiversx_sdk_cli.cli_faucet
 import multiversx_sdk_cli.cli_get
 import multiversx_sdk_cli.cli_governance
@@ -30,8 +30,8 @@ import multiversx_sdk_cli.cli_wallet
 import multiversx_sdk_cli.version
 from multiversx_sdk_cli import config, errors, utils, ux
 from multiversx_sdk_cli.cli_shared import set_proxy_from_config_if_not_provided
+from multiversx_sdk_cli.config_env import get_address_hrp
 from multiversx_sdk_cli.constants import LOG_LEVELS, SDK_PATH
-from multiversx_sdk_cli.env import get_address_hrp
 
 logger = logging.getLogger("cli")
 
@@ -140,7 +140,7 @@ See:
     commands.append(multiversx_sdk_cli.cli_faucet.setup_parser(args, subparsers))
     commands.append(multiversx_sdk_cli.cli_multisig.setup_parser(args, subparsers))
     commands.append(multiversx_sdk_cli.cli_governance.setup_parser(args, subparsers))
-    commands.append(multiversx_sdk_cli.cli_env.setup_parser(subparsers))
+    commands.append(multiversx_sdk_cli.cli_config_env.setup_parser(subparsers))
     commands.append(multiversx_sdk_cli.cli_get.setup_parser(subparsers))
 
     parser.epilog = """

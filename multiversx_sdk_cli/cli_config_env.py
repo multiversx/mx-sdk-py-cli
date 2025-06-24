@@ -3,7 +3,7 @@ import os
 from typing import Any
 
 from multiversx_sdk_cli import cli_shared
-from multiversx_sdk_cli.env import (
+from multiversx_sdk_cli.config_env import (
     create_new_env,
     delete_env,
     delete_value,
@@ -23,12 +23,12 @@ logger = logging.getLogger("cli.env")
 
 def setup_parser(subparsers: Any) -> Any:
     parser = cli_shared.add_group_subparser(
-        subparsers, "env", "Configure MultiversX CLI to use specific environment values."
+        subparsers, "config-env", "Configure MultiversX CLI to use specific environment values."
     )
     subparsers = parser.add_subparsers()
 
     sub = cli_shared.add_command_subparser(
-        subparsers, "env", "new", "Creates a new environment and sets it as the active environment."
+        subparsers, "config-env", "new", "Creates a new environment and sets it as the active environment."
     )
     _add_name_arg(sub)
     sub.add_argument(
@@ -38,16 +38,20 @@ def setup_parser(subparsers: Any) -> Any:
     )
     sub.set_defaults(func=new_env)
 
-    sub = cli_shared.add_command_subparser(subparsers, "env", "get", "Gets an env value from the active environment.")
+    sub = cli_shared.add_command_subparser(
+        subparsers, "config-env", "get", "Gets an env value from the active environment."
+    )
     _add_name_arg(sub)
     sub.set_defaults(func=get_env_value)
 
-    sub = cli_shared.add_command_subparser(subparsers, "env", "set", "Sets an env value for the active environment.")
+    sub = cli_shared.add_command_subparser(
+        subparsers, "config-env", "set", "Sets an env value for the active environment."
+    )
     _add_name_arg(sub)
     sub.add_argument("value", type=str, help="the new value")
     sub.set_defaults(func=set_env_value)
 
-    sub = cli_shared.add_command_subparser(subparsers, "env", "dump", "Dumps the active environment.")
+    sub = cli_shared.add_command_subparser(subparsers, "config-env", "dump", "Dumps the active environment.")
     sub.add_argument(
         "--default",
         required=False,
@@ -57,21 +61,21 @@ def setup_parser(subparsers: Any) -> Any:
     sub.set_defaults(func=dump)
 
     sub = cli_shared.add_command_subparser(
-        subparsers, "env", "delete", "Deletes an env value from the active environment."
+        subparsers, "config-env", "delete", "Deletes an env value from the active environment."
     )
     _add_name_arg(sub)
     sub.set_defaults(func=delete_env_value)
 
-    sub = cli_shared.add_command_subparser(subparsers, "env", "switch", "Switch to a different environment.")
+    sub = cli_shared.add_command_subparser(subparsers, "config-env", "switch", "Switch to a different environment.")
     _add_name_arg(sub)
     sub.set_defaults(func=switch_env)
 
-    sub = cli_shared.add_command_subparser(subparsers, "env", "list", "List available environments")
+    sub = cli_shared.add_command_subparser(subparsers, "config-env", "list", "List available environments")
     sub.set_defaults(func=list_envs)
 
     sub = cli_shared.add_command_subparser(
         subparsers,
-        "env",
+        "config-env",
         "remove",
         "Deletes an environment from the env file. Will switch to default env.",
     )
@@ -80,7 +84,7 @@ def setup_parser(subparsers: Any) -> Any:
 
     sub = cli_shared.add_command_subparser(
         subparsers,
-        "env",
+        "config-env",
         "reset",
         "Deletes the environment file. Default env will be used.",
     )

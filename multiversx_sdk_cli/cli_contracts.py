@@ -25,11 +25,11 @@ from multiversx_sdk_cli.args_validation import (
 )
 from multiversx_sdk_cli.cli_output import CLIOutputBuilder
 from multiversx_sdk_cli.config import get_config_for_network_providers
+from multiversx_sdk_cli.config_env import MxpyEnv
 from multiversx_sdk_cli.constants import NUMBER_OF_SHARDS
 from multiversx_sdk_cli.contract_verification import trigger_contract_verification
 from multiversx_sdk_cli.contracts import SmartContract
 from multiversx_sdk_cli.docker import is_docker_installed, run_docker
-from multiversx_sdk_cli.env import MxpyEnv
 from multiversx_sdk_cli.errors import DockerMissingError
 from multiversx_sdk_cli.ux import show_warning
 
