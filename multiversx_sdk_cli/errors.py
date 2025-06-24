@@ -188,7 +188,7 @@ class EnvironmentAlreadyExistsError(KnownError):
         super().__init__(f"Environment entry already exists: {name}.")
 
 
-class UnknownAddressAliasError(KnownError):
+class UnknownWalletAliasError(KnownError):
     def __init__(self, name: str):
         super().__init__(f"Alias is not known: {name}.")
 

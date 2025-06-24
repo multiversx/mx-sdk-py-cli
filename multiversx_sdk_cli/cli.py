@@ -9,8 +9,8 @@ import argcomplete
 from multiversx_sdk import LibraryConfig
 from rich.logging import RichHandler
 
-import multiversx_sdk_cli.cli_address
 import multiversx_sdk_cli.cli_config
+import multiversx_sdk_cli.cli_config_wallet
 import multiversx_sdk_cli.cli_contracts
 import multiversx_sdk_cli.cli_data
 import multiversx_sdk_cli.cli_delegation
@@ -124,7 +124,7 @@ See:
     subparsers = parser.add_subparsers()
     commands: list[Any] = []
 
-    commands.append(multiversx_sdk_cli.cli_address.setup_parser(subparsers))
+    commands.append(multiversx_sdk_cli.cli_config_wallet.setup_parser(subparsers))
     commands.append(multiversx_sdk_cli.cli_contracts.setup_parser(args, subparsers))
     commands.append(multiversx_sdk_cli.cli_transactions.setup_parser(args, subparsers))
     commands.append(multiversx_sdk_cli.cli_validators.setup_parser(args, subparsers))

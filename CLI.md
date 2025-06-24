@@ -23,7 +23,7 @@ See:
 
 
 COMMAND GROUPS:
-  {address,contract,tx,validator,ledger,wallet,validator-wallet,deps,config,localnet,data,staking-provider,dns,faucet,multisig,governance,env,get}
+  {config-wallet,contract,tx,validator,ledger,wallet,validator-wallet,deps,config,localnet,data,staking-provider,dns,faucet,multisig,governance,env,get}
 
 TOP-LEVEL OPTIONS:
   -h, --help            show this help message and exit
@@ -35,7 +35,7 @@ TOP-LEVEL OPTIONS:
 ----------------------
 COMMAND GROUPS summary
 ----------------------
-address                        Configure MultiversX CLI to use a default wallet.
+config-wallet                  Configure MultiversX CLI to use a default wallet.
 contract                       Deploy, upgrade and interact with Smart Contracts
 tx                             Create and broadcast Transactions
 validator                      Stake, UnStake, UnBond, Unjail and other actions useful for Validators
@@ -5783,12 +5783,12 @@ options:
   -h, --help  show this help message and exit
 
 ```
-## Group **Address**
+## Group **ConfigWallet**
 
 
 ```
-$ mxpy address --help
-usage: mxpy address COMMAND [-h] ...
+$ mxpy config-wallet --help
+usage: mxpy config-wallet COMMAND [-h] ...
 
 Configure MultiversX CLI to use a default wallet.
 
@@ -5801,149 +5801,149 @@ OPTIONS:
 ----------------
 COMMANDS summary
 ----------------
-new                            Creates a new address config and sets it as the active address.
-list                           List available addresses
-dump                           Dumps the active address.
-get                            Gets a config value from the active address.
-set                            Sets a config value for the active address.
-delete                         Deletes a config value from the active address.
-switch                         Switch to a different address.
-remove                         Deletes an address using the alias. No default address will be set. Use `address switch` to set a new address.
-reset                          Deletes the config file. No default address will be set.
+new                            Creates a new wallet config and sets it as the active wallet.
+list                           List configured wallets
+dump                           Dumps the active wallet.
+get                            Gets a config value from the specified wallet.
+set                            Sets a config value for the specified wallet.
+delete                         Deletes a config value from the specified wallet.
+switch                         Switch to a different wallet.
+remove                         Removes a wallet from the config using the alias. No default wallet will be set. Use `config-wallet switch` to set a new wallet.
+reset                          Deletes the config file. No default wallet will be set.
 
 ```
-### Address.New
+### ConfigWallet.New
 
 
 ```
-$ mxpy address new --help
-usage: mxpy address new [-h] ...
+$ mxpy config-wallet new --help
+usage: mxpy config-wallet new [-h] ...
 
-Creates a new address config and sets it as the active address.
+Creates a new wallet config and sets it as the active wallet.
 
 positional arguments:
   alias                the alias of the wallet
 
 options:
   -h, --help           show this help message and exit
-  --template TEMPLATE  an address config from which to create the new address
+  --path PATH          the absolute path to the wallet file
+  --template TEMPLATE  a wallet config from which to create the new config
 
 ```
-### Address.List
+### ConfigWallet.List
 
 
 ```
-$ mxpy address list --help
-usage: mxpy address list [-h] ...
+$ mxpy config-wallet list --help
+usage: mxpy config-wallet list [-h] ...
 
-List available addresses
+List configured wallets
 
 options:
   -h, --help  show this help message and exit
 
 ```
-### Address.Dump
+### ConfigWallet.Dump
 
 
 ```
-$ mxpy address dump --help
-usage: mxpy address dump [-h] ...
+$ mxpy config-wallet dump --help
+usage: mxpy config-wallet dump [-h] ...
 
-Dumps the active address.
+Dumps the active wallet.
 
 options:
   -h, --help  show this help message and exit
 
 ```
-### Address.Get
+### ConfigWallet.Get
 
 
 ```
-$ mxpy address get --help
-usage: mxpy address get [-h] ...
+$ mxpy config-wallet get --help
+usage: mxpy config-wallet get [-h] ...
 
-Gets a config value from the active address.
+Gets a config value from the specified wallet.
 
 positional arguments:
-  value       the value to get from the active address (e.g. path)
+  value          the value to get from the specified wallet (e.g. path)
 
 options:
-  -h, --help  show this help message and exit
+  -h, --help     show this help message and exit
+  --alias ALIAS  the alias of the wallet
 
 ```
-### Address.Set
+### ConfigWallet.Set
 
 
 ```
-$ mxpy address set --help
-usage: mxpy address set [-h] ...
+$ mxpy config-wallet set --help
+usage: mxpy config-wallet set [-h] ...
 
-Sets a config value for the active address.
+Sets a config value for the specified wallet.
 
 positional arguments:
-  key         the key to set for the active address (e.g. index)
-  value       the value to set for the specified key
+  key            the key to set for the specified wallet (e.g. index)
+  value          the value to set for the specified key
 
 options:
-  -h, --help  show this help message and exit
+  -h, --help     show this help message and exit
+  --alias ALIAS  the alias of the wallet
 
 ```
-### Address.Set
+### ConfigWallet.Set
 
 
 ```
-$ mxpy address delete --help
-usage: mxpy address delete [-h] ...
+$ mxpy config-wallet delete --help
+usage: mxpy config-wallet delete [-h] ...
 
-Deletes a config value from the active address.
+Deletes a config value from the specified wallet.
 
 positional arguments:
-  value       the value to delete for the active address
+  value          the value to delete for the specified address
 
 options:
-  -h, --help  show this help message and exit
+  -h, --help     show this help message and exit
+  --alias ALIAS  the alias of the wallet
 
 ```
-### Address.Switch
+### ConfigWallet.Switch
 
 
 ```
-$ mxpy address switch --help
-usage: mxpy address switch [-h] ...
+$ mxpy config-wallet switch --help
+usage: mxpy config-wallet switch [-h] ...
 
-Switch to a different address.
-
-positional arguments:
-  alias       the alias of the wallet
+Switch to a different wallet.
 
 options:
-  -h, --help  show this help message and exit
+  -h, --help     show this help message and exit
+  --alias ALIAS  the alias of the wallet
 
 ```
-### Address.Remove
+### ConfigWallet.Remove
 
 
 ```
-$ mxpy address remove --help
-usage: mxpy address remove [-h] ...
+$ mxpy config-wallet remove --help
+usage: mxpy config-wallet remove [-h] ...
 
-Deletes an address using the alias. No default address will be set. Use `address switch` to set a new address.
-
-positional arguments:
-  alias       the alias of the wallet
+Removes a wallet from the config using the alias. No default wallet will be set. Use `config-wallet switch` to set a new wallet.
 
 options:
-  -h, --help  show this help message and exit
+  -h, --help     show this help message and exit
+  --alias ALIAS  the alias of the wallet
 
 ```
-### Address.Reset
+### ConfigWallet.Reset
 
 
 ```
-$ mxpy address reset --help
+$ mxpy config-wallet reset --help
 usage: mxpy address reset [-h] ...
 
-Deletes the config file. No default address will be set.
+Deletes the config file. No default wallet will be set.
 
 options:
   -h, --help  show this help message and exit
