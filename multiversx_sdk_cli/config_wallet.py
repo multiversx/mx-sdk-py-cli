@@ -110,7 +110,7 @@ def _write_file(data: dict[str, Any]):
     write_json_file(str(env_path), data)
 
 
-def set_active(name: str):
+def switch_wallet(name: str):
     """Switches to the wallet configuration with the given name."""
     data = read_wallet_config_file()
     _guard_valid_wallet_name(data, name)
@@ -124,14 +124,11 @@ def _guard_valid_wallet_name(env: Any, name: str):
         raise UnknownWalletAliasError(name)
 
 
-def create_new_wallet_config(name: str, path: Optional[str] = None, template: Optional[str] = None):
-    """Creates a new wallet config with the given name and optional template and sets it as the default wallet."""
+def create_new_wallet_config(name: str, path: Optional[str] = None):
+    """Creates a new wallet config with the given name and sets it as the default wallet."""
     data = read_wallet_config_file()
     _guard_alias_unique(data, name)
     new_wallet = {}
-    if template:
-        _guard_valid_wallet_name(data, template)
-        new_wallet = data["wallets"][template]
 
     if path:
         new_wallet["path"] = path
@@ -143,8 +140,8 @@ def create_new_wallet_config(name: str, path: Optional[str] = None, template: Op
 
 
 def _guard_alias_unique(env: Any, name: str):
-    envs = env.get("wallets", {})
-    if name in envs:
+    wallets = env.get("wallets", {})
+    if name in wallets:
         raise AliasAlreadyExistsError(name)
 
 
