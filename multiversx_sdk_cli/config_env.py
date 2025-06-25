@@ -46,22 +46,47 @@ def get_defaults() -> dict[str, str]:
 
 @cache
 def get_address_hrp() -> str:
-    return get_value("default_address_hrp")
+    """
+    Returns the HRP for the active environment.
+    If not set, it returns the default value.
+    """
+    data = read_env_file()
+    active_env_name: str = data.get("active", "default")
+    return get_value("default_address_hrp", active_env_name)
 
 
 @cache
 def get_proxy_url() -> str:
-    return get_value("proxy_url")
+    """
+    Returns the proxy URL for the active environment.
+    If not set, it returns an empty string.
+    """
+    data = read_env_file()
+    active_env_name: str = data.get("active", "default")
+    return get_value("proxy_url", active_env_name)
 
 
 @cache
 def get_explorer_url() -> str:
-    return get_value("explorer_url")
+    """
+    Returns the explorer URL for the active environment.
+    If not set, it returns an empty string.
+    """
+    data = read_env_file()
+    active_env_name: str = data.get("active", "default")
+    return get_value("explorer_url", active_env_name)
 
 
 @cache
 def get_confirmation_setting() -> bool:
-    confirmation_value = get_value("ask_confirmation")
+    """
+    Returns the confirmation setting for the active environment.
+    If not set, it defaults to False.
+    """
+    data = read_env_file()
+    active_env_name: str = data.get("active", "default")
+
+    confirmation_value = get_value("ask_confirmation", active_env_name)
     if confirmation_value.lower() in ["true", "yes", "1"]:
         return True
     elif confirmation_value.lower() in ["false", "no", "0"]:
@@ -71,11 +96,17 @@ def get_confirmation_setting() -> bool:
 
 
 @cache
-def get_value(name: str) -> str:
+def get_value(name: str, env_name: str) -> str:
     _guard_valid_name(name)
-    data = get_active_env()
+    data = read_env_file()
+
+    envs = data.get("environments", {})
+    env = envs.get(env_name, None)
+    if env is None:
+        raise UnknownEnvironmentError(env_name)
+
     default_value = get_defaults()[name]
-    value = data.get(name, default_value)
+    value = env.get(name, default_value)
     assert isinstance(value, str)
     return value
 
@@ -109,13 +140,18 @@ def resolve_env_path() -> Path:
     return GLOBAL_ENV_PATH
 
 
-def set_value(name: str, value: Any):
+def set_value(name: str, value: str, env_name: str):
     _guard_valid_name(name)
     data = read_env_file()
-    active_env = data.get("active", "default")
-    data.setdefault("environments", {})
-    data["environments"].setdefault(active_env, {})
-    data["environments"][active_env][name] = value
+
+    envs = data.get("environments", {})
+    env = envs.get(env_name, None)
+    if env is None:
+        raise UnknownEnvironmentError(env_name)
+
+    env[name] = value
+    envs[env_name] = env
+    data["environments"] = envs
     write_file(data)
 
 
@@ -124,14 +160,19 @@ def write_file(data: dict[str, Any]):
     write_json_file(str(env_path), data)
 
 
-def delete_value(name: str):
+def delete_value(name: str, env_name: str):
     """Deletes a key-value pair of the active env."""
     _guard_valid_env_deletion(name)
     data = read_env_file()
-    active_env = data.get("active", "default")
-    data.setdefault("environments", {})
-    data["environments"].setdefault(active_env, {})
-    del data["environments"][active_env][name]
+
+    envs = data.get("environments", {})
+    env = envs.get(env_name, None)
+    if env is None:
+        raise UnknownEnvironmentError(env_name)
+
+    del env[name]
+    envs[env_name] = env
+    data["environments"] = envs
     write_file(data)
 
 

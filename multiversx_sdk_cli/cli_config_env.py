@@ -30,7 +30,7 @@ def setup_parser(subparsers: Any) -> Any:
     sub = cli_shared.add_command_subparser(
         subparsers, "config-env", "new", "Creates a new environment and sets it as the active environment."
     )
-    _add_name_arg(sub)
+    sub.add_argument("name", type=str, help="the name of the new environment")
     sub.add_argument(
         "--template",
         required=False,
@@ -39,16 +39,18 @@ def setup_parser(subparsers: Any) -> Any:
     sub.set_defaults(func=new_env)
 
     sub = cli_shared.add_command_subparser(
-        subparsers, "config-env", "get", "Gets an env value from the active environment."
+        subparsers, "config-env", "get", "Gets an env value from the specified environment."
     )
     _add_name_arg(sub)
+    _add_env_arg(sub)
     sub.set_defaults(func=get_env_value)
 
     sub = cli_shared.add_command_subparser(
-        subparsers, "config-env", "set", "Sets an env value for the active environment."
+        subparsers, "config-env", "set", "Sets an env value for the specified environment."
     )
     _add_name_arg(sub)
     sub.add_argument("value", type=str, help="the new value")
+    _add_env_arg(sub)
     sub.set_defaults(func=set_env_value)
 
     sub = cli_shared.add_command_subparser(subparsers, "config-env", "dump", "Dumps the active environment.")
@@ -61,13 +63,14 @@ def setup_parser(subparsers: Any) -> Any:
     sub.set_defaults(func=dump)
 
     sub = cli_shared.add_command_subparser(
-        subparsers, "config-env", "delete", "Deletes an env value from the active environment."
+        subparsers, "config-env", "delete", "Deletes an env value from the specified environment."
     )
     _add_name_arg(sub)
+    _add_env_arg(sub)
     sub.set_defaults(func=delete_env_value)
 
     sub = cli_shared.add_command_subparser(subparsers, "config-env", "switch", "Switch to a different environment.")
-    _add_name_arg(sub)
+    _add_env_arg(sub)
     sub.set_defaults(func=switch_env)
 
     sub = cli_shared.add_command_subparser(subparsers, "config-env", "list", "List available environments")
@@ -77,9 +80,9 @@ def setup_parser(subparsers: Any) -> Any:
         subparsers,
         "config-env",
         "remove",
-        "Deletes an environment from the env file. Will switch to default env.",
+        "Deletes an environment from the env file. Use `mxpy config-env switch` to move to another env.",
     )
-    sub.add_argument("environment", type=str, help="The environment to remove from env file.")
+    _add_env_arg(sub)
     sub.set_defaults(func=remove_env_entry)
 
     sub = cli_shared.add_command_subparser(
@@ -98,6 +101,10 @@ def _add_name_arg(sub: Any):
     sub.add_argument("name", type=str, help="the name of the configuration entry")
 
 
+def _add_env_arg(sub: Any):
+    sub.add_argument("--env", required=True, type=str, help="the name of the environment to operate on")
+
+
 def dump(args: Any):
     if args.default:
         dump_out_json(get_defaults())
@@ -106,16 +113,16 @@ def dump(args: Any):
 
 
 def get_env_value(args: Any):
-    value = get_value(args.name)
+    value = get_value(args.name, args.env)
     print(value)
 
 
 def set_env_value(args: Any):
-    set_value(args.name, args.value)
+    set_value(args.name, args.value, args.env)
 
 
 def delete_env_value(args: Any):
-    delete_value(args.name)
+    delete_value(args.name, args.env)
 
 
 def new_env(args: Any):
@@ -124,7 +131,7 @@ def new_env(args: Any):
 
 
 def switch_env(args: Any):
-    set_active(args.name)
+    set_active(args.env)
     dump_out_json(get_active_env())
 
 
@@ -139,7 +146,7 @@ def remove_env_entry(args: Any):
         logger.info("Environment file not found. Aborting...")
         return
 
-    delete_env(args.environment)
+    delete_env(args.env)
 
 
 def delete_env_file(args: Any):

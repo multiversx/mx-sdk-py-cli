@@ -5651,13 +5651,13 @@ OPTIONS:
 COMMANDS summary
 ----------------
 new                            Creates a new environment and sets it as the active environment.
-get                            Gets an env value from the active environment.
-set                            Sets an env value for the active environment.
+get                            Gets an env value from the specified environment.
+set                            Sets an env value for the specified environment.
 dump                           Dumps the active environment.
-delete                         Deletes an env value from the active environment.
+delete                         Deletes an env value from the specified environment.
 switch                         Switch to a different environment.
 list                           List available environments
-remove                         Deletes an environment from the env file. Will switch to default env.
+remove                         Deletes an environment from the env file. Use `mxpy config-env switch` to move to another env.
 reset                          Deletes the environment file. Default env will be used.
 
 ```
@@ -5671,7 +5671,7 @@ usage: mxpy config-env new [-h] ...
 Creates a new environment and sets it as the active environment.
 
 positional arguments:
-  name                 the name of the configuration entry
+  name                 the name of the new environment
 
 options:
   -h, --help           show this help message and exit
@@ -5685,7 +5685,7 @@ options:
 $ mxpy config-env set --help
 usage: mxpy config-env set [-h] ...
 
-Sets an env value for the active environment.
+Sets an env value for the specified environment.
 
 positional arguments:
   name        the name of the configuration entry
@@ -5693,6 +5693,7 @@ positional arguments:
 
 options:
   -h, --help  show this help message and exit
+  --env ENV   the name of the environment to operate on
 
 ```
 ### ConfigEnv.Get
@@ -5702,13 +5703,14 @@ options:
 $ mxpy config-env get --help
 usage: mxpy config-env get [-h] ...
 
-Gets an env value from the active environment.
+Gets an env value from the specified environment.
 
 positional arguments:
   name        the name of the configuration entry
 
 options:
   -h, --help  show this help message and exit
+  --env ENV   the name of the environment to operate on
 
 ```
 ### ConfigEnv.Dump
@@ -5734,11 +5736,9 @@ usage: mxpy config-env switch [-h] ...
 
 Switch to a different environment.
 
-positional arguments:
-  name        the name of the configuration entry
-
 options:
   -h, --help  show this help message and exit
+  --env ENV   the name of the environment to operate on
 
 ```
 ### ConfigEnv.List
@@ -5761,13 +5761,11 @@ options:
 $ mxpy config-env remove --help
 usage: mxpy config-env remove [-h] ...
 
-Deletes an environment from the env file. Will switch to default env.
-
-positional arguments:
-  environment  The environment to remove from env file.
+Deletes an environment from the env file. Use `mxpy config-env switch` to move to another env.
 
 options:
-  -h, --help   show this help message and exit
+  -h, --help  show this help message and exit
+  --env ENV   the name of the environment to operate on
 
 ```
 ### ConfigEnv.Reset
