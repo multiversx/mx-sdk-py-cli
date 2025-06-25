@@ -104,12 +104,6 @@ def set_value(name: str, value: str, alias: str):
     data["wallets"] = available_wallets
     _write_file(data)
 
-    # active_env = data.get("active", "default")
-    # data.setdefault("wallets", {})
-    # data["wallets"].setdefault(active_env, {})
-    # data["wallets"][active_env][name] = value
-    # _write_file(data)
-
 
 def _write_file(data: dict[str, Any]):
     env_path = resolve_wallet_config_path()
@@ -169,12 +163,6 @@ def delete_config_value(key: str, alias: str):
     available_wallets[alias] = wallet
     data["wallets"] = available_wallets
     _write_file(data)
-
-    # active_env = data.get("active", "default")
-    # data.setdefault("wallets", {})
-    # data["wallets"].setdefault(active_env, {})
-    # del data["wallets"][active_env][key]
-    # _write_file(data)
 
 
 def delete_alias(name: str):
