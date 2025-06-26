@@ -52,6 +52,9 @@ def get_address_hrp() -> str:
     """
     data = read_env_file()
     active_env_name: str = data.get("active", "default")
+
+    if active_env_name == "default":
+        return get_defaults()["default_address_hrp"]
     return get_value("default_address_hrp", active_env_name)
 
 
@@ -63,6 +66,9 @@ def get_proxy_url() -> str:
     """
     data = read_env_file()
     active_env_name: str = data.get("active", "default")
+
+    if active_env_name == "default":
+        return get_defaults()["proxy_url"]
     return get_value("proxy_url", active_env_name)
 
 
@@ -74,6 +80,9 @@ def get_explorer_url() -> str:
     """
     data = read_env_file()
     active_env_name: str = data.get("active", "default")
+
+    if active_env_name == "default":
+        return get_defaults()["explorer_url"]
     return get_value("explorer_url", active_env_name)
 
 
@@ -85,6 +94,9 @@ def get_confirmation_setting() -> bool:
     """
     data = read_env_file()
     active_env_name: str = data.get("active", "default")
+
+    if active_env_name == "default":
+        return get_defaults()["ask_confirmation"].lower() in ["true", "yes", "1"]
 
     confirmation_value = get_value("ask_confirmation", active_env_name)
     if confirmation_value.lower() in ["true", "yes", "1"]:
