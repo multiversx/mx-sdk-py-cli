@@ -23,7 +23,7 @@ See:
 
 
 COMMAND GROUPS:
-  {config-wallet,contract,tx,validator,ledger,wallet,validator-wallet,deps,config,localnet,data,staking-provider,dns,faucet,multisig,governance,env,get}
+  {config-wallet,contract,tx,validator,ledger,wallet,validator-wallet,deps,config,localnet,data,staking-provider,dns,faucet,multisig,governance,config-env,get}
 
 TOP-LEVEL OPTIONS:
   -h, --help            show this help message and exit
@@ -51,7 +51,7 @@ dns                            Operations related to the Domain Name Service
 faucet                         Get xEGLD on Devnet or Testnet
 multisig                       Deploy and interact with the Multisig Smart Contract
 governance                     Propose, vote and interact with the governance contract.
-env                            Configure MultiversX CLI to use specific environment values.
+config-env                     Configure MultiversX CLI to use specific environment values.
 get                            Get info from the network.
 
 ```
@@ -5632,12 +5632,12 @@ options:
   --proxy PROXY        🔗 the URL of the proxy
 
 ```
-## Group **Environment**
+## Group **ConfigEnv**
 
 
 ```
-$ mxpy env --help
-usage: mxpy env COMMAND [-h] ...
+$ mxpy config-env --help
+usage: mxpy config-env COMMAND [-h] ...
 
 Configure MultiversX CLI to use specific environment values.
 
@@ -5651,41 +5651,41 @@ OPTIONS:
 COMMANDS summary
 ----------------
 new                            Creates a new environment and sets it as the active environment.
-get                            Gets an env value from the active environment.
-set                            Sets an env value for the active environment.
+get                            Gets an env value from the specified environment.
+set                            Sets an env value for the specified environment.
 dump                           Dumps the active environment.
-delete                         Deletes an env value from the active environment.
+delete                         Deletes an env value from the specified environment.
 switch                         Switch to a different environment.
 list                           List available environments
-remove                         Deletes an environment from the env file. Will switch to default env.
+remove                         Deletes an environment from the env file. Use `mxpy config-env switch` to move to another env.
 reset                          Deletes the environment file. Default env will be used.
 
 ```
-### Environment.New
+### ConfigEnv.New
 
 
 ```
-$ mxpy env new --help
-usage: mxpy env new [-h] ...
+$ mxpy config-env new --help
+usage: mxpy config-env new [-h] ...
 
 Creates a new environment and sets it as the active environment.
 
 positional arguments:
-  name                 the name of the configuration entry
+  name                 the name of the new environment
 
 options:
   -h, --help           show this help message and exit
   --template TEMPLATE  an environment from which to create the new environment
 
 ```
-### Environment.Set
+### ConfigEnv.Set
 
 
 ```
-$ mxpy env set --help
-usage: mxpy env set [-h] ...
+$ mxpy config-env set --help
+usage: mxpy config-env set [-h] ...
 
-Sets an env value for the active environment.
+Sets an env value for the specified environment.
 
 positional arguments:
   name        the name of the configuration entry
@@ -5693,30 +5693,32 @@ positional arguments:
 
 options:
   -h, --help  show this help message and exit
+  --env ENV   the name of the environment to operate on
 
 ```
-### Environment.Get
+### ConfigEnv.Get
 
 
 ```
-$ mxpy env get --help
-usage: mxpy env get [-h] ...
+$ mxpy config-env get --help
+usage: mxpy config-env get [-h] ...
 
-Gets an env value from the active environment.
+Gets an env value from the specified environment.
 
 positional arguments:
   name        the name of the configuration entry
 
 options:
   -h, --help  show this help message and exit
+  --env ENV   the name of the environment to operate on
 
 ```
-### Environment.Dump
+### ConfigEnv.Dump
 
 
 ```
-$ mxpy env dump --help
-usage: mxpy env dump [-h] ...
+$ mxpy config-env dump --help
+usage: mxpy config-env dump [-h] ...
 
 Dumps the active environment.
 
@@ -5725,28 +5727,26 @@ options:
   --default   dumps the default environment instead of the active one.
 
 ```
-### Environment.Switch
+### ConfigEnv.Switch
 
 
 ```
-$ mxpy env switch --help
-usage: mxpy env switch [-h] ...
+$ mxpy config-env switch --help
+usage: mxpy config-env switch [-h] ...
 
 Switch to a different environment.
 
-positional arguments:
-  name        the name of the configuration entry
-
 options:
   -h, --help  show this help message and exit
+  --env ENV   the name of the environment to operate on
 
 ```
-### Environment.List
+### ConfigEnv.List
 
 
 ```
-$ mxpy env list --help
-usage: mxpy env list [-h] ...
+$ mxpy config-env list --help
+usage: mxpy config-env list [-h] ...
 
 List available environments
 
@@ -5754,28 +5754,26 @@ options:
   -h, --help  show this help message and exit
 
 ```
-### Environment.Remove
+### ConfigEnv.Remove
 
 
 ```
-$ mxpy env remove --help
-usage: mxpy env remove [-h] ...
+$ mxpy config-env remove --help
+usage: mxpy config-env remove [-h] ...
 
-Deletes an environment from the env file. Will switch to default env.
-
-positional arguments:
-  environment  The environment to remove from env file.
+Deletes an environment from the env file. Use `mxpy config-env switch` to move to another env.
 
 options:
-  -h, --help   show this help message and exit
+  -h, --help  show this help message and exit
+  --env ENV   the name of the environment to operate on
 
 ```
-### Environment.Reset
+### ConfigEnv.Reset
 
 
 ```
-$ mxpy env reset --help
-usage: mxpy env reset [-h] ...
+$ mxpy config-env reset --help
+usage: mxpy config-env reset [-h] ...
 
 Deletes the environment file. Default env will be used.
 

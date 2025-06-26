@@ -28,6 +28,7 @@ from multiversx_sdk_cli.cli_password import (
     load_password,
     load_relayer_password,
 )
+from multiversx_sdk_cli.config_env import MxpyEnv, get_address_hrp
 from multiversx_sdk_cli.config_wallet import (
     get_active_wallet,
     read_wallet_config_file,
@@ -38,7 +39,6 @@ from multiversx_sdk_cli.constants import (
     DEFAULT_TX_VERSION,
     TCS_SERVICE_ID,
 )
-from multiversx_sdk_cli.env import MxpyEnv, get_address_hrp
 from multiversx_sdk_cli.errors import (
     AddressConfigFileError,
     ArgumentsNotProvidedError,

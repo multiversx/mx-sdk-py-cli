@@ -14,8 +14,8 @@ from multiversx_sdk_cli.args_validation import (
     validate_chain_id_args,
     validate_transaction_args,
 )
+from multiversx_sdk_cli.config_env import get_address_hrp
 from multiversx_sdk_cli.constants import ADDRESS_ZERO_HEX
-from multiversx_sdk_cli.env import get_address_hrp
 from multiversx_sdk_cli.transactions import TransactionsController
 
 MaxNumShards = 256
