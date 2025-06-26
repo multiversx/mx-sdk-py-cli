@@ -201,8 +201,8 @@ generate() {
     command "ConfigWallet.Dump" "config-wallet dump"
     command "ConfigWallet.Get" "config-wallet get"
     command "ConfigWallet.Set" "config-wallet set"
-    command "ConfigWallet.Set" "config-wallet delete"
     command "ConfigWallet.Switch" "config-wallet switch"
+    command "ConfigWallet.Delete" "config-wallet delete"
     command "ConfigWallet.Remove" "config-wallet remove"
     command "ConfigWallet.Reset" "config-wallet reset"
 

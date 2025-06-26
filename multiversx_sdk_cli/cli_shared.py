@@ -382,7 +382,7 @@ def load_wallet_by_alias(alias: str, hrp: str) -> Account:
         raise UnknownWalletAliasError(alias)
 
     logger.info(f"Using sender [{alias}] from wallet config.")
-    return _load_wallet_from_address_config(wallet=wallet, hrp=hrp)
+    return _load_wallet_from_wallet_config(wallet=wallet, hrp=hrp)
 
 
 def load_default_wallet(hrp: str) -> Account:
@@ -394,10 +394,10 @@ def load_default_wallet(hrp: str) -> Account:
     alias_of_default_wallet = read_wallet_config_file().get("active", "")
     logger.info(f"Using sender [{alias_of_default_wallet}] from wallet config.")
 
-    return _load_wallet_from_address_config(wallet=active_wallet, hrp=hrp)
+    return _load_wallet_from_wallet_config(wallet=active_wallet, hrp=hrp)
 
 
-def _load_wallet_from_address_config(wallet: dict[str, str], hrp: str) -> Account:
+def _load_wallet_from_wallet_config(wallet: dict[str, str], hrp: str) -> Account:
     wallet_path = wallet.get("path", None)
     if not wallet_path:
         raise AddressConfigFileError("'path' field must be set in the wallet config.")

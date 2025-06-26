@@ -30,7 +30,7 @@ TOP-LEVEL OPTIONS:
   -v, --version         show program's version number and exit
   --verbose
   --log-level {debug,info,warning,error}
-                        default: debug
+                        default: info
 
 ----------------------
 COMMAND GROUPS summary
@@ -5820,12 +5820,11 @@ usage: mxpy config-wallet new [-h] ...
 Creates a new wallet config and sets it as the active wallet.
 
 positional arguments:
-  alias                the alias of the wallet
+  alias        the alias of the wallet
 
 options:
-  -h, --help           show this help message and exit
-  --path PATH          the absolute path to the wallet file
-  --template TEMPLATE  a wallet config from which to create the new config
+  -h, --help   show this help message and exit
+  --path PATH  the absolute path to the wallet file
 
 ```
 ### ConfigWallet.List
@@ -5889,7 +5888,21 @@ options:
   --alias ALIAS  the alias of the wallet
 
 ```
-### ConfigWallet.Set
+### ConfigWallet.Switch
+
+
+```
+$ mxpy config-wallet switch --help
+usage: mxpy config-wallet switch [-h] ...
+
+Switch to a different wallet.
+
+options:
+  -h, --help     show this help message and exit
+  --alias ALIAS  the alias of the wallet
+
+```
+### ConfigWallet.Delete
 
 
 ```
@@ -5900,20 +5913,6 @@ Deletes a config value from the specified wallet.
 
 positional arguments:
   value          the value to delete for the specified address
-
-options:
-  -h, --help     show this help message and exit
-  --alias ALIAS  the alias of the wallet
-
-```
-### ConfigWallet.Switch
-
-
-```
-$ mxpy config-wallet switch --help
-usage: mxpy config-wallet switch [-h] ...
-
-Switch to a different wallet.
 
 options:
   -h, --help     show this help message and exit
@@ -5939,7 +5938,7 @@ options:
 
 ```
 $ mxpy config-wallet reset --help
-usage: mxpy address reset [-h] ...
+usage: mxpy config-wallet reset [-h] ...
 
 Deletes the config file. No default wallet will be set.
 
