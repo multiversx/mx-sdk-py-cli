@@ -44,18 +44,23 @@ def get_defaults() -> dict[str, str]:
     }
 
 
+def _get_env_value(key: str) -> str:
+    """Returns the value of a key for the active environment."""
+    data = read_env_file()
+    active_env_name: str = data.get("active", "default")
+
+    if active_env_name == "default":
+        return get_defaults()[key]
+    return get_value(key, active_env_name)
+
+
 @cache
 def get_address_hrp() -> str:
     """
     Returns the HRP for the active environment.
     If not set, it returns the default value.
     """
-    data = read_env_file()
-    active_env_name: str = data.get("active", "default")
-
-    if active_env_name == "default":
-        return get_defaults()["default_address_hrp"]
-    return get_value("default_address_hrp", active_env_name)
+    return _get_env_value("default_address_hrp")
 
 
 @cache
@@ -64,12 +69,7 @@ def get_proxy_url() -> str:
     Returns the proxy URL for the active environment.
     If not set, it returns an empty string.
     """
-    data = read_env_file()
-    active_env_name: str = data.get("active", "default")
-
-    if active_env_name == "default":
-        return get_defaults()["proxy_url"]
-    return get_value("proxy_url", active_env_name)
+    return _get_env_value("proxy_url")
 
 
 @cache
@@ -78,12 +78,7 @@ def get_explorer_url() -> str:
     Returns the explorer URL for the active environment.
     If not set, it returns an empty string.
     """
-    data = read_env_file()
-    active_env_name: str = data.get("active", "default")
-
-    if active_env_name == "default":
-        return get_defaults()["explorer_url"]
-    return get_value("explorer_url", active_env_name)
+    return _get_env_value("explorer_url")
 
 
 @cache
@@ -92,13 +87,7 @@ def get_confirmation_setting() -> bool:
     Returns the confirmation setting for the active environment.
     If not set, it defaults to False.
     """
-    data = read_env_file()
-    active_env_name: str = data.get("active", "default")
-
-    if active_env_name == "default":
-        return get_defaults()["ask_confirmation"].lower() in ["true", "yes", "1"]
-
-    confirmation_value = get_value("ask_confirmation", active_env_name)
+    confirmation_value = _get_env_value("ask_confirmation")
     if confirmation_value.lower() in ["true", "yes", "1"]:
         return True
     elif confirmation_value.lower() in ["false", "no", "0"]:
