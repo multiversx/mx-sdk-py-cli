@@ -18,7 +18,7 @@ from multiversx_sdk_cli.config_env import (
 from multiversx_sdk_cli.utils import dump_out_json
 from multiversx_sdk_cli.ux import confirm_continuation
 
-logger = logging.getLogger("cli.env")
+logger = logging.getLogger("cli.config_env")
 
 
 def setup_parser(subparsers: Any) -> Any:
@@ -80,7 +80,7 @@ def setup_parser(subparsers: Any) -> Any:
         subparsers,
         "config-env",
         "remove",
-        "Deletes an environment from the env file. Use `mxpy config-env switch` to move to another env.",
+        "Deletes an environment from the env file. Use `mxpy config-env switch` to switch to another env.",
     )
     _add_env_arg(sub)
     sub.set_defaults(func=remove_env_entry)
