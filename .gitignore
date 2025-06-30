@@ -30,3 +30,5 @@ venv.bak/
 typings
 
 multiversx_sdk_cli/tests/testdata-out
+
+.DS_store

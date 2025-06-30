@@ -270,6 +270,7 @@ def test_contract_flow(capsys: Any):
 
 
 def test_contract_deploy_without_required_arguments():
+    """This test passes with an unaltered config. If proxy is set in the config, the test will fail due to mxpy fetching the nonce and the chain ID."""
     alice = f"{parent}/testdata/alice.pem"
     adder = f"{parent}/testdata/adder.wasm"
 

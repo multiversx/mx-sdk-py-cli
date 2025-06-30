@@ -1,3 +1,5 @@
+from pathlib import Path
+
 VM_TYPE_SYSTEM = "0001"
 VM_TYPE_WASM_VM = "0500"
 SC_HEX_PUBKEY_PREFIX = "0" * 16
@@ -19,3 +21,14 @@ MIN_GAS_LIMIT = 50000
 TCS_SERVICE_ID = "MultiversXTCSService"
 EXTRA_GAS_LIMIT_FOR_GUARDED_TRANSACTIONS = 50_000
 EXTRA_GAS_LIMIT_FOR_RELAYED_TRANSACTIONS = 50_000
+
+HEX_PREFIX = "0x"
+FALSE_STR_LOWER = "false"
+TRUE_STR_LOWER = "true"
+STR_PREFIX = "str:"
+ADDRESS_PREFIX = "addr:"
+MAINCHAIN_ADDRESS_HRP = "erd"
+
+SDK_PATH = Path("~/multiversx-sdk").expanduser().resolve()
+
+LOG_LEVELS = ["debug", "info", "warning", "error"]

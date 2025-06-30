@@ -18,7 +18,6 @@ from multiversx_sdk.abi import Abi
 
 from multiversx_sdk_cli import cli_shared, utils
 from multiversx_sdk_cli.args_validation import (
-    ensure_wallet_args_are_provided,
     validate_broadcast_args,
     validate_chain_id_args,
     validate_proxy_argument,
@@ -26,6 +25,7 @@ from multiversx_sdk_cli.args_validation import (
 )
 from multiversx_sdk_cli.cli_output import CLIOutputBuilder
 from multiversx_sdk_cli.config import get_config_for_network_providers
+from multiversx_sdk_cli.config_env import MxpyEnv
 from multiversx_sdk_cli.constants import NUMBER_OF_SHARDS
 from multiversx_sdk_cli.contract_verification import trigger_contract_verification
 from multiversx_sdk_cli.contracts import SmartContract
@@ -56,23 +56,13 @@ def setup_parser(args: list[str], subparsers: Any) -> Any:
     )
     _add_bytecode_arg(sub)
     _add_contract_abi_arg(sub)
-    _add_metadata_arg(sub)
+    cli_shared.add_metadata_arg(sub)
     cli_shared.add_outfile_arg(sub)
     cli_shared.add_wallet_args(args, sub)
     cli_shared.add_proxy_arg(sub)
     cli_shared.add_tx_args(args, sub, with_receiver=False, with_data=False)
     _add_arguments_arg(sub)
-    sub.add_argument(
-        "--wait-result",
-        action="store_true",
-        default=False,
-        help="signal to wait for the transaction result - only valid if --send is set",
-    )
-    sub.add_argument(
-        "--timeout",
-        default=100,
-        help="max num of seconds to wait for result" " - only valid if --wait-result is set",
-    )
+    cli_shared.add_wait_result_and_timeout_args(sub)
     cli_shared.add_broadcast_args(sub)
     cli_shared.add_guardian_wallet_args(args, sub)
     cli_shared.add_relayed_v3_wallet_args(args, sub)
@@ -94,17 +84,7 @@ def setup_parser(args: list[str], subparsers: Any) -> Any:
     _add_function_arg(sub)
     _add_arguments_arg(sub)
     cli_shared.add_token_transfers_args(sub)
-    sub.add_argument(
-        "--wait-result",
-        action="store_true",
-        default=False,
-        help="signal to wait for the transaction result - only valid if --send is set",
-    )
-    sub.add_argument(
-        "--timeout",
-        default=100,
-        help="max num of seconds to wait for result" " - only valid if --wait-result is set",
-    )
+    cli_shared.add_wait_result_and_timeout_args(sub)
     cli_shared.add_broadcast_args(sub)
     cli_shared.add_guardian_wallet_args(args, sub)
     cli_shared.add_relayed_v3_wallet_args(args, sub)
@@ -121,22 +101,12 @@ def setup_parser(args: list[str], subparsers: Any) -> Any:
     _add_contract_abi_arg(sub)
     cli_shared.add_outfile_arg(sub)
     _add_bytecode_arg(sub)
-    _add_metadata_arg(sub)
+    cli_shared.add_metadata_arg(sub)
     cli_shared.add_wallet_args(args, sub)
     cli_shared.add_proxy_arg(sub)
     cli_shared.add_tx_args(args, sub, with_receiver=False, with_data=False)
     _add_arguments_arg(sub)
-    sub.add_argument(
-        "--wait-result",
-        action="store_true",
-        default=False,
-        help="signal to wait for the transaction result - only valid if --send is set",
-    )
-    sub.add_argument(
-        "--timeout",
-        default=100,
-        help="max num of seconds to wait for result" " - only valid if --wait-result is set",
-    )
+    cli_shared.add_wait_result_and_timeout_args(sub)
     cli_shared.add_broadcast_args(sub)
     cli_shared.add_guardian_wallet_args(args, sub)
     cli_shared.add_relayed_v3_wallet_args(args, sub)
@@ -336,40 +306,12 @@ def _add_arguments_arg(sub: Any):
     )
 
 
-def _add_metadata_arg(sub: Any):
-    sub.add_argument(
-        "--metadata-not-upgradeable",
-        dest="metadata_upgradeable",
-        action="store_false",
-        help="‼ mark the contract as NOT upgradeable (default: upgradeable)",
-    )
-    sub.add_argument(
-        "--metadata-not-readable",
-        dest="metadata_readable",
-        action="store_false",
-        help="‼ mark the contract as NOT readable (default: readable)",
-    )
-    sub.add_argument(
-        "--metadata-payable",
-        dest="metadata_payable",
-        action="store_true",
-        help="‼ mark the contract as payable (default: not payable)",
-    )
-    sub.add_argument(
-        "--metadata-payable-by-sc",
-        dest="metadata_payable_by_sc",
-        action="store_true",
-        help="‼ mark the contract as payable by SC (default: not payable by SC)",
-    )
-    sub.set_defaults(metadata_upgradeable=True, metadata_payable=False)
-
-
 def build(args: Any):
     message = """This command cannot build smart contracts anymore.
 
 The primary tool for building smart contracts is `sc-meta`.
 To install `sc-meta` check out the documentation: https://docs.multiversx.com/sdk-and-tools/troubleshooting/rust-setup.
-After installing, use the `sc-meta all build` command. To lear more about `sc-meta`, check out this page: https://docs.multiversx.com/developers/meta/sc-meta-cli/#calling-build."""
+After installing, use the `sc-meta all build` command. To learn more about `sc-meta`, check out this page: https://docs.multiversx.com/developers/meta/sc-meta-cli/#calling-build."""
     show_warning(message)
 
 
@@ -377,7 +319,6 @@ def deploy(args: Any):
     logger.debug("deploy")
 
     validate_transaction_args(args)
-    ensure_wallet_args_are_provided(args)
     validate_broadcast_args(args)
     validate_chain_id_args(args)
 
@@ -387,7 +328,7 @@ def deploy(args: Any):
         args=args,
     )
 
-    chain_id = cli_shared.get_chain_id(args.chain, args.proxy)
+    chain_id = cli_shared.get_chain_id(args.proxy, args.chain)
     config = TransactionsFactoryConfig(chain_id)
 
     abi = Abi.load(Path(args.abi)) if args.abi else None
@@ -405,6 +346,7 @@ def deploy(args: Any):
         payable=args.metadata_payable,
         payable_by_sc=args.metadata_payable_by_sc,
         gas_limit=int(args.gas_limit),
+        gas_price=int(args.gas_price),
         value=int(args.value),
         nonce=sender.nonce,
         version=int(args.version),
@@ -416,7 +358,9 @@ def deploy(args: Any):
     contract_address = address_computer.compute_contract_address(deployer=sender.address, deployment_nonce=tx.nonce)
 
     logger.info("Contract address: %s", contract_address.to_bech32())
-    utils.log_explorer_contract_address(args.chain, contract_address.to_bech32())
+
+    cli_config = MxpyEnv.from_active_env()
+    utils.log_explorer_contract_address(args.chain, contract_address.to_bech32(), cli_config.explorer_url)
 
     _send_or_simulate(tx, contract_address, args)
 
@@ -425,7 +369,6 @@ def call(args: Any):
     logger.debug("call")
 
     validate_transaction_args(args)
-    ensure_wallet_args_are_provided(args)
     validate_broadcast_args(args)
     validate_chain_id_args(args)
 
@@ -435,7 +378,7 @@ def call(args: Any):
         args=args,
     )
 
-    chain_id = cli_shared.get_chain_id(args.chain, args.proxy)
+    chain_id = cli_shared.get_chain_id(args.proxy, args.chain)
     config = TransactionsFactoryConfig(chain_id)
 
     abi = Abi.load(Path(args.abi)) if args.abi else None
@@ -444,6 +387,10 @@ def call(args: Any):
     arguments, should_prepare_args = _get_contract_arguments(args)
     contract_address = Address.new_from_bech32(args.contract)
 
+    token_transfers = None
+    if args.token_transfers:
+        token_transfers = cli_shared.prepare_token_transfers(args.token_transfers)
+
     tx = contract.prepare_execute_transaction(
         caller=sender,
         contract=contract_address,
@@ -451,8 +398,9 @@ def call(args: Any):
         arguments=arguments,
         should_prepare_args=should_prepare_args,
         gas_limit=int(args.gas_limit),
+        gas_price=int(args.gas_price),
         value=int(args.value),
-        transfers=args.token_transfers,
+        token_transfers=token_transfers,
         nonce=sender.nonce,
         version=int(args.version),
         options=int(args.options),
@@ -466,7 +414,6 @@ def upgrade(args: Any):
     logger.debug("upgrade")
 
     validate_transaction_args(args)
-    ensure_wallet_args_are_provided(args)
     validate_broadcast_args(args)
     validate_chain_id_args(args)
 
@@ -476,7 +423,7 @@ def upgrade(args: Any):
         args=args,
     )
 
-    chain_id = cli_shared.get_chain_id(args.chain, args.proxy)
+    chain_id = cli_shared.get_chain_id(args.proxy, args.chain)
     config = TransactionsFactoryConfig(chain_id)
 
     abi = Abi.load(Path(args.abi)) if args.abi else None
@@ -496,6 +443,7 @@ def upgrade(args: Any):
         payable=args.metadata_payable,
         payable_by_sc=args.metadata_payable_by_sc,
         gas_limit=int(args.gas_limit),
+        gas_price=int(args.gas_price),
         value=int(args.value),
         nonce=sender.nonce,
         version=int(args.version),

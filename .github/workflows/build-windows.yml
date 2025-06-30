@@ -8,6 +8,9 @@ on:
     branches: [main, feat/*]
   workflow_dispatch:
 
+permissions:
+  contents: read
+
 jobs:
   build:
     name: Build and Test mxpy for ${{ matrix.os }}, python ${{ matrix.python-version }}
@@ -16,7 +19,7 @@ jobs:
 
     strategy:
       matrix:
-        os: [windows-2019]
+        os: [windows-2022]
         python-version: [3.11]
 
     steps:

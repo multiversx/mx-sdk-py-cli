@@ -12,7 +12,6 @@ from multiversx_sdk import (
 
 from multiversx_sdk_cli import cli_shared, errors, utils
 from multiversx_sdk_cli.args_validation import (
-    ensure_wallet_args_are_provided,
     validate_broadcast_args,
     validate_chain_id_args,
     validate_nonce_args,
@@ -389,13 +388,12 @@ def _add_common_arguments(args: list[str], sub: Any):
 def validate_arguments(args: Any):
     validate_nonce_args(args)
     validate_receiver_args(args)
-    ensure_wallet_args_are_provided(args)
     validate_broadcast_args(args)
     validate_chain_id_args(args)
 
 
 def _get_delegation_controller(args: Any):
-    chain_id = cli_shared.get_chain_id(args.chain, args.proxy)
+    chain_id = cli_shared.get_chain_id(args.proxy, args.chain)
     config = TransactionsFactoryConfig(chain_id)
     delegation = DelegationOperations(config)
     return delegation

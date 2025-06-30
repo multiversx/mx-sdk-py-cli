@@ -1,9 +1,13 @@
 import argparse
 import ast
+import base64
+import logging
 import sys
 from argparse import FileType
+from functools import cache
+from getpass import getpass
 from pathlib import Path
-from typing import Any, Text, Union, cast
+from typing import Any, Optional, Text, Union, cast
 
 from multiversx_sdk import (
     Account,
@@ -11,15 +15,24 @@ from multiversx_sdk import (
     ApiNetworkProvider,
     LedgerAccount,
     ProxyNetworkProvider,
+    Token,
+    TokenComputer,
+    TokenTransfer,
     Transaction,
 )
 
-from multiversx_sdk_cli import config, errors, utils
+from multiversx_sdk_cli import config, utils
 from multiversx_sdk_cli.cli_output import CLIOutputBuilder
 from multiversx_sdk_cli.cli_password import (
     load_guardian_password,
     load_password,
     load_relayer_password,
+)
+from multiversx_sdk_cli.config_env import MxpyEnv, get_address_hrp
+from multiversx_sdk_cli.config_wallet import (
+    get_active_wallet,
+    read_wallet_config_file,
+    resolve_wallet_config_path,
 )
 from multiversx_sdk_cli.constants import (
     DEFAULT_GAS_PRICE,
@@ -27,16 +40,24 @@ from multiversx_sdk_cli.constants import (
     TCS_SERVICE_ID,
 )
 from multiversx_sdk_cli.errors import (
+    AddressConfigFileError,
     ArgumentsNotProvidedError,
     BadUsage,
     IncorrectWalletError,
+    LedgerError,
+    NoWalletProvided,
+    UnknownWalletAliasError,
+    WalletError,
 )
 from multiversx_sdk_cli.guardian_relayer_data import GuardianRelayerData
 from multiversx_sdk_cli.interfaces import IAccount
 from multiversx_sdk_cli.simulation import Simulator
 from multiversx_sdk_cli.transactions import send_and_wait_for_result
 from multiversx_sdk_cli.utils import log_explorer_transaction
-from multiversx_sdk_cli.ux import show_warning
+from multiversx_sdk_cli.ux import confirm_continuation
+
+logger = logging.getLogger("cli_shared")
+
 
 trusted_cosigner_service_url_by_chain_id = {
     "1": "https://tools.multiversx.com/guardian",
@@ -106,12 +127,6 @@ def add_tx_args(
             default=None,
             help="# the nonce for the transaction. If not provided, is fetched from the network.",
         )
-        sub.add_argument(
-            "--recall-nonce",
-            action="store_true",
-            default=False,
-            help="⭮ whether to recall the nonce when creating the transaction (default: %(default)s). This argument is OBSOLETE.",
-        )
 
     if with_receiver:
         sub.add_argument("--receiver", required=False, help="🖄 the address of the receiver")
@@ -125,7 +140,7 @@ def add_tx_args(
     )
     sub.add_argument("--gas-limit", required=False, type=int, help="⛽ the gas limit")
 
-    sub.add_argument("--value", default="0", type=int, help="the value to transfer (default: %(default)s)")
+    sub.add_argument("--value", default=0, type=int, help="the value to transfer (default: %(default)s)")
 
     if with_data:
         sub.add_argument(
@@ -148,6 +163,7 @@ def add_tx_args(
 
 
 def add_wallet_args(args: list[str], sub: Any):
+    sub.add_argument("--sender", type=str, help="the alias of the wallet set in the address config")
     sub.add_argument(
         "--pem",
         required=False,
@@ -160,7 +176,7 @@ def add_wallet_args(args: list[str], sub: Any):
     )
     sub.add_argument(
         "--passfile",
-        help="🔑 a file containing keyfile's password, if keyfile provided. If not provided, you'll be prompted to enter the password.",
+        help="DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter the password.",
     )
     sub.add_argument(
         "--ledger",
@@ -204,7 +220,7 @@ def add_guardian_wallet_args(args: list[str], sub: Any):
     )
     sub.add_argument(
         "--guardian-passfile",
-        help="🔑 a file containing keyfile's password, if keyfile provided. If not provided, you'll be prompted to enter the password.",
+        help="DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter the password.",
     )
     sub.add_argument(
         "--guardian-ledger",
@@ -225,7 +241,7 @@ def add_relayed_v3_wallet_args(args: list[str], sub: Any):
     sub.add_argument("--relayer-keyfile", help="🔑 a JSON keyfile, if PEM not provided")
     sub.add_argument(
         "--relayer-passfile",
-        help="🔑 a file containing keyfile's password, if keyfile provided. If not provided, you'll be prompted to enter the password.",
+        help="DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter the password.",
     )
     sub.add_argument(
         "--relayer-ledger",
@@ -279,6 +295,48 @@ def add_token_transfers_args(sub: Any):
     )
 
 
+def add_metadata_arg(sub: Any):
+    sub.add_argument(
+        "--metadata-not-upgradeable",
+        dest="metadata_upgradeable",
+        action="store_false",
+        help="‼ mark the contract as NOT upgradeable (default: upgradeable)",
+    )
+    sub.add_argument(
+        "--metadata-not-readable",
+        dest="metadata_readable",
+        action="store_false",
+        help="‼ mark the contract as NOT readable (default: readable)",
+    )
+    sub.add_argument(
+        "--metadata-payable",
+        dest="metadata_payable",
+        action="store_true",
+        help="‼ mark the contract as payable (default: not payable)",
+    )
+    sub.add_argument(
+        "--metadata-payable-by-sc",
+        dest="metadata_payable_by_sc",
+        action="store_true",
+        help="‼ mark the contract as payable by SC (default: not payable by SC)",
+    )
+    sub.set_defaults(metadata_upgradeable=True, metadata_payable=False)
+
+
+def add_wait_result_and_timeout_args(sub: Any):
+    sub.add_argument(
+        "--wait-result",
+        action="store_true",
+        default=False,
+        help="signal to wait for the transaction result - only valid if --send is set",
+    )
+    sub.add_argument(
+        "--timeout",
+        default=100,
+        help="max num of seconds to wait for result" " - only valid if --wait-result is set",
+    )
+
+
 def parse_omit_fields_arg(args: Any) -> list[str]:
     literal = args.omit_fields
     parsed = ast.literal_eval(literal)
@@ -294,16 +352,71 @@ def prepare_account(args: Any):
         password = load_password(args)
         index = args.sender_wallet_index if args.sender_wallet_index != 0 else None
 
-        return Account.new_from_keystore(
-            file_path=Path(args.keyfile),
-            password=password,
-            address_index=index,
-            hrp=hrp,
-        )
+        try:
+            return Account.new_from_keystore(Path(args.keyfile), password=password, address_index=index, hrp=hrp)
+        except Exception as e:
+            raise WalletError(str(e))
     elif args.ledger:
-        return LedgerAccount(address_index=args.sender_wallet_index)
+        try:
+            return LedgerAccount(address_index=args.sender_wallet_index)
+        except Exception as e:
+            raise LedgerError(str(e))
+    elif args.sender:
+        return load_wallet_by_alias(alias=args.sender, hrp=hrp)
     else:
-        raise errors.NoWalletProvided()
+        return load_default_wallet(hrp=hrp)
+
+
+def load_wallet_by_alias(alias: str, hrp: str) -> Account:
+    file_path = resolve_wallet_config_path()
+    if not file_path.is_file():
+        raise AddressConfigFileError("The wallet config file was not found.")
+
+    file = read_wallet_config_file()
+    if file == dict():
+        raise AddressConfigFileError("Wallet config file is empty.")
+
+    wallets: dict[str, Any] = file["wallets"]
+    wallet = wallets.get(alias, None)
+    if not wallet:
+        raise UnknownWalletAliasError(alias)
+
+    logger.info(f"Using sender [{alias}] from wallet config.")
+    return _load_wallet_from_wallet_config(wallet=wallet, hrp=hrp)
+
+
+def load_default_wallet(hrp: str) -> Account:
+    active_wallet = get_active_wallet()
+    if active_wallet == dict():
+        logger.info("No default wallet found in wallet config.")
+        raise NoWalletProvided()
+
+    alias_of_default_wallet = read_wallet_config_file().get("active", "")
+    logger.info(f"Using sender [{alias_of_default_wallet}] from wallet config.")
+
+    return _load_wallet_from_wallet_config(wallet=active_wallet, hrp=hrp)
+
+
+def _load_wallet_from_wallet_config(wallet: dict[str, str], hrp: str) -> Account:
+    wallet_path = wallet.get("path", None)
+    if not wallet_path:
+        raise AddressConfigFileError("'path' field must be set in the wallet config.")
+    path = Path(wallet_path)
+
+    index = int(wallet.get("index", 0))
+
+    if path.suffix == ".pem":
+        return Account.new_from_pem(file_path=path, index=index, hrp=hrp)
+    elif path.suffix == ".json":
+        logger.info(f"Using keystore wallet at: [{path}].")
+        password = getpass("Please enter the wallet password: ")
+
+        try:
+            return Account.new_from_keystore(file_path=path, password=password, address_index=index, hrp=hrp)
+        except Exception as e:
+            raise WalletError(str(e))
+    else:
+        raise WalletError(f"Unsupported wallet file type: [{path.suffix}]. Supported types are: `.pem` and `.json`.")
 
 
 def _get_address_hrp(args: Any) -> str:
@@ -322,7 +435,7 @@ def _get_address_hrp(args: Any) -> str:
     if hrp:
         return hrp
 
-    return config.get_address_hrp()
+    return get_address_hrp()
 
 
 def _get_hrp_from_proxy(args: Any) -> str:
@@ -350,14 +463,20 @@ def load_guardian_account(args: Any) -> Union[IAccount, None]:
         password = load_guardian_password(args)
         index = args.guardian_wallet_index if args.guardian_wallet_index != 0 else None
 
-        return Account.new_from_keystore(
-            file_path=Path(args.guardian_keyfile),
-            password=password,
-            address_index=index,
-            hrp=hrp,
-        )
+        try:
+            return Account.new_from_keystore(
+                Path(args.guardian_keyfile),
+                password=password,
+                address_index=index,
+                hrp=hrp,
+            )
+        except Exception as e:
+            raise WalletError(str(e))
     elif args.guardian_ledger:
-        return LedgerAccount(address_index=args.guardian_wallet_index)
+        try:
+            return LedgerAccount(address_index=args.guardian_wallet_index)
+        except Exception as e:
+            raise LedgerError(str(e))
 
     return None
 
@@ -481,14 +600,20 @@ def load_relayer_account(args: Any) -> Union[IAccount, None]:
         password = load_relayer_password(args)
         index = args.relayer_wallet_index if args.relayer_wallet_index != 0 else None
 
-        return Account.new_from_keystore(
-            file_path=Path(args.relayer_keyfile),
-            password=password,
-            address_index=index,
-            hrp=hrp,
-        )
+        try:
+            return Account.new_from_keystore(
+                Path(args.relayer_keyfile),
+                password=password,
+                address_index=index,
+                hrp=hrp,
+            )
+        except Exception as e:
+            raise WalletError(str(e))
     elif args.relayer_ledger:
-        return LedgerAccount(address_index=args.relayer_wallet_index)
+        try:
+            return LedgerAccount(address_index=args.relayer_wallet_index)
+        except Exception as e:
+            raise LedgerError(str(e))
 
     return None
 
@@ -502,22 +627,16 @@ def get_current_nonce_for_address(address: Address, proxy_url: Union[str, None])
     return proxy.get_account(address).nonce
 
 
-def get_chain_id(chain_id: str, proxy_url: str) -> str:
-    if chain_id and proxy_url:
-        fetched_chain_id = _fetch_chain_id(proxy_url)
-
-        if chain_id != fetched_chain_id:
-            show_warning(
-                f"The chain ID you have provided does not match the chain ID you got from the proxy. Will use the proxy's value: '{fetched_chain_id}'"
-            )
-        return fetched_chain_id
-
+@cache
+def get_chain_id(proxy_url: str, chain_id: Optional[str] = None) -> str:
+    """We know and have already validated that if chainID is not provided, proxy is provided."""
     if chain_id:
         return chain_id
 
     return _fetch_chain_id(proxy_url)
 
 
+@cache
 def _fetch_chain_id(proxy_url: str) -> str:
     network_provider_config = config.get_config_for_network_providers()
     proxy = ProxyNetworkProvider(url=proxy_url, config=network_provider_config)
@@ -557,11 +676,16 @@ def send_or_simulate(tx: Transaction, args: Any, dump_output: bool = True) -> CL
     output_builder.set_emitted_transaction(tx)
     outfile = args.outfile if hasattr(args, "outfile") else None
 
+    hash = b""
     try:
         if send_wait_result:
+            _confirm_continuation_if_required(tx)
+
             transaction_on_network = send_and_wait_for_result(tx, proxy, args.timeout)
             output_builder.set_awaited_transaction(transaction_on_network)
         elif send_only:
+            _confirm_continuation_if_required(tx)
+
             hash = proxy.send_transaction(tx)
             output_builder.set_emitted_transaction_hash(hash.hex())
         elif simulate:
@@ -573,13 +697,29 @@ def send_or_simulate(tx: Transaction, args: Any, dump_output: bool = True) -> CL
         if dump_output:
             utils.dump_out_json(output_transaction, outfile=outfile)
 
-        if send_only:
+        if send_only and hash:
+            cli_config = MxpyEnv.from_active_env()
             log_explorer_transaction(
                 chain=output_transaction["emittedTransaction"]["chainID"],
                 transaction_hash=output_transaction["emittedTransactionHash"],
+                explorer_url=cli_config.explorer_url,
             )
 
     return output_builder
+
+
+def _confirm_continuation_if_required(tx: Transaction) -> None:
+    env = MxpyEnv.from_active_env()
+
+    if env.ask_confirmation:
+        transaction = tx.to_dictionary()
+
+        # decode the data field from base64 if it exists
+        data = base64.b64decode(transaction.get("data", "")).decode()
+        transaction["data"] = data if data else ""
+
+        utils.dump_out_json(transaction)
+        confirm_continuation("You are about to send the above transaction. Do you want to continue?")
 
 
 def prepare_sender(args: Any):
@@ -617,3 +757,36 @@ def prepare_guardian_relayer_data(args: Any) -> GuardianRelayerData:
         relayer=relayer,
         relayer_address=relayer_address,
     )
+
+
+def prepare_token_transfers(transfers: list[str]) -> list[TokenTransfer]:
+    """Converts a list of token transfers as received from the CLI to a list of TokenTransfer objects."""
+    token_computer = TokenComputer()
+    token_transfers: list[TokenTransfer] = []
+
+    for i in range(0, len(transfers) - 1, 2):
+        extended_identifier = transfers[i]
+        amount = int(transfers[i + 1])
+        nonce = token_computer.extract_nonce_from_extended_identifier(extended_identifier)
+        identifier = token_computer.extract_identifier_from_extended_identifier(extended_identifier)
+
+        token = Token(identifier, nonce)
+        transfer = TokenTransfer(token, amount)
+        token_transfers.append(transfer)
+
+    return token_transfers
+
+
+def set_proxy_from_config_if_not_provided(args: Any) -> None:
+    """This function modifies the `args` object by setting the proxy from the config if not already set. If proxy is not needed (chainID and nonce are provided), the proxy will not be set."""
+    if not hasattr(args, "proxy"):
+        return
+
+    if not args.proxy:
+        if hasattr(args, "chain") and args.chain and hasattr(args, "nonce") and args.nonce is not None:
+            return
+
+        env = MxpyEnv.from_active_env()
+        if env.proxy_url:
+            logger.info(f"Using proxy URL from config: {env.proxy_url}")
+            args.proxy = env.proxy_url
