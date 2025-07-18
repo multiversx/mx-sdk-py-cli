@@ -49,8 +49,12 @@ def _do_build(cwd: Path, env: Dict[str, str]):
 def _copy_wasmer_libs(config: ConfigRoot, destination: Path):
     golang = dependencies.get_golang()
     vm_go_folder_name = _get_chain_vm_go_folder_name(config)
+    vm_go_legacy_folder_name = _get_chain_vm_go_legacy_folder_name(config)
+
     vm_go_path = golang.get_gopath() / "pkg" / "mod" / vm_go_folder_name
-    wasmer_path = vm_go_path / "wasmer"
+    vm_go_legacy_path = golang.get_gopath() / "pkg" / "mod" / vm_go_legacy_folder_name
+
+    wasmer_path = vm_go_legacy_path / "wasmer"
     wasmer2_path = vm_go_path / "wasmer2"
 
     libraries.copy_libraries(wasmer_path, destination)
@@ -61,6 +65,14 @@ def _get_chain_vm_go_folder_name(config: ConfigRoot) -> str:
     go_mod = config.software.mx_chain_go.get_path_within_source(Path("go.mod"))
     lines = utils.read_lines(go_mod)
     line = [line for line in lines if "github.com/multiversx/mx-chain-vm-go" in line][0]
+    parts = line.split()
+    return f"{parts[0]}@{parts[1]}"
+
+
+def _get_chain_vm_go_legacy_folder_name(config: ConfigRoot) -> str:
+    go_mod = config.software.mx_chain_go.get_path_within_source(Path("go.mod"))
+    lines = utils.read_lines(go_mod)
+    line = [line for line in lines if "github.com/multiversx/mx-chain-vm-v1_4-go" in line][0]
     parts = line.split()
     return f"{parts[0]}@{parts[1]}"
 
