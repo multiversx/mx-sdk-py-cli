@@ -205,9 +205,9 @@ def create_proposal(args: Any):
         args=args,
     )
     chain_id = cli_shared.get_chain_id(args.proxy, args.chain)
-    gas_limit = args.gas_limit if args.gas_limit else 0
+    gas_estimator = cli_shared.initialize_gas_limit_estimator(args)
+    controller = GovernanceWrapper(config=TransactionsFactoryConfig(chain_id), gas_limit_estimator=gas_estimator)
 
-    controller = GovernanceWrapper(TransactionsFactoryConfig(chain_id))
     transaction = controller.create_transaction_for_new_proposal(
         sender=sender,
         nonce=sender.nonce,
@@ -215,7 +215,7 @@ def create_proposal(args: Any):
         start_vote_epoch=args.start_vote_epoch,
         end_vote_epoch=args.end_vote_epoch,
         native_token_amount=args.value,
-        gas_limit=gas_limit,
+        gas_limit=args.gas_limit,
         gas_price=args.gas_price,
         version=args.version,
         options=args.options,
@@ -234,15 +234,15 @@ def vote(args: Any):
         args=args,
     )
     chain_id = cli_shared.get_chain_id(args.proxy, args.chain)
-    gas_limit = args.gas_limit if args.gas_limit else 0
+    gas_estimator = cli_shared.initialize_gas_limit_estimator(args)
+    controller = GovernanceWrapper(config=TransactionsFactoryConfig(chain_id), gas_limit_estimator=gas_estimator)
 
-    controller = GovernanceWrapper(TransactionsFactoryConfig(chain_id))
     transaction = controller.create_transaction_for_voting(
         sender=sender,
         nonce=sender.nonce,
         proposal_nonce=args.proposal_nonce,
         vote=args.vote,
-        gas_limit=gas_limit,
+        gas_limit=args.gas_limit,
         gas_price=args.gas_price,
         version=args.version,
         options=args.options,
@@ -261,14 +261,14 @@ def close_proposal(args: Any):
         args=args,
     )
     chain_id = cli_shared.get_chain_id(args.proxy, args.chain)
-    gas_limit = args.gas_limit if args.gas_limit else 0
+    gas_estimator = cli_shared.initialize_gas_limit_estimator(args)
+    controller = GovernanceWrapper(config=TransactionsFactoryConfig(chain_id), gas_limit_estimator=gas_estimator)
 
-    controller = GovernanceWrapper(TransactionsFactoryConfig(chain_id))
     transaction = controller.create_transaction_for_closing_proposal(
         sender=sender,
         nonce=sender.nonce,
         proposal_nonce=args.proposal_nonce,
-        gas_limit=gas_limit,
+        gas_limit=args.gas_limit,
         gas_price=args.gas_price,
         version=args.version,
         options=args.options,
@@ -287,15 +287,15 @@ def clear_ended_proposals(args: Any):
         args=args,
     )
     chain_id = cli_shared.get_chain_id(args.proxy, args.chain)
-    gas_limit = args.gas_limit if args.gas_limit else 0
-    controller = GovernanceWrapper(TransactionsFactoryConfig(chain_id))
+    gas_estimator = cli_shared.initialize_gas_limit_estimator(args)
+    controller = GovernanceWrapper(config=TransactionsFactoryConfig(chain_id), gas_limit_estimator=gas_estimator)
 
     proposers = [Address.new_from_bech32(proposer) for proposer in args.proposers]
     transaction = controller.create_transaction_for_clearing_ended_proposals(
         sender=sender,
         nonce=sender.nonce,
         proposers=proposers,
-        gas_limit=gas_limit,
+        gas_limit=args.gas_limit,
         gas_price=args.gas_price,
         version=args.version,
         options=args.options,
@@ -314,13 +314,13 @@ def claim_accumulated_fees(args: Any):
         args=args,
     )
     chain_id = cli_shared.get_chain_id(args.proxy, args.chain)
-    gas_limit = args.gas_limit if args.gas_limit else 0
+    gas_estimator = cli_shared.initialize_gas_limit_estimator(args)
+    controller = GovernanceWrapper(config=TransactionsFactoryConfig(chain_id), gas_limit_estimator=gas_estimator)
 
-    controller = GovernanceWrapper(TransactionsFactoryConfig(chain_id))
     transaction = controller.create_transaction_for_claiming_accumulated_fees(
         sender=sender,
         nonce=sender.nonce,
-        gas_limit=gas_limit,
+        gas_limit=args.gas_limit,
         gas_price=args.gas_price,
         version=args.version,
         options=args.options,
@@ -339,9 +339,9 @@ def change_config(args: Any):
         args=args,
     )
     chain_id = cli_shared.get_chain_id(args.proxy, args.chain)
-    gas_limit = args.gas_limit if args.gas_limit else 0
+    gas_estimator = cli_shared.initialize_gas_limit_estimator(args)
+    controller = GovernanceWrapper(config=TransactionsFactoryConfig(chain_id), gas_limit_estimator=gas_estimator)
 
-    controller = GovernanceWrapper(TransactionsFactoryConfig(chain_id))
     transaction = controller.create_transaction_for_changing_config(
         sender=sender,
         nonce=sender.nonce,
@@ -350,7 +350,7 @@ def change_config(args: Any):
         min_quorum=args.min_quorum,
         min_veto_threshold=args.min_veto_threshold,
         min_pass_threshold=args.min_pass_threshold,
-        gas_limit=gas_limit,
+        gas_limit=args.gas_limit,
         gas_price=args.gas_price,
         version=args.version,
         options=args.options,

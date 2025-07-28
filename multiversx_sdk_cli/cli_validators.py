@@ -160,7 +160,6 @@ def do_stake(args: Any):
     )
 
     native_amount = int(args.value)
-    gas_limit = args.gas_limit if args.gas_limit else 0
     rewards_address = Address.new_from_bech32(args.reward_address) if args.reward_address else None
 
     controller = _get_validators_controller(args)
@@ -169,7 +168,7 @@ def do_stake(args: Any):
         tx = controller.create_transaction_for_topping_up(
             sender=sender,
             native_amount=native_amount,
-            gas_limit=gas_limit,
+            gas_limit=args.gas_limit,
             gas_price=args.gas_price,
             nonce=sender.nonce,
             version=args.version,
@@ -182,7 +181,7 @@ def do_stake(args: Any):
             sender=sender,
             validators=validators_signers,
             native_amount=native_amount,
-            gas_limit=gas_limit,
+            gas_limit=args.gas_limit,
             gas_price=args.gas_price,
             nonce=sender.nonce,
             version=args.version,
@@ -196,7 +195,8 @@ def do_stake(args: Any):
 
 def _get_validators_controller(args: Any):
     chain_id = cli_shared.get_chain_id(args.proxy, args.chain)
-    validators = ValidatorsController(chain_id)
+    gas_estimator = cli_shared.initialize_gas_limit_estimator(args)
+    validators = ValidatorsController(chain_id=chain_id, gas_limit_estimator=gas_estimator)
     return validators
 
 
@@ -225,7 +225,6 @@ def do_unstake(args: Any):
     )
 
     native_amount = int(args.value)
-    gas_limit = args.gas_limit if args.gas_limit else 0
     keys = _parse_public_bls_keys(args.nodes_public_keys)
 
     controller = _get_validators_controller(args)
@@ -233,7 +232,7 @@ def do_unstake(args: Any):
         sender=sender,
         keys=keys,
         native_amount=native_amount,
-        gas_limit=gas_limit,
+        gas_limit=args.gas_limit,
         gas_price=args.gas_price,
         nonce=sender.nonce,
         version=args.version,
@@ -254,7 +253,6 @@ def do_unjail(args: Any):
     )
 
     native_amount = int(args.value)
-    gas_limit = args.gas_limit if args.gas_limit else 0
     keys = _parse_public_bls_keys(args.nodes_public_keys)
 
     controller = _get_validators_controller(args)
@@ -262,7 +260,7 @@ def do_unjail(args: Any):
         sender=sender,
         keys=keys,
         native_amount=native_amount,
-        gas_limit=gas_limit,
+        gas_limit=args.gas_limit,
         gas_price=args.gas_price,
         nonce=sender.nonce,
         version=args.version,
@@ -283,7 +281,6 @@ def do_unbond(args: Any):
     )
 
     native_amount = int(args.value)
-    gas_limit = args.gas_limit if args.gas_limit else 0
     keys = _parse_public_bls_keys(args.nodes_public_keys)
 
     controller = _get_validators_controller(args)
@@ -291,7 +288,7 @@ def do_unbond(args: Any):
         sender=sender,
         keys=keys,
         native_amount=native_amount,
-        gas_limit=gas_limit,
+        gas_limit=args.gas_limit,
         gas_price=args.gas_price,
         nonce=sender.nonce,
         version=args.version,
@@ -312,7 +309,6 @@ def change_reward_address(args: Any):
     )
 
     native_amount = int(args.value)
-    gas_limit = args.gas_limit if args.gas_limit else 0
     rewards_address = Address.new_from_bech32(args.reward_address)
 
     controller = _get_validators_controller(args)
@@ -320,7 +316,7 @@ def change_reward_address(args: Any):
         sender=sender,
         rewards_address=rewards_address,
         native_amount=native_amount,
-        gas_limit=gas_limit,
+        gas_limit=args.gas_limit,
         gas_price=args.gas_price,
         nonce=sender.nonce,
         version=args.version,
@@ -341,13 +337,12 @@ def do_claim(args: Any):
     )
 
     native_amount = int(args.value)
-    gas_limit = args.gas_limit if args.gas_limit else 0
 
     controller = _get_validators_controller(args)
     tx = controller.create_transaction_for_claiming(
         sender=sender,
         native_amount=native_amount,
-        gas_limit=gas_limit,
+        gas_limit=args.gas_limit,
         gas_price=args.gas_price,
         nonce=sender.nonce,
         version=args.version,
@@ -368,8 +363,6 @@ def do_unstake_nodes(args: Any):
     )
 
     native_amount = int(args.value)
-    gas_limit = args.gas_limit if args.gas_limit else 0
-
     keys = _parse_public_bls_keys(args.nodes_public_keys)
 
     controller = _get_validators_controller(args)
@@ -377,7 +370,7 @@ def do_unstake_nodes(args: Any):
         sender=sender,
         keys=keys,
         native_amount=native_amount,
-        gas_limit=gas_limit,
+        gas_limit=args.gas_limit,
         gas_price=args.gas_price,
         nonce=sender.nonce,
         version=args.version,
@@ -399,14 +392,13 @@ def do_unstake_tokens(args: Any):
 
     native_amount = int(args.value)
     value = int(args.unstake_value)
-    gas_limit = args.gas_limit if args.gas_limit else 0
 
     controller = _get_validators_controller(args)
     tx = controller.create_transaction_for_unstaking_tokens(
         sender=sender,
         value=value,
         native_amount=native_amount,
-        gas_limit=gas_limit,
+        gas_limit=args.gas_limit,
         gas_price=args.gas_price,
         nonce=sender.nonce,
         version=args.version,
@@ -427,8 +419,6 @@ def do_unbond_nodes(args: Any):
     )
 
     native_amount = int(args.value)
-    gas_limit = args.gas_limit if args.gas_limit else 0
-
     keys = _parse_public_bls_keys(args.nodes_public_keys)
 
     controller = _get_validators_controller(args)
@@ -436,7 +426,7 @@ def do_unbond_nodes(args: Any):
         sender=sender,
         keys=keys,
         native_amount=native_amount,
-        gas_limit=gas_limit,
+        gas_limit=args.gas_limit,
         gas_price=args.gas_price,
         nonce=sender.nonce,
         version=args.version,
@@ -458,14 +448,13 @@ def do_unbond_tokens(args: Any):
 
     native_amount = int(args.value)
     value = int(args.unbond_value)
-    gas_limit = args.gas_limit if args.gas_limit else 0
 
     controller = _get_validators_controller(args)
     tx = controller.create_transaction_for_unbonding_tokens(
         sender=sender,
         value=value,
         native_amount=native_amount,
-        gas_limit=gas_limit,
+        gas_limit=args.gas_limit,
         gas_price=args.gas_price,
         nonce=sender.nonce,
         version=args.version,
@@ -486,13 +475,12 @@ def do_clean_registered_data(args: Any):
     )
 
     native_amount = int(args.value)
-    gas_limit = args.gas_limit if args.gas_limit else 0
 
     controller = _get_validators_controller(args)
     tx = controller.create_transaction_for_cleaning_registered_data(
         sender=sender,
         native_amount=native_amount,
-        gas_limit=gas_limit,
+        gas_limit=args.gas_limit,
         gas_price=args.gas_price,
         nonce=sender.nonce,
         version=args.version,
@@ -513,7 +501,6 @@ def do_restake_unstaked_nodes(args: Any):
     )
 
     native_amount = int(args.value)
-    gas_limit = args.gas_limit if args.gas_limit else 0
     keys = _parse_public_bls_keys(args.nodes_public_keys)
 
     controller = _get_validators_controller(args)
@@ -521,7 +508,7 @@ def do_restake_unstaked_nodes(args: Any):
         sender=sender,
         keys=keys,
         native_amount=native_amount,
-        gas_limit=gas_limit,
+        gas_limit=args.gas_limit,
         gas_price=args.gas_price,
         nonce=sender.nonce,
         version=args.version,

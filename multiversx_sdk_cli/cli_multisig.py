@@ -659,6 +659,17 @@ def _ensure_args(args: Any):
     validate_chain_id_args(args)
 
 
+def _initialize_multisig_wrapper(args: Any) -> MultisigWrapper:
+    abi = Abi.load(Path(args.abi))
+    chain_id = cli_shared.get_chain_id(args.proxy, args.chain)
+    gas_estimator = cli_shared.initialize_gas_limit_estimator(args)
+    return MultisigWrapper(
+        config=TransactionsFactoryConfig(chain_id),
+        abi=abi,
+        gas_limit_estimator=gas_estimator,
+    )
+
+
 def deploy(args: Any):
     logger.debug("multisig.deploy")
     _ensure_args(args)
@@ -669,13 +680,10 @@ def deploy(args: Any):
         args=args,
     )
 
-    abi = Abi.load(Path(args.abi))
     quorum = args.quorum
     board_members = [Address.new_from_bech32(addr) for addr in args.board_members]
 
-    chain_id = cli_shared.get_chain_id(args.proxy, args.chain)
-    multisig = MultisigWrapper(TransactionsFactoryConfig(chain_id), abi)
-
+    multisig = _initialize_multisig_wrapper(args)
     tx = multisig.prepare_deploy_transaction(
         owner=sender,
         nonce=sender.nonce,
@@ -686,7 +694,7 @@ def deploy(args: Any):
         readable=args.metadata_readable,
         payable=args.metadata_payable,
         payable_by_sc=args.metadata_payable_by_sc,
-        gas_limit=int(args.gas_limit),
+        gas_limit=args.gas_limit,
         gas_price=int(args.gas_price),
         version=int(args.version),
         options=int(args.options),
@@ -711,10 +719,6 @@ def deposit(args: Any):
         args=args,
     )
 
-    abi = Abi.load(Path(args.abi))
-    chain_id = cli_shared.get_chain_id(args.proxy, args.chain)
-    multisig = MultisigWrapper(TransactionsFactoryConfig(chain_id), abi)
-
     contract = Address.new_from_bech32(args.contract)
     native_amount = int(args.value)
 
@@ -722,13 +726,14 @@ def deposit(args: Any):
     if token_transfers:
         token_transfers = cli_shared.prepare_token_transfers(token_transfers)
 
+    multisig = _initialize_multisig_wrapper(args)
     tx = multisig.prepare_deposit_transaction(
         owner=sender,
         nonce=sender.nonce,
         contract=contract,
         native_amount=native_amount,
         token_transfers=token_transfers,
-        gas_limit=int(args.gas_limit),
+        gas_limit=args.gas_limit,
         gas_price=int(args.gas_price),
         version=int(args.version),
         options=int(args.options),
@@ -747,19 +752,16 @@ def discard_action(args: Any):
         args=args,
     )
 
-    abi = Abi.load(Path(args.abi))
-    chain_id = cli_shared.get_chain_id(args.proxy, args.chain)
-    multisig = MultisigWrapper(TransactionsFactoryConfig(chain_id), abi)
-
     contract = Address.new_from_bech32(args.contract)
     action_id = int(args.action)
 
+    multisig = _initialize_multisig_wrapper(args)
     tx = multisig.prepare_discard_action_transaction(
         owner=sender,
         nonce=sender.nonce,
         contract=contract,
         action_id=action_id,
-        gas_limit=int(args.gas_limit),
+        gas_limit=args.gas_limit,
         gas_price=int(args.gas_price),
         version=int(args.version),
         options=int(args.options),
@@ -778,19 +780,16 @@ def discard_batch(args: Any):
         args=args,
     )
 
-    abi = Abi.load(Path(args.abi))
-    chain_id = cli_shared.get_chain_id(args.proxy, args.chain)
-    multisig = MultisigWrapper(TransactionsFactoryConfig(chain_id), abi)
-
     contract = Address.new_from_bech32(args.contract)
     actions = args.action_ids
 
+    multisig = _initialize_multisig_wrapper(args)
     tx = multisig.prepare_discard_batch_transaction(
         owner=sender,
         nonce=sender.nonce,
         contract=contract,
         action_ids=actions,
-        gas_limit=int(args.gas_limit),
+        gas_limit=args.gas_limit,
         gas_price=int(args.gas_price),
         version=int(args.version),
         options=int(args.options),
@@ -809,19 +808,16 @@ def add_board_member(args: Any):
         args=args,
     )
 
-    abi = Abi.load(Path(args.abi))
-    chain_id = cli_shared.get_chain_id(args.proxy, args.chain)
-    multisig = MultisigWrapper(TransactionsFactoryConfig(chain_id), abi)
-
     contract = Address.new_from_bech32(args.contract)
     board_member = Address.new_from_bech32(args.board_member)
 
+    multisig = _initialize_multisig_wrapper(args)
     tx = multisig.prepare_add_board_member_transaction(
         owner=sender,
         nonce=sender.nonce,
         contract=contract,
         board_member=board_member,
-        gas_limit=int(args.gas_limit),
+        gas_limit=args.gas_limit,
         gas_price=int(args.gas_price),
         version=int(args.version),
         options=int(args.options),
@@ -840,19 +836,16 @@ def add_proposer(args: Any):
         args=args,
     )
 
-    abi = Abi.load(Path(args.abi))
-    chain_id = cli_shared.get_chain_id(args.proxy, args.chain)
-    multisig = MultisigWrapper(TransactionsFactoryConfig(chain_id), abi)
-
     contract = Address.new_from_bech32(args.contract)
     proposer = Address.new_from_bech32(args.proposer)
 
+    multisig = _initialize_multisig_wrapper(args)
     tx = multisig.prepare_add_proposer_transaction(
         owner=sender,
         nonce=sender.nonce,
         contract=contract,
         proposer=proposer,
-        gas_limit=int(args.gas_limit),
+        gas_limit=args.gas_limit,
         gas_price=int(args.gas_price),
         version=int(args.version),
         options=int(args.options),
@@ -871,19 +864,16 @@ def remove_user(args: Any):
         args=args,
     )
 
-    abi = Abi.load(Path(args.abi))
-    chain_id = cli_shared.get_chain_id(args.proxy, args.chain)
-    multisig = MultisigWrapper(TransactionsFactoryConfig(chain_id), abi)
-
     contract = Address.new_from_bech32(args.contract)
     user = Address.new_from_bech32(args.user)
 
+    multisig = _initialize_multisig_wrapper(args)
     tx = multisig.prepare_remove_user_transaction(
         owner=sender,
         nonce=sender.nonce,
         contract=contract,
         user=user,
-        gas_limit=int(args.gas_limit),
+        gas_limit=args.gas_limit,
         gas_price=int(args.gas_price),
         version=int(args.version),
         options=int(args.options),
@@ -902,19 +892,16 @@ def change_quorum(args: Any):
         args=args,
     )
 
-    abi = Abi.load(Path(args.abi))
-    chain_id = cli_shared.get_chain_id(args.proxy, args.chain)
-    multisig = MultisigWrapper(TransactionsFactoryConfig(chain_id), abi)
-
     contract = Address.new_from_bech32(args.contract)
     quorum = int(args.quorum)
 
+    multisig = _initialize_multisig_wrapper(args)
     tx = multisig.prepare_change_quorum_transaction(
         owner=sender,
         nonce=sender.nonce,
         contract=contract,
         quorum=quorum,
-        gas_limit=int(args.gas_limit),
+        gas_limit=args.gas_limit,
         gas_price=int(args.gas_price),
         version=int(args.version),
         options=int(args.options),
@@ -933,24 +920,20 @@ def transfer_and_execute(args: Any):
         args=args,
     )
 
-    abi = Abi.load(Path(args.abi))
-    chain_id = cli_shared.get_chain_id(args.proxy, args.chain)
-    multisig = MultisigWrapper(TransactionsFactoryConfig(chain_id), abi)
-
     contract = Address.new_from_bech32(args.contract)
-
     receiver = Address.new_from_bech32(args.receiver)
     opt_gas_limit = int(args.opt_gas_limit) if args.opt_gas_limit else None
     function = args.function if args.function else None
     contract_abi = Abi.load(Path(args.contract_abi)) if args.contract_abi else None
     arguments, should_prepare_args = _get_contract_arguments(args)
 
+    multisig = _initialize_multisig_wrapper(args)
     tx = multisig.prepare_transfer_execute_transaction(
         owner=sender,
         nonce=sender.nonce,
         contract=contract,
         receiver=receiver,
-        gas_limit=int(args.gas_limit),
+        gas_limit=args.gas_limit,
         gas_price=int(args.gas_price),
         version=int(args.version),
         options=int(args.options),
@@ -981,12 +964,7 @@ def transfer_and_execute_esdt(args: Any):
         args=args,
     )
 
-    abi = Abi.load(Path(args.abi))
-    chain_id = cli_shared.get_chain_id(args.proxy, args.chain)
-    multisig = MultisigWrapper(TransactionsFactoryConfig(chain_id), abi)
-
     contract = Address.new_from_bech32(args.contract)
-
     receiver = Address.new_from_bech32(args.receiver)
     opt_gas_limit = int(args.opt_gas_limit) if args.opt_gas_limit else None
     function = args.function if args.function else None
@@ -994,12 +972,13 @@ def transfer_and_execute_esdt(args: Any):
     arguments, should_prepare_args = _get_contract_arguments(args)
     token_transfers = cli_shared.prepare_token_transfers(args.token_transfers)
 
+    multisig = _initialize_multisig_wrapper(args)
     tx = multisig.prepare_transfer_execute_esdt_transaction(
         owner=sender,
         nonce=sender.nonce,
         contract=contract,
         receiver=receiver,
-        gas_limit=int(args.gas_limit),
+        gas_limit=args.gas_limit,
         gas_price=int(args.gas_price),
         version=int(args.version),
         options=int(args.options),
@@ -1024,12 +1003,7 @@ def async_call(args: Any):
         args=args,
     )
 
-    abi = Abi.load(Path(args.abi))
-    chain_id = cli_shared.get_chain_id(args.proxy, args.chain)
-    multisig = MultisigWrapper(TransactionsFactoryConfig(chain_id), abi)
-
     contract = Address.new_from_bech32(args.contract)
-
     receiver = Address.new_from_bech32(args.receiver)
     opt_gas_limit = int(args.opt_gas_limit) if args.opt_gas_limit else None
     function = args.function if args.function else None
@@ -1040,12 +1014,13 @@ def async_call(args: Any):
     if token_transfers:
         token_transfers = cli_shared.prepare_token_transfers(args.token_transfers)
 
+    multisig = _initialize_multisig_wrapper(args)
     tx = multisig.prepare_async_call_transaction(
         owner=sender,
         nonce=sender.nonce,
         contract=contract,
         receiver=receiver,
-        gas_limit=int(args.gas_limit),
+        gas_limit=args.gas_limit,
         gas_price=int(args.gas_price),
         version=int(args.version),
         options=int(args.options),
@@ -1071,22 +1046,19 @@ def deploy_from_source(args: Any):
         args=args,
     )
 
-    abi = Abi.load(Path(args.abi))
-    chain_id = cli_shared.get_chain_id(args.proxy, args.chain)
-    multisig = MultisigWrapper(TransactionsFactoryConfig(chain_id), abi)
-
     contract = Address.new_from_bech32(args.contract)
     contract_to_copy = Address.new_from_bech32(args.contract_to_copy)
 
     contract_abi = Abi.load(Path(args.contract_abi)) if args.contract_abi else None
     arguments, should_prepare_args = _get_contract_arguments(args)
 
+    multisig = _initialize_multisig_wrapper(args)
     tx = multisig.prepare_contract_deploy_from_source_transaction(
         owner=sender,
         nonce=sender.nonce,
         contract=contract,
         contract_to_copy=contract_to_copy,
-        gas_limit=int(args.gas_limit),
+        gas_limit=args.gas_limit,
         gas_price=int(args.gas_price),
         version=int(args.version),
         options=int(args.options),
@@ -1113,10 +1085,6 @@ def upgrade_from_source(args: Any):
         args=args,
     )
 
-    abi = Abi.load(Path(args.abi))
-    chain_id = cli_shared.get_chain_id(args.proxy, args.chain)
-    multisig = MultisigWrapper(TransactionsFactoryConfig(chain_id), abi)
-
     contract = Address.new_from_bech32(args.contract)
     contract_to_upgrade = Address.new_from_bech32(args.contract_to_upgrade)
     contract_to_copy = Address.new_from_bech32(args.contract_to_copy)
@@ -1124,13 +1092,14 @@ def upgrade_from_source(args: Any):
     contract_abi = Abi.load(Path(args.contract_abi)) if args.contract_abi else None
     arguments, should_prepare_args = _get_contract_arguments(args)
 
+    multisig = _initialize_multisig_wrapper(args)
     tx = multisig.prepare_contract_upgrade_from_source_transaction(
         owner=sender,
         nonce=sender.nonce,
         contract=contract,
         contract_to_upgrade=contract_to_upgrade,
         contract_to_copy=contract_to_copy,
-        gas_limit=int(args.gas_limit),
+        gas_limit=args.gas_limit,
         gas_price=int(args.gas_price),
         version=int(args.version),
         options=int(args.options),
@@ -1157,19 +1126,16 @@ def sign_action(args: Any):
         args=args,
     )
 
-    abi = Abi.load(Path(args.abi))
-    chain_id = cli_shared.get_chain_id(args.proxy, args.chain)
-    multisig = MultisigWrapper(TransactionsFactoryConfig(chain_id), abi)
-
     contract = Address.new_from_bech32(args.contract)
     action_id = int(args.action)
 
+    multisig = _initialize_multisig_wrapper(args)
     tx = multisig.prepare_sign_action_transaction(
         owner=sender,
         nonce=sender.nonce,
         contract=contract,
         action_id=action_id,
-        gas_limit=int(args.gas_limit),
+        gas_limit=args.gas_limit,
         gas_price=int(args.gas_price),
         version=int(args.version),
         options=int(args.options),
@@ -1188,19 +1154,16 @@ def sign_batch(args: Any):
         args=args,
     )
 
-    abi = Abi.load(Path(args.abi))
-    chain_id = cli_shared.get_chain_id(args.proxy, args.chain)
-    multisig = MultisigWrapper(TransactionsFactoryConfig(chain_id), abi)
-
     contract = Address.new_from_bech32(args.contract)
     batch_id = int(args.batch)
 
+    multisig = _initialize_multisig_wrapper(args)
     tx = multisig.prepare_sign_batch_transaction(
         owner=sender,
         nonce=sender.nonce,
         contract=contract,
         batch_id=batch_id,
-        gas_limit=int(args.gas_limit),
+        gas_limit=args.gas_limit,
         gas_price=int(args.gas_price),
         version=int(args.version),
         options=int(args.options),
@@ -1219,19 +1182,16 @@ def sign_and_perform(args: Any):
         args=args,
     )
 
-    abi = Abi.load(Path(args.abi))
-    chain_id = cli_shared.get_chain_id(args.proxy, args.chain)
-    multisig = MultisigWrapper(TransactionsFactoryConfig(chain_id), abi)
-
     contract = Address.new_from_bech32(args.contract)
     action_id = int(args.action)
 
+    multisig = _initialize_multisig_wrapper(args)
     tx = multisig.prepare_sign_and_perform_transaction(
         owner=sender,
         nonce=sender.nonce,
         contract=contract,
         action_id=action_id,
-        gas_limit=int(args.gas_limit),
+        gas_limit=args.gas_limit,
         gas_price=int(args.gas_price),
         version=int(args.version),
         options=int(args.options),
@@ -1250,19 +1210,16 @@ def sign_batch_and_perform(args: Any):
         args=args,
     )
 
-    abi = Abi.load(Path(args.abi))
-    chain_id = cli_shared.get_chain_id(args.proxy, args.chain)
-    multisig = MultisigWrapper(TransactionsFactoryConfig(chain_id), abi)
-
     contract = Address.new_from_bech32(args.contract)
     batch_id = int(args.batch)
 
+    multisig = _initialize_multisig_wrapper(args)
     tx = multisig.prepare_sign_batch_and_perform_transaction(
         owner=sender,
         nonce=sender.nonce,
         contract=contract,
         batch_id=batch_id,
-        gas_limit=int(args.gas_limit),
+        gas_limit=args.gas_limit,
         gas_price=int(args.gas_price),
         version=int(args.version),
         options=int(args.options),
@@ -1281,19 +1238,16 @@ def unsign_action(args: Any):
         args=args,
     )
 
-    abi = Abi.load(Path(args.abi))
-    chain_id = cli_shared.get_chain_id(args.proxy, args.chain)
-    multisig = MultisigWrapper(TransactionsFactoryConfig(chain_id), abi)
-
     contract = Address.new_from_bech32(args.contract)
     action_id = int(args.action)
 
+    multisig = _initialize_multisig_wrapper(args)
     tx = multisig.prepare_unsign_action_transaction(
         owner=sender,
         nonce=sender.nonce,
         contract=contract,
         action_id=action_id,
-        gas_limit=int(args.gas_limit),
+        gas_limit=args.gas_limit,
         gas_price=int(args.gas_price),
         version=int(args.version),
         options=int(args.options),
@@ -1312,19 +1266,16 @@ def unsign_batch(args: Any):
         args=args,
     )
 
-    abi = Abi.load(Path(args.abi))
-    chain_id = cli_shared.get_chain_id(args.proxy, args.chain)
-    multisig = MultisigWrapper(TransactionsFactoryConfig(chain_id), abi)
-
     contract = Address.new_from_bech32(args.contract)
     batch_id = int(args.batch)
 
+    multisig = _initialize_multisig_wrapper(args)
     tx = multisig.prepare_unsign_batch_transaction(
         owner=sender,
         nonce=sender.nonce,
         contract=contract,
         batch_id=batch_id,
-        gas_limit=int(args.gas_limit),
+        gas_limit=args.gas_limit,
         gas_price=int(args.gas_price),
         version=int(args.version),
         options=int(args.options),
@@ -1343,20 +1294,17 @@ def unsign_for_outdated_board_members(args: Any):
         args=args,
     )
 
-    abi = Abi.load(Path(args.abi))
-    chain_id = cli_shared.get_chain_id(args.proxy, args.chain)
-    multisig = MultisigWrapper(TransactionsFactoryConfig(chain_id), abi)
-
     contract = Address.new_from_bech32(args.contract)
     action_id = int(args.action)
 
+    multisig = _initialize_multisig_wrapper(args)
     tx = multisig.prepare_unsign_for_outdated_board_members_transaction(
         owner=sender,
         nonce=sender.nonce,
         contract=contract,
         action_id=action_id,
         outdated_board_members=args.outdated_members,
-        gas_limit=int(args.gas_limit),
+        gas_limit=args.gas_limit,
         gas_price=int(args.gas_price),
         version=int(args.version),
         options=int(args.options),
@@ -1375,19 +1323,16 @@ def perform_action(args: Any):
         args=args,
     )
 
-    abi = Abi.load(Path(args.abi))
-    chain_id = cli_shared.get_chain_id(args.proxy, args.chain)
-    multisig = MultisigWrapper(TransactionsFactoryConfig(chain_id), abi)
-
     contract = Address.new_from_bech32(args.contract)
     action_id = int(args.action)
 
+    multisig = _initialize_multisig_wrapper(args)
     tx = multisig.prepare_perform_action_transaction(
         owner=sender,
         nonce=sender.nonce,
         contract=contract,
         action_id=action_id,
-        gas_limit=int(args.gas_limit),
+        gas_limit=args.gas_limit,
         gas_price=int(args.gas_price),
         version=int(args.version),
         options=int(args.options),
@@ -1406,19 +1351,16 @@ def perform_batch(args: Any):
         args=args,
     )
 
-    abi = Abi.load(Path(args.abi))
-    chain_id = cli_shared.get_chain_id(args.proxy, args.chain)
-    multisig = MultisigWrapper(TransactionsFactoryConfig(chain_id), abi)
-
     contract = Address.new_from_bech32(args.contract)
     batch_id = int(args.batch)
 
+    multisig = _initialize_multisig_wrapper(args)
     tx = multisig.prepare_perform_batch_transaction(
         owner=sender,
         nonce=sender.nonce,
         contract=contract,
         batch_id=batch_id,
-        gas_limit=int(args.gas_limit),
+        gas_limit=args.gas_limit,
         gas_price=int(args.gas_price),
         version=int(args.version),
         options=int(args.options),
@@ -1428,15 +1370,18 @@ def perform_batch(args: Any):
     _send_or_simulate(tx, contract, args)
 
 
-def get_quorum(args: Any):
-    validate_proxy_argument(args)
-
+def _initialize_multisig_controller(args: Any) -> MultisigController:
     abi = Abi.load(Path(args.abi))
     config = get_config_for_network_providers()
     proxy = ProxyNetworkProvider(url=args.proxy, config=config)
     chain_id = proxy.get_network_config().chain_id
-    multisig = MultisigController(chain_id, proxy, abi)
+    return MultisigController(chain_id, proxy, abi)
 
+
+def get_quorum(args: Any):
+    validate_proxy_argument(args)
+
+    multisig = _initialize_multisig_controller(args)
     quorum = multisig.get_quorum(Address.new_from_bech32(args.contract))
     print(f"Quorum: {quorum}")
 
@@ -1444,12 +1389,7 @@ def get_quorum(args: Any):
 def get_num_board_members(args: Any):
     validate_proxy_argument(args)
 
-    abi = Abi.load(Path(args.abi))
-    config = get_config_for_network_providers()
-    proxy = ProxyNetworkProvider(url=args.proxy, config=config)
-    chain_id = proxy.get_network_config().chain_id
-    multisig = MultisigController(chain_id, proxy, abi)
-
+    multisig = _initialize_multisig_controller(args)
     num_board_members = multisig.get_num_board_members(Address.new_from_bech32(args.contract))
     print(f"Number of board members: {num_board_members}")
 
@@ -1457,12 +1397,7 @@ def get_num_board_members(args: Any):
 def get_num_groups(args: Any):
     validate_proxy_argument(args)
 
-    abi = Abi.load(Path(args.abi))
-    config = get_config_for_network_providers()
-    proxy = ProxyNetworkProvider(url=args.proxy, config=config)
-    chain_id = proxy.get_network_config().chain_id
-    multisig = MultisigController(chain_id, proxy, abi)
-
+    multisig = _initialize_multisig_controller(args)
     num_groups = multisig.get_num_groups(Address.new_from_bech32(args.contract))
     print(f"Number of groups: {num_groups}")
 
@@ -1470,12 +1405,7 @@ def get_num_groups(args: Any):
 def get_num_proposers(args: Any):
     validate_proxy_argument(args)
 
-    abi = Abi.load(Path(args.abi))
-    config = get_config_for_network_providers()
-    proxy = ProxyNetworkProvider(url=args.proxy, config=config)
-    chain_id = proxy.get_network_config().chain_id
-    multisig = MultisigController(chain_id, proxy, abi)
-
+    multisig = _initialize_multisig_controller(args)
     num_proposers = multisig.get_num_proposers(Address.new_from_bech32(args.contract))
     print(f"Number of proposers: {num_proposers}")
 
@@ -1483,12 +1413,7 @@ def get_num_proposers(args: Any):
 def get_action_group(args: Any):
     validate_proxy_argument(args)
 
-    abi = Abi.load(Path(args.abi))
-    config = get_config_for_network_providers()
-    proxy = ProxyNetworkProvider(url=args.proxy, config=config)
-    chain_id = proxy.get_network_config().chain_id
-    multisig = MultisigController(chain_id, proxy, abi)
-
+    multisig = _initialize_multisig_controller(args)
     actions = multisig.get_action_group(Address.new_from_bech32(args.contract), args.group)
     print(f"Actions: [{actions}]")
 
@@ -1496,12 +1421,7 @@ def get_action_group(args: Any):
 def get_last_group_action_id(args: Any):
     validate_proxy_argument(args)
 
-    abi = Abi.load(Path(args.abi))
-    config = get_config_for_network_providers()
-    proxy = ProxyNetworkProvider(url=args.proxy, config=config)
-    chain_id = proxy.get_network_config().chain_id
-    multisig = MultisigController(chain_id, proxy, abi)
-
+    multisig = _initialize_multisig_controller(args)
     id = multisig.get_last_group_action_id(Address.new_from_bech32(args.contract))
     print(f"Last group action id: {id}")
 
@@ -1509,12 +1429,7 @@ def get_last_group_action_id(args: Any):
 def get_action_last_index(args: Any):
     validate_proxy_argument(args)
 
-    abi = Abi.load(Path(args.abi))
-    config = get_config_for_network_providers()
-    proxy = ProxyNetworkProvider(url=args.proxy, config=config)
-    chain_id = proxy.get_network_config().chain_id
-    multisig = MultisigController(chain_id, proxy, abi)
-
+    multisig = _initialize_multisig_controller(args)
     id = multisig.get_action_last_index(Address.new_from_bech32(args.contract))
     print(f"Action last index: {id}")
 
@@ -1522,12 +1437,7 @@ def get_action_last_index(args: Any):
 def is_signed_by(args: Any):
     validate_proxy_argument(args)
 
-    abi = Abi.load(Path(args.abi))
-    config = get_config_for_network_providers()
-    proxy = ProxyNetworkProvider(url=args.proxy, config=config)
-    chain_id = proxy.get_network_config().chain_id
-    multisig = MultisigController(chain_id, proxy, abi)
-
+    multisig = _initialize_multisig_controller(args)
     contract = Address.new_from_bech32(args.contract)
     action_id = int(args.action)
     user = Address.new_from_bech32(args.user)
@@ -1539,12 +1449,7 @@ def is_signed_by(args: Any):
 def is_quorum_reached(args: Any):
     validate_proxy_argument(args)
 
-    abi = Abi.load(Path(args.abi))
-    config = get_config_for_network_providers()
-    proxy = ProxyNetworkProvider(url=args.proxy, config=config)
-    chain_id = proxy.get_network_config().chain_id
-    multisig = MultisigController(chain_id, proxy, abi)
-
+    multisig = _initialize_multisig_controller(args)
     contract = Address.new_from_bech32(args.contract)
     action_id = int(args.action)
 
@@ -1555,14 +1460,9 @@ def is_quorum_reached(args: Any):
 def get_pending_actions_full_info(args: Any):
     validate_proxy_argument(args)
 
-    abi = Abi.load(Path(args.abi))
-    config = get_config_for_network_providers()
-    proxy = ProxyNetworkProvider(url=args.proxy, config=config)
-    chain_id = proxy.get_network_config().chain_id
+    multisig = _initialize_multisig_controller(args)
     contract = Address.new_from_bech32(args.contract)
-
-    controller = MultisigController(chain_id, proxy, abi)
-    actions = controller.get_pending_actions_full_info(contract)
+    actions = multisig.get_pending_actions_full_info(contract)
 
     output = [_convert_action_full_info_to_dict(action) for action in actions]
     utils.dump_out_json(output)
@@ -1571,12 +1471,7 @@ def get_pending_actions_full_info(args: Any):
 def get_user_role(args: Any):
     validate_proxy_argument(args)
 
-    abi = Abi.load(Path(args.abi))
-    config = get_config_for_network_providers()
-    proxy = ProxyNetworkProvider(url=args.proxy, config=config)
-    chain_id = proxy.get_network_config().chain_id
-    multisig = MultisigController(chain_id, proxy, abi)
-
+    multisig = _initialize_multisig_controller(args)
     contract = Address.new_from_bech32(args.contract)
     user = Address.new_from_bech32(args.user)
 
@@ -1587,12 +1482,7 @@ def get_user_role(args: Any):
 def get_all_board_members(args: Any):
     validate_proxy_argument(args)
 
-    abi = Abi.load(Path(args.abi))
-    config = get_config_for_network_providers()
-    proxy = ProxyNetworkProvider(url=args.proxy, config=config)
-    chain_id = proxy.get_network_config().chain_id
-    multisig = MultisigController(chain_id, proxy, abi)
-
+    multisig = _initialize_multisig_controller(args)
     contract = Address.new_from_bech32(args.contract)
 
     board_members = multisig.get_all_board_members(contract)
@@ -1607,12 +1497,7 @@ def get_all_board_members(args: Any):
 def get_all_proposers(args: Any):
     validate_proxy_argument(args)
 
-    abi = Abi.load(Path(args.abi))
-    config = get_config_for_network_providers()
-    proxy = ProxyNetworkProvider(url=args.proxy, config=config)
-    chain_id = proxy.get_network_config().chain_id
-    multisig = MultisigController(chain_id, proxy, abi)
-
+    multisig = _initialize_multisig_controller(args)
     contract = Address.new_from_bech32(args.contract)
 
     proposers = multisig.get_all_proposers(contract)
@@ -1627,28 +1512,18 @@ def get_all_proposers(args: Any):
 def get_action_data(args: Any):
     validate_proxy_argument(args)
 
-    abi = Abi.load(Path(args.abi))
-    config = get_config_for_network_providers()
-    proxy = ProxyNetworkProvider(url=args.proxy, config=config)
-    chain_id = proxy.get_network_config().chain_id
-    controller = MultisigController(chain_id, proxy, abi)
-
+    multisig = _initialize_multisig_controller(args)
     contract = Address.new_from_bech32(args.contract)
     action = args.action
 
-    action_data = controller.get_action_data(contract=contract, action_id=action)
+    action_data = multisig.get_action_data(contract=contract, action_id=action)
     utils.dump_out_json(_convert_action_to_dict(action_data))
 
 
 def get_action_signers(args: Any):
     validate_proxy_argument(args)
 
-    abi = Abi.load(Path(args.abi))
-    config = get_config_for_network_providers()
-    proxy = ProxyNetworkProvider(url=args.proxy, config=config)
-    chain_id = proxy.get_network_config().chain_id
-    multisig = MultisigController(chain_id, proxy, abi)
-
+    multisig = _initialize_multisig_controller(args)
     contract = Address.new_from_bech32(args.contract)
     action = args.action
 
@@ -1661,12 +1536,7 @@ def get_action_signers(args: Any):
 def get_action_signer_count(args: Any):
     validate_proxy_argument(args)
 
-    abi = Abi.load(Path(args.abi))
-    config = get_config_for_network_providers()
-    proxy = ProxyNetworkProvider(url=args.proxy, config=config)
-    chain_id = proxy.get_network_config().chain_id
-    multisig = MultisigController(chain_id, proxy, abi)
-
+    multisig = _initialize_multisig_controller(args)
     contract = Address.new_from_bech32(args.contract)
     action = args.action
 
@@ -1677,12 +1547,7 @@ def get_action_signer_count(args: Any):
 def get_action_valid_signer_count(args: Any):
     validate_proxy_argument(args)
 
-    abi = Abi.load(Path(args.abi))
-    config = get_config_for_network_providers()
-    proxy = ProxyNetworkProvider(url=args.proxy, config=config)
-    chain_id = proxy.get_network_config().chain_id
-    multisig = MultisigController(chain_id, proxy, abi)
-
+    multisig = _initialize_multisig_controller(args)
     contract = Address.new_from_bech32(args.contract)
     action = args.action
 
@@ -1693,12 +1558,7 @@ def get_action_valid_signer_count(args: Any):
 def parse_proposal(args: Any):
     validate_proxy_argument(args)
 
-    abi = Abi.load(Path(args.abi))
-    config = get_config_for_network_providers()
-    proxy = ProxyNetworkProvider(url=args.proxy, config=config)
-    chain_id = proxy.get_network_config().chain_id
-    multisig = MultisigController(chain_id, proxy, abi)
-
+    multisig = _initialize_multisig_controller(args)
     id = multisig.await_completed_execute_propose_any(args.hash)
     print(f"Proposal ID: {id}")
 

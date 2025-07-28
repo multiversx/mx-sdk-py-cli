@@ -43,7 +43,7 @@ class ContractVerificationRequest:
         return {
             "signature": self.signature.hex(),
             "payload": {
-                "contract": self.contract.bech32(),
+                "contract": self.contract.to_bech32(),
                 "dockerImage": self.docker_image,
                 "sourceCode": self.source_code,
                 "contractVariant": self.contract_variant,

@@ -5,6 +5,7 @@ from typing import Any, Optional, Protocol, Union
 from multiversx_sdk import (
     Address,
     AwaitingOptions,
+    GasLimitEstimator,
     SmartContractController,
     SmartContractQuery,
     SmartContractQueryResponse,
@@ -37,10 +38,15 @@ class INetworkProvider(Protocol):
 
 
 class SmartContract(BaseTransactionsController):
-    def __init__(self, config: TransactionsFactoryConfig, abi: Optional[Abi] = None):
+    def __init__(
+        self,
+        config: TransactionsFactoryConfig,
+        abi: Optional[Abi] = None,
+        gas_limit_estimator: Optional[GasLimitEstimator] = None,
+    ):
         self._abi = abi
         self._config = config
-        self._factory = SmartContractTransactionsFactory(config, abi)
+        self._factory = SmartContractTransactionsFactory(config, abi, gas_limit_estimator)
 
     def prepare_deploy_transaction(
         self,
@@ -52,7 +58,7 @@ class SmartContract(BaseTransactionsController):
         readable: bool,
         payable: bool,
         payable_by_sc: bool,
-        gas_limit: int,
+        gas_limit: Union[int, None],
         gas_price: int,
         value: int,
         nonce: int,
@@ -100,7 +106,7 @@ class SmartContract(BaseTransactionsController):
         function: str,
         arguments: Union[list[Any], None],
         should_prepare_args: bool,
-        gas_limit: int,
+        gas_limit: Union[int, None],
         gas_price: int,
         value: int,
         token_transfers: Union[list[TokenTransfer], None],
@@ -151,7 +157,7 @@ class SmartContract(BaseTransactionsController):
         readable: bool,
         payable: bool,
         payable_by_sc: bool,
-        gas_limit: int,
+        gas_limit: Union[int, None],
         gas_price: int,
         value: int,
         nonce: int,

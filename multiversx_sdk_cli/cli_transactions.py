@@ -111,19 +111,19 @@ def create_transaction(args: Any):
         args.data = Path(args.data_file).read_text()
 
     native_amount = int(args.value)
-    gas_limit = int(args.gas_limit) if args.gas_limit else 0
 
     transfers = getattr(args, "token_transfers", None)
     transfers = cli_shared.prepare_token_transfers(transfers) if transfers else None
 
     chain_id = cli_shared.get_chain_id(args.proxy, args.chain)
-    tx_controller = TransactionsController(chain_id)
+    gas_estimator = cli_shared.initialize_gas_limit_estimator(args)
+    tx_controller = TransactionsController(chain_id, gas_estimator)
 
     tx = tx_controller.create_transaction(
         sender=sender,
         receiver=Address.new_from_bech32(args.receiver),
         native_amount=native_amount,
-        gas_limit=gas_limit,
+        gas_limit=args.gas_limit,
         gas_price=args.gas_price,
         nonce=sender.nonce,
         version=args.version,

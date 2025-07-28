@@ -138,7 +138,13 @@ def get_defaults() -> dict[str, Any]:
         "dependencies.testwallets.urlTemplate.windows": "https://github.com/multiversx/mx-sdk-testwallets/archive/{TAG}.tar.gz",
         "github_api_token": "",
         "log_level": "info",
+        "gas_limit_multiplier": "1.0",
     }
+
+
+def get_gas_limit_multiplier_from_config() -> float:
+    value = get_value("gas_limit_multiplier")
+    return float(value)
 
 
 def get_log_level_from_config() -> str:
