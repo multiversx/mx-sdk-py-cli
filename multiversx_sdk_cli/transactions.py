@@ -41,6 +41,7 @@ class INetworkProvider(Protocol):
 class TransactionsController(BaseTransactionsController):
     def __init__(self, chain_id: str, gas_limit_estimator: Optional[GasLimitEstimator] = None) -> None:
         config = TransactionsFactoryConfig(chain_id)
+        self.chain_id = chain_id
         self.factory = TransferTransactionsFactory(config, gas_limit_estimator)
 
     def create_transaction(
@@ -63,7 +64,7 @@ class TransactionsController(BaseTransactionsController):
                 sender=sender.address,
                 receiver=receiver,
                 gas_limit=MIN_GAS_LIMIT,
-                chain_id=self.factory.config.chain_id,
+                chain_id=self.chain_id,
             )
         else:
             transaction = self.factory.create_transaction_for_transfer(

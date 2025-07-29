@@ -26,6 +26,7 @@ class DelegationOperations(BaseTransactionsController):
         gas_limit_estimator: Optional[GasLimitEstimator] = None,
     ) -> None:
         self._factory = DelegationTransactionsFactory(config=config, gas_limit_estimator=gas_limit_estimator)
+        self.chain_id = config.chain_id
 
     def prepare_transaction_for_new_delegation_contract(
         self,
@@ -779,7 +780,7 @@ class DelegationOperations(BaseTransactionsController):
             sender=owner.address,
             receiver=receiver,
             gas_limit=510000000,
-            chain_id=self._factory.config.chain_id,
+            chain_id=self.chain_id,
             data=data.encode(),
             nonce=nonce,
             version=version,
