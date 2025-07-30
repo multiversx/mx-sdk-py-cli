@@ -393,6 +393,76 @@ def test_sign_transaction(capsys: Any):
     )
 
 
+def test_estimate_gas(capsys: Any):
+    return_code = main(
+        [
+            "tx",
+            "new",
+            "--pem",
+            str(testdata_path / "alice.pem"),
+            "--receiver",
+            "erd1spyavw0956vq68xj8y4tenjpq2wd5a9p2c6j8gsz7ztyrnpxrruqzu66jx",
+            "--proxy",
+            "https://devnet-gateway.multiversx.com",
+            "--value",
+            "1000000000000",
+        ]
+    )
+    assert return_code == 0
+
+    tx = _read_stdout(capsys)
+    tx_json = json.loads(tx)["emittedTransaction"]
+    assert tx_json["gasLimit"] == 50000
+
+
+def test_estimate_gas_for_guarded_tx(capsys: Any):
+    return_code = main(
+        [
+            "tx",
+            "new",
+            "--pem",
+            str(testdata_path / "alice.pem"),
+            "--receiver",
+            "erd1spyavw0956vq68xj8y4tenjpq2wd5a9p2c6j8gsz7ztyrnpxrruqzu66jx",
+            "--proxy",
+            "https://devnet-gateway.multiversx.com",
+            "--value",
+            "1000000000000",
+            "--guardian",
+            "erd1cqqxak4wun7508e0yj9ng843r6hv4mzd0hhpjpsejkpn9wa9yq8sj7u2u5",
+        ]
+    )
+    assert return_code == 0
+
+    tx = _read_stdout(capsys)
+    tx_json = json.loads(tx)["emittedTransaction"]
+    assert tx_json["gasLimit"] == 100000
+
+
+def test_estimate_gas_with_multiplier(capsys: Any):
+    return_code = main(
+        [
+            "tx",
+            "new",
+            "--pem",
+            str(testdata_path / "alice.pem"),
+            "--receiver",
+            "erd1spyavw0956vq68xj8y4tenjpq2wd5a9p2c6j8gsz7ztyrnpxrruqzu66jx",
+            "--proxy",
+            "https://devnet-gateway.multiversx.com",
+            "--gas-limit-multiplier",
+            "1.5",
+            "--value",
+            "1000000000000",
+        ]
+    )
+    assert return_code == 0
+
+    tx = _read_stdout(capsys)
+    tx_json = json.loads(tx)["emittedTransaction"]
+    assert tx_json["gasLimit"] == 75000
+
+
 def _read_stdout(capsys: Any) -> str:
     stdout: str = capsys.readouterr().out.strip()
     return stdout

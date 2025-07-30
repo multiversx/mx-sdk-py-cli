@@ -5,6 +5,7 @@ from typing import Optional, Protocol, TextIO, Union
 from multiversx_sdk import (
     Address,
     AwaitingOptions,
+    GasLimitEstimator,
     TokenTransfer,
     Transaction,
     TransactionOnNetwork,
@@ -38,16 +39,17 @@ class INetworkProvider(Protocol):
 
 
 class TransactionsController(BaseTransactionsController):
-    def __init__(self, chain_id: str) -> None:
+    def __init__(self, chain_id: str, gas_limit_estimator: Optional[GasLimitEstimator] = None) -> None:
         config = TransactionsFactoryConfig(chain_id)
-        self.factory = TransferTransactionsFactory(config)
+        self.chain_id = chain_id
+        self.factory = TransferTransactionsFactory(config, gas_limit_estimator)
 
     def create_transaction(
         self,
         sender: IAccount,
         receiver: Address,
         native_amount: int,
-        gas_limit: int,
+        gas_limit: Union[int, None],
         gas_price: int,
         nonce: int,
         version: int,
@@ -62,7 +64,7 @@ class TransactionsController(BaseTransactionsController):
                 sender=sender.address,
                 receiver=receiver,
                 gas_limit=MIN_GAS_LIMIT,
-                chain_id=self.factory.config.chain_id,
+                chain_id=self.chain_id,
             )
         else:
             transaction = self.factory.create_transaction_for_transfer(

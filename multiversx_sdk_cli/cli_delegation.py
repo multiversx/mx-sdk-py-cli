@@ -395,7 +395,8 @@ def validate_arguments(args: Any):
 def _get_delegation_controller(args: Any):
     chain_id = cli_shared.get_chain_id(args.proxy, args.chain)
     config = TransactionsFactoryConfig(chain_id)
-    delegation = DelegationOperations(config)
+    gas_estimator = cli_shared.initialize_gas_limit_estimator(args)
+    delegation = DelegationOperations(config=config, gas_limit_estimator=gas_estimator)
     return delegation
 
 
@@ -408,7 +409,6 @@ def do_create_delegation_contract(args: Any):
         args=args,
     )
 
-    gas_limit = args.gas_limit if args.gas_limit else 0
     delegation = _get_delegation_controller(args)
 
     tx = delegation.prepare_transaction_for_new_delegation_contract(
@@ -416,7 +416,7 @@ def do_create_delegation_contract(args: Any):
         native_amount=int(args.value),
         total_delegation_cap=int(args.total_delegation_cap),
         service_fee=int(args.service_fee),
-        gas_limit=gas_limit,
+        gas_limit=args.gas_limit,
         gas_price=int(args.gas_price),
         nonce=sender.nonce,
         version=int(args.version),
@@ -453,7 +453,6 @@ def add_new_nodes(args: Any):
         args=args,
     )
 
-    gas_limit = args.gas_limit if args.gas_limit else 0
     public_keys, signed_messages = _get_public_keys_and_signed_messages(args)
 
     delegation = _get_delegation_controller(args)
@@ -462,7 +461,7 @@ def add_new_nodes(args: Any):
         delegation_contract=Address.new_from_bech32(args.delegation_contract),
         public_keys=public_keys,
         signed_messages=signed_messages,
-        gas_limit=gas_limit,
+        gas_limit=args.gas_limit,
         gas_price=int(args.gas_price),
         value=int(args.value),
         nonce=sender.nonce,
@@ -502,7 +501,6 @@ def remove_nodes(args: Any):
         args=args,
     )
 
-    gas_limit = args.gas_limit if args.gas_limit else 0
     public_keys = _load_validators_public_keys(args)
 
     delegation = _get_delegation_controller(args)
@@ -510,7 +508,7 @@ def remove_nodes(args: Any):
         owner=sender,
         delegation_contract=Address.new_from_bech32(args.delegation_contract),
         public_keys=public_keys,
-        gas_limit=gas_limit,
+        gas_limit=args.gas_limit,
         gas_price=int(args.gas_price),
         value=int(args.value),
         nonce=sender.nonce,
@@ -551,7 +549,6 @@ def stake_nodes(args: Any):
         args=args,
     )
 
-    gas_limit = args.gas_limit if args.gas_limit else 0
     public_keys = _load_validators_public_keys(args)
 
     delegation = _get_delegation_controller(args)
@@ -559,7 +556,7 @@ def stake_nodes(args: Any):
         owner=sender,
         delegation_contract=Address.new_from_bech32(args.delegation_contract),
         public_keys=public_keys,
-        gas_limit=gas_limit,
+        gas_limit=args.gas_limit,
         gas_price=int(args.gas_price),
         value=int(args.value),
         nonce=sender.nonce,
@@ -589,7 +586,6 @@ def unbond_nodes(args: Any):
         args=args,
     )
 
-    gas_limit = args.gas_limit if args.gas_limit else 0
     public_keys = _load_validators_public_keys(args)
 
     delegation = _get_delegation_controller(args)
@@ -597,7 +593,7 @@ def unbond_nodes(args: Any):
         owner=sender,
         delegation_contract=Address.new_from_bech32(args.delegation_contract),
         public_keys=public_keys,
-        gas_limit=gas_limit,
+        gas_limit=args.gas_limit,
         gas_price=int(args.gas_price),
         value=int(args.value),
         nonce=sender.nonce,
@@ -619,7 +615,6 @@ def unstake_nodes(args: Any):
         args=args,
     )
 
-    gas_limit = args.gas_limit if args.gas_limit else 0
     public_keys = _load_validators_public_keys(args)
 
     delegation = _get_delegation_controller(args)
@@ -627,7 +622,7 @@ def unstake_nodes(args: Any):
         owner=sender,
         delegation_contract=Address.new_from_bech32(args.delegation_contract),
         public_keys=public_keys,
-        gas_limit=gas_limit,
+        gas_limit=args.gas_limit,
         gas_price=int(args.gas_price),
         value=int(args.value),
         nonce=sender.nonce,
@@ -649,7 +644,6 @@ def unjail_nodes(args: Any):
         args=args,
     )
 
-    gas_limit = args.gas_limit if args.gas_limit else 0
     public_keys = _load_validators_public_keys(args)
 
     delegation = _get_delegation_controller(args)
@@ -657,7 +651,7 @@ def unjail_nodes(args: Any):
         owner=sender,
         delegation_contract=Address.new_from_bech32(args.delegation_contract),
         public_keys=public_keys,
-        gas_limit=gas_limit,
+        gas_limit=args.gas_limit,
         gas_price=int(args.gas_price),
         value=int(args.value),
         nonce=sender.nonce,
@@ -678,16 +672,13 @@ def delegate(args: Any):
         args=args,
     )
 
-    gas_limit = args.gas_limit if args.gas_limit else 0
-    value = int(args.value)
-
     delegation = _get_delegation_controller(args)
     tx = delegation.prepare_transaction_for_delegating(
         owner=sender,
         delegation_contract=Address.new_from_bech32(args.delegation_contract),
-        gas_limit=gas_limit,
+        gas_limit=args.gas_limit,
         gas_price=int(args.gas_price),
-        value=value,
+        value=int(args.value),
         nonce=sender.nonce,
         version=int(args.version),
         options=int(args.options),
@@ -706,13 +697,11 @@ def claim_rewards(args: Any):
         args=args,
     )
 
-    gas_limit = args.gas_limit if args.gas_limit else 0
-
     delegation = _get_delegation_controller(args)
     tx = delegation.prepare_transaction_for_claiming_rewards(
         owner=sender,
         delegation_contract=Address.new_from_bech32(args.delegation_contract),
-        gas_limit=gas_limit,
+        gas_limit=args.gas_limit,
         gas_price=int(args.gas_price),
         value=int(args.value),
         nonce=sender.nonce,
@@ -732,13 +721,11 @@ def redelegate_rewards(args: Any):
         args=args,
     )
 
-    gas_limit = args.gas_limit if args.gas_limit else 0
-
     delegation = _get_delegation_controller(args)
     tx = delegation.prepare_transaction_for_redelegating_rewards(
         owner=sender,
         delegation_contract=Address.new_from_bech32(args.delegation_contract),
-        gas_limit=gas_limit,
+        gas_limit=args.gas_limit,
         gas_price=int(args.gas_price),
         value=int(args.value),
         nonce=sender.nonce,
@@ -758,16 +745,13 @@ def undelegate(args: Any):
         args=args,
     )
 
-    gas_limit = args.gas_limit if args.gas_limit else 0
-    value = int(args.value)
-
     delegation = _get_delegation_controller(args)
     tx = delegation.prepare_transaction_for_undelegating(
         owner=sender,
         delegation_contract=Address.new_from_bech32(args.delegation_contract),
-        gas_limit=gas_limit,
+        gas_limit=args.gas_limit,
         gas_price=int(args.gas_price),
-        value=value,
+        value=int(args.value),
         nonce=sender.nonce,
         version=int(args.version),
         options=int(args.options),
@@ -786,13 +770,11 @@ def withdraw(args: Any):
         args=args,
     )
 
-    gas_limit = args.gas_limit if args.gas_limit else 0
-
     delegation = _get_delegation_controller(args)
     tx = delegation.prepare_transaction_for_withdrawing(
         owner=sender,
         delegation_contract=Address.new_from_bech32(args.delegation_contract),
-        gas_limit=gas_limit,
+        gas_limit=args.gas_limit,
         gas_price=int(args.gas_price),
         value=int(args.value),
         nonce=sender.nonce,
@@ -813,14 +795,12 @@ def change_service_fee(args: Any):
         args=args,
     )
 
-    gas_limit = args.gas_limit if args.gas_limit else 0
-
     delegation = _get_delegation_controller(args)
     tx = delegation.prepare_transaction_for_changing_service_fee(
         owner=sender,
         delegation_contract=Address.new_from_bech32(args.delegation_contract),
         service_fee=int(args.service_fee),
-        gas_limit=gas_limit,
+        gas_limit=args.gas_limit,
         gas_price=int(args.gas_price),
         value=int(args.value),
         nonce=sender.nonce,
@@ -841,14 +821,12 @@ def modify_delegation_cap(args: Any):
         args=args,
     )
 
-    gas_limit = args.gas_limit if args.gas_limit else 0
-
     delegation = _get_delegation_controller(args)
     tx = delegation.prepare_transaction_for_modifying_delegation_cap(
         owner=sender,
         delegation_contract=Address.new_from_bech32(args.delegation_contract),
         delegation_cap=int(args.delegation_cap),
-        gas_limit=gas_limit,
+        gas_limit=args.gas_limit,
         gas_price=int(args.gas_price),
         value=int(args.value),
         nonce=sender.nonce,
@@ -869,15 +847,13 @@ def automatic_activation(args: Any):
         args=args,
     )
 
-    gas_limit = args.gas_limit if args.gas_limit else 0
-
     delegation = _get_delegation_controller(args)
     tx = delegation.prepare_transaction_for_automatic_activation(
         owner=sender,
         delegation_contract=Address.new_from_bech32(args.delegation_contract),
         set=args.set,
         unset=args.unset,
-        gas_limit=gas_limit,
+        gas_limit=args.gas_limit,
         gas_price=int(args.gas_price),
         value=int(args.value),
         nonce=sender.nonce,
@@ -898,15 +874,13 @@ def redelegate_cap(args: Any):
         args=args,
     )
 
-    gas_limit = args.gas_limit if args.gas_limit else 0
-
     delegation = _get_delegation_controller(args)
     tx = delegation.prepare_transaction_for_redelegate_cap(
         owner=sender,
         delegation_contract=Address.new_from_bech32(args.delegation_contract),
         set=args.set,
         unset=args.unset,
-        gas_limit=gas_limit,
+        gas_limit=args.gas_limit,
         gas_price=int(args.gas_price),
         value=int(args.value),
         nonce=sender.nonce,
@@ -927,8 +901,6 @@ def set_metadata(args: Any):
         args=args,
     )
 
-    gas_limit = args.gas_limit if args.gas_limit else 0
-
     delegation = _get_delegation_controller(args)
     tx = delegation.prepare_transaction_for_setting_metadata(
         owner=sender,
@@ -936,7 +908,7 @@ def set_metadata(args: Any):
         name=args.name,
         website=args.website,
         identifier=args.identifier,
-        gas_limit=gas_limit,
+        gas_limit=args.gas_limit,
         gas_price=int(args.gas_price),
         value=int(args.value),
         nonce=sender.nonce,
@@ -957,14 +929,12 @@ def make_new_contract_from_validator_data(args: Any):
         args=args,
     )
 
-    gas_limit = args.gas_limit if args.gas_limit else 0
-
     delegation = _get_delegation_controller(args)
     tx = delegation.prepare_transaction_for_creating_delegation_contract_from_validator(
         owner=sender,
         max_cap=args.max_cap,
         service_fee=args.fee,
-        gas_limit=gas_limit,
+        gas_limit=args.gas_limit,
         gas_price=int(args.gas_price),
         value=int(args.value),
         nonce=sender.nonce,

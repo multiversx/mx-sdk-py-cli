@@ -332,7 +332,8 @@ def deploy(args: Any):
     config = TransactionsFactoryConfig(chain_id)
 
     abi = Abi.load(Path(args.abi)) if args.abi else None
-    contract = SmartContract(config, abi)
+    gas_estimator = cli_shared.initialize_gas_limit_estimator(args)
+    contract = SmartContract(config, abi, gas_estimator)
 
     arguments, should_prepare_args = _get_contract_arguments(args)
 
@@ -345,7 +346,7 @@ def deploy(args: Any):
         readable=args.metadata_readable,
         payable=args.metadata_payable,
         payable_by_sc=args.metadata_payable_by_sc,
-        gas_limit=int(args.gas_limit),
+        gas_limit=args.gas_limit,
         gas_price=int(args.gas_price),
         value=int(args.value),
         nonce=sender.nonce,
@@ -382,7 +383,8 @@ def call(args: Any):
     config = TransactionsFactoryConfig(chain_id)
 
     abi = Abi.load(Path(args.abi)) if args.abi else None
-    contract = SmartContract(config, abi)
+    gas_estimator = cli_shared.initialize_gas_limit_estimator(args)
+    contract = SmartContract(config, abi, gas_estimator)
 
     arguments, should_prepare_args = _get_contract_arguments(args)
     contract_address = Address.new_from_bech32(args.contract)
@@ -397,7 +399,7 @@ def call(args: Any):
         function=args.function,
         arguments=arguments,
         should_prepare_args=should_prepare_args,
-        gas_limit=int(args.gas_limit),
+        gas_limit=args.gas_limit,
         gas_price=int(args.gas_price),
         value=int(args.value),
         token_transfers=token_transfers,
@@ -427,7 +429,8 @@ def upgrade(args: Any):
     config = TransactionsFactoryConfig(chain_id)
 
     abi = Abi.load(Path(args.abi)) if args.abi else None
-    contract = SmartContract(config, abi)
+    gas_estimator = cli_shared.initialize_gas_limit_estimator(args)
+    contract = SmartContract(config, abi, gas_estimator)
 
     arguments, should_prepare_args = _get_contract_arguments(args)
     contract_address = Address.new_from_bech32(args.contract)
@@ -442,7 +445,7 @@ def upgrade(args: Any):
         readable=args.metadata_readable,
         payable=args.metadata_payable,
         payable_by_sc=args.metadata_payable_by_sc,
-        gas_limit=int(args.gas_limit),
+        gas_limit=args.gas_limit,
         gas_price=int(args.gas_price),
         value=int(args.value),
         nonce=sender.nonce,

@@ -6,7 +6,6 @@ from multiversx_sdk_cli.errors import InvalidArgumentsError
 def validate_transaction_args(args: Any):
     validate_nonce_args(args)
     validate_receiver_args(args)
-    validate_gas_limit_args(args)
 
 
 def validate_nonce_args(args: Any):

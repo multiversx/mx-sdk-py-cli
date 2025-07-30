@@ -1,5 +1,8 @@
+from typing import Optional, Union
+
 from multiversx_sdk import (
     Address,
+    GasLimitEstimator,
     GovernanceTransactionsFactory,
     Transaction,
     TransactionsFactoryConfig,
@@ -12,8 +15,12 @@ from multiversx_sdk_cli.interfaces import IAccount
 
 
 class GovernanceWrapper(BaseTransactionsController):
-    def __init__(self, config: TransactionsFactoryConfig) -> None:
-        self.factory = GovernanceTransactionsFactory(config)
+    def __init__(
+        self,
+        config: TransactionsFactoryConfig,
+        gas_limit_estimator: Optional[GasLimitEstimator] = None,
+    ) -> None:
+        self.factory = GovernanceTransactionsFactory(config=config, gas_limit_estimator=gas_limit_estimator)
 
     def create_transaction_for_new_proposal(
         self,
@@ -23,7 +30,7 @@ class GovernanceWrapper(BaseTransactionsController):
         start_vote_epoch: int,
         end_vote_epoch: int,
         native_token_amount: int,
-        gas_limit: int,
+        gas_limit: Union[int, None],
         gas_price: int,
         version: int,
         options: int,
@@ -66,7 +73,7 @@ class GovernanceWrapper(BaseTransactionsController):
         nonce: int,
         proposal_nonce: int,
         vote: str,
-        gas_limit: int,
+        gas_limit: Union[int, None],
         gas_price: int,
         version: int,
         options: int,
@@ -106,7 +113,7 @@ class GovernanceWrapper(BaseTransactionsController):
         sender: IAccount,
         nonce: int,
         proposal_nonce: int,
-        gas_limit: int,
+        gas_limit: Union[int, None],
         gas_price: int,
         version: int,
         options: int,
@@ -142,7 +149,7 @@ class GovernanceWrapper(BaseTransactionsController):
         sender: IAccount,
         nonce: int,
         proposers: list[Address],
-        gas_limit: int,
+        gas_limit: Union[int, None],
         gas_price: int,
         version: int,
         options: int,
@@ -177,7 +184,7 @@ class GovernanceWrapper(BaseTransactionsController):
         self,
         sender: IAccount,
         nonce: int,
-        gas_limit: int,
+        gas_limit: Union[int, None],
         gas_price: int,
         version: int,
         options: int,
@@ -217,7 +224,7 @@ class GovernanceWrapper(BaseTransactionsController):
         min_quorum: int,
         min_veto_threshold: int,
         min_pass_threshold: int,
-        gas_limit: int,
+        gas_limit: Union[int, None],
         gas_price: int,
         version: int,
         options: int,
