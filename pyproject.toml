@@ -25,7 +25,7 @@ dependencies = [
   "ledgercomm[hid]",
   "rich==13.3.4",
   "argcomplete==3.2.2",
-  "multiversx-sdk[ledger]==2.0.0"
+  "multiversx-sdk[ledger]==2.0.1"
 ]
 
 [project.scripts]
