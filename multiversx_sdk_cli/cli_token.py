@@ -63,7 +63,17 @@ def setup_parser(args: list[str], subparsers: Any) -> Any:
 
 
 def validate_token_args(args: Any):
-    pass
+    if args.initial_supply < 0:
+        raise ValueError("Initial supply must be a non-negative integer")
+
+    if not (0 <= args.num_decimals <= 18):
+        raise ValueError("Number of decimals must be between 0 and 18")
+
+    if not (3 <= len(args.token_name) <= 20) or not args.token_name.isalnum():
+        raise ValueError("Token name must be 3-20 alphanumerical characters")
+
+    if not (3 <= len(args.token_ticker) <= 10) or not args.token_ticker.isalnum() or not args.token_ticker.isupper():
+        raise ValueError("Token ticker must be 3-10 UPPERCASE alphanumerical characters")
 
 
 def _ensure_args(args: Any):
