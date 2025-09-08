@@ -23,6 +23,7 @@ import multiversx_sdk_cli.cli_governance
 import multiversx_sdk_cli.cli_ledger
 import multiversx_sdk_cli.cli_localnet
 import multiversx_sdk_cli.cli_multisig
+import multiversx_sdk_cli.cli_token
 import multiversx_sdk_cli.cli_transactions
 import multiversx_sdk_cli.cli_validator_wallet
 import multiversx_sdk_cli.cli_validators
@@ -142,6 +143,7 @@ See:
     commands.append(multiversx_sdk_cli.cli_governance.setup_parser(args, subparsers))
     commands.append(multiversx_sdk_cli.cli_config_env.setup_parser(subparsers))
     commands.append(multiversx_sdk_cli.cli_get.setup_parser(subparsers))
+    commands.append(multiversx_sdk_cli.cli_token.setup_parser(args, subparsers))
 
     parser.epilog = """
 ----------------------
