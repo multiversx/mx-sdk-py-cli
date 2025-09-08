@@ -8,12 +8,13 @@ from multiversx_sdk_cli.args_validation import (
     validate_chain_id_args,
 )
 from multiversx_sdk_cli.cli_output import CLIOutputBuilder
-from multiversx_sdk_cli.cli_transactions import _add_common_arguments
-from multiversx_sdk_cli.token import TokenWrapper
+from multiversx_sdk_cli.tokens import TokenWrapper
 
 
 def setup_parser(args: list[str], subparsers: Any) -> Any:
-    parser = cli_shared.add_group_subparser(subparsers, "token", "Perform operations with tokens")
+    parser = cli_shared.add_group_subparser(
+        subparsers, "token", "Perform token management operations (issue tokens, create NFTs, set roles, etc.)"
+    )
     subparsers = parser.add_subparsers()
 
     sub = cli_shared.add_command_subparser(
@@ -41,14 +42,31 @@ def setup_parser(args: list[str], subparsers: Any) -> Any:
         type=int,
         help="a numerical value between 0 and 18 representing number of decimals",
     )
-    sub.add_argument("--can-freeze", type=bool, help="whether a token can be freezed")
-    sub.add_argument("--can-wipe", type=bool, help="whether a token can be wiped")
-    sub.add_argument("--can-pause", type=bool, help="whether a token can be paused")
-    sub.add_argument("--can-change-owner", type=bool, help="whether a token can change owner")
-    sub.add_argument("--can-upgrade", type=bool, help="whether a token can be upgraded")
-    sub.add_argument("--can-add_special-roles", type=bool, help="whether special roles can be added for the token")
+    sub.add_argument(
+        "--can-freeze", required=True, type=lambda x: x.lower() == "true", help="whether a token can be freezed"
+    )
+    sub.add_argument(
+        "--can-wipe", required=True, type=lambda x: x.lower() == "true", help="whether a token can be wiped"
+    )
+    sub.add_argument(
+        "--can-pause", required=True, type=lambda x: x.lower() == "true", help="whether a token can be paused"
+    )
+    sub.add_argument(
+        "--can-change-owner", required=True, type=lambda x: x.lower() == "true", help="whether a token can change owner"
+    )
+    sub.add_argument(
+        "--can-upgrade", required=True, type=lambda x: x.lower() == "true", help="whether a token can be upgraded"
+    )
+    sub.add_argument(
+        "--can-add_special-roles",
+        required=lambda x: x.lower() == "true",
+        type=bool,
+        help="whether special roles can be added for the token",
+    )
 
-    _add_common_arguments(args, sub)
+    cli_shared.add_wallet_args(args, sub)
+    cli_shared.add_tx_args(args, sub, with_receiver=False, with_data=False)
+    sub.add_argument("--data-file", type=str, default=None, help="a file containing transaction data")
     cli_shared.add_broadcast_args(sub)
     cli_shared.add_proxy_arg(sub)
     cli_shared.add_wait_result_and_timeout_args(sub)
@@ -106,12 +124,12 @@ def issue_fungible(args: Any):
         version=args.version,
         options=args.options,
         guardian_and_relayer_data=guardian_and_relayer_data,
-        can_freeze=args.can_freeze if args.can_freeze is not None else True,
-        can_wipe=args.can_wipe if args.can_wipe is not None else True,
-        can_pause=args.can_pause if args.can_pause is not None else True,
-        can_change_owner=args.can_change_owner if args.can_change_owner is not None else True,
-        can_upgrade=args.can_upgrade if args.can_upgrade is not None else True,
-        can_add_special_roles=args.can_add_special_roles if args.can_add_special_roles is not None else True,
+        can_freeze=args.can_freeze,
+        can_wipe=args.can_wipe,
+        can_pause=args.can_pause,
+        can_change_owner=args.can_change_owner,
+        can_upgrade=args.can_upgrade,
+        can_add_special_roles=args.can_add_special_roles,
     )
 
     cli_shared.send_or_simulate(transaction, args)
