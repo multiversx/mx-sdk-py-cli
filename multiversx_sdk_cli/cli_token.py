@@ -1,8 +1,15 @@
 from typing import Any
 
+from multiversx_sdk import TransactionsFactoryConfig
+
 from multiversx_sdk_cli import cli_shared
+from multiversx_sdk_cli.args_validation import (
+    validate_broadcast_args,
+    validate_chain_id_args,
+)
 from multiversx_sdk_cli.cli_output import CLIOutputBuilder
 from multiversx_sdk_cli.cli_transactions import _add_common_arguments
+from multiversx_sdk_cli.token import TokenWrapper
 
 
 def setup_parser(args: list[str], subparsers: Any) -> Any:
@@ -45,9 +52,56 @@ def setup_parser(args: list[str], subparsers: Any) -> Any:
     cli_shared.add_broadcast_args(sub)
     cli_shared.add_proxy_arg(sub)
     cli_shared.add_wait_result_and_timeout_args(sub)
+    cli_shared.add_guardian_wallet_args(args, sub)
+    cli_shared.add_relayed_v3_wallet_args(args, sub)
+    cli_shared.add_outfile_arg(sub)
 
     sub.set_defaults(func=issue_fungible)
 
+    parser.epilog = cli_shared.build_group_epilog(subparsers)
+    return subparsers
 
-def issue_fungible(arg: Any):
+
+def validate_token_args(args: Any):
     pass
+
+
+def _ensure_args(args: Any):
+    validate_broadcast_args(args)
+    validate_chain_id_args(args)
+    validate_token_args(args)
+
+
+def issue_fungible(args: Any):
+    _ensure_args(args)
+
+    sender = cli_shared.prepare_sender(args)
+    guardian_and_relayer_data = cli_shared.get_guardian_and_relayer_data(
+        sender=sender.address.to_bech32(),
+        args=args,
+    )
+    chain_id = cli_shared.get_chain_id(args.proxy, args.chain)
+    gas_estimator = cli_shared.initialize_gas_limit_estimator(args)
+    controller = TokenWrapper(config=TransactionsFactoryConfig(chain_id), gas_limit_estimator=gas_estimator)
+
+    transaction = controller.create_transaction_for_issuing_fungible_token(
+        sender=sender,
+        nonce=sender.nonce,
+        token_name=args.token_name,
+        token_ticker=args.token_ticker,
+        initial_supply=args.initial_supply,
+        num_decimals=args.num_decimals,
+        gas_limit=args.gas_limit,
+        gas_price=args.gas_price,
+        version=args.version,
+        options=args.options,
+        guardian_and_relayer_data=guardian_and_relayer_data,
+        can_freeze=args.can_freeze if args.can_freeze is not None else True,
+        can_wipe=args.can_wipe if args.can_wipe is not None else True,
+        can_pause=args.can_pause if args.can_pause is not None else True,
+        can_change_owner=args.can_change_owner if args.can_change_owner is not None else True,
+        can_upgrade=args.can_upgrade if args.can_upgrade is not None else True,
+        can_add_special_roles=args.can_add_special_roles if args.can_add_special_roles is not None else True,
+    )
+
+    cli_shared.send_or_simulate(transaction, args)
