@@ -571,38 +571,60 @@ def add_issuing_tokens_args(
         )
 
     sub.add_argument(
-        "--can-freeze", required=True, type=lambda x: x.lower() == "true", help="whether a token can be freezed"
+        "--can-not-freeze",
+        action="store_false",
+        dest="can_freeze",
+        default=True,
+        help="make token not freezable",
     )
     sub.add_argument(
-        "--can-wipe", required=True, type=lambda x: x.lower() == "true", help="whether a token can be wiped"
+        "--can-not-wipe",
+        action="store_false",
+        dest="can_wipe",
+        default=True,
+        help="make token not wipable",
     )
     sub.add_argument(
-        "--can-pause", required=True, type=lambda x: x.lower() == "true", help="whether a token can be paused"
+        "--can-not-pause",
+        action="store_false",
+        dest="can_pause",
+        default=True,
+        help="make token not pausable",
     )
     sub.add_argument(
-        "--can-change-owner", required=True, type=lambda x: x.lower() == "true", help="whether a token can change owner"
+        "--can-not-change-owner",
+        action="store_false",
+        dest="can_change_owner",
+        default=True,
+        help="don't allow changing the token's owner",
     )
     sub.add_argument(
-        "--can-upgrade", required=True, type=lambda x: x.lower() == "true", help="whether a token can be upgraded"
+        "--can-not-upgrade",
+        action="store_false",
+        dest="can_upgrade",
+        default=True,
+        help="don't allow upgrading the token",
     )
     sub.add_argument(
-        "--can-add_special-roles",
-        required=True,
-        type=lambda x: x.lower() == "true",
-        help="whether special roles can be added for the token",
+        "--can-not-add-special-roles",
+        action="store_false",
+        dest="can_add_special_roles",
+        default=True,
+        help="don't allow special roles to be added for the token",
     )
 
     if with_transfer_nft_create_role:
         sub.add_argument(
-            "--can-transfer-nft-create-role",
-            required=True,
-            type=lambda x: x.lower() == "true",
-            help="whether nft create roles can be transfered for the token",
+            "--can-not-transfer-nft-create-role",
+            action="store_false",
+            dest="can_transfer_nft_create_role",
+            default=True,
+            help="don't allow for nft create roles to be transfered for the token",
         )
 
 
 def _add_token_identifier_arg(sub: Any):
-    sub.add_argument("--identifier", required=True, type=str, help="the token identifier")
+    sub.add_argument("--token-identifier", required=True, type=str, help="the token identifier")
 
 
 def _add_user_arg(sub: Any):
