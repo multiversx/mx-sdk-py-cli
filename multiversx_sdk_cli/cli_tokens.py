@@ -291,7 +291,7 @@ def setup_parser(args: list[str], subparsers: Any) -> Any:
     )
     _add_token_identifier_arg(sub)
     sub.add_argument("--token-nonce", required=True, type=int, help="The nonce of the token as decimal value")
-    sub.add_argument("--quantity", required=True, type=str, help="The quantity to add")
+    sub.add_argument("--quantity", required=True, type=int, help="The quantity to add")
     add_common_args(args, sub)
     sub.set_defaults(func=add_quantity)
 
@@ -303,7 +303,7 @@ def setup_parser(args: list[str], subparsers: Any) -> Any:
     )
     _add_token_identifier_arg(sub)
     sub.add_argument("--token-nonce", required=True, type=int, help="The nonce of the token as decimal value")
-    sub.add_argument("--quantity", required=True, type=str, help="The quantity to burn")
+    sub.add_argument("--quantity", required=True, type=int, help="The quantity to burn")
     add_common_args(args, sub)
     sub.set_defaults(func=burn_quantity)
 
@@ -315,7 +315,7 @@ def setup_parser(args: list[str], subparsers: Any) -> Any:
     )
     _add_token_identifier_arg(sub)
     sub.add_argument("--token-nonce", required=True, type=int, help="The nonce of the token as decimal value")
-    sub.add_argument("--royalties", required=True, type=str, help="The new token royalties (e.g. 1234 for 12.34%)")
+    sub.add_argument("--royalties", required=True, type=int, help="The new token royalties (e.g. 1234 for 12.34%)")
     add_common_args(args, sub)
     sub.set_defaults(func=modify_royalties)
 
@@ -351,7 +351,7 @@ def setup_parser(args: list[str], subparsers: Any) -> Any:
     _add_token_identifier_arg(sub)
     sub.add_argument("--token-nonce", required=True, type=int, help="The nonce of the token as decimal value")
     sub.add_argument("--token-name", required=True, type=str, help="The new name of the token")
-    sub.add_argument("--royalties", required=True, type=int, help="The new token royalties (e.g. 1234 for 12.34%)")
+    sub.add_argument("--royalties", required=True, type=int, help="The new token royalties (e.g. 1234 for 12.34%%)")
     sub.add_argument("--hash", required=True, type=str, help="The new hash of the token")
     sub.add_argument(
         "--attributes", required=True, type=str, help="The new attributes of the token as a hex-encoded string"
@@ -369,7 +369,7 @@ def setup_parser(args: list[str], subparsers: Any) -> Any:
     _add_token_identifier_arg(sub)
     sub.add_argument("--token-nonce", required=True, type=int, help="The nonce of the token as decimal value")
     sub.add_argument("--token-name", required=True, type=str, help="The new name of the token")
-    sub.add_argument("--royalties", required=True, type=int, help="The new token royalties (e.g. 1234 for 12.34%)")
+    sub.add_argument("--royalties", required=True, type=int, help="The new token royalties (e.g. 1234 for 12.34%%)")
     sub.add_argument("--hash", required=True, type=str, help="The new hash of the token")
     sub.add_argument(
         "--attributes", required=True, type=str, help="The new attributes of the token as a hex-encoded string"
@@ -401,7 +401,7 @@ def setup_parser(args: list[str], subparsers: Any) -> Any:
     sub = cli_shared.add_command_subparser(
         subparsers,
         "token",
-        "register-dynamic-token",
+        "register-dynamic",
         "Register a dynamic token.",
     )
     sub.add_argument("--token-name", type=str, required=True, help="The token name")
