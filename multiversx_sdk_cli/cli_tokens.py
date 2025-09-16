@@ -1,13 +1,21 @@
 from typing import Any
 
-from multiversx_sdk import Address, TokenType, TransactionsFactoryConfig
+from multiversx_sdk import (
+    Address,
+    ProxyNetworkProvider,
+    TokenManagementController,
+    TokenType,
+    Transaction,
+)
 
 from multiversx_sdk_cli import cli_shared
 from multiversx_sdk_cli.args_validation import (
     validate_broadcast_args,
     validate_chain_id_args,
 )
-from multiversx_sdk_cli.tokens import TokensManagementWrapper
+from multiversx_sdk_cli.base_transactions_controller import BaseTransactionsController
+from multiversx_sdk_cli.guardian_relayer_data import GuardianRelayerData
+from multiversx_sdk_cli.interfaces import IAccount
 
 
 def setup_parser(args: list[str], subparsers: Any) -> Any:
@@ -832,6 +840,30 @@ def _ensure_issue_args(args: Any, with_initial_supply: bool = False, with_num_de
     validate_token_args(args, with_initial_supply, with_num_decimals)
 
 
+def _initialize_controller(args: Any) -> TokenManagementController:
+    chain_id = cli_shared.get_chain_id(args.proxy, args.chain)
+    gas_estimator = cli_shared.initialize_gas_limit_estimator(args)
+
+    proxy_url = args.proxy if args.proxy else ""
+    return TokenManagementController(
+        chain_id=chain_id,
+        network_provider=ProxyNetworkProvider(proxy_url),
+        gas_limit_estimator=gas_estimator,
+    )
+
+
+def _sign_transaction(transaction: Transaction, sender: IAccount, guardian_and_relayer_data: GuardianRelayerData):
+    base = BaseTransactionsController()
+    base.sign_transaction(
+        transaction=transaction,
+        sender=sender,
+        guardian=guardian_and_relayer_data.guardian,
+        relayer=guardian_and_relayer_data.relayer,
+        guardian_service_url=guardian_and_relayer_data.guardian_service_url,
+        guardian_2fa_code=guardian_and_relayer_data.guardian_2fa_code,
+    )
+
+
 def issue_fungible(args: Any):
     _ensure_issue_args(args, with_initial_supply=True, with_num_decimals=True)
 
@@ -840,33 +872,28 @@ def issue_fungible(args: Any):
         sender=sender.address.to_bech32(),
         args=args,
     )
-    chain_id = cli_shared.get_chain_id(args.proxy, args.chain)
-    gas_estimator = cli_shared.initialize_gas_limit_estimator(args)
-    controller = TokensManagementWrapper(
-        config=TransactionsFactoryConfig(chain_id),
-        gas_limit_estimator=gas_estimator,
-    )
 
-    transaction = controller.create_transaction_for_issuing_fungible_token(
+    controller = _initialize_controller(args)
+    transaction = controller.create_transaction_for_issuing_fungible(
         sender=sender,
         nonce=sender.nonce,
         token_name=args.token_name,
         token_ticker=args.token_ticker,
         initial_supply=args.initial_supply,
         num_decimals=args.num_decimals,
-        gas_limit=args.gas_limit,
-        gas_price=args.gas_price,
-        version=args.version,
-        options=args.options,
-        guardian_and_relayer_data=guardian_and_relayer_data,
         can_freeze=args.can_freeze,
         can_wipe=args.can_wipe,
         can_pause=args.can_pause,
         can_change_owner=args.can_change_owner,
         can_upgrade=args.can_upgrade,
         can_add_special_roles=args.can_add_special_roles,
+        guardian=guardian_and_relayer_data.guardian.address if guardian_and_relayer_data.guardian else None,
+        relayer=guardian_and_relayer_data.relayer.address if guardian_and_relayer_data.relayer else None,
+        gas_limit=args.gas_limit,
+        gas_price=args.gas_price,
     )
 
+    _sign_transaction(transaction, sender, guardian_and_relayer_data)
     cli_shared.send_or_simulate(transaction, args)
 
 
@@ -878,23 +905,13 @@ def issue_semi_fungible(args: Any):
         sender=sender.address.to_bech32(),
         args=args,
     )
-    chain_id = cli_shared.get_chain_id(args.proxy, args.chain)
-    gas_estimator = cli_shared.initialize_gas_limit_estimator(args)
-    controller = TokensManagementWrapper(
-        config=TransactionsFactoryConfig(chain_id),
-        gas_limit_estimator=gas_estimator,
-    )
 
-    transaction = controller.create_transaction_for_issuing_semi_fungible_token(
+    controller = _initialize_controller(args)
+    transaction = controller.create_transaction_for_issuing_semi_fungible(
         sender=sender,
         nonce=sender.nonce,
         token_name=args.token_name,
         token_ticker=args.token_ticker,
-        gas_limit=args.gas_limit,
-        gas_price=args.gas_price,
-        version=args.version,
-        options=args.options,
-        guardian_and_relayer_data=guardian_and_relayer_data,
         can_freeze=args.can_freeze,
         can_wipe=args.can_wipe,
         can_pause=args.can_pause,
@@ -902,8 +919,13 @@ def issue_semi_fungible(args: Any):
         can_change_owner=args.can_change_owner,
         can_upgrade=args.can_upgrade,
         can_add_special_roles=args.can_add_special_roles,
+        guardian=guardian_and_relayer_data.guardian.address if guardian_and_relayer_data.guardian else None,
+        relayer=guardian_and_relayer_data.relayer.address if guardian_and_relayer_data.relayer else None,
+        gas_limit=args.gas_limit,
+        gas_price=args.gas_price,
     )
 
+    _sign_transaction(transaction, sender, guardian_and_relayer_data)
     cli_shared.send_or_simulate(transaction, args)
 
 
@@ -915,23 +937,13 @@ def issue_non_fungible(args: Any):
         sender=sender.address.to_bech32(),
         args=args,
     )
-    chain_id = cli_shared.get_chain_id(args.proxy, args.chain)
-    gas_estimator = cli_shared.initialize_gas_limit_estimator(args)
-    controller = TokensManagementWrapper(
-        config=TransactionsFactoryConfig(chain_id),
-        gas_limit_estimator=gas_estimator,
-    )
 
-    transaction = controller.create_transaction_for_issuing_non_fungible_token(
+    controller = _initialize_controller(args)
+    transaction = controller.create_transaction_for_issuing_non_fungible(
         sender=sender,
         nonce=sender.nonce,
         token_name=args.token_name,
         token_ticker=args.token_ticker,
-        gas_limit=args.gas_limit,
-        gas_price=args.gas_price,
-        version=args.version,
-        options=args.options,
-        guardian_and_relayer_data=guardian_and_relayer_data,
         can_freeze=args.can_freeze,
         can_wipe=args.can_wipe,
         can_pause=args.can_pause,
@@ -939,8 +951,13 @@ def issue_non_fungible(args: Any):
         can_change_owner=args.can_change_owner,
         can_upgrade=args.can_upgrade,
         can_add_special_roles=args.can_add_special_roles,
+        guardian=guardian_and_relayer_data.guardian.address if guardian_and_relayer_data.guardian else None,
+        relayer=guardian_and_relayer_data.relayer.address if guardian_and_relayer_data.relayer else None,
+        gas_limit=args.gas_limit,
+        gas_price=args.gas_price,
     )
 
+    _sign_transaction(transaction, sender, guardian_and_relayer_data)
     cli_shared.send_or_simulate(transaction, args)
 
 
@@ -952,19 +969,14 @@ def register_meta_esdt(args: Any):
         sender=sender.address.to_bech32(),
         args=args,
     )
-    chain_id = cli_shared.get_chain_id(args.proxy, args.chain)
-    gas_estimator = cli_shared.initialize_gas_limit_estimator(args)
-    controller = TokensManagementWrapper(
-        config=TransactionsFactoryConfig(chain_id),
-        gas_limit_estimator=gas_estimator,
-    )
 
+    controller = _initialize_controller(args)
     transaction = controller.create_transaction_for_registering_meta_esdt(
         sender=sender,
         nonce=sender.nonce,
         token_name=args.token_name,
         token_ticker=args.token_ticker,
-        decimals=args.num_decimals,
+        num_decimals=args.num_decimals,
         can_freeze=args.can_freeze,
         can_wipe=args.can_wipe,
         can_pause=args.can_pause,
@@ -972,13 +984,13 @@ def register_meta_esdt(args: Any):
         can_change_owner=args.can_change_owner,
         can_upgrade=args.can_upgrade,
         can_add_special_roles=args.can_add_special_roles,
+        guardian=guardian_and_relayer_data.guardian.address if guardian_and_relayer_data.guardian else None,
+        relayer=guardian_and_relayer_data.relayer.address if guardian_and_relayer_data.relayer else None,
         gas_limit=args.gas_limit,
         gas_price=args.gas_price,
-        version=args.version,
-        options=args.options,
-        guardian_and_relayer_data=guardian_and_relayer_data,
     )
 
+    _sign_transaction(transaction, sender, guardian_and_relayer_data)
     cli_shared.send_or_simulate(transaction, args)
 
 
@@ -990,28 +1002,24 @@ def register_and_set_all_roles(args: Any):
         sender=sender.address.to_bech32(),
         args=args,
     )
-    chain_id = cli_shared.get_chain_id(args.proxy, args.chain)
-    gas_estimator = cli_shared.initialize_gas_limit_estimator(args)
-    controller = TokensManagementWrapper(
-        config=TransactionsFactoryConfig(chain_id),
-        gas_limit_estimator=gas_estimator,
-    )
+
+    controller = _initialize_controller(args)
     [token_type] = [type for type in TokenType if args.token_type == type.value]
 
-    transaction = controller.create_transaction_for_registering_and_set_all_roles(
+    transaction = controller.create_transaction_for_registering_and_setting_roles(
         sender=sender,
         nonce=sender.nonce,
         token_name=args.token_name,
         token_ticker=args.token_ticker,
-        decimals=args.num_decimals,
+        num_decimals=args.num_decimals,
         token_type=token_type,
+        guardian=guardian_and_relayer_data.guardian.address if guardian_and_relayer_data.guardian else None,
+        relayer=guardian_and_relayer_data.relayer.address if guardian_and_relayer_data.relayer else None,
         gas_limit=args.gas_limit,
         gas_price=args.gas_price,
-        version=args.version,
-        options=args.options,
-        guardian_and_relayer_data=guardian_and_relayer_data,
     )
 
+    _sign_transaction(transaction, sender, guardian_and_relayer_data)
     cli_shared.send_or_simulate(transaction, args)
 
 
@@ -1024,24 +1032,19 @@ def set_burn_role_globally(args: Any):
         sender=sender.address.to_bech32(),
         args=args,
     )
-    chain_id = cli_shared.get_chain_id(args.proxy, args.chain)
-    gas_estimator = cli_shared.initialize_gas_limit_estimator(args)
-    controller = TokensManagementWrapper(
-        config=TransactionsFactoryConfig(chain_id),
-        gas_limit_estimator=gas_estimator,
-    )
 
+    controller = _initialize_controller(args)
     transaction = controller.create_transaction_for_setting_burn_role_globally(
         sender=sender,
         nonce=sender.nonce,
         token_identifier=args.token_identifier,
+        guardian=guardian_and_relayer_data.guardian.address if guardian_and_relayer_data.guardian else None,
+        relayer=guardian_and_relayer_data.relayer.address if guardian_and_relayer_data.relayer else None,
         gas_limit=args.gas_limit,
         gas_price=args.gas_price,
-        version=args.version,
-        options=args.options,
-        guardian_and_relayer_data=guardian_and_relayer_data,
     )
 
+    _sign_transaction(transaction, sender, guardian_and_relayer_data)
     cli_shared.send_or_simulate(transaction, args)
 
 
@@ -1054,24 +1057,19 @@ def unset_burn_role_globally(args: Any):
         sender=sender.address.to_bech32(),
         args=args,
     )
-    chain_id = cli_shared.get_chain_id(args.proxy, args.chain)
-    gas_estimator = cli_shared.initialize_gas_limit_estimator(args)
-    controller = TokensManagementWrapper(
-        config=TransactionsFactoryConfig(chain_id),
-        gas_limit_estimator=gas_estimator,
-    )
+    controller = _initialize_controller(args)
 
     transaction = controller.create_transaction_for_unsetting_burn_role_globally(
         sender=sender,
         nonce=sender.nonce,
         token_identifier=args.token_identifier,
+        guardian=guardian_and_relayer_data.guardian.address if guardian_and_relayer_data.guardian else None,
+        relayer=guardian_and_relayer_data.relayer.address if guardian_and_relayer_data.relayer else None,
         gas_limit=args.gas_limit,
         gas_price=args.gas_price,
-        version=args.version,
-        options=args.options,
-        guardian_and_relayer_data=guardian_and_relayer_data,
     )
 
+    _sign_transaction(transaction, sender, guardian_and_relayer_data)
     cli_shared.send_or_simulate(transaction, args)
 
 
@@ -1084,14 +1082,9 @@ def set_special_role_on_fungible(args: Any):
         sender=sender.address.to_bech32(),
         args=args,
     )
-    chain_id = cli_shared.get_chain_id(args.proxy, args.chain)
-    gas_estimator = cli_shared.initialize_gas_limit_estimator(args)
-    controller = TokensManagementWrapper(
-        config=TransactionsFactoryConfig(chain_id),
-        gas_limit_estimator=gas_estimator,
-    )
 
-    transaction = controller.create_transaction_for_setting_special_role_on_fungible(
+    controller = _initialize_controller(args)
+    transaction = controller.create_transaction_for_setting_special_role_on_fungible_token(
         sender=sender,
         nonce=sender.nonce,
         token_identifier=args.token_identifier,
@@ -1099,13 +1092,13 @@ def set_special_role_on_fungible(args: Any):
         add_role_local_mint=args.local_mint,
         add_role_local_burn=args.local_burn,
         add_role_esdt_transfer_role=args.esdt_transfer_role,
+        guardian=guardian_and_relayer_data.guardian.address if guardian_and_relayer_data.guardian else None,
+        relayer=guardian_and_relayer_data.relayer.address if guardian_and_relayer_data.relayer else None,
         gas_limit=args.gas_limit,
         gas_price=args.gas_price,
-        version=args.version,
-        options=args.options,
-        guardian_and_relayer_data=guardian_and_relayer_data,
     )
 
+    _sign_transaction(transaction, sender, guardian_and_relayer_data)
     cli_shared.send_or_simulate(transaction, args)
 
 
@@ -1118,14 +1111,9 @@ def unset_special_role_on_fungible(args: Any):
         sender=sender.address.to_bech32(),
         args=args,
     )
-    chain_id = cli_shared.get_chain_id(args.proxy, args.chain)
-    gas_estimator = cli_shared.initialize_gas_limit_estimator(args)
-    controller = TokensManagementWrapper(
-        config=TransactionsFactoryConfig(chain_id),
-        gas_limit_estimator=gas_estimator,
-    )
 
-    transaction = controller.create_transaction_for_unsetting_special_role_on_fungible(
+    controller = _initialize_controller(args)
+    transaction = controller.create_transaction_for_unsetting_special_role_on_fungible_token(
         sender=sender,
         nonce=sender.nonce,
         token_identifier=args.token_identifier,
@@ -1133,13 +1121,13 @@ def unset_special_role_on_fungible(args: Any):
         remove_role_local_mint=args.local_mint,
         remove_role_local_burn=args.local_burn,
         remove_role_esdt_transfer_role=args.esdt_transfer_role,
+        guardian=guardian_and_relayer_data.guardian.address if guardian_and_relayer_data.guardian else None,
+        relayer=guardian_and_relayer_data.relayer.address if guardian_and_relayer_data.relayer else None,
         gas_limit=args.gas_limit,
         gas_price=args.gas_price,
-        version=args.version,
-        options=args.options,
-        guardian_and_relayer_data=guardian_and_relayer_data,
     )
 
+    _sign_transaction(transaction, sender, guardian_and_relayer_data)
     cli_shared.send_or_simulate(transaction, args)
 
 
@@ -1152,14 +1140,9 @@ def set_special_role_on_semi_fungible(args: Any):
         sender=sender.address.to_bech32(),
         args=args,
     )
-    chain_id = cli_shared.get_chain_id(args.proxy, args.chain)
-    gas_estimator = cli_shared.initialize_gas_limit_estimator(args)
-    controller = TokensManagementWrapper(
-        config=TransactionsFactoryConfig(chain_id),
-        gas_limit_estimator=gas_estimator,
-    )
 
-    transaction = controller.create_transaction_for_setting_special_role_on_semi_fungible(
+    controller = _initialize_controller(args)
+    transaction = controller.create_transaction_for_setting_special_role_on_semi_fungible_token(
         sender=sender,
         nonce=sender.nonce,
         token_identifier=args.token_identifier,
@@ -1173,13 +1156,13 @@ def set_special_role_on_semi_fungible(args: Any):
         add_role_esdt_set_new_uri=args.esdt_set_new_uri,
         add_role_esdt_modify_creator=args.esdt_modify_creator,
         add_role_nft_recreate=args.nft_recreate,
+        guardian=guardian_and_relayer_data.guardian.address if guardian_and_relayer_data.guardian else None,
+        relayer=guardian_and_relayer_data.relayer.address if guardian_and_relayer_data.relayer else None,
         gas_limit=args.gas_limit,
         gas_price=args.gas_price,
-        version=args.version,
-        options=args.options,
-        guardian_and_relayer_data=guardian_and_relayer_data,
     )
 
+    _sign_transaction(transaction, sender, guardian_and_relayer_data)
     cli_shared.send_or_simulate(transaction, args)
 
 
@@ -1192,14 +1175,9 @@ def unset_special_role_on_semi_fungible(args: Any):
         sender=sender.address.to_bech32(),
         args=args,
     )
-    chain_id = cli_shared.get_chain_id(args.proxy, args.chain)
-    gas_estimator = cli_shared.initialize_gas_limit_estimator(args)
-    controller = TokensManagementWrapper(
-        config=TransactionsFactoryConfig(chain_id),
-        gas_limit_estimator=gas_estimator,
-    )
 
-    transaction = controller.create_transaction_for_unsetting_special_role_on_semi_fungible(
+    controller = _initialize_controller(args)
+    transaction = controller.create_transaction_for_unsetting_special_role_on_semi_fungible_token(
         sender=sender,
         nonce=sender.nonce,
         token_identifier=args.token_identifier,
@@ -1212,13 +1190,13 @@ def unset_special_role_on_semi_fungible(args: Any):
         remove_role_esdt_set_new_uri=args.esdt_set_new_uri,
         remove_role_esdt_modify_creator=args.esdt_modify_creator,
         remove_role_nft_recreate=args.nft_recreate,
+        guardian=guardian_and_relayer_data.guardian.address if guardian_and_relayer_data.guardian else None,
+        relayer=guardian_and_relayer_data.relayer.address if guardian_and_relayer_data.relayer else None,
         gas_limit=args.gas_limit,
         gas_price=args.gas_price,
-        version=args.version,
-        options=args.options,
-        guardian_and_relayer_data=guardian_and_relayer_data,
     )
 
+    _sign_transaction(transaction, sender, guardian_and_relayer_data)
     cli_shared.send_or_simulate(transaction, args)
 
 
@@ -1231,13 +1209,8 @@ def set_special_role_on_meta_esdt(args: Any):
         sender=sender.address.to_bech32(),
         args=args,
     )
-    chain_id = cli_shared.get_chain_id(args.proxy, args.chain)
-    gas_estimator = cli_shared.initialize_gas_limit_estimator(args)
-    controller = TokensManagementWrapper(
-        config=TransactionsFactoryConfig(chain_id),
-        gas_limit_estimator=gas_estimator,
-    )
 
+    controller = _initialize_controller(args)
     transaction = controller.create_transaction_for_setting_special_role_on_meta_esdt(
         sender=sender,
         nonce=sender.nonce,
@@ -1247,13 +1220,13 @@ def set_special_role_on_meta_esdt(args: Any):
         add_role_nft_burn=args.nft_burn,
         add_role_nft_add_quantity=args.nft_add_quantity,
         add_role_esdt_transfer_role=args.esdt_transfer_role,
+        guardian=guardian_and_relayer_data.guardian.address if guardian_and_relayer_data.guardian else None,
+        relayer=guardian_and_relayer_data.relayer.address if guardian_and_relayer_data.relayer else None,
         gas_limit=args.gas_limit,
         gas_price=args.gas_price,
-        version=args.version,
-        options=args.options,
-        guardian_and_relayer_data=guardian_and_relayer_data,
     )
 
+    _sign_transaction(transaction, sender, guardian_and_relayer_data)
     cli_shared.send_or_simulate(transaction, args)
 
 
@@ -1266,13 +1239,8 @@ def unset_special_role_on_meta_esdt(args: Any):
         sender=sender.address.to_bech32(),
         args=args,
     )
-    chain_id = cli_shared.get_chain_id(args.proxy, args.chain)
-    gas_estimator = cli_shared.initialize_gas_limit_estimator(args)
-    controller = TokensManagementWrapper(
-        config=TransactionsFactoryConfig(chain_id),
-        gas_limit_estimator=gas_estimator,
-    )
 
+    controller = _initialize_controller(args)
     transaction = controller.create_transaction_for_unsetting_special_role_on_meta_esdt(
         sender=sender,
         nonce=sender.nonce,
@@ -1281,13 +1249,13 @@ def unset_special_role_on_meta_esdt(args: Any):
         remove_role_nft_burn=args.nft_burn,
         remove_role_nft_add_quantity=args.nft_add_quantity,
         remove_role_esdt_transfer_role=args.esdt_transfer_role,
+        guardian=guardian_and_relayer_data.guardian.address if guardian_and_relayer_data.guardian else None,
+        relayer=guardian_and_relayer_data.relayer.address if guardian_and_relayer_data.relayer else None,
         gas_limit=args.gas_limit,
         gas_price=args.gas_price,
-        version=args.version,
-        options=args.options,
-        guardian_and_relayer_data=guardian_and_relayer_data,
     )
 
+    _sign_transaction(transaction, sender, guardian_and_relayer_data)
     cli_shared.send_or_simulate(transaction, args)
 
 
@@ -1300,14 +1268,9 @@ def set_special_role_on_nft(args: Any):
         sender=sender.address.to_bech32(),
         args=args,
     )
-    chain_id = cli_shared.get_chain_id(args.proxy, args.chain)
-    gas_estimator = cli_shared.initialize_gas_limit_estimator(args)
-    controller = TokensManagementWrapper(
-        config=TransactionsFactoryConfig(chain_id),
-        gas_limit_estimator=gas_estimator,
-    )
 
-    transaction = controller.create_transaction_for_setting_special_role_on_non_fungible(
+    controller = _initialize_controller(args)
+    transaction = controller.create_transaction_for_setting_special_role_on_non_fungible_token(
         sender=sender,
         nonce=sender.nonce,
         token_identifier=args.token_identifier,
@@ -1322,13 +1285,13 @@ def set_special_role_on_nft(args: Any):
         add_role_esdt_set_new_uri=args.esdt_set_new_uri,
         add_role_esdt_modify_creator=args.esdt_modify_creator,
         add_role_nft_recreate=args.nft_recreate,
+        guardian=guardian_and_relayer_data.guardian.address if guardian_and_relayer_data.guardian else None,
+        relayer=guardian_and_relayer_data.relayer.address if guardian_and_relayer_data.relayer else None,
         gas_limit=args.gas_limit,
         gas_price=args.gas_price,
-        version=args.version,
-        options=args.options,
-        guardian_and_relayer_data=guardian_and_relayer_data,
     )
 
+    _sign_transaction(transaction, sender, guardian_and_relayer_data)
     cli_shared.send_or_simulate(transaction, args)
 
 
@@ -1341,34 +1304,29 @@ def unset_special_role_on_nft(args: Any):
         sender=sender.address.to_bech32(),
         args=args,
     )
-    chain_id = cli_shared.get_chain_id(args.proxy, args.chain)
-    gas_estimator = cli_shared.initialize_gas_limit_estimator(args)
-    controller = TokensManagementWrapper(
-        config=TransactionsFactoryConfig(chain_id),
-        gas_limit_estimator=gas_estimator,
-    )
 
-    transaction = controller.create_transaction_for_unsetting_special_role_on_non_fungible(
+    controller = _initialize_controller(args)
+    transaction = controller.create_transaction_for_unsetting_special_role_on_non_fungible_token(
         sender=sender,
         nonce=sender.nonce,
         token_identifier=args.token_identifier,
         user=Address.new_from_bech32(args.user),
         remove_role_nft_burn=args.nft_burn,
         remove_role_nft_update_attributes=args.nft_update_attributes,
-        remove_role_nft_add_uri=args.nft_add_uri,
+        remove_role_nft_remove_uri=args.nft_add_uri,
         remove_role_esdt_transfer_role=args.esdt_transfer_role,
         remove_role_nft_update=args.nft_update,
         remove_role_esdt_modify_royalties=args.esdt_modify_royalties,
         remove_role_esdt_set_new_uri=args.esdt_set_new_uri,
         remove_role_esdt_modify_creator=args.esdt_modify_creator,
         remove_role_nft_recreate=args.nft_recreate,
+        guardian=guardian_and_relayer_data.guardian.address if guardian_and_relayer_data.guardian else None,
+        relayer=guardian_and_relayer_data.relayer.address if guardian_and_relayer_data.relayer else None,
         gas_limit=args.gas_limit,
         gas_price=args.gas_price,
-        version=args.version,
-        options=args.options,
-        guardian_and_relayer_data=guardian_and_relayer_data,
     )
 
+    _sign_transaction(transaction, sender, guardian_and_relayer_data)
     cli_shared.send_or_simulate(transaction, args)
 
 
@@ -1381,13 +1339,8 @@ def create_nft(args: Any):
         sender=sender.address.to_bech32(),
         args=args,
     )
-    chain_id = cli_shared.get_chain_id(args.proxy, args.chain)
-    gas_estimator = cli_shared.initialize_gas_limit_estimator(args)
-    controller = TokensManagementWrapper(
-        config=TransactionsFactoryConfig(chain_id),
-        gas_limit_estimator=gas_estimator,
-    )
 
+    controller = _initialize_controller(args)
     transaction = controller.create_transaction_for_creating_nft(
         sender=sender,
         nonce=sender.nonce,
@@ -1398,13 +1351,13 @@ def create_nft(args: Any):
         hash=args.hash,
         attributes=bytes.fromhex(args.attributes),
         uris=args.uris,
+        guardian=guardian_and_relayer_data.guardian.address if guardian_and_relayer_data.guardian else None,
+        relayer=guardian_and_relayer_data.relayer.address if guardian_and_relayer_data.relayer else None,
         gas_limit=args.gas_limit,
         gas_price=args.gas_price,
-        version=args.version,
-        options=args.options,
-        guardian_and_relayer_data=guardian_and_relayer_data,
     )
 
+    _sign_transaction(transaction, sender, guardian_and_relayer_data)
     cli_shared.send_or_simulate(transaction, args)
 
 
@@ -1417,24 +1370,19 @@ def pause_token(args: Any):
         sender=sender.address.to_bech32(),
         args=args,
     )
-    chain_id = cli_shared.get_chain_id(args.proxy, args.chain)
-    gas_estimator = cli_shared.initialize_gas_limit_estimator(args)
-    controller = TokensManagementWrapper(
-        config=TransactionsFactoryConfig(chain_id),
-        gas_limit_estimator=gas_estimator,
-    )
 
+    controller = _initialize_controller(args)
     transaction = controller.create_transaction_for_pausing(
         sender=sender,
         nonce=sender.nonce,
         token_identifier=args.token_identifier,
+        guardian=guardian_and_relayer_data.guardian.address if guardian_and_relayer_data.guardian else None,
+        relayer=guardian_and_relayer_data.relayer.address if guardian_and_relayer_data.relayer else None,
         gas_limit=args.gas_limit,
         gas_price=args.gas_price,
-        version=args.version,
-        options=args.options,
-        guardian_and_relayer_data=guardian_and_relayer_data,
     )
 
+    _sign_transaction(transaction, sender, guardian_and_relayer_data)
     cli_shared.send_or_simulate(transaction, args)
 
 
@@ -1447,24 +1395,19 @@ def unpause_token(args: Any):
         sender=sender.address.to_bech32(),
         args=args,
     )
-    chain_id = cli_shared.get_chain_id(args.proxy, args.chain)
-    gas_estimator = cli_shared.initialize_gas_limit_estimator(args)
-    controller = TokensManagementWrapper(
-        config=TransactionsFactoryConfig(chain_id),
-        gas_limit_estimator=gas_estimator,
-    )
 
+    controller = _initialize_controller(args)
     transaction = controller.create_transaction_for_unpausing(
         sender=sender,
         nonce=sender.nonce,
         token_identifier=args.token_identifier,
+        guardian=guardian_and_relayer_data.guardian.address if guardian_and_relayer_data.guardian else None,
+        relayer=guardian_and_relayer_data.relayer.address if guardian_and_relayer_data.relayer else None,
         gas_limit=args.gas_limit,
         gas_price=args.gas_price,
-        version=args.version,
-        options=args.options,
-        guardian_and_relayer_data=guardian_and_relayer_data,
     )
 
+    _sign_transaction(transaction, sender, guardian_and_relayer_data)
     cli_shared.send_or_simulate(transaction, args)
 
 
@@ -1477,25 +1420,20 @@ def freeze_token(args: Any):
         sender=sender.address.to_bech32(),
         args=args,
     )
-    chain_id = cli_shared.get_chain_id(args.proxy, args.chain)
-    gas_estimator = cli_shared.initialize_gas_limit_estimator(args)
-    controller = TokensManagementWrapper(
-        config=TransactionsFactoryConfig(chain_id),
-        gas_limit_estimator=gas_estimator,
-    )
 
+    controller = _initialize_controller(args)
     transaction = controller.create_transaction_for_freezing(
         sender=sender,
         nonce=sender.nonce,
         token_identifier=args.token_identifier,
         user=Address.new_from_bech32(args.user),
+        guardian=guardian_and_relayer_data.guardian.address if guardian_and_relayer_data.guardian else None,
+        relayer=guardian_and_relayer_data.relayer.address if guardian_and_relayer_data.relayer else None,
         gas_limit=args.gas_limit,
         gas_price=args.gas_price,
-        version=args.version,
-        options=args.options,
-        guardian_and_relayer_data=guardian_and_relayer_data,
     )
 
+    _sign_transaction(transaction, sender, guardian_and_relayer_data)
     cli_shared.send_or_simulate(transaction, args)
 
 
@@ -1508,25 +1446,20 @@ def unfreeze_token(args: Any):
         sender=sender.address.to_bech32(),
         args=args,
     )
-    chain_id = cli_shared.get_chain_id(args.proxy, args.chain)
-    gas_estimator = cli_shared.initialize_gas_limit_estimator(args)
-    controller = TokensManagementWrapper(
-        config=TransactionsFactoryConfig(chain_id),
-        gas_limit_estimator=gas_estimator,
-    )
 
+    controller = _initialize_controller(args)
     transaction = controller.create_transaction_for_unfreezing(
         sender=sender,
         nonce=sender.nonce,
         token_identifier=args.token_identifier,
         user=Address.new_from_bech32(args.user),
+        guardian=guardian_and_relayer_data.guardian.address if guardian_and_relayer_data.guardian else None,
+        relayer=guardian_and_relayer_data.relayer.address if guardian_and_relayer_data.relayer else None,
         gas_limit=args.gas_limit,
         gas_price=args.gas_price,
-        version=args.version,
-        options=args.options,
-        guardian_and_relayer_data=guardian_and_relayer_data,
     )
 
+    _sign_transaction(transaction, sender, guardian_and_relayer_data)
     cli_shared.send_or_simulate(transaction, args)
 
 
@@ -1539,25 +1472,20 @@ def wipe_token(args: Any):
         sender=sender.address.to_bech32(),
         args=args,
     )
-    chain_id = cli_shared.get_chain_id(args.proxy, args.chain)
-    gas_estimator = cli_shared.initialize_gas_limit_estimator(args)
-    controller = TokensManagementWrapper(
-        config=TransactionsFactoryConfig(chain_id),
-        gas_limit_estimator=gas_estimator,
-    )
 
+    controller = _initialize_controller(args)
     transaction = controller.create_transaction_for_wiping(
         sender=sender,
         nonce=sender.nonce,
         token_identifier=args.token_identifier,
         user=Address.new_from_bech32(args.user),
+        guardian=guardian_and_relayer_data.guardian.address if guardian_and_relayer_data.guardian else None,
+        relayer=guardian_and_relayer_data.relayer.address if guardian_and_relayer_data.relayer else None,
         gas_limit=args.gas_limit,
         gas_price=args.gas_price,
-        version=args.version,
-        options=args.options,
-        guardian_and_relayer_data=guardian_and_relayer_data,
     )
 
+    _sign_transaction(transaction, sender, guardian_and_relayer_data)
     cli_shared.send_or_simulate(transaction, args)
 
 
@@ -1570,25 +1498,20 @@ def local_mint(args: Any):
         sender=sender.address.to_bech32(),
         args=args,
     )
-    chain_id = cli_shared.get_chain_id(args.proxy, args.chain)
-    gas_estimator = cli_shared.initialize_gas_limit_estimator(args)
-    controller = TokensManagementWrapper(
-        config=TransactionsFactoryConfig(chain_id),
-        gas_limit_estimator=gas_estimator,
-    )
 
+    controller = _initialize_controller(args)
     transaction = controller.create_transaction_for_local_minting(
         sender=sender,
         nonce=sender.nonce,
         token_identifier=args.token_identifier,
         supply_to_mint=args.supply_to_mint,
+        guardian=guardian_and_relayer_data.guardian.address if guardian_and_relayer_data.guardian else None,
+        relayer=guardian_and_relayer_data.relayer.address if guardian_and_relayer_data.relayer else None,
         gas_limit=args.gas_limit,
         gas_price=args.gas_price,
-        version=args.version,
-        options=args.options,
-        guardian_and_relayer_data=guardian_and_relayer_data,
     )
 
+    _sign_transaction(transaction, sender, guardian_and_relayer_data)
     cli_shared.send_or_simulate(transaction, args)
 
 
@@ -1601,25 +1524,20 @@ def local_burn(args: Any):
         sender=sender.address.to_bech32(),
         args=args,
     )
-    chain_id = cli_shared.get_chain_id(args.proxy, args.chain)
-    gas_estimator = cli_shared.initialize_gas_limit_estimator(args)
-    controller = TokensManagementWrapper(
-        config=TransactionsFactoryConfig(chain_id),
-        gas_limit_estimator=gas_estimator,
-    )
 
+    controller = _initialize_controller(args)
     transaction = controller.create_transaction_for_local_burning(
         sender=sender,
         nonce=sender.nonce,
         token_identifier=args.token_identifier,
         supply_to_burn=args.supply_to_burn,
+        guardian=guardian_and_relayer_data.guardian.address if guardian_and_relayer_data.guardian else None,
+        relayer=guardian_and_relayer_data.relayer.address if guardian_and_relayer_data.relayer else None,
         gas_limit=args.gas_limit,
         gas_price=args.gas_price,
-        version=args.version,
-        options=args.options,
-        guardian_and_relayer_data=guardian_and_relayer_data,
     )
 
+    _sign_transaction(transaction, sender, guardian_and_relayer_data)
     cli_shared.send_or_simulate(transaction, args)
 
 
@@ -1632,26 +1550,21 @@ def update_attributes(args: Any):
         sender=sender.address.to_bech32(),
         args=args,
     )
-    chain_id = cli_shared.get_chain_id(args.proxy, args.chain)
-    gas_estimator = cli_shared.initialize_gas_limit_estimator(args)
-    controller = TokensManagementWrapper(
-        config=TransactionsFactoryConfig(chain_id),
-        gas_limit_estimator=gas_estimator,
-    )
 
+    controller = _initialize_controller(args)
     transaction = controller.create_transaction_for_updating_attributes(
         sender=sender,
         nonce=sender.nonce,
         token_identifier=args.token_identifier,
         token_nonce=args.token_nonce,
         attributes=bytes.fromhex(args.attributes),
+        guardian=guardian_and_relayer_data.guardian.address if guardian_and_relayer_data.guardian else None,
+        relayer=guardian_and_relayer_data.relayer.address if guardian_and_relayer_data.relayer else None,
         gas_limit=args.gas_limit,
         gas_price=args.gas_price,
-        version=args.version,
-        options=args.options,
-        guardian_and_relayer_data=guardian_and_relayer_data,
     )
 
+    _sign_transaction(transaction, sender, guardian_and_relayer_data)
     cli_shared.send_or_simulate(transaction, args)
 
 
@@ -1664,26 +1577,21 @@ def add_quantity(args: Any):
         sender=sender.address.to_bech32(),
         args=args,
     )
-    chain_id = cli_shared.get_chain_id(args.proxy, args.chain)
-    gas_estimator = cli_shared.initialize_gas_limit_estimator(args)
-    controller = TokensManagementWrapper(
-        config=TransactionsFactoryConfig(chain_id),
-        gas_limit_estimator=gas_estimator,
-    )
 
+    controller = _initialize_controller(args)
     transaction = controller.create_transaction_for_adding_quantity(
         sender=sender,
         nonce=sender.nonce,
         token_identifier=args.token_identifier,
         token_nonce=args.token_nonce,
-        quantity=args.quantity,
+        quantity_to_add=args.quantity,
+        guardian=guardian_and_relayer_data.guardian.address if guardian_and_relayer_data.guardian else None,
+        relayer=guardian_and_relayer_data.relayer.address if guardian_and_relayer_data.relayer else None,
         gas_limit=args.gas_limit,
         gas_price=args.gas_price,
-        version=args.version,
-        options=args.options,
-        guardian_and_relayer_data=guardian_and_relayer_data,
     )
 
+    _sign_transaction(transaction, sender, guardian_and_relayer_data)
     cli_shared.send_or_simulate(transaction, args)
 
 
@@ -1696,26 +1604,21 @@ def burn_quantity(args: Any):
         sender=sender.address.to_bech32(),
         args=args,
     )
-    chain_id = cli_shared.get_chain_id(args.proxy, args.chain)
-    gas_estimator = cli_shared.initialize_gas_limit_estimator(args)
-    controller = TokensManagementWrapper(
-        config=TransactionsFactoryConfig(chain_id),
-        gas_limit_estimator=gas_estimator,
-    )
 
+    controller = _initialize_controller(args)
     transaction = controller.create_transaction_for_burning_quantity(
         sender=sender,
         nonce=sender.nonce,
         token_identifier=args.token_identifier,
         token_nonce=args.token_nonce,
-        quantity=args.quantity,
+        quantity_to_burn=args.quantity,
+        guardian=guardian_and_relayer_data.guardian.address if guardian_and_relayer_data.guardian else None,
+        relayer=guardian_and_relayer_data.relayer.address if guardian_and_relayer_data.relayer else None,
         gas_limit=args.gas_limit,
         gas_price=args.gas_price,
-        version=args.version,
-        options=args.options,
-        guardian_and_relayer_data=guardian_and_relayer_data,
     )
 
+    _sign_transaction(transaction, sender, guardian_and_relayer_data)
     cli_shared.send_or_simulate(transaction, args)
 
 
@@ -1728,26 +1631,21 @@ def modify_royalties(args: Any):
         sender=sender.address.to_bech32(),
         args=args,
     )
-    chain_id = cli_shared.get_chain_id(args.proxy, args.chain)
-    gas_estimator = cli_shared.initialize_gas_limit_estimator(args)
-    controller = TokensManagementWrapper(
-        config=TransactionsFactoryConfig(chain_id),
-        gas_limit_estimator=gas_estimator,
-    )
 
+    controller = _initialize_controller(args)
     transaction = controller.create_transaction_for_modifying_royalties(
         sender=sender,
         nonce=sender.nonce,
         token_identifier=args.token_identifier,
         token_nonce=args.token_nonce,
-        royalties=args.royalties,
+        new_royalties=args.royalties,
+        guardian=guardian_and_relayer_data.guardian.address if guardian_and_relayer_data.guardian else None,
+        relayer=guardian_and_relayer_data.relayer.address if guardian_and_relayer_data.relayer else None,
         gas_limit=args.gas_limit,
         gas_price=args.gas_price,
-        version=args.version,
-        options=args.options,
-        guardian_and_relayer_data=guardian_and_relayer_data,
     )
 
+    _sign_transaction(transaction, sender, guardian_and_relayer_data)
     cli_shared.send_or_simulate(transaction, args)
 
 
@@ -1760,26 +1658,21 @@ def set_new_uris(args: Any):
         sender=sender.address.to_bech32(),
         args=args,
     )
-    chain_id = cli_shared.get_chain_id(args.proxy, args.chain)
-    gas_estimator = cli_shared.initialize_gas_limit_estimator(args)
-    controller = TokensManagementWrapper(
-        config=TransactionsFactoryConfig(chain_id),
-        gas_limit_estimator=gas_estimator,
-    )
 
+    controller = _initialize_controller(args)
     transaction = controller.create_transaction_for_setting_new_uris(
         sender=sender,
         nonce=sender.nonce,
         token_identifier=args.token_identifier,
         token_nonce=args.token_nonce,
-        uris=args.uris,
+        new_uris=args.uris,
+        guardian=guardian_and_relayer_data.guardian.address if guardian_and_relayer_data.guardian else None,
+        relayer=guardian_and_relayer_data.relayer.address if guardian_and_relayer_data.relayer else None,
         gas_limit=args.gas_limit,
         gas_price=args.gas_price,
-        version=args.version,
-        options=args.options,
-        guardian_and_relayer_data=guardian_and_relayer_data,
     )
 
+    _sign_transaction(transaction, sender, guardian_and_relayer_data)
     cli_shared.send_or_simulate(transaction, args)
 
 
@@ -1792,25 +1685,20 @@ def modify_creator(args: Any):
         sender=sender.address.to_bech32(),
         args=args,
     )
-    chain_id = cli_shared.get_chain_id(args.proxy, args.chain)
-    gas_estimator = cli_shared.initialize_gas_limit_estimator(args)
-    controller = TokensManagementWrapper(
-        config=TransactionsFactoryConfig(chain_id),
-        gas_limit_estimator=gas_estimator,
-    )
 
+    controller = _initialize_controller(args)
     transaction = controller.create_transaction_for_modifying_creator(
         sender=sender,
         nonce=sender.nonce,
         token_identifier=args.token_identifier,
         token_nonce=args.token_nonce,
+        guardian=guardian_and_relayer_data.guardian.address if guardian_and_relayer_data.guardian else None,
+        relayer=guardian_and_relayer_data.relayer.address if guardian_and_relayer_data.relayer else None,
         gas_limit=args.gas_limit,
         gas_price=args.gas_price,
-        version=args.version,
-        options=args.options,
-        guardian_and_relayer_data=guardian_and_relayer_data,
     )
 
+    _sign_transaction(transaction, sender, guardian_and_relayer_data)
     cli_shared.send_or_simulate(transaction, args)
 
 
@@ -1823,13 +1711,8 @@ def update_metadata(args: Any):
         sender=sender.address.to_bech32(),
         args=args,
     )
-    chain_id = cli_shared.get_chain_id(args.proxy, args.chain)
-    gas_estimator = cli_shared.initialize_gas_limit_estimator(args)
-    controller = TokensManagementWrapper(
-        config=TransactionsFactoryConfig(chain_id),
-        gas_limit_estimator=gas_estimator,
-    )
 
+    controller = _initialize_controller(args)
     transaction = controller.create_transaction_for_updating_metadata(
         sender=sender,
         nonce=sender.nonce,
@@ -1840,13 +1723,13 @@ def update_metadata(args: Any):
         new_hash=args.hash,
         new_attributes=bytes.fromhex(args.attributes),
         new_uris=args.uris,
+        guardian=guardian_and_relayer_data.guardian.address if guardian_and_relayer_data.guardian else None,
+        relayer=guardian_and_relayer_data.relayer.address if guardian_and_relayer_data.relayer else None,
         gas_limit=args.gas_limit,
         gas_price=args.gas_price,
-        version=args.version,
-        options=args.options,
-        guardian_and_relayer_data=guardian_and_relayer_data,
     )
 
+    _sign_transaction(transaction, sender, guardian_and_relayer_data)
     cli_shared.send_or_simulate(transaction, args)
 
 
@@ -1859,14 +1742,9 @@ def nft_metadata_recreate(args: Any):
         sender=sender.address.to_bech32(),
         args=args,
     )
-    chain_id = cli_shared.get_chain_id(args.proxy, args.chain)
-    gas_estimator = cli_shared.initialize_gas_limit_estimator(args)
-    controller = TokensManagementWrapper(
-        config=TransactionsFactoryConfig(chain_id),
-        gas_limit_estimator=gas_estimator,
-    )
 
-    transaction = controller.create_transaction_for_recreating_metadata(
+    controller = _initialize_controller(args)
+    transaction = controller.create_transaction_for_nft_metadata_recreate(
         sender=sender,
         nonce=sender.nonce,
         token_identifier=args.token_identifier,
@@ -1876,13 +1754,13 @@ def nft_metadata_recreate(args: Any):
         new_hash=args.hash,
         new_attributes=bytes.fromhex(args.attributes),
         new_uris=args.uris,
+        guardian=guardian_and_relayer_data.guardian.address if guardian_and_relayer_data.guardian else None,
+        relayer=guardian_and_relayer_data.relayer.address if guardian_and_relayer_data.relayer else None,
         gas_limit=args.gas_limit,
         gas_price=args.gas_price,
-        version=args.version,
-        options=args.options,
-        guardian_and_relayer_data=guardian_and_relayer_data,
     )
 
+    _sign_transaction(transaction, sender, guardian_and_relayer_data)
     cli_shared.send_or_simulate(transaction, args)
 
 
@@ -1895,24 +1773,19 @@ def change_to_dynamic(args: Any):
         sender=sender.address.to_bech32(),
         args=args,
     )
-    chain_id = cli_shared.get_chain_id(args.proxy, args.chain)
-    gas_estimator = cli_shared.initialize_gas_limit_estimator(args)
-    controller = TokensManagementWrapper(
-        config=TransactionsFactoryConfig(chain_id),
-        gas_limit_estimator=gas_estimator,
-    )
 
+    controller = _initialize_controller(args)
     transaction = controller.create_transaction_for_changing_token_to_dynamic(
         sender=sender,
         nonce=sender.nonce,
         token_identifier=args.token_identifier,
+        guardian=guardian_and_relayer_data.guardian.address if guardian_and_relayer_data.guardian else None,
+        relayer=guardian_and_relayer_data.relayer.address if guardian_and_relayer_data.relayer else None,
         gas_limit=args.gas_limit,
         gas_price=args.gas_price,
-        version=args.version,
-        options=args.options,
-        guardian_and_relayer_data=guardian_and_relayer_data,
     )
 
+    _sign_transaction(transaction, sender, guardian_and_relayer_data)
     cli_shared.send_or_simulate(transaction, args)
 
 
@@ -1925,24 +1798,19 @@ def update_token_id(args: Any):
         sender=sender.address.to_bech32(),
         args=args,
     )
-    chain_id = cli_shared.get_chain_id(args.proxy, args.chain)
-    gas_estimator = cli_shared.initialize_gas_limit_estimator(args)
-    controller = TokensManagementWrapper(
-        config=TransactionsFactoryConfig(chain_id),
-        gas_limit_estimator=gas_estimator,
-    )
 
+    controller = _initialize_controller(args)
     transaction = controller.create_transaction_for_updating_token_id(
         sender=sender,
         nonce=sender.nonce,
         token_identifier=args.token_identifier,
+        guardian=guardian_and_relayer_data.guardian.address if guardian_and_relayer_data.guardian else None,
+        relayer=guardian_and_relayer_data.relayer.address if guardian_and_relayer_data.relayer else None,
         gas_limit=args.gas_limit,
         gas_price=args.gas_price,
-        version=args.version,
-        options=args.options,
-        guardian_and_relayer_data=guardian_and_relayer_data,
     )
 
+    _sign_transaction(transaction, sender, guardian_and_relayer_data)
     cli_shared.send_or_simulate(transaction, args)
 
 
@@ -1955,14 +1823,10 @@ def register_dynamic_token(args: Any):
         sender=sender.address.to_bech32(),
         args=args,
     )
-    chain_id = cli_shared.get_chain_id(args.proxy, args.chain)
-    gas_estimator = cli_shared.initialize_gas_limit_estimator(args)
-    controller = TokensManagementWrapper(
-        config=TransactionsFactoryConfig(chain_id),
-        gas_limit_estimator=gas_estimator,
-    )
 
+    controller = _initialize_controller(args)
     [token_type] = [token_type for token_type in TokenType if token_type.value == args.token_type]
+
     transaction = controller.create_transaction_for_registering_dynamic_token(
         sender=sender,
         nonce=sender.nonce,
@@ -1970,13 +1834,13 @@ def register_dynamic_token(args: Any):
         token_ticker=args.token_ticker,
         token_type=token_type,
         denominator=args.denominator,
+        guardian=guardian_and_relayer_data.guardian.address if guardian_and_relayer_data.guardian else None,
+        relayer=guardian_and_relayer_data.relayer.address if guardian_and_relayer_data.relayer else None,
         gas_limit=args.gas_limit,
         gas_price=args.gas_price,
-        version=args.version,
-        options=args.options,
-        guardian_and_relayer_data=guardian_and_relayer_data,
     )
 
+    _sign_transaction(transaction, sender, guardian_and_relayer_data)
     cli_shared.send_or_simulate(transaction, args)
 
 
@@ -1989,14 +1853,10 @@ def register_dynamic_and_set_all_roles(args: Any):
         sender=sender.address.to_bech32(),
         args=args,
     )
-    chain_id = cli_shared.get_chain_id(args.proxy, args.chain)
-    gas_estimator = cli_shared.initialize_gas_limit_estimator(args)
-    controller = TokensManagementWrapper(
-        config=TransactionsFactoryConfig(chain_id),
-        gas_limit_estimator=gas_estimator,
-    )
 
+    controller = _initialize_controller(args)
     [token_type] = [token_type for token_type in TokenType if token_type.value == args.token_type]
+
     transaction = controller.create_transaction_for_registering_dynamic_and_setting_roles(
         sender=sender,
         nonce=sender.nonce,
@@ -2004,13 +1864,13 @@ def register_dynamic_and_set_all_roles(args: Any):
         token_ticker=args.token_ticker,
         token_type=token_type,
         denominator=args.denominator,
+        guardian=guardian_and_relayer_data.guardian.address if guardian_and_relayer_data.guardian else None,
+        relayer=guardian_and_relayer_data.relayer.address if guardian_and_relayer_data.relayer else None,
         gas_limit=args.gas_limit,
         gas_price=args.gas_price,
-        version=args.version,
-        options=args.options,
-        guardian_and_relayer_data=guardian_and_relayer_data,
     )
 
+    _sign_transaction(transaction, sender, guardian_and_relayer_data)
     cli_shared.send_or_simulate(transaction, args)
 
 
@@ -2023,25 +1883,20 @@ def transfer_ownership(args: Any):
         sender=sender.address.to_bech32(),
         args=args,
     )
-    chain_id = cli_shared.get_chain_id(args.proxy, args.chain)
-    gas_estimator = cli_shared.initialize_gas_limit_estimator(args)
-    controller = TokensManagementWrapper(
-        config=TransactionsFactoryConfig(chain_id),
-        gas_limit_estimator=gas_estimator,
-    )
 
+    controller = _initialize_controller(args)
     transaction = controller.create_transaction_for_transferring_ownership(
         sender=sender,
         nonce=sender.nonce,
         token_identifier=args.token_identifier,
         new_owner=Address.new_from_bech32(args.new_owner),
+        guardian=guardian_and_relayer_data.guardian.address if guardian_and_relayer_data.guardian else None,
+        relayer=guardian_and_relayer_data.relayer.address if guardian_and_relayer_data.relayer else None,
         gas_limit=args.gas_limit,
         gas_price=args.gas_price,
-        version=args.version,
-        options=args.options,
-        guardian_and_relayer_data=guardian_and_relayer_data,
     )
 
+    _sign_transaction(transaction, sender, guardian_and_relayer_data)
     cli_shared.send_or_simulate(transaction, args)
 
 
@@ -2054,26 +1909,21 @@ def freeze_single_nft(args: Any):
         sender=sender.address.to_bech32(),
         args=args,
     )
-    chain_id = cli_shared.get_chain_id(args.proxy, args.chain)
-    gas_estimator = cli_shared.initialize_gas_limit_estimator(args)
-    controller = TokensManagementWrapper(
-        config=TransactionsFactoryConfig(chain_id),
-        gas_limit_estimator=gas_estimator,
-    )
 
+    controller = _initialize_controller(args)
     transaction = controller.create_transaction_for_freezing_single_nft(
         sender=sender,
         nonce=sender.nonce,
         token_identifier=args.token_identifier,
         token_nonce=args.token_nonce,
         user=Address.new_from_bech32(args.user),
+        guardian=guardian_and_relayer_data.guardian.address if guardian_and_relayer_data.guardian else None,
+        relayer=guardian_and_relayer_data.relayer.address if guardian_and_relayer_data.relayer else None,
         gas_limit=args.gas_limit,
         gas_price=args.gas_price,
-        version=args.version,
-        options=args.options,
-        guardian_and_relayer_data=guardian_and_relayer_data,
     )
 
+    _sign_transaction(transaction, sender, guardian_and_relayer_data)
     cli_shared.send_or_simulate(transaction, args)
 
 
@@ -2086,26 +1936,21 @@ def unfreeze_single_nft(args: Any):
         sender=sender.address.to_bech32(),
         args=args,
     )
-    chain_id = cli_shared.get_chain_id(args.proxy, args.chain)
-    gas_estimator = cli_shared.initialize_gas_limit_estimator(args)
-    controller = TokensManagementWrapper(
-        config=TransactionsFactoryConfig(chain_id),
-        gas_limit_estimator=gas_estimator,
-    )
 
+    controller = _initialize_controller(args)
     transaction = controller.create_transaction_for_unfreezing_single_nft(
         sender=sender,
         nonce=sender.nonce,
         token_identifier=args.token_identifier,
         token_nonce=args.token_nonce,
         user=Address.new_from_bech32(args.user),
+        guardian=guardian_and_relayer_data.guardian.address if guardian_and_relayer_data.guardian else None,
+        relayer=guardian_and_relayer_data.relayer.address if guardian_and_relayer_data.relayer else None,
         gas_limit=args.gas_limit,
         gas_price=args.gas_price,
-        version=args.version,
-        options=args.options,
-        guardian_and_relayer_data=guardian_and_relayer_data,
     )
 
+    _sign_transaction(transaction, sender, guardian_and_relayer_data)
     cli_shared.send_or_simulate(transaction, args)
 
 
@@ -2118,25 +1963,20 @@ def change_sft_to_meta_esdt(args: Any):
         sender=sender.address.to_bech32(),
         args=args,
     )
-    chain_id = cli_shared.get_chain_id(args.proxy, args.chain)
-    gas_estimator = cli_shared.initialize_gas_limit_estimator(args)
-    controller = TokensManagementWrapper(
-        config=TransactionsFactoryConfig(chain_id),
-        gas_limit_estimator=gas_estimator,
-    )
 
+    controller = _initialize_controller(args)
     transaction = controller.create_transaction_for_changing_sft_to_meta_esdt(
         sender=sender,
         nonce=sender.nonce,
-        collection_identifier=args.collection,
-        decimals=args.decimals,
+        collection=args.collection,
+        num_decimals=args.decimals,
+        guardian=guardian_and_relayer_data.guardian.address if guardian_and_relayer_data.guardian else None,
+        relayer=guardian_and_relayer_data.relayer.address if guardian_and_relayer_data.relayer else None,
         gas_limit=args.gas_limit,
         gas_price=args.gas_price,
-        version=args.version,
-        options=args.options,
-        guardian_and_relayer_data=guardian_and_relayer_data,
     )
 
+    _sign_transaction(transaction, sender, guardian_and_relayer_data)
     cli_shared.send_or_simulate(transaction, args)
 
 
@@ -2149,25 +1989,20 @@ def transfer_nft_create_role(args: Any):
         sender=sender.address.to_bech32(),
         args=args,
     )
-    chain_id = cli_shared.get_chain_id(args.proxy, args.chain)
-    gas_estimator = cli_shared.initialize_gas_limit_estimator(args)
-    controller = TokensManagementWrapper(
-        config=TransactionsFactoryConfig(chain_id),
-        gas_limit_estimator=gas_estimator,
-    )
 
+    controller = _initialize_controller(args)
     transaction = controller.create_transaction_for_transferring_nft_create_role(
         sender=sender,
         nonce=sender.nonce,
         token_identifier=args.token_identifier,
         user=Address.new_from_bech32(args.user),
+        guardian=guardian_and_relayer_data.guardian.address if guardian_and_relayer_data.guardian else None,
+        relayer=guardian_and_relayer_data.relayer.address if guardian_and_relayer_data.relayer else None,
         gas_limit=args.gas_limit,
         gas_price=args.gas_price,
-        version=args.version,
-        options=args.options,
-        guardian_and_relayer_data=guardian_and_relayer_data,
     )
 
+    _sign_transaction(transaction, sender, guardian_and_relayer_data)
     cli_shared.send_or_simulate(transaction, args)
 
 
@@ -2180,24 +2015,19 @@ def stop_nft_creation(args: Any):
         sender=sender.address.to_bech32(),
         args=args,
     )
-    chain_id = cli_shared.get_chain_id(args.proxy, args.chain)
-    gas_estimator = cli_shared.initialize_gas_limit_estimator(args)
-    controller = TokensManagementWrapper(
-        config=TransactionsFactoryConfig(chain_id),
-        gas_limit_estimator=gas_estimator,
-    )
 
+    controller = _initialize_controller(args)
     transaction = controller.create_transaction_for_stopping_nft_creation(
         sender=sender,
         nonce=sender.nonce,
         token_identifier=args.token_identifier,
+        guardian=guardian_and_relayer_data.guardian.address if guardian_and_relayer_data.guardian else None,
+        relayer=guardian_and_relayer_data.relayer.address if guardian_and_relayer_data.relayer else None,
         gas_limit=args.gas_limit,
         gas_price=args.gas_price,
-        version=args.version,
-        options=args.options,
-        guardian_and_relayer_data=guardian_and_relayer_data,
     )
 
+    _sign_transaction(transaction, sender, guardian_and_relayer_data)
     cli_shared.send_or_simulate(transaction, args)
 
 
@@ -2210,26 +2040,21 @@ def wipe_single_nft(args: Any):
         sender=sender.address.to_bech32(),
         args=args,
     )
-    chain_id = cli_shared.get_chain_id(args.proxy, args.chain)
-    gas_estimator = cli_shared.initialize_gas_limit_estimator(args)
-    controller = TokensManagementWrapper(
-        config=TransactionsFactoryConfig(chain_id),
-        gas_limit_estimator=gas_estimator,
-    )
 
+    controller = _initialize_controller(args)
     transaction = controller.create_transaction_for_wiping_single_nft(
         sender=sender,
         nonce=sender.nonce,
         token_identifier=args.token_identifier,
         token_nonce=args.token_nonce,
         user=Address.new_from_bech32(args.user),
+        guardian=guardian_and_relayer_data.guardian.address if guardian_and_relayer_data.guardian else None,
+        relayer=guardian_and_relayer_data.relayer.address if guardian_and_relayer_data.relayer else None,
         gas_limit=args.gas_limit,
         gas_price=args.gas_price,
-        version=args.version,
-        options=args.options,
-        guardian_and_relayer_data=guardian_and_relayer_data,
     )
 
+    _sign_transaction(transaction, sender, guardian_and_relayer_data)
     cli_shared.send_or_simulate(transaction, args)
 
 
@@ -2242,24 +2067,19 @@ def add_uris(args: Any):
         sender=sender.address.to_bech32(),
         args=args,
     )
-    chain_id = cli_shared.get_chain_id(args.proxy, args.chain)
-    gas_estimator = cli_shared.initialize_gas_limit_estimator(args)
-    controller = TokensManagementWrapper(
-        config=TransactionsFactoryConfig(chain_id),
-        gas_limit_estimator=gas_estimator,
-    )
 
+    controller = _initialize_controller(args)
     transaction = controller.create_transaction_for_adding_uris(
         sender=sender,
         nonce=sender.nonce,
         token_identifier=args.token_identifier,
         token_nonce=args.token_nonce,
         uris=args.uris,
+        guardian=guardian_and_relayer_data.guardian.address if guardian_and_relayer_data.guardian else None,
+        relayer=guardian_and_relayer_data.relayer.address if guardian_and_relayer_data.relayer else None,
         gas_limit=args.gas_limit,
         gas_price=args.gas_price,
-        version=args.version,
-        options=args.options,
-        guardian_and_relayer_data=guardian_and_relayer_data,
     )
 
+    _sign_transaction(transaction, sender, guardian_and_relayer_data)
     cli_shared.send_or_simulate(transaction, args)
