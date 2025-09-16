@@ -3,10 +3,12 @@ from typing import Any
 
 from multiversx_sdk import (
     Address,
+    DelegationController,
     DelegationTransactionsOutcomeParser,
     ProxyNetworkProvider,
-    TransactionsFactoryConfig,
+    Transaction,
     ValidatorPublicKey,
+    ValidatorsController,
     ValidatorsSigners,
 )
 
@@ -18,8 +20,10 @@ from multiversx_sdk_cli.args_validation import (
     validate_proxy_argument,
     validate_receiver_args,
 )
+from multiversx_sdk_cli.base_transactions_controller import BaseTransactionsController
 from multiversx_sdk_cli.config import get_config_for_network_providers
-from multiversx_sdk_cli.delegation import DelegationOperations
+from multiversx_sdk_cli.guardian_relayer_data import GuardianRelayerData
+from multiversx_sdk_cli.interfaces import IAccount
 
 
 def setup_parser(args: list[str], subparsers: Any) -> Any:
@@ -394,10 +398,28 @@ def validate_arguments(args: Any):
 
 def _get_delegation_controller(args: Any):
     chain_id = cli_shared.get_chain_id(args.proxy, args.chain)
-    config = TransactionsFactoryConfig(chain_id)
+    config = get_config_for_network_providers()
+    proxy_url = args.proxy if args.proxy else ""
+    proxy = ProxyNetworkProvider(url=proxy_url, config=config)
     gas_estimator = cli_shared.initialize_gas_limit_estimator(args)
-    delegation = DelegationOperations(config=config, gas_limit_estimator=gas_estimator)
-    return delegation
+
+    return DelegationController(
+        chain_id=chain_id,
+        network_provider=proxy,
+        gas_limit_estimator=gas_estimator,
+    )
+
+
+def _sign_transaction(transaction: Transaction, sender: IAccount, guardian_and_relayer_data: GuardianRelayerData):
+    base = BaseTransactionsController()
+    base.sign_transaction(
+        transaction=transaction,
+        sender=sender,
+        guardian=guardian_and_relayer_data.guardian,
+        relayer=guardian_and_relayer_data.relayer,
+        guardian_service_url=guardian_and_relayer_data.guardian_service_url,
+        guardian_2fa_code=guardian_and_relayer_data.guardian_2fa_code,
+    )
 
 
 def do_create_delegation_contract(args: Any):
@@ -410,20 +432,19 @@ def do_create_delegation_contract(args: Any):
     )
 
     delegation = _get_delegation_controller(args)
-
-    tx = delegation.prepare_transaction_for_new_delegation_contract(
-        owner=sender,
-        native_amount=int(args.value),
+    tx = delegation.create_transaction_for_new_delegation_contract(
+        sender=sender,
+        nonce=sender.nonce,
+        amount=int(args.value),
         total_delegation_cap=int(args.total_delegation_cap),
         service_fee=int(args.service_fee),
+        guardian=guardian_and_relayer_data.guardian.address if guardian_and_relayer_data.guardian else None,
+        relayer=guardian_and_relayer_data.relayer.address if guardian_and_relayer_data.relayer else None,
         gas_limit=args.gas_limit,
-        gas_price=int(args.gas_price),
-        nonce=sender.nonce,
-        version=int(args.version),
-        options=int(args.options),
-        guardian_and_relayer_data=guardian_and_relayer_data,
+        gas_price=args.gas_price,
     )
 
+    _sign_transaction(tx, sender, guardian_and_relayer_data)
     cli_shared.send_or_simulate(tx, args)
 
 
@@ -456,20 +477,19 @@ def add_new_nodes(args: Any):
     public_keys, signed_messages = _get_public_keys_and_signed_messages(args)
 
     delegation = _get_delegation_controller(args)
-    tx = delegation.prepare_transaction_for_adding_nodes(
-        owner=sender,
+    tx = delegation.create_transaction_for_adding_nodes(
+        sender=sender,
+        nonce=sender.nonce,
         delegation_contract=Address.new_from_bech32(args.delegation_contract),
         public_keys=public_keys,
         signed_messages=signed_messages,
+        guardian=guardian_and_relayer_data.guardian.address if guardian_and_relayer_data.guardian else None,
+        relayer=guardian_and_relayer_data.relayer.address if guardian_and_relayer_data.relayer else None,
         gas_limit=args.gas_limit,
-        gas_price=int(args.gas_price),
-        value=int(args.value),
-        nonce=sender.nonce,
-        version=int(args.version),
-        options=int(args.options),
-        guardian_and_relayer_data=guardian_and_relayer_data,
+        gas_price=args.gas_price,
     )
 
+    _sign_transaction(tx, sender, guardian_and_relayer_data)
     cli_shared.send_or_simulate(tx, args)
 
 
@@ -504,19 +524,18 @@ def remove_nodes(args: Any):
     public_keys = _load_validators_public_keys(args)
 
     delegation = _get_delegation_controller(args)
-    tx = delegation.prepare_transaction_for_removing_nodes(
-        owner=sender,
+    tx = delegation.create_transaction_for_removing_nodes(
+        sender=sender,
+        nonce=sender.nonce,
         delegation_contract=Address.new_from_bech32(args.delegation_contract),
         public_keys=public_keys,
+        guardian=guardian_and_relayer_data.guardian.address if guardian_and_relayer_data.guardian else None,
+        relayer=guardian_and_relayer_data.relayer.address if guardian_and_relayer_data.relayer else None,
         gas_limit=args.gas_limit,
-        gas_price=int(args.gas_price),
-        value=int(args.value),
-        nonce=sender.nonce,
-        version=int(args.version),
-        options=int(args.options),
-        guardian_and_relayer_data=guardian_and_relayer_data,
+        gas_price=args.gas_price,
     )
 
+    _sign_transaction(tx, sender, guardian_and_relayer_data)
     cli_shared.send_or_simulate(tx, args)
 
 
@@ -552,19 +571,18 @@ def stake_nodes(args: Any):
     public_keys = _load_validators_public_keys(args)
 
     delegation = _get_delegation_controller(args)
-    tx = delegation.prepare_transaction_for_staking_nodes(
-        owner=sender,
+    tx = delegation.create_transaction_for_staking_nodes(
+        sender=sender,
+        nonce=sender.nonce,
         delegation_contract=Address.new_from_bech32(args.delegation_contract),
         public_keys=public_keys,
+        guardian=guardian_and_relayer_data.guardian.address if guardian_and_relayer_data.guardian else None,
+        relayer=guardian_and_relayer_data.relayer.address if guardian_and_relayer_data.relayer else None,
         gas_limit=args.gas_limit,
-        gas_price=int(args.gas_price),
-        value=int(args.value),
-        nonce=sender.nonce,
-        version=int(args.version),
-        options=int(args.options),
-        guardian_and_relayer_data=guardian_and_relayer_data,
+        gas_price=args.gas_price,
     )
 
+    _sign_transaction(tx, sender, guardian_and_relayer_data)
     cli_shared.send_or_simulate(tx, args)
 
 
@@ -589,19 +607,18 @@ def unbond_nodes(args: Any):
     public_keys = _load_validators_public_keys(args)
 
     delegation = _get_delegation_controller(args)
-    tx = delegation.prepare_transaction_for_unbonding_nodes(
-        owner=sender,
+    tx = delegation.create_transaction_for_unbonding_nodes(
+        sender=sender,
+        nonce=sender.nonce,
         delegation_contract=Address.new_from_bech32(args.delegation_contract),
         public_keys=public_keys,
+        guardian=guardian_and_relayer_data.guardian.address if guardian_and_relayer_data.guardian else None,
+        relayer=guardian_and_relayer_data.relayer.address if guardian_and_relayer_data.relayer else None,
         gas_limit=args.gas_limit,
-        gas_price=int(args.gas_price),
-        value=int(args.value),
-        nonce=sender.nonce,
-        version=int(args.version),
-        options=int(args.options),
-        guardian_and_relayer_data=guardian_and_relayer_data,
+        gas_price=args.gas_price,
     )
 
+    _sign_transaction(tx, sender, guardian_and_relayer_data)
     cli_shared.send_or_simulate(tx, args)
 
 
@@ -618,19 +635,18 @@ def unstake_nodes(args: Any):
     public_keys = _load_validators_public_keys(args)
 
     delegation = _get_delegation_controller(args)
-    tx = delegation.prepare_transaction_for_unstaking_nodes(
-        owner=sender,
+    tx = delegation.create_transaction_for_unstaking_nodes(
+        sender=sender,
+        nonce=sender.nonce,
         delegation_contract=Address.new_from_bech32(args.delegation_contract),
         public_keys=public_keys,
+        guardian=guardian_and_relayer_data.guardian.address if guardian_and_relayer_data.guardian else None,
+        relayer=guardian_and_relayer_data.relayer.address if guardian_and_relayer_data.relayer else None,
         gas_limit=args.gas_limit,
-        gas_price=int(args.gas_price),
-        value=int(args.value),
-        nonce=sender.nonce,
-        version=int(args.version),
-        options=int(args.options),
-        guardian_and_relayer_data=guardian_and_relayer_data,
+        gas_price=args.gas_price,
     )
 
+    _sign_transaction(tx, sender, guardian_and_relayer_data)
     cli_shared.send_or_simulate(tx, args)
 
 
@@ -647,19 +663,19 @@ def unjail_nodes(args: Any):
     public_keys = _load_validators_public_keys(args)
 
     delegation = _get_delegation_controller(args)
-    tx = delegation.prepare_transaction_for_unjailing_nodes(
-        owner=sender,
+    tx = delegation.create_transaction_for_unjailing_nodes(
+        sender=sender,
+        nonce=sender.nonce,
         delegation_contract=Address.new_from_bech32(args.delegation_contract),
         public_keys=public_keys,
+        amount=int(args.value),
+        guardian=guardian_and_relayer_data.guardian.address if guardian_and_relayer_data.guardian else None,
+        relayer=guardian_and_relayer_data.relayer.address if guardian_and_relayer_data.relayer else None,
         gas_limit=args.gas_limit,
-        gas_price=int(args.gas_price),
-        value=int(args.value),
-        nonce=sender.nonce,
-        version=int(args.version),
-        options=int(args.options),
-        guardian_and_relayer_data=guardian_and_relayer_data,
+        gas_price=args.gas_price,
     )
 
+    _sign_transaction(tx, sender, guardian_and_relayer_data)
     cli_shared.send_or_simulate(tx, args)
 
 
@@ -673,18 +689,18 @@ def delegate(args: Any):
     )
 
     delegation = _get_delegation_controller(args)
-    tx = delegation.prepare_transaction_for_delegating(
-        owner=sender,
-        delegation_contract=Address.new_from_bech32(args.delegation_contract),
-        gas_limit=args.gas_limit,
-        gas_price=int(args.gas_price),
-        value=int(args.value),
+    tx = delegation.create_transaction_for_delegating(
+        sender=sender,
         nonce=sender.nonce,
-        version=int(args.version),
-        options=int(args.options),
-        guardian_and_relayer_data=guardian_and_relayer_data,
+        delegation_contract=Address.new_from_bech32(args.delegation_contract),
+        amount=int(args.value),
+        guardian=guardian_and_relayer_data.guardian.address if guardian_and_relayer_data.guardian else None,
+        relayer=guardian_and_relayer_data.relayer.address if guardian_and_relayer_data.relayer else None,
+        gas_limit=args.gas_limit,
+        gas_price=args.gas_price,
     )
 
+    _sign_transaction(tx, sender, guardian_and_relayer_data)
     cli_shared.send_or_simulate(tx, args)
 
 
@@ -698,17 +714,17 @@ def claim_rewards(args: Any):
     )
 
     delegation = _get_delegation_controller(args)
-    tx = delegation.prepare_transaction_for_claiming_rewards(
-        owner=sender,
-        delegation_contract=Address.new_from_bech32(args.delegation_contract),
-        gas_limit=args.gas_limit,
-        gas_price=int(args.gas_price),
-        value=int(args.value),
+    tx = delegation.create_transaction_for_claiming_rewards(
+        sender=sender,
         nonce=sender.nonce,
-        version=int(args.version),
-        options=int(args.options),
-        guardian_and_relayer_data=guardian_and_relayer_data,
+        delegation_contract=Address.new_from_bech32(args.delegation_contract),
+        guardian=guardian_and_relayer_data.guardian.address if guardian_and_relayer_data.guardian else None,
+        relayer=guardian_and_relayer_data.relayer.address if guardian_and_relayer_data.relayer else None,
+        gas_limit=args.gas_limit,
+        gas_price=args.gas_price,
     )
+
+    _sign_transaction(tx, sender, guardian_and_relayer_data)
     cli_shared.send_or_simulate(tx, args)
 
 
@@ -722,17 +738,17 @@ def redelegate_rewards(args: Any):
     )
 
     delegation = _get_delegation_controller(args)
-    tx = delegation.prepare_transaction_for_redelegating_rewards(
-        owner=sender,
-        delegation_contract=Address.new_from_bech32(args.delegation_contract),
-        gas_limit=args.gas_limit,
-        gas_price=int(args.gas_price),
-        value=int(args.value),
+    tx = delegation.create_transaction_for_redelegating_rewards(
+        sender=sender,
         nonce=sender.nonce,
-        version=int(args.version),
-        options=int(args.options),
-        guardian_and_relayer_data=guardian_and_relayer_data,
+        delegation_contract=Address.new_from_bech32(args.delegation_contract),
+        guardian=guardian_and_relayer_data.guardian.address if guardian_and_relayer_data.guardian else None,
+        relayer=guardian_and_relayer_data.relayer.address if guardian_and_relayer_data.relayer else None,
+        gas_limit=args.gas_limit,
+        gas_price=args.gas_price,
     )
+
+    _sign_transaction(tx, sender, guardian_and_relayer_data)
     cli_shared.send_or_simulate(tx, args)
 
 
@@ -746,18 +762,18 @@ def undelegate(args: Any):
     )
 
     delegation = _get_delegation_controller(args)
-    tx = delegation.prepare_transaction_for_undelegating(
-        owner=sender,
-        delegation_contract=Address.new_from_bech32(args.delegation_contract),
-        gas_limit=args.gas_limit,
-        gas_price=int(args.gas_price),
-        value=int(args.value),
+    tx = delegation.create_transaction_for_undelegating(
+        sender=sender,
         nonce=sender.nonce,
-        version=int(args.version),
-        options=int(args.options),
-        guardian_and_relayer_data=guardian_and_relayer_data,
+        delegation_contract=Address.new_from_bech32(args.delegation_contract),
+        amount=int(args.value),
+        guardian=guardian_and_relayer_data.guardian.address if guardian_and_relayer_data.guardian else None,
+        relayer=guardian_and_relayer_data.relayer.address if guardian_and_relayer_data.relayer else None,
+        gas_limit=args.gas_limit,
+        gas_price=args.gas_price,
     )
 
+    _sign_transaction(tx, sender, guardian_and_relayer_data)
     cli_shared.send_or_simulate(tx, args)
 
 
@@ -771,18 +787,17 @@ def withdraw(args: Any):
     )
 
     delegation = _get_delegation_controller(args)
-    tx = delegation.prepare_transaction_for_withdrawing(
-        owner=sender,
-        delegation_contract=Address.new_from_bech32(args.delegation_contract),
-        gas_limit=args.gas_limit,
-        gas_price=int(args.gas_price),
-        value=int(args.value),
+    tx = delegation.create_transaction_for_withdrawing(
+        sender=sender,
         nonce=sender.nonce,
-        version=int(args.version),
-        options=int(args.options),
-        guardian_and_relayer_data=guardian_and_relayer_data,
+        delegation_contract=Address.new_from_bech32(args.delegation_contract),
+        guardian=guardian_and_relayer_data.guardian.address if guardian_and_relayer_data.guardian else None,
+        relayer=guardian_and_relayer_data.relayer.address if guardian_and_relayer_data.relayer else None,
+        gas_limit=args.gas_limit,
+        gas_price=args.gas_price,
     )
 
+    _sign_transaction(tx, sender, guardian_and_relayer_data)
     cli_shared.send_or_simulate(tx, args)
 
 
@@ -796,19 +811,18 @@ def change_service_fee(args: Any):
     )
 
     delegation = _get_delegation_controller(args)
-    tx = delegation.prepare_transaction_for_changing_service_fee(
-        owner=sender,
+    tx = delegation.create_transaction_for_changing_service_fee(
+        sender=sender,
+        nonce=sender.nonce,
         delegation_contract=Address.new_from_bech32(args.delegation_contract),
         service_fee=int(args.service_fee),
+        guardian=guardian_and_relayer_data.guardian.address if guardian_and_relayer_data.guardian else None,
+        relayer=guardian_and_relayer_data.relayer.address if guardian_and_relayer_data.relayer else None,
         gas_limit=args.gas_limit,
-        gas_price=int(args.gas_price),
-        value=int(args.value),
-        nonce=sender.nonce,
-        version=int(args.version),
-        options=int(args.options),
-        guardian_and_relayer_data=guardian_and_relayer_data,
+        gas_price=args.gas_price,
     )
 
+    _sign_transaction(tx, sender, guardian_and_relayer_data)
     cli_shared.send_or_simulate(tx, args)
 
 
@@ -822,19 +836,18 @@ def modify_delegation_cap(args: Any):
     )
 
     delegation = _get_delegation_controller(args)
-    tx = delegation.prepare_transaction_for_modifying_delegation_cap(
-        owner=sender,
+    tx = delegation.create_transaction_for_modifying_delegation_cap(
+        sender=sender,
+        nonce=sender.nonce,
         delegation_contract=Address.new_from_bech32(args.delegation_contract),
         delegation_cap=int(args.delegation_cap),
+        guardian=guardian_and_relayer_data.guardian.address if guardian_and_relayer_data.guardian else None,
+        relayer=guardian_and_relayer_data.relayer.address if guardian_and_relayer_data.relayer else None,
         gas_limit=args.gas_limit,
-        gas_price=int(args.gas_price),
-        value=int(args.value),
-        nonce=sender.nonce,
-        version=int(args.version),
-        options=int(args.options),
-        guardian_and_relayer_data=guardian_and_relayer_data,
+        gas_price=args.gas_price,
     )
 
+    _sign_transaction(tx, sender, guardian_and_relayer_data)
     cli_shared.send_or_simulate(tx, args)
 
 
@@ -848,20 +861,34 @@ def automatic_activation(args: Any):
     )
 
     delegation = _get_delegation_controller(args)
-    tx = delegation.prepare_transaction_for_automatic_activation(
-        owner=sender,
-        delegation_contract=Address.new_from_bech32(args.delegation_contract),
-        set=args.set,
-        unset=args.unset,
-        gas_limit=args.gas_limit,
-        gas_price=int(args.gas_price),
-        value=int(args.value),
-        nonce=sender.nonce,
-        version=int(args.version),
-        options=int(args.options),
-        guardian_and_relayer_data=guardian_and_relayer_data,
-    )
 
+    if args.set and args.unset:
+        raise errors.BadUsage("Cannot set and unset at the same time")
+
+    if args.set:
+        tx = delegation.create_transaction_for_setting_automatic_activation(
+            sender=sender,
+            nonce=sender.nonce,
+            delegation_contract=Address.new_from_bech32(args.delegation_contract),
+            guardian=guardian_and_relayer_data.guardian.address if guardian_and_relayer_data.guardian else None,
+            relayer=guardian_and_relayer_data.relayer.address if guardian_and_relayer_data.relayer else None,
+            gas_limit=args.gas_limit,
+            gas_price=args.gas_price,
+        )
+    elif args.unset:
+        tx = delegation.create_transaction_for_unsetting_automatic_activation(
+            sender=sender,
+            nonce=sender.nonce,
+            delegation_contract=Address.new_from_bech32(args.delegation_contract),
+            guardian=guardian_and_relayer_data.guardian.address if guardian_and_relayer_data.guardian else None,
+            relayer=guardian_and_relayer_data.relayer.address if guardian_and_relayer_data.relayer else None,
+            gas_limit=args.gas_limit,
+            gas_price=args.gas_price,
+        )
+    else:
+        raise errors.BadUsage("Both set and unset automatic activation are False")
+
+    _sign_transaction(tx, sender, guardian_and_relayer_data)
     cli_shared.send_or_simulate(tx, args)
 
 
@@ -875,20 +902,33 @@ def redelegate_cap(args: Any):
     )
 
     delegation = _get_delegation_controller(args)
-    tx = delegation.prepare_transaction_for_redelegate_cap(
-        owner=sender,
-        delegation_contract=Address.new_from_bech32(args.delegation_contract),
-        set=args.set,
-        unset=args.unset,
-        gas_limit=args.gas_limit,
-        gas_price=int(args.gas_price),
-        value=int(args.value),
-        nonce=sender.nonce,
-        version=int(args.version),
-        options=int(args.options),
-        guardian_and_relayer_data=guardian_and_relayer_data,
-    )
+    if args.set and args.unset:
+        raise errors.BadUsage("Cannot set and unset at the same time")
 
+    if args.set:
+        tx = delegation.create_transaction_for_setting_cap_check_on_redelegate_rewards(
+            sender=sender,
+            nonce=sender.nonce,
+            delegation_contract=Address.new_from_bech32(args.delegation_contract),
+            guardian=guardian_and_relayer_data.guardian.address if guardian_and_relayer_data.guardian else None,
+            relayer=guardian_and_relayer_data.relayer.address if guardian_and_relayer_data.relayer else None,
+            gas_limit=args.gas_limit,
+            gas_price=args.gas_price,
+        )
+    elif args.unset:
+        tx = delegation.create_transaction_for_unsetting_cap_check_on_redelegate_rewards(
+            sender=sender,
+            nonce=sender.nonce,
+            delegation_contract=Address.new_from_bech32(args.delegation_contract),
+            guardian=guardian_and_relayer_data.guardian.address if guardian_and_relayer_data.guardian else None,
+            relayer=guardian_and_relayer_data.relayer.address if guardian_and_relayer_data.relayer else None,
+            gas_limit=args.gas_limit,
+            gas_price=args.gas_price,
+        )
+    else:
+        raise errors.BadUsage("Either set or unset should be True")
+
+    _sign_transaction(tx, sender, guardian_and_relayer_data)
     cli_shared.send_or_simulate(tx, args)
 
 
@@ -902,21 +942,20 @@ def set_metadata(args: Any):
     )
 
     delegation = _get_delegation_controller(args)
-    tx = delegation.prepare_transaction_for_setting_metadata(
-        owner=sender,
+    tx = delegation.create_transaction_for_setting_metadata(
+        sender=sender,
+        nonce=sender.nonce,
         delegation_contract=Address.new_from_bech32(args.delegation_contract),
         name=args.name,
         website=args.website,
         identifier=args.identifier,
+        guardian=guardian_and_relayer_data.guardian.address if guardian_and_relayer_data.guardian else None,
+        relayer=guardian_and_relayer_data.relayer.address if guardian_and_relayer_data.relayer else None,
         gas_limit=args.gas_limit,
-        gas_price=int(args.gas_price),
-        value=int(args.value),
-        nonce=sender.nonce,
-        version=int(args.version),
-        options=int(args.options),
-        guardian_and_relayer_data=guardian_and_relayer_data,
+        gas_price=args.gas_price,
     )
 
+    _sign_transaction(tx, sender, guardian_and_relayer_data)
     cli_shared.send_or_simulate(tx, args)
 
 
@@ -929,18 +968,20 @@ def make_new_contract_from_validator_data(args: Any):
         args=args,
     )
 
-    delegation = _get_delegation_controller(args)
-    tx = delegation.prepare_transaction_for_creating_delegation_contract_from_validator(
-        owner=sender,
-        max_cap=args.max_cap,
-        service_fee=args.fee,
-        gas_limit=args.gas_limit,
-        gas_price=int(args.gas_price),
-        value=int(args.value),
+    chain_id = cli_shared.get_chain_id(args.proxy, args.chain)
+    gas_estimator = cli_shared.initialize_gas_limit_estimator(args)
+    validators_controller = ValidatorsController(chain_id=chain_id, gas_limit_estimator=gas_estimator)
+
+    tx = validators_controller.create_transaction_for_new_delegation_contract_from_validator_data(
+        sender=sender,
         nonce=sender.nonce,
-        version=int(args.version),
-        options=int(args.options),
-        guardian_and_relayer_data=guardian_and_relayer_data,
+        max_cap=args.max_cap,
+        fee=args.fee,
+        guardian=guardian_and_relayer_data.guardian.address if guardian_and_relayer_data.guardian else None,
+        relayer=guardian_and_relayer_data.relayer.address if guardian_and_relayer_data.relayer else None,
+        gas_limit=args.gas_limit,
+        gas_price=args.gas_price,
     )
 
+    _sign_transaction(tx, sender, guardian_and_relayer_data)
     cli_shared.send_or_simulate(tx, args)

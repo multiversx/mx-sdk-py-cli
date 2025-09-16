@@ -586,7 +586,7 @@ def test_create_delegation_contract_from_validator(capsys: Any):
     assert data == "makeNewContractFromValidatorData@@0ea1"
     assert transaction["sender"] == "erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th"
     assert transaction["receiver"] == "erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqylllslmq6y6"
-    assert transaction["gasLimit"] == 510000000
+    assert transaction["gasLimit"] == 51107000
 
 
 def test_delegate(capsys: Any):
