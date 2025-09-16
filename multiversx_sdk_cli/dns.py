@@ -76,7 +76,8 @@ def register(args: Any):
     data = dns_register_data(args.name)
 
     chain_id = cli_shared.get_chain_id(args.proxy, args.chain)
-    controller = TransactionsController(chain_id)
+    gas_estimator = cli_shared.initialize_gas_limit_estimator(args)
+    controller = TransactionsController(chain_id=chain_id, gas_limit_estimator=gas_estimator)
 
     tx = controller.create_transaction(
         sender=sender,

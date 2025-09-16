@@ -13,6 +13,7 @@ from multiversx_sdk import (
     Account,
     Address,
     ApiNetworkProvider,
+    GasLimitEstimator,
     LedgerAccount,
     ProxyNetworkProvider,
     Token,
@@ -139,6 +140,12 @@ def add_tx_args(
         help="⛽ the gas price (default: %(default)d)",
     )
     sub.add_argument("--gas-limit", required=False, type=int, help="⛽ the gas limit")
+    sub.add_argument(
+        "--gas-limit-multiplier",
+        required=False,
+        type=float,
+        help="if `--gas-limit` is not provided, the estimated value will be multiplied by this multiplier (e.g 1.1)",
+    )
 
     sub.add_argument("--value", default=0, type=int, help="the value to transfer (default: %(default)s)")
 
@@ -790,3 +797,18 @@ def set_proxy_from_config_if_not_provided(args: Any) -> None:
         if env.proxy_url:
             logger.info(f"Using proxy URL from config: {env.proxy_url}")
             args.proxy = env.proxy_url
+
+
+def initialize_gas_limit_estimator(args: Any) -> Union[GasLimitEstimator, None]:
+    # if proxy is not provided, we can't use GasLimitEstimator
+    if hasattr(args, "proxy") and not args.proxy:
+        return None
+
+    if hasattr(args, "gas_limit_multiplier") and args.gas_limit_multiplier:
+        multiplier: float = args.gas_limit_multiplier
+    else:
+        multiplier = config.get_gas_limit_multiplier_from_config()
+
+    network_provider_config = config.get_config_for_network_providers()
+    proxy = ProxyNetworkProvider(url=args.proxy, config=network_provider_config)
+    return GasLimitEstimator(network_provider=proxy, gas_multiplier=multiplier)

@@ -613,7 +613,7 @@ def test_delegate(capsys: Any):
     assert data == "delegate"
     assert transaction["sender"] == "erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th"
     assert transaction["receiver"] == "erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqthllllsy5r6rh"
-    assert transaction["gasLimit"] == 12000000
+    assert transaction["gasLimit"] == 11062000
 
 
 def test_claim_rewards(capsys: Any):
@@ -638,7 +638,7 @@ def test_claim_rewards(capsys: Any):
     assert data == "claimRewards"
     assert transaction["sender"] == "erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th"
     assert transaction["receiver"] == "erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqthllllsy5r6rh"
-    assert transaction["gasLimit"] == 6000000
+    assert transaction["gasLimit"] == 11068000
 
 
 def test_redelegate_rewards(capsys: Any):
@@ -663,7 +663,7 @@ def test_redelegate_rewards(capsys: Any):
     assert data == "reDelegateRewards"
     assert transaction["sender"] == "erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th"
     assert transaction["receiver"] == "erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqthllllsy5r6rh"
-    assert transaction["gasLimit"] == 12000000
+    assert transaction["gasLimit"] == 11075500
 
 
 def test_undelegate(capsys: Any):
@@ -690,7 +690,7 @@ def test_undelegate(capsys: Any):
     assert data == "unDelegate@0de0b6b3a7640000"
     assert transaction["sender"] == "erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th"
     assert transaction["receiver"] == "erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqthllllsy5r6rh"
-    assert transaction["gasLimit"] == 12000000
+    assert transaction["gasLimit"] == 11090500
 
 
 def test_withdraw(capsys: Any):
@@ -715,7 +715,7 @@ def test_withdraw(capsys: Any):
     assert data == "withdraw"
     assert transaction["sender"] == "erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th"
     assert transaction["receiver"] == "erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqthllllsy5r6rh"
-    assert transaction["gasLimit"] == 12000000
+    assert transaction["gasLimit"] == 11062000
 
 
 def _read_stdout(capsys: Any) -> str:

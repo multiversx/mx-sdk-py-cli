@@ -128,7 +128,7 @@ def _guard_valid_config_deletion(name: str):
 def get_defaults() -> dict[str, Any]:
     return {
         "dependencies.golang.resolution": "SDK",
-        "dependencies.golang.tag": "go1.20.7",
+        "dependencies.golang.tag": "go1.23.10",
         "dependencies.golang.urlTemplate.linux": "https://golang.org/dl/{TAG}.linux-amd64.tar.gz",
         "dependencies.golang.urlTemplate.osx": "https://golang.org/dl/{TAG}.darwin-amd64.tar.gz",
         "dependencies.golang.urlTemplate.windows": "https://golang.org/dl/{TAG}.windows-amd64.zip",
@@ -138,7 +138,13 @@ def get_defaults() -> dict[str, Any]:
         "dependencies.testwallets.urlTemplate.windows": "https://github.com/multiversx/mx-sdk-testwallets/archive/{TAG}.tar.gz",
         "github_api_token": "",
         "log_level": "info",
+        "gas_limit_multiplier": "1.0",
     }
+
+
+def get_gas_limit_multiplier_from_config() -> float:
+    value = get_value("gas_limit_multiplier")
+    return float(value)
 
 
 def get_log_level_from_config() -> str:
