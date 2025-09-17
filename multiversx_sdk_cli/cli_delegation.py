@@ -20,10 +20,10 @@ from multiversx_sdk_cli.args_validation import (
     validate_proxy_argument,
     validate_receiver_args,
 )
-from multiversx_sdk_cli.base_transactions_controller import BaseTransactionsController
 from multiversx_sdk_cli.config import get_config_for_network_providers
 from multiversx_sdk_cli.guardian_relayer_data import GuardianRelayerData
 from multiversx_sdk_cli.interfaces import IAccount
+from multiversx_sdk_cli.signing_wrapper import SigningWrapper
 
 
 def setup_parser(args: list[str], subparsers: Any) -> Any:
@@ -411,14 +411,11 @@ def _get_delegation_controller(args: Any):
 
 
 def _sign_transaction(transaction: Transaction, sender: IAccount, guardian_and_relayer_data: GuardianRelayerData):
-    base = BaseTransactionsController()
-    base.sign_transaction(
+    signer = SigningWrapper()
+    signer.sign_transaction(
         transaction=transaction,
         sender=sender,
-        guardian=guardian_and_relayer_data.guardian,
-        relayer=guardian_and_relayer_data.relayer,
-        guardian_service_url=guardian_and_relayer_data.guardian_service_url,
-        guardian_2fa_code=guardian_and_relayer_data.guardian_2fa_code,
+        guardian_and_relayer=guardian_and_relayer_data,
     )
 
 
