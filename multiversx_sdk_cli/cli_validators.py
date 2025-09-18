@@ -1,7 +1,13 @@
 from pathlib import Path
 from typing import Any
 
-from multiversx_sdk import Address, ValidatorPublicKey, ValidatorsSigners
+from multiversx_sdk import (
+    Address,
+    Transaction,
+    ValidatorPublicKey,
+    ValidatorsController,
+    ValidatorsSigners,
+)
 
 from multiversx_sdk_cli import cli_shared, utils
 from multiversx_sdk_cli.args_validation import (
@@ -10,7 +16,9 @@ from multiversx_sdk_cli.args_validation import (
     validate_nonce_args,
     validate_receiver_args,
 )
-from multiversx_sdk_cli.validators import ValidatorsController
+from multiversx_sdk_cli.guardian_relayer_data import GuardianRelayerData
+from multiversx_sdk_cli.interfaces import IAccount
+from multiversx_sdk_cli.signing_wrapper import SigningWrapper
 
 
 def setup_parser(args: list[str], subparsers: Any) -> Any:
@@ -151,8 +159,18 @@ def validate_args(args: Any) -> None:
     validate_chain_id_args(args)
 
 
+def _sign_transaction(transaction: Transaction, sender: IAccount, guardian_and_relayer_data: GuardianRelayerData):
+    signer = SigningWrapper()
+    signer.sign_transaction(
+        transaction=transaction,
+        sender=sender,
+        guardian_and_relayer=guardian_and_relayer_data,
+    )
+
+
 def do_stake(args: Any):
     validate_args(args)
+
     sender = cli_shared.prepare_sender(args)
     guardian_and_relayer_data = cli_shared.get_guardian_and_relayer_data(
         sender=sender.address.to_bech32(),
@@ -167,37 +185,35 @@ def do_stake(args: Any):
     if args.top_up:
         tx = controller.create_transaction_for_topping_up(
             sender=sender,
-            native_amount=native_amount,
+            nonce=sender.nonce,
+            amount=native_amount,
+            guardian=guardian_and_relayer_data.guardian_address if guardian_and_relayer_data.guardian_address else None,
+            relayer=guardian_and_relayer_data.relayer_address if guardian_and_relayer_data.relayer_address else None,
             gas_limit=args.gas_limit,
             gas_price=args.gas_price,
-            nonce=sender.nonce,
-            version=args.version,
-            options=args.options,
-            guardian_and_relayer_data=guardian_and_relayer_data,
         )
     else:
         validators_signers = _load_validators_signers(args.validators_pem)
         tx = controller.create_transaction_for_staking(
             sender=sender,
-            validators=validators_signers,
-            native_amount=native_amount,
+            nonce=sender.nonce,
+            validators_file=validators_signers,
+            amount=native_amount,
+            rewards_address=rewards_address,
+            guardian=guardian_and_relayer_data.guardian_address if guardian_and_relayer_data.guardian_address else None,
+            relayer=guardian_and_relayer_data.relayer_address if guardian_and_relayer_data.relayer_address else None,
             gas_limit=args.gas_limit,
             gas_price=args.gas_price,
-            nonce=sender.nonce,
-            version=args.version,
-            options=args.options,
-            rewards_address=rewards_address,
-            guardian_and_relayer_data=guardian_and_relayer_data,
         )
 
+    _sign_transaction(tx, sender, guardian_and_relayer_data)
     cli_shared.send_or_simulate(tx, args)
 
 
-def _get_validators_controller(args: Any):
+def _get_validators_controller(args: Any) -> ValidatorsController:
     chain_id = cli_shared.get_chain_id(args.proxy, args.chain)
     gas_estimator = cli_shared.initialize_gas_limit_estimator(args)
-    validators = ValidatorsController(chain_id=chain_id, gas_limit_estimator=gas_estimator)
-    return validators
+    return ValidatorsController(chain_id=chain_id, gas_limit_estimator=gas_estimator)
 
 
 def _load_validators_signers(validators_pem: str) -> ValidatorsSigners:
@@ -224,22 +240,20 @@ def do_unstake(args: Any):
         args=args,
     )
 
-    native_amount = int(args.value)
     keys = _parse_public_bls_keys(args.nodes_public_keys)
-
     controller = _get_validators_controller(args)
+
     tx = controller.create_transaction_for_unstaking(
         sender=sender,
-        keys=keys,
-        native_amount=native_amount,
+        nonce=sender.nonce,
+        public_keys=keys,
+        guardian=guardian_and_relayer_data.guardian_address if guardian_and_relayer_data.guardian_address else None,
+        relayer=guardian_and_relayer_data.relayer_address if guardian_and_relayer_data.relayer_address else None,
         gas_limit=args.gas_limit,
         gas_price=args.gas_price,
-        nonce=sender.nonce,
-        version=args.version,
-        options=args.options,
-        guardian_and_relayer_data=guardian_and_relayer_data,
     )
 
+    _sign_transaction(tx, sender, guardian_and_relayer_data)
     cli_shared.send_or_simulate(tx, args)
 
 
@@ -258,16 +272,16 @@ def do_unjail(args: Any):
     controller = _get_validators_controller(args)
     tx = controller.create_transaction_for_unjailing(
         sender=sender,
-        keys=keys,
-        native_amount=native_amount,
+        nonce=sender.nonce,
+        public_keys=keys,
+        amount=native_amount,
+        guardian=guardian_and_relayer_data.guardian_address if guardian_and_relayer_data.guardian_address else None,
+        relayer=guardian_and_relayer_data.relayer_address if guardian_and_relayer_data.relayer_address else None,
         gas_limit=args.gas_limit,
         gas_price=args.gas_price,
-        nonce=sender.nonce,
-        version=args.version,
-        options=args.options,
-        guardian_and_relayer_data=guardian_and_relayer_data,
     )
 
+    _sign_transaction(tx, sender, guardian_and_relayer_data)
     cli_shared.send_or_simulate(tx, args)
 
 
@@ -280,22 +294,20 @@ def do_unbond(args: Any):
         args=args,
     )
 
-    native_amount = int(args.value)
     keys = _parse_public_bls_keys(args.nodes_public_keys)
-
     controller = _get_validators_controller(args)
+
     tx = controller.create_transaction_for_unbonding(
         sender=sender,
-        keys=keys,
-        native_amount=native_amount,
+        nonce=sender.nonce,
+        public_keys=keys,
+        guardian=guardian_and_relayer_data.guardian_address if guardian_and_relayer_data.guardian_address else None,
+        relayer=guardian_and_relayer_data.relayer_address if guardian_and_relayer_data.relayer_address else None,
         gas_limit=args.gas_limit,
         gas_price=args.gas_price,
-        nonce=sender.nonce,
-        version=args.version,
-        options=args.options,
-        guardian_and_relayer_data=guardian_and_relayer_data,
     )
 
+    _sign_transaction(tx, sender, guardian_and_relayer_data)
     cli_shared.send_or_simulate(tx, args)
 
 
@@ -308,22 +320,20 @@ def change_reward_address(args: Any):
         args=args,
     )
 
-    native_amount = int(args.value)
     rewards_address = Address.new_from_bech32(args.reward_address)
-
     controller = _get_validators_controller(args)
+
     tx = controller.create_transaction_for_changing_rewards_address(
         sender=sender,
+        nonce=sender.nonce,
         rewards_address=rewards_address,
-        native_amount=native_amount,
+        guardian=guardian_and_relayer_data.guardian_address if guardian_and_relayer_data.guardian_address else None,
+        relayer=guardian_and_relayer_data.relayer_address if guardian_and_relayer_data.relayer_address else None,
         gas_limit=args.gas_limit,
         gas_price=args.gas_price,
-        nonce=sender.nonce,
-        version=args.version,
-        options=args.options,
-        guardian_and_relayer_data=guardian_and_relayer_data,
     )
 
+    _sign_transaction(tx, sender, guardian_and_relayer_data)
     cli_shared.send_or_simulate(tx, args)
 
 
@@ -336,20 +346,17 @@ def do_claim(args: Any):
         args=args,
     )
 
-    native_amount = int(args.value)
-
     controller = _get_validators_controller(args)
     tx = controller.create_transaction_for_claiming(
         sender=sender,
-        native_amount=native_amount,
+        nonce=sender.nonce,
+        guardian=guardian_and_relayer_data.guardian_address if guardian_and_relayer_data.guardian_address else None,
+        relayer=guardian_and_relayer_data.relayer_address if guardian_and_relayer_data.relayer_address else None,
         gas_limit=args.gas_limit,
         gas_price=args.gas_price,
-        nonce=sender.nonce,
-        version=args.version,
-        options=args.options,
-        guardian_and_relayer_data=guardian_and_relayer_data,
     )
 
+    _sign_transaction(tx, sender, guardian_and_relayer_data)
     cli_shared.send_or_simulate(tx, args)
 
 
@@ -362,22 +369,20 @@ def do_unstake_nodes(args: Any):
         args=args,
     )
 
-    native_amount = int(args.value)
     keys = _parse_public_bls_keys(args.nodes_public_keys)
-
     controller = _get_validators_controller(args)
+
     tx = controller.create_transaction_for_unstaking_nodes(
         sender=sender,
-        keys=keys,
-        native_amount=native_amount,
+        nonce=sender.nonce,
+        public_keys=keys,
+        guardian=guardian_and_relayer_data.guardian_address if guardian_and_relayer_data.guardian_address else None,
+        relayer=guardian_and_relayer_data.relayer_address if guardian_and_relayer_data.relayer_address else None,
         gas_limit=args.gas_limit,
         gas_price=args.gas_price,
-        nonce=sender.nonce,
-        version=args.version,
-        options=args.options,
-        guardian_and_relayer_data=guardian_and_relayer_data,
     )
 
+    _sign_transaction(tx, sender, guardian_and_relayer_data)
     cli_shared.send_or_simulate(tx, args)
 
 
@@ -390,22 +395,20 @@ def do_unstake_tokens(args: Any):
         args=args,
     )
 
-    native_amount = int(args.value)
     value = int(args.unstake_value)
-
     controller = _get_validators_controller(args)
+
     tx = controller.create_transaction_for_unstaking_tokens(
         sender=sender,
-        value=value,
-        native_amount=native_amount,
+        nonce=sender.nonce,
+        amount=value,
+        guardian=guardian_and_relayer_data.guardian_address if guardian_and_relayer_data.guardian_address else None,
+        relayer=guardian_and_relayer_data.relayer_address if guardian_and_relayer_data.relayer_address else None,
         gas_limit=args.gas_limit,
         gas_price=args.gas_price,
-        nonce=sender.nonce,
-        version=args.version,
-        options=args.options,
-        guardian_and_relayer_data=guardian_and_relayer_data,
     )
 
+    _sign_transaction(tx, sender, guardian_and_relayer_data)
     cli_shared.send_or_simulate(tx, args)
 
 
@@ -418,22 +421,20 @@ def do_unbond_nodes(args: Any):
         args=args,
     )
 
-    native_amount = int(args.value)
     keys = _parse_public_bls_keys(args.nodes_public_keys)
-
     controller = _get_validators_controller(args)
+
     tx = controller.create_transaction_for_unbonding_nodes(
         sender=sender,
-        keys=keys,
-        native_amount=native_amount,
+        nonce=sender.nonce,
+        public_keys=keys,
+        guardian=guardian_and_relayer_data.guardian_address if guardian_and_relayer_data.guardian_address else None,
+        relayer=guardian_and_relayer_data.relayer_address if guardian_and_relayer_data.relayer_address else None,
         gas_limit=args.gas_limit,
         gas_price=args.gas_price,
-        nonce=sender.nonce,
-        version=args.version,
-        options=args.options,
-        guardian_and_relayer_data=guardian_and_relayer_data,
     )
 
+    _sign_transaction(tx, sender, guardian_and_relayer_data)
     cli_shared.send_or_simulate(tx, args)
 
 
@@ -446,22 +447,20 @@ def do_unbond_tokens(args: Any):
         args=args,
     )
 
-    native_amount = int(args.value)
     value = int(args.unbond_value)
-
     controller = _get_validators_controller(args)
+
     tx = controller.create_transaction_for_unbonding_tokens(
         sender=sender,
-        value=value,
-        native_amount=native_amount,
+        nonce=sender.nonce,
+        amount=value,
+        guardian=guardian_and_relayer_data.guardian_address if guardian_and_relayer_data.guardian_address else None,
+        relayer=guardian_and_relayer_data.relayer_address if guardian_and_relayer_data.relayer_address else None,
         gas_limit=args.gas_limit,
         gas_price=args.gas_price,
-        nonce=sender.nonce,
-        version=args.version,
-        options=args.options,
-        guardian_and_relayer_data=guardian_and_relayer_data,
     )
 
+    _sign_transaction(tx, sender, guardian_and_relayer_data)
     cli_shared.send_or_simulate(tx, args)
 
 
@@ -474,20 +473,17 @@ def do_clean_registered_data(args: Any):
         args=args,
     )
 
-    native_amount = int(args.value)
-
     controller = _get_validators_controller(args)
     tx = controller.create_transaction_for_cleaning_registered_data(
         sender=sender,
-        native_amount=native_amount,
+        nonce=sender.nonce,
+        guardian=guardian_and_relayer_data.guardian_address if guardian_and_relayer_data.guardian_address else None,
+        relayer=guardian_and_relayer_data.relayer_address if guardian_and_relayer_data.relayer_address else None,
         gas_limit=args.gas_limit,
         gas_price=args.gas_price,
-        nonce=sender.nonce,
-        version=args.version,
-        options=args.options,
-        guardian_and_relayer_data=guardian_and_relayer_data,
     )
 
+    _sign_transaction(tx, sender, guardian_and_relayer_data)
     cli_shared.send_or_simulate(tx, args)
 
 
@@ -500,20 +496,18 @@ def do_restake_unstaked_nodes(args: Any):
         args=args,
     )
 
-    native_amount = int(args.value)
     keys = _parse_public_bls_keys(args.nodes_public_keys)
-
     controller = _get_validators_controller(args)
+
     tx = controller.create_transaction_for_restaking_unstaked_nodes(
         sender=sender,
-        keys=keys,
-        native_amount=native_amount,
+        nonce=sender.nonce,
+        public_keys=keys,
+        guardian=guardian_and_relayer_data.guardian_address if guardian_and_relayer_data.guardian_address else None,
+        relayer=guardian_and_relayer_data.relayer_address if guardian_and_relayer_data.relayer_address else None,
         gas_limit=args.gas_limit,
         gas_price=args.gas_price,
-        nonce=sender.nonce,
-        version=args.version,
-        options=args.options,
-        guardian_and_relayer_data=guardian_and_relayer_data,
     )
 
+    _sign_transaction(tx, sender, guardian_and_relayer_data)
     cli_shared.send_or_simulate(tx, args)
