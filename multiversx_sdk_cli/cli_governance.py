@@ -19,7 +19,6 @@ from multiversx_sdk_cli.args_validation import (
 )
 from multiversx_sdk_cli.cli_output import CLIOutputBuilder
 from multiversx_sdk_cli.config import get_config_for_network_providers
-from multiversx_sdk_cli.config_env import get_address_hrp
 from multiversx_sdk_cli.guardian_relayer_data import GuardianRelayerData
 from multiversx_sdk_cli.interfaces import IAccount
 from multiversx_sdk_cli.signing_wrapper import SigningWrapper
@@ -211,7 +210,7 @@ def _initialize_controller(args: Any) -> GovernanceController:
     return GovernanceController(
         chain_id=chain_id,
         network_provider=proxy,
-        address_hrp=get_address_hrp(),
+        address_hrp=cli_shared.get_address_hrp_with_fallback(args),
         gas_limit_estimator=gas_estimator,
     )
 
