@@ -204,6 +204,333 @@ def setup_parser(args: list[str], subparsers: Any) -> Any:
     add_common_args(args, sub)
     sub.set_defaults(func=create_nft)
 
+    sub = cli_shared.add_command_subparser(
+        subparsers,
+        "token",
+        "pause",
+        "Pause a token.",
+    )
+    _add_token_identifier_arg(sub)
+    add_common_args(args, sub)
+    sub.set_defaults(func=pause_token)
+
+    sub = cli_shared.add_command_subparser(
+        subparsers,
+        "token",
+        "unpause",
+        "Unpause a token.",
+    )
+    _add_token_identifier_arg(sub)
+    add_common_args(args, sub)
+    sub.set_defaults(func=unpause_token)
+
+    sub = cli_shared.add_command_subparser(
+        subparsers,
+        "token",
+        "freeze",
+        "Freeze a token for a user.",
+    )
+    _add_token_identifier_arg(sub)
+    _add_user_arg(sub)
+    add_common_args(args, sub)
+    sub.set_defaults(func=freeze_token)
+
+    sub = cli_shared.add_command_subparser(
+        subparsers,
+        "token",
+        "unfreeze",
+        "Unfreeze a token for a user.",
+    )
+    _add_token_identifier_arg(sub)
+    _add_user_arg(sub)
+    add_common_args(args, sub)
+    sub.set_defaults(func=unfreeze_token)
+
+    sub = cli_shared.add_command_subparser(
+        subparsers,
+        "token",
+        "wipe",
+        "Wipe a token for a user.",
+    )
+    _add_token_identifier_arg(sub)
+    _add_user_arg(sub)
+    add_common_args(args, sub)
+    sub.set_defaults(func=wipe_token)
+
+    sub = cli_shared.add_command_subparser(
+        subparsers,
+        "token",
+        "local-mint",
+        "Mint new tokens.",
+    )
+    _add_token_identifier_arg(sub)
+    sub.add_argument("--supply-to-mint", required=True, type=int, help="The amount of new tokens to mint")
+    add_common_args(args, sub)
+    sub.set_defaults(func=local_mint)
+
+    sub = cli_shared.add_command_subparser(
+        subparsers,
+        "token",
+        "local-burn",
+        "Burn tokens.",
+    )
+    _add_token_identifier_arg(sub)
+    sub.add_argument("--supply-to-burn", required=True, type=int, help="The amount of tokens to burn")
+    add_common_args(args, sub)
+    sub.set_defaults(func=local_burn)
+
+    sub = cli_shared.add_command_subparser(
+        subparsers,
+        "token",
+        "update-attributes",
+        "Update token attributes.",
+    )
+    _add_token_identifier_arg(sub)
+    sub.add_argument("--token-nonce", required=True, type=int, help="The nonce of the token as decimal value")
+    sub.add_argument("--attributes", required=True, type=str, help="The hex-string attributes of the token")
+    add_common_args(args, sub)
+    sub.set_defaults(func=update_attributes)
+
+    sub = cli_shared.add_command_subparser(
+        subparsers,
+        "token",
+        "add-quantity",
+        "Increase token quantity.",
+    )
+    _add_token_identifier_arg(sub)
+    sub.add_argument("--token-nonce", required=True, type=int, help="The nonce of the token as decimal value")
+    sub.add_argument("--quantity", required=True, type=int, help="The quantity to add")
+    add_common_args(args, sub)
+    sub.set_defaults(func=add_quantity)
+
+    sub = cli_shared.add_command_subparser(
+        subparsers,
+        "token",
+        "burn-quantity",
+        "Burn token quantity.",
+    )
+    _add_token_identifier_arg(sub)
+    sub.add_argument("--token-nonce", required=True, type=int, help="The nonce of the token as decimal value")
+    sub.add_argument("--quantity", required=True, type=int, help="The quantity to burn")
+    add_common_args(args, sub)
+    sub.set_defaults(func=burn_quantity)
+
+    sub = cli_shared.add_command_subparser(
+        subparsers,
+        "token",
+        "modify-royalties",
+        "Modify token royalties.",
+    )
+    _add_token_identifier_arg(sub)
+    sub.add_argument("--token-nonce", required=True, type=int, help="The nonce of the token as decimal value")
+    sub.add_argument("--royalties", required=True, type=int, help="The new token royalties (e.g. 1234 for 12.34%)")
+    add_common_args(args, sub)
+    sub.set_defaults(func=modify_royalties)
+
+    sub = cli_shared.add_command_subparser(
+        subparsers,
+        "token",
+        "set-new-uris",
+        "Set new uris.",
+    )
+    _add_token_identifier_arg(sub)
+    sub.add_argument("--token-nonce", required=True, type=int, help="The nonce of the token as decimal value")
+    sub.add_argument("--uris", required=True, nargs="+", help="The new uris")
+    add_common_args(args, sub)
+    sub.set_defaults(func=set_new_uris)
+
+    sub = cli_shared.add_command_subparser(
+        subparsers,
+        "token",
+        "modify-creator",
+        "Modify the creator of the token.",
+    )
+    _add_token_identifier_arg(sub)
+    sub.add_argument("--token-nonce", required=True, type=int, help="The nonce of the token as decimal value")
+    add_common_args(args, sub)
+    sub.set_defaults(func=modify_creator)
+
+    sub = cli_shared.add_command_subparser(
+        subparsers,
+        "token",
+        "update-metadata",
+        "Update the metadata of the token.",
+    )
+    _add_token_identifier_arg(sub)
+    sub.add_argument("--token-nonce", required=True, type=int, help="The nonce of the token as decimal value")
+    sub.add_argument("--token-name", required=True, type=str, help="The new name of the token")
+    sub.add_argument("--royalties", required=True, type=int, help="The new token royalties (e.g. 1234 for 12.34%%)")
+    sub.add_argument("--hash", required=True, type=str, help="The new hash of the token")
+    sub.add_argument(
+        "--attributes", required=True, type=str, help="The new attributes of the token as a hex-encoded string"
+    )
+    sub.add_argument("--uris", required=True, nargs="+", help="The new uris")
+    add_common_args(args, sub)
+    sub.set_defaults(func=update_metadata)
+
+    sub = cli_shared.add_command_subparser(
+        subparsers,
+        "token",
+        "nft-metadata-recreate",
+        "Recreate the metadata of the token.",
+    )
+    _add_token_identifier_arg(sub)
+    sub.add_argument("--token-nonce", required=True, type=int, help="The nonce of the token as decimal value")
+    sub.add_argument("--token-name", required=True, type=str, help="The new name of the token")
+    sub.add_argument("--royalties", required=True, type=int, help="The new token royalties (e.g. 1234 for 12.34%%)")
+    sub.add_argument("--hash", required=True, type=str, help="The new hash of the token")
+    sub.add_argument(
+        "--attributes", required=True, type=str, help="The new attributes of the token as a hex-encoded string"
+    )
+    sub.add_argument("--uris", required=True, nargs="+", help="The new uris")
+    add_common_args(args, sub)
+    sub.set_defaults(func=nft_metadata_recreate)
+
+    sub = cli_shared.add_command_subparser(
+        subparsers,
+        "token",
+        "change-to-dynamic",
+        "Change a token to a dynamic token.",
+    )
+    _add_token_identifier_arg(sub)
+    add_common_args(args, sub)
+    sub.set_defaults(func=change_to_dynamic)
+
+    sub = cli_shared.add_command_subparser(
+        subparsers,
+        "token",
+        "update-token-id",
+        "Update token id.",
+    )
+    _add_token_identifier_arg(sub)
+    add_common_args(args, sub)
+    sub.set_defaults(func=update_token_id)
+
+    sub = cli_shared.add_command_subparser(
+        subparsers,
+        "token",
+        "register-dynamic",
+        "Register a dynamic token.",
+    )
+    sub.add_argument("--token-name", type=str, required=True, help="The token name")
+    sub.add_argument("--token-ticker", type=str, required=True, help="The token ticker")
+    sub.add_argument(
+        "--token-type", type=str, required=True, choices=["NFT", "SFT", "FNG", "META"], help="The token type"
+    )
+    sub.add_argument(
+        "--denominator", type=int, default=None, help="The number of decimals, only needed when token type is META ESDT"
+    )
+    add_common_args(args, sub)
+    sub.set_defaults(func=register_dynamic_token)
+
+    sub = cli_shared.add_command_subparser(
+        subparsers,
+        "token",
+        "register-dynamic-and-set-all-roles",
+        "Register a dynamic token and set all roles.",
+    )
+    sub.add_argument("--token-name", type=str, required=True, help="The token name")
+    sub.add_argument("--token-ticker", type=str, required=True, help="The token ticker")
+    sub.add_argument(
+        "--token-type", type=str, required=True, choices=["NFT", "SFT", "FNG", "META"], help="The token type"
+    )
+    sub.add_argument(
+        "--denominator", type=int, default=None, help="The number of decimals, only needed when token type is META ESDT"
+    )
+    add_common_args(args, sub)
+    sub.set_defaults(func=register_dynamic_and_set_all_roles)
+
+    sub = cli_shared.add_command_subparser(
+        subparsers,
+        "token",
+        "transfer-ownership",
+        "Transfer the ownership of a token to another user.",
+    )
+    _add_token_identifier_arg(sub)
+    sub.add_argument("--new-owner", type=str, required=True, help="The new token owner")
+    add_common_args(args, sub)
+    sub.set_defaults(func=transfer_ownership)
+
+    sub = cli_shared.add_command_subparser(
+        subparsers,
+        "token",
+        "freeze-single-nft",
+        "Freeze the NFT of a user.",
+    )
+    _add_token_identifier_arg(sub)
+    sub.add_argument("--token-nonce", required=True, type=int, help="The nonce of the token as decimal value")
+    _add_user_arg(sub)
+    add_common_args(args, sub)
+    sub.set_defaults(func=freeze_single_nft)
+
+    sub = cli_shared.add_command_subparser(
+        subparsers,
+        "token",
+        "unfreeze-single-nft",
+        "Unfreeze the NFT of a user.",
+    )
+    _add_token_identifier_arg(sub)
+    sub.add_argument("--token-nonce", required=True, type=int, help="The nonce of the token as decimal value")
+    _add_user_arg(sub)
+    add_common_args(args, sub)
+    sub.set_defaults(func=unfreeze_single_nft)
+
+    sub = cli_shared.add_command_subparser(
+        subparsers,
+        "token",
+        "change-sft-to-meta-esdt",
+        "Change a semi fungible token to a Meta ESDT.",
+    )
+    sub.add_argument("--collection", required=True, type=str, help="The collection identifier")
+    sub.add_argument("--decimals", type=int, required=True, help="The number of decimals the meta esdt will have")
+    add_common_args(args, sub)
+    sub.set_defaults(func=change_sft_to_meta_esdt)
+
+    sub = cli_shared.add_command_subparser(
+        subparsers,
+        "token",
+        "transfer-nft-create-role",
+        "Transfer the nft create role to a user.",
+    )
+    _add_token_identifier_arg(sub)
+    _add_user_arg(sub)
+    add_common_args(args, sub)
+    sub.set_defaults(func=transfer_nft_create_role)
+
+    sub = cli_shared.add_command_subparser(
+        subparsers,
+        "token",
+        "stop-nft-creation",
+        "Stop the creation of new NFTs.",
+    )
+    _add_token_identifier_arg(sub)
+    add_common_args(args, sub)
+    sub.set_defaults(func=stop_nft_creation)
+
+    sub = cli_shared.add_command_subparser(
+        subparsers,
+        "token",
+        "wipe-single-nft",
+        "Wipe the NFT of a user.",
+    )
+    _add_token_identifier_arg(sub)
+    sub.add_argument("--token-nonce", type=int, required=True, help="The nonce of the NFT as a decimal number")
+    _add_user_arg(sub)
+    add_common_args(args, sub)
+    sub.set_defaults(func=wipe_single_nft)
+
+    sub = cli_shared.add_command_subparser(
+        subparsers,
+        "token",
+        "add-uris",
+        "Add uris for a token.",
+    )
+    _add_token_identifier_arg(sub)
+    sub.add_argument("--token-nonce", type=int, required=True, help="The nonce of the NFT as a decimal number")
+    sub.add_argument("--uris", nargs="+", required=True, help="The new uris to be added to the token.")
+    add_common_args(args, sub)
+    sub.set_defaults(func=add_uris)
+
     parser.epilog = cli_shared.build_group_epilog(subparsers)
     return subparsers
 
@@ -252,42 +579,42 @@ def add_issuing_tokens_args(
         )
 
     sub.add_argument(
-        "--can-not-freeze",
+        "--cannot-freeze",
         action="store_false",
         dest="can_freeze",
         default=True,
         help="make token not freezable",
     )
     sub.add_argument(
-        "--can-not-wipe",
+        "--cannot-wipe",
         action="store_false",
         dest="can_wipe",
         default=True,
-        help="make token not wipable",
+        help="make token not wipeable",
     )
     sub.add_argument(
-        "--can-not-pause",
+        "--cannot-pause",
         action="store_false",
         dest="can_pause",
         default=True,
         help="make token not pausable",
     )
     sub.add_argument(
-        "--can-not-change-owner",
+        "--cannot-change-owner",
         action="store_false",
         dest="can_change_owner",
         default=True,
         help="don't allow changing the token's owner",
     )
     sub.add_argument(
-        "--can-not-upgrade",
+        "--cannot-upgrade",
         action="store_false",
         dest="can_upgrade",
         default=True,
         help="don't allow upgrading the token",
     )
     sub.add_argument(
-        "--can-not-add-special-roles",
+        "--cannot-add-special-roles",
         action="store_false",
         dest="can_add_special_roles",
         default=True,
@@ -296,11 +623,11 @@ def add_issuing_tokens_args(
 
     if with_transfer_nft_create_role:
         sub.add_argument(
-            "--can-not-transfer-nft-create-role",
+            "--cannot-transfer-nft-create-role",
             action="store_false",
             dest="can_transfer_nft_create_role",
             default=True,
-            help="don't allow for nft create roles to be transfered for the token",
+            help="don't allow for nft create roles to be transferred for the token",
         )
 
 
@@ -493,24 +820,9 @@ def _add_special_roles_args_for_semi_fungible(sub: Any, with_nft_create: bool = 
     )
 
 
-def validate_token_args(args: Any, with_initial_supply: bool = False, with_num_decimals: bool = False):
-    if with_initial_supply and args.initial_supply < 0:
-        raise ValueError("Initial supply must be a non-negative integer")
-
-    if with_num_decimals and not (0 <= args.num_decimals <= 18):
-        raise ValueError("Number of decimals must be between 0 and 18")
-
-    if not (3 <= len(args.token_name) <= 20) or not args.token_name.isalnum():
-        raise ValueError("Token name must be 3-20 alphanumerical characters")
-
-    if not (3 <= len(args.token_ticker) <= 10) or not args.token_ticker.isalnum() or not args.token_ticker.isupper():
-        raise ValueError("Token ticker must be 3-10 UPPERCASE alphanumerical characters")
-
-
-def _ensure_issue_args(args: Any, with_initial_supply: bool = False, with_num_decimals: bool = False):
+def _ensure_args(args: Any):
     validate_broadcast_args(args)
     validate_chain_id_args(args)
-    validate_token_args(args, with_initial_supply, with_num_decimals)
 
 
 def _initialize_controller(args: Any) -> TokenManagementController:
@@ -538,7 +850,7 @@ def _sign_transaction(transaction: Transaction, sender: IAccount, guardian_and_r
 
 
 def issue_fungible(args: Any):
-    _ensure_issue_args(args, with_initial_supply=True, with_num_decimals=True)
+    _ensure_args(args)
 
     sender = cli_shared.prepare_sender(args)
     guardian_and_relayer_data = cli_shared.get_guardian_and_relayer_data(
@@ -571,7 +883,7 @@ def issue_fungible(args: Any):
 
 
 def issue_semi_fungible(args: Any):
-    _ensure_issue_args(args)
+    _ensure_args(args)
 
     sender = cli_shared.prepare_sender(args)
     guardian_and_relayer_data = cli_shared.get_guardian_and_relayer_data(
@@ -603,7 +915,7 @@ def issue_semi_fungible(args: Any):
 
 
 def issue_non_fungible(args: Any):
-    _ensure_issue_args(args)
+    _ensure_args(args)
 
     sender = cli_shared.prepare_sender(args)
     guardian_and_relayer_data = cli_shared.get_guardian_and_relayer_data(
@@ -635,7 +947,7 @@ def issue_non_fungible(args: Any):
 
 
 def register_meta_esdt(args: Any):
-    _ensure_issue_args(args, with_num_decimals=True)
+    _ensure_args(args)
 
     sender = cli_shared.prepare_sender(args)
     guardian_and_relayer_data = cli_shared.get_guardian_and_relayer_data(
@@ -668,7 +980,7 @@ def register_meta_esdt(args: Any):
 
 
 def register_and_set_all_roles(args: Any):
-    _ensure_issue_args(args, with_num_decimals=True)
+    _ensure_args(args)
 
     sender = cli_shared.prepare_sender(args)
     guardian_and_relayer_data = cli_shared.get_guardian_and_relayer_data(
@@ -697,8 +1009,7 @@ def register_and_set_all_roles(args: Any):
 
 
 def set_burn_role_globally(args: Any):
-    validate_broadcast_args(args)
-    validate_chain_id_args(args)
+    _ensure_args(args)
 
     sender = cli_shared.prepare_sender(args)
     guardian_and_relayer_data = cli_shared.get_guardian_and_relayer_data(
@@ -722,8 +1033,7 @@ def set_burn_role_globally(args: Any):
 
 
 def unset_burn_role_globally(args: Any):
-    validate_broadcast_args(args)
-    validate_chain_id_args(args)
+    _ensure_args(args)
 
     sender = cli_shared.prepare_sender(args)
     guardian_and_relayer_data = cli_shared.get_guardian_and_relayer_data(
@@ -747,8 +1057,7 @@ def unset_burn_role_globally(args: Any):
 
 
 def set_special_role_on_fungible(args: Any):
-    validate_broadcast_args(args)
-    validate_chain_id_args(args)
+    _ensure_args(args)
 
     sender = cli_shared.prepare_sender(args)
     guardian_and_relayer_data = cli_shared.get_guardian_and_relayer_data(
@@ -776,8 +1085,7 @@ def set_special_role_on_fungible(args: Any):
 
 
 def unset_special_role_on_fungible(args: Any):
-    validate_broadcast_args(args)
-    validate_chain_id_args(args)
+    _ensure_args(args)
 
     sender = cli_shared.prepare_sender(args)
     guardian_and_relayer_data = cli_shared.get_guardian_and_relayer_data(
@@ -805,8 +1113,7 @@ def unset_special_role_on_fungible(args: Any):
 
 
 def set_special_role_on_semi_fungible(args: Any):
-    validate_broadcast_args(args)
-    validate_chain_id_args(args)
+    _ensure_args(args)
 
     sender = cli_shared.prepare_sender(args)
     guardian_and_relayer_data = cli_shared.get_guardian_and_relayer_data(
@@ -840,8 +1147,7 @@ def set_special_role_on_semi_fungible(args: Any):
 
 
 def unset_special_role_on_semi_fungible(args: Any):
-    validate_broadcast_args(args)
-    validate_chain_id_args(args)
+    _ensure_args(args)
 
     sender = cli_shared.prepare_sender(args)
     guardian_and_relayer_data = cli_shared.get_guardian_and_relayer_data(
@@ -874,8 +1180,7 @@ def unset_special_role_on_semi_fungible(args: Any):
 
 
 def set_special_role_on_meta_esdt(args: Any):
-    validate_broadcast_args(args)
-    validate_chain_id_args(args)
+    _ensure_args(args)
 
     sender = cli_shared.prepare_sender(args)
     guardian_and_relayer_data = cli_shared.get_guardian_and_relayer_data(
@@ -904,8 +1209,7 @@ def set_special_role_on_meta_esdt(args: Any):
 
 
 def unset_special_role_on_meta_esdt(args: Any):
-    validate_broadcast_args(args)
-    validate_chain_id_args(args)
+    _ensure_args(args)
 
     sender = cli_shared.prepare_sender(args)
     guardian_and_relayer_data = cli_shared.get_guardian_and_relayer_data(
@@ -933,8 +1237,7 @@ def unset_special_role_on_meta_esdt(args: Any):
 
 
 def set_special_role_on_nft(args: Any):
-    validate_broadcast_args(args)
-    validate_chain_id_args(args)
+    _ensure_args(args)
 
     sender = cli_shared.prepare_sender(args)
     guardian_and_relayer_data = cli_shared.get_guardian_and_relayer_data(
@@ -969,8 +1272,7 @@ def set_special_role_on_nft(args: Any):
 
 
 def unset_special_role_on_nft(args: Any):
-    validate_broadcast_args(args)
-    validate_chain_id_args(args)
+    _ensure_args(args)
 
     sender = cli_shared.prepare_sender(args)
     guardian_and_relayer_data = cli_shared.get_guardian_and_relayer_data(
@@ -1004,8 +1306,7 @@ def unset_special_role_on_nft(args: Any):
 
 
 def create_nft(args: Any):
-    validate_broadcast_args(args)
-    validate_chain_id_args(args)
+    _ensure_args(args)
 
     sender = cli_shared.prepare_sender(args)
     guardian_and_relayer_data = cli_shared.get_guardian_and_relayer_data(
@@ -1023,6 +1324,703 @@ def create_nft(args: Any):
         royalties=args.royalties,
         hash=args.hash,
         attributes=bytes.fromhex(args.attributes),
+        uris=args.uris,
+        guardian=guardian_and_relayer_data.guardian.address if guardian_and_relayer_data.guardian else None,
+        relayer=guardian_and_relayer_data.relayer.address if guardian_and_relayer_data.relayer else None,
+        gas_limit=args.gas_limit,
+        gas_price=args.gas_price,
+    )
+
+    _sign_transaction(transaction, sender, guardian_and_relayer_data)
+    cli_shared.send_or_simulate(transaction, args)
+
+
+def pause_token(args: Any):
+    _ensure_args(args)
+
+    sender = cli_shared.prepare_sender(args)
+    guardian_and_relayer_data = cli_shared.get_guardian_and_relayer_data(
+        sender=sender.address.to_bech32(),
+        args=args,
+    )
+
+    controller = _initialize_controller(args)
+    transaction = controller.create_transaction_for_pausing(
+        sender=sender,
+        nonce=sender.nonce,
+        token_identifier=args.token_identifier,
+        guardian=guardian_and_relayer_data.guardian.address if guardian_and_relayer_data.guardian else None,
+        relayer=guardian_and_relayer_data.relayer.address if guardian_and_relayer_data.relayer else None,
+        gas_limit=args.gas_limit,
+        gas_price=args.gas_price,
+    )
+
+    _sign_transaction(transaction, sender, guardian_and_relayer_data)
+    cli_shared.send_or_simulate(transaction, args)
+
+
+def unpause_token(args: Any):
+    _ensure_args(args)
+
+    sender = cli_shared.prepare_sender(args)
+    guardian_and_relayer_data = cli_shared.get_guardian_and_relayer_data(
+        sender=sender.address.to_bech32(),
+        args=args,
+    )
+
+    controller = _initialize_controller(args)
+    transaction = controller.create_transaction_for_unpausing(
+        sender=sender,
+        nonce=sender.nonce,
+        token_identifier=args.token_identifier,
+        guardian=guardian_and_relayer_data.guardian.address if guardian_and_relayer_data.guardian else None,
+        relayer=guardian_and_relayer_data.relayer.address if guardian_and_relayer_data.relayer else None,
+        gas_limit=args.gas_limit,
+        gas_price=args.gas_price,
+    )
+
+    _sign_transaction(transaction, sender, guardian_and_relayer_data)
+    cli_shared.send_or_simulate(transaction, args)
+
+
+def freeze_token(args: Any):
+    _ensure_args(args)
+
+    sender = cli_shared.prepare_sender(args)
+    guardian_and_relayer_data = cli_shared.get_guardian_and_relayer_data(
+        sender=sender.address.to_bech32(),
+        args=args,
+    )
+
+    controller = _initialize_controller(args)
+    transaction = controller.create_transaction_for_freezing(
+        sender=sender,
+        nonce=sender.nonce,
+        token_identifier=args.token_identifier,
+        user=Address.new_from_bech32(args.user),
+        guardian=guardian_and_relayer_data.guardian.address if guardian_and_relayer_data.guardian else None,
+        relayer=guardian_and_relayer_data.relayer.address if guardian_and_relayer_data.relayer else None,
+        gas_limit=args.gas_limit,
+        gas_price=args.gas_price,
+    )
+
+    _sign_transaction(transaction, sender, guardian_and_relayer_data)
+    cli_shared.send_or_simulate(transaction, args)
+
+
+def unfreeze_token(args: Any):
+    _ensure_args(args)
+
+    sender = cli_shared.prepare_sender(args)
+    guardian_and_relayer_data = cli_shared.get_guardian_and_relayer_data(
+        sender=sender.address.to_bech32(),
+        args=args,
+    )
+
+    controller = _initialize_controller(args)
+    transaction = controller.create_transaction_for_unfreezing(
+        sender=sender,
+        nonce=sender.nonce,
+        token_identifier=args.token_identifier,
+        user=Address.new_from_bech32(args.user),
+        guardian=guardian_and_relayer_data.guardian.address if guardian_and_relayer_data.guardian else None,
+        relayer=guardian_and_relayer_data.relayer.address if guardian_and_relayer_data.relayer else None,
+        gas_limit=args.gas_limit,
+        gas_price=args.gas_price,
+    )
+
+    _sign_transaction(transaction, sender, guardian_and_relayer_data)
+    cli_shared.send_or_simulate(transaction, args)
+
+
+def wipe_token(args: Any):
+    _ensure_args(args)
+
+    sender = cli_shared.prepare_sender(args)
+    guardian_and_relayer_data = cli_shared.get_guardian_and_relayer_data(
+        sender=sender.address.to_bech32(),
+        args=args,
+    )
+
+    controller = _initialize_controller(args)
+    transaction = controller.create_transaction_for_wiping(
+        sender=sender,
+        nonce=sender.nonce,
+        token_identifier=args.token_identifier,
+        user=Address.new_from_bech32(args.user),
+        guardian=guardian_and_relayer_data.guardian.address if guardian_and_relayer_data.guardian else None,
+        relayer=guardian_and_relayer_data.relayer.address if guardian_and_relayer_data.relayer else None,
+        gas_limit=args.gas_limit,
+        gas_price=args.gas_price,
+    )
+
+    _sign_transaction(transaction, sender, guardian_and_relayer_data)
+    cli_shared.send_or_simulate(transaction, args)
+
+
+def local_mint(args: Any):
+    _ensure_args(args)
+
+    sender = cli_shared.prepare_sender(args)
+    guardian_and_relayer_data = cli_shared.get_guardian_and_relayer_data(
+        sender=sender.address.to_bech32(),
+        args=args,
+    )
+
+    controller = _initialize_controller(args)
+    transaction = controller.create_transaction_for_local_minting(
+        sender=sender,
+        nonce=sender.nonce,
+        token_identifier=args.token_identifier,
+        supply_to_mint=args.supply_to_mint,
+        guardian=guardian_and_relayer_data.guardian.address if guardian_and_relayer_data.guardian else None,
+        relayer=guardian_and_relayer_data.relayer.address if guardian_and_relayer_data.relayer else None,
+        gas_limit=args.gas_limit,
+        gas_price=args.gas_price,
+    )
+
+    _sign_transaction(transaction, sender, guardian_and_relayer_data)
+    cli_shared.send_or_simulate(transaction, args)
+
+
+def local_burn(args: Any):
+    _ensure_args(args)
+
+    sender = cli_shared.prepare_sender(args)
+    guardian_and_relayer_data = cli_shared.get_guardian_and_relayer_data(
+        sender=sender.address.to_bech32(),
+        args=args,
+    )
+
+    controller = _initialize_controller(args)
+    transaction = controller.create_transaction_for_local_burning(
+        sender=sender,
+        nonce=sender.nonce,
+        token_identifier=args.token_identifier,
+        supply_to_burn=args.supply_to_burn,
+        guardian=guardian_and_relayer_data.guardian.address if guardian_and_relayer_data.guardian else None,
+        relayer=guardian_and_relayer_data.relayer.address if guardian_and_relayer_data.relayer else None,
+        gas_limit=args.gas_limit,
+        gas_price=args.gas_price,
+    )
+
+    _sign_transaction(transaction, sender, guardian_and_relayer_data)
+    cli_shared.send_or_simulate(transaction, args)
+
+
+def update_attributes(args: Any):
+    _ensure_args(args)
+
+    sender = cli_shared.prepare_sender(args)
+    guardian_and_relayer_data = cli_shared.get_guardian_and_relayer_data(
+        sender=sender.address.to_bech32(),
+        args=args,
+    )
+
+    controller = _initialize_controller(args)
+    transaction = controller.create_transaction_for_updating_attributes(
+        sender=sender,
+        nonce=sender.nonce,
+        token_identifier=args.token_identifier,
+        token_nonce=args.token_nonce,
+        attributes=bytes.fromhex(args.attributes),
+        guardian=guardian_and_relayer_data.guardian.address if guardian_and_relayer_data.guardian else None,
+        relayer=guardian_and_relayer_data.relayer.address if guardian_and_relayer_data.relayer else None,
+        gas_limit=args.gas_limit,
+        gas_price=args.gas_price,
+    )
+
+    _sign_transaction(transaction, sender, guardian_and_relayer_data)
+    cli_shared.send_or_simulate(transaction, args)
+
+
+def add_quantity(args: Any):
+    _ensure_args(args)
+
+    sender = cli_shared.prepare_sender(args)
+    guardian_and_relayer_data = cli_shared.get_guardian_and_relayer_data(
+        sender=sender.address.to_bech32(),
+        args=args,
+    )
+
+    controller = _initialize_controller(args)
+    transaction = controller.create_transaction_for_adding_quantity(
+        sender=sender,
+        nonce=sender.nonce,
+        token_identifier=args.token_identifier,
+        token_nonce=args.token_nonce,
+        quantity_to_add=args.quantity,
+        guardian=guardian_and_relayer_data.guardian.address if guardian_and_relayer_data.guardian else None,
+        relayer=guardian_and_relayer_data.relayer.address if guardian_and_relayer_data.relayer else None,
+        gas_limit=args.gas_limit,
+        gas_price=args.gas_price,
+    )
+
+    _sign_transaction(transaction, sender, guardian_and_relayer_data)
+    cli_shared.send_or_simulate(transaction, args)
+
+
+def burn_quantity(args: Any):
+    _ensure_args(args)
+
+    sender = cli_shared.prepare_sender(args)
+    guardian_and_relayer_data = cli_shared.get_guardian_and_relayer_data(
+        sender=sender.address.to_bech32(),
+        args=args,
+    )
+
+    controller = _initialize_controller(args)
+    transaction = controller.create_transaction_for_burning_quantity(
+        sender=sender,
+        nonce=sender.nonce,
+        token_identifier=args.token_identifier,
+        token_nonce=args.token_nonce,
+        quantity_to_burn=args.quantity,
+        guardian=guardian_and_relayer_data.guardian.address if guardian_and_relayer_data.guardian else None,
+        relayer=guardian_and_relayer_data.relayer.address if guardian_and_relayer_data.relayer else None,
+        gas_limit=args.gas_limit,
+        gas_price=args.gas_price,
+    )
+
+    _sign_transaction(transaction, sender, guardian_and_relayer_data)
+    cli_shared.send_or_simulate(transaction, args)
+
+
+def modify_royalties(args: Any):
+    _ensure_args(args)
+
+    sender = cli_shared.prepare_sender(args)
+    guardian_and_relayer_data = cli_shared.get_guardian_and_relayer_data(
+        sender=sender.address.to_bech32(),
+        args=args,
+    )
+
+    controller = _initialize_controller(args)
+    transaction = controller.create_transaction_for_modifying_royalties(
+        sender=sender,
+        nonce=sender.nonce,
+        token_identifier=args.token_identifier,
+        token_nonce=args.token_nonce,
+        new_royalties=args.royalties,
+        guardian=guardian_and_relayer_data.guardian.address if guardian_and_relayer_data.guardian else None,
+        relayer=guardian_and_relayer_data.relayer.address if guardian_and_relayer_data.relayer else None,
+        gas_limit=args.gas_limit,
+        gas_price=args.gas_price,
+    )
+
+    _sign_transaction(transaction, sender, guardian_and_relayer_data)
+    cli_shared.send_or_simulate(transaction, args)
+
+
+def set_new_uris(args: Any):
+    _ensure_args(args)
+
+    sender = cli_shared.prepare_sender(args)
+    guardian_and_relayer_data = cli_shared.get_guardian_and_relayer_data(
+        sender=sender.address.to_bech32(),
+        args=args,
+    )
+
+    controller = _initialize_controller(args)
+    transaction = controller.create_transaction_for_setting_new_uris(
+        sender=sender,
+        nonce=sender.nonce,
+        token_identifier=args.token_identifier,
+        token_nonce=args.token_nonce,
+        new_uris=args.uris,
+        guardian=guardian_and_relayer_data.guardian.address if guardian_and_relayer_data.guardian else None,
+        relayer=guardian_and_relayer_data.relayer.address if guardian_and_relayer_data.relayer else None,
+        gas_limit=args.gas_limit,
+        gas_price=args.gas_price,
+    )
+
+    _sign_transaction(transaction, sender, guardian_and_relayer_data)
+    cli_shared.send_or_simulate(transaction, args)
+
+
+def modify_creator(args: Any):
+    _ensure_args(args)
+
+    sender = cli_shared.prepare_sender(args)
+    guardian_and_relayer_data = cli_shared.get_guardian_and_relayer_data(
+        sender=sender.address.to_bech32(),
+        args=args,
+    )
+
+    controller = _initialize_controller(args)
+    transaction = controller.create_transaction_for_modifying_creator(
+        sender=sender,
+        nonce=sender.nonce,
+        token_identifier=args.token_identifier,
+        token_nonce=args.token_nonce,
+        guardian=guardian_and_relayer_data.guardian.address if guardian_and_relayer_data.guardian else None,
+        relayer=guardian_and_relayer_data.relayer.address if guardian_and_relayer_data.relayer else None,
+        gas_limit=args.gas_limit,
+        gas_price=args.gas_price,
+    )
+
+    _sign_transaction(transaction, sender, guardian_and_relayer_data)
+    cli_shared.send_or_simulate(transaction, args)
+
+
+def update_metadata(args: Any):
+    _ensure_args(args)
+
+    sender = cli_shared.prepare_sender(args)
+    guardian_and_relayer_data = cli_shared.get_guardian_and_relayer_data(
+        sender=sender.address.to_bech32(),
+        args=args,
+    )
+
+    controller = _initialize_controller(args)
+    transaction = controller.create_transaction_for_updating_metadata(
+        sender=sender,
+        nonce=sender.nonce,
+        token_identifier=args.token_identifier,
+        token_nonce=args.token_nonce,
+        new_token_name=args.token_name,
+        new_royalties=args.royalties,
+        new_hash=args.hash,
+        new_attributes=bytes.fromhex(args.attributes),
+        new_uris=args.uris,
+        guardian=guardian_and_relayer_data.guardian.address if guardian_and_relayer_data.guardian else None,
+        relayer=guardian_and_relayer_data.relayer.address if guardian_and_relayer_data.relayer else None,
+        gas_limit=args.gas_limit,
+        gas_price=args.gas_price,
+    )
+
+    _sign_transaction(transaction, sender, guardian_and_relayer_data)
+    cli_shared.send_or_simulate(transaction, args)
+
+
+def nft_metadata_recreate(args: Any):
+    _ensure_args(args)
+
+    sender = cli_shared.prepare_sender(args)
+    guardian_and_relayer_data = cli_shared.get_guardian_and_relayer_data(
+        sender=sender.address.to_bech32(),
+        args=args,
+    )
+
+    controller = _initialize_controller(args)
+    transaction = controller.create_transaction_for_nft_metadata_recreate(
+        sender=sender,
+        nonce=sender.nonce,
+        token_identifier=args.token_identifier,
+        token_nonce=args.token_nonce,
+        new_token_name=args.token_name,
+        new_royalties=args.royalties,
+        new_hash=args.hash,
+        new_attributes=bytes.fromhex(args.attributes),
+        new_uris=args.uris,
+        guardian=guardian_and_relayer_data.guardian.address if guardian_and_relayer_data.guardian else None,
+        relayer=guardian_and_relayer_data.relayer.address if guardian_and_relayer_data.relayer else None,
+        gas_limit=args.gas_limit,
+        gas_price=args.gas_price,
+    )
+
+    _sign_transaction(transaction, sender, guardian_and_relayer_data)
+    cli_shared.send_or_simulate(transaction, args)
+
+
+def change_to_dynamic(args: Any):
+    _ensure_args(args)
+
+    sender = cli_shared.prepare_sender(args)
+    guardian_and_relayer_data = cli_shared.get_guardian_and_relayer_data(
+        sender=sender.address.to_bech32(),
+        args=args,
+    )
+
+    controller = _initialize_controller(args)
+    transaction = controller.create_transaction_for_changing_token_to_dynamic(
+        sender=sender,
+        nonce=sender.nonce,
+        token_identifier=args.token_identifier,
+        guardian=guardian_and_relayer_data.guardian.address if guardian_and_relayer_data.guardian else None,
+        relayer=guardian_and_relayer_data.relayer.address if guardian_and_relayer_data.relayer else None,
+        gas_limit=args.gas_limit,
+        gas_price=args.gas_price,
+    )
+
+    _sign_transaction(transaction, sender, guardian_and_relayer_data)
+    cli_shared.send_or_simulate(transaction, args)
+
+
+def update_token_id(args: Any):
+    _ensure_args(args)
+
+    sender = cli_shared.prepare_sender(args)
+    guardian_and_relayer_data = cli_shared.get_guardian_and_relayer_data(
+        sender=sender.address.to_bech32(),
+        args=args,
+    )
+
+    controller = _initialize_controller(args)
+    transaction = controller.create_transaction_for_updating_token_id(
+        sender=sender,
+        nonce=sender.nonce,
+        token_identifier=args.token_identifier,
+        guardian=guardian_and_relayer_data.guardian.address if guardian_and_relayer_data.guardian else None,
+        relayer=guardian_and_relayer_data.relayer.address if guardian_and_relayer_data.relayer else None,
+        gas_limit=args.gas_limit,
+        gas_price=args.gas_price,
+    )
+
+    _sign_transaction(transaction, sender, guardian_and_relayer_data)
+    cli_shared.send_or_simulate(transaction, args)
+
+
+def register_dynamic_token(args: Any):
+    _ensure_args(args)
+
+    sender = cli_shared.prepare_sender(args)
+    guardian_and_relayer_data = cli_shared.get_guardian_and_relayer_data(
+        sender=sender.address.to_bech32(),
+        args=args,
+    )
+
+    controller = _initialize_controller(args)
+    [token_type] = [token_type for token_type in TokenType if token_type.value == args.token_type]
+
+    transaction = controller.create_transaction_for_registering_dynamic_token(
+        sender=sender,
+        nonce=sender.nonce,
+        token_name=args.token_name,
+        token_ticker=args.token_ticker,
+        token_type=token_type,
+        denominator=args.denominator,
+        guardian=guardian_and_relayer_data.guardian.address if guardian_and_relayer_data.guardian else None,
+        relayer=guardian_and_relayer_data.relayer.address if guardian_and_relayer_data.relayer else None,
+        gas_limit=args.gas_limit,
+        gas_price=args.gas_price,
+    )
+
+    _sign_transaction(transaction, sender, guardian_and_relayer_data)
+    cli_shared.send_or_simulate(transaction, args)
+
+
+def register_dynamic_and_set_all_roles(args: Any):
+    _ensure_args(args)
+
+    sender = cli_shared.prepare_sender(args)
+    guardian_and_relayer_data = cli_shared.get_guardian_and_relayer_data(
+        sender=sender.address.to_bech32(),
+        args=args,
+    )
+
+    controller = _initialize_controller(args)
+    [token_type] = [token_type for token_type in TokenType if token_type.value == args.token_type]
+
+    transaction = controller.create_transaction_for_registering_dynamic_and_setting_roles(
+        sender=sender,
+        nonce=sender.nonce,
+        token_name=args.token_name,
+        token_ticker=args.token_ticker,
+        token_type=token_type,
+        denominator=args.denominator,
+        guardian=guardian_and_relayer_data.guardian.address if guardian_and_relayer_data.guardian else None,
+        relayer=guardian_and_relayer_data.relayer.address if guardian_and_relayer_data.relayer else None,
+        gas_limit=args.gas_limit,
+        gas_price=args.gas_price,
+    )
+
+    _sign_transaction(transaction, sender, guardian_and_relayer_data)
+    cli_shared.send_or_simulate(transaction, args)
+
+
+def transfer_ownership(args: Any):
+    _ensure_args(args)
+
+    sender = cli_shared.prepare_sender(args)
+    guardian_and_relayer_data = cli_shared.get_guardian_and_relayer_data(
+        sender=sender.address.to_bech32(),
+        args=args,
+    )
+
+    controller = _initialize_controller(args)
+    transaction = controller.create_transaction_for_transferring_ownership(
+        sender=sender,
+        nonce=sender.nonce,
+        token_identifier=args.token_identifier,
+        new_owner=Address.new_from_bech32(args.new_owner),
+        guardian=guardian_and_relayer_data.guardian.address if guardian_and_relayer_data.guardian else None,
+        relayer=guardian_and_relayer_data.relayer.address if guardian_and_relayer_data.relayer else None,
+        gas_limit=args.gas_limit,
+        gas_price=args.gas_price,
+    )
+
+    _sign_transaction(transaction, sender, guardian_and_relayer_data)
+    cli_shared.send_or_simulate(transaction, args)
+
+
+def freeze_single_nft(args: Any):
+    _ensure_args(args)
+
+    sender = cli_shared.prepare_sender(args)
+    guardian_and_relayer_data = cli_shared.get_guardian_and_relayer_data(
+        sender=sender.address.to_bech32(),
+        args=args,
+    )
+
+    controller = _initialize_controller(args)
+    transaction = controller.create_transaction_for_freezing_single_nft(
+        sender=sender,
+        nonce=sender.nonce,
+        token_identifier=args.token_identifier,
+        token_nonce=args.token_nonce,
+        user=Address.new_from_bech32(args.user),
+        guardian=guardian_and_relayer_data.guardian.address if guardian_and_relayer_data.guardian else None,
+        relayer=guardian_and_relayer_data.relayer.address if guardian_and_relayer_data.relayer else None,
+        gas_limit=args.gas_limit,
+        gas_price=args.gas_price,
+    )
+
+    _sign_transaction(transaction, sender, guardian_and_relayer_data)
+    cli_shared.send_or_simulate(transaction, args)
+
+
+def unfreeze_single_nft(args: Any):
+    _ensure_args(args)
+
+    sender = cli_shared.prepare_sender(args)
+    guardian_and_relayer_data = cli_shared.get_guardian_and_relayer_data(
+        sender=sender.address.to_bech32(),
+        args=args,
+    )
+
+    controller = _initialize_controller(args)
+    transaction = controller.create_transaction_for_unfreezing_single_nft(
+        sender=sender,
+        nonce=sender.nonce,
+        token_identifier=args.token_identifier,
+        token_nonce=args.token_nonce,
+        user=Address.new_from_bech32(args.user),
+        guardian=guardian_and_relayer_data.guardian.address if guardian_and_relayer_data.guardian else None,
+        relayer=guardian_and_relayer_data.relayer.address if guardian_and_relayer_data.relayer else None,
+        gas_limit=args.gas_limit,
+        gas_price=args.gas_price,
+    )
+
+    _sign_transaction(transaction, sender, guardian_and_relayer_data)
+    cli_shared.send_or_simulate(transaction, args)
+
+
+def change_sft_to_meta_esdt(args: Any):
+    _ensure_args(args)
+
+    sender = cli_shared.prepare_sender(args)
+    guardian_and_relayer_data = cli_shared.get_guardian_and_relayer_data(
+        sender=sender.address.to_bech32(),
+        args=args,
+    )
+
+    controller = _initialize_controller(args)
+    transaction = controller.create_transaction_for_changing_sft_to_meta_esdt(
+        sender=sender,
+        nonce=sender.nonce,
+        collection=args.collection,
+        num_decimals=args.decimals,
+        guardian=guardian_and_relayer_data.guardian.address if guardian_and_relayer_data.guardian else None,
+        relayer=guardian_and_relayer_data.relayer.address if guardian_and_relayer_data.relayer else None,
+        gas_limit=args.gas_limit,
+        gas_price=args.gas_price,
+    )
+
+    _sign_transaction(transaction, sender, guardian_and_relayer_data)
+    cli_shared.send_or_simulate(transaction, args)
+
+
+def transfer_nft_create_role(args: Any):
+    _ensure_args(args)
+
+    sender = cli_shared.prepare_sender(args)
+    guardian_and_relayer_data = cli_shared.get_guardian_and_relayer_data(
+        sender=sender.address.to_bech32(),
+        args=args,
+    )
+
+    controller = _initialize_controller(args)
+    transaction = controller.create_transaction_for_transferring_nft_create_role(
+        sender=sender,
+        nonce=sender.nonce,
+        token_identifier=args.token_identifier,
+        user=Address.new_from_bech32(args.user),
+        guardian=guardian_and_relayer_data.guardian.address if guardian_and_relayer_data.guardian else None,
+        relayer=guardian_and_relayer_data.relayer.address if guardian_and_relayer_data.relayer else None,
+        gas_limit=args.gas_limit,
+        gas_price=args.gas_price,
+    )
+
+    _sign_transaction(transaction, sender, guardian_and_relayer_data)
+    cli_shared.send_or_simulate(transaction, args)
+
+
+def stop_nft_creation(args: Any):
+    _ensure_args(args)
+
+    sender = cli_shared.prepare_sender(args)
+    guardian_and_relayer_data = cli_shared.get_guardian_and_relayer_data(
+        sender=sender.address.to_bech32(),
+        args=args,
+    )
+
+    controller = _initialize_controller(args)
+    transaction = controller.create_transaction_for_stopping_nft_creation(
+        sender=sender,
+        nonce=sender.nonce,
+        token_identifier=args.token_identifier,
+        guardian=guardian_and_relayer_data.guardian.address if guardian_and_relayer_data.guardian else None,
+        relayer=guardian_and_relayer_data.relayer.address if guardian_and_relayer_data.relayer else None,
+        gas_limit=args.gas_limit,
+        gas_price=args.gas_price,
+    )
+
+    _sign_transaction(transaction, sender, guardian_and_relayer_data)
+    cli_shared.send_or_simulate(transaction, args)
+
+
+def wipe_single_nft(args: Any):
+    _ensure_args(args)
+
+    sender = cli_shared.prepare_sender(args)
+    guardian_and_relayer_data = cli_shared.get_guardian_and_relayer_data(
+        sender=sender.address.to_bech32(),
+        args=args,
+    )
+
+    controller = _initialize_controller(args)
+    transaction = controller.create_transaction_for_wiping_single_nft(
+        sender=sender,
+        nonce=sender.nonce,
+        token_identifier=args.token_identifier,
+        token_nonce=args.token_nonce,
+        user=Address.new_from_bech32(args.user),
+        guardian=guardian_and_relayer_data.guardian.address if guardian_and_relayer_data.guardian else None,
+        relayer=guardian_and_relayer_data.relayer.address if guardian_and_relayer_data.relayer else None,
+        gas_limit=args.gas_limit,
+        gas_price=args.gas_price,
+    )
+
+    _sign_transaction(transaction, sender, guardian_and_relayer_data)
+    cli_shared.send_or_simulate(transaction, args)
+
+
+def add_uris(args: Any):
+    _ensure_args(args)
+
+    sender = cli_shared.prepare_sender(args)
+    guardian_and_relayer_data = cli_shared.get_guardian_and_relayer_data(
+        sender=sender.address.to_bech32(),
+        args=args,
+    )
+
+    controller = _initialize_controller(args)
+    transaction = controller.create_transaction_for_adding_uris(
+        sender=sender,
+        nonce=sender.nonce,
+        token_identifier=args.token_identifier,
+        token_nonce=args.token_nonce,
         uris=args.uris,
         guardian=guardian_and_relayer_data.guardian.address if guardian_and_relayer_data.guardian else None,
         relayer=guardian_and_relayer_data.relayer.address if guardian_and_relayer_data.relayer else None,
