@@ -20,6 +20,7 @@ from multiversx_sdk import (
     TokenComputer,
     TokenTransfer,
     Transaction,
+    TransactionComputer,
 )
 
 from multiversx_sdk_cli import config, utils
@@ -837,3 +838,27 @@ def initialize_gas_limit_estimator(args: Any) -> Union[GasLimitEstimator, None]:
     network_provider_config = config.get_config_for_network_providers()
     proxy = ProxyNetworkProvider(url=args.proxy, config=network_provider_config)
     return GasLimitEstimator(network_provider=proxy, gas_multiplier=multiplier)
+
+
+def set_options_for_hash_signing_if_needed(
+    transaction: Transaction,
+    sender: Union[IAccount, None],
+    guardian: Union[IAccount, None],
+    relayer: Union[IAccount, None],
+):
+    transaction_computer = TransactionComputer()
+
+    if isinstance(sender, LedgerAccount) or isinstance(guardian, LedgerAccount) or isinstance(relayer, LedgerAccount):
+        transaction_computer.apply_options_for_hash_signing(transaction)
+        return
+
+    if sender and sender.use_hash_signing:
+        transaction_computer.apply_options_for_hash_signing(transaction)
+        return
+
+    if guardian and guardian.use_hash_signing:
+        transaction_computer.apply_options_for_hash_signing(transaction)
+        return
+
+    if relayer and relayer.use_hash_signing:
+        transaction_computer.apply_options_for_hash_signing(transaction)
