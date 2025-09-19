@@ -20,10 +20,10 @@ from multiversx_sdk_cli.args_validation import (
     validate_proxy_argument,
     validate_receiver_args,
 )
-from multiversx_sdk_cli.base_transactions_controller import BaseTransactionsController
 from multiversx_sdk_cli.config import get_config_for_network_providers
 from multiversx_sdk_cli.guardian_relayer_data import GuardianRelayerData
 from multiversx_sdk_cli.interfaces import IAccount
+from multiversx_sdk_cli.signing_wrapper import SigningWrapper
 
 
 def setup_parser(args: list[str], subparsers: Any) -> Any:
@@ -411,14 +411,11 @@ def _get_delegation_controller(args: Any):
 
 
 def _sign_transaction(transaction: Transaction, sender: IAccount, guardian_and_relayer_data: GuardianRelayerData):
-    base = BaseTransactionsController()
-    base.sign_transaction(
+    signer = SigningWrapper()
+    signer.sign_transaction(
         transaction=transaction,
         sender=sender,
-        guardian=guardian_and_relayer_data.guardian,
-        relayer=guardian_and_relayer_data.relayer,
-        guardian_service_url=guardian_and_relayer_data.guardian_service_url,
-        guardian_2fa_code=guardian_and_relayer_data.guardian_2fa_code,
+        guardian_and_relayer=guardian_and_relayer_data,
     )
 
 
@@ -438,8 +435,8 @@ def do_create_delegation_contract(args: Any):
         amount=int(args.value),
         total_delegation_cap=int(args.total_delegation_cap),
         service_fee=int(args.service_fee),
-        guardian=guardian_and_relayer_data.guardian_address if guardian_and_relayer_data.guardian_address else None,
-        relayer=guardian_and_relayer_data.relayer_address if guardian_and_relayer_data.relayer_address else None,
+        guardian=guardian_and_relayer_data.guardian_address,
+        relayer=guardian_and_relayer_data.relayer_address,
         gas_limit=args.gas_limit,
         gas_price=args.gas_price,
     )
@@ -483,8 +480,8 @@ def add_new_nodes(args: Any):
         delegation_contract=Address.new_from_bech32(args.delegation_contract),
         public_keys=public_keys,
         signed_messages=signed_messages,
-        guardian=guardian_and_relayer_data.guardian_address if guardian_and_relayer_data.guardian_address else None,
-        relayer=guardian_and_relayer_data.relayer_address if guardian_and_relayer_data.relayer_address else None,
+        guardian=guardian_and_relayer_data.guardian_address,
+        relayer=guardian_and_relayer_data.relayer_address,
         gas_limit=args.gas_limit,
         gas_price=args.gas_price,
     )
@@ -529,8 +526,8 @@ def remove_nodes(args: Any):
         nonce=sender.nonce,
         delegation_contract=Address.new_from_bech32(args.delegation_contract),
         public_keys=public_keys,
-        guardian=guardian_and_relayer_data.guardian_address if guardian_and_relayer_data.guardian_address else None,
-        relayer=guardian_and_relayer_data.relayer_address if guardian_and_relayer_data.relayer_address else None,
+        guardian=guardian_and_relayer_data.guardian_address,
+        relayer=guardian_and_relayer_data.relayer_address,
         gas_limit=args.gas_limit,
         gas_price=args.gas_price,
     )
@@ -576,8 +573,8 @@ def stake_nodes(args: Any):
         nonce=sender.nonce,
         delegation_contract=Address.new_from_bech32(args.delegation_contract),
         public_keys=public_keys,
-        guardian=guardian_and_relayer_data.guardian_address if guardian_and_relayer_data.guardian_address else None,
-        relayer=guardian_and_relayer_data.relayer_address if guardian_and_relayer_data.relayer_address else None,
+        guardian=guardian_and_relayer_data.guardian_address,
+        relayer=guardian_and_relayer_data.relayer_address,
         gas_limit=args.gas_limit,
         gas_price=args.gas_price,
     )
@@ -612,8 +609,8 @@ def unbond_nodes(args: Any):
         nonce=sender.nonce,
         delegation_contract=Address.new_from_bech32(args.delegation_contract),
         public_keys=public_keys,
-        guardian=guardian_and_relayer_data.guardian_address if guardian_and_relayer_data.guardian_address else None,
-        relayer=guardian_and_relayer_data.relayer_address if guardian_and_relayer_data.relayer_address else None,
+        guardian=guardian_and_relayer_data.guardian_address,
+        relayer=guardian_and_relayer_data.relayer_address,
         gas_limit=args.gas_limit,
         gas_price=args.gas_price,
     )
@@ -640,8 +637,8 @@ def unstake_nodes(args: Any):
         nonce=sender.nonce,
         delegation_contract=Address.new_from_bech32(args.delegation_contract),
         public_keys=public_keys,
-        guardian=guardian_and_relayer_data.guardian_address if guardian_and_relayer_data.guardian_address else None,
-        relayer=guardian_and_relayer_data.relayer_address if guardian_and_relayer_data.relayer_address else None,
+        guardian=guardian_and_relayer_data.guardian_address,
+        relayer=guardian_and_relayer_data.relayer_address,
         gas_limit=args.gas_limit,
         gas_price=args.gas_price,
     )
@@ -669,8 +666,8 @@ def unjail_nodes(args: Any):
         delegation_contract=Address.new_from_bech32(args.delegation_contract),
         public_keys=public_keys,
         amount=int(args.value),
-        guardian=guardian_and_relayer_data.guardian_address if guardian_and_relayer_data.guardian_address else None,
-        relayer=guardian_and_relayer_data.relayer_address if guardian_and_relayer_data.relayer_address else None,
+        guardian=guardian_and_relayer_data.guardian_address,
+        relayer=guardian_and_relayer_data.relayer_address,
         gas_limit=args.gas_limit,
         gas_price=args.gas_price,
     )
@@ -694,8 +691,8 @@ def delegate(args: Any):
         nonce=sender.nonce,
         delegation_contract=Address.new_from_bech32(args.delegation_contract),
         amount=int(args.value),
-        guardian=guardian_and_relayer_data.guardian_address if guardian_and_relayer_data.guardian_address else None,
-        relayer=guardian_and_relayer_data.relayer_address if guardian_and_relayer_data.relayer_address else None,
+        guardian=guardian_and_relayer_data.guardian_address,
+        relayer=guardian_and_relayer_data.relayer_address,
         gas_limit=args.gas_limit,
         gas_price=args.gas_price,
     )
@@ -718,8 +715,8 @@ def claim_rewards(args: Any):
         sender=sender,
         nonce=sender.nonce,
         delegation_contract=Address.new_from_bech32(args.delegation_contract),
-        guardian=guardian_and_relayer_data.guardian_address if guardian_and_relayer_data.guardian_address else None,
-        relayer=guardian_and_relayer_data.relayer_address if guardian_and_relayer_data.relayer_address else None,
+        guardian=guardian_and_relayer_data.guardian_address,
+        relayer=guardian_and_relayer_data.relayer_address,
         gas_limit=args.gas_limit,
         gas_price=args.gas_price,
     )
@@ -742,8 +739,8 @@ def redelegate_rewards(args: Any):
         sender=sender,
         nonce=sender.nonce,
         delegation_contract=Address.new_from_bech32(args.delegation_contract),
-        guardian=guardian_and_relayer_data.guardian_address if guardian_and_relayer_data.guardian_address else None,
-        relayer=guardian_and_relayer_data.relayer_address if guardian_and_relayer_data.relayer_address else None,
+        guardian=guardian_and_relayer_data.guardian_address,
+        relayer=guardian_and_relayer_data.relayer_address,
         gas_limit=args.gas_limit,
         gas_price=args.gas_price,
     )
@@ -767,8 +764,8 @@ def undelegate(args: Any):
         nonce=sender.nonce,
         delegation_contract=Address.new_from_bech32(args.delegation_contract),
         amount=int(args.value),
-        guardian=guardian_and_relayer_data.guardian_address if guardian_and_relayer_data.guardian_address else None,
-        relayer=guardian_and_relayer_data.relayer_address if guardian_and_relayer_data.relayer_address else None,
+        guardian=guardian_and_relayer_data.guardian_address,
+        relayer=guardian_and_relayer_data.relayer_address,
         gas_limit=args.gas_limit,
         gas_price=args.gas_price,
     )
@@ -791,8 +788,8 @@ def withdraw(args: Any):
         sender=sender,
         nonce=sender.nonce,
         delegation_contract=Address.new_from_bech32(args.delegation_contract),
-        guardian=guardian_and_relayer_data.guardian_address if guardian_and_relayer_data.guardian_address else None,
-        relayer=guardian_and_relayer_data.relayer_address if guardian_and_relayer_data.relayer_address else None,
+        guardian=guardian_and_relayer_data.guardian_address,
+        relayer=guardian_and_relayer_data.relayer_address,
         gas_limit=args.gas_limit,
         gas_price=args.gas_price,
     )
@@ -816,8 +813,8 @@ def change_service_fee(args: Any):
         nonce=sender.nonce,
         delegation_contract=Address.new_from_bech32(args.delegation_contract),
         service_fee=int(args.service_fee),
-        guardian=guardian_and_relayer_data.guardian_address if guardian_and_relayer_data.guardian_address else None,
-        relayer=guardian_and_relayer_data.relayer_address if guardian_and_relayer_data.relayer_address else None,
+        guardian=guardian_and_relayer_data.guardian_address,
+        relayer=guardian_and_relayer_data.relayer_address,
         gas_limit=args.gas_limit,
         gas_price=args.gas_price,
     )
@@ -841,8 +838,8 @@ def modify_delegation_cap(args: Any):
         nonce=sender.nonce,
         delegation_contract=Address.new_from_bech32(args.delegation_contract),
         delegation_cap=int(args.delegation_cap),
-        guardian=guardian_and_relayer_data.guardian_address if guardian_and_relayer_data.guardian_address else None,
-        relayer=guardian_and_relayer_data.relayer_address if guardian_and_relayer_data.relayer_address else None,
+        guardian=guardian_and_relayer_data.guardian_address,
+        relayer=guardian_and_relayer_data.relayer_address,
         gas_limit=args.gas_limit,
         gas_price=args.gas_price,
     )
@@ -870,8 +867,8 @@ def automatic_activation(args: Any):
             sender=sender,
             nonce=sender.nonce,
             delegation_contract=Address.new_from_bech32(args.delegation_contract),
-            guardian=guardian_and_relayer_data.guardian_address if guardian_and_relayer_data.guardian_address else None,
-            relayer=guardian_and_relayer_data.relayer_address if guardian_and_relayer_data.relayer_address else None,
+            guardian=guardian_and_relayer_data.guardian_address,
+            relayer=guardian_and_relayer_data.relayer_address,
             gas_limit=args.gas_limit,
             gas_price=args.gas_price,
         )
@@ -880,8 +877,8 @@ def automatic_activation(args: Any):
             sender=sender,
             nonce=sender.nonce,
             delegation_contract=Address.new_from_bech32(args.delegation_contract),
-            guardian=guardian_and_relayer_data.guardian_address if guardian_and_relayer_data.guardian_address else None,
-            relayer=guardian_and_relayer_data.relayer_address if guardian_and_relayer_data.relayer_address else None,
+            guardian=guardian_and_relayer_data.guardian_address,
+            relayer=guardian_and_relayer_data.relayer_address,
             gas_limit=args.gas_limit,
             gas_price=args.gas_price,
         )
@@ -910,8 +907,8 @@ def redelegate_cap(args: Any):
             sender=sender,
             nonce=sender.nonce,
             delegation_contract=Address.new_from_bech32(args.delegation_contract),
-            guardian=guardian_and_relayer_data.guardian_address if guardian_and_relayer_data.guardian_address else None,
-            relayer=guardian_and_relayer_data.relayer_address if guardian_and_relayer_data.relayer_address else None,
+            guardian=guardian_and_relayer_data.guardian_address,
+            relayer=guardian_and_relayer_data.relayer_address,
             gas_limit=args.gas_limit,
             gas_price=args.gas_price,
         )
@@ -920,8 +917,8 @@ def redelegate_cap(args: Any):
             sender=sender,
             nonce=sender.nonce,
             delegation_contract=Address.new_from_bech32(args.delegation_contract),
-            guardian=guardian_and_relayer_data.guardian_address if guardian_and_relayer_data.guardian_address else None,
-            relayer=guardian_and_relayer_data.relayer_address if guardian_and_relayer_data.relayer_address else None,
+            guardian=guardian_and_relayer_data.guardian_address,
+            relayer=guardian_and_relayer_data.relayer_address,
             gas_limit=args.gas_limit,
             gas_price=args.gas_price,
         )
@@ -949,8 +946,8 @@ def set_metadata(args: Any):
         name=args.name,
         website=args.website,
         identifier=args.identifier,
-        guardian=guardian_and_relayer_data.guardian_address if guardian_and_relayer_data.guardian_address else None,
-        relayer=guardian_and_relayer_data.relayer_address if guardian_and_relayer_data.relayer_address else None,
+        guardian=guardian_and_relayer_data.guardian_address,
+        relayer=guardian_and_relayer_data.relayer_address,
         gas_limit=args.gas_limit,
         gas_price=args.gas_price,
     )
@@ -977,8 +974,8 @@ def make_new_contract_from_validator_data(args: Any):
         nonce=sender.nonce,
         max_cap=args.max_cap,
         fee=args.fee,
-        guardian=guardian_and_relayer_data.guardian_address if guardian_and_relayer_data.guardian_address else None,
-        relayer=guardian_and_relayer_data.relayer_address if guardian_and_relayer_data.relayer_address else None,
+        guardian=guardian_and_relayer_data.guardian_address,
+        relayer=guardian_and_relayer_data.relayer_address,
         gas_limit=args.gas_limit,
         gas_price=args.gas_price,
     )
