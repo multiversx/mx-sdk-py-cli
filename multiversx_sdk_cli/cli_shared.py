@@ -20,6 +20,7 @@ from multiversx_sdk import (
     TokenComputer,
     TokenTransfer,
     Transaction,
+    TransactionComputer,
 )
 
 from multiversx_sdk_cli import config, utils
@@ -39,6 +40,7 @@ from multiversx_sdk_cli.constants import (
     DEFAULT_GAS_PRICE,
     DEFAULT_TX_VERSION,
     TCS_SERVICE_ID,
+    TRANSACTION_OPTIONS_TX_HASH_SIGN,
 )
 from multiversx_sdk_cli.errors import (
     AddressConfigFileError,
@@ -350,17 +352,31 @@ def parse_omit_fields_arg(args: Any) -> list[str]:
     return cast(list[str], parsed)
 
 
+def _options_set_for_hash_signing(args: Any) -> bool:
+    if hasattr(args, "options") and args.options:
+        if args.options & TRANSACTION_OPTIONS_TX_HASH_SIGN == TRANSACTION_OPTIONS_TX_HASH_SIGN:
+            return True
+
+    return False
+
+
 def prepare_account(args: Any):
     hrp = _get_address_hrp(args)
 
     if args.pem:
-        return Account.new_from_pem(file_path=Path(args.pem), index=args.sender_wallet_index, hrp=hrp)
+        acc = Account.new_from_pem(file_path=Path(args.pem), index=args.sender_wallet_index, hrp=hrp)
+        if _options_set_for_hash_signing(args):
+            acc.use_hash_signing = True
+        return acc
     elif args.keyfile:
         password = load_password(args)
         index = args.sender_wallet_index if args.sender_wallet_index != 0 else None
 
         try:
-            return Account.new_from_keystore(Path(args.keyfile), password=password, address_index=index, hrp=hrp)
+            acc = Account.new_from_keystore(Path(args.keyfile), password=password, address_index=index, hrp=hrp)
+            if _options_set_for_hash_signing(args):
+                acc.use_hash_signing = True
+            return acc
         except Exception as e:
             raise WalletError(str(e))
     elif args.ledger:
@@ -369,9 +385,15 @@ def prepare_account(args: Any):
         except Exception as e:
             raise LedgerError(str(e))
     elif args.sender:
-        return load_wallet_by_alias(alias=args.sender, hrp=hrp)
+        acc = load_wallet_by_alias(alias=args.sender, hrp=hrp)
+        if _options_set_for_hash_signing(args):
+            acc.use_hash_signing = True
+        return acc
     else:
-        return load_default_wallet(hrp=hrp)
+        acc = load_default_wallet(hrp=hrp)
+        if _options_set_for_hash_signing(args):
+            acc.use_hash_signing = True
+        return acc
 
 
 def load_wallet_by_alias(alias: str, hrp: str) -> Account:
@@ -800,6 +822,10 @@ def set_proxy_from_config_if_not_provided(args: Any) -> None:
 
 
 def initialize_gas_limit_estimator(args: Any) -> Union[GasLimitEstimator, None]:
+    # if gas limit is provided, we don't need GasLimitEstimator
+    if hasattr(args, "gas_limit") and args.gas_limit:
+        return None
+
     # if proxy is not provided, we can't use GasLimitEstimator
     if hasattr(args, "proxy") and not args.proxy:
         return None
@@ -812,3 +838,27 @@ def initialize_gas_limit_estimator(args: Any) -> Union[GasLimitEstimator, None]:
     network_provider_config = config.get_config_for_network_providers()
     proxy = ProxyNetworkProvider(url=args.proxy, config=network_provider_config)
     return GasLimitEstimator(network_provider=proxy, gas_multiplier=multiplier)
+
+
+def set_options_for_hash_signing_if_needed(
+    transaction: Transaction,
+    sender: Union[IAccount, None],
+    guardian: Union[IAccount, None],
+    relayer: Union[IAccount, None],
+):
+    transaction_computer = TransactionComputer()
+
+    if isinstance(sender, LedgerAccount) or isinstance(guardian, LedgerAccount) or isinstance(relayer, LedgerAccount):
+        transaction_computer.apply_options_for_hash_signing(transaction)
+        return
+
+    if sender and sender.use_hash_signing:
+        transaction_computer.apply_options_for_hash_signing(transaction)
+        return
+
+    if guardian and guardian.use_hash_signing:
+        transaction_computer.apply_options_for_hash_signing(transaction)
+        return
+
+    if relayer and relayer.use_hash_signing:
+        transaction_computer.apply_options_for_hash_signing(transaction)
