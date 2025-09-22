@@ -30,9 +30,7 @@ from multiversx_sdk_cli.config_env import MxpyEnv
 from multiversx_sdk_cli.constants import NUMBER_OF_SHARDS
 from multiversx_sdk_cli.contract_verification import trigger_contract_verification
 from multiversx_sdk_cli.docker import is_docker_installed, run_docker
-from multiversx_sdk_cli.errors import DockerMissingError, QueryContractError
-from multiversx_sdk_cli.guardian_relayer_data import GuardianRelayerData
-from multiversx_sdk_cli.signing_wrapper import SigningWrapper
+from multiversx_sdk_cli.errors import BadUsage, DockerMissingError, QueryContractError
 from multiversx_sdk_cli.ux import show_warning
 
 logger = logging.getLogger("cli.contracts")
@@ -334,13 +332,9 @@ def _initialize_controller(args: Any) -> SmartContractController:
     )
 
 
-def _sign_transaction(transaction: Transaction, sender: Any, guardian_and_relayer_data: GuardianRelayerData):
-    signer = SigningWrapper()
-    signer.sign_transaction(
-        transaction=transaction,
-        sender=sender,
-        guardian_and_relayer=guardian_and_relayer_data,
-    )
+def _ensure_args_for_gas_estimation(args: Any):
+    if not args.proxy and not args.gas_limit:
+        raise BadUsage("To estimate the gas limit, you need to provide `--proxy` or set a value using `--gas-limit`")
 
 
 def deploy(args: Any):
@@ -349,6 +343,8 @@ def deploy(args: Any):
     validate_transaction_args(args)
     validate_broadcast_args(args)
     validate_chain_id_args(args)
+
+    _ensure_args_for_gas_estimation(args)
 
     sender = cli_shared.prepare_sender(args)
     guardian_and_relayer_data = cli_shared.get_guardian_and_relayer_data(
@@ -384,12 +380,17 @@ def deploy(args: Any):
 
     cli_config = MxpyEnv.from_active_env()
     utils.log_explorer_contract_address(
-        chain=controller.factory.config.chain_id,
+        chain=cli_shared.get_chain_id(args.proxy, args.chain),
         address=contract_address.to_bech32(),
         explorer_url=cli_config.explorer_url,
     )
 
-    _sign_transaction(tx, sender, guardian_and_relayer_data)
+    cli_shared.alter_transaction_and_sign_again_if_needed(
+        args=args,
+        tx=tx,
+        sender=sender,
+        guardian_and_relayer_data=guardian_and_relayer_data,
+    )
     _send_or_simulate(tx, contract_address, args)
 
 
@@ -399,6 +400,8 @@ def call(args: Any):
     validate_transaction_args(args)
     validate_broadcast_args(args)
     validate_chain_id_args(args)
+
+    _ensure_args_for_gas_estimation(args)
 
     sender = cli_shared.prepare_sender(args)
     guardian_and_relayer_data = cli_shared.get_guardian_and_relayer_data(
@@ -431,7 +434,12 @@ def call(args: Any):
         gas_price=args.gas_price,
     )
 
-    _sign_transaction(tx, sender, guardian_and_relayer_data)
+    cli_shared.alter_transaction_and_sign_again_if_needed(
+        args=args,
+        tx=tx,
+        sender=sender,
+        guardian_and_relayer_data=guardian_and_relayer_data,
+    )
     _send_or_simulate(tx, contract_address, args)
 
 
@@ -441,6 +449,8 @@ def upgrade(args: Any):
     validate_transaction_args(args)
     validate_broadcast_args(args)
     validate_chain_id_args(args)
+
+    _ensure_args_for_gas_estimation(args)
 
     sender = cli_shared.prepare_sender(args)
     guardian_and_relayer_data = cli_shared.get_guardian_and_relayer_data(
@@ -472,7 +482,12 @@ def upgrade(args: Any):
         gas_price=args.gas_price,
     )
 
-    _sign_transaction(tx, sender, guardian_and_relayer_data)
+    cli_shared.alter_transaction_and_sign_again_if_needed(
+        args=args,
+        tx=tx,
+        sender=sender,
+        guardian_and_relayer_data=guardian_and_relayer_data,
+    )
     _send_or_simulate(tx, contract_address, args)
 
 
