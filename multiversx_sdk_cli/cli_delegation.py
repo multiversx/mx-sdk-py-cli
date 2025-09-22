@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import Any
+from typing import Any, Optional
 
 from multiversx_sdk import (
     Address,
@@ -411,7 +411,11 @@ def _get_delegation_controller(args: Any):
     )
 
 
-def _sign_transaction(transaction: Transaction, sender: IAccount, guardian_and_relayer_data: GuardianRelayerData):
+def _sign_transaction(
+    transaction: Transaction,
+    sender: Optional[IAccount] = None,
+    guardian_and_relayer_data: GuardianRelayerData = GuardianRelayerData(),
+):
     signer = SigningWrapper()
     signer.sign_transaction(
         transaction=transaction,
@@ -441,7 +445,7 @@ def do_create_delegation_contract(args: Any):
         gas_limit=args.gas_limit,
         gas_price=args.gas_price,
     )
-    _alter_version_and_options_if_provided(args, tx)
+
     cli_shared.set_options_for_hash_signing_if_needed(
         transaction=tx,
         sender=sender,
@@ -449,7 +453,11 @@ def do_create_delegation_contract(args: Any):
         relayer=guardian_and_relayer_data.relayer,
     )
 
-    _sign_transaction(tx, sender, guardian_and_relayer_data)
+    altered = _alter_version_and_options_if_provided(args, tx)
+    if altered:  # sign only if something was altered
+        _sign_transaction(tx, sender, guardian_and_relayer_data)
+    else:
+        _sign_transaction(tx, None, guardian_and_relayer_data)  # sign only with guardian/relayer if needed
     cli_shared.send_or_simulate(tx, args)
 
 
@@ -493,7 +501,7 @@ def add_new_nodes(args: Any):
         gas_limit=args.gas_limit,
         gas_price=args.gas_price,
     )
-    _alter_version_and_options_if_provided(args, tx)
+
     cli_shared.set_options_for_hash_signing_if_needed(
         transaction=tx,
         sender=sender,
@@ -501,6 +509,7 @@ def add_new_nodes(args: Any):
         relayer=guardian_and_relayer_data.relayer,
     )
 
+    _alter_version_and_options_if_provided(args, tx)
     _sign_transaction(tx, sender, guardian_and_relayer_data)
     cli_shared.send_or_simulate(tx, args)
 
@@ -546,7 +555,7 @@ def remove_nodes(args: Any):
         gas_limit=args.gas_limit,
         gas_price=args.gas_price,
     )
-    _alter_version_and_options_if_provided(args, tx)
+
     cli_shared.set_options_for_hash_signing_if_needed(
         transaction=tx,
         sender=sender,
@@ -554,6 +563,7 @@ def remove_nodes(args: Any):
         relayer=guardian_and_relayer_data.relayer,
     )
 
+    _alter_version_and_options_if_provided(args, tx)
     _sign_transaction(tx, sender, guardian_and_relayer_data)
     cli_shared.send_or_simulate(tx, args)
 
@@ -600,7 +610,6 @@ def stake_nodes(args: Any):
         gas_limit=args.gas_limit,
         gas_price=args.gas_price,
     )
-    _alter_version_and_options_if_provided(args, tx)
     cli_shared.set_options_for_hash_signing_if_needed(
         transaction=tx,
         sender=sender,
@@ -608,6 +617,7 @@ def stake_nodes(args: Any):
         relayer=guardian_and_relayer_data.relayer,
     )
 
+    _alter_version_and_options_if_provided(args, tx)
     _sign_transaction(tx, sender, guardian_and_relayer_data)
     cli_shared.send_or_simulate(tx, args)
 
@@ -643,7 +653,7 @@ def unbond_nodes(args: Any):
         gas_limit=args.gas_limit,
         gas_price=args.gas_price,
     )
-    _alter_version_and_options_if_provided(args, tx)
+
     cli_shared.set_options_for_hash_signing_if_needed(
         transaction=tx,
         sender=sender,
@@ -651,6 +661,7 @@ def unbond_nodes(args: Any):
         relayer=guardian_and_relayer_data.relayer,
     )
 
+    _alter_version_and_options_if_provided(args, tx)
     _sign_transaction(tx, sender, guardian_and_relayer_data)
     cli_shared.send_or_simulate(tx, args)
 
@@ -678,7 +689,7 @@ def unstake_nodes(args: Any):
         gas_limit=args.gas_limit,
         gas_price=args.gas_price,
     )
-    _alter_version_and_options_if_provided(args, tx)
+
     cli_shared.set_options_for_hash_signing_if_needed(
         transaction=tx,
         sender=sender,
@@ -686,6 +697,7 @@ def unstake_nodes(args: Any):
         relayer=guardian_and_relayer_data.relayer,
     )
 
+    _alter_version_and_options_if_provided(args, tx)
     _sign_transaction(tx, sender, guardian_and_relayer_data)
     cli_shared.send_or_simulate(tx, args)
 
@@ -716,7 +728,7 @@ def unjail_nodes(args: Any):
         gas_limit=args.gas_limit,
         gas_price=args.gas_price,
     )
-    _alter_version_and_options_if_provided(args, tx)
+
     cli_shared.set_options_for_hash_signing_if_needed(
         transaction=tx,
         sender=sender,
@@ -724,6 +736,7 @@ def unjail_nodes(args: Any):
         relayer=guardian_and_relayer_data.relayer,
     )
 
+    _alter_version_and_options_if_provided(args, tx)
     _sign_transaction(tx, sender, guardian_and_relayer_data)
     cli_shared.send_or_simulate(tx, args)
 
@@ -750,7 +763,7 @@ def delegate(args: Any):
         gas_limit=args.gas_limit,
         gas_price=args.gas_price,
     )
-    _alter_version_and_options_if_provided(args, tx)
+
     cli_shared.set_options_for_hash_signing_if_needed(
         transaction=tx,
         sender=sender,
@@ -758,6 +771,7 @@ def delegate(args: Any):
         relayer=guardian_and_relayer_data.relayer,
     )
 
+    _alter_version_and_options_if_provided(args, tx)
     _sign_transaction(tx, sender, guardian_and_relayer_data)
     cli_shared.send_or_simulate(tx, args)
 
@@ -781,7 +795,7 @@ def claim_rewards(args: Any):
         gas_limit=args.gas_limit,
         gas_price=args.gas_price,
     )
-    _alter_version_and_options_if_provided(args, tx)
+
     cli_shared.set_options_for_hash_signing_if_needed(
         transaction=tx,
         sender=sender,
@@ -789,6 +803,7 @@ def claim_rewards(args: Any):
         relayer=guardian_and_relayer_data.relayer,
     )
 
+    _alter_version_and_options_if_provided(args, tx)
     _sign_transaction(tx, sender, guardian_and_relayer_data)
     cli_shared.send_or_simulate(tx, args)
 
@@ -812,7 +827,7 @@ def redelegate_rewards(args: Any):
         gas_limit=args.gas_limit,
         gas_price=args.gas_price,
     )
-    _alter_version_and_options_if_provided(args, tx)
+
     cli_shared.set_options_for_hash_signing_if_needed(
         transaction=tx,
         sender=sender,
@@ -820,6 +835,7 @@ def redelegate_rewards(args: Any):
         relayer=guardian_and_relayer_data.relayer,
     )
 
+    _alter_version_and_options_if_provided(args, tx)
     _sign_transaction(tx, sender, guardian_and_relayer_data)
     cli_shared.send_or_simulate(tx, args)
 
@@ -846,7 +862,7 @@ def undelegate(args: Any):
         gas_limit=args.gas_limit,
         gas_price=args.gas_price,
     )
-    _alter_version_and_options_if_provided(args, tx)
+
     cli_shared.set_options_for_hash_signing_if_needed(
         transaction=tx,
         sender=sender,
@@ -854,6 +870,7 @@ def undelegate(args: Any):
         relayer=guardian_and_relayer_data.relayer,
     )
 
+    _alter_version_and_options_if_provided(args, tx)
     _sign_transaction(tx, sender, guardian_and_relayer_data)
     cli_shared.send_or_simulate(tx, args)
 
@@ -877,7 +894,7 @@ def withdraw(args: Any):
         gas_limit=args.gas_limit,
         gas_price=args.gas_price,
     )
-    _alter_version_and_options_if_provided(args, tx)
+
     cli_shared.set_options_for_hash_signing_if_needed(
         transaction=tx,
         sender=sender,
@@ -885,6 +902,7 @@ def withdraw(args: Any):
         relayer=guardian_and_relayer_data.relayer,
     )
 
+    _alter_version_and_options_if_provided(args, tx)
     _sign_transaction(tx, sender, guardian_and_relayer_data)
     cli_shared.send_or_simulate(tx, args)
 
@@ -909,7 +927,7 @@ def change_service_fee(args: Any):
         gas_limit=args.gas_limit,
         gas_price=args.gas_price,
     )
-    _alter_version_and_options_if_provided(args, tx)
+
     cli_shared.set_options_for_hash_signing_if_needed(
         transaction=tx,
         sender=sender,
@@ -917,6 +935,7 @@ def change_service_fee(args: Any):
         relayer=guardian_and_relayer_data.relayer,
     )
 
+    _alter_version_and_options_if_provided(args, tx)
     _sign_transaction(tx, sender, guardian_and_relayer_data)
     cli_shared.send_or_simulate(tx, args)
 
@@ -941,7 +960,7 @@ def modify_delegation_cap(args: Any):
         gas_limit=args.gas_limit,
         gas_price=args.gas_price,
     )
-    _alter_version_and_options_if_provided(args, tx)
+
     cli_shared.set_options_for_hash_signing_if_needed(
         transaction=tx,
         sender=sender,
@@ -949,6 +968,7 @@ def modify_delegation_cap(args: Any):
         relayer=guardian_and_relayer_data.relayer,
     )
 
+    _alter_version_and_options_if_provided(args, tx)
     _sign_transaction(tx, sender, guardian_and_relayer_data)
     cli_shared.send_or_simulate(tx, args)
 
@@ -990,13 +1010,14 @@ def automatic_activation(args: Any):
     else:
         raise errors.BadUsage("Both set and unset automatic activation are False")
 
-    _alter_version_and_options_if_provided(args, tx)
     cli_shared.set_options_for_hash_signing_if_needed(
         transaction=tx,
         sender=sender,
         guardian=guardian_and_relayer_data.guardian,
         relayer=guardian_and_relayer_data.relayer,
     )
+
+    _alter_version_and_options_if_provided(args, tx)
     _sign_transaction(tx, sender, guardian_and_relayer_data)
     cli_shared.send_or_simulate(tx, args)
 
@@ -1037,13 +1058,14 @@ def redelegate_cap(args: Any):
     else:
         raise errors.BadUsage("Either set or unset should be True")
 
-    _alter_version_and_options_if_provided(args, tx)
     cli_shared.set_options_for_hash_signing_if_needed(
         transaction=tx,
         sender=sender,
         guardian=guardian_and_relayer_data.guardian,
         relayer=guardian_and_relayer_data.relayer,
     )
+
+    _alter_version_and_options_if_provided(args, tx)
     _sign_transaction(tx, sender, guardian_and_relayer_data)
     cli_shared.send_or_simulate(tx, args)
 
@@ -1070,7 +1092,7 @@ def set_metadata(args: Any):
         gas_limit=args.gas_limit,
         gas_price=args.gas_price,
     )
-    _alter_version_and_options_if_provided(args, tx)
+
     cli_shared.set_options_for_hash_signing_if_needed(
         transaction=tx,
         sender=sender,
@@ -1078,6 +1100,7 @@ def set_metadata(args: Any):
         relayer=guardian_and_relayer_data.relayer,
     )
 
+    _alter_version_and_options_if_provided(args, tx)
     _sign_transaction(tx, sender, guardian_and_relayer_data)
     cli_shared.send_or_simulate(tx, args)
 
@@ -1105,7 +1128,7 @@ def make_new_contract_from_validator_data(args: Any):
         gas_limit=args.gas_limit,
         gas_price=args.gas_price,
     )
-    _alter_version_and_options_if_provided(args, tx)
+
     cli_shared.set_options_for_hash_signing_if_needed(
         transaction=tx,
         sender=sender,
@@ -1113,13 +1136,21 @@ def make_new_contract_from_validator_data(args: Any):
         relayer=guardian_and_relayer_data.relayer,
     )
 
+    _alter_version_and_options_if_provided(args, tx)
     _sign_transaction(tx, sender, guardian_and_relayer_data)
     cli_shared.send_or_simulate(tx, args)
 
 
-def _alter_version_and_options_if_provided(args: Any, transaction: Transaction):
+def _alter_version_and_options_if_provided(args: Any, transaction: Transaction) -> bool:
+    """Alters the transaction version and options if they are provided in args. Returns True if any alteration was made, False otherwise."""
+    altered = False
+
     if args.options:
         transaction.options = args.options
+        altered = True
 
     if args.version != DEFAULT_TX_VERSION:
         transaction.version = args.version
+        altered = True
+
+    return altered
