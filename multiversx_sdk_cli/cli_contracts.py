@@ -367,8 +367,8 @@ def deploy(args: Any):
         is_readable=args.metadata_readable,
         is_payable=args.metadata_payable,
         is_payable_by_sc=args.metadata_payable_by_sc,
-        guardian=guardian_and_relayer_data.guardian.address if guardian_and_relayer_data.guardian else None,
-        relayer=guardian_and_relayer_data.relayer.address if guardian_and_relayer_data.relayer else None,
+        guardian=guardian_and_relayer_data.guardian_address,
+        relayer=guardian_and_relayer_data.relayer_address,
         gas_limit=args.gas_limit,
         gas_price=args.gas_price,
     )
@@ -428,8 +428,8 @@ def call(args: Any):
         arguments=arguments,
         native_transfer_amount=int(args.value),
         token_transfers=token_transfers,
-        guardian=guardian_and_relayer_data.guardian.address if guardian_and_relayer_data.guardian else None,
-        relayer=guardian_and_relayer_data.relayer.address if guardian_and_relayer_data.relayer else None,
+        guardian=guardian_and_relayer_data.guardian_address,
+        relayer=guardian_and_relayer_data.relayer_address,
         gas_limit=args.gas_limit,
         gas_price=args.gas_price,
     )
@@ -476,8 +476,8 @@ def upgrade(args: Any):
         is_readable=args.metadata_readable,
         is_payable=args.metadata_payable,
         is_payable_by_sc=args.metadata_payable_by_sc,
-        guardian=guardian_and_relayer_data.guardian.address if guardian_and_relayer_data.guardian else None,
-        relayer=guardian_and_relayer_data.relayer.address if guardian_and_relayer_data.relayer else None,
+        guardian=guardian_and_relayer_data.guardian_address,
+        relayer=guardian_and_relayer_data.relayer_address,
         gas_limit=args.gas_limit,
         gas_price=args.gas_price,
     )
