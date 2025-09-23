@@ -32,6 +32,8 @@ def test_stake():
             "localnet",
             "--proxy",
             "http://127.0.0.1:7950",
+            "--gas-limit",
+            "60000000",
         ]
     )
     assert return_code == 0
@@ -54,6 +56,8 @@ def test_stake():
             "--proxy",
             "http://127.0.0.1:7950",
             "--nonce=0",
+            "--gas-limit",
+            "60000000",
         ]
     )
     assert return_code == 0
@@ -75,6 +79,8 @@ def test_stake_top_up():
             "localnet",
             "--proxy",
             "http://127.0.0.1:7950",
+            "--gas-limit",
+            "60000000",
         ]
     )
     assert return_code == 0
@@ -95,6 +101,8 @@ def test_unstake():
             "localnet",
             "--proxy",
             "http://127.0.0.1:7950",
+            "--gas-limit",
+            "60000000",
         ]
     )
     assert return_code == 0
@@ -115,6 +123,8 @@ def test_unbond():
             "localnet",
             "--proxy",
             "http://127.0.0.1:7950",
+            "--gas-limit",
+            "60000000",
         ]
     )
     assert return_code == 0
@@ -137,6 +147,8 @@ def test_unjail():
             "localnet",
             "--proxy",
             "http://127.0.0.1:7950",
+            "--gas-limit",
+            "60000000",
         ]
     )
     assert return_code == 0
@@ -157,6 +169,8 @@ def test_change_reward_address():
             "localnet",
             "--proxy",
             "http://127.0.0.1:7950",
+            "--gas-limit",
+            "60000000",
         ]
     )
     assert return_code == 0
@@ -177,6 +191,8 @@ def test_unstake_nodes():
             "localnet",
             "--proxy",
             "http://127.0.0.1:7950",
+            "--gas-limit",
+            "60000000",
         ]
     )
     assert return_code == 0
@@ -197,6 +213,8 @@ def test_unstake_tokens():
             "localnet",
             "--proxy",
             "http://127.0.0.1:7950",
+            "--gas-limit",
+            "60000000",
         ]
     )
     assert return_code == 0
@@ -217,6 +235,8 @@ def test_unbond_nodes():
             "localnet",
             "--proxy",
             "http://127.0.0.1:7950",
+            "--gas-limit",
+            "60000000",
         ]
     )
     assert return_code == 0
@@ -237,6 +257,8 @@ def test_unbond_tokens():
             "localnet",
             "--proxy",
             "http://127.0.0.1:7950",
+            "--gas-limit",
+            "60000000",
         ]
     )
     assert return_code == 0
@@ -255,6 +277,8 @@ def test_clean_registration_data():
             "localnet",
             "--proxy",
             "http://127.0.0.1:7950",
+            "--gas-limit",
+            "60000000",
         ]
     )
     assert return_code == 0
@@ -275,6 +299,8 @@ def test_re_stake_unstaked_nodes():
             "localnet",
             "--proxy",
             "http://127.0.0.1:7950",
+            "--gas-limit",
+            "60000000",
         ]
     )
     assert return_code == 0
