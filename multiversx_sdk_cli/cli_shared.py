@@ -870,30 +870,32 @@ def alter_transaction_and_sign_again_if_needed(
 
     altered = _alter_version_and_options_if_provided(
         args=args,
-        final_transaction=tx,
+        transaction=tx,
     )
 
-    if altered:  # sign only if something was altered
+    if altered:
+        # sign only if something was altered
         _sign_transaction(tx, sender, guardian_and_relayer_data)
     else:
-        _sign_transaction(tx, None, guardian_and_relayer_data)  # sign only with guardian/relayer if needed
+        # sign only with guardian/relayer if needed
+        _sign_transaction(tx, None, guardian_and_relayer_data)
 
 
 def _alter_version_and_options_if_provided(
     args: Any,
-    final_transaction: Transaction,
+    transaction: Transaction,
 ) -> bool:
     """Alters the transaction version and options if they are provided in args.
     Returns True if any alteration was made, False otherwise.
     """
     altered = False
 
-    if args.version != DEFAULT_TX_VERSION and final_transaction.version != args.version:
-        final_transaction.version = args.version
+    if args.version != DEFAULT_TX_VERSION and transaction.version != args.version:
+        transaction.version = args.version
         altered = True
 
-    if args.options and final_transaction.options != args.options:
-        final_transaction.options = args.options
+    if args.options and transaction.options != args.options:
+        transaction.options = args.options
         altered = True
 
     return altered
