@@ -37,9 +37,6 @@ from multiversx_sdk_cli.args_validation import (
 from multiversx_sdk_cli.cli_output import CLIOutputBuilder
 from multiversx_sdk_cli.config import get_config_for_network_providers
 from multiversx_sdk_cli.constants import NUMBER_OF_SHARDS
-from multiversx_sdk_cli.guardian_relayer_data import GuardianRelayerData
-from multiversx_sdk_cli.interfaces import IAccount
-from multiversx_sdk_cli.signing_wrapper import SigningWrapper
 
 logger = logging.getLogger("cli.multisig")
 
@@ -664,7 +661,7 @@ def _ensure_args(args: Any):
 
 def _initialize_multisig_controller(args: Any) -> MultisigController:
     abi = Abi.load(Path(args.abi))
-    chain = args.chain if hasattr(args, "chain") else None
+    chain = getattr(args, "chain", None)
     chain_id = cli_shared.get_chain_id(args.proxy, chain)
 
     config = get_config_for_network_providers()
@@ -678,15 +675,6 @@ def _initialize_multisig_controller(args: Any) -> MultisigController:
         abi=abi,
         address_hrp=cli_shared.get_address_hrp_with_fallback(args),
         gas_limit_estimator=gas_estimator,
-    )
-
-
-def _sign_transaction(transaction: Transaction, sender: IAccount, guardian_and_relayer_data: GuardianRelayerData):
-    signer = SigningWrapper()
-    signer.sign_transaction(
-        transaction=transaction,
-        sender=sender,
-        guardian_and_relayer=guardian_and_relayer_data,
     )
 
 
@@ -714,8 +702,8 @@ def deploy(args: Any):
         is_readable=args.metadata_readable,
         is_payable=args.metadata_payable,
         is_payable_by_sc=args.metadata_payable_by_sc,
-        guardian=guardian_and_relayer_data.guardian.address if guardian_and_relayer_data.guardian else None,
-        relayer=guardian_and_relayer_data.relayer.address if guardian_and_relayer_data.relayer else None,
+        guardian=guardian_and_relayer_data.guardian_address,
+        relayer=guardian_and_relayer_data.relayer_address,
         gas_limit=args.gas_limit,
         gas_price=args.gas_price,
     )
@@ -724,9 +712,14 @@ def deploy(args: Any):
     contract_address = address_computer.compute_contract_address(deployer=sender.address, deployment_nonce=tx.nonce)
 
     logger.info("Contract address: %s", contract_address.to_bech32())
-    utils.log_explorer_contract_address(multisig._factory._sc_factory.config.chain_id, contract_address.to_bech32())
+    utils.log_explorer_contract_address(cli_shared.get_chain_id(args.proxy, args.chain), contract_address.to_bech32())
 
-    _sign_transaction(tx, sender, guardian_and_relayer_data)
+    cli_shared.alter_transaction_and_sign_again_if_needed(
+        args=args,
+        tx=tx,
+        sender=sender,
+        guardian_and_relayer_data=guardian_and_relayer_data,
+    )
     _send_or_simulate(tx, contract_address, args)
 
 
@@ -753,13 +746,18 @@ def deposit(args: Any):
         contract=contract,
         native_token_amount=native_amount,
         token_transfers=token_transfers,
-        guardian=guardian_and_relayer_data.guardian.address if guardian_and_relayer_data.guardian else None,
-        relayer=guardian_and_relayer_data.relayer.address if guardian_and_relayer_data.relayer else None,
+        guardian=guardian_and_relayer_data.guardian_address,
+        relayer=guardian_and_relayer_data.relayer_address,
         gas_limit=args.gas_limit,
         gas_price=args.gas_price,
     )
 
-    _sign_transaction(tx, sender, guardian_and_relayer_data)
+    cli_shared.alter_transaction_and_sign_again_if_needed(
+        args=args,
+        tx=tx,
+        sender=sender,
+        guardian_and_relayer_data=guardian_and_relayer_data,
+    )
     _send_or_simulate(tx, contract, args)
 
 
@@ -781,13 +779,18 @@ def discard_action(args: Any):
         nonce=sender.nonce,
         contract=contract,
         action_id=action_id,
-        guardian=guardian_and_relayer_data.guardian.address if guardian_and_relayer_data.guardian else None,
-        relayer=guardian_and_relayer_data.relayer.address if guardian_and_relayer_data.relayer else None,
+        guardian=guardian_and_relayer_data.guardian_address,
+        relayer=guardian_and_relayer_data.relayer_address,
         gas_limit=args.gas_limit,
         gas_price=args.gas_price,
     )
 
-    _sign_transaction(tx, sender, guardian_and_relayer_data)
+    cli_shared.alter_transaction_and_sign_again_if_needed(
+        args=args,
+        tx=tx,
+        sender=sender,
+        guardian_and_relayer_data=guardian_and_relayer_data,
+    )
     _send_or_simulate(tx, contract, args)
 
 
@@ -809,13 +812,18 @@ def discard_batch(args: Any):
         nonce=sender.nonce,
         contract=contract,
         actions_ids=actions,
-        guardian=guardian_and_relayer_data.guardian.address if guardian_and_relayer_data.guardian else None,
-        relayer=guardian_and_relayer_data.relayer.address if guardian_and_relayer_data.relayer else None,
+        guardian=guardian_and_relayer_data.guardian_address,
+        relayer=guardian_and_relayer_data.relayer_address,
         gas_limit=args.gas_limit,
         gas_price=args.gas_price,
     )
 
-    _sign_transaction(tx, sender, guardian_and_relayer_data)
+    cli_shared.alter_transaction_and_sign_again_if_needed(
+        args=args,
+        tx=tx,
+        sender=sender,
+        guardian_and_relayer_data=guardian_and_relayer_data,
+    )
     _send_or_simulate(tx, contract, args)
 
 
@@ -837,13 +845,18 @@ def add_board_member(args: Any):
         nonce=sender.nonce,
         contract=contract,
         board_member=board_member,
-        guardian=guardian_and_relayer_data.guardian.address if guardian_and_relayer_data.guardian else None,
-        relayer=guardian_and_relayer_data.relayer.address if guardian_and_relayer_data.relayer else None,
+        guardian=guardian_and_relayer_data.guardian_address,
+        relayer=guardian_and_relayer_data.relayer_address,
         gas_limit=args.gas_limit,
         gas_price=args.gas_price,
     )
 
-    _sign_transaction(tx, sender, guardian_and_relayer_data)
+    cli_shared.alter_transaction_and_sign_again_if_needed(
+        args=args,
+        tx=tx,
+        sender=sender,
+        guardian_and_relayer_data=guardian_and_relayer_data,
+    )
     _send_or_simulate(tx, contract, args)
 
 
@@ -865,13 +878,18 @@ def add_proposer(args: Any):
         nonce=sender.nonce,
         contract=contract,
         proposer=proposer,
-        guardian=guardian_and_relayer_data.guardian.address if guardian_and_relayer_data.guardian else None,
-        relayer=guardian_and_relayer_data.relayer.address if guardian_and_relayer_data.relayer else None,
+        guardian=guardian_and_relayer_data.guardian_address,
+        relayer=guardian_and_relayer_data.relayer_address,
         gas_limit=args.gas_limit,
         gas_price=args.gas_price,
     )
 
-    _sign_transaction(tx, sender, guardian_and_relayer_data)
+    cli_shared.alter_transaction_and_sign_again_if_needed(
+        args=args,
+        tx=tx,
+        sender=sender,
+        guardian_and_relayer_data=guardian_and_relayer_data,
+    )
     _send_or_simulate(tx, contract, args)
 
 
@@ -893,13 +911,18 @@ def remove_user(args: Any):
         nonce=sender.nonce,
         contract=contract,
         user=user,
-        guardian=guardian_and_relayer_data.guardian.address if guardian_and_relayer_data.guardian else None,
-        relayer=guardian_and_relayer_data.relayer.address if guardian_and_relayer_data.relayer else None,
+        guardian=guardian_and_relayer_data.guardian_address,
+        relayer=guardian_and_relayer_data.relayer_address,
         gas_limit=args.gas_limit,
         gas_price=args.gas_price,
     )
 
-    _sign_transaction(tx, sender, guardian_and_relayer_data)
+    cli_shared.alter_transaction_and_sign_again_if_needed(
+        args=args,
+        tx=tx,
+        sender=sender,
+        guardian_and_relayer_data=guardian_and_relayer_data,
+    )
     _send_or_simulate(tx, contract, args)
 
 
@@ -921,13 +944,18 @@ def change_quorum(args: Any):
         nonce=sender.nonce,
         contract=contract,
         new_quorum=quorum,
-        guardian=guardian_and_relayer_data.guardian.address if guardian_and_relayer_data.guardian else None,
-        relayer=guardian_and_relayer_data.relayer.address if guardian_and_relayer_data.relayer else None,
+        guardian=guardian_and_relayer_data.guardian_address,
+        relayer=guardian_and_relayer_data.relayer_address,
         gas_limit=args.gas_limit,
         gas_price=args.gas_price,
     )
 
-    _sign_transaction(tx, sender, guardian_and_relayer_data)
+    cli_shared.alter_transaction_and_sign_again_if_needed(
+        args=args,
+        tx=tx,
+        sender=sender,
+        guardian_and_relayer_data=guardian_and_relayer_data,
+    )
     _send_or_simulate(tx, contract, args)
 
 
@@ -961,13 +989,18 @@ def transfer_and_execute(args: Any):
         abi=contract_abi,
         arguments=arguments,
         native_token_amount=int(args.value),
-        guardian=guardian_and_relayer_data.guardian.address if guardian_and_relayer_data.guardian else None,
-        relayer=guardian_and_relayer_data.relayer.address if guardian_and_relayer_data.relayer else None,
+        guardian=guardian_and_relayer_data.guardian_address,
+        relayer=guardian_and_relayer_data.relayer_address,
         gas_limit=args.gas_limit,
         gas_price=args.gas_price,
     )
 
-    _sign_transaction(tx, sender, guardian_and_relayer_data)
+    cli_shared.alter_transaction_and_sign_again_if_needed(
+        args=args,
+        tx=tx,
+        sender=sender,
+        guardian_and_relayer_data=guardian_and_relayer_data,
+    )
     _send_or_simulate(tx, contract, args)
 
 
@@ -1008,13 +1041,18 @@ def transfer_and_execute_esdt(args: Any):
         function=function,
         abi=contract_abi,
         arguments=arguments,
-        guardian=guardian_and_relayer_data.guardian.address if guardian_and_relayer_data.guardian else None,
-        relayer=guardian_and_relayer_data.relayer.address if guardian_and_relayer_data.relayer else None,
+        guardian=guardian_and_relayer_data.guardian_address,
+        relayer=guardian_and_relayer_data.relayer_address,
         gas_limit=args.gas_limit,
         gas_price=args.gas_price,
     )
 
-    _sign_transaction(tx, sender, guardian_and_relayer_data)
+    cli_shared.alter_transaction_and_sign_again_if_needed(
+        args=args,
+        tx=tx,
+        sender=sender,
+        guardian_and_relayer_data=guardian_and_relayer_data,
+    )
     _send_or_simulate(tx, contract, args)
 
 
@@ -1053,13 +1091,18 @@ def async_call(args: Any):
         function=function,
         abi=contract_abi,
         arguments=arguments,
-        guardian=guardian_and_relayer_data.guardian.address if guardian_and_relayer_data.guardian else None,
-        relayer=guardian_and_relayer_data.relayer.address if guardian_and_relayer_data.relayer else None,
+        guardian=guardian_and_relayer_data.guardian_address,
+        relayer=guardian_and_relayer_data.relayer_address,
         gas_limit=args.gas_limit,
         gas_price=args.gas_price,
     )
 
-    _sign_transaction(tx, sender, guardian_and_relayer_data)
+    cli_shared.alter_transaction_and_sign_again_if_needed(
+        args=args,
+        tx=tx,
+        sender=sender,
+        guardian_and_relayer_data=guardian_and_relayer_data,
+    )
     _send_or_simulate(tx, contract, args)
 
 
@@ -1093,13 +1136,18 @@ def deploy_from_source(args: Any):
         native_token_amount=int(args.value),
         abi=contract_abi,
         arguments=arguments,
-        guardian=guardian_and_relayer_data.guardian.address if guardian_and_relayer_data.guardian else None,
-        relayer=guardian_and_relayer_data.relayer.address if guardian_and_relayer_data.relayer else None,
+        guardian=guardian_and_relayer_data.guardian_address,
+        relayer=guardian_and_relayer_data.relayer_address,
         gas_limit=args.gas_limit,
         gas_price=args.gas_price,
     )
 
-    _sign_transaction(tx, sender, guardian_and_relayer_data)
+    cli_shared.alter_transaction_and_sign_again_if_needed(
+        args=args,
+        tx=tx,
+        sender=sender,
+        guardian_and_relayer_data=guardian_and_relayer_data,
+    )
     _send_or_simulate(tx, contract, args)
 
 
@@ -1135,13 +1183,18 @@ def upgrade_from_source(args: Any):
         native_token_amount=int(args.value),
         abi=contract_abi,
         arguments=arguments,
-        guardian=guardian_and_relayer_data.guardian.address if guardian_and_relayer_data.guardian else None,
-        relayer=guardian_and_relayer_data.relayer.address if guardian_and_relayer_data.relayer else None,
+        guardian=guardian_and_relayer_data.guardian_address,
+        relayer=guardian_and_relayer_data.relayer_address,
         gas_limit=args.gas_limit,
         gas_price=args.gas_price,
     )
 
-    _sign_transaction(tx, sender, guardian_and_relayer_data)
+    cli_shared.alter_transaction_and_sign_again_if_needed(
+        args=args,
+        tx=tx,
+        sender=sender,
+        guardian_and_relayer_data=guardian_and_relayer_data,
+    )
     _send_or_simulate(tx, contract, args)
 
 
@@ -1163,13 +1216,18 @@ def sign_action(args: Any):
         nonce=sender.nonce,
         contract=contract,
         action_id=action_id,
-        guardian=guardian_and_relayer_data.guardian.address if guardian_and_relayer_data.guardian else None,
-        relayer=guardian_and_relayer_data.relayer.address if guardian_and_relayer_data.relayer else None,
+        guardian=guardian_and_relayer_data.guardian_address,
+        relayer=guardian_and_relayer_data.relayer_address,
         gas_limit=args.gas_limit,
         gas_price=args.gas_price,
     )
 
-    _sign_transaction(tx, sender, guardian_and_relayer_data)
+    cli_shared.alter_transaction_and_sign_again_if_needed(
+        args=args,
+        tx=tx,
+        sender=sender,
+        guardian_and_relayer_data=guardian_and_relayer_data,
+    )
     _send_or_simulate(tx, contract, args)
 
 
@@ -1191,13 +1249,18 @@ def sign_batch(args: Any):
         nonce=sender.nonce,
         contract=contract,
         batch_id=batch_id,
-        guardian=guardian_and_relayer_data.guardian.address if guardian_and_relayer_data.guardian else None,
-        relayer=guardian_and_relayer_data.relayer.address if guardian_and_relayer_data.relayer else None,
+        guardian=guardian_and_relayer_data.guardian_address,
+        relayer=guardian_and_relayer_data.relayer_address,
         gas_limit=args.gas_limit,
         gas_price=args.gas_price,
     )
 
-    _sign_transaction(tx, sender, guardian_and_relayer_data)
+    cli_shared.alter_transaction_and_sign_again_if_needed(
+        args=args,
+        tx=tx,
+        sender=sender,
+        guardian_and_relayer_data=guardian_and_relayer_data,
+    )
     _send_or_simulate(tx, contract, args)
 
 
@@ -1219,13 +1282,18 @@ def sign_and_perform(args: Any):
         nonce=sender.nonce,
         contract=contract,
         action_id=action_id,
-        guardian=guardian_and_relayer_data.guardian.address if guardian_and_relayer_data.guardian else None,
-        relayer=guardian_and_relayer_data.relayer.address if guardian_and_relayer_data.relayer else None,
+        guardian=guardian_and_relayer_data.guardian_address,
+        relayer=guardian_and_relayer_data.relayer_address,
         gas_limit=args.gas_limit,
         gas_price=args.gas_price,
     )
 
-    _sign_transaction(tx, sender, guardian_and_relayer_data)
+    cli_shared.alter_transaction_and_sign_again_if_needed(
+        args=args,
+        tx=tx,
+        sender=sender,
+        guardian_and_relayer_data=guardian_and_relayer_data,
+    )
     _send_or_simulate(tx, contract, args)
 
 
@@ -1247,13 +1315,18 @@ def sign_batch_and_perform(args: Any):
         nonce=sender.nonce,
         contract=contract,
         batch_id=batch_id,
-        guardian=guardian_and_relayer_data.guardian.address if guardian_and_relayer_data.guardian else None,
-        relayer=guardian_and_relayer_data.relayer.address if guardian_and_relayer_data.relayer else None,
+        guardian=guardian_and_relayer_data.guardian_address,
+        relayer=guardian_and_relayer_data.relayer_address,
         gas_limit=args.gas_limit,
         gas_price=args.gas_price,
     )
 
-    _sign_transaction(tx, sender, guardian_and_relayer_data)
+    cli_shared.alter_transaction_and_sign_again_if_needed(
+        args=args,
+        tx=tx,
+        sender=sender,
+        guardian_and_relayer_data=guardian_and_relayer_data,
+    )
     _send_or_simulate(tx, contract, args)
 
 
@@ -1275,13 +1348,18 @@ def unsign_action(args: Any):
         nonce=sender.nonce,
         contract=contract,
         action_id=action_id,
-        guardian=guardian_and_relayer_data.guardian.address if guardian_and_relayer_data.guardian else None,
-        relayer=guardian_and_relayer_data.relayer.address if guardian_and_relayer_data.relayer else None,
+        guardian=guardian_and_relayer_data.guardian_address,
+        relayer=guardian_and_relayer_data.relayer_address,
         gas_limit=args.gas_limit,
         gas_price=args.gas_price,
     )
 
-    _sign_transaction(tx, sender, guardian_and_relayer_data)
+    cli_shared.alter_transaction_and_sign_again_if_needed(
+        args=args,
+        tx=tx,
+        sender=sender,
+        guardian_and_relayer_data=guardian_and_relayer_data,
+    )
     _send_or_simulate(tx, contract, args)
 
 
@@ -1303,13 +1381,18 @@ def unsign_batch(args: Any):
         nonce=sender.nonce,
         contract=contract,
         batch_id=batch_id,
-        guardian=guardian_and_relayer_data.guardian.address if guardian_and_relayer_data.guardian else None,
-        relayer=guardian_and_relayer_data.relayer.address if guardian_and_relayer_data.relayer else None,
+        guardian=guardian_and_relayer_data.guardian_address,
+        relayer=guardian_and_relayer_data.relayer_address,
         gas_limit=args.gas_limit,
         gas_price=args.gas_price,
     )
 
-    _sign_transaction(tx, sender, guardian_and_relayer_data)
+    cli_shared.alter_transaction_and_sign_again_if_needed(
+        args=args,
+        tx=tx,
+        sender=sender,
+        guardian_and_relayer_data=guardian_and_relayer_data,
+    )
     _send_or_simulate(tx, contract, args)
 
 
@@ -1332,13 +1415,18 @@ def unsign_for_outdated_board_members(args: Any):
         contract=contract,
         action_id=action_id,
         outdated_board_members=args.outdated_members,
-        guardian=guardian_and_relayer_data.guardian.address if guardian_and_relayer_data.guardian else None,
-        relayer=guardian_and_relayer_data.relayer.address if guardian_and_relayer_data.relayer else None,
+        guardian=guardian_and_relayer_data.guardian_address,
+        relayer=guardian_and_relayer_data.relayer_address,
         gas_limit=args.gas_limit,
         gas_price=args.gas_price,
     )
 
-    _sign_transaction(tx, sender, guardian_and_relayer_data)
+    cli_shared.alter_transaction_and_sign_again_if_needed(
+        args=args,
+        tx=tx,
+        sender=sender,
+        guardian_and_relayer_data=guardian_and_relayer_data,
+    )
     _send_or_simulate(tx, contract, args)
 
 
@@ -1360,13 +1448,18 @@ def perform_action(args: Any):
         nonce=sender.nonce,
         contract=contract,
         action_id=action_id,
-        guardian=guardian_and_relayer_data.guardian.address if guardian_and_relayer_data.guardian else None,
-        relayer=guardian_and_relayer_data.relayer.address if guardian_and_relayer_data.relayer else None,
+        guardian=guardian_and_relayer_data.guardian_address,
+        relayer=guardian_and_relayer_data.relayer_address,
         gas_limit=args.gas_limit,
         gas_price=args.gas_price,
     )
 
-    _sign_transaction(tx, sender, guardian_and_relayer_data)
+    cli_shared.alter_transaction_and_sign_again_if_needed(
+        args=args,
+        tx=tx,
+        sender=sender,
+        guardian_and_relayer_data=guardian_and_relayer_data,
+    )
     _send_or_simulate(tx, contract, args)
 
 
@@ -1388,13 +1481,18 @@ def perform_batch(args: Any):
         nonce=sender.nonce,
         contract=contract,
         batch_id=batch_id,
-        guardian=guardian_and_relayer_data.guardian.address if guardian_and_relayer_data.guardian else None,
-        relayer=guardian_and_relayer_data.relayer.address if guardian_and_relayer_data.relayer else None,
+        guardian=guardian_and_relayer_data.guardian_address,
+        relayer=guardian_and_relayer_data.relayer_address,
         gas_limit=args.gas_limit,
         gas_price=args.gas_price,
     )
 
-    _sign_transaction(tx, sender, guardian_and_relayer_data)
+    cli_shared.alter_transaction_and_sign_again_if_needed(
+        args=args,
+        tx=tx,
+        sender=sender,
+        guardian_and_relayer_data=guardian_and_relayer_data,
+    )
     _send_or_simulate(tx, contract, args)
 
 

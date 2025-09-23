@@ -196,7 +196,7 @@ def _ensure_args(args: Any):
 
 
 def _initialize_controller(args: Any) -> GovernanceController:
-    chain = args.chain if hasattr(args, "chain") else None
+    chain = getattr(args, "chain", None)
     chain_id = cli_shared.get_chain_id(args.proxy, chain)
     config = get_config_for_network_providers()
     proxy_url = args.proxy if args.proxy else ""
