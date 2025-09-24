@@ -2,7 +2,12 @@ import logging
 from pathlib import Path
 from typing import Any
 
-from multiversx_sdk import Address, ProxyNetworkProvider, TransactionComputer
+from multiversx_sdk import (
+    Address,
+    ProxyNetworkProvider,
+    TransactionComputer,
+    TransfersController,
+)
 
 from multiversx_sdk_cli import cli_shared, utils
 from multiversx_sdk_cli.args_validation import (
@@ -13,14 +18,12 @@ from multiversx_sdk_cli.args_validation import (
     validate_proxy_argument,
     validate_receiver_args,
 )
-from multiversx_sdk_cli.base_transactions_controller import BaseTransactionsController
 from multiversx_sdk_cli.cli_output import CLIOutputBuilder
 from multiversx_sdk_cli.config import get_config_for_network_providers
 from multiversx_sdk_cli.errors import BadUsage, IncorrectWalletError, NoWalletProvided
-from multiversx_sdk_cli.transactions import (
-    TransactionsController,
-    load_transaction_from_file,
-)
+from multiversx_sdk_cli.guardian_relayer_data import GuardianRelayerData
+from multiversx_sdk_cli.signing_wrapper import SigningWrapper
+from multiversx_sdk_cli.transactions import load_transaction_from_file
 
 logger = logging.getLogger("cli.transactions")
 
@@ -101,38 +104,59 @@ def create_transaction(args: Any):
     validate_broadcast_args(args)
     validate_chain_id_args(args)
 
+    if args.data_file:
+        args.data = Path(args.data_file).read_text()
+
+    transfers = getattr(args, "token_transfers", None)
+
+    if transfers and args.data:
+        raise BadUsage("You cannot provide both data and token transfers")
+
     sender = cli_shared.prepare_sender(args)
     guardian_and_relayer_data = cli_shared.get_guardian_and_relayer_data(
         sender=sender.address.to_bech32(),
         args=args,
     )
 
-    if args.data_file:
-        args.data = Path(args.data_file).read_text()
-
     native_amount = int(args.value)
-
-    transfers = getattr(args, "token_transfers", None)
+    receiver = Address.new_from_bech32(args.receiver)
     transfers = cli_shared.prepare_token_transfers(transfers) if transfers else None
 
     chain_id = cli_shared.get_chain_id(args.proxy, args.chain)
     gas_estimator = cli_shared.initialize_gas_limit_estimator(args)
-    tx_controller = TransactionsController(chain_id, gas_estimator)
+    controller = TransfersController(chain_id=chain_id, gas_limit_estimator=gas_estimator)
 
-    tx = tx_controller.create_transaction(
+    if not transfers:
+        tx = controller.create_transaction_for_native_token_transfer(
+            sender=sender,
+            nonce=sender.nonce,
+            receiver=receiver,
+            native_transfer_amount=native_amount,
+            data=args.data.encode() if args.data else None,
+            guardian=guardian_and_relayer_data.guardian_address,
+            relayer=guardian_and_relayer_data.relayer_address,
+            gas_limit=args.gas_limit,
+            gas_price=args.gas_price,
+        )
+    else:
+        tx = controller.create_transaction_for_transfer(
+            sender=sender,
+            nonce=sender.nonce,
+            receiver=receiver,
+            native_transfer_amount=native_amount,
+            token_transfers=transfers,
+            guardian=guardian_and_relayer_data.guardian_address,
+            relayer=guardian_and_relayer_data.relayer_address,
+            gas_limit=args.gas_limit,
+            gas_price=args.gas_price,
+        )
+
+    cli_shared.alter_transaction_and_sign_again_if_needed(
+        args=args,
+        tx=tx,
         sender=sender,
-        receiver=Address.new_from_bech32(args.receiver),
-        native_amount=native_amount,
-        gas_limit=args.gas_limit,
-        gas_price=args.gas_price,
-        nonce=sender.nonce,
-        version=args.version,
-        options=args.options,
-        token_transfers=transfers,
-        data=args.data,
         guardian_and_relayer_data=guardian_and_relayer_data,
     )
-
     cli_shared.send_or_simulate(tx, args)
 
 
@@ -180,16 +204,22 @@ def sign_transaction(args: Any):
 
         tx_computer = TransactionComputer()
         if tx.guardian and not tx_computer.has_options_set_for_guarded_transaction(tx):
-            raise BadUsage("Guardian wallet provided but the transaction has incorrect options.")
+            raise BadUsage("Guardian wallet provided but the transaction has incorrect options")
 
-    tx_controller = BaseTransactionsController()
-    tx_controller.sign_transaction(
-        transaction=tx,
-        sender=sender,
+    guardian_and_relayer = GuardianRelayerData(
         guardian=guardian,
+        guardian_address=tx.guardian,
         relayer=relayer,
+        relayer_address=tx.relayer,
         guardian_service_url=args.guardian_service_url,
         guardian_2fa_code=args.guardian_2fa_code,
+    )
+
+    signer = SigningWrapper()
+    signer.sign_transaction(
+        transaction=tx,
+        sender=sender,
+        guardian_and_relayer=guardian_and_relayer,
     )
 
     cli_shared.send_or_simulate(tx, args)

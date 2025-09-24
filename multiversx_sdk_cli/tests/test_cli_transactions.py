@@ -463,6 +463,28 @@ def test_estimate_gas_with_multiplier(capsys: Any):
     assert tx_json["gasLimit"] == 75000
 
 
+def test_raise_error_when_data_and_transfers_provided(capsys: Any):
+    return_code = main(
+        [
+            "tx",
+            "new",
+            "--pem",
+            str(testdata_path / "alice.pem"),
+            "--receiver",
+            "erd1spyavw0956vq68xj8y4tenjpq2wd5a9p2c6j8gsz7ztyrnpxrruqzu66jx",
+            "--nonce",
+            "7",
+            "--chain",
+            "D",
+            "--data",
+            "hello",
+            "--token-transfers",
+            "TEST-123456",
+        ]
+    )
+    assert return_code == 1
+
+
 def _read_stdout(capsys: Any) -> str:
     stdout: str = capsys.readouterr().out.strip()
     return stdout
