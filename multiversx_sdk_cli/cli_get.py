@@ -107,7 +107,7 @@ def get_account(args: Any):
     if args.address:
         address = Address.new_from_bech32(args.address)
     else:
-        hrp = cli_shared.get_address_hrp(args)
+        hrp = cli_shared.get_address_hrp_with_fallback(args)
         address = _get_address_from_alias_or_config(args.alias, hrp)
 
     proxy = _get_proxy(args)
@@ -128,7 +128,7 @@ def get_storage(args: Any):
     if args.address:
         address = Address.new_from_bech32(args.address)
     else:
-        hrp = cli_shared.get_address_hrp(args)
+        hrp = cli_shared.get_address_hrp_with_fallback(args)
         address = _get_address_from_alias_or_config(args.alias, hrp)
 
     proxy = _get_proxy(args)
@@ -146,7 +146,7 @@ def get_key(args: Any):
     if args.address:
         address = Address.new_from_bech32(args.address)
     else:
-        hrp = cli_shared.get_address_hrp(args)
+        hrp = cli_shared.get_address_hrp_with_fallback(args)
         address = _get_address_from_alias_or_config(args.alias, hrp)
 
     proxy = _get_proxy(args)
@@ -167,7 +167,7 @@ def get_token(args: Any):
     if args.address:
         address = Address.new_from_bech32(args.address)
     else:
-        hrp = cli_shared.get_address_hrp(args)
+        hrp = cli_shared.get_address_hrp_with_fallback(args)
         address = _get_address_from_alias_or_config(args.alias, hrp)
 
     proxy = _get_proxy(args)
