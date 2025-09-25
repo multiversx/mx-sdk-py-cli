@@ -362,7 +362,7 @@ def _has_options_set_for_hash_signing(args: Any) -> bool:
 
 
 def prepare_account(args: Any):
-    hrp = _get_address_hrp(args)
+    hrp = get_address_hrp_with_fallback(args)
 
     if args.pem:
         acc = Account.new_from_pem(file_path=Path(args.pem), index=args.sender_wallet_index, hrp=hrp)
@@ -449,7 +449,7 @@ def _load_wallet_from_wallet_config(wallet: dict[str, str], hrp: str) -> Account
         raise WalletError(f"Unsupported wallet file type: [{path.suffix}]. Supported types are: `.pem` and `.json`.")
 
 
-def _get_address_hrp(args: Any) -> str:
+def get_address_hrp_with_fallback(args: Any) -> str:
     """Use hrp provided by the user. If not provided, fetch from network. If proxy not provided, get hrp from config."""
     hrp: str = ""
 
@@ -485,7 +485,7 @@ def _get_hrp_from_api(args: Any) -> str:
 
 
 def load_guardian_account(args: Any) -> Union[IAccount, None]:
-    hrp = _get_address_hrp(args)
+    hrp = get_address_hrp_with_fallback(args)
 
     if args.guardian_pem:
         return Account.new_from_pem(file_path=Path(args.guardian_pem), index=args.guardian_wallet_index, hrp=hrp)
@@ -622,7 +622,7 @@ def _is_matching_address(account_address: Union[Address, None], args_address: Un
 
 
 def load_relayer_account(args: Any) -> Union[IAccount, None]:
-    hrp = _get_address_hrp(args)
+    hrp = get_address_hrp_with_fallback(args)
 
     if args.relayer_pem:
         return Account.new_from_pem(file_path=Path(args.relayer_pem), index=args.relayer_wallet_index, hrp=hrp)

@@ -18,7 +18,6 @@ from multiversx_sdk_cli.args_validation import (
 )
 from multiversx_sdk_cli.cli_output import CLIOutputBuilder
 from multiversx_sdk_cli.config import get_config_for_network_providers
-from multiversx_sdk_cli.config_env import get_address_hrp
 
 
 def setup_parser(args: list[str], subparsers: Any) -> Any:
@@ -197,7 +196,7 @@ def _ensure_args(args: Any):
 
 
 def _initialize_controller(args: Any) -> GovernanceController:
-    chain = args.chain if hasattr(args, "chain") else None
+    chain = getattr(args, "chain", None)
     chain_id = cli_shared.get_chain_id(args.proxy, chain)
     config = get_config_for_network_providers()
     proxy_url = args.proxy if args.proxy else ""
@@ -207,7 +206,7 @@ def _initialize_controller(args: Any) -> GovernanceController:
     return GovernanceController(
         chain_id=chain_id,
         network_provider=proxy,
-        address_hrp=get_address_hrp(),
+        address_hrp=cli_shared.get_address_hrp_with_fallback(args),
         gas_limit_estimator=gas_estimator,
     )
 
