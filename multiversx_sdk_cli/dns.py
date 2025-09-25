@@ -6,6 +6,7 @@ from multiversx_sdk import (
     AddressComputer,
     SmartContractQuery,
     SmartContractQueryResponse,
+    TransfersController,
 )
 
 from multiversx_sdk_cli import cli_shared
@@ -16,7 +17,6 @@ from multiversx_sdk_cli.args_validation import (
 )
 from multiversx_sdk_cli.config_env import get_address_hrp
 from multiversx_sdk_cli.constants import ADDRESS_ZERO_HEX
-from multiversx_sdk_cli.transactions import TransactionsController
 
 MaxNumShards = 256
 ShardIdentiferLen = 2
@@ -77,21 +77,26 @@ def register(args: Any):
 
     chain_id = cli_shared.get_chain_id(args.proxy, args.chain)
     gas_estimator = cli_shared.initialize_gas_limit_estimator(args)
-    controller = TransactionsController(chain_id=chain_id, gas_limit_estimator=gas_estimator)
+    controller = TransfersController(chain_id=chain_id, gas_limit_estimator=gas_estimator)
 
-    tx = controller.create_transaction(
+    tx = controller.create_transaction_for_native_token_transfer(
         sender=sender,
         receiver=receiver,
-        native_amount=native_amount,
+        native_transfer_amount=native_amount,
         gas_limit=args.gas_limit,
         gas_price=args.gas_price,
         nonce=sender.nonce,
-        version=args.version,
-        options=args.options,
-        data=data,
-        guardian_and_relayer_data=guardian_and_relayer_data,
+        data=data.encode(),
+        guardian=guardian_and_relayer_data.guardian_address,
+        relayer=guardian_and_relayer_data.relayer_address,
     )
 
+    cli_shared.alter_transaction_and_sign_again_if_needed(
+        args=args,
+        tx=tx,
+        sender=sender,
+        guardian_and_relayer_data=guardian_and_relayer_data,
+    )
     cli_shared.send_or_simulate(tx, args)
 
 
