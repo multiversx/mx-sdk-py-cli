@@ -5,7 +5,6 @@ from multiversx_sdk import (
     ProxyNetworkProvider,
     TokenManagementController,
     TokenType,
-    Transaction,
 )
 
 from multiversx_sdk_cli import cli_shared
@@ -13,9 +12,6 @@ from multiversx_sdk_cli.args_validation import (
     validate_broadcast_args,
     validate_chain_id_args,
 )
-from multiversx_sdk_cli.base_transactions_controller import BaseTransactionsController
-from multiversx_sdk_cli.guardian_relayer_data import GuardianRelayerData
-from multiversx_sdk_cli.interfaces import IAccount
 
 
 def setup_parser(args: list[str], subparsers: Any) -> Any:
@@ -837,18 +833,6 @@ def _initialize_controller(args: Any) -> TokenManagementController:
     )
 
 
-def _sign_transaction(transaction: Transaction, sender: IAccount, guardian_and_relayer_data: GuardianRelayerData):
-    base = BaseTransactionsController()
-    base.sign_transaction(
-        transaction=transaction,
-        sender=sender,
-        guardian=guardian_and_relayer_data.guardian,
-        relayer=guardian_and_relayer_data.relayer,
-        guardian_service_url=guardian_and_relayer_data.guardian_service_url,
-        guardian_2fa_code=guardian_and_relayer_data.guardian_2fa_code,
-    )
-
-
 def issue_fungible(args: Any):
     _ensure_args(args)
 
@@ -878,7 +862,12 @@ def issue_fungible(args: Any):
         gas_price=args.gas_price,
     )
 
-    _sign_transaction(transaction, sender, guardian_and_relayer_data)
+    cli_shared.alter_transaction_and_sign_again_if_needed(
+        args=args,
+        tx=transaction,
+        sender=sender,
+        guardian_and_relayer_data=guardian_and_relayer_data,
+    )
     cli_shared.send_or_simulate(transaction, args)
 
 
@@ -910,7 +899,12 @@ def issue_semi_fungible(args: Any):
         gas_price=args.gas_price,
     )
 
-    _sign_transaction(transaction, sender, guardian_and_relayer_data)
+    cli_shared.alter_transaction_and_sign_again_if_needed(
+        args=args,
+        tx=transaction,
+        sender=sender,
+        guardian_and_relayer_data=guardian_and_relayer_data,
+    )
     cli_shared.send_or_simulate(transaction, args)
 
 
@@ -942,7 +936,12 @@ def issue_non_fungible(args: Any):
         gas_price=args.gas_price,
     )
 
-    _sign_transaction(transaction, sender, guardian_and_relayer_data)
+    cli_shared.alter_transaction_and_sign_again_if_needed(
+        args=args,
+        tx=transaction,
+        sender=sender,
+        guardian_and_relayer_data=guardian_and_relayer_data,
+    )
     cli_shared.send_or_simulate(transaction, args)
 
 
@@ -975,7 +974,12 @@ def register_meta_esdt(args: Any):
         gas_price=args.gas_price,
     )
 
-    _sign_transaction(transaction, sender, guardian_and_relayer_data)
+    cli_shared.alter_transaction_and_sign_again_if_needed(
+        args=args,
+        tx=transaction,
+        sender=sender,
+        guardian_and_relayer_data=guardian_and_relayer_data,
+    )
     cli_shared.send_or_simulate(transaction, args)
 
 
@@ -1004,7 +1008,12 @@ def register_and_set_all_roles(args: Any):
         gas_price=args.gas_price,
     )
 
-    _sign_transaction(transaction, sender, guardian_and_relayer_data)
+    cli_shared.alter_transaction_and_sign_again_if_needed(
+        args=args,
+        tx=transaction,
+        sender=sender,
+        guardian_and_relayer_data=guardian_and_relayer_data,
+    )
     cli_shared.send_or_simulate(transaction, args)
 
 
@@ -1028,7 +1037,12 @@ def set_burn_role_globally(args: Any):
         gas_price=args.gas_price,
     )
 
-    _sign_transaction(transaction, sender, guardian_and_relayer_data)
+    cli_shared.alter_transaction_and_sign_again_if_needed(
+        args=args,
+        tx=transaction,
+        sender=sender,
+        guardian_and_relayer_data=guardian_and_relayer_data,
+    )
     cli_shared.send_or_simulate(transaction, args)
 
 
@@ -1052,7 +1066,12 @@ def unset_burn_role_globally(args: Any):
         gas_price=args.gas_price,
     )
 
-    _sign_transaction(transaction, sender, guardian_and_relayer_data)
+    cli_shared.alter_transaction_and_sign_again_if_needed(
+        args=args,
+        tx=transaction,
+        sender=sender,
+        guardian_and_relayer_data=guardian_and_relayer_data,
+    )
     cli_shared.send_or_simulate(transaction, args)
 
 
@@ -1080,7 +1099,12 @@ def set_special_role_on_fungible(args: Any):
         gas_price=args.gas_price,
     )
 
-    _sign_transaction(transaction, sender, guardian_and_relayer_data)
+    cli_shared.alter_transaction_and_sign_again_if_needed(
+        args=args,
+        tx=transaction,
+        sender=sender,
+        guardian_and_relayer_data=guardian_and_relayer_data,
+    )
     cli_shared.send_or_simulate(transaction, args)
 
 
@@ -1108,7 +1132,12 @@ def unset_special_role_on_fungible(args: Any):
         gas_price=args.gas_price,
     )
 
-    _sign_transaction(transaction, sender, guardian_and_relayer_data)
+    cli_shared.alter_transaction_and_sign_again_if_needed(
+        args=args,
+        tx=transaction,
+        sender=sender,
+        guardian_and_relayer_data=guardian_and_relayer_data,
+    )
     cli_shared.send_or_simulate(transaction, args)
 
 
@@ -1142,7 +1171,12 @@ def set_special_role_on_semi_fungible(args: Any):
         gas_price=args.gas_price,
     )
 
-    _sign_transaction(transaction, sender, guardian_and_relayer_data)
+    cli_shared.alter_transaction_and_sign_again_if_needed(
+        args=args,
+        tx=transaction,
+        sender=sender,
+        guardian_and_relayer_data=guardian_and_relayer_data,
+    )
     cli_shared.send_or_simulate(transaction, args)
 
 
@@ -1175,7 +1209,12 @@ def unset_special_role_on_semi_fungible(args: Any):
         gas_price=args.gas_price,
     )
 
-    _sign_transaction(transaction, sender, guardian_and_relayer_data)
+    cli_shared.alter_transaction_and_sign_again_if_needed(
+        args=args,
+        tx=transaction,
+        sender=sender,
+        guardian_and_relayer_data=guardian_and_relayer_data,
+    )
     cli_shared.send_or_simulate(transaction, args)
 
 
@@ -1204,7 +1243,12 @@ def set_special_role_on_meta_esdt(args: Any):
         gas_price=args.gas_price,
     )
 
-    _sign_transaction(transaction, sender, guardian_and_relayer_data)
+    cli_shared.alter_transaction_and_sign_again_if_needed(
+        args=args,
+        tx=transaction,
+        sender=sender,
+        guardian_and_relayer_data=guardian_and_relayer_data,
+    )
     cli_shared.send_or_simulate(transaction, args)
 
 
@@ -1232,7 +1276,12 @@ def unset_special_role_on_meta_esdt(args: Any):
         gas_price=args.gas_price,
     )
 
-    _sign_transaction(transaction, sender, guardian_and_relayer_data)
+    cli_shared.alter_transaction_and_sign_again_if_needed(
+        args=args,
+        tx=transaction,
+        sender=sender,
+        guardian_and_relayer_data=guardian_and_relayer_data,
+    )
     cli_shared.send_or_simulate(transaction, args)
 
 
@@ -1267,7 +1316,12 @@ def set_special_role_on_nft(args: Any):
         gas_price=args.gas_price,
     )
 
-    _sign_transaction(transaction, sender, guardian_and_relayer_data)
+    cli_shared.alter_transaction_and_sign_again_if_needed(
+        args=args,
+        tx=transaction,
+        sender=sender,
+        guardian_and_relayer_data=guardian_and_relayer_data,
+    )
     cli_shared.send_or_simulate(transaction, args)
 
 
@@ -1301,7 +1355,12 @@ def unset_special_role_on_nft(args: Any):
         gas_price=args.gas_price,
     )
 
-    _sign_transaction(transaction, sender, guardian_and_relayer_data)
+    cli_shared.alter_transaction_and_sign_again_if_needed(
+        args=args,
+        tx=transaction,
+        sender=sender,
+        guardian_and_relayer_data=guardian_and_relayer_data,
+    )
     cli_shared.send_or_simulate(transaction, args)
 
 
@@ -1331,7 +1390,12 @@ def create_nft(args: Any):
         gas_price=args.gas_price,
     )
 
-    _sign_transaction(transaction, sender, guardian_and_relayer_data)
+    cli_shared.alter_transaction_and_sign_again_if_needed(
+        args=args,
+        tx=transaction,
+        sender=sender,
+        guardian_and_relayer_data=guardian_and_relayer_data,
+    )
     cli_shared.send_or_simulate(transaction, args)
 
 
@@ -1355,7 +1419,12 @@ def pause_token(args: Any):
         gas_price=args.gas_price,
     )
 
-    _sign_transaction(transaction, sender, guardian_and_relayer_data)
+    cli_shared.alter_transaction_and_sign_again_if_needed(
+        args=args,
+        tx=transaction,
+        sender=sender,
+        guardian_and_relayer_data=guardian_and_relayer_data,
+    )
     cli_shared.send_or_simulate(transaction, args)
 
 
@@ -1379,7 +1448,12 @@ def unpause_token(args: Any):
         gas_price=args.gas_price,
     )
 
-    _sign_transaction(transaction, sender, guardian_and_relayer_data)
+    cli_shared.alter_transaction_and_sign_again_if_needed(
+        args=args,
+        tx=transaction,
+        sender=sender,
+        guardian_and_relayer_data=guardian_and_relayer_data,
+    )
     cli_shared.send_or_simulate(transaction, args)
 
 
@@ -1404,7 +1478,12 @@ def freeze_token(args: Any):
         gas_price=args.gas_price,
     )
 
-    _sign_transaction(transaction, sender, guardian_and_relayer_data)
+    cli_shared.alter_transaction_and_sign_again_if_needed(
+        args=args,
+        tx=transaction,
+        sender=sender,
+        guardian_and_relayer_data=guardian_and_relayer_data,
+    )
     cli_shared.send_or_simulate(transaction, args)
 
 
@@ -1429,7 +1508,12 @@ def unfreeze_token(args: Any):
         gas_price=args.gas_price,
     )
 
-    _sign_transaction(transaction, sender, guardian_and_relayer_data)
+    cli_shared.alter_transaction_and_sign_again_if_needed(
+        args=args,
+        tx=transaction,
+        sender=sender,
+        guardian_and_relayer_data=guardian_and_relayer_data,
+    )
     cli_shared.send_or_simulate(transaction, args)
 
 
@@ -1454,7 +1538,12 @@ def wipe_token(args: Any):
         gas_price=args.gas_price,
     )
 
-    _sign_transaction(transaction, sender, guardian_and_relayer_data)
+    cli_shared.alter_transaction_and_sign_again_if_needed(
+        args=args,
+        tx=transaction,
+        sender=sender,
+        guardian_and_relayer_data=guardian_and_relayer_data,
+    )
     cli_shared.send_or_simulate(transaction, args)
 
 
@@ -1479,7 +1568,12 @@ def local_mint(args: Any):
         gas_price=args.gas_price,
     )
 
-    _sign_transaction(transaction, sender, guardian_and_relayer_data)
+    cli_shared.alter_transaction_and_sign_again_if_needed(
+        args=args,
+        tx=transaction,
+        sender=sender,
+        guardian_and_relayer_data=guardian_and_relayer_data,
+    )
     cli_shared.send_or_simulate(transaction, args)
 
 
@@ -1504,7 +1598,12 @@ def local_burn(args: Any):
         gas_price=args.gas_price,
     )
 
-    _sign_transaction(transaction, sender, guardian_and_relayer_data)
+    cli_shared.alter_transaction_and_sign_again_if_needed(
+        args=args,
+        tx=transaction,
+        sender=sender,
+        guardian_and_relayer_data=guardian_and_relayer_data,
+    )
     cli_shared.send_or_simulate(transaction, args)
 
 
@@ -1530,7 +1629,12 @@ def update_attributes(args: Any):
         gas_price=args.gas_price,
     )
 
-    _sign_transaction(transaction, sender, guardian_and_relayer_data)
+    cli_shared.alter_transaction_and_sign_again_if_needed(
+        args=args,
+        tx=transaction,
+        sender=sender,
+        guardian_and_relayer_data=guardian_and_relayer_data,
+    )
     cli_shared.send_or_simulate(transaction, args)
 
 
@@ -1556,7 +1660,12 @@ def add_quantity(args: Any):
         gas_price=args.gas_price,
     )
 
-    _sign_transaction(transaction, sender, guardian_and_relayer_data)
+    cli_shared.alter_transaction_and_sign_again_if_needed(
+        args=args,
+        tx=transaction,
+        sender=sender,
+        guardian_and_relayer_data=guardian_and_relayer_data,
+    )
     cli_shared.send_or_simulate(transaction, args)
 
 
@@ -1582,7 +1691,12 @@ def burn_quantity(args: Any):
         gas_price=args.gas_price,
     )
 
-    _sign_transaction(transaction, sender, guardian_and_relayer_data)
+    cli_shared.alter_transaction_and_sign_again_if_needed(
+        args=args,
+        tx=transaction,
+        sender=sender,
+        guardian_and_relayer_data=guardian_and_relayer_data,
+    )
     cli_shared.send_or_simulate(transaction, args)
 
 
@@ -1608,7 +1722,12 @@ def modify_royalties(args: Any):
         gas_price=args.gas_price,
     )
 
-    _sign_transaction(transaction, sender, guardian_and_relayer_data)
+    cli_shared.alter_transaction_and_sign_again_if_needed(
+        args=args,
+        tx=transaction,
+        sender=sender,
+        guardian_and_relayer_data=guardian_and_relayer_data,
+    )
     cli_shared.send_or_simulate(transaction, args)
 
 
@@ -1634,7 +1753,12 @@ def set_new_uris(args: Any):
         gas_price=args.gas_price,
     )
 
-    _sign_transaction(transaction, sender, guardian_and_relayer_data)
+    cli_shared.alter_transaction_and_sign_again_if_needed(
+        args=args,
+        tx=transaction,
+        sender=sender,
+        guardian_and_relayer_data=guardian_and_relayer_data,
+    )
     cli_shared.send_or_simulate(transaction, args)
 
 
@@ -1659,7 +1783,12 @@ def modify_creator(args: Any):
         gas_price=args.gas_price,
     )
 
-    _sign_transaction(transaction, sender, guardian_and_relayer_data)
+    cli_shared.alter_transaction_and_sign_again_if_needed(
+        args=args,
+        tx=transaction,
+        sender=sender,
+        guardian_and_relayer_data=guardian_and_relayer_data,
+    )
     cli_shared.send_or_simulate(transaction, args)
 
 
@@ -1689,7 +1818,12 @@ def update_metadata(args: Any):
         gas_price=args.gas_price,
     )
 
-    _sign_transaction(transaction, sender, guardian_and_relayer_data)
+    cli_shared.alter_transaction_and_sign_again_if_needed(
+        args=args,
+        tx=transaction,
+        sender=sender,
+        guardian_and_relayer_data=guardian_and_relayer_data,
+    )
     cli_shared.send_or_simulate(transaction, args)
 
 
@@ -1719,7 +1853,12 @@ def nft_metadata_recreate(args: Any):
         gas_price=args.gas_price,
     )
 
-    _sign_transaction(transaction, sender, guardian_and_relayer_data)
+    cli_shared.alter_transaction_and_sign_again_if_needed(
+        args=args,
+        tx=transaction,
+        sender=sender,
+        guardian_and_relayer_data=guardian_and_relayer_data,
+    )
     cli_shared.send_or_simulate(transaction, args)
 
 
@@ -1743,7 +1882,12 @@ def change_to_dynamic(args: Any):
         gas_price=args.gas_price,
     )
 
-    _sign_transaction(transaction, sender, guardian_and_relayer_data)
+    cli_shared.alter_transaction_and_sign_again_if_needed(
+        args=args,
+        tx=transaction,
+        sender=sender,
+        guardian_and_relayer_data=guardian_and_relayer_data,
+    )
     cli_shared.send_or_simulate(transaction, args)
 
 
@@ -1767,7 +1911,12 @@ def update_token_id(args: Any):
         gas_price=args.gas_price,
     )
 
-    _sign_transaction(transaction, sender, guardian_and_relayer_data)
+    cli_shared.alter_transaction_and_sign_again_if_needed(
+        args=args,
+        tx=transaction,
+        sender=sender,
+        guardian_and_relayer_data=guardian_and_relayer_data,
+    )
     cli_shared.send_or_simulate(transaction, args)
 
 
@@ -1796,7 +1945,12 @@ def register_dynamic_token(args: Any):
         gas_price=args.gas_price,
     )
 
-    _sign_transaction(transaction, sender, guardian_and_relayer_data)
+    cli_shared.alter_transaction_and_sign_again_if_needed(
+        args=args,
+        tx=transaction,
+        sender=sender,
+        guardian_and_relayer_data=guardian_and_relayer_data,
+    )
     cli_shared.send_or_simulate(transaction, args)
 
 
@@ -1825,7 +1979,12 @@ def register_dynamic_and_set_all_roles(args: Any):
         gas_price=args.gas_price,
     )
 
-    _sign_transaction(transaction, sender, guardian_and_relayer_data)
+    cli_shared.alter_transaction_and_sign_again_if_needed(
+        args=args,
+        tx=transaction,
+        sender=sender,
+        guardian_and_relayer_data=guardian_and_relayer_data,
+    )
     cli_shared.send_or_simulate(transaction, args)
 
 
@@ -1850,7 +2009,12 @@ def transfer_ownership(args: Any):
         gas_price=args.gas_price,
     )
 
-    _sign_transaction(transaction, sender, guardian_and_relayer_data)
+    cli_shared.alter_transaction_and_sign_again_if_needed(
+        args=args,
+        tx=transaction,
+        sender=sender,
+        guardian_and_relayer_data=guardian_and_relayer_data,
+    )
     cli_shared.send_or_simulate(transaction, args)
 
 
@@ -1876,7 +2040,12 @@ def freeze_single_nft(args: Any):
         gas_price=args.gas_price,
     )
 
-    _sign_transaction(transaction, sender, guardian_and_relayer_data)
+    cli_shared.alter_transaction_and_sign_again_if_needed(
+        args=args,
+        tx=transaction,
+        sender=sender,
+        guardian_and_relayer_data=guardian_and_relayer_data,
+    )
     cli_shared.send_or_simulate(transaction, args)
 
 
@@ -1902,7 +2071,12 @@ def unfreeze_single_nft(args: Any):
         gas_price=args.gas_price,
     )
 
-    _sign_transaction(transaction, sender, guardian_and_relayer_data)
+    cli_shared.alter_transaction_and_sign_again_if_needed(
+        args=args,
+        tx=transaction,
+        sender=sender,
+        guardian_and_relayer_data=guardian_and_relayer_data,
+    )
     cli_shared.send_or_simulate(transaction, args)
 
 
@@ -1927,7 +2101,12 @@ def change_sft_to_meta_esdt(args: Any):
         gas_price=args.gas_price,
     )
 
-    _sign_transaction(transaction, sender, guardian_and_relayer_data)
+    cli_shared.alter_transaction_and_sign_again_if_needed(
+        args=args,
+        tx=transaction,
+        sender=sender,
+        guardian_and_relayer_data=guardian_and_relayer_data,
+    )
     cli_shared.send_or_simulate(transaction, args)
 
 
@@ -1952,7 +2131,12 @@ def transfer_nft_create_role(args: Any):
         gas_price=args.gas_price,
     )
 
-    _sign_transaction(transaction, sender, guardian_and_relayer_data)
+    cli_shared.alter_transaction_and_sign_again_if_needed(
+        args=args,
+        tx=transaction,
+        sender=sender,
+        guardian_and_relayer_data=guardian_and_relayer_data,
+    )
     cli_shared.send_or_simulate(transaction, args)
 
 
@@ -1976,7 +2160,12 @@ def stop_nft_creation(args: Any):
         gas_price=args.gas_price,
     )
 
-    _sign_transaction(transaction, sender, guardian_and_relayer_data)
+    cli_shared.alter_transaction_and_sign_again_if_needed(
+        args=args,
+        tx=transaction,
+        sender=sender,
+        guardian_and_relayer_data=guardian_and_relayer_data,
+    )
     cli_shared.send_or_simulate(transaction, args)
 
 
@@ -2002,7 +2191,12 @@ def wipe_single_nft(args: Any):
         gas_price=args.gas_price,
     )
 
-    _sign_transaction(transaction, sender, guardian_and_relayer_data)
+    cli_shared.alter_transaction_and_sign_again_if_needed(
+        args=args,
+        tx=transaction,
+        sender=sender,
+        guardian_and_relayer_data=guardian_and_relayer_data,
+    )
     cli_shared.send_or_simulate(transaction, args)
 
 
@@ -2028,5 +2222,10 @@ def add_uris(args: Any):
         gas_price=args.gas_price,
     )
 
-    _sign_transaction(transaction, sender, guardian_and_relayer_data)
+    cli_shared.alter_transaction_and_sign_again_if_needed(
+        args=args,
+        tx=transaction,
+        sender=sender,
+        guardian_and_relayer_data=guardian_and_relayer_data,
+    )
     cli_shared.send_or_simulate(transaction, args)
