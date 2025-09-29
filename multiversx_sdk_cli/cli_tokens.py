@@ -319,7 +319,7 @@ def setup_parser(args: list[str], subparsers: Any) -> Any:
     )
     _add_token_identifier_arg(sub)
     sub.add_argument("--token-nonce", required=True, type=int, help="The nonce of the token as decimal value")
-    sub.add_argument("--royalties", required=True, type=int, help="The new token royalties (e.g. 1234 for 12.34%)")
+    sub.add_argument("--royalties", required=True, type=int, help="The new token royalties (e.g. 1234 for 12.34%%)")
     add_common_args(args, sub)
     sub.set_defaults(func=modify_royalties)
 

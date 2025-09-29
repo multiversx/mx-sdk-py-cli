@@ -23,7 +23,7 @@ See:
 
 
 COMMAND GROUPS:
-  {config-wallet,contract,tx,validator,ledger,wallet,validator-wallet,deps,config,localnet,data,staking-provider,dns,faucet,multisig,governance,config-env,get}
+  {config-wallet,contract,tx,validator,ledger,wallet,validator-wallet,deps,config,localnet,data,staking-provider,dns,faucet,multisig,governance,config-env,get,token}
 
 TOP-LEVEL OPTIONS:
   -h, --help            show this help message and exit
@@ -53,6 +53,7 @@ multisig                       Deploy and interact with the Multisig Smart Contr
 governance                     Propose, vote and interact with the governance contract.
 config-env                     Configure MultiversX CLI to use specific environment values.
 get                            Get info from the network.
+token                          Perform token management operations (issue tokens, create NFTs, set roles, etc.)
 
 ```
 ## Group **Contract**
@@ -144,6 +145,8 @@ options:
                                                  network.
   --gas-price GAS_PRICE                          ⛽ the gas price (default: 1000000000)
   --gas-limit GAS_LIMIT                          ⛽ the gas limit
+  --gas-limit-multiplier GAS_LIMIT_MULTIPLIER    if `--gas-limit` is not provided, the estimated value will be
+                                                 multiplied by this multiplier (e.g 1.1)
   --value VALUE                                  the value to transfer (default: 0)
   --chain CHAIN                                  the chain identifier
   --version VERSION                              the transaction version (default: 2)
@@ -237,6 +240,8 @@ options:
                                                   network.
   --gas-price GAS_PRICE                           ⛽ the gas price (default: 1000000000)
   --gas-limit GAS_LIMIT                           ⛽ the gas limit
+  --gas-limit-multiplier GAS_LIMIT_MULTIPLIER     if `--gas-limit` is not provided, the estimated value will be
+                                                  multiplied by this multiplier (e.g 1.1)
   --value VALUE                                   the value to transfer (default: 0)
   --chain CHAIN                                   the chain identifier
   --version VERSION                               the transaction version (default: 2)
@@ -340,6 +345,8 @@ options:
                                                  network.
   --gas-price GAS_PRICE                          ⛽ the gas price (default: 1000000000)
   --gas-limit GAS_LIMIT                          ⛽ the gas limit
+  --gas-limit-multiplier GAS_LIMIT_MULTIPLIER    if `--gas-limit` is not provided, the estimated value will be
+                                                 multiplied by this multiplier (e.g 1.1)
   --value VALUE                                  the value to transfer (default: 0)
   --chain CHAIN                                  the chain identifier
   --version VERSION                              the transaction version (default: 2)
@@ -551,6 +558,8 @@ options:
   --receiver-username RECEIVER_USERNAME           🖄 the username of the receiver
   --gas-price GAS_PRICE                           ⛽ the gas price (default: 1000000000)
   --gas-limit GAS_LIMIT                           ⛽ the gas limit
+  --gas-limit-multiplier GAS_LIMIT_MULTIPLIER     if `--gas-limit` is not provided, the estimated value will be
+                                                  multiplied by this multiplier (e.g 1.1)
   --value VALUE                                   the value to transfer (default: 0)
   --data DATA                                     the payload, or 'memo' of the transaction (default: )
   --chain CHAIN                                   the chain identifier
@@ -771,6 +780,8 @@ options:
                                                  network.
   --gas-price GAS_PRICE                          ⛽ the gas price (default: 1000000000)
   --gas-limit GAS_LIMIT                          ⛽ the gas limit
+  --gas-limit-multiplier GAS_LIMIT_MULTIPLIER    if `--gas-limit` is not provided, the estimated value will be
+                                                 multiplied by this multiplier (e.g 1.1)
   --value VALUE                                  the value to transfer (default: 0)
   --chain CHAIN                                  the chain identifier
   --version VERSION                              the transaction version (default: 2)
@@ -827,6 +838,8 @@ options:
                                                  network.
   --gas-price GAS_PRICE                          ⛽ the gas price (default: 1000000000)
   --gas-limit GAS_LIMIT                          ⛽ the gas limit
+  --gas-limit-multiplier GAS_LIMIT_MULTIPLIER    if `--gas-limit` is not provided, the estimated value will be
+                                                 multiplied by this multiplier (e.g 1.1)
   --value VALUE                                  the value to transfer (default: 0)
   --chain CHAIN                                  the chain identifier
   --version VERSION                              the transaction version (default: 2)
@@ -881,6 +894,8 @@ options:
                                                  network.
   --gas-price GAS_PRICE                          ⛽ the gas price (default: 1000000000)
   --gas-limit GAS_LIMIT                          ⛽ the gas limit
+  --gas-limit-multiplier GAS_LIMIT_MULTIPLIER    if `--gas-limit` is not provided, the estimated value will be
+                                                 multiplied by this multiplier (e.g 1.1)
   --value VALUE                                  the value to transfer (default: 0)
   --chain CHAIN                                  the chain identifier
   --version VERSION                              the transaction version (default: 2)
@@ -935,6 +950,8 @@ options:
                                                  network.
   --gas-price GAS_PRICE                          ⛽ the gas price (default: 1000000000)
   --gas-limit GAS_LIMIT                          ⛽ the gas limit
+  --gas-limit-multiplier GAS_LIMIT_MULTIPLIER    if `--gas-limit` is not provided, the estimated value will be
+                                                 multiplied by this multiplier (e.g 1.1)
   --value VALUE                                  the value to transfer (default: 0)
   --chain CHAIN                                  the chain identifier
   --version VERSION                              the transaction version (default: 2)
@@ -989,6 +1006,8 @@ options:
                                                  network.
   --gas-price GAS_PRICE                          ⛽ the gas price (default: 1000000000)
   --gas-limit GAS_LIMIT                          ⛽ the gas limit
+  --gas-limit-multiplier GAS_LIMIT_MULTIPLIER    if `--gas-limit` is not provided, the estimated value will be
+                                                 multiplied by this multiplier (e.g 1.1)
   --value VALUE                                  the value to transfer (default: 0)
   --chain CHAIN                                  the chain identifier
   --version VERSION                              the transaction version (default: 2)
@@ -1043,6 +1062,8 @@ options:
                                                  network.
   --gas-price GAS_PRICE                          ⛽ the gas price (default: 1000000000)
   --gas-limit GAS_LIMIT                          ⛽ the gas limit
+  --gas-limit-multiplier GAS_LIMIT_MULTIPLIER    if `--gas-limit` is not provided, the estimated value will be
+                                                 multiplied by this multiplier (e.g 1.1)
   --value VALUE                                  the value to transfer (default: 0)
   --chain CHAIN                                  the chain identifier
   --version VERSION                              the transaction version (default: 2)
@@ -1096,6 +1117,8 @@ options:
                                                  network.
   --gas-price GAS_PRICE                          ⛽ the gas price (default: 1000000000)
   --gas-limit GAS_LIMIT                          ⛽ the gas limit
+  --gas-limit-multiplier GAS_LIMIT_MULTIPLIER    if `--gas-limit` is not provided, the estimated value will be
+                                                 multiplied by this multiplier (e.g 1.1)
   --value VALUE                                  the value to transfer (default: 0)
   --chain CHAIN                                  the chain identifier
   --version VERSION                              the transaction version (default: 2)
@@ -1150,6 +1173,8 @@ options:
                                                  network.
   --gas-price GAS_PRICE                          ⛽ the gas price (default: 1000000000)
   --gas-limit GAS_LIMIT                          ⛽ the gas limit
+  --gas-limit-multiplier GAS_LIMIT_MULTIPLIER    if `--gas-limit` is not provided, the estimated value will be
+                                                 multiplied by this multiplier (e.g 1.1)
   --value VALUE                                  the value to transfer (default: 0)
   --chain CHAIN                                  the chain identifier
   --version VERSION                              the transaction version (default: 2)
@@ -1204,6 +1229,8 @@ options:
                                                  network.
   --gas-price GAS_PRICE                          ⛽ the gas price (default: 1000000000)
   --gas-limit GAS_LIMIT                          ⛽ the gas limit
+  --gas-limit-multiplier GAS_LIMIT_MULTIPLIER    if `--gas-limit` is not provided, the estimated value will be
+                                                 multiplied by this multiplier (e.g 1.1)
   --value VALUE                                  the value to transfer (default: 0)
   --chain CHAIN                                  the chain identifier
   --version VERSION                              the transaction version (default: 2)
@@ -1258,6 +1285,8 @@ options:
                                                  network.
   --gas-price GAS_PRICE                          ⛽ the gas price (default: 1000000000)
   --gas-limit GAS_LIMIT                          ⛽ the gas limit
+  --gas-limit-multiplier GAS_LIMIT_MULTIPLIER    if `--gas-limit` is not provided, the estimated value will be
+                                                 multiplied by this multiplier (e.g 1.1)
   --value VALUE                                  the value to transfer (default: 0)
   --chain CHAIN                                  the chain identifier
   --version VERSION                              the transaction version (default: 2)
@@ -1312,6 +1341,8 @@ options:
                                                  network.
   --gas-price GAS_PRICE                          ⛽ the gas price (default: 1000000000)
   --gas-limit GAS_LIMIT                          ⛽ the gas limit
+  --gas-limit-multiplier GAS_LIMIT_MULTIPLIER    if `--gas-limit` is not provided, the estimated value will be
+                                                 multiplied by this multiplier (e.g 1.1)
   --value VALUE                                  the value to transfer (default: 0)
   --chain CHAIN                                  the chain identifier
   --version VERSION                              the transaction version (default: 2)
@@ -1365,6 +1396,8 @@ options:
                                                  network.
   --gas-price GAS_PRICE                          ⛽ the gas price (default: 1000000000)
   --gas-limit GAS_LIMIT                          ⛽ the gas limit
+  --gas-limit-multiplier GAS_LIMIT_MULTIPLIER    if `--gas-limit` is not provided, the estimated value will be
+                                                 multiplied by this multiplier (e.g 1.1)
   --value VALUE                                  the value to transfer (default: 0)
   --chain CHAIN                                  the chain identifier
   --version VERSION                              the transaction version (default: 2)
@@ -1458,6 +1491,8 @@ options:
                                                  network.
   --gas-price GAS_PRICE                          ⛽ the gas price (default: 1000000000)
   --gas-limit GAS_LIMIT                          ⛽ the gas limit
+  --gas-limit-multiplier GAS_LIMIT_MULTIPLIER    if `--gas-limit` is not provided, the estimated value will be
+                                                 multiplied by this multiplier (e.g 1.1)
   --value VALUE                                  the value to transfer (default: 0)
   --chain CHAIN                                  the chain identifier
   --version VERSION                              the transaction version (default: 2)
@@ -1530,6 +1565,8 @@ options:
                                                  network.
   --gas-price GAS_PRICE                          ⛽ the gas price (default: 1000000000)
   --gas-limit GAS_LIMIT                          ⛽ the gas limit
+  --gas-limit-multiplier GAS_LIMIT_MULTIPLIER    if `--gas-limit` is not provided, the estimated value will be
+                                                 multiplied by this multiplier (e.g 1.1)
   --value VALUE                                  the value to transfer (default: 0)
   --chain CHAIN                                  the chain identifier
   --version VERSION                              the transaction version (default: 2)
@@ -1586,6 +1623,8 @@ options:
                                                  network.
   --gas-price GAS_PRICE                          ⛽ the gas price (default: 1000000000)
   --gas-limit GAS_LIMIT                          ⛽ the gas limit
+  --gas-limit-multiplier GAS_LIMIT_MULTIPLIER    if `--gas-limit` is not provided, the estimated value will be
+                                                 multiplied by this multiplier (e.g 1.1)
   --value VALUE                                  the value to transfer (default: 0)
   --chain CHAIN                                  the chain identifier
   --version VERSION                              the transaction version (default: 2)
@@ -1642,6 +1681,8 @@ options:
                                                  network.
   --gas-price GAS_PRICE                          ⛽ the gas price (default: 1000000000)
   --gas-limit GAS_LIMIT                          ⛽ the gas limit
+  --gas-limit-multiplier GAS_LIMIT_MULTIPLIER    if `--gas-limit` is not provided, the estimated value will be
+                                                 multiplied by this multiplier (e.g 1.1)
   --value VALUE                                  the value to transfer (default: 0)
   --chain CHAIN                                  the chain identifier
   --version VERSION                              the transaction version (default: 2)
@@ -1698,6 +1739,8 @@ options:
                                                  network.
   --gas-price GAS_PRICE                          ⛽ the gas price (default: 1000000000)
   --gas-limit GAS_LIMIT                          ⛽ the gas limit
+  --gas-limit-multiplier GAS_LIMIT_MULTIPLIER    if `--gas-limit` is not provided, the estimated value will be
+                                                 multiplied by this multiplier (e.g 1.1)
   --value VALUE                                  the value to transfer (default: 0)
   --chain CHAIN                                  the chain identifier
   --version VERSION                              the transaction version (default: 2)
@@ -1754,6 +1797,8 @@ options:
                                                  network.
   --gas-price GAS_PRICE                          ⛽ the gas price (default: 1000000000)
   --gas-limit GAS_LIMIT                          ⛽ the gas limit
+  --gas-limit-multiplier GAS_LIMIT_MULTIPLIER    if `--gas-limit` is not provided, the estimated value will be
+                                                 multiplied by this multiplier (e.g 1.1)
   --value VALUE                                  the value to transfer (default: 0)
   --chain CHAIN                                  the chain identifier
   --version VERSION                              the transaction version (default: 2)
@@ -1810,6 +1855,8 @@ options:
                                                  network.
   --gas-price GAS_PRICE                          ⛽ the gas price (default: 1000000000)
   --gas-limit GAS_LIMIT                          ⛽ the gas limit
+  --gas-limit-multiplier GAS_LIMIT_MULTIPLIER    if `--gas-limit` is not provided, the estimated value will be
+                                                 multiplied by this multiplier (e.g 1.1)
   --value VALUE                                  the value to transfer (default: 0)
   --chain CHAIN                                  the chain identifier
   --version VERSION                              the transaction version (default: 2)
@@ -1864,6 +1911,8 @@ options:
                                                  network.
   --gas-price GAS_PRICE                          ⛽ the gas price (default: 1000000000)
   --gas-limit GAS_LIMIT                          ⛽ the gas limit
+  --gas-limit-multiplier GAS_LIMIT_MULTIPLIER    if `--gas-limit` is not provided, the estimated value will be
+                                                 multiplied by this multiplier (e.g 1.1)
   --value VALUE                                  the value to transfer (default: 0)
   --chain CHAIN                                  the chain identifier
   --version VERSION                              the transaction version (default: 2)
@@ -1918,6 +1967,8 @@ options:
                                                  network.
   --gas-price GAS_PRICE                          ⛽ the gas price (default: 1000000000)
   --gas-limit GAS_LIMIT                          ⛽ the gas limit
+  --gas-limit-multiplier GAS_LIMIT_MULTIPLIER    if `--gas-limit` is not provided, the estimated value will be
+                                                 multiplied by this multiplier (e.g 1.1)
   --value VALUE                                  the value to transfer (default: 0)
   --chain CHAIN                                  the chain identifier
   --version VERSION                              the transaction version (default: 2)
@@ -1972,6 +2023,8 @@ options:
                                                  network.
   --gas-price GAS_PRICE                          ⛽ the gas price (default: 1000000000)
   --gas-limit GAS_LIMIT                          ⛽ the gas limit
+  --gas-limit-multiplier GAS_LIMIT_MULTIPLIER    if `--gas-limit` is not provided, the estimated value will be
+                                                 multiplied by this multiplier (e.g 1.1)
   --value VALUE                                  the value to transfer (default: 0)
   --chain CHAIN                                  the chain identifier
   --version VERSION                              the transaction version (default: 2)
@@ -2026,6 +2079,8 @@ options:
                                                  network.
   --gas-price GAS_PRICE                          ⛽ the gas price (default: 1000000000)
   --gas-limit GAS_LIMIT                          ⛽ the gas limit
+  --gas-limit-multiplier GAS_LIMIT_MULTIPLIER    if `--gas-limit` is not provided, the estimated value will be
+                                                 multiplied by this multiplier (e.g 1.1)
   --value VALUE                                  the value to transfer (default: 0)
   --chain CHAIN                                  the chain identifier
   --version VERSION                              the transaction version (default: 2)
@@ -2080,6 +2135,8 @@ options:
                                                  network.
   --gas-price GAS_PRICE                          ⛽ the gas price (default: 1000000000)
   --gas-limit GAS_LIMIT                          ⛽ the gas limit
+  --gas-limit-multiplier GAS_LIMIT_MULTIPLIER    if `--gas-limit` is not provided, the estimated value will be
+                                                 multiplied by this multiplier (e.g 1.1)
   --value VALUE                                  the value to transfer (default: 0)
   --chain CHAIN                                  the chain identifier
   --version VERSION                              the transaction version (default: 2)
@@ -2135,6 +2192,8 @@ options:
                                                  network.
   --gas-price GAS_PRICE                          ⛽ the gas price (default: 1000000000)
   --gas-limit GAS_LIMIT                          ⛽ the gas limit
+  --gas-limit-multiplier GAS_LIMIT_MULTIPLIER    if `--gas-limit` is not provided, the estimated value will be
+                                                 multiplied by this multiplier (e.g 1.1)
   --value VALUE                                  the value to transfer (default: 0)
   --chain CHAIN                                  the chain identifier
   --version VERSION                              the transaction version (default: 2)
@@ -2190,6 +2249,8 @@ options:
                                                  network.
   --gas-price GAS_PRICE                          ⛽ the gas price (default: 1000000000)
   --gas-limit GAS_LIMIT                          ⛽ the gas limit
+  --gas-limit-multiplier GAS_LIMIT_MULTIPLIER    if `--gas-limit` is not provided, the estimated value will be
+                                                 multiplied by this multiplier (e.g 1.1)
   --value VALUE                                  the value to transfer (default: 0)
   --chain CHAIN                                  the chain identifier
   --version VERSION                              the transaction version (default: 2)
@@ -2246,6 +2307,8 @@ options:
                                                  network.
   --gas-price GAS_PRICE                          ⛽ the gas price (default: 1000000000)
   --gas-limit GAS_LIMIT                          ⛽ the gas limit
+  --gas-limit-multiplier GAS_LIMIT_MULTIPLIER    if `--gas-limit` is not provided, the estimated value will be
+                                                 multiplied by this multiplier (e.g 1.1)
   --value VALUE                                  the value to transfer (default: 0)
   --chain CHAIN                                  the chain identifier
   --version VERSION                              the transaction version (default: 2)
@@ -2302,6 +2365,8 @@ options:
                                                  network.
   --gas-price GAS_PRICE                          ⛽ the gas price (default: 1000000000)
   --gas-limit GAS_LIMIT                          ⛽ the gas limit
+  --gas-limit-multiplier GAS_LIMIT_MULTIPLIER    if `--gas-limit` is not provided, the estimated value will be
+                                                 multiplied by this multiplier (e.g 1.1)
   --value VALUE                                  the value to transfer (default: 0)
   --chain CHAIN                                  the chain identifier
   --version VERSION                              the transaction version (default: 2)
@@ -2359,6 +2424,8 @@ options:
                                                  network.
   --gas-price GAS_PRICE                          ⛽ the gas price (default: 1000000000)
   --gas-limit GAS_LIMIT                          ⛽ the gas limit
+  --gas-limit-multiplier GAS_LIMIT_MULTIPLIER    if `--gas-limit` is not provided, the estimated value will be
+                                                 multiplied by this multiplier (e.g 1.1)
   --value VALUE                                  the value to transfer (default: 0)
   --chain CHAIN                                  the chain identifier
   --version VERSION                              the transaction version (default: 2)
@@ -2416,6 +2483,8 @@ options:
                                                  network.
   --gas-price GAS_PRICE                          ⛽ the gas price (default: 1000000000)
   --gas-limit GAS_LIMIT                          ⛽ the gas limit
+  --gas-limit-multiplier GAS_LIMIT_MULTIPLIER    if `--gas-limit` is not provided, the estimated value will be
+                                                 multiplied by this multiplier (e.g 1.1)
   --value VALUE                                  the value to transfer (default: 0)
   --chain CHAIN                                  the chain identifier
   --version VERSION                              the transaction version (default: 2)
@@ -3189,6 +3258,8 @@ options:
                                                   network.
   --gas-price GAS_PRICE                           ⛽ the gas price (default: 1000000000)
   --gas-limit GAS_LIMIT                           ⛽ the gas limit
+  --gas-limit-multiplier GAS_LIMIT_MULTIPLIER     if `--gas-limit` is not provided, the estimated value will be
+                                                  multiplied by this multiplier (e.g 1.1)
   --value VALUE                                   the value to transfer (default: 0)
   --chain CHAIN                                   the chain identifier
   --version VERSION                               the transaction version (default: 2)
@@ -3264,6 +3335,8 @@ options:
                                                   network.
   --gas-price GAS_PRICE                           ⛽ the gas price (default: 1000000000)
   --gas-limit GAS_LIMIT                           ⛽ the gas limit
+  --gas-limit-multiplier GAS_LIMIT_MULTIPLIER     if `--gas-limit` is not provided, the estimated value will be
+                                                  multiplied by this multiplier (e.g 1.1)
   --value VALUE                                   the value to transfer (default: 0)
   --chain CHAIN                                   the chain identifier
   --version VERSION                               the transaction version (default: 2)
@@ -3337,6 +3410,8 @@ options:
                                                  network.
   --gas-price GAS_PRICE                          ⛽ the gas price (default: 1000000000)
   --gas-limit GAS_LIMIT                          ⛽ the gas limit
+  --gas-limit-multiplier GAS_LIMIT_MULTIPLIER    if `--gas-limit` is not provided, the estimated value will be
+                                                 multiplied by this multiplier (e.g 1.1)
   --value VALUE                                  the value to transfer (default: 0)
   --chain CHAIN                                  the chain identifier
   --version VERSION                              the transaction version (default: 2)
@@ -3409,6 +3484,8 @@ options:
                                                  network.
   --gas-price GAS_PRICE                          ⛽ the gas price (default: 1000000000)
   --gas-limit GAS_LIMIT                          ⛽ the gas limit
+  --gas-limit-multiplier GAS_LIMIT_MULTIPLIER    if `--gas-limit` is not provided, the estimated value will be
+                                                 multiplied by this multiplier (e.g 1.1)
   --value VALUE                                  the value to transfer (default: 0)
   --chain CHAIN                                  the chain identifier
   --version VERSION                              the transaction version (default: 2)
@@ -3481,6 +3558,8 @@ options:
                                                  network.
   --gas-price GAS_PRICE                          ⛽ the gas price (default: 1000000000)
   --gas-limit GAS_LIMIT                          ⛽ the gas limit
+  --gas-limit-multiplier GAS_LIMIT_MULTIPLIER    if `--gas-limit` is not provided, the estimated value will be
+                                                 multiplied by this multiplier (e.g 1.1)
   --value VALUE                                  the value to transfer (default: 0)
   --chain CHAIN                                  the chain identifier
   --version VERSION                              the transaction version (default: 2)
@@ -3553,6 +3632,8 @@ options:
                                                  network.
   --gas-price GAS_PRICE                          ⛽ the gas price (default: 1000000000)
   --gas-limit GAS_LIMIT                          ⛽ the gas limit
+  --gas-limit-multiplier GAS_LIMIT_MULTIPLIER    if `--gas-limit` is not provided, the estimated value will be
+                                                 multiplied by this multiplier (e.g 1.1)
   --value VALUE                                  the value to transfer (default: 0)
   --chain CHAIN                                  the chain identifier
   --version VERSION                              the transaction version (default: 2)
@@ -3625,6 +3706,8 @@ options:
                                                  network.
   --gas-price GAS_PRICE                          ⛽ the gas price (default: 1000000000)
   --gas-limit GAS_LIMIT                          ⛽ the gas limit
+  --gas-limit-multiplier GAS_LIMIT_MULTIPLIER    if `--gas-limit` is not provided, the estimated value will be
+                                                 multiplied by this multiplier (e.g 1.1)
   --value VALUE                                  the value to transfer (default: 0)
   --chain CHAIN                                  the chain identifier
   --version VERSION                              the transaction version (default: 2)
@@ -3698,6 +3781,8 @@ options:
                                                  network.
   --gas-price GAS_PRICE                          ⛽ the gas price (default: 1000000000)
   --gas-limit GAS_LIMIT                          ⛽ the gas limit
+  --gas-limit-multiplier GAS_LIMIT_MULTIPLIER    if `--gas-limit` is not provided, the estimated value will be
+                                                 multiplied by this multiplier (e.g 1.1)
   --value VALUE                                  the value to transfer (default: 0)
   --chain CHAIN                                  the chain identifier
   --version VERSION                              the transaction version (default: 2)
@@ -3779,6 +3864,8 @@ options:
   --receiver-username RECEIVER_USERNAME          🖄 the username of the receiver
   --gas-price GAS_PRICE                          ⛽ the gas price (default: 1000000000)
   --gas-limit GAS_LIMIT                          ⛽ the gas limit
+  --gas-limit-multiplier GAS_LIMIT_MULTIPLIER    if `--gas-limit` is not provided, the estimated value will be
+                                                 multiplied by this multiplier (e.g 1.1)
   --value VALUE                                  the value to transfer (default: 0)
   --chain CHAIN                                  the chain identifier
   --version VERSION                              the transaction version (default: 2)
@@ -3863,6 +3950,8 @@ options:
   --receiver-username RECEIVER_USERNAME           🖄 the username of the receiver
   --gas-price GAS_PRICE                           ⛽ the gas price (default: 1000000000)
   --gas-limit GAS_LIMIT                           ⛽ the gas limit
+  --gas-limit-multiplier GAS_LIMIT_MULTIPLIER     if `--gas-limit` is not provided, the estimated value will be
+                                                  multiplied by this multiplier (e.g 1.1)
   --value VALUE                                   the value to transfer (default: 0)
   --chain CHAIN                                   the chain identifier
   --version VERSION                               the transaction version (default: 2)
@@ -3948,6 +4037,8 @@ options:
   --receiver-username RECEIVER_USERNAME           🖄 the username of the receiver
   --gas-price GAS_PRICE                           ⛽ the gas price (default: 1000000000)
   --gas-limit GAS_LIMIT                           ⛽ the gas limit
+  --gas-limit-multiplier GAS_LIMIT_MULTIPLIER     if `--gas-limit` is not provided, the estimated value will be
+                                                  multiplied by this multiplier (e.g 1.1)
   --value VALUE                                   the value to transfer (default: 0)
   --chain CHAIN                                   the chain identifier
   --version VERSION                               the transaction version (default: 2)
@@ -4031,6 +4122,8 @@ options:
                                                  network.
   --gas-price GAS_PRICE                          ⛽ the gas price (default: 1000000000)
   --gas-limit GAS_LIMIT                          ⛽ the gas limit
+  --gas-limit-multiplier GAS_LIMIT_MULTIPLIER    if `--gas-limit` is not provided, the estimated value will be
+                                                 multiplied by this multiplier (e.g 1.1)
   --value VALUE                                  the value to transfer (default: 0)
   --chain CHAIN                                  the chain identifier
   --version VERSION                              the transaction version (default: 2)
@@ -4114,6 +4207,8 @@ options:
                                                  network.
   --gas-price GAS_PRICE                          ⛽ the gas price (default: 1000000000)
   --gas-limit GAS_LIMIT                          ⛽ the gas limit
+  --gas-limit-multiplier GAS_LIMIT_MULTIPLIER    if `--gas-limit` is not provided, the estimated value will be
+                                                 multiplied by this multiplier (e.g 1.1)
   --value VALUE                                  the value to transfer (default: 0)
   --chain CHAIN                                  the chain identifier
   --version VERSION                              the transaction version (default: 2)
@@ -4186,6 +4281,8 @@ options:
                                                  network.
   --gas-price GAS_PRICE                          ⛽ the gas price (default: 1000000000)
   --gas-limit GAS_LIMIT                          ⛽ the gas limit
+  --gas-limit-multiplier GAS_LIMIT_MULTIPLIER    if `--gas-limit` is not provided, the estimated value will be
+                                                 multiplied by this multiplier (e.g 1.1)
   --value VALUE                                  the value to transfer (default: 0)
   --chain CHAIN                                  the chain identifier
   --version VERSION                              the transaction version (default: 2)
@@ -4258,6 +4355,8 @@ options:
                                                  network.
   --gas-price GAS_PRICE                          ⛽ the gas price (default: 1000000000)
   --gas-limit GAS_LIMIT                          ⛽ the gas limit
+  --gas-limit-multiplier GAS_LIMIT_MULTIPLIER    if `--gas-limit` is not provided, the estimated value will be
+                                                 multiplied by this multiplier (e.g 1.1)
   --value VALUE                                  the value to transfer (default: 0)
   --chain CHAIN                                  the chain identifier
   --version VERSION                              the transaction version (default: 2)
@@ -4330,6 +4429,8 @@ options:
                                                  network.
   --gas-price GAS_PRICE                          ⛽ the gas price (default: 1000000000)
   --gas-limit GAS_LIMIT                          ⛽ the gas limit
+  --gas-limit-multiplier GAS_LIMIT_MULTIPLIER    if `--gas-limit` is not provided, the estimated value will be
+                                                 multiplied by this multiplier (e.g 1.1)
   --value VALUE                                  the value to transfer (default: 0)
   --chain CHAIN                                  the chain identifier
   --version VERSION                              the transaction version (default: 2)
@@ -4402,6 +4503,8 @@ options:
                                                  network.
   --gas-price GAS_PRICE                          ⛽ the gas price (default: 1000000000)
   --gas-limit GAS_LIMIT                          ⛽ the gas limit
+  --gas-limit-multiplier GAS_LIMIT_MULTIPLIER    if `--gas-limit` is not provided, the estimated value will be
+                                                 multiplied by this multiplier (e.g 1.1)
   --value VALUE                                  the value to transfer (default: 0)
   --chain CHAIN                                  the chain identifier
   --version VERSION                              the transaction version (default: 2)
@@ -4474,6 +4577,8 @@ options:
                                                  network.
   --gas-price GAS_PRICE                          ⛽ the gas price (default: 1000000000)
   --gas-limit GAS_LIMIT                          ⛽ the gas limit
+  --gas-limit-multiplier GAS_LIMIT_MULTIPLIER    if `--gas-limit` is not provided, the estimated value will be
+                                                 multiplied by this multiplier (e.g 1.1)
   --value VALUE                                  the value to transfer (default: 0)
   --chain CHAIN                                  the chain identifier
   --version VERSION                              the transaction version (default: 2)
@@ -4546,6 +4651,8 @@ options:
                                                  network.
   --gas-price GAS_PRICE                          ⛽ the gas price (default: 1000000000)
   --gas-limit GAS_LIMIT                          ⛽ the gas limit
+  --gas-limit-multiplier GAS_LIMIT_MULTIPLIER    if `--gas-limit` is not provided, the estimated value will be
+                                                 multiplied by this multiplier (e.g 1.1)
   --value VALUE                                  the value to transfer (default: 0)
   --chain CHAIN                                  the chain identifier
   --version VERSION                              the transaction version (default: 2)
@@ -4620,6 +4727,8 @@ options:
                                                   network.
   --gas-price GAS_PRICE                           ⛽ the gas price (default: 1000000000)
   --gas-limit GAS_LIMIT                           ⛽ the gas limit
+  --gas-limit-multiplier GAS_LIMIT_MULTIPLIER     if `--gas-limit` is not provided, the estimated value will be
+                                                  multiplied by this multiplier (e.g 1.1)
   --value VALUE                                   the value to transfer (default: 0)
   --chain CHAIN                                   the chain identifier
   --version VERSION                               the transaction version (default: 2)
@@ -4693,6 +4802,8 @@ options:
                                                  network.
   --gas-price GAS_PRICE                          ⛽ the gas price (default: 1000000000)
   --gas-limit GAS_LIMIT                          ⛽ the gas limit
+  --gas-limit-multiplier GAS_LIMIT_MULTIPLIER    if `--gas-limit` is not provided, the estimated value will be
+                                                 multiplied by this multiplier (e.g 1.1)
   --value VALUE                                  the value to transfer (default: 0)
   --chain CHAIN                                  the chain identifier
   --version VERSION                              the transaction version (default: 2)
@@ -4765,6 +4876,8 @@ options:
                                                  network.
   --gas-price GAS_PRICE                          ⛽ the gas price (default: 1000000000)
   --gas-limit GAS_LIMIT                          ⛽ the gas limit
+  --gas-limit-multiplier GAS_LIMIT_MULTIPLIER    if `--gas-limit` is not provided, the estimated value will be
+                                                 multiplied by this multiplier (e.g 1.1)
   --value VALUE                                  the value to transfer (default: 0)
   --chain CHAIN                                  the chain identifier
   --version VERSION                              the transaction version (default: 2)
@@ -5163,6 +5276,8 @@ options:
                                                  network.
   --gas-price GAS_PRICE                          ⛽ the gas price (default: 1000000000)
   --gas-limit GAS_LIMIT                          ⛽ the gas limit
+  --gas-limit-multiplier GAS_LIMIT_MULTIPLIER    if `--gas-limit` is not provided, the estimated value will be
+                                                 multiplied by this multiplier (e.g 1.1)
   --value VALUE                                  the value to transfer (default: 0)
   --chain CHAIN                                  the chain identifier
   --version VERSION                              the transaction version (default: 2)
@@ -5234,6 +5349,8 @@ options:
                                                  network.
   --gas-price GAS_PRICE                          ⛽ the gas price (default: 1000000000)
   --gas-limit GAS_LIMIT                          ⛽ the gas limit
+  --gas-limit-multiplier GAS_LIMIT_MULTIPLIER    if `--gas-limit` is not provided, the estimated value will be
+                                                 multiplied by this multiplier (e.g 1.1)
   --value VALUE                                  the value to transfer (default: 0)
   --chain CHAIN                                  the chain identifier
   --version VERSION                              the transaction version (default: 2)
@@ -5304,6 +5421,8 @@ options:
                                                  network.
   --gas-price GAS_PRICE                          ⛽ the gas price (default: 1000000000)
   --gas-limit GAS_LIMIT                          ⛽ the gas limit
+  --gas-limit-multiplier GAS_LIMIT_MULTIPLIER    if `--gas-limit` is not provided, the estimated value will be
+                                                 multiplied by this multiplier (e.g 1.1)
   --value VALUE                                  the value to transfer (default: 0)
   --chain CHAIN                                  the chain identifier
   --version VERSION                              the transaction version (default: 2)
@@ -5375,6 +5494,8 @@ options:
                                                  network.
   --gas-price GAS_PRICE                          ⛽ the gas price (default: 1000000000)
   --gas-limit GAS_LIMIT                          ⛽ the gas limit
+  --gas-limit-multiplier GAS_LIMIT_MULTIPLIER    if `--gas-limit` is not provided, the estimated value will be
+                                                 multiplied by this multiplier (e.g 1.1)
   --value VALUE                                  the value to transfer (default: 0)
   --chain CHAIN                                  the chain identifier
   --version VERSION                              the transaction version (default: 2)
@@ -5444,6 +5565,8 @@ options:
                                                  network.
   --gas-price GAS_PRICE                          ⛽ the gas price (default: 1000000000)
   --gas-limit GAS_LIMIT                          ⛽ the gas limit
+  --gas-limit-multiplier GAS_LIMIT_MULTIPLIER    if `--gas-limit` is not provided, the estimated value will be
+                                                 multiplied by this multiplier (e.g 1.1)
   --value VALUE                                  the value to transfer (default: 0)
   --chain CHAIN                                  the chain identifier
   --version VERSION                              the transaction version (default: 2)
@@ -5518,6 +5641,8 @@ options:
                                                  network.
   --gas-price GAS_PRICE                          ⛽ the gas price (default: 1000000000)
   --gas-limit GAS_LIMIT                          ⛽ the gas limit
+  --gas-limit-multiplier GAS_LIMIT_MULTIPLIER    if `--gas-limit` is not provided, the estimated value will be
+                                                 multiplied by this multiplier (e.g 1.1)
   --value VALUE                                  the value to transfer (default: 0)
   --chain CHAIN                                  the chain identifier
   --version VERSION                              the transaction version (default: 2)
@@ -5657,7 +5782,7 @@ dump                           Dumps the active environment.
 delete                         Deletes an env value from the specified environment.
 switch                         Switch to a different environment.
 list                           List available environments
-remove                         Deletes an environment from the env file. Use `mxpy config-env switch` to move to another env.
+remove                         Deletes an environment from the env file. Use `mxpy config-env switch` to switch to another env.
 reset                          Deletes the environment file. Default env will be used.
 
 ```
@@ -5761,7 +5886,7 @@ options:
 $ mxpy config-env remove --help
 usage: mxpy config-env remove [-h] ...
 
-Deletes an environment from the env file. Use `mxpy config-env switch` to move to another env.
+Deletes an environment from the env file. Use `mxpy config-env switch` to switch to another env.
 
 options:
   -h, --help  show this help message and exit
@@ -6053,5 +6178,2688 @@ options:
   -h, --help     show this help message and exit
   --proxy PROXY  the proxy url
   --hash HASH    the transaction hash
+
+```
+## Group **Token**
+
+
+```
+$ mxpy token --help
+usage: mxpy token COMMAND [-h] ...
+
+Perform token management operations (issue tokens, create NFTs, set roles, etc.)
+
+COMMANDS:
+  {issue-fungible,issue-semi-fungible,issue-non-fungible,register-meta-esdt,register-and-set-all-roles,set-burn-role-globally,unset-burn-role-globally,set-special-role-fungible,unset-special-role-fungible,set-special-role-semi-fungible,unset-special-role-semi-fungible,set-special-role-meta-esdt,unset-special-role-meta-esdt,set-special-role-nft,unset-special-role-nft,create-nft,pause,unpause,freeze,unfreeze,wipe,local-mint,local-burn,update-attributes,add-quantity,burn-quantity,modify-royalties,set-new-uris,modify-creator,update-metadata,nft-metadata-recreate,change-to-dynamic,update-token-id,register-dynamic,register-dynamic-and-set-all-roles,transfer-ownership,freeze-single-nft,unfreeze-single-nft,change-sft-to-meta-esdt,transfer-nft-create-role,stop-nft-creation,wipe-single-nft,add-uris}
+
+OPTIONS:
+  -h, --help            show this help message and exit
+
+----------------
+COMMANDS summary
+----------------
+issue-fungible                 Issue a new fungible ESDT token.
+issue-semi-fungible            Issue a new semi-fungible ESDT token.
+issue-non-fungible             Issue a new non-fungible ESDT token (NFT).
+register-meta-esdt             Register a MetaESDT token.
+register-and-set-all-roles     Register a token and set all roles.
+set-burn-role-globally         Set the burn role globally for a token.
+unset-burn-role-globally       Unset the burn role globally for a token.
+set-special-role-fungible      Set special roles on a fungible token for a user.
+unset-special-role-fungible    Unset special roles on a fungible token for a user.
+set-special-role-semi-fungible Set special roles on a semi-fungible token for a user.
+unset-special-role-semi-fungible Unset special roles on a semi-fungible token for a user.
+set-special-role-meta-esdt     Set special roles on a meta-esdt token for a user.
+unset-special-role-meta-esdt   Unset special roles on a meta-esdt token for a user.
+set-special-role-nft           Set special roles on a non-fungible token for a user.
+unset-special-role-nft         Unset special roles on a non-fungible token for a user.
+create-nft                     Create a non-fungible token.
+pause                          Pause a token.
+unpause                        Unpause a token.
+freeze                         Freeze a token for a user.
+unfreeze                       Unfreeze a token for a user.
+wipe                           Wipe a token for a user.
+local-mint                     Mint new tokens.
+local-burn                     Burn tokens.
+update-attributes              Update token attributes.
+add-quantity                   Increase token quantity.
+burn-quantity                  Burn token quantity.
+modify-royalties               Modify token royalties.
+set-new-uris                   Set new uris.
+modify-creator                 Modify the creator of the token.
+update-metadata                Update the metadata of the token.
+nft-metadata-recreate          Recreate the metadata of the token.
+change-to-dynamic              Change a token to a dynamic token.
+update-token-id                Update token id.
+register-dynamic               Register a dynamic token.
+register-dynamic-and-set-all-roles Register a dynamic token and set all roles.
+transfer-ownership             Transfer the ownership of a token to another user.
+freeze-single-nft              Freeze the NFT of a user.
+unfreeze-single-nft            Unfreeze the NFT of a user.
+change-sft-to-meta-esdt        Change a semi fungible token to a Meta ESDT.
+transfer-nft-create-role       Transfer the nft create role to a user.
+stop-nft-creation              Stop the creation of new NFTs.
+wipe-single-nft                Wipe the NFT of a user.
+add-uris                       Add uris for a token.
+
+```
+### Token.IssueFungbile
+
+
+```
+$ mxpy token issue-fungible --help
+usage: mxpy token issue-fungible [-h] ...
+
+Issue a new fungible ESDT token.
+
+options:
+  -h, --help                                     show this help message and exit
+  --token-name TOKEN_NAME                        the name of the token to be issued: 3-20 alphanumerical characters
+  --token-ticker TOKEN_TICKER                    the ticker of the token to be issued: 3-10 UPPERCASE alphanumerical
+                                                 characters
+  --initial-supply INITIAL_SUPPLY                the initial supply of the token to be issued
+  --num-decimals NUM_DECIMALS                    a numerical value between 0 and 18 representing number of decimals
+  --cannot-freeze                                make token not freezable
+  --cannot-wipe                                  make token not wipeable
+  --cannot-pause                                 make token not pausable
+  --cannot-change-owner                          don't allow changing the token's owner
+  --cannot-upgrade                               don't allow upgrading the token
+  --cannot-add-special-roles                     don't allow special roles to be added for the token
+  --sender SENDER                                the alias of the wallet set in the address config
+  --pem PEM                                      🔑 the PEM file, if keyfile not provided
+  --keyfile KEYFILE                              🔑 a JSON keyfile, if PEM not provided
+  --passfile PASSFILE                            DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
+  --ledger                                       🔐 bool flag for signing transaction using ledger
+  --sender-wallet-index SENDER_WALLET_INDEX      🔑 the address index; can be used for PEM files, keyfiles of type
+                                                 mnemonic or Ledger devices (default: 0)
+  --sender-username SENDER_USERNAME              🖄 the username of the sender
+  --hrp HRP                                      The hrp used to convert the address to its bech32 representation
+  --nonce NONCE                                  # the nonce for the transaction. If not provided, is fetched from the
+                                                 network.
+  --gas-price GAS_PRICE                          ⛽ the gas price (default: 1000000000)
+  --gas-limit GAS_LIMIT                          ⛽ the gas limit
+  --gas-limit-multiplier GAS_LIMIT_MULTIPLIER    if `--gas-limit` is not provided, the estimated value will be
+                                                 multiplied by this multiplier (e.g 1.1)
+  --value VALUE                                  the value to transfer (default: 0)
+  --chain CHAIN                                  the chain identifier
+  --version VERSION                              the transaction version (default: 2)
+  --options OPTIONS                              the transaction options (default: 0)
+  --relayer RELAYER                              the bech32 address of the relayer
+  --guardian GUARDIAN                            the bech32 address of the guardian
+  --proxy PROXY                                  🔗 the URL of the proxy
+  --send                                         ✓ whether to broadcast the transaction (default: False)
+  --simulate                                     whether to simulate the transaction (default: False)
+  --wait-result                                  signal to wait for the transaction result - only valid if --send is set
+  --timeout TIMEOUT                              max num of seconds to wait for result - only valid if --wait-result is
+                                                 set
+  --guardian-service-url GUARDIAN_SERVICE_URL    the url of the guardian service
+  --guardian-2fa-code GUARDIAN_2FA_CODE          the 2fa code for the guardian
+  --guardian-pem GUARDIAN_PEM                    🔑 the PEM file, if keyfile not provided
+  --guardian-keyfile GUARDIAN_KEYFILE            🔑 a JSON keyfile, if PEM not provided
+  --guardian-passfile GUARDIAN_PASSFILE          DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
+  --guardian-ledger                              🔐 bool flag for signing transaction using ledger
+  --guardian-wallet-index GUARDIAN_WALLET_INDEX  🔑 the address index; can be used for PEM files, keyfiles of type
+                                                 mnemonic or Ledger devices (default: 0)
+  --relayer-pem RELAYER_PEM                      🔑 the PEM file, if keyfile not provided
+  --relayer-keyfile RELAYER_KEYFILE              🔑 a JSON keyfile, if PEM not provided
+  --relayer-passfile RELAYER_PASSFILE            DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
+  --relayer-ledger                               🔐 bool flag for signing transaction using ledger
+  --relayer-wallet-index RELAYER_WALLET_INDEX    🔑 the address index; can be used for PEM files, keyfiles of type
+                                                 mnemonic or Ledger devices (default: 0)
+  --outfile OUTFILE                              where to save the output (default: stdout)
+
+```
+### Token.IssueNonFungbile
+
+
+```
+$ mxpy token issue-non-fungible --help
+usage: mxpy token issue-non-fungible [-h] ...
+
+Issue a new non-fungible ESDT token (NFT).
+
+options:
+  -h, --help                                     show this help message and exit
+  --token-name TOKEN_NAME                        the name of the token to be issued: 3-20 alphanumerical characters
+  --token-ticker TOKEN_TICKER                    the ticker of the token to be issued: 3-10 UPPERCASE alphanumerical
+                                                 characters
+  --cannot-freeze                                make token not freezable
+  --cannot-wipe                                  make token not wipeable
+  --cannot-pause                                 make token not pausable
+  --cannot-change-owner                          don't allow changing the token's owner
+  --cannot-upgrade                               don't allow upgrading the token
+  --cannot-add-special-roles                     don't allow special roles to be added for the token
+  --cannot-transfer-nft-create-role              don't allow for nft create roles to be transferred for the token
+  --sender SENDER                                the alias of the wallet set in the address config
+  --pem PEM                                      🔑 the PEM file, if keyfile not provided
+  --keyfile KEYFILE                              🔑 a JSON keyfile, if PEM not provided
+  --passfile PASSFILE                            DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
+  --ledger                                       🔐 bool flag for signing transaction using ledger
+  --sender-wallet-index SENDER_WALLET_INDEX      🔑 the address index; can be used for PEM files, keyfiles of type
+                                                 mnemonic or Ledger devices (default: 0)
+  --sender-username SENDER_USERNAME              🖄 the username of the sender
+  --hrp HRP                                      The hrp used to convert the address to its bech32 representation
+  --nonce NONCE                                  # the nonce for the transaction. If not provided, is fetched from the
+                                                 network.
+  --gas-price GAS_PRICE                          ⛽ the gas price (default: 1000000000)
+  --gas-limit GAS_LIMIT                          ⛽ the gas limit
+  --gas-limit-multiplier GAS_LIMIT_MULTIPLIER    if `--gas-limit` is not provided, the estimated value will be
+                                                 multiplied by this multiplier (e.g 1.1)
+  --value VALUE                                  the value to transfer (default: 0)
+  --chain CHAIN                                  the chain identifier
+  --version VERSION                              the transaction version (default: 2)
+  --options OPTIONS                              the transaction options (default: 0)
+  --relayer RELAYER                              the bech32 address of the relayer
+  --guardian GUARDIAN                            the bech32 address of the guardian
+  --proxy PROXY                                  🔗 the URL of the proxy
+  --send                                         ✓ whether to broadcast the transaction (default: False)
+  --simulate                                     whether to simulate the transaction (default: False)
+  --wait-result                                  signal to wait for the transaction result - only valid if --send is set
+  --timeout TIMEOUT                              max num of seconds to wait for result - only valid if --wait-result is
+                                                 set
+  --guardian-service-url GUARDIAN_SERVICE_URL    the url of the guardian service
+  --guardian-2fa-code GUARDIAN_2FA_CODE          the 2fa code for the guardian
+  --guardian-pem GUARDIAN_PEM                    🔑 the PEM file, if keyfile not provided
+  --guardian-keyfile GUARDIAN_KEYFILE            🔑 a JSON keyfile, if PEM not provided
+  --guardian-passfile GUARDIAN_PASSFILE          DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
+  --guardian-ledger                              🔐 bool flag for signing transaction using ledger
+  --guardian-wallet-index GUARDIAN_WALLET_INDEX  🔑 the address index; can be used for PEM files, keyfiles of type
+                                                 mnemonic or Ledger devices (default: 0)
+  --relayer-pem RELAYER_PEM                      🔑 the PEM file, if keyfile not provided
+  --relayer-keyfile RELAYER_KEYFILE              🔑 a JSON keyfile, if PEM not provided
+  --relayer-passfile RELAYER_PASSFILE            DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
+  --relayer-ledger                               🔐 bool flag for signing transaction using ledger
+  --relayer-wallet-index RELAYER_WALLET_INDEX    🔑 the address index; can be used for PEM files, keyfiles of type
+                                                 mnemonic or Ledger devices (default: 0)
+  --outfile OUTFILE                              where to save the output (default: stdout)
+
+```
+### Token.RegisterMetaEsdt
+
+
+```
+$ mxpy token register-meta-esdt --help
+usage: mxpy token register-meta-esdt [-h] ...
+
+Register a MetaESDT token.
+
+options:
+  -h, --help                                     show this help message and exit
+  --token-name TOKEN_NAME                        the name of the token to be issued: 3-20 alphanumerical characters
+  --token-ticker TOKEN_TICKER                    the ticker of the token to be issued: 3-10 UPPERCASE alphanumerical
+                                                 characters
+  --num-decimals NUM_DECIMALS                    a numerical value between 0 and 18 representing number of decimals
+  --cannot-freeze                                make token not freezable
+  --cannot-wipe                                  make token not wipeable
+  --cannot-pause                                 make token not pausable
+  --cannot-change-owner                          don't allow changing the token's owner
+  --cannot-upgrade                               don't allow upgrading the token
+  --cannot-add-special-roles                     don't allow special roles to be added for the token
+  --cannot-transfer-nft-create-role              don't allow for nft create roles to be transferred for the token
+  --sender SENDER                                the alias of the wallet set in the address config
+  --pem PEM                                      🔑 the PEM file, if keyfile not provided
+  --keyfile KEYFILE                              🔑 a JSON keyfile, if PEM not provided
+  --passfile PASSFILE                            DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
+  --ledger                                       🔐 bool flag for signing transaction using ledger
+  --sender-wallet-index SENDER_WALLET_INDEX      🔑 the address index; can be used for PEM files, keyfiles of type
+                                                 mnemonic or Ledger devices (default: 0)
+  --sender-username SENDER_USERNAME              🖄 the username of the sender
+  --hrp HRP                                      The hrp used to convert the address to its bech32 representation
+  --nonce NONCE                                  # the nonce for the transaction. If not provided, is fetched from the
+                                                 network.
+  --gas-price GAS_PRICE                          ⛽ the gas price (default: 1000000000)
+  --gas-limit GAS_LIMIT                          ⛽ the gas limit
+  --gas-limit-multiplier GAS_LIMIT_MULTIPLIER    if `--gas-limit` is not provided, the estimated value will be
+                                                 multiplied by this multiplier (e.g 1.1)
+  --value VALUE                                  the value to transfer (default: 0)
+  --chain CHAIN                                  the chain identifier
+  --version VERSION                              the transaction version (default: 2)
+  --options OPTIONS                              the transaction options (default: 0)
+  --relayer RELAYER                              the bech32 address of the relayer
+  --guardian GUARDIAN                            the bech32 address of the guardian
+  --proxy PROXY                                  🔗 the URL of the proxy
+  --send                                         ✓ whether to broadcast the transaction (default: False)
+  --simulate                                     whether to simulate the transaction (default: False)
+  --wait-result                                  signal to wait for the transaction result - only valid if --send is set
+  --timeout TIMEOUT                              max num of seconds to wait for result - only valid if --wait-result is
+                                                 set
+  --guardian-service-url GUARDIAN_SERVICE_URL    the url of the guardian service
+  --guardian-2fa-code GUARDIAN_2FA_CODE          the 2fa code for the guardian
+  --guardian-pem GUARDIAN_PEM                    🔑 the PEM file, if keyfile not provided
+  --guardian-keyfile GUARDIAN_KEYFILE            🔑 a JSON keyfile, if PEM not provided
+  --guardian-passfile GUARDIAN_PASSFILE          DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
+  --guardian-ledger                              🔐 bool flag for signing transaction using ledger
+  --guardian-wallet-index GUARDIAN_WALLET_INDEX  🔑 the address index; can be used for PEM files, keyfiles of type
+                                                 mnemonic or Ledger devices (default: 0)
+  --relayer-pem RELAYER_PEM                      🔑 the PEM file, if keyfile not provided
+  --relayer-keyfile RELAYER_KEYFILE              🔑 a JSON keyfile, if PEM not provided
+  --relayer-passfile RELAYER_PASSFILE            DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
+  --relayer-ledger                               🔐 bool flag for signing transaction using ledger
+  --relayer-wallet-index RELAYER_WALLET_INDEX    🔑 the address index; can be used for PEM files, keyfiles of type
+                                                 mnemonic or Ledger devices (default: 0)
+  --outfile OUTFILE                              where to save the output (default: stdout)
+
+```
+### Token.RegisterAndSetAllRoles
+
+
+```
+$ mxpy token register-and-set-all-roles --help
+usage: mxpy token register-and-set-all-roles [-h] ...
+
+Register a token and set all roles.
+
+options:
+  -h, --help                                     show this help message and exit
+  --token-name TOKEN_NAME                        the name of the token to be issued: 3-20 alphanumerical characters
+  --token-ticker TOKEN_TICKER                    the ticker of the token to be issued: 3-10 UPPERCASE alphanumerical
+                                                 characters
+  --num-decimals NUM_DECIMALS                    a numerical value between 0 and 18 representing number of decimals
+  --token-type {NFT,SFT,META,FNG}                the token type
+  --sender SENDER                                the alias of the wallet set in the address config
+  --pem PEM                                      🔑 the PEM file, if keyfile not provided
+  --keyfile KEYFILE                              🔑 a JSON keyfile, if PEM not provided
+  --passfile PASSFILE                            DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
+  --ledger                                       🔐 bool flag for signing transaction using ledger
+  --sender-wallet-index SENDER_WALLET_INDEX      🔑 the address index; can be used for PEM files, keyfiles of type
+                                                 mnemonic or Ledger devices (default: 0)
+  --sender-username SENDER_USERNAME              🖄 the username of the sender
+  --hrp HRP                                      The hrp used to convert the address to its bech32 representation
+  --nonce NONCE                                  # the nonce for the transaction. If not provided, is fetched from the
+                                                 network.
+  --gas-price GAS_PRICE                          ⛽ the gas price (default: 1000000000)
+  --gas-limit GAS_LIMIT                          ⛽ the gas limit
+  --gas-limit-multiplier GAS_LIMIT_MULTIPLIER    if `--gas-limit` is not provided, the estimated value will be
+                                                 multiplied by this multiplier (e.g 1.1)
+  --value VALUE                                  the value to transfer (default: 0)
+  --chain CHAIN                                  the chain identifier
+  --version VERSION                              the transaction version (default: 2)
+  --options OPTIONS                              the transaction options (default: 0)
+  --relayer RELAYER                              the bech32 address of the relayer
+  --guardian GUARDIAN                            the bech32 address of the guardian
+  --proxy PROXY                                  🔗 the URL of the proxy
+  --send                                         ✓ whether to broadcast the transaction (default: False)
+  --simulate                                     whether to simulate the transaction (default: False)
+  --wait-result                                  signal to wait for the transaction result - only valid if --send is set
+  --timeout TIMEOUT                              max num of seconds to wait for result - only valid if --wait-result is
+                                                 set
+  --guardian-service-url GUARDIAN_SERVICE_URL    the url of the guardian service
+  --guardian-2fa-code GUARDIAN_2FA_CODE          the 2fa code for the guardian
+  --guardian-pem GUARDIAN_PEM                    🔑 the PEM file, if keyfile not provided
+  --guardian-keyfile GUARDIAN_KEYFILE            🔑 a JSON keyfile, if PEM not provided
+  --guardian-passfile GUARDIAN_PASSFILE          DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
+  --guardian-ledger                              🔐 bool flag for signing transaction using ledger
+  --guardian-wallet-index GUARDIAN_WALLET_INDEX  🔑 the address index; can be used for PEM files, keyfiles of type
+                                                 mnemonic or Ledger devices (default: 0)
+  --relayer-pem RELAYER_PEM                      🔑 the PEM file, if keyfile not provided
+  --relayer-keyfile RELAYER_KEYFILE              🔑 a JSON keyfile, if PEM not provided
+  --relayer-passfile RELAYER_PASSFILE            DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
+  --relayer-ledger                               🔐 bool flag for signing transaction using ledger
+  --relayer-wallet-index RELAYER_WALLET_INDEX    🔑 the address index; can be used for PEM files, keyfiles of type
+                                                 mnemonic or Ledger devices (default: 0)
+  --outfile OUTFILE                              where to save the output (default: stdout)
+
+```
+### Token.SetBurnRoleGlobally
+
+
+```
+$ mxpy token set-burn-role-globally --help
+usage: mxpy token set-burn-role-globally [-h] ...
+
+Set the burn role globally for a token.
+
+options:
+  -h, --help                                     show this help message and exit
+  --token-identifier TOKEN_IDENTIFIER            the token identifier
+  --sender SENDER                                the alias of the wallet set in the address config
+  --pem PEM                                      🔑 the PEM file, if keyfile not provided
+  --keyfile KEYFILE                              🔑 a JSON keyfile, if PEM not provided
+  --passfile PASSFILE                            DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
+  --ledger                                       🔐 bool flag for signing transaction using ledger
+  --sender-wallet-index SENDER_WALLET_INDEX      🔑 the address index; can be used for PEM files, keyfiles of type
+                                                 mnemonic or Ledger devices (default: 0)
+  --sender-username SENDER_USERNAME              🖄 the username of the sender
+  --hrp HRP                                      The hrp used to convert the address to its bech32 representation
+  --nonce NONCE                                  # the nonce for the transaction. If not provided, is fetched from the
+                                                 network.
+  --gas-price GAS_PRICE                          ⛽ the gas price (default: 1000000000)
+  --gas-limit GAS_LIMIT                          ⛽ the gas limit
+  --gas-limit-multiplier GAS_LIMIT_MULTIPLIER    if `--gas-limit` is not provided, the estimated value will be
+                                                 multiplied by this multiplier (e.g 1.1)
+  --value VALUE                                  the value to transfer (default: 0)
+  --chain CHAIN                                  the chain identifier
+  --version VERSION                              the transaction version (default: 2)
+  --options OPTIONS                              the transaction options (default: 0)
+  --relayer RELAYER                              the bech32 address of the relayer
+  --guardian GUARDIAN                            the bech32 address of the guardian
+  --proxy PROXY                                  🔗 the URL of the proxy
+  --send                                         ✓ whether to broadcast the transaction (default: False)
+  --simulate                                     whether to simulate the transaction (default: False)
+  --wait-result                                  signal to wait for the transaction result - only valid if --send is set
+  --timeout TIMEOUT                              max num of seconds to wait for result - only valid if --wait-result is
+                                                 set
+  --guardian-service-url GUARDIAN_SERVICE_URL    the url of the guardian service
+  --guardian-2fa-code GUARDIAN_2FA_CODE          the 2fa code for the guardian
+  --guardian-pem GUARDIAN_PEM                    🔑 the PEM file, if keyfile not provided
+  --guardian-keyfile GUARDIAN_KEYFILE            🔑 a JSON keyfile, if PEM not provided
+  --guardian-passfile GUARDIAN_PASSFILE          DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
+  --guardian-ledger                              🔐 bool flag for signing transaction using ledger
+  --guardian-wallet-index GUARDIAN_WALLET_INDEX  🔑 the address index; can be used for PEM files, keyfiles of type
+                                                 mnemonic or Ledger devices (default: 0)
+  --relayer-pem RELAYER_PEM                      🔑 the PEM file, if keyfile not provided
+  --relayer-keyfile RELAYER_KEYFILE              🔑 a JSON keyfile, if PEM not provided
+  --relayer-passfile RELAYER_PASSFILE            DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
+  --relayer-ledger                               🔐 bool flag for signing transaction using ledger
+  --relayer-wallet-index RELAYER_WALLET_INDEX    🔑 the address index; can be used for PEM files, keyfiles of type
+                                                 mnemonic or Ledger devices (default: 0)
+  --outfile OUTFILE                              where to save the output (default: stdout)
+
+```
+### Token.UnsetBurnRoleGlobally
+
+
+```
+$ mxpy token unset-burn-role-globally --help
+usage: mxpy token unset-burn-role-globally [-h] ...
+
+Unset the burn role globally for a token.
+
+options:
+  -h, --help                                     show this help message and exit
+  --token-identifier TOKEN_IDENTIFIER            the token identifier
+  --sender SENDER                                the alias of the wallet set in the address config
+  --pem PEM                                      🔑 the PEM file, if keyfile not provided
+  --keyfile KEYFILE                              🔑 a JSON keyfile, if PEM not provided
+  --passfile PASSFILE                            DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
+  --ledger                                       🔐 bool flag for signing transaction using ledger
+  --sender-wallet-index SENDER_WALLET_INDEX      🔑 the address index; can be used for PEM files, keyfiles of type
+                                                 mnemonic or Ledger devices (default: 0)
+  --sender-username SENDER_USERNAME              🖄 the username of the sender
+  --hrp HRP                                      The hrp used to convert the address to its bech32 representation
+  --nonce NONCE                                  # the nonce for the transaction. If not provided, is fetched from the
+                                                 network.
+  --gas-price GAS_PRICE                          ⛽ the gas price (default: 1000000000)
+  --gas-limit GAS_LIMIT                          ⛽ the gas limit
+  --gas-limit-multiplier GAS_LIMIT_MULTIPLIER    if `--gas-limit` is not provided, the estimated value will be
+                                                 multiplied by this multiplier (e.g 1.1)
+  --value VALUE                                  the value to transfer (default: 0)
+  --chain CHAIN                                  the chain identifier
+  --version VERSION                              the transaction version (default: 2)
+  --options OPTIONS                              the transaction options (default: 0)
+  --relayer RELAYER                              the bech32 address of the relayer
+  --guardian GUARDIAN                            the bech32 address of the guardian
+  --proxy PROXY                                  🔗 the URL of the proxy
+  --send                                         ✓ whether to broadcast the transaction (default: False)
+  --simulate                                     whether to simulate the transaction (default: False)
+  --wait-result                                  signal to wait for the transaction result - only valid if --send is set
+  --timeout TIMEOUT                              max num of seconds to wait for result - only valid if --wait-result is
+                                                 set
+  --guardian-service-url GUARDIAN_SERVICE_URL    the url of the guardian service
+  --guardian-2fa-code GUARDIAN_2FA_CODE          the 2fa code for the guardian
+  --guardian-pem GUARDIAN_PEM                    🔑 the PEM file, if keyfile not provided
+  --guardian-keyfile GUARDIAN_KEYFILE            🔑 a JSON keyfile, if PEM not provided
+  --guardian-passfile GUARDIAN_PASSFILE          DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
+  --guardian-ledger                              🔐 bool flag for signing transaction using ledger
+  --guardian-wallet-index GUARDIAN_WALLET_INDEX  🔑 the address index; can be used for PEM files, keyfiles of type
+                                                 mnemonic or Ledger devices (default: 0)
+  --relayer-pem RELAYER_PEM                      🔑 the PEM file, if keyfile not provided
+  --relayer-keyfile RELAYER_KEYFILE              🔑 a JSON keyfile, if PEM not provided
+  --relayer-passfile RELAYER_PASSFILE            DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
+  --relayer-ledger                               🔐 bool flag for signing transaction using ledger
+  --relayer-wallet-index RELAYER_WALLET_INDEX    🔑 the address index; can be used for PEM files, keyfiles of type
+                                                 mnemonic or Ledger devices (default: 0)
+  --outfile OUTFILE                              where to save the output (default: stdout)
+
+```
+### Token.SetSpecialRoleFungible
+
+
+```
+$ mxpy token set-special-role-fungible --help
+usage: mxpy token set-special-role-fungible [-h] ...
+
+Set special roles on a fungible token for a user.
+
+options:
+  -h, --help                                     show this help message and exit
+  --token-identifier TOKEN_IDENTIFIER            the token identifier
+  --user USER                                    the bech32 address of the user
+  --local-mint                                   role for local minting
+  --local-burn                                   role for local burning
+  --esdt-transfer-role                           role for esdt transfer
+  --sender SENDER                                the alias of the wallet set in the address config
+  --pem PEM                                      🔑 the PEM file, if keyfile not provided
+  --keyfile KEYFILE                              🔑 a JSON keyfile, if PEM not provided
+  --passfile PASSFILE                            DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
+  --ledger                                       🔐 bool flag for signing transaction using ledger
+  --sender-wallet-index SENDER_WALLET_INDEX      🔑 the address index; can be used for PEM files, keyfiles of type
+                                                 mnemonic or Ledger devices (default: 0)
+  --sender-username SENDER_USERNAME              🖄 the username of the sender
+  --hrp HRP                                      The hrp used to convert the address to its bech32 representation
+  --nonce NONCE                                  # the nonce for the transaction. If not provided, is fetched from the
+                                                 network.
+  --gas-price GAS_PRICE                          ⛽ the gas price (default: 1000000000)
+  --gas-limit GAS_LIMIT                          ⛽ the gas limit
+  --gas-limit-multiplier GAS_LIMIT_MULTIPLIER    if `--gas-limit` is not provided, the estimated value will be
+                                                 multiplied by this multiplier (e.g 1.1)
+  --value VALUE                                  the value to transfer (default: 0)
+  --chain CHAIN                                  the chain identifier
+  --version VERSION                              the transaction version (default: 2)
+  --options OPTIONS                              the transaction options (default: 0)
+  --relayer RELAYER                              the bech32 address of the relayer
+  --guardian GUARDIAN                            the bech32 address of the guardian
+  --proxy PROXY                                  🔗 the URL of the proxy
+  --send                                         ✓ whether to broadcast the transaction (default: False)
+  --simulate                                     whether to simulate the transaction (default: False)
+  --wait-result                                  signal to wait for the transaction result - only valid if --send is set
+  --timeout TIMEOUT                              max num of seconds to wait for result - only valid if --wait-result is
+                                                 set
+  --guardian-service-url GUARDIAN_SERVICE_URL    the url of the guardian service
+  --guardian-2fa-code GUARDIAN_2FA_CODE          the 2fa code for the guardian
+  --guardian-pem GUARDIAN_PEM                    🔑 the PEM file, if keyfile not provided
+  --guardian-keyfile GUARDIAN_KEYFILE            🔑 a JSON keyfile, if PEM not provided
+  --guardian-passfile GUARDIAN_PASSFILE          DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
+  --guardian-ledger                              🔐 bool flag for signing transaction using ledger
+  --guardian-wallet-index GUARDIAN_WALLET_INDEX  🔑 the address index; can be used for PEM files, keyfiles of type
+                                                 mnemonic or Ledger devices (default: 0)
+  --relayer-pem RELAYER_PEM                      🔑 the PEM file, if keyfile not provided
+  --relayer-keyfile RELAYER_KEYFILE              🔑 a JSON keyfile, if PEM not provided
+  --relayer-passfile RELAYER_PASSFILE            DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
+  --relayer-ledger                               🔐 bool flag for signing transaction using ledger
+  --relayer-wallet-index RELAYER_WALLET_INDEX    🔑 the address index; can be used for PEM files, keyfiles of type
+                                                 mnemonic or Ledger devices (default: 0)
+  --outfile OUTFILE                              where to save the output (default: stdout)
+
+```
+### Token.UnsetSpecialRoleFungible
+
+
+```
+$ mxpy token unset-special-role-fungible --help
+usage: mxpy token unset-special-role-fungible [-h] ...
+
+Unset special roles on a fungible token for a user.
+
+options:
+  -h, --help                                     show this help message and exit
+  --token-identifier TOKEN_IDENTIFIER            the token identifier
+  --user USER                                    the bech32 address of the user
+  --local-mint                                   role for local minting
+  --local-burn                                   role for local burning
+  --esdt-transfer-role                           role for esdt transfer
+  --sender SENDER                                the alias of the wallet set in the address config
+  --pem PEM                                      🔑 the PEM file, if keyfile not provided
+  --keyfile KEYFILE                              🔑 a JSON keyfile, if PEM not provided
+  --passfile PASSFILE                            DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
+  --ledger                                       🔐 bool flag for signing transaction using ledger
+  --sender-wallet-index SENDER_WALLET_INDEX      🔑 the address index; can be used for PEM files, keyfiles of type
+                                                 mnemonic or Ledger devices (default: 0)
+  --sender-username SENDER_USERNAME              🖄 the username of the sender
+  --hrp HRP                                      The hrp used to convert the address to its bech32 representation
+  --nonce NONCE                                  # the nonce for the transaction. If not provided, is fetched from the
+                                                 network.
+  --gas-price GAS_PRICE                          ⛽ the gas price (default: 1000000000)
+  --gas-limit GAS_LIMIT                          ⛽ the gas limit
+  --gas-limit-multiplier GAS_LIMIT_MULTIPLIER    if `--gas-limit` is not provided, the estimated value will be
+                                                 multiplied by this multiplier (e.g 1.1)
+  --value VALUE                                  the value to transfer (default: 0)
+  --chain CHAIN                                  the chain identifier
+  --version VERSION                              the transaction version (default: 2)
+  --options OPTIONS                              the transaction options (default: 0)
+  --relayer RELAYER                              the bech32 address of the relayer
+  --guardian GUARDIAN                            the bech32 address of the guardian
+  --proxy PROXY                                  🔗 the URL of the proxy
+  --send                                         ✓ whether to broadcast the transaction (default: False)
+  --simulate                                     whether to simulate the transaction (default: False)
+  --wait-result                                  signal to wait for the transaction result - only valid if --send is set
+  --timeout TIMEOUT                              max num of seconds to wait for result - only valid if --wait-result is
+                                                 set
+  --guardian-service-url GUARDIAN_SERVICE_URL    the url of the guardian service
+  --guardian-2fa-code GUARDIAN_2FA_CODE          the 2fa code for the guardian
+  --guardian-pem GUARDIAN_PEM                    🔑 the PEM file, if keyfile not provided
+  --guardian-keyfile GUARDIAN_KEYFILE            🔑 a JSON keyfile, if PEM not provided
+  --guardian-passfile GUARDIAN_PASSFILE          DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
+  --guardian-ledger                              🔐 bool flag for signing transaction using ledger
+  --guardian-wallet-index GUARDIAN_WALLET_INDEX  🔑 the address index; can be used for PEM files, keyfiles of type
+                                                 mnemonic or Ledger devices (default: 0)
+  --relayer-pem RELAYER_PEM                      🔑 the PEM file, if keyfile not provided
+  --relayer-keyfile RELAYER_KEYFILE              🔑 a JSON keyfile, if PEM not provided
+  --relayer-passfile RELAYER_PASSFILE            DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
+  --relayer-ledger                               🔐 bool flag for signing transaction using ledger
+  --relayer-wallet-index RELAYER_WALLET_INDEX    🔑 the address index; can be used for PEM files, keyfiles of type
+                                                 mnemonic or Ledger devices (default: 0)
+  --outfile OUTFILE                              where to save the output (default: stdout)
+
+```
+### Token.SetSpecialRoleSemiFungible
+
+
+```
+$ mxpy token set-special-role-semi-fungible --help
+usage: mxpy token set-special-role-semi-fungible [-h] ...
+
+Set special roles on a semi-fungible token for a user.
+
+options:
+  -h, --help                                     show this help message and exit
+  --token-identifier TOKEN_IDENTIFIER            the token identifier
+  --user USER                                    the bech32 address of the user
+  --nft-create                                   role for nft create
+  --nft-burn                                     role for nft burn
+  --nft-add-quantity                             role for adding quantity
+  --esdt-transfer-role                           role for esdt transfer
+  --nft-update                                   role for updating nft
+  --esdt-modify-royalties                        role for modifying royalties
+  --esdt-set-new-uri                             role for setting new uri
+  --esdt-modify-creator                          role for modifying creator
+  --nft-recreate                                 role for recreating nft
+  --sender SENDER                                the alias of the wallet set in the address config
+  --pem PEM                                      🔑 the PEM file, if keyfile not provided
+  --keyfile KEYFILE                              🔑 a JSON keyfile, if PEM not provided
+  --passfile PASSFILE                            DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
+  --ledger                                       🔐 bool flag for signing transaction using ledger
+  --sender-wallet-index SENDER_WALLET_INDEX      🔑 the address index; can be used for PEM files, keyfiles of type
+                                                 mnemonic or Ledger devices (default: 0)
+  --sender-username SENDER_USERNAME              🖄 the username of the sender
+  --hrp HRP                                      The hrp used to convert the address to its bech32 representation
+  --nonce NONCE                                  # the nonce for the transaction. If not provided, is fetched from the
+                                                 network.
+  --gas-price GAS_PRICE                          ⛽ the gas price (default: 1000000000)
+  --gas-limit GAS_LIMIT                          ⛽ the gas limit
+  --gas-limit-multiplier GAS_LIMIT_MULTIPLIER    if `--gas-limit` is not provided, the estimated value will be
+                                                 multiplied by this multiplier (e.g 1.1)
+  --value VALUE                                  the value to transfer (default: 0)
+  --chain CHAIN                                  the chain identifier
+  --version VERSION                              the transaction version (default: 2)
+  --options OPTIONS                              the transaction options (default: 0)
+  --relayer RELAYER                              the bech32 address of the relayer
+  --guardian GUARDIAN                            the bech32 address of the guardian
+  --proxy PROXY                                  🔗 the URL of the proxy
+  --send                                         ✓ whether to broadcast the transaction (default: False)
+  --simulate                                     whether to simulate the transaction (default: False)
+  --wait-result                                  signal to wait for the transaction result - only valid if --send is set
+  --timeout TIMEOUT                              max num of seconds to wait for result - only valid if --wait-result is
+                                                 set
+  --guardian-service-url GUARDIAN_SERVICE_URL    the url of the guardian service
+  --guardian-2fa-code GUARDIAN_2FA_CODE          the 2fa code for the guardian
+  --guardian-pem GUARDIAN_PEM                    🔑 the PEM file, if keyfile not provided
+  --guardian-keyfile GUARDIAN_KEYFILE            🔑 a JSON keyfile, if PEM not provided
+  --guardian-passfile GUARDIAN_PASSFILE          DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
+  --guardian-ledger                              🔐 bool flag for signing transaction using ledger
+  --guardian-wallet-index GUARDIAN_WALLET_INDEX  🔑 the address index; can be used for PEM files, keyfiles of type
+                                                 mnemonic or Ledger devices (default: 0)
+  --relayer-pem RELAYER_PEM                      🔑 the PEM file, if keyfile not provided
+  --relayer-keyfile RELAYER_KEYFILE              🔑 a JSON keyfile, if PEM not provided
+  --relayer-passfile RELAYER_PASSFILE            DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
+  --relayer-ledger                               🔐 bool flag for signing transaction using ledger
+  --relayer-wallet-index RELAYER_WALLET_INDEX    🔑 the address index; can be used for PEM files, keyfiles of type
+                                                 mnemonic or Ledger devices (default: 0)
+  --outfile OUTFILE                              where to save the output (default: stdout)
+
+```
+### Token.UnsetSpecialRoleSemiFungible
+
+
+```
+$ mxpy token unset-special-role-semi-fungible --help
+usage: mxpy token unset-special-role-semi-fungible [-h] ...
+
+Unset special roles on a semi-fungible token for a user.
+
+options:
+  -h, --help                                     show this help message and exit
+  --token-identifier TOKEN_IDENTIFIER            the token identifier
+  --user USER                                    the bech32 address of the user
+  --nft-burn                                     role for nft burn
+  --nft-add-quantity                             role for adding quantity
+  --esdt-transfer-role                           role for esdt transfer
+  --nft-update                                   role for updating nft
+  --esdt-modify-royalties                        role for modifying royalties
+  --esdt-set-new-uri                             role for setting new uri
+  --esdt-modify-creator                          role for modifying creator
+  --nft-recreate                                 role for recreating nft
+  --sender SENDER                                the alias of the wallet set in the address config
+  --pem PEM                                      🔑 the PEM file, if keyfile not provided
+  --keyfile KEYFILE                              🔑 a JSON keyfile, if PEM not provided
+  --passfile PASSFILE                            DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
+  --ledger                                       🔐 bool flag for signing transaction using ledger
+  --sender-wallet-index SENDER_WALLET_INDEX      🔑 the address index; can be used for PEM files, keyfiles of type
+                                                 mnemonic or Ledger devices (default: 0)
+  --sender-username SENDER_USERNAME              🖄 the username of the sender
+  --hrp HRP                                      The hrp used to convert the address to its bech32 representation
+  --nonce NONCE                                  # the nonce for the transaction. If not provided, is fetched from the
+                                                 network.
+  --gas-price GAS_PRICE                          ⛽ the gas price (default: 1000000000)
+  --gas-limit GAS_LIMIT                          ⛽ the gas limit
+  --gas-limit-multiplier GAS_LIMIT_MULTIPLIER    if `--gas-limit` is not provided, the estimated value will be
+                                                 multiplied by this multiplier (e.g 1.1)
+  --value VALUE                                  the value to transfer (default: 0)
+  --chain CHAIN                                  the chain identifier
+  --version VERSION                              the transaction version (default: 2)
+  --options OPTIONS                              the transaction options (default: 0)
+  --relayer RELAYER                              the bech32 address of the relayer
+  --guardian GUARDIAN                            the bech32 address of the guardian
+  --proxy PROXY                                  🔗 the URL of the proxy
+  --send                                         ✓ whether to broadcast the transaction (default: False)
+  --simulate                                     whether to simulate the transaction (default: False)
+  --wait-result                                  signal to wait for the transaction result - only valid if --send is set
+  --timeout TIMEOUT                              max num of seconds to wait for result - only valid if --wait-result is
+                                                 set
+  --guardian-service-url GUARDIAN_SERVICE_URL    the url of the guardian service
+  --guardian-2fa-code GUARDIAN_2FA_CODE          the 2fa code for the guardian
+  --guardian-pem GUARDIAN_PEM                    🔑 the PEM file, if keyfile not provided
+  --guardian-keyfile GUARDIAN_KEYFILE            🔑 a JSON keyfile, if PEM not provided
+  --guardian-passfile GUARDIAN_PASSFILE          DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
+  --guardian-ledger                              🔐 bool flag for signing transaction using ledger
+  --guardian-wallet-index GUARDIAN_WALLET_INDEX  🔑 the address index; can be used for PEM files, keyfiles of type
+                                                 mnemonic or Ledger devices (default: 0)
+  --relayer-pem RELAYER_PEM                      🔑 the PEM file, if keyfile not provided
+  --relayer-keyfile RELAYER_KEYFILE              🔑 a JSON keyfile, if PEM not provided
+  --relayer-passfile RELAYER_PASSFILE            DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
+  --relayer-ledger                               🔐 bool flag for signing transaction using ledger
+  --relayer-wallet-index RELAYER_WALLET_INDEX    🔑 the address index; can be used for PEM files, keyfiles of type
+                                                 mnemonic or Ledger devices (default: 0)
+  --outfile OUTFILE                              where to save the output (default: stdout)
+
+```
+### Token.SetSpecialRoleMetaEsdt
+
+
+```
+$ mxpy token set-special-role-meta-esdt --help
+usage: mxpy token set-special-role-meta-esdt [-h] ...
+
+Set special roles on a meta-esdt token for a user.
+
+options:
+  -h, --help                                     show this help message and exit
+  --token-identifier TOKEN_IDENTIFIER            the token identifier
+  --user USER                                    the bech32 address of the user
+  --nft-create                                   role for nft create
+  --nft-burn                                     role for nft burn
+  --nft-add-quantity                             role for adding quantity
+  --esdt-transfer-role                           role for esdt transfer
+  --sender SENDER                                the alias of the wallet set in the address config
+  --pem PEM                                      🔑 the PEM file, if keyfile not provided
+  --keyfile KEYFILE                              🔑 a JSON keyfile, if PEM not provided
+  --passfile PASSFILE                            DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
+  --ledger                                       🔐 bool flag for signing transaction using ledger
+  --sender-wallet-index SENDER_WALLET_INDEX      🔑 the address index; can be used for PEM files, keyfiles of type
+                                                 mnemonic or Ledger devices (default: 0)
+  --sender-username SENDER_USERNAME              🖄 the username of the sender
+  --hrp HRP                                      The hrp used to convert the address to its bech32 representation
+  --nonce NONCE                                  # the nonce for the transaction. If not provided, is fetched from the
+                                                 network.
+  --gas-price GAS_PRICE                          ⛽ the gas price (default: 1000000000)
+  --gas-limit GAS_LIMIT                          ⛽ the gas limit
+  --gas-limit-multiplier GAS_LIMIT_MULTIPLIER    if `--gas-limit` is not provided, the estimated value will be
+                                                 multiplied by this multiplier (e.g 1.1)
+  --value VALUE                                  the value to transfer (default: 0)
+  --chain CHAIN                                  the chain identifier
+  --version VERSION                              the transaction version (default: 2)
+  --options OPTIONS                              the transaction options (default: 0)
+  --relayer RELAYER                              the bech32 address of the relayer
+  --guardian GUARDIAN                            the bech32 address of the guardian
+  --proxy PROXY                                  🔗 the URL of the proxy
+  --send                                         ✓ whether to broadcast the transaction (default: False)
+  --simulate                                     whether to simulate the transaction (default: False)
+  --wait-result                                  signal to wait for the transaction result - only valid if --send is set
+  --timeout TIMEOUT                              max num of seconds to wait for result - only valid if --wait-result is
+                                                 set
+  --guardian-service-url GUARDIAN_SERVICE_URL    the url of the guardian service
+  --guardian-2fa-code GUARDIAN_2FA_CODE          the 2fa code for the guardian
+  --guardian-pem GUARDIAN_PEM                    🔑 the PEM file, if keyfile not provided
+  --guardian-keyfile GUARDIAN_KEYFILE            🔑 a JSON keyfile, if PEM not provided
+  --guardian-passfile GUARDIAN_PASSFILE          DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
+  --guardian-ledger                              🔐 bool flag for signing transaction using ledger
+  --guardian-wallet-index GUARDIAN_WALLET_INDEX  🔑 the address index; can be used for PEM files, keyfiles of type
+                                                 mnemonic or Ledger devices (default: 0)
+  --relayer-pem RELAYER_PEM                      🔑 the PEM file, if keyfile not provided
+  --relayer-keyfile RELAYER_KEYFILE              🔑 a JSON keyfile, if PEM not provided
+  --relayer-passfile RELAYER_PASSFILE            DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
+  --relayer-ledger                               🔐 bool flag for signing transaction using ledger
+  --relayer-wallet-index RELAYER_WALLET_INDEX    🔑 the address index; can be used for PEM files, keyfiles of type
+                                                 mnemonic or Ledger devices (default: 0)
+  --outfile OUTFILE                              where to save the output (default: stdout)
+
+```
+### Token.UnsetSpecialRoleMetaEsdt
+
+
+```
+$ mxpy token unset-special-role-meta-esdt --help
+usage: mxpy token unset-special-role-meta-esdt [-h] ...
+
+Unset special roles on a meta-esdt token for a user.
+
+options:
+  -h, --help                                     show this help message and exit
+  --token-identifier TOKEN_IDENTIFIER            the token identifier
+  --user USER                                    the bech32 address of the user
+  --nft-burn                                     role for nft burn
+  --nft-add-quantity                             role for adding quantity
+  --esdt-transfer-role                           role for esdt transfer
+  --sender SENDER                                the alias of the wallet set in the address config
+  --pem PEM                                      🔑 the PEM file, if keyfile not provided
+  --keyfile KEYFILE                              🔑 a JSON keyfile, if PEM not provided
+  --passfile PASSFILE                            DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
+  --ledger                                       🔐 bool flag for signing transaction using ledger
+  --sender-wallet-index SENDER_WALLET_INDEX      🔑 the address index; can be used for PEM files, keyfiles of type
+                                                 mnemonic or Ledger devices (default: 0)
+  --sender-username SENDER_USERNAME              🖄 the username of the sender
+  --hrp HRP                                      The hrp used to convert the address to its bech32 representation
+  --nonce NONCE                                  # the nonce for the transaction. If not provided, is fetched from the
+                                                 network.
+  --gas-price GAS_PRICE                          ⛽ the gas price (default: 1000000000)
+  --gas-limit GAS_LIMIT                          ⛽ the gas limit
+  --gas-limit-multiplier GAS_LIMIT_MULTIPLIER    if `--gas-limit` is not provided, the estimated value will be
+                                                 multiplied by this multiplier (e.g 1.1)
+  --value VALUE                                  the value to transfer (default: 0)
+  --chain CHAIN                                  the chain identifier
+  --version VERSION                              the transaction version (default: 2)
+  --options OPTIONS                              the transaction options (default: 0)
+  --relayer RELAYER                              the bech32 address of the relayer
+  --guardian GUARDIAN                            the bech32 address of the guardian
+  --proxy PROXY                                  🔗 the URL of the proxy
+  --send                                         ✓ whether to broadcast the transaction (default: False)
+  --simulate                                     whether to simulate the transaction (default: False)
+  --wait-result                                  signal to wait for the transaction result - only valid if --send is set
+  --timeout TIMEOUT                              max num of seconds to wait for result - only valid if --wait-result is
+                                                 set
+  --guardian-service-url GUARDIAN_SERVICE_URL    the url of the guardian service
+  --guardian-2fa-code GUARDIAN_2FA_CODE          the 2fa code for the guardian
+  --guardian-pem GUARDIAN_PEM                    🔑 the PEM file, if keyfile not provided
+  --guardian-keyfile GUARDIAN_KEYFILE            🔑 a JSON keyfile, if PEM not provided
+  --guardian-passfile GUARDIAN_PASSFILE          DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
+  --guardian-ledger                              🔐 bool flag for signing transaction using ledger
+  --guardian-wallet-index GUARDIAN_WALLET_INDEX  🔑 the address index; can be used for PEM files, keyfiles of type
+                                                 mnemonic or Ledger devices (default: 0)
+  --relayer-pem RELAYER_PEM                      🔑 the PEM file, if keyfile not provided
+  --relayer-keyfile RELAYER_KEYFILE              🔑 a JSON keyfile, if PEM not provided
+  --relayer-passfile RELAYER_PASSFILE            DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
+  --relayer-ledger                               🔐 bool flag for signing transaction using ledger
+  --relayer-wallet-index RELAYER_WALLET_INDEX    🔑 the address index; can be used for PEM files, keyfiles of type
+                                                 mnemonic or Ledger devices (default: 0)
+  --outfile OUTFILE                              where to save the output (default: stdout)
+
+```
+### Token.SetSpecialRoleNft
+
+
+```
+$ mxpy token set-special-role-nft --help
+usage: mxpy token set-special-role-nft [-h] ...
+
+Set special roles on a non-fungible token for a user.
+
+options:
+  -h, --help                                     show this help message and exit
+  --token-identifier TOKEN_IDENTIFIER            the token identifier
+  --user USER                                    the bech32 address of the user
+  --nft-create                                   role for nft create
+  --nft-burn                                     role for nft burn
+  --nft-update-attributes                        role for updating attributes
+  --nft-add-uri                                  role for adding uri
+  --esdt-transfer-role                           role for esdt transfer
+  --nft-update                                   role for updating nft
+  --esdt-modify-royalties                        role for modifying royalties
+  --esdt-set-new-uri                             role for setting new uri
+  --esdt-modify-creator                          role for modifying creator
+  --nft-recreate                                 role for recreating nft
+  --sender SENDER                                the alias of the wallet set in the address config
+  --pem PEM                                      🔑 the PEM file, if keyfile not provided
+  --keyfile KEYFILE                              🔑 a JSON keyfile, if PEM not provided
+  --passfile PASSFILE                            DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
+  --ledger                                       🔐 bool flag for signing transaction using ledger
+  --sender-wallet-index SENDER_WALLET_INDEX      🔑 the address index; can be used for PEM files, keyfiles of type
+                                                 mnemonic or Ledger devices (default: 0)
+  --sender-username SENDER_USERNAME              🖄 the username of the sender
+  --hrp HRP                                      The hrp used to convert the address to its bech32 representation
+  --nonce NONCE                                  # the nonce for the transaction. If not provided, is fetched from the
+                                                 network.
+  --gas-price GAS_PRICE                          ⛽ the gas price (default: 1000000000)
+  --gas-limit GAS_LIMIT                          ⛽ the gas limit
+  --gas-limit-multiplier GAS_LIMIT_MULTIPLIER    if `--gas-limit` is not provided, the estimated value will be
+                                                 multiplied by this multiplier (e.g 1.1)
+  --value VALUE                                  the value to transfer (default: 0)
+  --chain CHAIN                                  the chain identifier
+  --version VERSION                              the transaction version (default: 2)
+  --options OPTIONS                              the transaction options (default: 0)
+  --relayer RELAYER                              the bech32 address of the relayer
+  --guardian GUARDIAN                            the bech32 address of the guardian
+  --proxy PROXY                                  🔗 the URL of the proxy
+  --send                                         ✓ whether to broadcast the transaction (default: False)
+  --simulate                                     whether to simulate the transaction (default: False)
+  --wait-result                                  signal to wait for the transaction result - only valid if --send is set
+  --timeout TIMEOUT                              max num of seconds to wait for result - only valid if --wait-result is
+                                                 set
+  --guardian-service-url GUARDIAN_SERVICE_URL    the url of the guardian service
+  --guardian-2fa-code GUARDIAN_2FA_CODE          the 2fa code for the guardian
+  --guardian-pem GUARDIAN_PEM                    🔑 the PEM file, if keyfile not provided
+  --guardian-keyfile GUARDIAN_KEYFILE            🔑 a JSON keyfile, if PEM not provided
+  --guardian-passfile GUARDIAN_PASSFILE          DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
+  --guardian-ledger                              🔐 bool flag for signing transaction using ledger
+  --guardian-wallet-index GUARDIAN_WALLET_INDEX  🔑 the address index; can be used for PEM files, keyfiles of type
+                                                 mnemonic or Ledger devices (default: 0)
+  --relayer-pem RELAYER_PEM                      🔑 the PEM file, if keyfile not provided
+  --relayer-keyfile RELAYER_KEYFILE              🔑 a JSON keyfile, if PEM not provided
+  --relayer-passfile RELAYER_PASSFILE            DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
+  --relayer-ledger                               🔐 bool flag for signing transaction using ledger
+  --relayer-wallet-index RELAYER_WALLET_INDEX    🔑 the address index; can be used for PEM files, keyfiles of type
+                                                 mnemonic or Ledger devices (default: 0)
+  --outfile OUTFILE                              where to save the output (default: stdout)
+
+```
+### Token.UnsetSpecialRoleNft
+
+
+```
+$ mxpy token unset-special-role-nft --help
+usage: mxpy token unset-special-role-nft [-h] ...
+
+Unset special roles on a non-fungible token for a user.
+
+options:
+  -h, --help                                     show this help message and exit
+  --token-identifier TOKEN_IDENTIFIER            the token identifier
+  --user USER                                    the bech32 address of the user
+  --nft-create                                   role for nft create
+  --nft-burn                                     role for nft burn
+  --nft-update-attributes                        role for updating attributes
+  --nft-add-uri                                  role for adding uri
+  --esdt-transfer-role                           role for esdt transfer
+  --nft-update                                   role for updating nft
+  --esdt-modify-royalties                        role for modifying royalties
+  --esdt-set-new-uri                             role for setting new uri
+  --esdt-modify-creator                          role for modifying creator
+  --nft-recreate                                 role for recreating nft
+  --sender SENDER                                the alias of the wallet set in the address config
+  --pem PEM                                      🔑 the PEM file, if keyfile not provided
+  --keyfile KEYFILE                              🔑 a JSON keyfile, if PEM not provided
+  --passfile PASSFILE                            DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
+  --ledger                                       🔐 bool flag for signing transaction using ledger
+  --sender-wallet-index SENDER_WALLET_INDEX      🔑 the address index; can be used for PEM files, keyfiles of type
+                                                 mnemonic or Ledger devices (default: 0)
+  --sender-username SENDER_USERNAME              🖄 the username of the sender
+  --hrp HRP                                      The hrp used to convert the address to its bech32 representation
+  --nonce NONCE                                  # the nonce for the transaction. If not provided, is fetched from the
+                                                 network.
+  --gas-price GAS_PRICE                          ⛽ the gas price (default: 1000000000)
+  --gas-limit GAS_LIMIT                          ⛽ the gas limit
+  --gas-limit-multiplier GAS_LIMIT_MULTIPLIER    if `--gas-limit` is not provided, the estimated value will be
+                                                 multiplied by this multiplier (e.g 1.1)
+  --value VALUE                                  the value to transfer (default: 0)
+  --chain CHAIN                                  the chain identifier
+  --version VERSION                              the transaction version (default: 2)
+  --options OPTIONS                              the transaction options (default: 0)
+  --relayer RELAYER                              the bech32 address of the relayer
+  --guardian GUARDIAN                            the bech32 address of the guardian
+  --proxy PROXY                                  🔗 the URL of the proxy
+  --send                                         ✓ whether to broadcast the transaction (default: False)
+  --simulate                                     whether to simulate the transaction (default: False)
+  --wait-result                                  signal to wait for the transaction result - only valid if --send is set
+  --timeout TIMEOUT                              max num of seconds to wait for result - only valid if --wait-result is
+                                                 set
+  --guardian-service-url GUARDIAN_SERVICE_URL    the url of the guardian service
+  --guardian-2fa-code GUARDIAN_2FA_CODE          the 2fa code for the guardian
+  --guardian-pem GUARDIAN_PEM                    🔑 the PEM file, if keyfile not provided
+  --guardian-keyfile GUARDIAN_KEYFILE            🔑 a JSON keyfile, if PEM not provided
+  --guardian-passfile GUARDIAN_PASSFILE          DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
+  --guardian-ledger                              🔐 bool flag for signing transaction using ledger
+  --guardian-wallet-index GUARDIAN_WALLET_INDEX  🔑 the address index; can be used for PEM files, keyfiles of type
+                                                 mnemonic or Ledger devices (default: 0)
+  --relayer-pem RELAYER_PEM                      🔑 the PEM file, if keyfile not provided
+  --relayer-keyfile RELAYER_KEYFILE              🔑 a JSON keyfile, if PEM not provided
+  --relayer-passfile RELAYER_PASSFILE            DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
+  --relayer-ledger                               🔐 bool flag for signing transaction using ledger
+  --relayer-wallet-index RELAYER_WALLET_INDEX    🔑 the address index; can be used for PEM files, keyfiles of type
+                                                 mnemonic or Ledger devices (default: 0)
+  --outfile OUTFILE                              where to save the output (default: stdout)
+
+```
+### Token.CreateNft
+
+
+```
+$ mxpy token create-nft --help
+usage: mxpy token create-nft [-h] ...
+
+Create a non-fungible token.
+
+options:
+  -h, --help                                     show this help message and exit
+  --token-identifier TOKEN_IDENTIFIER            the token identifier
+  --initial-quantity INITIAL_QUANTITY            The initial quantity of the token.
+  --name NAME                                    The name of the token.
+  --royalties ROYALTIES                          The royalties of the token.
+  --hash HASH                                    The hash of the token.
+  --attributes ATTRIBUTES                        The hex-string attributes of the token.
+  --uris URIS [URIS ...]                         The uris of the token.
+  --sender SENDER                                the alias of the wallet set in the address config
+  --pem PEM                                      🔑 the PEM file, if keyfile not provided
+  --keyfile KEYFILE                              🔑 a JSON keyfile, if PEM not provided
+  --passfile PASSFILE                            DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
+  --ledger                                       🔐 bool flag for signing transaction using ledger
+  --sender-wallet-index SENDER_WALLET_INDEX      🔑 the address index; can be used for PEM files, keyfiles of type
+                                                 mnemonic or Ledger devices (default: 0)
+  --sender-username SENDER_USERNAME              🖄 the username of the sender
+  --hrp HRP                                      The hrp used to convert the address to its bech32 representation
+  --nonce NONCE                                  # the nonce for the transaction. If not provided, is fetched from the
+                                                 network.
+  --gas-price GAS_PRICE                          ⛽ the gas price (default: 1000000000)
+  --gas-limit GAS_LIMIT                          ⛽ the gas limit
+  --gas-limit-multiplier GAS_LIMIT_MULTIPLIER    if `--gas-limit` is not provided, the estimated value will be
+                                                 multiplied by this multiplier (e.g 1.1)
+  --value VALUE                                  the value to transfer (default: 0)
+  --chain CHAIN                                  the chain identifier
+  --version VERSION                              the transaction version (default: 2)
+  --options OPTIONS                              the transaction options (default: 0)
+  --relayer RELAYER                              the bech32 address of the relayer
+  --guardian GUARDIAN                            the bech32 address of the guardian
+  --proxy PROXY                                  🔗 the URL of the proxy
+  --send                                         ✓ whether to broadcast the transaction (default: False)
+  --simulate                                     whether to simulate the transaction (default: False)
+  --wait-result                                  signal to wait for the transaction result - only valid if --send is set
+  --timeout TIMEOUT                              max num of seconds to wait for result - only valid if --wait-result is
+                                                 set
+  --guardian-service-url GUARDIAN_SERVICE_URL    the url of the guardian service
+  --guardian-2fa-code GUARDIAN_2FA_CODE          the 2fa code for the guardian
+  --guardian-pem GUARDIAN_PEM                    🔑 the PEM file, if keyfile not provided
+  --guardian-keyfile GUARDIAN_KEYFILE            🔑 a JSON keyfile, if PEM not provided
+  --guardian-passfile GUARDIAN_PASSFILE          DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
+  --guardian-ledger                              🔐 bool flag for signing transaction using ledger
+  --guardian-wallet-index GUARDIAN_WALLET_INDEX  🔑 the address index; can be used for PEM files, keyfiles of type
+                                                 mnemonic or Ledger devices (default: 0)
+  --relayer-pem RELAYER_PEM                      🔑 the PEM file, if keyfile not provided
+  --relayer-keyfile RELAYER_KEYFILE              🔑 a JSON keyfile, if PEM not provided
+  --relayer-passfile RELAYER_PASSFILE            DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
+  --relayer-ledger                               🔐 bool flag for signing transaction using ledger
+  --relayer-wallet-index RELAYER_WALLET_INDEX    🔑 the address index; can be used for PEM files, keyfiles of type
+                                                 mnemonic or Ledger devices (default: 0)
+  --outfile OUTFILE                              where to save the output (default: stdout)
+
+```
+### Token.Pause
+
+
+```
+$ mxpy token pause --help
+usage: mxpy token pause [-h] ...
+
+Pause a token.
+
+options:
+  -h, --help                                     show this help message and exit
+  --token-identifier TOKEN_IDENTIFIER            the token identifier
+  --sender SENDER                                the alias of the wallet set in the address config
+  --pem PEM                                      🔑 the PEM file, if keyfile not provided
+  --keyfile KEYFILE                              🔑 a JSON keyfile, if PEM not provided
+  --passfile PASSFILE                            DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
+  --ledger                                       🔐 bool flag for signing transaction using ledger
+  --sender-wallet-index SENDER_WALLET_INDEX      🔑 the address index; can be used for PEM files, keyfiles of type
+                                                 mnemonic or Ledger devices (default: 0)
+  --sender-username SENDER_USERNAME              🖄 the username of the sender
+  --hrp HRP                                      The hrp used to convert the address to its bech32 representation
+  --nonce NONCE                                  # the nonce for the transaction. If not provided, is fetched from the
+                                                 network.
+  --gas-price GAS_PRICE                          ⛽ the gas price (default: 1000000000)
+  --gas-limit GAS_LIMIT                          ⛽ the gas limit
+  --gas-limit-multiplier GAS_LIMIT_MULTIPLIER    if `--gas-limit` is not provided, the estimated value will be
+                                                 multiplied by this multiplier (e.g 1.1)
+  --value VALUE                                  the value to transfer (default: 0)
+  --chain CHAIN                                  the chain identifier
+  --version VERSION                              the transaction version (default: 2)
+  --options OPTIONS                              the transaction options (default: 0)
+  --relayer RELAYER                              the bech32 address of the relayer
+  --guardian GUARDIAN                            the bech32 address of the guardian
+  --proxy PROXY                                  🔗 the URL of the proxy
+  --send                                         ✓ whether to broadcast the transaction (default: False)
+  --simulate                                     whether to simulate the transaction (default: False)
+  --wait-result                                  signal to wait for the transaction result - only valid if --send is set
+  --timeout TIMEOUT                              max num of seconds to wait for result - only valid if --wait-result is
+                                                 set
+  --guardian-service-url GUARDIAN_SERVICE_URL    the url of the guardian service
+  --guardian-2fa-code GUARDIAN_2FA_CODE          the 2fa code for the guardian
+  --guardian-pem GUARDIAN_PEM                    🔑 the PEM file, if keyfile not provided
+  --guardian-keyfile GUARDIAN_KEYFILE            🔑 a JSON keyfile, if PEM not provided
+  --guardian-passfile GUARDIAN_PASSFILE          DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
+  --guardian-ledger                              🔐 bool flag for signing transaction using ledger
+  --guardian-wallet-index GUARDIAN_WALLET_INDEX  🔑 the address index; can be used for PEM files, keyfiles of type
+                                                 mnemonic or Ledger devices (default: 0)
+  --relayer-pem RELAYER_PEM                      🔑 the PEM file, if keyfile not provided
+  --relayer-keyfile RELAYER_KEYFILE              🔑 a JSON keyfile, if PEM not provided
+  --relayer-passfile RELAYER_PASSFILE            DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
+  --relayer-ledger                               🔐 bool flag for signing transaction using ledger
+  --relayer-wallet-index RELAYER_WALLET_INDEX    🔑 the address index; can be used for PEM files, keyfiles of type
+                                                 mnemonic or Ledger devices (default: 0)
+  --outfile OUTFILE                              where to save the output (default: stdout)
+
+```
+### Token.Unpause
+
+
+```
+$ mxpy token unpause --help
+usage: mxpy token unpause [-h] ...
+
+Unpause a token.
+
+options:
+  -h, --help                                     show this help message and exit
+  --token-identifier TOKEN_IDENTIFIER            the token identifier
+  --sender SENDER                                the alias of the wallet set in the address config
+  --pem PEM                                      🔑 the PEM file, if keyfile not provided
+  --keyfile KEYFILE                              🔑 a JSON keyfile, if PEM not provided
+  --passfile PASSFILE                            DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
+  --ledger                                       🔐 bool flag for signing transaction using ledger
+  --sender-wallet-index SENDER_WALLET_INDEX      🔑 the address index; can be used for PEM files, keyfiles of type
+                                                 mnemonic or Ledger devices (default: 0)
+  --sender-username SENDER_USERNAME              🖄 the username of the sender
+  --hrp HRP                                      The hrp used to convert the address to its bech32 representation
+  --nonce NONCE                                  # the nonce for the transaction. If not provided, is fetched from the
+                                                 network.
+  --gas-price GAS_PRICE                          ⛽ the gas price (default: 1000000000)
+  --gas-limit GAS_LIMIT                          ⛽ the gas limit
+  --gas-limit-multiplier GAS_LIMIT_MULTIPLIER    if `--gas-limit` is not provided, the estimated value will be
+                                                 multiplied by this multiplier (e.g 1.1)
+  --value VALUE                                  the value to transfer (default: 0)
+  --chain CHAIN                                  the chain identifier
+  --version VERSION                              the transaction version (default: 2)
+  --options OPTIONS                              the transaction options (default: 0)
+  --relayer RELAYER                              the bech32 address of the relayer
+  --guardian GUARDIAN                            the bech32 address of the guardian
+  --proxy PROXY                                  🔗 the URL of the proxy
+  --send                                         ✓ whether to broadcast the transaction (default: False)
+  --simulate                                     whether to simulate the transaction (default: False)
+  --wait-result                                  signal to wait for the transaction result - only valid if --send is set
+  --timeout TIMEOUT                              max num of seconds to wait for result - only valid if --wait-result is
+                                                 set
+  --guardian-service-url GUARDIAN_SERVICE_URL    the url of the guardian service
+  --guardian-2fa-code GUARDIAN_2FA_CODE          the 2fa code for the guardian
+  --guardian-pem GUARDIAN_PEM                    🔑 the PEM file, if keyfile not provided
+  --guardian-keyfile GUARDIAN_KEYFILE            🔑 a JSON keyfile, if PEM not provided
+  --guardian-passfile GUARDIAN_PASSFILE          DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
+  --guardian-ledger                              🔐 bool flag for signing transaction using ledger
+  --guardian-wallet-index GUARDIAN_WALLET_INDEX  🔑 the address index; can be used for PEM files, keyfiles of type
+                                                 mnemonic or Ledger devices (default: 0)
+  --relayer-pem RELAYER_PEM                      🔑 the PEM file, if keyfile not provided
+  --relayer-keyfile RELAYER_KEYFILE              🔑 a JSON keyfile, if PEM not provided
+  --relayer-passfile RELAYER_PASSFILE            DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
+  --relayer-ledger                               🔐 bool flag for signing transaction using ledger
+  --relayer-wallet-index RELAYER_WALLET_INDEX    🔑 the address index; can be used for PEM files, keyfiles of type
+                                                 mnemonic or Ledger devices (default: 0)
+  --outfile OUTFILE                              where to save the output (default: stdout)
+
+```
+### Token.Freeze
+
+
+```
+$ mxpy token freeze --help
+usage: mxpy token freeze [-h] ...
+
+Freeze a token for a user.
+
+options:
+  -h, --help                                     show this help message and exit
+  --token-identifier TOKEN_IDENTIFIER            the token identifier
+  --user USER                                    the bech32 address of the user
+  --sender SENDER                                the alias of the wallet set in the address config
+  --pem PEM                                      🔑 the PEM file, if keyfile not provided
+  --keyfile KEYFILE                              🔑 a JSON keyfile, if PEM not provided
+  --passfile PASSFILE                            DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
+  --ledger                                       🔐 bool flag for signing transaction using ledger
+  --sender-wallet-index SENDER_WALLET_INDEX      🔑 the address index; can be used for PEM files, keyfiles of type
+                                                 mnemonic or Ledger devices (default: 0)
+  --sender-username SENDER_USERNAME              🖄 the username of the sender
+  --hrp HRP                                      The hrp used to convert the address to its bech32 representation
+  --nonce NONCE                                  # the nonce for the transaction. If not provided, is fetched from the
+                                                 network.
+  --gas-price GAS_PRICE                          ⛽ the gas price (default: 1000000000)
+  --gas-limit GAS_LIMIT                          ⛽ the gas limit
+  --gas-limit-multiplier GAS_LIMIT_MULTIPLIER    if `--gas-limit` is not provided, the estimated value will be
+                                                 multiplied by this multiplier (e.g 1.1)
+  --value VALUE                                  the value to transfer (default: 0)
+  --chain CHAIN                                  the chain identifier
+  --version VERSION                              the transaction version (default: 2)
+  --options OPTIONS                              the transaction options (default: 0)
+  --relayer RELAYER                              the bech32 address of the relayer
+  --guardian GUARDIAN                            the bech32 address of the guardian
+  --proxy PROXY                                  🔗 the URL of the proxy
+  --send                                         ✓ whether to broadcast the transaction (default: False)
+  --simulate                                     whether to simulate the transaction (default: False)
+  --wait-result                                  signal to wait for the transaction result - only valid if --send is set
+  --timeout TIMEOUT                              max num of seconds to wait for result - only valid if --wait-result is
+                                                 set
+  --guardian-service-url GUARDIAN_SERVICE_URL    the url of the guardian service
+  --guardian-2fa-code GUARDIAN_2FA_CODE          the 2fa code for the guardian
+  --guardian-pem GUARDIAN_PEM                    🔑 the PEM file, if keyfile not provided
+  --guardian-keyfile GUARDIAN_KEYFILE            🔑 a JSON keyfile, if PEM not provided
+  --guardian-passfile GUARDIAN_PASSFILE          DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
+  --guardian-ledger                              🔐 bool flag for signing transaction using ledger
+  --guardian-wallet-index GUARDIAN_WALLET_INDEX  🔑 the address index; can be used for PEM files, keyfiles of type
+                                                 mnemonic or Ledger devices (default: 0)
+  --relayer-pem RELAYER_PEM                      🔑 the PEM file, if keyfile not provided
+  --relayer-keyfile RELAYER_KEYFILE              🔑 a JSON keyfile, if PEM not provided
+  --relayer-passfile RELAYER_PASSFILE            DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
+  --relayer-ledger                               🔐 bool flag for signing transaction using ledger
+  --relayer-wallet-index RELAYER_WALLET_INDEX    🔑 the address index; can be used for PEM files, keyfiles of type
+                                                 mnemonic or Ledger devices (default: 0)
+  --outfile OUTFILE                              where to save the output (default: stdout)
+
+```
+### Token.Unfreeze
+
+
+```
+$ mxpy token unfreeze --help
+usage: mxpy token unfreeze [-h] ...
+
+Unfreeze a token for a user.
+
+options:
+  -h, --help                                     show this help message and exit
+  --token-identifier TOKEN_IDENTIFIER            the token identifier
+  --user USER                                    the bech32 address of the user
+  --sender SENDER                                the alias of the wallet set in the address config
+  --pem PEM                                      🔑 the PEM file, if keyfile not provided
+  --keyfile KEYFILE                              🔑 a JSON keyfile, if PEM not provided
+  --passfile PASSFILE                            DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
+  --ledger                                       🔐 bool flag for signing transaction using ledger
+  --sender-wallet-index SENDER_WALLET_INDEX      🔑 the address index; can be used for PEM files, keyfiles of type
+                                                 mnemonic or Ledger devices (default: 0)
+  --sender-username SENDER_USERNAME              🖄 the username of the sender
+  --hrp HRP                                      The hrp used to convert the address to its bech32 representation
+  --nonce NONCE                                  # the nonce for the transaction. If not provided, is fetched from the
+                                                 network.
+  --gas-price GAS_PRICE                          ⛽ the gas price (default: 1000000000)
+  --gas-limit GAS_LIMIT                          ⛽ the gas limit
+  --gas-limit-multiplier GAS_LIMIT_MULTIPLIER    if `--gas-limit` is not provided, the estimated value will be
+                                                 multiplied by this multiplier (e.g 1.1)
+  --value VALUE                                  the value to transfer (default: 0)
+  --chain CHAIN                                  the chain identifier
+  --version VERSION                              the transaction version (default: 2)
+  --options OPTIONS                              the transaction options (default: 0)
+  --relayer RELAYER                              the bech32 address of the relayer
+  --guardian GUARDIAN                            the bech32 address of the guardian
+  --proxy PROXY                                  🔗 the URL of the proxy
+  --send                                         ✓ whether to broadcast the transaction (default: False)
+  --simulate                                     whether to simulate the transaction (default: False)
+  --wait-result                                  signal to wait for the transaction result - only valid if --send is set
+  --timeout TIMEOUT                              max num of seconds to wait for result - only valid if --wait-result is
+                                                 set
+  --guardian-service-url GUARDIAN_SERVICE_URL    the url of the guardian service
+  --guardian-2fa-code GUARDIAN_2FA_CODE          the 2fa code for the guardian
+  --guardian-pem GUARDIAN_PEM                    🔑 the PEM file, if keyfile not provided
+  --guardian-keyfile GUARDIAN_KEYFILE            🔑 a JSON keyfile, if PEM not provided
+  --guardian-passfile GUARDIAN_PASSFILE          DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
+  --guardian-ledger                              🔐 bool flag for signing transaction using ledger
+  --guardian-wallet-index GUARDIAN_WALLET_INDEX  🔑 the address index; can be used for PEM files, keyfiles of type
+                                                 mnemonic or Ledger devices (default: 0)
+  --relayer-pem RELAYER_PEM                      🔑 the PEM file, if keyfile not provided
+  --relayer-keyfile RELAYER_KEYFILE              🔑 a JSON keyfile, if PEM not provided
+  --relayer-passfile RELAYER_PASSFILE            DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
+  --relayer-ledger                               🔐 bool flag for signing transaction using ledger
+  --relayer-wallet-index RELAYER_WALLET_INDEX    🔑 the address index; can be used for PEM files, keyfiles of type
+                                                 mnemonic or Ledger devices (default: 0)
+  --outfile OUTFILE                              where to save the output (default: stdout)
+
+```
+### Token.Wipe
+
+
+```
+$ mxpy token wipe --help
+usage: mxpy token wipe [-h] ...
+
+Wipe a token for a user.
+
+options:
+  -h, --help                                     show this help message and exit
+  --token-identifier TOKEN_IDENTIFIER            the token identifier
+  --user USER                                    the bech32 address of the user
+  --sender SENDER                                the alias of the wallet set in the address config
+  --pem PEM                                      🔑 the PEM file, if keyfile not provided
+  --keyfile KEYFILE                              🔑 a JSON keyfile, if PEM not provided
+  --passfile PASSFILE                            DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
+  --ledger                                       🔐 bool flag for signing transaction using ledger
+  --sender-wallet-index SENDER_WALLET_INDEX      🔑 the address index; can be used for PEM files, keyfiles of type
+                                                 mnemonic or Ledger devices (default: 0)
+  --sender-username SENDER_USERNAME              🖄 the username of the sender
+  --hrp HRP                                      The hrp used to convert the address to its bech32 representation
+  --nonce NONCE                                  # the nonce for the transaction. If not provided, is fetched from the
+                                                 network.
+  --gas-price GAS_PRICE                          ⛽ the gas price (default: 1000000000)
+  --gas-limit GAS_LIMIT                          ⛽ the gas limit
+  --gas-limit-multiplier GAS_LIMIT_MULTIPLIER    if `--gas-limit` is not provided, the estimated value will be
+                                                 multiplied by this multiplier (e.g 1.1)
+  --value VALUE                                  the value to transfer (default: 0)
+  --chain CHAIN                                  the chain identifier
+  --version VERSION                              the transaction version (default: 2)
+  --options OPTIONS                              the transaction options (default: 0)
+  --relayer RELAYER                              the bech32 address of the relayer
+  --guardian GUARDIAN                            the bech32 address of the guardian
+  --proxy PROXY                                  🔗 the URL of the proxy
+  --send                                         ✓ whether to broadcast the transaction (default: False)
+  --simulate                                     whether to simulate the transaction (default: False)
+  --wait-result                                  signal to wait for the transaction result - only valid if --send is set
+  --timeout TIMEOUT                              max num of seconds to wait for result - only valid if --wait-result is
+                                                 set
+  --guardian-service-url GUARDIAN_SERVICE_URL    the url of the guardian service
+  --guardian-2fa-code GUARDIAN_2FA_CODE          the 2fa code for the guardian
+  --guardian-pem GUARDIAN_PEM                    🔑 the PEM file, if keyfile not provided
+  --guardian-keyfile GUARDIAN_KEYFILE            🔑 a JSON keyfile, if PEM not provided
+  --guardian-passfile GUARDIAN_PASSFILE          DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
+  --guardian-ledger                              🔐 bool flag for signing transaction using ledger
+  --guardian-wallet-index GUARDIAN_WALLET_INDEX  🔑 the address index; can be used for PEM files, keyfiles of type
+                                                 mnemonic or Ledger devices (default: 0)
+  --relayer-pem RELAYER_PEM                      🔑 the PEM file, if keyfile not provided
+  --relayer-keyfile RELAYER_KEYFILE              🔑 a JSON keyfile, if PEM not provided
+  --relayer-passfile RELAYER_PASSFILE            DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
+  --relayer-ledger                               🔐 bool flag for signing transaction using ledger
+  --relayer-wallet-index RELAYER_WALLET_INDEX    🔑 the address index; can be used for PEM files, keyfiles of type
+                                                 mnemonic or Ledger devices (default: 0)
+  --outfile OUTFILE                              where to save the output (default: stdout)
+
+```
+### Token.LocalMint
+
+
+```
+$ mxpy token local-mint --help
+usage: mxpy token local-mint [-h] ...
+
+Mint new tokens.
+
+options:
+  -h, --help                                     show this help message and exit
+  --token-identifier TOKEN_IDENTIFIER            the token identifier
+  --supply-to-mint SUPPLY_TO_MINT                The amount of new tokens to mint
+  --sender SENDER                                the alias of the wallet set in the address config
+  --pem PEM                                      🔑 the PEM file, if keyfile not provided
+  --keyfile KEYFILE                              🔑 a JSON keyfile, if PEM not provided
+  --passfile PASSFILE                            DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
+  --ledger                                       🔐 bool flag for signing transaction using ledger
+  --sender-wallet-index SENDER_WALLET_INDEX      🔑 the address index; can be used for PEM files, keyfiles of type
+                                                 mnemonic or Ledger devices (default: 0)
+  --sender-username SENDER_USERNAME              🖄 the username of the sender
+  --hrp HRP                                      The hrp used to convert the address to its bech32 representation
+  --nonce NONCE                                  # the nonce for the transaction. If not provided, is fetched from the
+                                                 network.
+  --gas-price GAS_PRICE                          ⛽ the gas price (default: 1000000000)
+  --gas-limit GAS_LIMIT                          ⛽ the gas limit
+  --gas-limit-multiplier GAS_LIMIT_MULTIPLIER    if `--gas-limit` is not provided, the estimated value will be
+                                                 multiplied by this multiplier (e.g 1.1)
+  --value VALUE                                  the value to transfer (default: 0)
+  --chain CHAIN                                  the chain identifier
+  --version VERSION                              the transaction version (default: 2)
+  --options OPTIONS                              the transaction options (default: 0)
+  --relayer RELAYER                              the bech32 address of the relayer
+  --guardian GUARDIAN                            the bech32 address of the guardian
+  --proxy PROXY                                  🔗 the URL of the proxy
+  --send                                         ✓ whether to broadcast the transaction (default: False)
+  --simulate                                     whether to simulate the transaction (default: False)
+  --wait-result                                  signal to wait for the transaction result - only valid if --send is set
+  --timeout TIMEOUT                              max num of seconds to wait for result - only valid if --wait-result is
+                                                 set
+  --guardian-service-url GUARDIAN_SERVICE_URL    the url of the guardian service
+  --guardian-2fa-code GUARDIAN_2FA_CODE          the 2fa code for the guardian
+  --guardian-pem GUARDIAN_PEM                    🔑 the PEM file, if keyfile not provided
+  --guardian-keyfile GUARDIAN_KEYFILE            🔑 a JSON keyfile, if PEM not provided
+  --guardian-passfile GUARDIAN_PASSFILE          DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
+  --guardian-ledger                              🔐 bool flag for signing transaction using ledger
+  --guardian-wallet-index GUARDIAN_WALLET_INDEX  🔑 the address index; can be used for PEM files, keyfiles of type
+                                                 mnemonic or Ledger devices (default: 0)
+  --relayer-pem RELAYER_PEM                      🔑 the PEM file, if keyfile not provided
+  --relayer-keyfile RELAYER_KEYFILE              🔑 a JSON keyfile, if PEM not provided
+  --relayer-passfile RELAYER_PASSFILE            DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
+  --relayer-ledger                               🔐 bool flag for signing transaction using ledger
+  --relayer-wallet-index RELAYER_WALLET_INDEX    🔑 the address index; can be used for PEM files, keyfiles of type
+                                                 mnemonic or Ledger devices (default: 0)
+  --outfile OUTFILE                              where to save the output (default: stdout)
+
+```
+### Token.LocalBurn
+
+
+```
+$ mxpy token local-burn --help
+usage: mxpy token local-burn [-h] ...
+
+Burn tokens.
+
+options:
+  -h, --help                                     show this help message and exit
+  --token-identifier TOKEN_IDENTIFIER            the token identifier
+  --supply-to-burn SUPPLY_TO_BURN                The amount of tokens to burn
+  --sender SENDER                                the alias of the wallet set in the address config
+  --pem PEM                                      🔑 the PEM file, if keyfile not provided
+  --keyfile KEYFILE                              🔑 a JSON keyfile, if PEM not provided
+  --passfile PASSFILE                            DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
+  --ledger                                       🔐 bool flag for signing transaction using ledger
+  --sender-wallet-index SENDER_WALLET_INDEX      🔑 the address index; can be used for PEM files, keyfiles of type
+                                                 mnemonic or Ledger devices (default: 0)
+  --sender-username SENDER_USERNAME              🖄 the username of the sender
+  --hrp HRP                                      The hrp used to convert the address to its bech32 representation
+  --nonce NONCE                                  # the nonce for the transaction. If not provided, is fetched from the
+                                                 network.
+  --gas-price GAS_PRICE                          ⛽ the gas price (default: 1000000000)
+  --gas-limit GAS_LIMIT                          ⛽ the gas limit
+  --gas-limit-multiplier GAS_LIMIT_MULTIPLIER    if `--gas-limit` is not provided, the estimated value will be
+                                                 multiplied by this multiplier (e.g 1.1)
+  --value VALUE                                  the value to transfer (default: 0)
+  --chain CHAIN                                  the chain identifier
+  --version VERSION                              the transaction version (default: 2)
+  --options OPTIONS                              the transaction options (default: 0)
+  --relayer RELAYER                              the bech32 address of the relayer
+  --guardian GUARDIAN                            the bech32 address of the guardian
+  --proxy PROXY                                  🔗 the URL of the proxy
+  --send                                         ✓ whether to broadcast the transaction (default: False)
+  --simulate                                     whether to simulate the transaction (default: False)
+  --wait-result                                  signal to wait for the transaction result - only valid if --send is set
+  --timeout TIMEOUT                              max num of seconds to wait for result - only valid if --wait-result is
+                                                 set
+  --guardian-service-url GUARDIAN_SERVICE_URL    the url of the guardian service
+  --guardian-2fa-code GUARDIAN_2FA_CODE          the 2fa code for the guardian
+  --guardian-pem GUARDIAN_PEM                    🔑 the PEM file, if keyfile not provided
+  --guardian-keyfile GUARDIAN_KEYFILE            🔑 a JSON keyfile, if PEM not provided
+  --guardian-passfile GUARDIAN_PASSFILE          DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
+  --guardian-ledger                              🔐 bool flag for signing transaction using ledger
+  --guardian-wallet-index GUARDIAN_WALLET_INDEX  🔑 the address index; can be used for PEM files, keyfiles of type
+                                                 mnemonic or Ledger devices (default: 0)
+  --relayer-pem RELAYER_PEM                      🔑 the PEM file, if keyfile not provided
+  --relayer-keyfile RELAYER_KEYFILE              🔑 a JSON keyfile, if PEM not provided
+  --relayer-passfile RELAYER_PASSFILE            DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
+  --relayer-ledger                               🔐 bool flag for signing transaction using ledger
+  --relayer-wallet-index RELAYER_WALLET_INDEX    🔑 the address index; can be used for PEM files, keyfiles of type
+                                                 mnemonic or Ledger devices (default: 0)
+  --outfile OUTFILE                              where to save the output (default: stdout)
+
+```
+### Token.UpdateAttributes
+
+
+```
+$ mxpy token update-attributes --help
+usage: mxpy token update-attributes [-h] ...
+
+Update token attributes.
+
+options:
+  -h, --help                                     show this help message and exit
+  --token-identifier TOKEN_IDENTIFIER            the token identifier
+  --token-nonce TOKEN_NONCE                      The nonce of the token as decimal value
+  --attributes ATTRIBUTES                        The hex-string attributes of the token
+  --sender SENDER                                the alias of the wallet set in the address config
+  --pem PEM                                      🔑 the PEM file, if keyfile not provided
+  --keyfile KEYFILE                              🔑 a JSON keyfile, if PEM not provided
+  --passfile PASSFILE                            DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
+  --ledger                                       🔐 bool flag for signing transaction using ledger
+  --sender-wallet-index SENDER_WALLET_INDEX      🔑 the address index; can be used for PEM files, keyfiles of type
+                                                 mnemonic or Ledger devices (default: 0)
+  --sender-username SENDER_USERNAME              🖄 the username of the sender
+  --hrp HRP                                      The hrp used to convert the address to its bech32 representation
+  --nonce NONCE                                  # the nonce for the transaction. If not provided, is fetched from the
+                                                 network.
+  --gas-price GAS_PRICE                          ⛽ the gas price (default: 1000000000)
+  --gas-limit GAS_LIMIT                          ⛽ the gas limit
+  --gas-limit-multiplier GAS_LIMIT_MULTIPLIER    if `--gas-limit` is not provided, the estimated value will be
+                                                 multiplied by this multiplier (e.g 1.1)
+  --value VALUE                                  the value to transfer (default: 0)
+  --chain CHAIN                                  the chain identifier
+  --version VERSION                              the transaction version (default: 2)
+  --options OPTIONS                              the transaction options (default: 0)
+  --relayer RELAYER                              the bech32 address of the relayer
+  --guardian GUARDIAN                            the bech32 address of the guardian
+  --proxy PROXY                                  🔗 the URL of the proxy
+  --send                                         ✓ whether to broadcast the transaction (default: False)
+  --simulate                                     whether to simulate the transaction (default: False)
+  --wait-result                                  signal to wait for the transaction result - only valid if --send is set
+  --timeout TIMEOUT                              max num of seconds to wait for result - only valid if --wait-result is
+                                                 set
+  --guardian-service-url GUARDIAN_SERVICE_URL    the url of the guardian service
+  --guardian-2fa-code GUARDIAN_2FA_CODE          the 2fa code for the guardian
+  --guardian-pem GUARDIAN_PEM                    🔑 the PEM file, if keyfile not provided
+  --guardian-keyfile GUARDIAN_KEYFILE            🔑 a JSON keyfile, if PEM not provided
+  --guardian-passfile GUARDIAN_PASSFILE          DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
+  --guardian-ledger                              🔐 bool flag for signing transaction using ledger
+  --guardian-wallet-index GUARDIAN_WALLET_INDEX  🔑 the address index; can be used for PEM files, keyfiles of type
+                                                 mnemonic or Ledger devices (default: 0)
+  --relayer-pem RELAYER_PEM                      🔑 the PEM file, if keyfile not provided
+  --relayer-keyfile RELAYER_KEYFILE              🔑 a JSON keyfile, if PEM not provided
+  --relayer-passfile RELAYER_PASSFILE            DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
+  --relayer-ledger                               🔐 bool flag for signing transaction using ledger
+  --relayer-wallet-index RELAYER_WALLET_INDEX    🔑 the address index; can be used for PEM files, keyfiles of type
+                                                 mnemonic or Ledger devices (default: 0)
+  --outfile OUTFILE                              where to save the output (default: stdout)
+
+```
+### Token.AddQuantity
+
+
+```
+$ mxpy token add-quantity --help
+usage: mxpy token add-quantity [-h] ...
+
+Increase token quantity.
+
+options:
+  -h, --help                                     show this help message and exit
+  --token-identifier TOKEN_IDENTIFIER            the token identifier
+  --token-nonce TOKEN_NONCE                      The nonce of the token as decimal value
+  --quantity QUANTITY                            The quantity to add
+  --sender SENDER                                the alias of the wallet set in the address config
+  --pem PEM                                      🔑 the PEM file, if keyfile not provided
+  --keyfile KEYFILE                              🔑 a JSON keyfile, if PEM not provided
+  --passfile PASSFILE                            DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
+  --ledger                                       🔐 bool flag for signing transaction using ledger
+  --sender-wallet-index SENDER_WALLET_INDEX      🔑 the address index; can be used for PEM files, keyfiles of type
+                                                 mnemonic or Ledger devices (default: 0)
+  --sender-username SENDER_USERNAME              🖄 the username of the sender
+  --hrp HRP                                      The hrp used to convert the address to its bech32 representation
+  --nonce NONCE                                  # the nonce for the transaction. If not provided, is fetched from the
+                                                 network.
+  --gas-price GAS_PRICE                          ⛽ the gas price (default: 1000000000)
+  --gas-limit GAS_LIMIT                          ⛽ the gas limit
+  --gas-limit-multiplier GAS_LIMIT_MULTIPLIER    if `--gas-limit` is not provided, the estimated value will be
+                                                 multiplied by this multiplier (e.g 1.1)
+  --value VALUE                                  the value to transfer (default: 0)
+  --chain CHAIN                                  the chain identifier
+  --version VERSION                              the transaction version (default: 2)
+  --options OPTIONS                              the transaction options (default: 0)
+  --relayer RELAYER                              the bech32 address of the relayer
+  --guardian GUARDIAN                            the bech32 address of the guardian
+  --proxy PROXY                                  🔗 the URL of the proxy
+  --send                                         ✓ whether to broadcast the transaction (default: False)
+  --simulate                                     whether to simulate the transaction (default: False)
+  --wait-result                                  signal to wait for the transaction result - only valid if --send is set
+  --timeout TIMEOUT                              max num of seconds to wait for result - only valid if --wait-result is
+                                                 set
+  --guardian-service-url GUARDIAN_SERVICE_URL    the url of the guardian service
+  --guardian-2fa-code GUARDIAN_2FA_CODE          the 2fa code for the guardian
+  --guardian-pem GUARDIAN_PEM                    🔑 the PEM file, if keyfile not provided
+  --guardian-keyfile GUARDIAN_KEYFILE            🔑 a JSON keyfile, if PEM not provided
+  --guardian-passfile GUARDIAN_PASSFILE          DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
+  --guardian-ledger                              🔐 bool flag for signing transaction using ledger
+  --guardian-wallet-index GUARDIAN_WALLET_INDEX  🔑 the address index; can be used for PEM files, keyfiles of type
+                                                 mnemonic or Ledger devices (default: 0)
+  --relayer-pem RELAYER_PEM                      🔑 the PEM file, if keyfile not provided
+  --relayer-keyfile RELAYER_KEYFILE              🔑 a JSON keyfile, if PEM not provided
+  --relayer-passfile RELAYER_PASSFILE            DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
+  --relayer-ledger                               🔐 bool flag for signing transaction using ledger
+  --relayer-wallet-index RELAYER_WALLET_INDEX    🔑 the address index; can be used for PEM files, keyfiles of type
+                                                 mnemonic or Ledger devices (default: 0)
+  --outfile OUTFILE                              where to save the output (default: stdout)
+
+```
+### Token.BurnQuantity
+
+
+```
+$ mxpy token burn-quantity --help
+usage: mxpy token burn-quantity [-h] ...
+
+Burn token quantity.
+
+options:
+  -h, --help                                     show this help message and exit
+  --token-identifier TOKEN_IDENTIFIER            the token identifier
+  --token-nonce TOKEN_NONCE                      The nonce of the token as decimal value
+  --quantity QUANTITY                            The quantity to burn
+  --sender SENDER                                the alias of the wallet set in the address config
+  --pem PEM                                      🔑 the PEM file, if keyfile not provided
+  --keyfile KEYFILE                              🔑 a JSON keyfile, if PEM not provided
+  --passfile PASSFILE                            DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
+  --ledger                                       🔐 bool flag for signing transaction using ledger
+  --sender-wallet-index SENDER_WALLET_INDEX      🔑 the address index; can be used for PEM files, keyfiles of type
+                                                 mnemonic or Ledger devices (default: 0)
+  --sender-username SENDER_USERNAME              🖄 the username of the sender
+  --hrp HRP                                      The hrp used to convert the address to its bech32 representation
+  --nonce NONCE                                  # the nonce for the transaction. If not provided, is fetched from the
+                                                 network.
+  --gas-price GAS_PRICE                          ⛽ the gas price (default: 1000000000)
+  --gas-limit GAS_LIMIT                          ⛽ the gas limit
+  --gas-limit-multiplier GAS_LIMIT_MULTIPLIER    if `--gas-limit` is not provided, the estimated value will be
+                                                 multiplied by this multiplier (e.g 1.1)
+  --value VALUE                                  the value to transfer (default: 0)
+  --chain CHAIN                                  the chain identifier
+  --version VERSION                              the transaction version (default: 2)
+  --options OPTIONS                              the transaction options (default: 0)
+  --relayer RELAYER                              the bech32 address of the relayer
+  --guardian GUARDIAN                            the bech32 address of the guardian
+  --proxy PROXY                                  🔗 the URL of the proxy
+  --send                                         ✓ whether to broadcast the transaction (default: False)
+  --simulate                                     whether to simulate the transaction (default: False)
+  --wait-result                                  signal to wait for the transaction result - only valid if --send is set
+  --timeout TIMEOUT                              max num of seconds to wait for result - only valid if --wait-result is
+                                                 set
+  --guardian-service-url GUARDIAN_SERVICE_URL    the url of the guardian service
+  --guardian-2fa-code GUARDIAN_2FA_CODE          the 2fa code for the guardian
+  --guardian-pem GUARDIAN_PEM                    🔑 the PEM file, if keyfile not provided
+  --guardian-keyfile GUARDIAN_KEYFILE            🔑 a JSON keyfile, if PEM not provided
+  --guardian-passfile GUARDIAN_PASSFILE          DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
+  --guardian-ledger                              🔐 bool flag for signing transaction using ledger
+  --guardian-wallet-index GUARDIAN_WALLET_INDEX  🔑 the address index; can be used for PEM files, keyfiles of type
+                                                 mnemonic or Ledger devices (default: 0)
+  --relayer-pem RELAYER_PEM                      🔑 the PEM file, if keyfile not provided
+  --relayer-keyfile RELAYER_KEYFILE              🔑 a JSON keyfile, if PEM not provided
+  --relayer-passfile RELAYER_PASSFILE            DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
+  --relayer-ledger                               🔐 bool flag for signing transaction using ledger
+  --relayer-wallet-index RELAYER_WALLET_INDEX    🔑 the address index; can be used for PEM files, keyfiles of type
+                                                 mnemonic or Ledger devices (default: 0)
+  --outfile OUTFILE                              where to save the output (default: stdout)
+
+```
+### Token.ModifyRolaties
+
+
+```
+$ mxpy token modify-royalties --help
+usage: mxpy token modify-royalties [-h] ...
+
+Modify token royalties.
+
+options:
+  -h, --help                                     show this help message and exit
+  --token-identifier TOKEN_IDENTIFIER            the token identifier
+  --token-nonce TOKEN_NONCE                      The nonce of the token as decimal value
+  --royalties ROYALTIES                          The new token royalties (e.g. 1234 for 12.34%)
+  --sender SENDER                                the alias of the wallet set in the address config
+  --pem PEM                                      🔑 the PEM file, if keyfile not provided
+  --keyfile KEYFILE                              🔑 a JSON keyfile, if PEM not provided
+  --passfile PASSFILE                            DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
+  --ledger                                       🔐 bool flag for signing transaction using ledger
+  --sender-wallet-index SENDER_WALLET_INDEX      🔑 the address index; can be used for PEM files, keyfiles of type
+                                                 mnemonic or Ledger devices (default: 0)
+  --sender-username SENDER_USERNAME              🖄 the username of the sender
+  --hrp HRP                                      The hrp used to convert the address to its bech32 representation
+  --nonce NONCE                                  # the nonce for the transaction. If not provided, is fetched from the
+                                                 network.
+  --gas-price GAS_PRICE                          ⛽ the gas price (default: 1000000000)
+  --gas-limit GAS_LIMIT                          ⛽ the gas limit
+  --gas-limit-multiplier GAS_LIMIT_MULTIPLIER    if `--gas-limit` is not provided, the estimated value will be
+                                                 multiplied by this multiplier (e.g 1.1)
+  --value VALUE                                  the value to transfer (default: 0)
+  --chain CHAIN                                  the chain identifier
+  --version VERSION                              the transaction version (default: 2)
+  --options OPTIONS                              the transaction options (default: 0)
+  --relayer RELAYER                              the bech32 address of the relayer
+  --guardian GUARDIAN                            the bech32 address of the guardian
+  --proxy PROXY                                  🔗 the URL of the proxy
+  --send                                         ✓ whether to broadcast the transaction (default: False)
+  --simulate                                     whether to simulate the transaction (default: False)
+  --wait-result                                  signal to wait for the transaction result - only valid if --send is set
+  --timeout TIMEOUT                              max num of seconds to wait for result - only valid if --wait-result is
+                                                 set
+  --guardian-service-url GUARDIAN_SERVICE_URL    the url of the guardian service
+  --guardian-2fa-code GUARDIAN_2FA_CODE          the 2fa code for the guardian
+  --guardian-pem GUARDIAN_PEM                    🔑 the PEM file, if keyfile not provided
+  --guardian-keyfile GUARDIAN_KEYFILE            🔑 a JSON keyfile, if PEM not provided
+  --guardian-passfile GUARDIAN_PASSFILE          DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
+  --guardian-ledger                              🔐 bool flag for signing transaction using ledger
+  --guardian-wallet-index GUARDIAN_WALLET_INDEX  🔑 the address index; can be used for PEM files, keyfiles of type
+                                                 mnemonic or Ledger devices (default: 0)
+  --relayer-pem RELAYER_PEM                      🔑 the PEM file, if keyfile not provided
+  --relayer-keyfile RELAYER_KEYFILE              🔑 a JSON keyfile, if PEM not provided
+  --relayer-passfile RELAYER_PASSFILE            DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
+  --relayer-ledger                               🔐 bool flag for signing transaction using ledger
+  --relayer-wallet-index RELAYER_WALLET_INDEX    🔑 the address index; can be used for PEM files, keyfiles of type
+                                                 mnemonic or Ledger devices (default: 0)
+  --outfile OUTFILE                              where to save the output (default: stdout)
+
+```
+### Token.SetNewUris
+
+
+```
+$ mxpy token set-new-uris --help
+usage: mxpy token set-new-uris [-h] ...
+
+Set new uris.
+
+options:
+  -h, --help                                     show this help message and exit
+  --token-identifier TOKEN_IDENTIFIER            the token identifier
+  --token-nonce TOKEN_NONCE                      The nonce of the token as decimal value
+  --uris URIS [URIS ...]                         The new uris
+  --sender SENDER                                the alias of the wallet set in the address config
+  --pem PEM                                      🔑 the PEM file, if keyfile not provided
+  --keyfile KEYFILE                              🔑 a JSON keyfile, if PEM not provided
+  --passfile PASSFILE                            DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
+  --ledger                                       🔐 bool flag for signing transaction using ledger
+  --sender-wallet-index SENDER_WALLET_INDEX      🔑 the address index; can be used for PEM files, keyfiles of type
+                                                 mnemonic or Ledger devices (default: 0)
+  --sender-username SENDER_USERNAME              🖄 the username of the sender
+  --hrp HRP                                      The hrp used to convert the address to its bech32 representation
+  --nonce NONCE                                  # the nonce for the transaction. If not provided, is fetched from the
+                                                 network.
+  --gas-price GAS_PRICE                          ⛽ the gas price (default: 1000000000)
+  --gas-limit GAS_LIMIT                          ⛽ the gas limit
+  --gas-limit-multiplier GAS_LIMIT_MULTIPLIER    if `--gas-limit` is not provided, the estimated value will be
+                                                 multiplied by this multiplier (e.g 1.1)
+  --value VALUE                                  the value to transfer (default: 0)
+  --chain CHAIN                                  the chain identifier
+  --version VERSION                              the transaction version (default: 2)
+  --options OPTIONS                              the transaction options (default: 0)
+  --relayer RELAYER                              the bech32 address of the relayer
+  --guardian GUARDIAN                            the bech32 address of the guardian
+  --proxy PROXY                                  🔗 the URL of the proxy
+  --send                                         ✓ whether to broadcast the transaction (default: False)
+  --simulate                                     whether to simulate the transaction (default: False)
+  --wait-result                                  signal to wait for the transaction result - only valid if --send is set
+  --timeout TIMEOUT                              max num of seconds to wait for result - only valid if --wait-result is
+                                                 set
+  --guardian-service-url GUARDIAN_SERVICE_URL    the url of the guardian service
+  --guardian-2fa-code GUARDIAN_2FA_CODE          the 2fa code for the guardian
+  --guardian-pem GUARDIAN_PEM                    🔑 the PEM file, if keyfile not provided
+  --guardian-keyfile GUARDIAN_KEYFILE            🔑 a JSON keyfile, if PEM not provided
+  --guardian-passfile GUARDIAN_PASSFILE          DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
+  --guardian-ledger                              🔐 bool flag for signing transaction using ledger
+  --guardian-wallet-index GUARDIAN_WALLET_INDEX  🔑 the address index; can be used for PEM files, keyfiles of type
+                                                 mnemonic or Ledger devices (default: 0)
+  --relayer-pem RELAYER_PEM                      🔑 the PEM file, if keyfile not provided
+  --relayer-keyfile RELAYER_KEYFILE              🔑 a JSON keyfile, if PEM not provided
+  --relayer-passfile RELAYER_PASSFILE            DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
+  --relayer-ledger                               🔐 bool flag for signing transaction using ledger
+  --relayer-wallet-index RELAYER_WALLET_INDEX    🔑 the address index; can be used for PEM files, keyfiles of type
+                                                 mnemonic or Ledger devices (default: 0)
+  --outfile OUTFILE                              where to save the output (default: stdout)
+
+```
+### Token.ModifyCreator
+
+
+```
+$ mxpy token modify-creator --help
+usage: mxpy token modify-creator [-h] ...
+
+Modify the creator of the token.
+
+options:
+  -h, --help                                     show this help message and exit
+  --token-identifier TOKEN_IDENTIFIER            the token identifier
+  --token-nonce TOKEN_NONCE                      The nonce of the token as decimal value
+  --sender SENDER                                the alias of the wallet set in the address config
+  --pem PEM                                      🔑 the PEM file, if keyfile not provided
+  --keyfile KEYFILE                              🔑 a JSON keyfile, if PEM not provided
+  --passfile PASSFILE                            DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
+  --ledger                                       🔐 bool flag for signing transaction using ledger
+  --sender-wallet-index SENDER_WALLET_INDEX      🔑 the address index; can be used for PEM files, keyfiles of type
+                                                 mnemonic or Ledger devices (default: 0)
+  --sender-username SENDER_USERNAME              🖄 the username of the sender
+  --hrp HRP                                      The hrp used to convert the address to its bech32 representation
+  --nonce NONCE                                  # the nonce for the transaction. If not provided, is fetched from the
+                                                 network.
+  --gas-price GAS_PRICE                          ⛽ the gas price (default: 1000000000)
+  --gas-limit GAS_LIMIT                          ⛽ the gas limit
+  --gas-limit-multiplier GAS_LIMIT_MULTIPLIER    if `--gas-limit` is not provided, the estimated value will be
+                                                 multiplied by this multiplier (e.g 1.1)
+  --value VALUE                                  the value to transfer (default: 0)
+  --chain CHAIN                                  the chain identifier
+  --version VERSION                              the transaction version (default: 2)
+  --options OPTIONS                              the transaction options (default: 0)
+  --relayer RELAYER                              the bech32 address of the relayer
+  --guardian GUARDIAN                            the bech32 address of the guardian
+  --proxy PROXY                                  🔗 the URL of the proxy
+  --send                                         ✓ whether to broadcast the transaction (default: False)
+  --simulate                                     whether to simulate the transaction (default: False)
+  --wait-result                                  signal to wait for the transaction result - only valid if --send is set
+  --timeout TIMEOUT                              max num of seconds to wait for result - only valid if --wait-result is
+                                                 set
+  --guardian-service-url GUARDIAN_SERVICE_URL    the url of the guardian service
+  --guardian-2fa-code GUARDIAN_2FA_CODE          the 2fa code for the guardian
+  --guardian-pem GUARDIAN_PEM                    🔑 the PEM file, if keyfile not provided
+  --guardian-keyfile GUARDIAN_KEYFILE            🔑 a JSON keyfile, if PEM not provided
+  --guardian-passfile GUARDIAN_PASSFILE          DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
+  --guardian-ledger                              🔐 bool flag for signing transaction using ledger
+  --guardian-wallet-index GUARDIAN_WALLET_INDEX  🔑 the address index; can be used for PEM files, keyfiles of type
+                                                 mnemonic or Ledger devices (default: 0)
+  --relayer-pem RELAYER_PEM                      🔑 the PEM file, if keyfile not provided
+  --relayer-keyfile RELAYER_KEYFILE              🔑 a JSON keyfile, if PEM not provided
+  --relayer-passfile RELAYER_PASSFILE            DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
+  --relayer-ledger                               🔐 bool flag for signing transaction using ledger
+  --relayer-wallet-index RELAYER_WALLET_INDEX    🔑 the address index; can be used for PEM files, keyfiles of type
+                                                 mnemonic or Ledger devices (default: 0)
+  --outfile OUTFILE                              where to save the output (default: stdout)
+
+```
+### Token.UpdateMetadata
+
+
+```
+$ mxpy token update-metadata --help
+usage: mxpy token update-metadata [-h] ...
+
+Update the metadata of the token.
+
+options:
+  -h, --help                                     show this help message and exit
+  --token-identifier TOKEN_IDENTIFIER            the token identifier
+  --token-nonce TOKEN_NONCE                      The nonce of the token as decimal value
+  --token-name TOKEN_NAME                        The new name of the token
+  --royalties ROYALTIES                          The new token royalties (e.g. 1234 for 12.34%)
+  --hash HASH                                    The new hash of the token
+  --attributes ATTRIBUTES                        The new attributes of the token as a hex-encoded string
+  --uris URIS [URIS ...]                         The new uris
+  --sender SENDER                                the alias of the wallet set in the address config
+  --pem PEM                                      🔑 the PEM file, if keyfile not provided
+  --keyfile KEYFILE                              🔑 a JSON keyfile, if PEM not provided
+  --passfile PASSFILE                            DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
+  --ledger                                       🔐 bool flag for signing transaction using ledger
+  --sender-wallet-index SENDER_WALLET_INDEX      🔑 the address index; can be used for PEM files, keyfiles of type
+                                                 mnemonic or Ledger devices (default: 0)
+  --sender-username SENDER_USERNAME              🖄 the username of the sender
+  --hrp HRP                                      The hrp used to convert the address to its bech32 representation
+  --nonce NONCE                                  # the nonce for the transaction. If not provided, is fetched from the
+                                                 network.
+  --gas-price GAS_PRICE                          ⛽ the gas price (default: 1000000000)
+  --gas-limit GAS_LIMIT                          ⛽ the gas limit
+  --gas-limit-multiplier GAS_LIMIT_MULTIPLIER    if `--gas-limit` is not provided, the estimated value will be
+                                                 multiplied by this multiplier (e.g 1.1)
+  --value VALUE                                  the value to transfer (default: 0)
+  --chain CHAIN                                  the chain identifier
+  --version VERSION                              the transaction version (default: 2)
+  --options OPTIONS                              the transaction options (default: 0)
+  --relayer RELAYER                              the bech32 address of the relayer
+  --guardian GUARDIAN                            the bech32 address of the guardian
+  --proxy PROXY                                  🔗 the URL of the proxy
+  --send                                         ✓ whether to broadcast the transaction (default: False)
+  --simulate                                     whether to simulate the transaction (default: False)
+  --wait-result                                  signal to wait for the transaction result - only valid if --send is set
+  --timeout TIMEOUT                              max num of seconds to wait for result - only valid if --wait-result is
+                                                 set
+  --guardian-service-url GUARDIAN_SERVICE_URL    the url of the guardian service
+  --guardian-2fa-code GUARDIAN_2FA_CODE          the 2fa code for the guardian
+  --guardian-pem GUARDIAN_PEM                    🔑 the PEM file, if keyfile not provided
+  --guardian-keyfile GUARDIAN_KEYFILE            🔑 a JSON keyfile, if PEM not provided
+  --guardian-passfile GUARDIAN_PASSFILE          DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
+  --guardian-ledger                              🔐 bool flag for signing transaction using ledger
+  --guardian-wallet-index GUARDIAN_WALLET_INDEX  🔑 the address index; can be used for PEM files, keyfiles of type
+                                                 mnemonic or Ledger devices (default: 0)
+  --relayer-pem RELAYER_PEM                      🔑 the PEM file, if keyfile not provided
+  --relayer-keyfile RELAYER_KEYFILE              🔑 a JSON keyfile, if PEM not provided
+  --relayer-passfile RELAYER_PASSFILE            DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
+  --relayer-ledger                               🔐 bool flag for signing transaction using ledger
+  --relayer-wallet-index RELAYER_WALLET_INDEX    🔑 the address index; can be used for PEM files, keyfiles of type
+                                                 mnemonic or Ledger devices (default: 0)
+  --outfile OUTFILE                              where to save the output (default: stdout)
+
+```
+### Token.NftMetadataRecreate
+
+
+```
+$ mxpy token nft-metadata-recreate --help
+usage: mxpy token nft-metadata-recreate [-h] ...
+
+Recreate the metadata of the token.
+
+options:
+  -h, --help                                     show this help message and exit
+  --token-identifier TOKEN_IDENTIFIER            the token identifier
+  --token-nonce TOKEN_NONCE                      The nonce of the token as decimal value
+  --token-name TOKEN_NAME                        The new name of the token
+  --royalties ROYALTIES                          The new token royalties (e.g. 1234 for 12.34%)
+  --hash HASH                                    The new hash of the token
+  --attributes ATTRIBUTES                        The new attributes of the token as a hex-encoded string
+  --uris URIS [URIS ...]                         The new uris
+  --sender SENDER                                the alias of the wallet set in the address config
+  --pem PEM                                      🔑 the PEM file, if keyfile not provided
+  --keyfile KEYFILE                              🔑 a JSON keyfile, if PEM not provided
+  --passfile PASSFILE                            DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
+  --ledger                                       🔐 bool flag for signing transaction using ledger
+  --sender-wallet-index SENDER_WALLET_INDEX      🔑 the address index; can be used for PEM files, keyfiles of type
+                                                 mnemonic or Ledger devices (default: 0)
+  --sender-username SENDER_USERNAME              🖄 the username of the sender
+  --hrp HRP                                      The hrp used to convert the address to its bech32 representation
+  --nonce NONCE                                  # the nonce for the transaction. If not provided, is fetched from the
+                                                 network.
+  --gas-price GAS_PRICE                          ⛽ the gas price (default: 1000000000)
+  --gas-limit GAS_LIMIT                          ⛽ the gas limit
+  --gas-limit-multiplier GAS_LIMIT_MULTIPLIER    if `--gas-limit` is not provided, the estimated value will be
+                                                 multiplied by this multiplier (e.g 1.1)
+  --value VALUE                                  the value to transfer (default: 0)
+  --chain CHAIN                                  the chain identifier
+  --version VERSION                              the transaction version (default: 2)
+  --options OPTIONS                              the transaction options (default: 0)
+  --relayer RELAYER                              the bech32 address of the relayer
+  --guardian GUARDIAN                            the bech32 address of the guardian
+  --proxy PROXY                                  🔗 the URL of the proxy
+  --send                                         ✓ whether to broadcast the transaction (default: False)
+  --simulate                                     whether to simulate the transaction (default: False)
+  --wait-result                                  signal to wait for the transaction result - only valid if --send is set
+  --timeout TIMEOUT                              max num of seconds to wait for result - only valid if --wait-result is
+                                                 set
+  --guardian-service-url GUARDIAN_SERVICE_URL    the url of the guardian service
+  --guardian-2fa-code GUARDIAN_2FA_CODE          the 2fa code for the guardian
+  --guardian-pem GUARDIAN_PEM                    🔑 the PEM file, if keyfile not provided
+  --guardian-keyfile GUARDIAN_KEYFILE            🔑 a JSON keyfile, if PEM not provided
+  --guardian-passfile GUARDIAN_PASSFILE          DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
+  --guardian-ledger                              🔐 bool flag for signing transaction using ledger
+  --guardian-wallet-index GUARDIAN_WALLET_INDEX  🔑 the address index; can be used for PEM files, keyfiles of type
+                                                 mnemonic or Ledger devices (default: 0)
+  --relayer-pem RELAYER_PEM                      🔑 the PEM file, if keyfile not provided
+  --relayer-keyfile RELAYER_KEYFILE              🔑 a JSON keyfile, if PEM not provided
+  --relayer-passfile RELAYER_PASSFILE            DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
+  --relayer-ledger                               🔐 bool flag for signing transaction using ledger
+  --relayer-wallet-index RELAYER_WALLET_INDEX    🔑 the address index; can be used for PEM files, keyfiles of type
+                                                 mnemonic or Ledger devices (default: 0)
+  --outfile OUTFILE                              where to save the output (default: stdout)
+
+```
+### Token.ChangeToDynamic
+
+
+```
+$ mxpy token change-to-dynamic --help
+usage: mxpy token change-to-dynamic [-h] ...
+
+Change a token to a dynamic token.
+
+options:
+  -h, --help                                     show this help message and exit
+  --token-identifier TOKEN_IDENTIFIER            the token identifier
+  --sender SENDER                                the alias of the wallet set in the address config
+  --pem PEM                                      🔑 the PEM file, if keyfile not provided
+  --keyfile KEYFILE                              🔑 a JSON keyfile, if PEM not provided
+  --passfile PASSFILE                            DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
+  --ledger                                       🔐 bool flag for signing transaction using ledger
+  --sender-wallet-index SENDER_WALLET_INDEX      🔑 the address index; can be used for PEM files, keyfiles of type
+                                                 mnemonic or Ledger devices (default: 0)
+  --sender-username SENDER_USERNAME              🖄 the username of the sender
+  --hrp HRP                                      The hrp used to convert the address to its bech32 representation
+  --nonce NONCE                                  # the nonce for the transaction. If not provided, is fetched from the
+                                                 network.
+  --gas-price GAS_PRICE                          ⛽ the gas price (default: 1000000000)
+  --gas-limit GAS_LIMIT                          ⛽ the gas limit
+  --gas-limit-multiplier GAS_LIMIT_MULTIPLIER    if `--gas-limit` is not provided, the estimated value will be
+                                                 multiplied by this multiplier (e.g 1.1)
+  --value VALUE                                  the value to transfer (default: 0)
+  --chain CHAIN                                  the chain identifier
+  --version VERSION                              the transaction version (default: 2)
+  --options OPTIONS                              the transaction options (default: 0)
+  --relayer RELAYER                              the bech32 address of the relayer
+  --guardian GUARDIAN                            the bech32 address of the guardian
+  --proxy PROXY                                  🔗 the URL of the proxy
+  --send                                         ✓ whether to broadcast the transaction (default: False)
+  --simulate                                     whether to simulate the transaction (default: False)
+  --wait-result                                  signal to wait for the transaction result - only valid if --send is set
+  --timeout TIMEOUT                              max num of seconds to wait for result - only valid if --wait-result is
+                                                 set
+  --guardian-service-url GUARDIAN_SERVICE_URL    the url of the guardian service
+  --guardian-2fa-code GUARDIAN_2FA_CODE          the 2fa code for the guardian
+  --guardian-pem GUARDIAN_PEM                    🔑 the PEM file, if keyfile not provided
+  --guardian-keyfile GUARDIAN_KEYFILE            🔑 a JSON keyfile, if PEM not provided
+  --guardian-passfile GUARDIAN_PASSFILE          DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
+  --guardian-ledger                              🔐 bool flag for signing transaction using ledger
+  --guardian-wallet-index GUARDIAN_WALLET_INDEX  🔑 the address index; can be used for PEM files, keyfiles of type
+                                                 mnemonic or Ledger devices (default: 0)
+  --relayer-pem RELAYER_PEM                      🔑 the PEM file, if keyfile not provided
+  --relayer-keyfile RELAYER_KEYFILE              🔑 a JSON keyfile, if PEM not provided
+  --relayer-passfile RELAYER_PASSFILE            DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
+  --relayer-ledger                               🔐 bool flag for signing transaction using ledger
+  --relayer-wallet-index RELAYER_WALLET_INDEX    🔑 the address index; can be used for PEM files, keyfiles of type
+                                                 mnemonic or Ledger devices (default: 0)
+  --outfile OUTFILE                              where to save the output (default: stdout)
+
+```
+### Token.UpdateTokenId
+
+
+```
+$ mxpy token update-token-id --help
+usage: mxpy token update-token-id [-h] ...
+
+Update token id.
+
+options:
+  -h, --help                                     show this help message and exit
+  --token-identifier TOKEN_IDENTIFIER            the token identifier
+  --sender SENDER                                the alias of the wallet set in the address config
+  --pem PEM                                      🔑 the PEM file, if keyfile not provided
+  --keyfile KEYFILE                              🔑 a JSON keyfile, if PEM not provided
+  --passfile PASSFILE                            DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
+  --ledger                                       🔐 bool flag for signing transaction using ledger
+  --sender-wallet-index SENDER_WALLET_INDEX      🔑 the address index; can be used for PEM files, keyfiles of type
+                                                 mnemonic or Ledger devices (default: 0)
+  --sender-username SENDER_USERNAME              🖄 the username of the sender
+  --hrp HRP                                      The hrp used to convert the address to its bech32 representation
+  --nonce NONCE                                  # the nonce for the transaction. If not provided, is fetched from the
+                                                 network.
+  --gas-price GAS_PRICE                          ⛽ the gas price (default: 1000000000)
+  --gas-limit GAS_LIMIT                          ⛽ the gas limit
+  --gas-limit-multiplier GAS_LIMIT_MULTIPLIER    if `--gas-limit` is not provided, the estimated value will be
+                                                 multiplied by this multiplier (e.g 1.1)
+  --value VALUE                                  the value to transfer (default: 0)
+  --chain CHAIN                                  the chain identifier
+  --version VERSION                              the transaction version (default: 2)
+  --options OPTIONS                              the transaction options (default: 0)
+  --relayer RELAYER                              the bech32 address of the relayer
+  --guardian GUARDIAN                            the bech32 address of the guardian
+  --proxy PROXY                                  🔗 the URL of the proxy
+  --send                                         ✓ whether to broadcast the transaction (default: False)
+  --simulate                                     whether to simulate the transaction (default: False)
+  --wait-result                                  signal to wait for the transaction result - only valid if --send is set
+  --timeout TIMEOUT                              max num of seconds to wait for result - only valid if --wait-result is
+                                                 set
+  --guardian-service-url GUARDIAN_SERVICE_URL    the url of the guardian service
+  --guardian-2fa-code GUARDIAN_2FA_CODE          the 2fa code for the guardian
+  --guardian-pem GUARDIAN_PEM                    🔑 the PEM file, if keyfile not provided
+  --guardian-keyfile GUARDIAN_KEYFILE            🔑 a JSON keyfile, if PEM not provided
+  --guardian-passfile GUARDIAN_PASSFILE          DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
+  --guardian-ledger                              🔐 bool flag for signing transaction using ledger
+  --guardian-wallet-index GUARDIAN_WALLET_INDEX  🔑 the address index; can be used for PEM files, keyfiles of type
+                                                 mnemonic or Ledger devices (default: 0)
+  --relayer-pem RELAYER_PEM                      🔑 the PEM file, if keyfile not provided
+  --relayer-keyfile RELAYER_KEYFILE              🔑 a JSON keyfile, if PEM not provided
+  --relayer-passfile RELAYER_PASSFILE            DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
+  --relayer-ledger                               🔐 bool flag for signing transaction using ledger
+  --relayer-wallet-index RELAYER_WALLET_INDEX    🔑 the address index; can be used for PEM files, keyfiles of type
+                                                 mnemonic or Ledger devices (default: 0)
+  --outfile OUTFILE                              where to save the output (default: stdout)
+
+```
+### Token.RegisterDynamic
+
+
+```
+$ mxpy token register-dynamic --help
+usage: mxpy token register-dynamic [-h] ...
+
+Register a dynamic token.
+
+options:
+  -h, --help                                     show this help message and exit
+  --token-name TOKEN_NAME                        The token name
+  --token-ticker TOKEN_TICKER                    The token ticker
+  --token-type {NFT,SFT,FNG,META}                The token type
+  --denominator DENOMINATOR                      The number of decimals, only needed when token type is META ESDT
+  --sender SENDER                                the alias of the wallet set in the address config
+  --pem PEM                                      🔑 the PEM file, if keyfile not provided
+  --keyfile KEYFILE                              🔑 a JSON keyfile, if PEM not provided
+  --passfile PASSFILE                            DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
+  --ledger                                       🔐 bool flag for signing transaction using ledger
+  --sender-wallet-index SENDER_WALLET_INDEX      🔑 the address index; can be used for PEM files, keyfiles of type
+                                                 mnemonic or Ledger devices (default: 0)
+  --sender-username SENDER_USERNAME              🖄 the username of the sender
+  --hrp HRP                                      The hrp used to convert the address to its bech32 representation
+  --nonce NONCE                                  # the nonce for the transaction. If not provided, is fetched from the
+                                                 network.
+  --gas-price GAS_PRICE                          ⛽ the gas price (default: 1000000000)
+  --gas-limit GAS_LIMIT                          ⛽ the gas limit
+  --gas-limit-multiplier GAS_LIMIT_MULTIPLIER    if `--gas-limit` is not provided, the estimated value will be
+                                                 multiplied by this multiplier (e.g 1.1)
+  --value VALUE                                  the value to transfer (default: 0)
+  --chain CHAIN                                  the chain identifier
+  --version VERSION                              the transaction version (default: 2)
+  --options OPTIONS                              the transaction options (default: 0)
+  --relayer RELAYER                              the bech32 address of the relayer
+  --guardian GUARDIAN                            the bech32 address of the guardian
+  --proxy PROXY                                  🔗 the URL of the proxy
+  --send                                         ✓ whether to broadcast the transaction (default: False)
+  --simulate                                     whether to simulate the transaction (default: False)
+  --wait-result                                  signal to wait for the transaction result - only valid if --send is set
+  --timeout TIMEOUT                              max num of seconds to wait for result - only valid if --wait-result is
+                                                 set
+  --guardian-service-url GUARDIAN_SERVICE_URL    the url of the guardian service
+  --guardian-2fa-code GUARDIAN_2FA_CODE          the 2fa code for the guardian
+  --guardian-pem GUARDIAN_PEM                    🔑 the PEM file, if keyfile not provided
+  --guardian-keyfile GUARDIAN_KEYFILE            🔑 a JSON keyfile, if PEM not provided
+  --guardian-passfile GUARDIAN_PASSFILE          DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
+  --guardian-ledger                              🔐 bool flag for signing transaction using ledger
+  --guardian-wallet-index GUARDIAN_WALLET_INDEX  🔑 the address index; can be used for PEM files, keyfiles of type
+                                                 mnemonic or Ledger devices (default: 0)
+  --relayer-pem RELAYER_PEM                      🔑 the PEM file, if keyfile not provided
+  --relayer-keyfile RELAYER_KEYFILE              🔑 a JSON keyfile, if PEM not provided
+  --relayer-passfile RELAYER_PASSFILE            DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
+  --relayer-ledger                               🔐 bool flag for signing transaction using ledger
+  --relayer-wallet-index RELAYER_WALLET_INDEX    🔑 the address index; can be used for PEM files, keyfiles of type
+                                                 mnemonic or Ledger devices (default: 0)
+  --outfile OUTFILE                              where to save the output (default: stdout)
+
+```
+### Token.RegisterDynamicAndSetAllRoles
+
+
+```
+$ mxpy token register-dynamic-and-set-all-roles --help
+usage: mxpy token register-dynamic-and-set-all-roles [-h] ...
+
+Register a dynamic token and set all roles.
+
+options:
+  -h, --help                                     show this help message and exit
+  --token-name TOKEN_NAME                        The token name
+  --token-ticker TOKEN_TICKER                    The token ticker
+  --token-type {NFT,SFT,FNG,META}                The token type
+  --denominator DENOMINATOR                      The number of decimals, only needed when token type is META ESDT
+  --sender SENDER                                the alias of the wallet set in the address config
+  --pem PEM                                      🔑 the PEM file, if keyfile not provided
+  --keyfile KEYFILE                              🔑 a JSON keyfile, if PEM not provided
+  --passfile PASSFILE                            DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
+  --ledger                                       🔐 bool flag for signing transaction using ledger
+  --sender-wallet-index SENDER_WALLET_INDEX      🔑 the address index; can be used for PEM files, keyfiles of type
+                                                 mnemonic or Ledger devices (default: 0)
+  --sender-username SENDER_USERNAME              🖄 the username of the sender
+  --hrp HRP                                      The hrp used to convert the address to its bech32 representation
+  --nonce NONCE                                  # the nonce for the transaction. If not provided, is fetched from the
+                                                 network.
+  --gas-price GAS_PRICE                          ⛽ the gas price (default: 1000000000)
+  --gas-limit GAS_LIMIT                          ⛽ the gas limit
+  --gas-limit-multiplier GAS_LIMIT_MULTIPLIER    if `--gas-limit` is not provided, the estimated value will be
+                                                 multiplied by this multiplier (e.g 1.1)
+  --value VALUE                                  the value to transfer (default: 0)
+  --chain CHAIN                                  the chain identifier
+  --version VERSION                              the transaction version (default: 2)
+  --options OPTIONS                              the transaction options (default: 0)
+  --relayer RELAYER                              the bech32 address of the relayer
+  --guardian GUARDIAN                            the bech32 address of the guardian
+  --proxy PROXY                                  🔗 the URL of the proxy
+  --send                                         ✓ whether to broadcast the transaction (default: False)
+  --simulate                                     whether to simulate the transaction (default: False)
+  --wait-result                                  signal to wait for the transaction result - only valid if --send is set
+  --timeout TIMEOUT                              max num of seconds to wait for result - only valid if --wait-result is
+                                                 set
+  --guardian-service-url GUARDIAN_SERVICE_URL    the url of the guardian service
+  --guardian-2fa-code GUARDIAN_2FA_CODE          the 2fa code for the guardian
+  --guardian-pem GUARDIAN_PEM                    🔑 the PEM file, if keyfile not provided
+  --guardian-keyfile GUARDIAN_KEYFILE            🔑 a JSON keyfile, if PEM not provided
+  --guardian-passfile GUARDIAN_PASSFILE          DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
+  --guardian-ledger                              🔐 bool flag for signing transaction using ledger
+  --guardian-wallet-index GUARDIAN_WALLET_INDEX  🔑 the address index; can be used for PEM files, keyfiles of type
+                                                 mnemonic or Ledger devices (default: 0)
+  --relayer-pem RELAYER_PEM                      🔑 the PEM file, if keyfile not provided
+  --relayer-keyfile RELAYER_KEYFILE              🔑 a JSON keyfile, if PEM not provided
+  --relayer-passfile RELAYER_PASSFILE            DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
+  --relayer-ledger                               🔐 bool flag for signing transaction using ledger
+  --relayer-wallet-index RELAYER_WALLET_INDEX    🔑 the address index; can be used for PEM files, keyfiles of type
+                                                 mnemonic or Ledger devices (default: 0)
+  --outfile OUTFILE                              where to save the output (default: stdout)
+
+```
+### Token.TransferOwnership
+
+
+```
+$ mxpy token transfer-ownership --help
+usage: mxpy token transfer-ownership [-h] ...
+
+Transfer the ownership of a token to another user.
+
+options:
+  -h, --help                                     show this help message and exit
+  --token-identifier TOKEN_IDENTIFIER            the token identifier
+  --new-owner NEW_OWNER                          The new token owner
+  --sender SENDER                                the alias of the wallet set in the address config
+  --pem PEM                                      🔑 the PEM file, if keyfile not provided
+  --keyfile KEYFILE                              🔑 a JSON keyfile, if PEM not provided
+  --passfile PASSFILE                            DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
+  --ledger                                       🔐 bool flag for signing transaction using ledger
+  --sender-wallet-index SENDER_WALLET_INDEX      🔑 the address index; can be used for PEM files, keyfiles of type
+                                                 mnemonic or Ledger devices (default: 0)
+  --sender-username SENDER_USERNAME              🖄 the username of the sender
+  --hrp HRP                                      The hrp used to convert the address to its bech32 representation
+  --nonce NONCE                                  # the nonce for the transaction. If not provided, is fetched from the
+                                                 network.
+  --gas-price GAS_PRICE                          ⛽ the gas price (default: 1000000000)
+  --gas-limit GAS_LIMIT                          ⛽ the gas limit
+  --gas-limit-multiplier GAS_LIMIT_MULTIPLIER    if `--gas-limit` is not provided, the estimated value will be
+                                                 multiplied by this multiplier (e.g 1.1)
+  --value VALUE                                  the value to transfer (default: 0)
+  --chain CHAIN                                  the chain identifier
+  --version VERSION                              the transaction version (default: 2)
+  --options OPTIONS                              the transaction options (default: 0)
+  --relayer RELAYER                              the bech32 address of the relayer
+  --guardian GUARDIAN                            the bech32 address of the guardian
+  --proxy PROXY                                  🔗 the URL of the proxy
+  --send                                         ✓ whether to broadcast the transaction (default: False)
+  --simulate                                     whether to simulate the transaction (default: False)
+  --wait-result                                  signal to wait for the transaction result - only valid if --send is set
+  --timeout TIMEOUT                              max num of seconds to wait for result - only valid if --wait-result is
+                                                 set
+  --guardian-service-url GUARDIAN_SERVICE_URL    the url of the guardian service
+  --guardian-2fa-code GUARDIAN_2FA_CODE          the 2fa code for the guardian
+  --guardian-pem GUARDIAN_PEM                    🔑 the PEM file, if keyfile not provided
+  --guardian-keyfile GUARDIAN_KEYFILE            🔑 a JSON keyfile, if PEM not provided
+  --guardian-passfile GUARDIAN_PASSFILE          DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
+  --guardian-ledger                              🔐 bool flag for signing transaction using ledger
+  --guardian-wallet-index GUARDIAN_WALLET_INDEX  🔑 the address index; can be used for PEM files, keyfiles of type
+                                                 mnemonic or Ledger devices (default: 0)
+  --relayer-pem RELAYER_PEM                      🔑 the PEM file, if keyfile not provided
+  --relayer-keyfile RELAYER_KEYFILE              🔑 a JSON keyfile, if PEM not provided
+  --relayer-passfile RELAYER_PASSFILE            DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
+  --relayer-ledger                               🔐 bool flag for signing transaction using ledger
+  --relayer-wallet-index RELAYER_WALLET_INDEX    🔑 the address index; can be used for PEM files, keyfiles of type
+                                                 mnemonic or Ledger devices (default: 0)
+  --outfile OUTFILE                              where to save the output (default: stdout)
+
+```
+### Token.FreezeSingleNft
+
+
+```
+$ mxpy token freeze-single-nft --help
+usage: mxpy token freeze-single-nft [-h] ...
+
+Freeze the NFT of a user.
+
+options:
+  -h, --help                                     show this help message and exit
+  --token-identifier TOKEN_IDENTIFIER            the token identifier
+  --token-nonce TOKEN_NONCE                      The nonce of the token as decimal value
+  --user USER                                    the bech32 address of the user
+  --sender SENDER                                the alias of the wallet set in the address config
+  --pem PEM                                      🔑 the PEM file, if keyfile not provided
+  --keyfile KEYFILE                              🔑 a JSON keyfile, if PEM not provided
+  --passfile PASSFILE                            DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
+  --ledger                                       🔐 bool flag for signing transaction using ledger
+  --sender-wallet-index SENDER_WALLET_INDEX      🔑 the address index; can be used for PEM files, keyfiles of type
+                                                 mnemonic or Ledger devices (default: 0)
+  --sender-username SENDER_USERNAME              🖄 the username of the sender
+  --hrp HRP                                      The hrp used to convert the address to its bech32 representation
+  --nonce NONCE                                  # the nonce for the transaction. If not provided, is fetched from the
+                                                 network.
+  --gas-price GAS_PRICE                          ⛽ the gas price (default: 1000000000)
+  --gas-limit GAS_LIMIT                          ⛽ the gas limit
+  --gas-limit-multiplier GAS_LIMIT_MULTIPLIER    if `--gas-limit` is not provided, the estimated value will be
+                                                 multiplied by this multiplier (e.g 1.1)
+  --value VALUE                                  the value to transfer (default: 0)
+  --chain CHAIN                                  the chain identifier
+  --version VERSION                              the transaction version (default: 2)
+  --options OPTIONS                              the transaction options (default: 0)
+  --relayer RELAYER                              the bech32 address of the relayer
+  --guardian GUARDIAN                            the bech32 address of the guardian
+  --proxy PROXY                                  🔗 the URL of the proxy
+  --send                                         ✓ whether to broadcast the transaction (default: False)
+  --simulate                                     whether to simulate the transaction (default: False)
+  --wait-result                                  signal to wait for the transaction result - only valid if --send is set
+  --timeout TIMEOUT                              max num of seconds to wait for result - only valid if --wait-result is
+                                                 set
+  --guardian-service-url GUARDIAN_SERVICE_URL    the url of the guardian service
+  --guardian-2fa-code GUARDIAN_2FA_CODE          the 2fa code for the guardian
+  --guardian-pem GUARDIAN_PEM                    🔑 the PEM file, if keyfile not provided
+  --guardian-keyfile GUARDIAN_KEYFILE            🔑 a JSON keyfile, if PEM not provided
+  --guardian-passfile GUARDIAN_PASSFILE          DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
+  --guardian-ledger                              🔐 bool flag for signing transaction using ledger
+  --guardian-wallet-index GUARDIAN_WALLET_INDEX  🔑 the address index; can be used for PEM files, keyfiles of type
+                                                 mnemonic or Ledger devices (default: 0)
+  --relayer-pem RELAYER_PEM                      🔑 the PEM file, if keyfile not provided
+  --relayer-keyfile RELAYER_KEYFILE              🔑 a JSON keyfile, if PEM not provided
+  --relayer-passfile RELAYER_PASSFILE            DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
+  --relayer-ledger                               🔐 bool flag for signing transaction using ledger
+  --relayer-wallet-index RELAYER_WALLET_INDEX    🔑 the address index; can be used for PEM files, keyfiles of type
+                                                 mnemonic or Ledger devices (default: 0)
+  --outfile OUTFILE                              where to save the output (default: stdout)
+
+```
+### Token.UnfreezeSingleNft
+
+
+```
+$ mxpy token unfreeze-single-nft --help
+usage: mxpy token unfreeze-single-nft [-h] ...
+
+Unfreeze the NFT of a user.
+
+options:
+  -h, --help                                     show this help message and exit
+  --token-identifier TOKEN_IDENTIFIER            the token identifier
+  --token-nonce TOKEN_NONCE                      The nonce of the token as decimal value
+  --user USER                                    the bech32 address of the user
+  --sender SENDER                                the alias of the wallet set in the address config
+  --pem PEM                                      🔑 the PEM file, if keyfile not provided
+  --keyfile KEYFILE                              🔑 a JSON keyfile, if PEM not provided
+  --passfile PASSFILE                            DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
+  --ledger                                       🔐 bool flag for signing transaction using ledger
+  --sender-wallet-index SENDER_WALLET_INDEX      🔑 the address index; can be used for PEM files, keyfiles of type
+                                                 mnemonic or Ledger devices (default: 0)
+  --sender-username SENDER_USERNAME              🖄 the username of the sender
+  --hrp HRP                                      The hrp used to convert the address to its bech32 representation
+  --nonce NONCE                                  # the nonce for the transaction. If not provided, is fetched from the
+                                                 network.
+  --gas-price GAS_PRICE                          ⛽ the gas price (default: 1000000000)
+  --gas-limit GAS_LIMIT                          ⛽ the gas limit
+  --gas-limit-multiplier GAS_LIMIT_MULTIPLIER    if `--gas-limit` is not provided, the estimated value will be
+                                                 multiplied by this multiplier (e.g 1.1)
+  --value VALUE                                  the value to transfer (default: 0)
+  --chain CHAIN                                  the chain identifier
+  --version VERSION                              the transaction version (default: 2)
+  --options OPTIONS                              the transaction options (default: 0)
+  --relayer RELAYER                              the bech32 address of the relayer
+  --guardian GUARDIAN                            the bech32 address of the guardian
+  --proxy PROXY                                  🔗 the URL of the proxy
+  --send                                         ✓ whether to broadcast the transaction (default: False)
+  --simulate                                     whether to simulate the transaction (default: False)
+  --wait-result                                  signal to wait for the transaction result - only valid if --send is set
+  --timeout TIMEOUT                              max num of seconds to wait for result - only valid if --wait-result is
+                                                 set
+  --guardian-service-url GUARDIAN_SERVICE_URL    the url of the guardian service
+  --guardian-2fa-code GUARDIAN_2FA_CODE          the 2fa code for the guardian
+  --guardian-pem GUARDIAN_PEM                    🔑 the PEM file, if keyfile not provided
+  --guardian-keyfile GUARDIAN_KEYFILE            🔑 a JSON keyfile, if PEM not provided
+  --guardian-passfile GUARDIAN_PASSFILE          DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
+  --guardian-ledger                              🔐 bool flag for signing transaction using ledger
+  --guardian-wallet-index GUARDIAN_WALLET_INDEX  🔑 the address index; can be used for PEM files, keyfiles of type
+                                                 mnemonic or Ledger devices (default: 0)
+  --relayer-pem RELAYER_PEM                      🔑 the PEM file, if keyfile not provided
+  --relayer-keyfile RELAYER_KEYFILE              🔑 a JSON keyfile, if PEM not provided
+  --relayer-passfile RELAYER_PASSFILE            DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
+  --relayer-ledger                               🔐 bool flag for signing transaction using ledger
+  --relayer-wallet-index RELAYER_WALLET_INDEX    🔑 the address index; can be used for PEM files, keyfiles of type
+                                                 mnemonic or Ledger devices (default: 0)
+  --outfile OUTFILE                              where to save the output (default: stdout)
+
+```
+### Token.ChangeSftToMetaEsdt
+
+
+```
+$ mxpy token change-sft-to-meta-esdt --help
+usage: mxpy token change-sft-to-meta-esdt [-h] ...
+
+Change a semi fungible token to a Meta ESDT.
+
+options:
+  -h, --help                                     show this help message and exit
+  --collection COLLECTION                        The collection identifier
+  --decimals DECIMALS                            The number of decimals the meta esdt will have
+  --sender SENDER                                the alias of the wallet set in the address config
+  --pem PEM                                      🔑 the PEM file, if keyfile not provided
+  --keyfile KEYFILE                              🔑 a JSON keyfile, if PEM not provided
+  --passfile PASSFILE                            DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
+  --ledger                                       🔐 bool flag for signing transaction using ledger
+  --sender-wallet-index SENDER_WALLET_INDEX      🔑 the address index; can be used for PEM files, keyfiles of type
+                                                 mnemonic or Ledger devices (default: 0)
+  --sender-username SENDER_USERNAME              🖄 the username of the sender
+  --hrp HRP                                      The hrp used to convert the address to its bech32 representation
+  --nonce NONCE                                  # the nonce for the transaction. If not provided, is fetched from the
+                                                 network.
+  --gas-price GAS_PRICE                          ⛽ the gas price (default: 1000000000)
+  --gas-limit GAS_LIMIT                          ⛽ the gas limit
+  --gas-limit-multiplier GAS_LIMIT_MULTIPLIER    if `--gas-limit` is not provided, the estimated value will be
+                                                 multiplied by this multiplier (e.g 1.1)
+  --value VALUE                                  the value to transfer (default: 0)
+  --chain CHAIN                                  the chain identifier
+  --version VERSION                              the transaction version (default: 2)
+  --options OPTIONS                              the transaction options (default: 0)
+  --relayer RELAYER                              the bech32 address of the relayer
+  --guardian GUARDIAN                            the bech32 address of the guardian
+  --proxy PROXY                                  🔗 the URL of the proxy
+  --send                                         ✓ whether to broadcast the transaction (default: False)
+  --simulate                                     whether to simulate the transaction (default: False)
+  --wait-result                                  signal to wait for the transaction result - only valid if --send is set
+  --timeout TIMEOUT                              max num of seconds to wait for result - only valid if --wait-result is
+                                                 set
+  --guardian-service-url GUARDIAN_SERVICE_URL    the url of the guardian service
+  --guardian-2fa-code GUARDIAN_2FA_CODE          the 2fa code for the guardian
+  --guardian-pem GUARDIAN_PEM                    🔑 the PEM file, if keyfile not provided
+  --guardian-keyfile GUARDIAN_KEYFILE            🔑 a JSON keyfile, if PEM not provided
+  --guardian-passfile GUARDIAN_PASSFILE          DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
+  --guardian-ledger                              🔐 bool flag for signing transaction using ledger
+  --guardian-wallet-index GUARDIAN_WALLET_INDEX  🔑 the address index; can be used for PEM files, keyfiles of type
+                                                 mnemonic or Ledger devices (default: 0)
+  --relayer-pem RELAYER_PEM                      🔑 the PEM file, if keyfile not provided
+  --relayer-keyfile RELAYER_KEYFILE              🔑 a JSON keyfile, if PEM not provided
+  --relayer-passfile RELAYER_PASSFILE            DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
+  --relayer-ledger                               🔐 bool flag for signing transaction using ledger
+  --relayer-wallet-index RELAYER_WALLET_INDEX    🔑 the address index; can be used for PEM files, keyfiles of type
+                                                 mnemonic or Ledger devices (default: 0)
+  --outfile OUTFILE                              where to save the output (default: stdout)
+
+```
+### Token.TransferNftCreateRole
+
+
+```
+$ mxpy token transfer-nft-create-role --help
+usage: mxpy token transfer-nft-create-role [-h] ...
+
+Transfer the nft create role to a user.
+
+options:
+  -h, --help                                     show this help message and exit
+  --token-identifier TOKEN_IDENTIFIER            the token identifier
+  --user USER                                    the bech32 address of the user
+  --sender SENDER                                the alias of the wallet set in the address config
+  --pem PEM                                      🔑 the PEM file, if keyfile not provided
+  --keyfile KEYFILE                              🔑 a JSON keyfile, if PEM not provided
+  --passfile PASSFILE                            DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
+  --ledger                                       🔐 bool flag for signing transaction using ledger
+  --sender-wallet-index SENDER_WALLET_INDEX      🔑 the address index; can be used for PEM files, keyfiles of type
+                                                 mnemonic or Ledger devices (default: 0)
+  --sender-username SENDER_USERNAME              🖄 the username of the sender
+  --hrp HRP                                      The hrp used to convert the address to its bech32 representation
+  --nonce NONCE                                  # the nonce for the transaction. If not provided, is fetched from the
+                                                 network.
+  --gas-price GAS_PRICE                          ⛽ the gas price (default: 1000000000)
+  --gas-limit GAS_LIMIT                          ⛽ the gas limit
+  --gas-limit-multiplier GAS_LIMIT_MULTIPLIER    if `--gas-limit` is not provided, the estimated value will be
+                                                 multiplied by this multiplier (e.g 1.1)
+  --value VALUE                                  the value to transfer (default: 0)
+  --chain CHAIN                                  the chain identifier
+  --version VERSION                              the transaction version (default: 2)
+  --options OPTIONS                              the transaction options (default: 0)
+  --relayer RELAYER                              the bech32 address of the relayer
+  --guardian GUARDIAN                            the bech32 address of the guardian
+  --proxy PROXY                                  🔗 the URL of the proxy
+  --send                                         ✓ whether to broadcast the transaction (default: False)
+  --simulate                                     whether to simulate the transaction (default: False)
+  --wait-result                                  signal to wait for the transaction result - only valid if --send is set
+  --timeout TIMEOUT                              max num of seconds to wait for result - only valid if --wait-result is
+                                                 set
+  --guardian-service-url GUARDIAN_SERVICE_URL    the url of the guardian service
+  --guardian-2fa-code GUARDIAN_2FA_CODE          the 2fa code for the guardian
+  --guardian-pem GUARDIAN_PEM                    🔑 the PEM file, if keyfile not provided
+  --guardian-keyfile GUARDIAN_KEYFILE            🔑 a JSON keyfile, if PEM not provided
+  --guardian-passfile GUARDIAN_PASSFILE          DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
+  --guardian-ledger                              🔐 bool flag for signing transaction using ledger
+  --guardian-wallet-index GUARDIAN_WALLET_INDEX  🔑 the address index; can be used for PEM files, keyfiles of type
+                                                 mnemonic or Ledger devices (default: 0)
+  --relayer-pem RELAYER_PEM                      🔑 the PEM file, if keyfile not provided
+  --relayer-keyfile RELAYER_KEYFILE              🔑 a JSON keyfile, if PEM not provided
+  --relayer-passfile RELAYER_PASSFILE            DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
+  --relayer-ledger                               🔐 bool flag for signing transaction using ledger
+  --relayer-wallet-index RELAYER_WALLET_INDEX    🔑 the address index; can be used for PEM files, keyfiles of type
+                                                 mnemonic or Ledger devices (default: 0)
+  --outfile OUTFILE                              where to save the output (default: stdout)
+
+```
+### Token.StopNftCreation
+
+
+```
+$ mxpy token stop-nft-creation --help
+usage: mxpy token stop-nft-creation [-h] ...
+
+Stop the creation of new NFTs.
+
+options:
+  -h, --help                                     show this help message and exit
+  --token-identifier TOKEN_IDENTIFIER            the token identifier
+  --sender SENDER                                the alias of the wallet set in the address config
+  --pem PEM                                      🔑 the PEM file, if keyfile not provided
+  --keyfile KEYFILE                              🔑 a JSON keyfile, if PEM not provided
+  --passfile PASSFILE                            DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
+  --ledger                                       🔐 bool flag for signing transaction using ledger
+  --sender-wallet-index SENDER_WALLET_INDEX      🔑 the address index; can be used for PEM files, keyfiles of type
+                                                 mnemonic or Ledger devices (default: 0)
+  --sender-username SENDER_USERNAME              🖄 the username of the sender
+  --hrp HRP                                      The hrp used to convert the address to its bech32 representation
+  --nonce NONCE                                  # the nonce for the transaction. If not provided, is fetched from the
+                                                 network.
+  --gas-price GAS_PRICE                          ⛽ the gas price (default: 1000000000)
+  --gas-limit GAS_LIMIT                          ⛽ the gas limit
+  --gas-limit-multiplier GAS_LIMIT_MULTIPLIER    if `--gas-limit` is not provided, the estimated value will be
+                                                 multiplied by this multiplier (e.g 1.1)
+  --value VALUE                                  the value to transfer (default: 0)
+  --chain CHAIN                                  the chain identifier
+  --version VERSION                              the transaction version (default: 2)
+  --options OPTIONS                              the transaction options (default: 0)
+  --relayer RELAYER                              the bech32 address of the relayer
+  --guardian GUARDIAN                            the bech32 address of the guardian
+  --proxy PROXY                                  🔗 the URL of the proxy
+  --send                                         ✓ whether to broadcast the transaction (default: False)
+  --simulate                                     whether to simulate the transaction (default: False)
+  --wait-result                                  signal to wait for the transaction result - only valid if --send is set
+  --timeout TIMEOUT                              max num of seconds to wait for result - only valid if --wait-result is
+                                                 set
+  --guardian-service-url GUARDIAN_SERVICE_URL    the url of the guardian service
+  --guardian-2fa-code GUARDIAN_2FA_CODE          the 2fa code for the guardian
+  --guardian-pem GUARDIAN_PEM                    🔑 the PEM file, if keyfile not provided
+  --guardian-keyfile GUARDIAN_KEYFILE            🔑 a JSON keyfile, if PEM not provided
+  --guardian-passfile GUARDIAN_PASSFILE          DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
+  --guardian-ledger                              🔐 bool flag for signing transaction using ledger
+  --guardian-wallet-index GUARDIAN_WALLET_INDEX  🔑 the address index; can be used for PEM files, keyfiles of type
+                                                 mnemonic or Ledger devices (default: 0)
+  --relayer-pem RELAYER_PEM                      🔑 the PEM file, if keyfile not provided
+  --relayer-keyfile RELAYER_KEYFILE              🔑 a JSON keyfile, if PEM not provided
+  --relayer-passfile RELAYER_PASSFILE            DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
+  --relayer-ledger                               🔐 bool flag for signing transaction using ledger
+  --relayer-wallet-index RELAYER_WALLET_INDEX    🔑 the address index; can be used for PEM files, keyfiles of type
+                                                 mnemonic or Ledger devices (default: 0)
+  --outfile OUTFILE                              where to save the output (default: stdout)
+
+```
+### Token.WipeSingleNft
+
+
+```
+$ mxpy token wipe-single-nft --help
+usage: mxpy token wipe-single-nft [-h] ...
+
+Wipe the NFT of a user.
+
+options:
+  -h, --help                                     show this help message and exit
+  --token-identifier TOKEN_IDENTIFIER            the token identifier
+  --token-nonce TOKEN_NONCE                      The nonce of the NFT as a decimal number
+  --user USER                                    the bech32 address of the user
+  --sender SENDER                                the alias of the wallet set in the address config
+  --pem PEM                                      🔑 the PEM file, if keyfile not provided
+  --keyfile KEYFILE                              🔑 a JSON keyfile, if PEM not provided
+  --passfile PASSFILE                            DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
+  --ledger                                       🔐 bool flag for signing transaction using ledger
+  --sender-wallet-index SENDER_WALLET_INDEX      🔑 the address index; can be used for PEM files, keyfiles of type
+                                                 mnemonic or Ledger devices (default: 0)
+  --sender-username SENDER_USERNAME              🖄 the username of the sender
+  --hrp HRP                                      The hrp used to convert the address to its bech32 representation
+  --nonce NONCE                                  # the nonce for the transaction. If not provided, is fetched from the
+                                                 network.
+  --gas-price GAS_PRICE                          ⛽ the gas price (default: 1000000000)
+  --gas-limit GAS_LIMIT                          ⛽ the gas limit
+  --gas-limit-multiplier GAS_LIMIT_MULTIPLIER    if `--gas-limit` is not provided, the estimated value will be
+                                                 multiplied by this multiplier (e.g 1.1)
+  --value VALUE                                  the value to transfer (default: 0)
+  --chain CHAIN                                  the chain identifier
+  --version VERSION                              the transaction version (default: 2)
+  --options OPTIONS                              the transaction options (default: 0)
+  --relayer RELAYER                              the bech32 address of the relayer
+  --guardian GUARDIAN                            the bech32 address of the guardian
+  --proxy PROXY                                  🔗 the URL of the proxy
+  --send                                         ✓ whether to broadcast the transaction (default: False)
+  --simulate                                     whether to simulate the transaction (default: False)
+  --wait-result                                  signal to wait for the transaction result - only valid if --send is set
+  --timeout TIMEOUT                              max num of seconds to wait for result - only valid if --wait-result is
+                                                 set
+  --guardian-service-url GUARDIAN_SERVICE_URL    the url of the guardian service
+  --guardian-2fa-code GUARDIAN_2FA_CODE          the 2fa code for the guardian
+  --guardian-pem GUARDIAN_PEM                    🔑 the PEM file, if keyfile not provided
+  --guardian-keyfile GUARDIAN_KEYFILE            🔑 a JSON keyfile, if PEM not provided
+  --guardian-passfile GUARDIAN_PASSFILE          DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
+  --guardian-ledger                              🔐 bool flag for signing transaction using ledger
+  --guardian-wallet-index GUARDIAN_WALLET_INDEX  🔑 the address index; can be used for PEM files, keyfiles of type
+                                                 mnemonic or Ledger devices (default: 0)
+  --relayer-pem RELAYER_PEM                      🔑 the PEM file, if keyfile not provided
+  --relayer-keyfile RELAYER_KEYFILE              🔑 a JSON keyfile, if PEM not provided
+  --relayer-passfile RELAYER_PASSFILE            DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
+  --relayer-ledger                               🔐 bool flag for signing transaction using ledger
+  --relayer-wallet-index RELAYER_WALLET_INDEX    🔑 the address index; can be used for PEM files, keyfiles of type
+                                                 mnemonic or Ledger devices (default: 0)
+  --outfile OUTFILE                              where to save the output (default: stdout)
+
+```
+### Token.AddUris
+
+
+```
+$ mxpy token add-uris --help
+usage: mxpy token add-uris [-h] ...
+
+Add uris for a token.
+
+options:
+  -h, --help                                     show this help message and exit
+  --token-identifier TOKEN_IDENTIFIER            the token identifier
+  --token-nonce TOKEN_NONCE                      The nonce of the NFT as a decimal number
+  --uris URIS [URIS ...]                         The new uris to be added to the token.
+  --sender SENDER                                the alias of the wallet set in the address config
+  --pem PEM                                      🔑 the PEM file, if keyfile not provided
+  --keyfile KEYFILE                              🔑 a JSON keyfile, if PEM not provided
+  --passfile PASSFILE                            DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
+  --ledger                                       🔐 bool flag for signing transaction using ledger
+  --sender-wallet-index SENDER_WALLET_INDEX      🔑 the address index; can be used for PEM files, keyfiles of type
+                                                 mnemonic or Ledger devices (default: 0)
+  --sender-username SENDER_USERNAME              🖄 the username of the sender
+  --hrp HRP                                      The hrp used to convert the address to its bech32 representation
+  --nonce NONCE                                  # the nonce for the transaction. If not provided, is fetched from the
+                                                 network.
+  --gas-price GAS_PRICE                          ⛽ the gas price (default: 1000000000)
+  --gas-limit GAS_LIMIT                          ⛽ the gas limit
+  --gas-limit-multiplier GAS_LIMIT_MULTIPLIER    if `--gas-limit` is not provided, the estimated value will be
+                                                 multiplied by this multiplier (e.g 1.1)
+  --value VALUE                                  the value to transfer (default: 0)
+  --chain CHAIN                                  the chain identifier
+  --version VERSION                              the transaction version (default: 2)
+  --options OPTIONS                              the transaction options (default: 0)
+  --relayer RELAYER                              the bech32 address of the relayer
+  --guardian GUARDIAN                            the bech32 address of the guardian
+  --proxy PROXY                                  🔗 the URL of the proxy
+  --send                                         ✓ whether to broadcast the transaction (default: False)
+  --simulate                                     whether to simulate the transaction (default: False)
+  --wait-result                                  signal to wait for the transaction result - only valid if --send is set
+  --timeout TIMEOUT                              max num of seconds to wait for result - only valid if --wait-result is
+                                                 set
+  --guardian-service-url GUARDIAN_SERVICE_URL    the url of the guardian service
+  --guardian-2fa-code GUARDIAN_2FA_CODE          the 2fa code for the guardian
+  --guardian-pem GUARDIAN_PEM                    🔑 the PEM file, if keyfile not provided
+  --guardian-keyfile GUARDIAN_KEYFILE            🔑 a JSON keyfile, if PEM not provided
+  --guardian-passfile GUARDIAN_PASSFILE          DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
+  --guardian-ledger                              🔐 bool flag for signing transaction using ledger
+  --guardian-wallet-index GUARDIAN_WALLET_INDEX  🔑 the address index; can be used for PEM files, keyfiles of type
+                                                 mnemonic or Ledger devices (default: 0)
+  --relayer-pem RELAYER_PEM                      🔑 the PEM file, if keyfile not provided
+  --relayer-keyfile RELAYER_KEYFILE              🔑 a JSON keyfile, if PEM not provided
+  --relayer-passfile RELAYER_PASSFILE            DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
+  --relayer-ledger                               🔐 bool flag for signing transaction using ledger
+  --relayer-wallet-index RELAYER_WALLET_INDEX    🔑 the address index; can be used for PEM files, keyfiles of type
+                                                 mnemonic or Ledger devices (default: 0)
+  --outfile OUTFILE                              where to save the output (default: stdout)
 
 ```
