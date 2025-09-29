@@ -11,12 +11,13 @@ from multiversx_sdk import (
     AddressComputer,
     Message,
     ProxyNetworkProvider,
+    SmartContractController,
     Transaction,
-    TransactionsFactoryConfig,
 )
 from multiversx_sdk.abi import Abi
 
 from multiversx_sdk_cli import cli_shared, utils
+from multiversx_sdk_cli.args_converter import convert_args_to_typed_values
 from multiversx_sdk_cli.args_validation import (
     validate_broadcast_args,
     validate_chain_id_args,
@@ -28,9 +29,8 @@ from multiversx_sdk_cli.config import get_config_for_network_providers
 from multiversx_sdk_cli.config_env import MxpyEnv
 from multiversx_sdk_cli.constants import NUMBER_OF_SHARDS
 from multiversx_sdk_cli.contract_verification import trigger_contract_verification
-from multiversx_sdk_cli.contracts import SmartContract
 from multiversx_sdk_cli.docker import is_docker_installed, run_docker
-from multiversx_sdk_cli.errors import DockerMissingError
+from multiversx_sdk_cli.errors import BadUsage, DockerMissingError, QueryContractError
 from multiversx_sdk_cli.ux import show_warning
 
 logger = logging.getLogger("cli.contracts")
@@ -295,6 +295,7 @@ def _add_arguments_arg(sub: Any):
     sub.add_argument(
         "--arguments",
         nargs="+",
+        default=[],
         help="arguments for the contract transaction, as [number, bech32-address, ascii string, "
         "boolean] or hex-encoded. E.g. --arguments 42 0x64 1000 0xabba str:TOK-a1c2ef true addr:erd1[..]",
     )
@@ -315,6 +316,27 @@ After installing, use the `sc-meta all build` command. To learn more about `sc-m
     show_warning(message)
 
 
+def _initialize_controller(args: Any) -> SmartContractController:
+    chain_id = cli_shared.get_chain_id(args.proxy, args.chain)
+    config = get_config_for_network_providers()
+    proxy_url = args.proxy if args.proxy else ""
+    proxy = ProxyNetworkProvider(url=proxy_url, config=config)
+    abi = Abi.load(Path(args.abi)) if args.abi else None
+    gas_estimator = cli_shared.initialize_gas_limit_estimator(args)
+
+    return SmartContractController(
+        chain_id=chain_id,
+        network_provider=proxy,
+        abi=abi,
+        gas_limit_estimator=gas_estimator,
+    )
+
+
+def _ensure_args_for_gas_estimation(args: Any):
+    if not args.proxy and not args.gas_limit:
+        raise BadUsage("To estimate the gas limit, you need to provide `--proxy` or set a value using `--gas-limit`")
+
+
 def deploy(args: Any):
     logger.debug("deploy")
 
@@ -322,37 +344,33 @@ def deploy(args: Any):
     validate_broadcast_args(args)
     validate_chain_id_args(args)
 
+    _ensure_args_for_gas_estimation(args)
+
     sender = cli_shared.prepare_sender(args)
     guardian_and_relayer_data = cli_shared.get_guardian_and_relayer_data(
         sender=sender.address.to_bech32(),
         args=args,
     )
 
-    chain_id = cli_shared.get_chain_id(args.proxy, args.chain)
-    config = TransactionsFactoryConfig(chain_id)
-
-    abi = Abi.load(Path(args.abi)) if args.abi else None
-    gas_estimator = cli_shared.initialize_gas_limit_estimator(args)
-    contract = SmartContract(config, abi, gas_estimator)
-
     arguments, should_prepare_args = _get_contract_arguments(args)
+    if should_prepare_args:
+        arguments = convert_args_to_typed_values(arguments)
 
-    tx = contract.prepare_deploy_transaction(
-        owner=sender,
+    controller = _initialize_controller(args)
+    tx = controller.create_transaction_for_deploy(
+        sender=sender,
+        nonce=sender.nonce,
         bytecode=Path(args.bytecode),
         arguments=arguments,
-        should_prepare_args=should_prepare_args,
-        upgradeable=args.metadata_upgradeable,
-        readable=args.metadata_readable,
-        payable=args.metadata_payable,
-        payable_by_sc=args.metadata_payable_by_sc,
+        native_transfer_amount=int(args.value),
+        is_upgradeable=args.metadata_upgradeable,
+        is_readable=args.metadata_readable,
+        is_payable=args.metadata_payable,
+        is_payable_by_sc=args.metadata_payable_by_sc,
+        guardian=guardian_and_relayer_data.guardian_address,
+        relayer=guardian_and_relayer_data.relayer_address,
         gas_limit=args.gas_limit,
-        gas_price=int(args.gas_price),
-        value=int(args.value),
-        nonce=sender.nonce,
-        version=int(args.version),
-        options=int(args.options),
-        guardian_and_relayer_data=guardian_and_relayer_data,
+        gas_price=args.gas_price,
     )
 
     address_computer = AddressComputer(NUMBER_OF_SHARDS)
@@ -361,8 +379,18 @@ def deploy(args: Any):
     logger.info("Contract address: %s", contract_address.to_bech32())
 
     cli_config = MxpyEnv.from_active_env()
-    utils.log_explorer_contract_address(args.chain, contract_address.to_bech32(), cli_config.explorer_url)
+    utils.log_explorer_contract_address(
+        chain=cli_shared.get_chain_id(args.proxy, args.chain),
+        address=contract_address.to_bech32(),
+        explorer_url=cli_config.explorer_url,
+    )
 
+    cli_shared.alter_transaction_and_sign_again_if_needed(
+        args=args,
+        tx=tx,
+        sender=sender,
+        guardian_and_relayer_data=guardian_and_relayer_data,
+    )
     _send_or_simulate(tx, contract_address, args)
 
 
@@ -373,42 +401,45 @@ def call(args: Any):
     validate_broadcast_args(args)
     validate_chain_id_args(args)
 
+    _ensure_args_for_gas_estimation(args)
+
     sender = cli_shared.prepare_sender(args)
     guardian_and_relayer_data = cli_shared.get_guardian_and_relayer_data(
         sender=sender.address.to_bech32(),
         args=args,
     )
 
-    chain_id = cli_shared.get_chain_id(args.proxy, args.chain)
-    config = TransactionsFactoryConfig(chain_id)
-
-    abi = Abi.load(Path(args.abi)) if args.abi else None
-    gas_estimator = cli_shared.initialize_gas_limit_estimator(args)
-    contract = SmartContract(config, abi, gas_estimator)
-
     arguments, should_prepare_args = _get_contract_arguments(args)
-    contract_address = Address.new_from_bech32(args.contract)
+    if should_prepare_args:
+        arguments = convert_args_to_typed_values(arguments)
 
-    token_transfers = None
+    token_transfers = []
     if args.token_transfers:
         token_transfers = cli_shared.prepare_token_transfers(args.token_transfers)
 
-    tx = contract.prepare_execute_transaction(
-        caller=sender,
+    contract_address = Address.new_from_bech32(args.contract)
+    controller = _initialize_controller(args)
+
+    tx = controller.create_transaction_for_execute(
+        sender=sender,
+        nonce=sender.nonce,
         contract=contract_address,
         function=args.function,
         arguments=arguments,
-        should_prepare_args=should_prepare_args,
-        gas_limit=args.gas_limit,
-        gas_price=int(args.gas_price),
-        value=int(args.value),
+        native_transfer_amount=int(args.value),
         token_transfers=token_transfers,
-        nonce=sender.nonce,
-        version=int(args.version),
-        options=int(args.options),
-        guardian_and_relayer_data=guardian_and_relayer_data,
+        guardian=guardian_and_relayer_data.guardian_address,
+        relayer=guardian_and_relayer_data.relayer_address,
+        gas_limit=args.gas_limit,
+        gas_price=args.gas_price,
     )
 
+    cli_shared.alter_transaction_and_sign_again_if_needed(
+        args=args,
+        tx=tx,
+        sender=sender,
+        guardian_and_relayer_data=guardian_and_relayer_data,
+    )
     _send_or_simulate(tx, contract_address, args)
 
 
@@ -419,41 +450,44 @@ def upgrade(args: Any):
     validate_broadcast_args(args)
     validate_chain_id_args(args)
 
+    _ensure_args_for_gas_estimation(args)
+
     sender = cli_shared.prepare_sender(args)
     guardian_and_relayer_data = cli_shared.get_guardian_and_relayer_data(
         sender=sender.address.to_bech32(),
         args=args,
     )
 
-    chain_id = cli_shared.get_chain_id(args.proxy, args.chain)
-    config = TransactionsFactoryConfig(chain_id)
-
-    abi = Abi.load(Path(args.abi)) if args.abi else None
-    gas_estimator = cli_shared.initialize_gas_limit_estimator(args)
-    contract = SmartContract(config, abi, gas_estimator)
-
     arguments, should_prepare_args = _get_contract_arguments(args)
-    contract_address = Address.new_from_bech32(args.contract)
+    if should_prepare_args:
+        arguments = convert_args_to_typed_values(arguments)
 
-    tx = contract.prepare_upgrade_transaction(
-        owner=sender,
+    contract_address = Address.new_from_bech32(args.contract)
+    controller = _initialize_controller(args)
+
+    tx = controller.create_transaction_for_upgrade(
+        sender=sender,
+        nonce=sender.nonce,
         contract=contract_address,
         bytecode=Path(args.bytecode),
         arguments=arguments,
-        should_prepare_args=should_prepare_args,
-        upgradeable=args.metadata_upgradeable,
-        readable=args.metadata_readable,
-        payable=args.metadata_payable,
-        payable_by_sc=args.metadata_payable_by_sc,
+        native_transfer_amount=int(args.value),
+        is_upgradeable=args.metadata_upgradeable,
+        is_readable=args.metadata_readable,
+        is_payable=args.metadata_payable,
+        is_payable_by_sc=args.metadata_payable_by_sc,
+        guardian=guardian_and_relayer_data.guardian_address,
+        relayer=guardian_and_relayer_data.relayer_address,
         gas_limit=args.gas_limit,
-        gas_price=int(args.gas_price),
-        value=int(args.value),
-        nonce=sender.nonce,
-        version=int(args.version),
-        options=int(args.options),
-        guardian_and_relayer_data=guardian_and_relayer_data,
+        gas_price=args.gas_price,
     )
 
+    cli_shared.alter_transaction_and_sign_again_if_needed(
+        args=args,
+        tx=tx,
+        sender=sender,
+        guardian_and_relayer_data=guardian_and_relayer_data,
+    )
     _send_or_simulate(tx, contract_address, args)
 
 
@@ -462,25 +496,31 @@ def query(args: Any):
 
     validate_proxy_argument(args)
 
-    # we don't need chainID to query a contract; we use the provided proxy
-    factory_config = TransactionsFactoryConfig("")
     abi = Abi.load(Path(args.abi)) if args.abi else None
-    contract = SmartContract(factory_config, abi)
+    contract_address = Address.new_from_bech32(args.contract)
+    function = args.function
 
     arguments, should_prepare_args = _get_contract_arguments(args)
-    contract_address = Address.new_from_bech32(args.contract)
+    if should_prepare_args:
+        arguments = convert_args_to_typed_values(arguments)
 
     network_provider_config = get_config_for_network_providers()
     proxy = ProxyNetworkProvider(url=args.proxy, config=network_provider_config)
-    function = args.function
 
-    result = contract.query_contract(
-        contract_address=contract_address,
-        proxy=proxy,
-        function=function,
-        arguments=arguments,
-        should_prepare_args=should_prepare_args,
+    controller = SmartContractController(
+        chain_id="",
+        network_provider=proxy,
+        abi=abi,
     )
+
+    try:
+        result = controller.query(
+            contract=contract_address,
+            function=function,
+            arguments=arguments,
+        )
+    except Exception as e:
+        raise QueryContractError("Couldn't query contract: ", e)
 
     utils.dump_out_json(result)
 

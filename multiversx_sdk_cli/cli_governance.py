@@ -7,7 +7,7 @@ from multiversx_sdk import (
     GovernanceController,
     ProposalInfo,
     ProxyNetworkProvider,
-    TransactionsFactoryConfig,
+    VoteType,
 )
 
 from multiversx_sdk_cli import cli_shared, utils
@@ -18,7 +18,6 @@ from multiversx_sdk_cli.args_validation import (
 )
 from multiversx_sdk_cli.cli_output import CLIOutputBuilder
 from multiversx_sdk_cli.config import get_config_for_network_providers
-from multiversx_sdk_cli.governance import GovernanceWrapper
 
 
 def setup_parser(args: list[str], subparsers: Any) -> Any:
@@ -196,6 +195,22 @@ def _ensure_args(args: Any):
     validate_chain_id_args(args)
 
 
+def _initialize_controller(args: Any) -> GovernanceController:
+    chain = getattr(args, "chain", None)
+    chain_id = cli_shared.get_chain_id(args.proxy, chain)
+    config = get_config_for_network_providers()
+    proxy_url = args.proxy if args.proxy else ""
+    proxy = ProxyNetworkProvider(url=proxy_url, config=config)
+    gas_estimator = cli_shared.initialize_gas_limit_estimator(args)
+
+    return GovernanceController(
+        chain_id=chain_id,
+        network_provider=proxy,
+        address_hrp=cli_shared.get_address_hrp_with_fallback(args),
+        gas_limit_estimator=gas_estimator,
+    )
+
+
 def create_proposal(args: Any):
     _ensure_args(args)
 
@@ -204,10 +219,8 @@ def create_proposal(args: Any):
         sender=sender.address.to_bech32(),
         args=args,
     )
-    chain_id = cli_shared.get_chain_id(args.proxy, args.chain)
-    gas_estimator = cli_shared.initialize_gas_limit_estimator(args)
-    controller = GovernanceWrapper(config=TransactionsFactoryConfig(chain_id), gas_limit_estimator=gas_estimator)
 
+    controller = _initialize_controller(args)
     transaction = controller.create_transaction_for_new_proposal(
         sender=sender,
         nonce=sender.nonce,
@@ -215,13 +228,18 @@ def create_proposal(args: Any):
         start_vote_epoch=args.start_vote_epoch,
         end_vote_epoch=args.end_vote_epoch,
         native_token_amount=args.value,
+        guardian=guardian_and_relayer_data.guardian_address,
+        relayer=guardian_and_relayer_data.relayer_address,
         gas_limit=args.gas_limit,
         gas_price=args.gas_price,
-        version=args.version,
-        options=args.options,
-        guardian_and_relayer_data=guardian_and_relayer_data,
     )
 
+    cli_shared.alter_transaction_and_sign_again_if_needed(
+        args=args,
+        tx=transaction,
+        sender=sender,
+        guardian_and_relayer_data=guardian_and_relayer_data,
+    )
     cli_shared.send_or_simulate(transaction, args)
 
 
@@ -233,22 +251,27 @@ def vote(args: Any):
         sender=sender.address.to_bech32(),
         args=args,
     )
-    chain_id = cli_shared.get_chain_id(args.proxy, args.chain)
-    gas_estimator = cli_shared.initialize_gas_limit_estimator(args)
-    controller = GovernanceWrapper(config=TransactionsFactoryConfig(chain_id), gas_limit_estimator=gas_estimator)
+
+    [vote_value] = [v for v in VoteType if v.value == args.vote]
+    controller = _initialize_controller(args)
 
     transaction = controller.create_transaction_for_voting(
         sender=sender,
         nonce=sender.nonce,
         proposal_nonce=args.proposal_nonce,
-        vote=args.vote,
+        vote=vote_value,
+        guardian=guardian_and_relayer_data.guardian_address,
+        relayer=guardian_and_relayer_data.relayer_address,
         gas_limit=args.gas_limit,
         gas_price=args.gas_price,
-        version=args.version,
-        options=args.options,
-        guardian_and_relayer_data=guardian_and_relayer_data,
     )
 
+    cli_shared.alter_transaction_and_sign_again_if_needed(
+        args=args,
+        tx=transaction,
+        sender=sender,
+        guardian_and_relayer_data=guardian_and_relayer_data,
+    )
     cli_shared.send_or_simulate(transaction, args)
 
 
@@ -260,21 +283,24 @@ def close_proposal(args: Any):
         sender=sender.address.to_bech32(),
         args=args,
     )
-    chain_id = cli_shared.get_chain_id(args.proxy, args.chain)
-    gas_estimator = cli_shared.initialize_gas_limit_estimator(args)
-    controller = GovernanceWrapper(config=TransactionsFactoryConfig(chain_id), gas_limit_estimator=gas_estimator)
 
+    controller = _initialize_controller(args)
     transaction = controller.create_transaction_for_closing_proposal(
         sender=sender,
         nonce=sender.nonce,
         proposal_nonce=args.proposal_nonce,
+        guardian=guardian_and_relayer_data.guardian_address,
+        relayer=guardian_and_relayer_data.relayer_address,
         gas_limit=args.gas_limit,
         gas_price=args.gas_price,
-        version=args.version,
-        options=args.options,
-        guardian_and_relayer_data=guardian_and_relayer_data,
     )
 
+    cli_shared.alter_transaction_and_sign_again_if_needed(
+        args=args,
+        tx=transaction,
+        sender=sender,
+        guardian_and_relayer_data=guardian_and_relayer_data,
+    )
     cli_shared.send_or_simulate(transaction, args)
 
 
@@ -286,22 +312,26 @@ def clear_ended_proposals(args: Any):
         sender=sender.address.to_bech32(),
         args=args,
     )
-    chain_id = cli_shared.get_chain_id(args.proxy, args.chain)
-    gas_estimator = cli_shared.initialize_gas_limit_estimator(args)
-    controller = GovernanceWrapper(config=TransactionsFactoryConfig(chain_id), gas_limit_estimator=gas_estimator)
 
     proposers = [Address.new_from_bech32(proposer) for proposer in args.proposers]
+    controller = _initialize_controller(args)
+
     transaction = controller.create_transaction_for_clearing_ended_proposals(
         sender=sender,
         nonce=sender.nonce,
         proposers=proposers,
+        guardian=guardian_and_relayer_data.guardian_address,
+        relayer=guardian_and_relayer_data.relayer_address,
         gas_limit=args.gas_limit,
         gas_price=args.gas_price,
-        version=args.version,
-        options=args.options,
-        guardian_and_relayer_data=guardian_and_relayer_data,
     )
 
+    cli_shared.alter_transaction_and_sign_again_if_needed(
+        args=args,
+        tx=transaction,
+        sender=sender,
+        guardian_and_relayer_data=guardian_and_relayer_data,
+    )
     cli_shared.send_or_simulate(transaction, args)
 
 
@@ -313,20 +343,23 @@ def claim_accumulated_fees(args: Any):
         sender=sender.address.to_bech32(),
         args=args,
     )
-    chain_id = cli_shared.get_chain_id(args.proxy, args.chain)
-    gas_estimator = cli_shared.initialize_gas_limit_estimator(args)
-    controller = GovernanceWrapper(config=TransactionsFactoryConfig(chain_id), gas_limit_estimator=gas_estimator)
 
+    controller = _initialize_controller(args)
     transaction = controller.create_transaction_for_claiming_accumulated_fees(
         sender=sender,
         nonce=sender.nonce,
+        guardian=guardian_and_relayer_data.guardian_address,
+        relayer=guardian_and_relayer_data.relayer_address,
         gas_limit=args.gas_limit,
         gas_price=args.gas_price,
-        version=args.version,
-        options=args.options,
-        guardian_and_relayer_data=guardian_and_relayer_data,
     )
 
+    cli_shared.alter_transaction_and_sign_again_if_needed(
+        args=args,
+        tx=transaction,
+        sender=sender,
+        guardian_and_relayer_data=guardian_and_relayer_data,
+    )
     cli_shared.send_or_simulate(transaction, args)
 
 
@@ -338,10 +371,8 @@ def change_config(args: Any):
         sender=sender.address.to_bech32(),
         args=args,
     )
-    chain_id = cli_shared.get_chain_id(args.proxy, args.chain)
-    gas_estimator = cli_shared.initialize_gas_limit_estimator(args)
-    controller = GovernanceWrapper(config=TransactionsFactoryConfig(chain_id), gas_limit_estimator=gas_estimator)
 
+    controller = _initialize_controller(args)
     transaction = controller.create_transaction_for_changing_config(
         sender=sender,
         nonce=sender.nonce,
@@ -350,24 +381,25 @@ def change_config(args: Any):
         min_quorum=args.min_quorum,
         min_veto_threshold=args.min_veto_threshold,
         min_pass_threshold=args.min_pass_threshold,
+        guardian=guardian_and_relayer_data.guardian_address,
+        relayer=guardian_and_relayer_data.relayer_address,
         gas_limit=args.gas_limit,
         gas_price=args.gas_price,
-        version=args.version,
-        options=args.options,
-        guardian_and_relayer_data=guardian_and_relayer_data,
     )
 
+    cli_shared.alter_transaction_and_sign_again_if_needed(
+        args=args,
+        tx=transaction,
+        sender=sender,
+        guardian_and_relayer_data=guardian_and_relayer_data,
+    )
     cli_shared.send_or_simulate(transaction, args)
 
 
 def get_voting_power(args: Any):
     validate_proxy_argument(args)
 
-    config = get_config_for_network_providers()
-    proxy = ProxyNetworkProvider(url=args.proxy, config=config)
-    chain_id = proxy.get_network_config().chain_id
-    controller = GovernanceController(chain_id, proxy)
-
+    controller = _initialize_controller(args)
     user = Address.new_from_bech32(args.user)
 
     voting_power = controller.get_voting_power(user)
@@ -377,10 +409,7 @@ def get_voting_power(args: Any):
 def get_config(args: Any):
     validate_proxy_argument(args)
 
-    config = get_config_for_network_providers()
-    proxy = ProxyNetworkProvider(url=args.proxy, config=config)
-    chain_id = proxy.get_network_config().chain_id
-    controller = GovernanceController(chain_id, proxy)
+    controller = _initialize_controller(args)
 
     contract_config = controller.get_config()
     utils.dump_out_json(_config_to_dict(contract_config))
@@ -389,10 +418,7 @@ def get_config(args: Any):
 def get_proposal(args: Any):
     validate_proxy_argument(args)
 
-    config = get_config_for_network_providers()
-    proxy = ProxyNetworkProvider(url=args.proxy, config=config)
-    chain_id = proxy.get_network_config().chain_id
-    controller = GovernanceController(chain_id, proxy)
+    controller = _initialize_controller(args)
 
     info = controller.get_proposal(args.proposal_nonce)
     utils.dump_out_json(_proposal_to_dict(info))
@@ -401,10 +427,7 @@ def get_proposal(args: Any):
 def get_delegated_vote_info(args: Any):
     validate_proxy_argument(args)
 
-    config = get_config_for_network_providers()
-    proxy = ProxyNetworkProvider(url=args.proxy, config=config)
-    chain_id = proxy.get_network_config().chain_id
-    controller = GovernanceController(chain_id, proxy)
+    controller = _initialize_controller(args)
 
     contract = Address.new_from_bech32(args.contract)
     user = Address.new_from_bech32(args.user)

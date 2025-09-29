@@ -23,11 +23,11 @@ from multiversx_sdk import (
     SendTransferExecuteEgld,
     SendTransferExecuteEsdt,
     Transaction,
-    TransactionsFactoryConfig,
 )
 from multiversx_sdk.abi import Abi
 
 from multiversx_sdk_cli import cli_shared, utils
+from multiversx_sdk_cli.args_converter import convert_args_to_typed_values
 from multiversx_sdk_cli.args_validation import (
     validate_broadcast_args,
     validate_chain_id_args,
@@ -37,7 +37,6 @@ from multiversx_sdk_cli.args_validation import (
 from multiversx_sdk_cli.cli_output import CLIOutputBuilder
 from multiversx_sdk_cli.config import get_config_for_network_providers
 from multiversx_sdk_cli.constants import NUMBER_OF_SHARDS
-from multiversx_sdk_cli.multisig import MultisigWrapper
 
 logger = logging.getLogger("cli.multisig")
 
@@ -629,6 +628,7 @@ def _add_arguments_arg(sub: Any):
         nargs="+",
         help="arguments for the contract transaction, as [number, bech32-address, ascii string, "
         "boolean] or hex-encoded. E.g. --arguments 42 0x64 1000 0xabba str:TOK-a1c2ef true addr:erd1[..]",
+        default=[],
     )
     sub.add_argument(
         "--arguments-file",
@@ -659,13 +659,21 @@ def _ensure_args(args: Any):
     validate_chain_id_args(args)
 
 
-def _initialize_multisig_wrapper(args: Any) -> MultisigWrapper:
+def _initialize_multisig_controller(args: Any) -> MultisigController:
     abi = Abi.load(Path(args.abi))
-    chain_id = cli_shared.get_chain_id(args.proxy, args.chain)
+    chain = getattr(args, "chain", None)
+    chain_id = cli_shared.get_chain_id(args.proxy, chain)
+
+    config = get_config_for_network_providers()
+    proxy_url = args.proxy if args.proxy else ""
     gas_estimator = cli_shared.initialize_gas_limit_estimator(args)
-    return MultisigWrapper(
-        config=TransactionsFactoryConfig(chain_id),
+    proxy = ProxyNetworkProvider(url=proxy_url, config=config)
+
+    return MultisigController(
+        chain_id=chain_id,
+        network_provider=proxy,
         abi=abi,
+        address_hrp=cli_shared.get_address_hrp_with_fallback(args),
         gas_limit_estimator=gas_estimator,
     )
 
@@ -683,30 +691,35 @@ def deploy(args: Any):
     quorum = args.quorum
     board_members = [Address.new_from_bech32(addr) for addr in args.board_members]
 
-    multisig = _initialize_multisig_wrapper(args)
-    tx = multisig.prepare_deploy_transaction(
-        owner=sender,
+    multisig = _initialize_multisig_controller(args)
+    tx = multisig.create_transaction_for_deploy(
+        sender=sender,
         nonce=sender.nonce,
         bytecode=Path(args.bytecode),
         quorum=quorum,
-        board_members=board_members,
-        upgradeable=args.metadata_upgradeable,
-        readable=args.metadata_readable,
-        payable=args.metadata_payable,
-        payable_by_sc=args.metadata_payable_by_sc,
+        board=board_members,
+        is_upgradeable=args.metadata_upgradeable,
+        is_readable=args.metadata_readable,
+        is_payable=args.metadata_payable,
+        is_payable_by_sc=args.metadata_payable_by_sc,
+        guardian=guardian_and_relayer_data.guardian_address,
+        relayer=guardian_and_relayer_data.relayer_address,
         gas_limit=args.gas_limit,
-        gas_price=int(args.gas_price),
-        version=int(args.version),
-        options=int(args.options),
-        guardian_and_relayer_data=guardian_and_relayer_data,
+        gas_price=args.gas_price,
     )
 
     address_computer = AddressComputer(NUMBER_OF_SHARDS)
     contract_address = address_computer.compute_contract_address(deployer=sender.address, deployment_nonce=tx.nonce)
 
     logger.info("Contract address: %s", contract_address.to_bech32())
-    utils.log_explorer_contract_address(args.chain, contract_address.to_bech32())
+    utils.log_explorer_contract_address(cli_shared.get_chain_id(args.proxy, args.chain), contract_address.to_bech32())
 
+    cli_shared.alter_transaction_and_sign_again_if_needed(
+        args=args,
+        tx=tx,
+        sender=sender,
+        guardian_and_relayer_data=guardian_and_relayer_data,
+    )
     _send_or_simulate(tx, contract_address, args)
 
 
@@ -726,20 +739,25 @@ def deposit(args: Any):
     if token_transfers:
         token_transfers = cli_shared.prepare_token_transfers(token_transfers)
 
-    multisig = _initialize_multisig_wrapper(args)
-    tx = multisig.prepare_deposit_transaction(
-        owner=sender,
+    multisig = _initialize_multisig_controller(args)
+    tx = multisig.create_transaction_for_deposit(
+        sender=sender,
         nonce=sender.nonce,
         contract=contract,
-        native_amount=native_amount,
+        native_token_amount=native_amount,
         token_transfers=token_transfers,
+        guardian=guardian_and_relayer_data.guardian_address,
+        relayer=guardian_and_relayer_data.relayer_address,
         gas_limit=args.gas_limit,
-        gas_price=int(args.gas_price),
-        version=int(args.version),
-        options=int(args.options),
-        guardian_and_relayer_data=guardian_and_relayer_data,
+        gas_price=args.gas_price,
     )
 
+    cli_shared.alter_transaction_and_sign_again_if_needed(
+        args=args,
+        tx=tx,
+        sender=sender,
+        guardian_and_relayer_data=guardian_and_relayer_data,
+    )
     _send_or_simulate(tx, contract, args)
 
 
@@ -755,19 +773,24 @@ def discard_action(args: Any):
     contract = Address.new_from_bech32(args.contract)
     action_id = int(args.action)
 
-    multisig = _initialize_multisig_wrapper(args)
-    tx = multisig.prepare_discard_action_transaction(
-        owner=sender,
+    multisig = _initialize_multisig_controller(args)
+    tx = multisig.create_transaction_for_discard_action(
+        sender=sender,
         nonce=sender.nonce,
         contract=contract,
         action_id=action_id,
+        guardian=guardian_and_relayer_data.guardian_address,
+        relayer=guardian_and_relayer_data.relayer_address,
         gas_limit=args.gas_limit,
-        gas_price=int(args.gas_price),
-        version=int(args.version),
-        options=int(args.options),
-        guardian_and_relayer_data=guardian_and_relayer_data,
+        gas_price=args.gas_price,
     )
 
+    cli_shared.alter_transaction_and_sign_again_if_needed(
+        args=args,
+        tx=tx,
+        sender=sender,
+        guardian_and_relayer_data=guardian_and_relayer_data,
+    )
     _send_or_simulate(tx, contract, args)
 
 
@@ -783,19 +806,24 @@ def discard_batch(args: Any):
     contract = Address.new_from_bech32(args.contract)
     actions = args.action_ids
 
-    multisig = _initialize_multisig_wrapper(args)
-    tx = multisig.prepare_discard_batch_transaction(
-        owner=sender,
+    multisig = _initialize_multisig_controller(args)
+    tx = multisig.create_transaction_for_discard_batch(
+        sender=sender,
         nonce=sender.nonce,
         contract=contract,
-        action_ids=actions,
+        actions_ids=actions,
+        guardian=guardian_and_relayer_data.guardian_address,
+        relayer=guardian_and_relayer_data.relayer_address,
         gas_limit=args.gas_limit,
-        gas_price=int(args.gas_price),
-        version=int(args.version),
-        options=int(args.options),
-        guardian_and_relayer_data=guardian_and_relayer_data,
+        gas_price=args.gas_price,
     )
 
+    cli_shared.alter_transaction_and_sign_again_if_needed(
+        args=args,
+        tx=tx,
+        sender=sender,
+        guardian_and_relayer_data=guardian_and_relayer_data,
+    )
     _send_or_simulate(tx, contract, args)
 
 
@@ -811,19 +839,24 @@ def add_board_member(args: Any):
     contract = Address.new_from_bech32(args.contract)
     board_member = Address.new_from_bech32(args.board_member)
 
-    multisig = _initialize_multisig_wrapper(args)
-    tx = multisig.prepare_add_board_member_transaction(
-        owner=sender,
+    multisig = _initialize_multisig_controller(args)
+    tx = multisig.create_transaction_for_propose_add_board_member(
+        sender=sender,
         nonce=sender.nonce,
         contract=contract,
         board_member=board_member,
+        guardian=guardian_and_relayer_data.guardian_address,
+        relayer=guardian_and_relayer_data.relayer_address,
         gas_limit=args.gas_limit,
-        gas_price=int(args.gas_price),
-        version=int(args.version),
-        options=int(args.options),
-        guardian_and_relayer_data=guardian_and_relayer_data,
+        gas_price=args.gas_price,
     )
 
+    cli_shared.alter_transaction_and_sign_again_if_needed(
+        args=args,
+        tx=tx,
+        sender=sender,
+        guardian_and_relayer_data=guardian_and_relayer_data,
+    )
     _send_or_simulate(tx, contract, args)
 
 
@@ -839,19 +872,24 @@ def add_proposer(args: Any):
     contract = Address.new_from_bech32(args.contract)
     proposer = Address.new_from_bech32(args.proposer)
 
-    multisig = _initialize_multisig_wrapper(args)
-    tx = multisig.prepare_add_proposer_transaction(
-        owner=sender,
+    multisig = _initialize_multisig_controller(args)
+    tx = multisig.create_transaction_for_propose_add_proposer(
+        sender=sender,
         nonce=sender.nonce,
         contract=contract,
         proposer=proposer,
+        guardian=guardian_and_relayer_data.guardian_address,
+        relayer=guardian_and_relayer_data.relayer_address,
         gas_limit=args.gas_limit,
-        gas_price=int(args.gas_price),
-        version=int(args.version),
-        options=int(args.options),
-        guardian_and_relayer_data=guardian_and_relayer_data,
+        gas_price=args.gas_price,
     )
 
+    cli_shared.alter_transaction_and_sign_again_if_needed(
+        args=args,
+        tx=tx,
+        sender=sender,
+        guardian_and_relayer_data=guardian_and_relayer_data,
+    )
     _send_or_simulate(tx, contract, args)
 
 
@@ -867,19 +905,24 @@ def remove_user(args: Any):
     contract = Address.new_from_bech32(args.contract)
     user = Address.new_from_bech32(args.user)
 
-    multisig = _initialize_multisig_wrapper(args)
-    tx = multisig.prepare_remove_user_transaction(
-        owner=sender,
+    multisig = _initialize_multisig_controller(args)
+    tx = multisig.create_transaction_for_propose_remove_user(
+        sender=sender,
         nonce=sender.nonce,
         contract=contract,
         user=user,
+        guardian=guardian_and_relayer_data.guardian_address,
+        relayer=guardian_and_relayer_data.relayer_address,
         gas_limit=args.gas_limit,
-        gas_price=int(args.gas_price),
-        version=int(args.version),
-        options=int(args.options),
-        guardian_and_relayer_data=guardian_and_relayer_data,
+        gas_price=args.gas_price,
     )
 
+    cli_shared.alter_transaction_and_sign_again_if_needed(
+        args=args,
+        tx=tx,
+        sender=sender,
+        guardian_and_relayer_data=guardian_and_relayer_data,
+    )
     _send_or_simulate(tx, contract, args)
 
 
@@ -895,19 +938,24 @@ def change_quorum(args: Any):
     contract = Address.new_from_bech32(args.contract)
     quorum = int(args.quorum)
 
-    multisig = _initialize_multisig_wrapper(args)
-    tx = multisig.prepare_change_quorum_transaction(
-        owner=sender,
+    multisig = _initialize_multisig_controller(args)
+    tx = multisig.create_transaction_for_propose_change_quorum(
+        sender=sender,
         nonce=sender.nonce,
         contract=contract,
-        quorum=quorum,
+        new_quorum=quorum,
+        guardian=guardian_and_relayer_data.guardian_address,
+        relayer=guardian_and_relayer_data.relayer_address,
         gas_limit=args.gas_limit,
-        gas_price=int(args.gas_price),
-        version=int(args.version),
-        options=int(args.options),
-        guardian_and_relayer_data=guardian_and_relayer_data,
+        gas_price=args.gas_price,
     )
 
+    cli_shared.alter_transaction_and_sign_again_if_needed(
+        args=args,
+        tx=tx,
+        sender=sender,
+        guardian_and_relayer_data=guardian_and_relayer_data,
+    )
     _send_or_simulate(tx, contract, args)
 
 
@@ -925,27 +973,34 @@ def transfer_and_execute(args: Any):
     opt_gas_limit = int(args.opt_gas_limit) if args.opt_gas_limit else None
     function = args.function if args.function else None
     contract_abi = Abi.load(Path(args.contract_abi)) if args.contract_abi else None
-    arguments, should_prepare_args = _get_contract_arguments(args)
 
-    multisig = _initialize_multisig_wrapper(args)
-    tx = multisig.prepare_transfer_execute_transaction(
-        owner=sender,
+    arguments, should_prepare_args = _get_contract_arguments(args)
+    if should_prepare_args:
+        arguments = convert_args_to_typed_values(arguments)
+
+    multisig = _initialize_multisig_controller(args)
+    tx = multisig.create_transaction_for_propose_transfer_execute(
+        sender=sender,
         nonce=sender.nonce,
         contract=contract,
         receiver=receiver,
-        gas_limit=args.gas_limit,
-        gas_price=int(args.gas_price),
-        version=int(args.version),
-        options=int(args.options),
-        should_prepare_args_for_factory=should_prepare_args,
-        guardian_and_relayer_data=guardian_and_relayer_data,
         opt_gas_limit=opt_gas_limit,
         function=function,
         abi=contract_abi,
         arguments=arguments,
         native_token_amount=int(args.value),
+        guardian=guardian_and_relayer_data.guardian_address,
+        relayer=guardian_and_relayer_data.relayer_address,
+        gas_limit=args.gas_limit,
+        gas_price=args.gas_price,
     )
 
+    cli_shared.alter_transaction_and_sign_again_if_needed(
+        args=args,
+        tx=tx,
+        sender=sender,
+        guardian_and_relayer_data=guardian_and_relayer_data,
+    )
     _send_or_simulate(tx, contract, args)
 
 
@@ -969,28 +1024,35 @@ def transfer_and_execute_esdt(args: Any):
     opt_gas_limit = int(args.opt_gas_limit) if args.opt_gas_limit else None
     function = args.function if args.function else None
     contract_abi = Abi.load(Path(args.contract_abi)) if args.contract_abi else None
-    arguments, should_prepare_args = _get_contract_arguments(args)
     token_transfers = cli_shared.prepare_token_transfers(args.token_transfers)
 
-    multisig = _initialize_multisig_wrapper(args)
-    tx = multisig.prepare_transfer_execute_esdt_transaction(
-        owner=sender,
+    arguments, should_prepare_args = _get_contract_arguments(args)
+    if should_prepare_args:
+        arguments = convert_args_to_typed_values(arguments)
+
+    multisig = _initialize_multisig_controller(args)
+    tx = multisig.create_transaction_for_propose_transfer_execute_esdt(
+        sender=sender,
         nonce=sender.nonce,
         contract=contract,
         receiver=receiver,
-        gas_limit=args.gas_limit,
-        gas_price=int(args.gas_price),
-        version=int(args.version),
-        options=int(args.options),
-        should_prepare_args_for_factory=should_prepare_args,
-        guardian_and_relayer_data=guardian_and_relayer_data,
         token_transfers=token_transfers,
         opt_gas_limit=opt_gas_limit,
         function=function,
         abi=contract_abi,
         arguments=arguments,
+        guardian=guardian_and_relayer_data.guardian_address,
+        relayer=guardian_and_relayer_data.relayer_address,
+        gas_limit=args.gas_limit,
+        gas_price=args.gas_price,
     )
 
+    cli_shared.alter_transaction_and_sign_again_if_needed(
+        args=args,
+        tx=tx,
+        sender=sender,
+        guardian_and_relayer_data=guardian_and_relayer_data,
+    )
     _send_or_simulate(tx, contract, args)
 
 
@@ -1008,32 +1070,39 @@ def async_call(args: Any):
     opt_gas_limit = int(args.opt_gas_limit) if args.opt_gas_limit else None
     function = args.function if args.function else None
     contract_abi = Abi.load(Path(args.contract_abi)) if args.contract_abi else None
+
     arguments, should_prepare_args = _get_contract_arguments(args)
+    if should_prepare_args:
+        arguments = convert_args_to_typed_values(arguments)
 
     token_transfers = args.token_transfers or None
     if token_transfers:
         token_transfers = cli_shared.prepare_token_transfers(args.token_transfers)
 
-    multisig = _initialize_multisig_wrapper(args)
-    tx = multisig.prepare_async_call_transaction(
-        owner=sender,
+    multisig = _initialize_multisig_controller(args)
+    tx = multisig.create_transaction_for_propose_async_call(
+        sender=sender,
         nonce=sender.nonce,
         contract=contract,
         receiver=receiver,
-        gas_limit=args.gas_limit,
-        gas_price=int(args.gas_price),
-        version=int(args.version),
-        options=int(args.options),
-        should_prepare_args_for_factory=should_prepare_args,
-        guardian_and_relayer_data=guardian_and_relayer_data,
         native_token_amount=int(args.value),
         token_transfers=token_transfers,
         opt_gas_limit=opt_gas_limit,
         function=function,
         abi=contract_abi,
         arguments=arguments,
+        guardian=guardian_and_relayer_data.guardian_address,
+        relayer=guardian_and_relayer_data.relayer_address,
+        gas_limit=args.gas_limit,
+        gas_price=args.gas_price,
     )
 
+    cli_shared.alter_transaction_and_sign_again_if_needed(
+        args=args,
+        tx=tx,
+        sender=sender,
+        guardian_and_relayer_data=guardian_and_relayer_data,
+    )
     _send_or_simulate(tx, contract, args)
 
 
@@ -1048,31 +1117,37 @@ def deploy_from_source(args: Any):
 
     contract = Address.new_from_bech32(args.contract)
     contract_to_copy = Address.new_from_bech32(args.contract_to_copy)
-
     contract_abi = Abi.load(Path(args.contract_abi)) if args.contract_abi else None
-    arguments, should_prepare_args = _get_contract_arguments(args)
 
-    multisig = _initialize_multisig_wrapper(args)
-    tx = multisig.prepare_contract_deploy_from_source_transaction(
-        owner=sender,
+    arguments, should_prepare_args = _get_contract_arguments(args)
+    if should_prepare_args:
+        arguments = convert_args_to_typed_values(arguments)
+
+    multisig = _initialize_multisig_controller(args)
+    tx = multisig.create_transaction_for_propose_contract_deploy_from_source(
+        sender=sender,
         nonce=sender.nonce,
         contract=contract,
         contract_to_copy=contract_to_copy,
-        gas_limit=args.gas_limit,
-        gas_price=int(args.gas_price),
-        version=int(args.version),
-        options=int(args.options),
-        upgradeable=args.metadata_upgradeable,
-        readable=args.metadata_readable,
-        payable=args.metadata_payable,
-        payable_by_sc=args.metadata_payable_by_sc,
-        should_prepare_args_for_factory=should_prepare_args,
-        guardian_and_relayer_data=guardian_and_relayer_data,
+        is_upgradeable=args.metadata_upgradeable,
+        is_readable=args.metadata_readable,
+        is_payable=args.metadata_payable,
+        is_payable_by_sc=args.metadata_payable_by_sc,
         native_token_amount=int(args.value),
         abi=contract_abi,
         arguments=arguments,
+        guardian=guardian_and_relayer_data.guardian_address,
+        relayer=guardian_and_relayer_data.relayer_address,
+        gas_limit=args.gas_limit,
+        gas_price=args.gas_price,
     )
 
+    cli_shared.alter_transaction_and_sign_again_if_needed(
+        args=args,
+        tx=tx,
+        sender=sender,
+        guardian_and_relayer_data=guardian_and_relayer_data,
+    )
     _send_or_simulate(tx, contract, args)
 
 
@@ -1088,32 +1163,38 @@ def upgrade_from_source(args: Any):
     contract = Address.new_from_bech32(args.contract)
     contract_to_upgrade = Address.new_from_bech32(args.contract_to_upgrade)
     contract_to_copy = Address.new_from_bech32(args.contract_to_copy)
-
     contract_abi = Abi.load(Path(args.contract_abi)) if args.contract_abi else None
-    arguments, should_prepare_args = _get_contract_arguments(args)
 
-    multisig = _initialize_multisig_wrapper(args)
-    tx = multisig.prepare_contract_upgrade_from_source_transaction(
-        owner=sender,
+    arguments, should_prepare_args = _get_contract_arguments(args)
+    if should_prepare_args:
+        arguments = convert_args_to_typed_values(arguments)
+
+    multisig = _initialize_multisig_controller(args)
+    tx = multisig.create_transaction_for_propose_contract_upgrade_from_source(
+        sender=sender,
         nonce=sender.nonce,
         contract=contract,
         contract_to_upgrade=contract_to_upgrade,
         contract_to_copy=contract_to_copy,
-        gas_limit=args.gas_limit,
-        gas_price=int(args.gas_price),
-        version=int(args.version),
-        options=int(args.options),
-        upgradeable=args.metadata_upgradeable,
-        readable=args.metadata_readable,
-        payable=args.metadata_payable,
-        payable_by_sc=args.metadata_payable_by_sc,
-        should_prepare_args_for_factory=should_prepare_args,
-        guardian_and_relayer_data=guardian_and_relayer_data,
+        is_upgradeable=args.metadata_upgradeable,
+        is_readable=args.metadata_readable,
+        is_payable=args.metadata_payable,
+        is_payable_by_sc=args.metadata_payable_by_sc,
         native_token_amount=int(args.value),
         abi=contract_abi,
         arguments=arguments,
+        guardian=guardian_and_relayer_data.guardian_address,
+        relayer=guardian_and_relayer_data.relayer_address,
+        gas_limit=args.gas_limit,
+        gas_price=args.gas_price,
     )
 
+    cli_shared.alter_transaction_and_sign_again_if_needed(
+        args=args,
+        tx=tx,
+        sender=sender,
+        guardian_and_relayer_data=guardian_and_relayer_data,
+    )
     _send_or_simulate(tx, contract, args)
 
 
@@ -1129,19 +1210,24 @@ def sign_action(args: Any):
     contract = Address.new_from_bech32(args.contract)
     action_id = int(args.action)
 
-    multisig = _initialize_multisig_wrapper(args)
-    tx = multisig.prepare_sign_action_transaction(
-        owner=sender,
+    multisig = _initialize_multisig_controller(args)
+    tx = multisig.create_transaction_for_sign_action(
+        sender=sender,
         nonce=sender.nonce,
         contract=contract,
         action_id=action_id,
+        guardian=guardian_and_relayer_data.guardian_address,
+        relayer=guardian_and_relayer_data.relayer_address,
         gas_limit=args.gas_limit,
-        gas_price=int(args.gas_price),
-        version=int(args.version),
-        options=int(args.options),
-        guardian_and_relayer_data=guardian_and_relayer_data,
+        gas_price=args.gas_price,
     )
 
+    cli_shared.alter_transaction_and_sign_again_if_needed(
+        args=args,
+        tx=tx,
+        sender=sender,
+        guardian_and_relayer_data=guardian_and_relayer_data,
+    )
     _send_or_simulate(tx, contract, args)
 
 
@@ -1157,19 +1243,24 @@ def sign_batch(args: Any):
     contract = Address.new_from_bech32(args.contract)
     batch_id = int(args.batch)
 
-    multisig = _initialize_multisig_wrapper(args)
-    tx = multisig.prepare_sign_batch_transaction(
-        owner=sender,
+    multisig = _initialize_multisig_controller(args)
+    tx = multisig.create_transaction_for_sign_batch(
+        sender=sender,
         nonce=sender.nonce,
         contract=contract,
         batch_id=batch_id,
+        guardian=guardian_and_relayer_data.guardian_address,
+        relayer=guardian_and_relayer_data.relayer_address,
         gas_limit=args.gas_limit,
-        gas_price=int(args.gas_price),
-        version=int(args.version),
-        options=int(args.options),
-        guardian_and_relayer_data=guardian_and_relayer_data,
+        gas_price=args.gas_price,
     )
 
+    cli_shared.alter_transaction_and_sign_again_if_needed(
+        args=args,
+        tx=tx,
+        sender=sender,
+        guardian_and_relayer_data=guardian_and_relayer_data,
+    )
     _send_or_simulate(tx, contract, args)
 
 
@@ -1185,19 +1276,24 @@ def sign_and_perform(args: Any):
     contract = Address.new_from_bech32(args.contract)
     action_id = int(args.action)
 
-    multisig = _initialize_multisig_wrapper(args)
-    tx = multisig.prepare_sign_and_perform_transaction(
-        owner=sender,
+    multisig = _initialize_multisig_controller(args)
+    tx = multisig.create_transaction_for_sign_and_perform(
+        sender=sender,
         nonce=sender.nonce,
         contract=contract,
         action_id=action_id,
+        guardian=guardian_and_relayer_data.guardian_address,
+        relayer=guardian_and_relayer_data.relayer_address,
         gas_limit=args.gas_limit,
-        gas_price=int(args.gas_price),
-        version=int(args.version),
-        options=int(args.options),
-        guardian_and_relayer_data=guardian_and_relayer_data,
+        gas_price=args.gas_price,
     )
 
+    cli_shared.alter_transaction_and_sign_again_if_needed(
+        args=args,
+        tx=tx,
+        sender=sender,
+        guardian_and_relayer_data=guardian_and_relayer_data,
+    )
     _send_or_simulate(tx, contract, args)
 
 
@@ -1213,19 +1309,24 @@ def sign_batch_and_perform(args: Any):
     contract = Address.new_from_bech32(args.contract)
     batch_id = int(args.batch)
 
-    multisig = _initialize_multisig_wrapper(args)
-    tx = multisig.prepare_sign_batch_and_perform_transaction(
-        owner=sender,
+    multisig = _initialize_multisig_controller(args)
+    tx = multisig.create_transaction_for_sign_batch_and_perform(
+        sender=sender,
         nonce=sender.nonce,
         contract=contract,
         batch_id=batch_id,
+        guardian=guardian_and_relayer_data.guardian_address,
+        relayer=guardian_and_relayer_data.relayer_address,
         gas_limit=args.gas_limit,
-        gas_price=int(args.gas_price),
-        version=int(args.version),
-        options=int(args.options),
-        guardian_and_relayer_data=guardian_and_relayer_data,
+        gas_price=args.gas_price,
     )
 
+    cli_shared.alter_transaction_and_sign_again_if_needed(
+        args=args,
+        tx=tx,
+        sender=sender,
+        guardian_and_relayer_data=guardian_and_relayer_data,
+    )
     _send_or_simulate(tx, contract, args)
 
 
@@ -1241,19 +1342,24 @@ def unsign_action(args: Any):
     contract = Address.new_from_bech32(args.contract)
     action_id = int(args.action)
 
-    multisig = _initialize_multisig_wrapper(args)
-    tx = multisig.prepare_unsign_action_transaction(
-        owner=sender,
+    multisig = _initialize_multisig_controller(args)
+    tx = multisig.create_transaction_for_unsign_action(
+        sender=sender,
         nonce=sender.nonce,
         contract=contract,
         action_id=action_id,
+        guardian=guardian_and_relayer_data.guardian_address,
+        relayer=guardian_and_relayer_data.relayer_address,
         gas_limit=args.gas_limit,
-        gas_price=int(args.gas_price),
-        version=int(args.version),
-        options=int(args.options),
-        guardian_and_relayer_data=guardian_and_relayer_data,
+        gas_price=args.gas_price,
     )
 
+    cli_shared.alter_transaction_and_sign_again_if_needed(
+        args=args,
+        tx=tx,
+        sender=sender,
+        guardian_and_relayer_data=guardian_and_relayer_data,
+    )
     _send_or_simulate(tx, contract, args)
 
 
@@ -1269,19 +1375,24 @@ def unsign_batch(args: Any):
     contract = Address.new_from_bech32(args.contract)
     batch_id = int(args.batch)
 
-    multisig = _initialize_multisig_wrapper(args)
-    tx = multisig.prepare_unsign_batch_transaction(
-        owner=sender,
+    multisig = _initialize_multisig_controller(args)
+    tx = multisig.create_transaction_for_unsign_batch(
+        sender=sender,
         nonce=sender.nonce,
         contract=contract,
         batch_id=batch_id,
+        guardian=guardian_and_relayer_data.guardian_address,
+        relayer=guardian_and_relayer_data.relayer_address,
         gas_limit=args.gas_limit,
-        gas_price=int(args.gas_price),
-        version=int(args.version),
-        options=int(args.options),
-        guardian_and_relayer_data=guardian_and_relayer_data,
+        gas_price=args.gas_price,
     )
 
+    cli_shared.alter_transaction_and_sign_again_if_needed(
+        args=args,
+        tx=tx,
+        sender=sender,
+        guardian_and_relayer_data=guardian_and_relayer_data,
+    )
     _send_or_simulate(tx, contract, args)
 
 
@@ -1297,20 +1408,25 @@ def unsign_for_outdated_board_members(args: Any):
     contract = Address.new_from_bech32(args.contract)
     action_id = int(args.action)
 
-    multisig = _initialize_multisig_wrapper(args)
-    tx = multisig.prepare_unsign_for_outdated_board_members_transaction(
-        owner=sender,
+    multisig = _initialize_multisig_controller(args)
+    tx = multisig.create_transaction_for_unsign_for_outdated_board_members(
+        sender=sender,
         nonce=sender.nonce,
         contract=contract,
         action_id=action_id,
         outdated_board_members=args.outdated_members,
+        guardian=guardian_and_relayer_data.guardian_address,
+        relayer=guardian_and_relayer_data.relayer_address,
         gas_limit=args.gas_limit,
-        gas_price=int(args.gas_price),
-        version=int(args.version),
-        options=int(args.options),
-        guardian_and_relayer_data=guardian_and_relayer_data,
+        gas_price=args.gas_price,
     )
 
+    cli_shared.alter_transaction_and_sign_again_if_needed(
+        args=args,
+        tx=tx,
+        sender=sender,
+        guardian_and_relayer_data=guardian_and_relayer_data,
+    )
     _send_or_simulate(tx, contract, args)
 
 
@@ -1326,19 +1442,24 @@ def perform_action(args: Any):
     contract = Address.new_from_bech32(args.contract)
     action_id = int(args.action)
 
-    multisig = _initialize_multisig_wrapper(args)
-    tx = multisig.prepare_perform_action_transaction(
-        owner=sender,
+    multisig = _initialize_multisig_controller(args)
+    tx = multisig.create_transaction_for_perform_action(
+        sender=sender,
         nonce=sender.nonce,
         contract=contract,
         action_id=action_id,
+        guardian=guardian_and_relayer_data.guardian_address,
+        relayer=guardian_and_relayer_data.relayer_address,
         gas_limit=args.gas_limit,
-        gas_price=int(args.gas_price),
-        version=int(args.version),
-        options=int(args.options),
-        guardian_and_relayer_data=guardian_and_relayer_data,
+        gas_price=args.gas_price,
     )
 
+    cli_shared.alter_transaction_and_sign_again_if_needed(
+        args=args,
+        tx=tx,
+        sender=sender,
+        guardian_and_relayer_data=guardian_and_relayer_data,
+    )
     _send_or_simulate(tx, contract, args)
 
 
@@ -1354,28 +1475,25 @@ def perform_batch(args: Any):
     contract = Address.new_from_bech32(args.contract)
     batch_id = int(args.batch)
 
-    multisig = _initialize_multisig_wrapper(args)
-    tx = multisig.prepare_perform_batch_transaction(
-        owner=sender,
+    multisig = _initialize_multisig_controller(args)
+    tx = multisig.create_transaction_for_perform_batch(
+        sender=sender,
         nonce=sender.nonce,
         contract=contract,
         batch_id=batch_id,
+        guardian=guardian_and_relayer_data.guardian_address,
+        relayer=guardian_and_relayer_data.relayer_address,
         gas_limit=args.gas_limit,
-        gas_price=int(args.gas_price),
-        version=int(args.version),
-        options=int(args.options),
-        guardian_and_relayer_data=guardian_and_relayer_data,
+        gas_price=args.gas_price,
     )
 
+    cli_shared.alter_transaction_and_sign_again_if_needed(
+        args=args,
+        tx=tx,
+        sender=sender,
+        guardian_and_relayer_data=guardian_and_relayer_data,
+    )
     _send_or_simulate(tx, contract, args)
-
-
-def _initialize_multisig_controller(args: Any) -> MultisigController:
-    abi = Abi.load(Path(args.abi))
-    config = get_config_for_network_providers()
-    proxy = ProxyNetworkProvider(url=args.proxy, config=config)
-    chain_id = proxy.get_network_config().chain_id
-    return MultisigController(chain_id, proxy, abi)
 
 
 def get_quorum(args: Any):
