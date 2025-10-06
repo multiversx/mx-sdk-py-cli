@@ -4,6 +4,7 @@ import base64
 import logging
 import sys
 from argparse import FileType
+from copy import deepcopy
 from functools import cache
 from getpass import getpass
 from pathlib import Path
@@ -862,6 +863,8 @@ def alter_transaction_and_sign_again_if_needed(
     sender: IAccount,
     guardian_and_relayer_data: GuardianRelayerData,
 ):
+    initial_tx = deepcopy(tx)
+
     set_options_for_hash_signing_if_needed(
         transaction=tx,
         guardian=guardian_and_relayer_data.guardian,
@@ -870,6 +873,7 @@ def alter_transaction_and_sign_again_if_needed(
 
     altered = _alter_version_and_options_if_provided(
         args=args,
+        initial_tx=initial_tx,
         transaction=tx,
     )
 
@@ -883,12 +887,19 @@ def alter_transaction_and_sign_again_if_needed(
 
 def _alter_version_and_options_if_provided(
     args: Any,
+    initial_tx: Transaction,
     transaction: Transaction,
 ) -> bool:
     """Alters the transaction version and options if they are provided in args.
     Returns True if any alteration was made, False otherwise.
     """
     altered = False
+
+    if initial_tx.version != transaction.version:
+        altered = True
+
+    if initial_tx.options != transaction.options:
+        altered = True
 
     if args.version != DEFAULT_TX_VERSION and transaction.version != args.version:
         transaction.version = args.version
