@@ -6,4 +6,4 @@ ledgercomm[hid]
 rich==13.3.4
 argcomplete==3.2.2
 
-multiversx-sdk[ledger]==2.2.0
+multiversx-sdk[ledger]==2.3.1
