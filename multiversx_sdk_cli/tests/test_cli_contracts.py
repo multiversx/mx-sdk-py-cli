@@ -608,6 +608,27 @@ def test_contract_query(capsys: Any):
     assert response == [14]
 
 
+def test_contract_deploy_using_gas_estimator(capsys: Any):
+    return_code = main(
+        [
+            "contract",
+            "deploy",
+            "--bytecode",
+            f"{parent}/testdata/adder.wasm",
+            "--pem",
+            f"{parent}/testdata/testUser.pem",
+            "--proxy",
+            "https://devnet-api.multiversx.com",
+            "--arguments",
+            "0",
+        ]
+    )
+    assert not return_code
+    output = _read_stdout(capsys)
+    transaction = json.loads(output)["emittedTransaction"]
+    assert transaction["gasLimit"] > 50_000
+
+
 def _read_stdout(capsys: Any) -> str:
     stdout: str = capsys.readouterr().out.strip()
     return stdout
