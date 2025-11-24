@@ -44,7 +44,8 @@ def patch_config(data: ConfigDict, config: ConfigRoot, supernova_activation_epoc
     for item in chain_parameters_by_epoch:
         enable_epoch = item["EnableEpoch"]
 
-        if supernova_activation_epoch and enable_epoch >= supernova_activation_epoch:
+        is_supernova_enabled = supernova_activation_epoch and enable_epoch >= supernova_activation_epoch
+        if is_supernova_enabled:
             item["RoundDuration"] = config.general.round_duration_milliseconds_in_supernova
             item["RoundsPerEpoch"] = config.general.rounds_per_epoch_in_supernova
             item["MinRoundsBetweenEpochs"] = int(
