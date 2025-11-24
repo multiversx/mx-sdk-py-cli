@@ -1,12 +1,13 @@
-from typing import Any, Dict
+from typing import Any, Dict, Optional
 
 from multiversx_sdk_cli.localnet.config_root import ConfigRoot
+from multiversx_sdk_cli.localnet.constants import ROUNDS_PER_EPOCH_TO_MIN_ROUNDS_BETWEEN_EPOCHS_RATIO
 from multiversx_sdk_cli.localnet.nodes_setup_json import CHAIN_ID
 
 ConfigDict = Dict[str, Any]
 
 
-def patch_config(data: ConfigDict, config: ConfigRoot):
+def patch_config(data: ConfigDict, config: ConfigRoot, supernova_activation_epoch: Optional[int] = None):
     data["GeneralSettings"]["ChainID"] = CHAIN_ID
 
     # "--operation-mode=historical-balances" is not available for nodes,
@@ -18,33 +19,48 @@ def patch_config(data: ConfigDict, config: ConfigRoot):
     data["StoragePruning"]["ObserverCleanOldEpochsData"] = False
     data["StoragePruning"]["AccountsTrieCleanOldEpochsData"] = False
 
-    # Make epochs shorter
-    epoch_start_config: ConfigDict = dict()
-    epoch_start_config["RoundsPerEpoch"] = config.general.rounds_per_epoch
-    epoch_start_config["MinRoundsBetweenEpochs"] = int(config.general.rounds_per_epoch / 4)
+    # Some time after the release of Supernova, we should drop this custom (and somehow cumbersome) logic.
+    if supernova_activation_epoch is None:
+        # Before Supernova (as software version, not as "era after activation"),
+        # we alter epoch duration by adjusting "RoundsPerEpoch" and "MinRoundsBetweenEpochs" in section "EpochStartConfig".
+        # In a Supernova-aware node configuration, these entries do not exist anymore (see "ChainParametersByEpoch").
+        epoch_start_config: ConfigDict = dict()
+        epoch_start_config["RoundsPerEpoch"] = config.general.rounds_per_epoch
+        epoch_start_config["MinRoundsBetweenEpochs"] = int(
+            config.general.rounds_per_epoch / ROUNDS_PER_EPOCH_TO_MIN_ROUNDS_BETWEEN_EPOCHS_RATIO
+        )
 
-    data["EpochStartConfig"].update(epoch_start_config)
+        data["EpochStartConfig"].update(epoch_start_config)
+
     data["WebServerAntiflood"]["VmQueryDelayAfterStartInSec"] = 30
 
     # Always use the latest VM
     data["VirtualMachine"]["Execution"]["WasmVMVersions"] = [{"StartEpoch": 0, "Version": "*"}]
     data["VirtualMachine"]["Querying"]["WasmVMVersions"] = [{"StartEpoch": 0, "Version": "*"}]
 
-    # Adjust "ChainParametersByEpoch" (for Andromeda)
+    # Adjust "ChainParametersByEpoch"
     chain_parameters_by_epoch = data["GeneralSettings"].get("ChainParametersByEpoch", [])
 
-    if chain_parameters_by_epoch:
-        # For convenience, keep a single entry ...
-        chain_parameters_by_epoch.clear()
-        chain_parameters_by_epoch.append({})
+    for item in chain_parameters_by_epoch:
+        enable_epoch = item["EnableEpoch"]
 
-        # ... and set the activation epoch to 0
-        chain_parameters_by_epoch[0]["EnableEpoch"] = 0
-        chain_parameters_by_epoch[0]["RoundDuration"] = config.general.round_duration_milliseconds
-        chain_parameters_by_epoch[0]["ShardConsensusGroupSize"] = config.shards.consensus_size
-        chain_parameters_by_epoch[0]["ShardMinNumNodes"] = config.shards.num_validators_per_shard
-        chain_parameters_by_epoch[0]["MetachainConsensusGroupSize"] = config.metashard.consensus_size
-        chain_parameters_by_epoch[0]["MetachainMinNumNodes"] = config.metashard.num_validators
+        if supernova_activation_epoch and enable_epoch >= supernova_activation_epoch:
+            item["RoundDuration"] = config.general.round_duration_milliseconds_in_supernova
+            item["RoundsPerEpoch"] = config.general.rounds_per_epoch_in_supernova
+            item["MinRoundsBetweenEpochs"] = (
+                config.general.rounds_per_epoch_in_supernova / ROUNDS_PER_EPOCH_TO_MIN_ROUNDS_BETWEEN_EPOCHS_RATIO
+            )
+        else:
+            item["RoundDuration"] = config.general.round_duration_milliseconds
+            item["RoundsPerEpoch"] = config.general.rounds_per_epoch
+            item["MinRoundsBetweenEpochs"] = (
+                config.general.rounds_per_epoch / ROUNDS_PER_EPOCH_TO_MIN_ROUNDS_BETWEEN_EPOCHS_RATIO
+            )
+
+        item["ShardConsensusGroupSize"] = config.shards.consensus_size
+        item["ShardMinNumNodes"] = config.shards.num_validators_per_shard
+        item["MetachainConsensusGroupSize"] = config.metashard.consensus_size
+        item["MetachainMinNumNodes"] = config.metashard.num_validators
 
 
 def patch_api(data: ConfigDict, config: ConfigRoot):

@@ -101,24 +101,26 @@ def copy_validator_keys(config: ConfigRoot):
 def patch_node_config(config: ConfigRoot):
     for node_config in config.all_nodes_config_folders():
         node_config_file = node_config / "config.toml"
-        data = utils.read_toml_file(node_config_file)
-        node_config_toml.patch_config(data, config)
-        utils.write_toml_file(node_config_file, data)
-
         api_config_file = node_config / "api.toml"
-        data = utils.read_toml_file(api_config_file)
-        node_config_toml.patch_api(data, config)
-        utils.write_toml_file(api_config_file, data)
-
         enable_epochs_config_file = node_config / "enableEpochs.toml"
-        data = utils.read_toml_file(enable_epochs_config_file)
-        node_config_toml.patch_enable_epochs(data, config)
-        utils.write_toml_file(enable_epochs_config_file, data)
-
         genesis_smart_contracts_file = node_config / "genesisSmartContracts.json"
-        data = utils.read_json_file(genesis_smart_contracts_file)
-        genesis_smart_contracts_json.patch(data, config)
-        utils.write_json_file(genesis_smart_contracts_file, data)
+
+        node_config_data = utils.read_toml_file(node_config_file)
+        api_config_data = utils.read_toml_file(api_config_file)
+        enable_epochs_config_data = utils.read_toml_file(enable_epochs_config_file)
+        genesis_smart_contracts_data = utils.read_json_file(genesis_smart_contracts_file)
+
+        supernova_activation_epoch = enable_epochs_config_data["EnableEpochs"].get("SupernovaEnableEpoch", None)
+
+        node_config_toml.patch_config(node_config_data, config, supernova_activation_epoch)
+        node_config_toml.patch_api(api_config_data, config)
+        node_config_toml.patch_enable_epochs(enable_epochs_config_data, config)
+        genesis_smart_contracts_json.patch(genesis_smart_contracts_data, config)
+
+        utils.write_toml_file(node_config_file, node_config_data)
+        utils.write_toml_file(api_config_file, api_config_data)
+        utils.write_toml_file(enable_epochs_config_file, enable_epochs_config_data)
+        utils.write_json_file(genesis_smart_contracts_file, genesis_smart_contracts_data)
 
 
 def copy_config_to_seednode(config: ConfigRoot):
