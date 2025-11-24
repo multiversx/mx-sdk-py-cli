@@ -55,10 +55,6 @@ def patch_api(data: ConfigDict, config: ConfigRoot):
 
 def patch_enable_epochs(data: ConfigDict, config: ConfigRoot):
     enable_epochs = data["EnableEpochs"]
-    enable_epochs["SCDeployEnableEpoch"] = 0
-    enable_epochs["BuiltInFunctionsEnableEpoch"] = 0
-    enable_epochs["RelayedTransactionsEnableEpoch"] = 0
-    enable_epochs["PenalizedTooMuchGasEnableEpoch"] = 0
     enable_epochs["AheadOfTimeGasUsageEnableEpoch"] = 0
     enable_epochs["GasPriceModifierEnableEpoch"] = 0
     enable_epochs["RepairCallbackEnableEpoch"] = 0
@@ -69,12 +65,12 @@ def patch_enable_epochs(data: ConfigDict, config: ConfigRoot):
     enable_epochs["ESDTMultiTransferEnableEpoch"] = 0
     enable_epochs["GlobalMintBurnDisableEpoch"] = 0
     enable_epochs["ESDTTransferRoleEnableEpoch"] = 0
-    enable_epochs["BuiltInFunctionOnMetaEnableEpoch"] = 0
     enable_epochs["MultiESDTTransferFixOnCallBackOnEnableEpoch"] = 0
     enable_epochs["ESDTNFTCreateOnMultiShard"] = 0
     enable_epochs["MetaESDTSetEnableEpoch"] = 0
     enable_epochs["DelegationManagerEnableEpoch"] = 0
 
+    # Adjust "MaxNumNodes":
     max_nodes_change_enable_epoch = enable_epochs["MaxNodesChangeEnableEpoch"]
     last_entry = max_nodes_change_enable_epoch[-1]
     penultimate_entry = max_nodes_change_enable_epoch[-2]
