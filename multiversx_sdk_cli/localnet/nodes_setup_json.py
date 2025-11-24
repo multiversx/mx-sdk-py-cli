@@ -26,14 +26,5 @@ def build(config: ConfigRoot) -> Any:
 
     return {
         "startTime": config.genesis_time(),
-        "roundDuration": config.general.round_duration_milliseconds,
-        "consensusGroupSize": config.shards.consensus_size,
-        "minNodesPerShard": config.shards.consensus_size,
-        "metaChainConsensusGroupSize": config.metashard.consensus_size,
-        "metaChainMinNodes": config.metashard.num_validators,
-        "hysteresis": 0,
-        "adaptivity": False,
-        "chainID": CHAIN_ID,
-        "minTransactionVersion": 1,
         "initialNodes": initial_nodes,
     }
