@@ -8,4 +8,4 @@ FILE_MODE_EXECUTABLE = (
 )
 
 # See https://github.com/multiversx/mx-chain-go/blob/master/cmd/node/config/config.toml.
-ROUNDS_PER_EPOCH_TO_MIN_ROUNDS_BETWEEN_EPOCHS_RATIO = 5
+ROUNDS_PER_EPOCH_TO_MIN_ROUNDS_BETWEEN_EPOCHS_RATIO = 4

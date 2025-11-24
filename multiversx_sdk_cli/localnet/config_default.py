@@ -2,12 +2,13 @@ from pathlib import Path
 
 from multiversx_sdk_cli.localnet.config_general import General
 from multiversx_sdk_cli.localnet.config_networking import Networking
-from multiversx_sdk_cli.localnet.config_sharding import (Metashard,
-                                                         RegularShards)
-from multiversx_sdk_cli.localnet.config_software import (Software,
-                                                         SoftwareChainGo,
-                                                         SoftwareChainProxyGo,
-                                                         SoftwareResolution)
+from multiversx_sdk_cli.localnet.config_sharding import Metashard, RegularShards
+from multiversx_sdk_cli.localnet.config_software import (
+    Software,
+    SoftwareChainGo,
+    SoftwareChainProxyGo,
+    SoftwareResolution,
+)
 
 general = General(
     log_level="*:DEBUG",
