@@ -1,13 +1,18 @@
 from typing import Any, Dict, Optional
 
 from multiversx_sdk_cli.localnet.config_root import ConfigRoot
-from multiversx_sdk_cli.localnet.constants import ROUNDS_PER_EPOCH_TO_MIN_ROUNDS_BETWEEN_EPOCHS_RATIO
+from multiversx_sdk_cli.localnet.constants import (
+    NUM_ROUNDS_BETWEEN_SUPERNOVA_ACTIVATION_EPOCH_AND_ACTIVATION_ROUND,
+    ROUNDS_PER_EPOCH_TO_MIN_ROUNDS_BETWEEN_EPOCHS_RATIO,
+)
 from multiversx_sdk_cli.localnet.nodes_setup_json import CHAIN_ID
 
 ConfigDict = Dict[str, Any]
 
 
-def patch_config(data: ConfigDict, config: ConfigRoot, supernova_activation_epoch: Optional[int] = None):
+def patch_config(data: ConfigDict, config: ConfigRoot, enable_epochs_config: ConfigDict):
+    supernova_activation_epoch = enable_epochs_config["EnableEpochs"].get("SupernovaEnableEpoch", None)
+
     data["GeneralSettings"]["ChainID"] = CHAIN_ID
 
     # "--operation-mode=historical-balances" is not available for nodes,
@@ -94,3 +99,19 @@ def patch_enable_epochs(data: ConfigDict, config: ConfigRoot):
     last_entry["MaxNumNodes"] = (
         penultimate_entry["MaxNumNodes"] - (config.shards.num_shards + 1) * penultimate_entry["NodesToShufflePerShard"]
     )
+
+
+def patch_enable_rounds(data: ConfigDict, config: ConfigRoot, enable_epochs_config: ConfigDict):
+    supernova_activation_epoch = enable_epochs_config["EnableEpochs"].get("SupernovaEnableEpoch", None)
+
+    activations = data["RoundActivations"]
+    supernova_entry = activations.get("SupernovaEnableRound")
+
+    if supernova_entry:
+        # Epochs are zero-indexed.
+        supernova_computed_activation_round = (
+            config.general.rounds_per_epoch * supernova_activation_epoch
+            + NUM_ROUNDS_BETWEEN_SUPERNOVA_ACTIVATION_EPOCH_AND_ACTIVATION_ROUND
+        )
+
+        supernova_entry["Round"] = str(supernova_computed_activation_round)

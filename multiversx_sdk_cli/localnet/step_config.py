@@ -103,23 +103,25 @@ def patch_node_config(config: ConfigRoot):
         node_config_file = node_config / "config.toml"
         api_config_file = node_config / "api.toml"
         enable_epochs_config_file = node_config / "enableEpochs.toml"
+        enable_rounds_config_file = node_config / "enableRounds.toml"
         genesis_smart_contracts_file = node_config / "genesisSmartContracts.json"
 
         node_config_data = utils.read_toml_file(node_config_file)
         api_config_data = utils.read_toml_file(api_config_file)
         enable_epochs_config_data = utils.read_toml_file(enable_epochs_config_file)
+        enable_rounds_config_data = utils.read_toml_file(enable_rounds_config_file)
         genesis_smart_contracts_data = utils.read_json_file(genesis_smart_contracts_file)
 
-        supernova_activation_epoch = enable_epochs_config_data["EnableEpochs"].get("SupernovaEnableEpoch", None)
-
-        node_config_toml.patch_config(node_config_data, config, supernova_activation_epoch)
+        node_config_toml.patch_config(node_config_data, config, enable_epochs_config_data)
         node_config_toml.patch_api(api_config_data, config)
         node_config_toml.patch_enable_epochs(enable_epochs_config_data, config)
+        node_config_toml.patch_enable_rounds(enable_rounds_config_data, config, enable_epochs_config_data)
         genesis_smart_contracts_json.patch(genesis_smart_contracts_data, config)
 
         utils.write_toml_file(node_config_file, node_config_data)
         utils.write_toml_file(api_config_file, api_config_data)
         utils.write_toml_file(enable_epochs_config_file, enable_epochs_config_data)
+        utils.write_toml_file(enable_rounds_config_file, enable_rounds_config_data)
         utils.write_json_file(genesis_smart_contracts_file, genesis_smart_contracts_data)
 
 
