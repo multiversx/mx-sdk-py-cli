@@ -68,6 +68,15 @@ def patch_config(data: ConfigDict, config: ConfigRoot, enable_epochs_config: Con
         item["MetachainConsensusGroupSize"] = config.metashard.consensus_size
         item["MetachainMinNumNodes"] = config.metashard.num_validators
 
+    # Adjust "Versions" (of blocks)
+    versions_by_epoch = data["Versions"].get("VersionsByEpochs", [])
+
+    for item in versions_by_epoch:
+        enable_epoch = item["StartEpoch"]
+
+        if enable_epoch == supernova_activation_epoch:
+            item["StartRound"] = _compute_supernova_activation_round(config, supernova_activation_epoch)
+
 
 def patch_api(data: ConfigDict, config: ConfigRoot):
     routes = data["APIPackages"]["transaction"]["Routes"]
@@ -109,9 +118,12 @@ def patch_enable_rounds(data: ConfigDict, config: ConfigRoot, enable_epochs_conf
 
     if supernova_entry:
         # Epochs are zero-indexed.
-        supernova_computed_activation_round = (
-            config.general.rounds_per_epoch * supernova_activation_epoch
-            + NUM_ROUNDS_BETWEEN_SUPERNOVA_ACTIVATION_EPOCH_AND_ACTIVATION_ROUND
-        )
-
+        supernova_computed_activation_round = _compute_supernova_activation_round(config, supernova_activation_epoch)
         supernova_entry["Round"] = str(supernova_computed_activation_round)
+
+
+def _compute_supernova_activation_round(config: ConfigRoot, supernova_activation_epoch: int) -> int:
+    return (
+        config.general.rounds_per_epoch * supernova_activation_epoch
+        + NUM_ROUNDS_BETWEEN_SUPERNOVA_ACTIVATION_EPOCH_AND_ACTIVATION_ROUND
+    )
