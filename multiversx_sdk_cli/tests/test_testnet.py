@@ -14,6 +14,8 @@ def test_override_config() -> None:
     # Check a few default values
     assert config.general.rounds_per_epoch == 100
     assert config.general.round_duration_milliseconds == 6000
+    assert config.general.rounds_per_epoch_in_supernova == 300
+    assert config.general.round_duration_milliseconds_in_supernova == 2000
     assert config.metashard.consensus_size == 1
     assert config.networking.port_proxy == 7950
     assert config.software.mx_chain_go.resolution == SoftwareResolution.Remote
@@ -27,6 +29,8 @@ def test_override_config() -> None:
     config_patch["general"] = {
         "rounds_per_epoch": 200,
         "round_duration_milliseconds": 4000,
+        "rounds_per_epoch_in_supernova": 400,
+        "round_duration_milliseconds_in_supernova": 1000,
     }
     config_patch["metashard"] = {
         "consensus_size": 2,
@@ -43,6 +47,8 @@ def test_override_config() -> None:
     # Check the overridden values
     assert config.general.rounds_per_epoch == 200
     assert config.general.round_duration_milliseconds == 4000
+    assert config.general.rounds_per_epoch_in_supernova == 400
+    assert config.general.round_duration_milliseconds_in_supernova == 1000
     assert config.metashard.consensus_size == 2
     assert config.networking.port_proxy == 7951
     assert config.software.mx_chain_go.resolution == SoftwareResolution.Remote

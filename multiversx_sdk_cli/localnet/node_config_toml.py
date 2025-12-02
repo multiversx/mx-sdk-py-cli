@@ -1,4 +1,4 @@
-from typing import Any, Dict, Optional
+from typing import Any, Dict
 
 from multiversx_sdk_cli.localnet.config_root import ConfigRoot
 from multiversx_sdk_cli.localnet.constants import (
@@ -24,7 +24,7 @@ def patch_config(data: ConfigDict, config: ConfigRoot, enable_epochs_config: Con
     data["StoragePruning"]["ObserverCleanOldEpochsData"] = False
     data["StoragePruning"]["AccountsTrieCleanOldEpochsData"] = False
 
-    # Some time after the release of Supernova, we should drop this custom (and somehow cumbersome) logic.
+    # Some time after the release of Supernova, we should drop this custom (and somewhat cumbersome) logic.
     if supernova_activation_epoch is None:
         # Before Supernova (as software version, not as "era after activation"),
         # we alter epoch duration by adjusting "RoundsPerEpoch" and "MinRoundsBetweenEpochs" in section "EpochStartConfig".
@@ -49,7 +49,7 @@ def patch_config(data: ConfigDict, config: ConfigRoot, enable_epochs_config: Con
     for item in chain_parameters_by_epoch:
         enable_epoch = item["EnableEpoch"]
 
-        is_supernova_enabled = supernova_activation_epoch and enable_epoch >= supernova_activation_epoch
+        is_supernova_enabled = supernova_activation_epoch is not None and enable_epoch >= supernova_activation_epoch
         if is_supernova_enabled:
             item["RoundDuration"] = config.general.round_duration_milliseconds_in_supernova
             item["RoundsPerEpoch"] = config.general.rounds_per_epoch_in_supernova
@@ -116,7 +116,7 @@ def patch_enable_rounds(data: ConfigDict, config: ConfigRoot, enable_epochs_conf
     activations = data["RoundActivations"]
     supernova_entry = activations.get("SupernovaEnableRound")
 
-    if supernova_entry:
+    if supernova_entry and supernova_activation_epoch is not None:
         supernova_computed_activation_round = _compute_supernova_activation_round(config, supernova_activation_epoch)
         supernova_entry["Round"] = str(supernova_computed_activation_round)
 
