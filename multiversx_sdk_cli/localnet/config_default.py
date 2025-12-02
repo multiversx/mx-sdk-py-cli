@@ -15,6 +15,9 @@ general = General(
     genesis_delay_seconds=10,
     rounds_per_epoch=100,
     round_duration_milliseconds=6000,
+    # For the purpose of the localnet, we'll have 3x for Supernova (by default).
+    rounds_per_epoch_in_supernova=300,
+    round_duration_milliseconds_in_supernova=2000,
 )
 
 software = Software(
