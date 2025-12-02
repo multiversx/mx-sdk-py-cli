@@ -117,12 +117,12 @@ def patch_enable_rounds(data: ConfigDict, config: ConfigRoot, enable_epochs_conf
     supernova_entry = activations.get("SupernovaEnableRound")
 
     if supernova_entry:
-        # Epochs are zero-indexed.
         supernova_computed_activation_round = _compute_supernova_activation_round(config, supernova_activation_epoch)
         supernova_entry["Round"] = str(supernova_computed_activation_round)
 
 
 def _compute_supernova_activation_round(config: ConfigRoot, supernova_activation_epoch: int) -> int:
+    # Epochs are zero-indexed.
     return (
         config.general.rounds_per_epoch * supernova_activation_epoch
         + NUM_ROUNDS_BETWEEN_SUPERNOVA_ACTIVATION_EPOCH_AND_ACTIVATION_ROUND

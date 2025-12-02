@@ -9,4 +9,5 @@ FILE_MODE_EXECUTABLE = (
 
 # See https://github.com/multiversx/mx-chain-go/blob/master/cmd/node/config/config.toml.
 ROUNDS_PER_EPOCH_TO_MIN_ROUNDS_BETWEEN_EPOCHS_RATIO = 4
+# See https://github.com/multiversx/mx-chain-go/blob/master/cmd/node/config/enableRounds.toml.
 NUM_ROUNDS_BETWEEN_SUPERNOVA_ACTIVATION_EPOCH_AND_ACTIVATION_ROUND = 20
