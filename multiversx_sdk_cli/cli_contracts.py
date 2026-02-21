@@ -28,7 +28,10 @@ from multiversx_sdk_cli.cli_output import CLIOutputBuilder
 from multiversx_sdk_cli.config import get_config_for_network_providers
 from multiversx_sdk_cli.config_env import MxpyEnv
 from multiversx_sdk_cli.constants import NUMBER_OF_SHARDS
-from multiversx_sdk_cli.contract_verification import trigger_contract_verification
+from multiversx_sdk_cli.contract_verification import (
+    trigger_contract_verification,
+    trigger_contract_verification_from_existing,
+)
 from multiversx_sdk_cli.docker import is_docker_installed, run_docker
 from multiversx_sdk_cli.errors import BadUsage, DockerMissingError, QueryContractError
 from multiversx_sdk_cli.ux import show_warning
@@ -159,6 +162,34 @@ def setup_parser(args: list[str], subparsers: Any) -> Any:
         help="can be used to skip the confirmation prompt",
     )
     sub.set_defaults(func=verify)
+
+    sub = cli_shared.add_command_subparser(
+        subparsers,
+        "contract",
+        "verify-from-existing",
+        "Verify the authenticity of the code of a deployed Smart Contract from an already verified Smart Contract",
+    )
+
+    _add_contract_arg(sub)
+    sub.add_argument(
+        "--verified-contract",
+        required=True,
+        help="the bech32 address of the already verified contract",
+    )
+    sub.add_argument(
+        "--verifier-url",
+        required=True,
+        help="the url of the service that validates the contract",
+    )
+    sub.add_argument(
+        "--skip-confirmation",
+        "-y",
+        dest="skip_confirmation",
+        action="store_true",
+        default=False,
+        help="can be used to skip the confirmation prompt",
+    )
+    sub.set_defaults(func=verify_from_existing)
 
     sub = cli_shared.add_command_subparser(
         subparsers,
@@ -568,6 +599,23 @@ def verify(args: Any) -> None:
     logger.info("Contract verification request completed!")
 
 
+def verify_from_existing(args: Any) -> None:
+    if not args.skip_confirmation:
+        response = input(
+            "Are you sure you want to verify the contract? This will publish the contract's source code, which will be displayed on the MultiversX Explorer (y/n): "
+        )
+        if response.lower() != "y":
+            logger.info("Contract verification cancelled.")
+            return
+
+    contract = Address.new_from_bech32(args.contract)
+    verified_contract = Address.new_from_bech32(args.verified_contract)
+    verifier_url = args.verifier_url
+
+    trigger_contract_verification_from_existing(contract, verified_contract, verifier_url)
+    logger.info("Contract verification request completed!")
+
+
 def unverify(args: Any) -> None:
     account = cli_shared.prepare_account(args)
     contract: str = args.contract
@@ -593,7 +641,7 @@ def unverify(args: Any) -> None:
     headers = {"Content-type": "application/json"}
     response = requests.delete(verifier_url, json=request_payload, headers=headers)
     logger.info(f"Your request to unverify contract {contract} was submitted.")
-    print(response.json().get("message"))
+    utils.dump_out_json(response.json())
 
 
 def do_reproducible_build(args: Any):
