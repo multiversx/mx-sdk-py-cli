@@ -11,9 +11,6 @@ from multiversx_sdk import Address, Message
 from multiversx_sdk_cli.errors import KnownError
 from multiversx_sdk_cli.utils import dump_out_json, read_json_file
 
-HTTP_REQUEST_TIMEOUT = 408
-HTTP_SUCCESS = 200
-
 logger = logging.getLogger("cli.contracts.verifier")
 
 
@@ -94,26 +91,31 @@ def trigger_contract_verification(
     request_dictionary = contract_verification.to_dictionary()
 
     url = f"{verifier_url}/verifier"
-    status_code, message, data = _do_post(url, request_dictionary)
+    response = _do_post(url, request_dictionary)
 
-    if status_code == HTTP_REQUEST_TIMEOUT:
-        task_id = data.get("taskId", "")
+    task_id: str = response.get("taskId", "")
+    if not task_id:
+        raise KnownError("No task ID received from the verifier.")
 
-        if task_id:
-            query_status_with_task_id(verifier_url, task_id)
-        else:
-            dump_out_json(data)
-    elif status_code != HTTP_SUCCESS:
-        dump_out_json(data)
-        raise KnownError(f"Cannot verify contract: {message}")
-    else:
-        status = data.get("status", "")
-        if status:
-            logger.info(f"Task status: {status}")
-            dump_out_json(data)
-        else:
-            task_id = data.get("taskId", "")
-            query_status_with_task_id(verifier_url, task_id)
+    logger.info(f"Contract verification triggered successfully. Task ID: {task_id}")
+    query_status_with_task_id(verifier_url, task_id)
+
+
+def trigger_contract_verification_from_existing(contract: Address, verified_contract: Address, verifier_url: str):
+    payload = {
+        "contract": contract.to_bech32(),
+        "existingVerifiedContract": verified_contract.to_bech32(),
+    }
+
+    url = f"{verifier_url}/verifier/from-existing"
+    response = _do_post(url, payload)
+
+    task_id: str = response.get("taskId", "")
+    if not task_id:
+        raise KnownError("No task ID received from the verifier.")
+
+    logger.info(f"Contract verification triggered successfully. Task ID: {task_id}")
+    query_status_with_task_id(verifier_url, task_id)
 
 
 def _create_request_signature(account: IAccount, contract_address: Address, request_payload: bytes) -> bytes:
@@ -128,42 +130,46 @@ def query_status_with_task_id(url: str, task_id: str, interval: int = 10):
     old_status = ""
 
     while True:
-        _, _, response = _do_get(f"{url}/tasks/{task_id}")
+        response = _do_get(f"{url}/tasks/{task_id}")
+        try:
+            response.raise_for_status()
+        except requests.HTTPError as error:
+            data = response.json()
+            message = data.get("message", str(error))
+            raise KnownError(f"Cannot verify contract: {message}", error)
+
+        response = response.json()
         status = response.get("status", "")
 
-        if status == "finished":
+        if status == "error":
+            logger.error("Verification failed!")
+            dump_out_json(response)
+            break
+        elif status == "finished":
             logger.info("Verification finished!")
             dump_out_json(response)
             break
         elif status != old_status:
             logger.info(f"Task status: {status}")
-            dump_out_json(response)
             old_status = status
 
         time.sleep(interval)
 
 
-def _do_post(url: str, payload: Any) -> tuple[int, str, dict[str, Any]]:
+def _do_post(url: str, payload: Any) -> dict[str, str]:
     logger.debug(f"_do_post() to {url}")
     response = requests.post(url, json=payload)
-
     try:
+        response.raise_for_status()
+    except requests.HTTPError as error:
         data = response.json()
-        message = data.get("message", "")
-        return response.status_code, message, data
-    except Exception as error:
-        logger.error(f"Erroneous response from {url}: {response.text}")
-        raise KnownError(f"Cannot parse response from {url}", error)
+        message = data.get("message", str(error))
+        raise KnownError(f"Cannot verify contract: {message}", error)
+
+    return response.json()
 
 
-def _do_get(url: str) -> tuple[int, str, dict[str, Any]]:
+def _do_get(url: str) -> requests.Response:
     logger.debug(f"_do_get() from {url}")
     response = requests.get(url)
-
-    try:
-        data = response.json()
-        message = data.get("message", "")
-        return response.status_code, message, data
-    except Exception as error:
-        logger.error(f"Erroneous response from {url}: {response.text}")
-        raise KnownError(f"Cannot parse response from {url}", error)
+    return response
