@@ -146,6 +146,7 @@ def query_status_with_task_id(url: str, task_id: str, interval: int = 10):
 def _do_post(url: str, payload: Any) -> tuple[int, str, dict[str, Any]]:
     logger.debug(f"_do_post() to {url}")
     response = requests.post(url, json=payload)
+    response.raise_for_status()
 
     try:
         data = response.json()
@@ -159,6 +160,7 @@ def _do_post(url: str, payload: Any) -> tuple[int, str, dict[str, Any]]:
 def _do_get(url: str) -> tuple[int, str, dict[str, Any]]:
     logger.debug(f"_do_get() from {url}")
     response = requests.get(url)
+    response.raise_for_status()
 
     try:
         data = response.json()

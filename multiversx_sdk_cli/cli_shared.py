@@ -361,6 +361,7 @@ def add_wait_result_and_timeout_args(sub: Any):
     )
     sub.add_argument(
         "--timeout",
+        type=int,
         default=100,
         help="max num of seconds to wait for result" " - only valid if --wait-result is set",
     )
@@ -812,6 +813,12 @@ def prepare_token_transfers(transfers: list[str]) -> list[TokenTransfer]:
     """Converts a list of token transfers as received from the CLI to a list of TokenTransfer objects."""
     token_computer = TokenComputer()
     token_transfers: list[TokenTransfer] = []
+
+    if len(transfers) % 2 != 0:
+        raise ArgumentsNotProvidedError(
+            "Invalid number of arguments for token transfers. "
+            "Expected pairs of [token, amount], but got an odd number of arguments."
+        )
 
     for i in range(0, len(transfers) - 1, 2):
         extended_identifier = transfers[i]

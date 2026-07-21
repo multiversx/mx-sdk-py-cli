@@ -202,7 +202,7 @@ def get_network_config(args: Any):
 
 def get_network_status(args: Any):
     proxy = _get_proxy(args)
-    status = proxy.get_network_status()
+    status = proxy.get_network_status(args.shard)
 
     dump_out_json(status.raw)
 

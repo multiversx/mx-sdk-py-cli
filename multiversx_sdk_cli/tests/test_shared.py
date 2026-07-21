@@ -1,7 +1,9 @@
+import pytest
 from multiversx_sdk import Address
 
 from multiversx_sdk_cli.args_converter import convert_args_to_typed_values
 from multiversx_sdk_cli.cli_shared import prepare_token_transfers
+from multiversx_sdk_cli.errors import ArgumentsNotProvidedError
 
 
 def test_prepare_token_tranfers():
@@ -36,6 +38,17 @@ def test_prepare_token_tranfers():
     assert transfers[3].amount == 123456789
 
 
+def test_prepare_invalid_token_tranfers():
+    # list of token transfers as interpreted by the CLI
+    token_transfers = [
+        "FNG-123456",
+        "10000",
+        "SFT-123123-0a",
+    ]
+    with pytest.raises(ArgumentsNotProvidedError):
+        prepare_token_transfers(token_transfers)
+
+
 def test_prepare_args_for_factories():
     args = [
         "0x5",
@@ -43,7 +56,7 @@ def test_prepare_args_for_factories():
         "false",
         "true",
         "str:test-string",
-        "erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th",
+        "addr:erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th",
     ]
 
     arguments = convert_args_to_typed_values(args)
