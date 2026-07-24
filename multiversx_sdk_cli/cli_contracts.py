@@ -592,6 +592,7 @@ def unverify(args: Any) -> None:
 
     headers = {"Content-type": "application/json"}
     response = requests.delete(verifier_url, json=request_payload, headers=headers)
+    response.raise_for_status()
     logger.info(f"Your request to unverify contract {contract} was submitted.")
     print(response.json().get("message"))
 

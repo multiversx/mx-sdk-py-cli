@@ -206,6 +206,9 @@ def sign_transaction(args: Any):
         if tx.guardian and not tx_computer.has_options_set_for_guarded_transaction(tx):
             raise BadUsage("Guardian wallet provided but the transaction has incorrect options")
 
+    if not sender and not guardian and not relayer:
+        raise NoWalletProvided()
+
     guardian_and_relayer = GuardianRelayerData(
         guardian=guardian,
         guardian_address=tx.guardian,

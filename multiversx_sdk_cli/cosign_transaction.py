@@ -1,5 +1,3 @@
-from typing import Any
-
 import requests
 from multiversx_sdk import Transaction
 
@@ -15,15 +13,11 @@ def cosign_transaction(transaction: Transaction, service_url: str, guardian_code
     # we call sign-multiple-transactions to be allowed a bigger payload (e.g. deploying large contracts)
     url = f"{service_url}/sign-multiple-transactions"
     response = requests.post(url, json=payload)
-    check_for_guardian_error(response.json())
+    try:
+        response.raise_for_status()
+    except requests.exceptions.HTTPError as e:
+        raise GuardianServiceError(f"Guardian service returned an error: {str(e)}")
 
     # we only send 1 transaction
     tx_as_dict = response.json()["data"]["transactions"][0]
     transaction.guardian_signature = bytes.fromhex(tx_as_dict["guardianSignature"])
-
-
-def check_for_guardian_error(response: dict[str, Any]):
-    error = response["error"]
-
-    if error:
-        raise GuardianServiceError(error)

@@ -37,7 +37,7 @@ def setup_parser(args: list[str], subparsers: Any) -> Any:
     cli_shared.add_tx_args(args, sub, with_receiver=False, with_data=False)
     cli_shared.add_guardian_wallet_args(args, sub)
     cli_shared.add_relayed_v3_wallet_args(args, sub)
-    sub.add_argument("--name", help="the name to register")
+    sub.add_argument("--name", required=True, help="the name to register")
     sub.set_defaults(func=register)
 
     sub = cli_shared.add_command_subparser(subparsers, "dns", "resolve", "Find the address for a name")

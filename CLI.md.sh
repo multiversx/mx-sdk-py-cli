@@ -122,6 +122,7 @@ generate() {
     command "Configuration.New" "config new"
     command "Configuration.Switch" "config switch"
     command "Configuration.List" "config list"
+    command "Configuration.Delete" "config delete"
     command "Configuration.Reset" "config reset"
 
     group "Data" "data"
@@ -184,6 +185,7 @@ generate() {
     command "Governance.GetVotingPower" "governance get-voting-power"
     command "Governance.GetConfig" "governance get-config"
     command "Governance.GetDelegatedVoteInfo" "governance get-delegated-vote-info"
+    command "Governance.GetProposal" "governance get-proposal"
 
     group "ConfigEnv" "config-env"
     command "ConfigEnv.New" "config-env new"
@@ -192,6 +194,7 @@ generate() {
     command "ConfigEnv.Dump" "config-env dump"
     command "ConfigEnv.Switch" "config-env switch"
     command "ConfigEnv.List" "config-env list"
+    command "ConfigEnv.Delete" "config-env delete"
     command "ConfigEnv.Remove" "config-env remove"
     command "ConfigEnv.Reset" "config-env reset"
 
@@ -212,10 +215,13 @@ generate() {
     command "Get.StorageEntry" "get storage-entry"
     command "Get.Token" "get token"
     command "Get.Transaction" "get transaction"
+    command "Get.NetworkConfig" "get network-config"
+    command "Get.NetworkStatus" "get network-status"
 
     group "Token" "token"
     command "Token.IssueFungbile" "token issue-fungible"
     command "Token.IssueNonFungbile" "token issue-non-fungible"
+    command "Token.IssueSemiFungible" "token issue-semi-fungible"
     command "Token.RegisterMetaEsdt" "token register-meta-esdt"
     command "Token.RegisterAndSetAllRoles" "token register-and-set-all-roles"
     command "Token.SetBurnRoleGlobally" "token set-burn-role-globally"
@@ -256,6 +262,17 @@ generate() {
     command "Token.StopNftCreation" "token stop-nft-creation"
     command "Token.WipeSingleNft" "token wipe-single-nft"
     command "Token.AddUris" "token add-uris"
+
+    group "Dns" "dns"
+    command "Dns.DnsAddressForName" "dns dns-address-for-name"
+    command "Dns.DnsAddressForNameHex" "dns dns-address-for-name-hex"
+    command "Dns.DnsAddresses" "dns dns-addresses"
+    command "Dns.NameHash" "dns name-hash"
+    command "Dns.Register" "dns register"
+    command "Dns.RegistrationCost" "dns registration-cost"
+    command "Dns.Resolve" "dns resolve"
+    command "Dns.ValidateName" "dns validate-name"
+    command "Dns.Version" "dns version"
 }
 
 generate

@@ -3057,6 +3057,22 @@ options:
   -h, --help  show this help message and exit
 
 ```
+### Configuration.Delete
+
+
+```
+$ mxpy config delete --help
+usage: mxpy config delete [-h] ...
+
+Deletes a configuration value from the active configuration.
+
+positional arguments:
+  name        the name of the configuration entry
+
+options:
+  -h, --help  show this help message and exit
+
+```
 ### Configuration.Reset
 
 
@@ -5846,6 +5862,35 @@ options:
   --proxy-headers KEY=VALUE [KEY=VALUE ...]  custom HTTP headers for proxy requests, e.g. 'Api-Key=mytoken'
 
 ```
+### Governance.GetProposal
+
+
+```
+$ mxpy governance get-proposal --help
+usage: mxpy governance get-proposal [-h] ...
+
+Get info about a proposal.
+
+Output example:
+===============
+{
+    "emittedTransaction": {
+        "nonce": 42,
+        "sender": "alice",
+        "receiver": "bob",
+        "...": "..."
+    },
+    "emittedTransactionData": "the transaction data, not encoded",
+    "emittedTransactionHash": "the transaction hash"
+}
+
+options:
+  -h, --help                                 show this help message and exit
+  --proposal-nonce PROPOSAL_NONCE            the nonce of the proposal
+  --proxy PROXY                              🔗 the URL of the proxy
+  --proxy-headers KEY=VALUE [KEY=VALUE ...]  custom HTTP headers for proxy requests, e.g. 'Api-Key=mytoken'
+
+```
 ## Group **ConfigEnv**
 
 
@@ -5966,6 +6011,23 @@ List available environments
 
 options:
   -h, --help  show this help message and exit
+
+```
+### ConfigEnv.Delete
+
+
+```
+$ mxpy config-env delete --help
+usage: mxpy config-env delete [-h] ...
+
+Deletes an env value from the specified environment.
+
+positional arguments:
+  name        the name of the configuration entry
+
+options:
+  -h, --help  show this help message and exit
+  --env ENV   the name of the environment to operate on
 
 ```
 ### ConfigEnv.Remove
@@ -6275,6 +6337,37 @@ options:
   --hash HASH                                the transaction hash
 
 ```
+### Get.NetworkConfig
+
+
+```
+$ mxpy get network-config --help
+usage: mxpy get network-config [-h] ...
+
+Get the network configuration.
+
+options:
+  -h, --help                                 show this help message and exit
+  --proxy PROXY                              🔗 the URL of the proxy
+  --proxy-headers KEY=VALUE [KEY=VALUE ...]  custom HTTP headers for proxy requests, e.g. 'Api-Key=mytoken'
+
+```
+### Get.NetworkStatus
+
+
+```
+$ mxpy get network-status --help
+usage: mxpy get network-status [-h] ...
+
+Get the network status.
+
+options:
+  -h, --help                                 show this help message and exit
+  --proxy PROXY                              🔗 the URL of the proxy
+  --proxy-headers KEY=VALUE [KEY=VALUE ...]  custom HTTP headers for proxy requests, e.g. 'Api-Key=mytoken'
+  --shard {0,1,2,4294967295}                 the shard to get the status for (default: 4294967295, which is methachain)
+
+```
 ## Group **Token**
 
 
@@ -6416,6 +6509,75 @@ $ mxpy token issue-non-fungible --help
 usage: mxpy token issue-non-fungible [-h] ...
 
 Issue a new non-fungible ESDT token (NFT).
+
+options:
+  -h, --help                                     show this help message and exit
+  --token-name TOKEN_NAME                        the name of the token to be issued: 3-20 alphanumerical characters
+  --token-ticker TOKEN_TICKER                    the ticker of the token to be issued: 3-10 UPPERCASE alphanumerical
+                                                 characters
+  --cannot-freeze                                make token not freezable
+  --cannot-wipe                                  make token not wipeable
+  --cannot-pause                                 make token not pausable
+  --cannot-change-owner                          don't allow changing the token's owner
+  --cannot-upgrade                               don't allow upgrading the token
+  --cannot-add-special-roles                     don't allow special roles to be added for the token
+  --cannot-transfer-nft-create-role              don't allow for nft create roles to be transferred for the token
+  --sender SENDER                                the alias of the wallet set in the address config
+  --pem PEM                                      🔑 the PEM file, if keyfile not provided
+  --keyfile KEYFILE                              🔑 a JSON keyfile, if PEM not provided
+  --passfile PASSFILE                            DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
+  --ledger                                       🔐 bool flag for signing transaction using ledger
+  --sender-wallet-index SENDER_WALLET_INDEX      🔑 the address index; can be used for PEM files, keyfiles of type
+                                                 mnemonic or Ledger devices (default: 0)
+  --sender-username SENDER_USERNAME              🖄 the username of the sender
+  --hrp HRP                                      The hrp used to convert the address to its bech32 representation
+  --nonce NONCE                                  # the nonce for the transaction. If not provided, is fetched from the
+                                                 network.
+  --gas-price GAS_PRICE                          ⛽ the gas price (default: 1000000000)
+  --gas-limit GAS_LIMIT                          ⛽ the gas limit
+  --gas-limit-multiplier GAS_LIMIT_MULTIPLIER    if `--gas-limit` is not provided, the estimated value will be
+                                                 multiplied by this multiplier (e.g 1.1)
+  --value VALUE                                  the value to transfer (default: 0)
+  --chain CHAIN                                  the chain identifier
+  --version VERSION                              the transaction version (default: 2)
+  --options OPTIONS                              the transaction options (default: 0)
+  --relayer RELAYER                              the bech32 address of the relayer
+  --guardian GUARDIAN                            the bech32 address of the guardian
+  --proxy PROXY                                  🔗 the URL of the proxy
+  --proxy-headers KEY=VALUE [KEY=VALUE ...]      custom HTTP headers for proxy requests, e.g. 'Api-Key=mytoken'
+  --send                                         ✓ whether to broadcast the transaction (default: False)
+  --simulate                                     whether to simulate the transaction (default: False)
+  --wait-result                                  signal to wait for the transaction result - only valid if --send is set
+  --timeout TIMEOUT                              max num of seconds to wait for result - only valid if --wait-result is
+                                                 set
+  --guardian-service-url GUARDIAN_SERVICE_URL    the url of the guardian service
+  --guardian-2fa-code GUARDIAN_2FA_CODE          the 2fa code for the guardian
+  --guardian-pem GUARDIAN_PEM                    🔑 the PEM file, if keyfile not provided
+  --guardian-keyfile GUARDIAN_KEYFILE            🔑 a JSON keyfile, if PEM not provided
+  --guardian-passfile GUARDIAN_PASSFILE          DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
+  --guardian-ledger                              🔐 bool flag for signing transaction using ledger
+  --guardian-wallet-index GUARDIAN_WALLET_INDEX  🔑 the address index; can be used for PEM files, keyfiles of type
+                                                 mnemonic or Ledger devices (default: 0)
+  --relayer-pem RELAYER_PEM                      🔑 the PEM file, if keyfile not provided
+  --relayer-keyfile RELAYER_KEYFILE              🔑 a JSON keyfile, if PEM not provided
+  --relayer-passfile RELAYER_PASSFILE            DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
+  --relayer-ledger                               🔐 bool flag for signing transaction using ledger
+  --relayer-wallet-index RELAYER_WALLET_INDEX    🔑 the address index; can be used for PEM files, keyfiles of type
+                                                 mnemonic or Ledger devices (default: 0)
+  --outfile OUTFILE                              where to save the output (default: stdout)
+
+```
+### Token.IssueSemiFungible
+
+
+```
+$ mxpy token issue-semi-fungible --help
+usage: mxpy token issue-semi-fungible [-h] ...
+
+Issue a new semi-fungible ESDT token.
 
 options:
   -h, --help                                     show this help message and exit
@@ -8998,5 +9160,223 @@ options:
   --relayer-wallet-index RELAYER_WALLET_INDEX    🔑 the address index; can be used for PEM files, keyfiles of type
                                                  mnemonic or Ledger devices (default: 0)
   --outfile OUTFILE                              where to save the output (default: stdout)
+
+```
+## Group **Dns**
+
+
+```
+$ mxpy dns --help
+usage: mxpy dns COMMAND [-h] ...
+
+Operations related to the Domain Name Service
+
+COMMANDS:
+  {register,resolve,validate-name,name-hash,registration-cost,version,dns-addresses,dns-address-for-name,dns-address-for-name-hex}
+
+OPTIONS:
+  -h, --help            show this help message and exit
+
+----------------
+COMMANDS summary
+----------------
+register                       Send a register transaction to the appropriate DNS contract from given user and with given name
+resolve                        Find the address for a name
+validate-name                  Asks one of the DNS contracts to validate a name. Can be useful before registering it.
+name-hash                      The hash of a name, as computed by a DNS smart contract
+registration-cost              Gets the registration cost from a DNS smart contract, by default the one with shard id 0.
+version                        Asks the contract for its version
+dns-addresses                  Lists all 256 DNS contract addresses
+dns-address-for-name           DNS contract address (bech32) that corresponds to a name
+dns-address-for-name-hex       DNS contract address (hex) that corresponds to a name
+
+```
+### Dns.DnsAddressForName
+
+
+```
+$ mxpy dns dns-address-for-name --help
+usage: mxpy dns dns-address-for-name [-h] ...
+
+DNS contract address (bech32) that corresponds to a name
+
+positional arguments:
+  name        the name for which to check
+
+options:
+  -h, --help  show this help message and exit
+
+```
+### Dns.DnsAddressForNameHex
+
+
+```
+$ mxpy dns dns-address-for-name-hex --help
+usage: mxpy dns dns-address-for-name-hex [-h] ...
+
+DNS contract address (hex) that corresponds to a name
+
+positional arguments:
+  name        the name for which to check
+
+options:
+  -h, --help  show this help message and exit
+
+```
+### Dns.DnsAddresses
+
+
+```
+$ mxpy dns dns-addresses --help
+usage: mxpy dns dns-addresses [-h] ...
+
+Lists all 256 DNS contract addresses
+
+options:
+  -h, --help  show this help message and exit
+
+```
+### Dns.NameHash
+
+
+```
+$ mxpy dns name-hash --help
+usage: mxpy dns name-hash [-h] ...
+
+The hash of a name, as computed by a DNS smart contract
+
+positional arguments:
+  name        the name for which to check
+
+options:
+  -h, --help  show this help message and exit
+
+```
+### Dns.Register
+
+
+```
+$ mxpy dns register --help
+usage: mxpy dns register [-h] ...
+
+Send a register transaction to the appropriate DNS contract from given user and with given name
+
+options:
+  -h, --help                                     show this help message and exit
+  --outfile OUTFILE                              where to save the output (default: stdout)
+  --send                                         ✓ whether to broadcast the transaction (default: False)
+  --simulate                                     whether to simulate the transaction (default: False)
+  --sender SENDER                                the alias of the wallet set in the address config
+  --pem PEM                                      🔑 the PEM file, if keyfile not provided
+  --keyfile KEYFILE                              🔑 a JSON keyfile, if PEM not provided
+  --passfile PASSFILE                            DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
+  --ledger                                       🔐 bool flag for signing transaction using ledger
+  --sender-wallet-index SENDER_WALLET_INDEX      🔑 the address index; can be used for PEM files, keyfiles of type
+                                                 mnemonic or Ledger devices (default: 0)
+  --sender-username SENDER_USERNAME              🖄 the username of the sender
+  --hrp HRP                                      The hrp used to convert the address to its bech32 representation
+  --proxy PROXY                                  🔗 the URL of the proxy
+  --proxy-headers KEY=VALUE [KEY=VALUE ...]      custom HTTP headers for proxy requests, e.g. 'Api-Key=mytoken'
+  --nonce NONCE                                  # the nonce for the transaction. If not provided, is fetched from the
+                                                 network.
+  --gas-price GAS_PRICE                          ⛽ the gas price (default: 1000000000)
+  --gas-limit GAS_LIMIT                          ⛽ the gas limit
+  --gas-limit-multiplier GAS_LIMIT_MULTIPLIER    if `--gas-limit` is not provided, the estimated value will be
+                                                 multiplied by this multiplier (e.g 1.1)
+  --value VALUE                                  the value to transfer (default: 0)
+  --chain CHAIN                                  the chain identifier
+  --version VERSION                              the transaction version (default: 2)
+  --options OPTIONS                              the transaction options (default: 0)
+  --relayer RELAYER                              the bech32 address of the relayer
+  --guardian GUARDIAN                            the bech32 address of the guardian
+  --guardian-service-url GUARDIAN_SERVICE_URL    the url of the guardian service
+  --guardian-2fa-code GUARDIAN_2FA_CODE          the 2fa code for the guardian
+  --guardian-pem GUARDIAN_PEM                    🔑 the PEM file, if keyfile not provided
+  --guardian-keyfile GUARDIAN_KEYFILE            🔑 a JSON keyfile, if PEM not provided
+  --guardian-passfile GUARDIAN_PASSFILE          DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
+  --guardian-ledger                              🔐 bool flag for signing transaction using ledger
+  --guardian-wallet-index GUARDIAN_WALLET_INDEX  🔑 the address index; can be used for PEM files, keyfiles of type
+                                                 mnemonic or Ledger devices (default: 0)
+  --relayer-pem RELAYER_PEM                      🔑 the PEM file, if keyfile not provided
+  --relayer-keyfile RELAYER_KEYFILE              🔑 a JSON keyfile, if PEM not provided
+  --relayer-passfile RELAYER_PASSFILE            DEPRECATED, do not use it anymore. Instead, you'll be prompted to enter
+                                                 the password.
+  --relayer-ledger                               🔐 bool flag for signing transaction using ledger
+  --relayer-wallet-index RELAYER_WALLET_INDEX    🔑 the address index; can be used for PEM files, keyfiles of type
+                                                 mnemonic or Ledger devices (default: 0)
+  --name NAME                                    the name to register
+
+```
+### Dns.RegistrationCost
+
+
+```
+$ mxpy dns registration-cost --help
+usage: mxpy dns registration-cost [-h] ...
+
+Gets the registration cost from a DNS smart contract, by default the one with shard id 0.
+
+options:
+  -h, --help                                 show this help message and exit
+  --shard-id SHARD_ID                        shard id of the contract to call (default: 0)
+  --proxy PROXY                              🔗 the URL of the proxy
+  --proxy-headers KEY=VALUE [KEY=VALUE ...]  custom HTTP headers for proxy requests, e.g. 'Api-Key=mytoken'
+
+```
+### Dns.Resolve
+
+
+```
+$ mxpy dns resolve --help
+usage: mxpy dns resolve [-h] ...
+
+Find the address for a name
+
+positional arguments:
+  name                                       the name for which to check
+
+options:
+  -h, --help                                 show this help message and exit
+  --proxy PROXY                              🔗 the URL of the proxy
+  --proxy-headers KEY=VALUE [KEY=VALUE ...]  custom HTTP headers for proxy requests, e.g. 'Api-Key=mytoken'
+
+```
+### Dns.ValidateName
+
+
+```
+$ mxpy dns validate-name --help
+usage: mxpy dns validate-name [-h] ...
+
+Asks one of the DNS contracts to validate a name. Can be useful before registering it.
+
+positional arguments:
+  name                                       the name for which to check
+
+options:
+  -h, --help                                 show this help message and exit
+  --shard-id SHARD_ID                        shard id of the contract to call (default: 0)
+  --proxy PROXY                              🔗 the URL of the proxy
+  --proxy-headers KEY=VALUE [KEY=VALUE ...]  custom HTTP headers for proxy requests, e.g. 'Api-Key=mytoken'
+
+```
+### Dns.Version
+
+
+```
+$ mxpy dns version --help
+usage: mxpy dns version [-h] ...
+
+Asks the contract for its version
+
+options:
+  -h, --help                                 show this help message and exit
+  --shard-id SHARD_ID                        shard id of the contract to call (default: 0)
+  --all                                      prints a list of all DNS contracts and their current versions (default:
+                                             False)
+  --proxy PROXY                              🔗 the URL of the proxy
+  --proxy-headers KEY=VALUE [KEY=VALUE ...]  custom HTTP headers for proxy requests, e.g. 'Api-Key=mytoken'
 
 ```
