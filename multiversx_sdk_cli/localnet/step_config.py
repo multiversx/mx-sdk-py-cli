@@ -112,7 +112,7 @@ def patch_node_config(config: ConfigRoot):
         enable_rounds_config_data = utils.read_toml_file(enable_rounds_config_file)
         genesis_smart_contracts_data = utils.read_json_file(genesis_smart_contracts_file)
 
-        node_config_toml.patch_config(node_config_data, config, enable_epochs_config_data)
+        node_config_toml.patch_config(node_config_data, config, enable_epochs_config_data, enable_rounds_config_data)
         node_config_toml.patch_api(api_config_data, config)
         node_config_toml.patch_enable_epochs(enable_epochs_config_data, config)
         node_config_toml.patch_enable_rounds(enable_rounds_config_data, config, enable_epochs_config_data)

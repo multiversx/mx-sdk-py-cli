@@ -1,4 +1,4 @@
-from typing import Any, Dict
+from typing import Any, Dict, Optional
 
 from multiversx_sdk_cli.localnet.config_root import ConfigRoot
 from multiversx_sdk_cli.localnet.constants import (
@@ -10,7 +10,16 @@ from multiversx_sdk_cli.localnet.nodes_setup_json import CHAIN_ID
 ConfigDict = Dict[str, Any]
 
 
-def patch_config(data: ConfigDict, config: ConfigRoot, enable_epochs_config: ConfigDict):
+def patch_config(
+    data: ConfigDict,
+    config: ConfigRoot,
+    enable_epochs_config: ConfigDict,
+    enable_rounds_config: ConfigDict,
+):
+    """
+    Note: "enable_rounds_config" must be the original (not yet patched) "enableRounds.toml",
+    so that we can detect the default (upstream) Supernova activation round.
+    """
     supernova_activation_epoch = enable_epochs_config["EnableEpochs"].get("SupernovaEnableEpoch", None)
 
     data["GeneralSettings"]["ChainID"] = CHAIN_ID
@@ -77,6 +86,26 @@ def patch_config(data: ConfigDict, config: ConfigRoot, enable_epochs_config: Con
         if enable_epoch == supernova_activation_epoch:
             item["StartRound"] = _compute_supernova_activation_round(config, supernova_activation_epoch)
 
+    # Adjust the "*ByRound" configs: entries defined (upstream) at the default Supernova activation round
+    # must be moved to the (localnet-specific) computed Supernova activation round.
+    # Otherwise, the node fails with "supernova activation configs mismatch".
+    default_supernova_activation_round = _get_supernova_activation_round(enable_rounds_config)
+
+    if supernova_activation_epoch is not None and default_supernova_activation_round is not None:
+        supernova_activation_round = _compute_supernova_activation_round(config, supernova_activation_epoch)
+
+        configs_by_round = [
+            (data["GeneralSettings"].get("ProcessConfigsByRound", []), "EnableRound"),
+            (data["GeneralSettings"].get("EpochStartConfigsByRound", []), "EnableRound"),
+            (data["GeneralSettings"].get("ConsensusConfigsByRound", []), "EnableRound"),
+            (data.get("Antiflood", {}).get("ConfigsByRound", []), "Round"),
+        ]
+
+        for items, round_key in configs_by_round:
+            for item in items:
+                if int(item.get(round_key, 0)) == default_supernova_activation_round:
+                    item[round_key] = supernova_activation_round
+
 
 def patch_api(data: ConfigDict, config: ConfigRoot):
     routes = data["APIPackages"]["transaction"]["Routes"]
@@ -119,6 +148,13 @@ def patch_enable_rounds(data: ConfigDict, config: ConfigRoot, enable_epochs_conf
     if supernova_entry and supernova_activation_epoch is not None:
         supernova_computed_activation_round = _compute_supernova_activation_round(config, supernova_activation_epoch)
         supernova_entry["Round"] = str(supernova_computed_activation_round)
+
+
+def _get_supernova_activation_round(enable_rounds_config: ConfigDict) -> Optional[int]:
+    supernova_entry = enable_rounds_config.get("RoundActivations", {}).get("SupernovaEnableRound")
+    if not supernova_entry:
+        return None
+    return int(supernova_entry["Round"])
 
 
 def _compute_supernova_activation_round(config: ConfigRoot, supernova_activation_epoch: int) -> int:
